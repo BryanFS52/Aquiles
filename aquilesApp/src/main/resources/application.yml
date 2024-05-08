@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: aquilesApp
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/Aquiles1
+    username: postgres
+    password: "fabrica2024*"
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+  main:
+    allow-circular-references: true
