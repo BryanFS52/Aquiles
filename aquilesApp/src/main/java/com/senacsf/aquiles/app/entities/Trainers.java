@@ -33,5 +33,5 @@ public class Trainers {
     private Set<Attendances> attendanceSet;
 
     @OneToMany (mappedBy = "fk_trainer_id" , fetch = FetchType.LAZY , cascade = CascadeType.ALL)
-    private Set<Juies> jurieSet;
+    private Set<Juries> jurieSet;
 }

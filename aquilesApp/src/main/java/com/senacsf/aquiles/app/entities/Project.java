@@ -30,7 +30,7 @@ public class Project implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_team_scrum_id", nullable = false)
-    private Team_Scrum teamScrum;
+    private Teams_scrum fk_team_scrum_id;
 
     @Column(name = "justification", nullable = false, length = 255)
     private String justification;
