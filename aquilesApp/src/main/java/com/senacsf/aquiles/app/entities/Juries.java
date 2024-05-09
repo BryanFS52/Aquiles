@@ -19,10 +19,7 @@ public class Juries implements Serializable {
     @Column(name = "jury_id", nullable = false)
     private Long juryId;
 
-    @Column(name = "fk_trainer_id", nullable = false)
-    private Long trainerId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_trainer_id", nullable = false)
-    private Set<Trainers> trainers;
+    private Trainers fk_trainer_id;
 }
