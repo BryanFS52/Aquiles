@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Set;
 
@@ -13,7 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "trainers")
-public class Trainers {
+public class Trainers implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
