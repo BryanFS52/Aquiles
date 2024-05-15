@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -38,6 +39,6 @@ public class ChecklistSubstantiationList implements Serializable {
     @JoinColumn(name = "fk_project_id", nullable = false)
     private Project project;
 
-    @OneToMany(mappedBy = "checklistSubstantiationList", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<JuriesChecklistSubstantiationList> juriesChecklistSubstantiationList;
+    @ManyToMany(mappedBy = "list_checklistSubstantiationLists", cascade = CascadeType.PERSIST)
+        private List<Juries> juries;
 }

@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 
 @NoArgsConstructor
 @Entity
@@ -24,4 +25,7 @@ public class DiarySustainations implements Serializable {
 
     @Column(name = "place", length = 255)
     private String place;
+
+    @ManyToMany(mappedBy = "list_DiarySustainations", cascade = CascadeType.PERSIST)
+    private List<Juries> juries;
 }
