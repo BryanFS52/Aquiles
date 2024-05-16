@@ -34,6 +34,11 @@ public class ExcusesService implements Idao<Excuses, Long> {
     }
 
     @Override
+    public void create(Excuses obje){
+        this.excusesRepository.save(obje);
+    }
+
+    @Override
     public void delete(Excuses obje){
         this.excusesRepository.delete(obje);
     }

@@ -32,7 +32,7 @@ public class Teams_scrumService implements Idao<Teams_scrum, Long> {
     }
 
     @Override
-    public void save(Teams_scrum obje) {
+    public void create(Teams_scrum obje) {
         this.teamsScrumRepository.save(obje);
 
     }

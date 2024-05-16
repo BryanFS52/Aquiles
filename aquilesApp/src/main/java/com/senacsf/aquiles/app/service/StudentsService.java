@@ -36,6 +36,11 @@ public class StudentsService implements Idao<Students, Long> {
     }
 
     @Override
+    public void create(Students obje) {
+        this.studentsRepository.save(obje);
+    }
+
+    @Override
     public void delete(Students obje) {
         this.studentsRepository.delete(obje);
     }

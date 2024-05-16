@@ -35,6 +35,11 @@ public class JuriesService implements Idao<Juries, Long> {
     }
 
     @Override
+    public void create(Juries obje) {
+        this.juriesRepository.save(obje);
+    }
+
+    @Override
     public void delete(Juries obje) {
         this.juriesRepository.delete(obje);
     }

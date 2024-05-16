@@ -38,6 +38,11 @@ public class Follow_upsService implements Idao<Follow_ups,Long> {
     }
 
     @Override
+    public void create(Follow_ups obje){
+        this.followUpsRepository.save(obje);
+    }
+
+    @Override
     public void delete(Follow_ups obje){
         this.followUpsRepository.delete(obje);
     }
