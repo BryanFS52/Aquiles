@@ -55,11 +55,12 @@ public class TeamsScrumBusiness {
         try {
             // Verificar si el nombre del proyecto ya existe
             String nameProject = teamsScrumDto.getNameProject();
-            Teams_scrum existingProject = teamsScrumService.findByNameProject(nameProject);
+            Teams_scrum existingProject = teamsScrumService.findByName_project(nameProject);
             if (existingProject != null) {
-                // Si el proyecto ya existe, lanzar una excepción
-                throw new CustomException("The project with a name" + nameProject + " already exists.");
+                // Si el proyecto ya existe, lanzar una excepción o manejar este caso según la lógica de tu aplicación
+                throw new CustomException("The project with a name " + nameProject + " already exists.");
             }
+
             // Mapear el DTO a la entidad Teams_scrum
             Teams_scrum teamsScrum = modelMapper.map(teamsScrumDto, Teams_scrum.class);
             // Guardar el nuevo registro
@@ -68,7 +69,6 @@ public class TeamsScrumBusiness {
             throw new CustomException("Error saving teams scrum");
         }
     }
-
 
     public void delete(Long teamScrumId) {
         try {

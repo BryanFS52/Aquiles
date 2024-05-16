@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.swing.*;
 import java.io.Serializable;
 
 @NoArgsConstructor
@@ -22,13 +21,13 @@ public class Follow_ups implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column (name = "follow_up_id", nullable = false)
+    @Column(name = "follow_up_id", nullable = false)
     private Long follow_up_id;
 
-    @Column (name = "state", nullable = false)
+    @Column(name = "state", nullable = false)
     private Enum_State_Follow_Up state;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_idStudent",referencedColumnName = "student_id")
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_idStudent", referencedColumnName = "student_id")
     private Students fk_idStudent;
 }

@@ -18,7 +18,7 @@ public class Trainers implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column (name = "trainer_id", nullable = false)
+    @Column(name = "trainer_id", nullable = false)
     private Long trainer_id;
 
     @Column(name = "triner_state", nullable = false)
@@ -30,9 +30,9 @@ public class Trainers implements Serializable {
     @Column(name = "document_number", nullable = false)
     private BigInteger document_number;
 
-    @OneToMany (mappedBy = "fk_trainer_id" , fetch = FetchType.LAZY , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "fk_trainer_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Attendances> attendanceSet;
 
-    @OneToMany (mappedBy = "fk_trainer_id" , fetch = FetchType.LAZY , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "fk_trainer_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Juries> jurieSet;
 }

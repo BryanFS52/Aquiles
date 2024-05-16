@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TeamsScrumDto {
 
-    private Long teamScrumId;
+    private Long team_scrum_id;
 
     private String nameProject;
 }

@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
 
 @NoArgsConstructor
 @Entity
@@ -24,16 +23,16 @@ public class Juries implements Serializable {
     @JoinColumn(name = "fk_trainer_id", nullable = false)
     private Trainers fk_trainer_id;
 
-    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JoinTable(name = "juries_checklist_substantiation_list",joinColumns = @JoinColumn(name = "fk_check_list_id",nullable = false),
-        inverseJoinColumns = @JoinColumn(name = "fk_jury_id",nullable = false)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "juries_checklist_substantiation_list", joinColumns = @JoinColumn(name = "fk_check_list_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "fk_jury_id", nullable = false)
     )
 
     private List<ChecklistSubstantiationList> list_checklistSubstantiationLists;
 
-    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JoinTable(name = "juries_diary_sustainations",joinColumns = @JoinColumn(name = "fk_diary_id",nullable = false),
-            inverseJoinColumns = @JoinColumn(name = "fk_jury_id",nullable = false)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "juries_diary_sustainations", joinColumns = @JoinColumn(name = "fk_diary_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "fk_jury_id", nullable = false)
     )
 
     private List<DiarySustainations> list_DiarySustainations;

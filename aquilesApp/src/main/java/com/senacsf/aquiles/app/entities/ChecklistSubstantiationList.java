@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
 
 @NoArgsConstructor
 @Entity
@@ -40,5 +39,5 @@ public class ChecklistSubstantiationList implements Serializable {
     private Project project;
 
     @ManyToMany(mappedBy = "list_checklistSubstantiationLists", cascade = CascadeType.PERSIST)
-        private List<Juries> juries;
+    private List<Juries> juries;
 }

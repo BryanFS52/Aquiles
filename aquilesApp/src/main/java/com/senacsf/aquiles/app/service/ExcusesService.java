@@ -1,6 +1,5 @@
 package com.senacsf.aquiles.app.service;
 
-import com.senacsf.aquiles.app.entities.DiarySustainations;
 import com.senacsf.aquiles.app.entities.Excuses;
 import com.senacsf.aquiles.app.repository.ExcusesRepository;
 import com.senacsf.aquiles.app.service.dao.Idao;
@@ -14,7 +13,7 @@ public class ExcusesService implements Idao<Excuses, Long> {
     ExcusesRepository excusesRepository;
 
     @Override
-    public List<Excuses> findAll(){
+    public List<Excuses> findAll() {
         return List.of();
     }
 
@@ -29,17 +28,17 @@ public class ExcusesService implements Idao<Excuses, Long> {
     }
 
     @Override
-    public void save(Excuses obje){
+    public void save(Excuses obje) {
         this.excusesRepository.save(obje);
     }
 
     @Override
-    public void create(Excuses obje){
+    public void create(Excuses obje) {
         this.excusesRepository.save(obje);
     }
 
     @Override
-    public void delete(Excuses obje){
+    public void delete(Excuses obje) {
         this.excusesRepository.delete(obje);
     }
 }

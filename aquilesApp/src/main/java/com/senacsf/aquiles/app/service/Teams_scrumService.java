@@ -6,7 +6,6 @@ import com.senacsf.aquiles.app.service.dao.Idao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 import java.util.List;
 
 @Service
@@ -15,8 +14,8 @@ public class Teams_scrumService implements Idao<Teams_scrum, Long> {
     @Autowired
     Teams_scrumRepository teamsScrumRepository;
 
-    public Teams_scrum findByNameProject(String name_Project) {
-        return teamsScrumRepository.findByNameProject(name_Project);
+    public Teams_scrum findByName_project(String name_project) {
+        return teamsScrumRepository.findByNameProject(name_project);
     }
 
     @Override
@@ -26,7 +25,7 @@ public class Teams_scrumService implements Idao<Teams_scrum, Long> {
 
     @Override
     public Teams_scrum getById(Long aLong) {
-            return null;
+        return null;
     }
 
     @Override

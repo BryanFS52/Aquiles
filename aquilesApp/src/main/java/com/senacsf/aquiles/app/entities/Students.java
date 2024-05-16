@@ -1,13 +1,11 @@
 package com.senacsf.aquiles.app.entities;
 
 import jakarta.persistence.*;
-import jdk.jfr.Timestamp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -19,10 +17,10 @@ public class Students implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column (name = "student_id", nullable = false)
+    @Column(name = "student_id", nullable = false)
     private Long student_id;
 
-    @Column (name = "id_student_sheet", nullable = false)
+    @Column(name = "id_student_sheet", nullable = false)
     private Long id_student_sheet;
 
     @Column(name = "id_state", nullable = false)
@@ -34,13 +32,13 @@ public class Students implements Serializable {
     @Column(name = "document_number", nullable = false)
     private Long document_number;
 
-    @OneToMany (mappedBy = "fk_idStudent" , fetch = FetchType.LAZY , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "fk_idStudent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Attendances> attendanceSet;
 
-    @OneToMany (mappedBy = "fk_idStudent" , fetch = FetchType.LAZY , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "fk_idStudent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Follow_ups> follow_upSet;
 
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_team_scrum_id",referencedColumnName = "team_scrum_id")
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_team_scrum_id", referencedColumnName = "team_scrum_id")
     private Teams_scrum fk_team_scrum_id;
 }

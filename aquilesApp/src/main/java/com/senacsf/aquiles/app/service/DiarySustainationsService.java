@@ -1,6 +1,5 @@
 package com.senacsf.aquiles.app.service;
 
-import com.senacsf.aquiles.app.entities.ChecklistSubstantiationList;
 import com.senacsf.aquiles.app.entities.DiarySustainations;
 import com.senacsf.aquiles.app.repository.DiarySustainationsRepository;
 import com.senacsf.aquiles.app.service.dao.Idao;
@@ -14,7 +13,7 @@ public class DiarySustainationsService implements Idao<DiarySustainations, Long>
     DiarySustainationsRepository diarySustainationsRepository;
 
     @Override
-    public List<DiarySustainations> findAll(){
+    public List<DiarySustainations> findAll() {
         return List.of();
     }
 
@@ -29,17 +28,17 @@ public class DiarySustainationsService implements Idao<DiarySustainations, Long>
     }
 
     @Override
-    public void save(DiarySustainations obje){
+    public void save(DiarySustainations obje) {
         this.diarySustainationsRepository.save(obje);
     }
 
     @Override
-    public void create(DiarySustainations obje){
+    public void create(DiarySustainations obje) {
         this.diarySustainationsRepository.save(obje);
     }
 
     @Override
-    public void delete(DiarySustainations obje){
+    public void delete(DiarySustainations obje) {
         this.diarySustainationsRepository.delete(obje);
     }
 }
