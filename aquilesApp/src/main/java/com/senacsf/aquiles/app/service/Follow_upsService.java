@@ -28,6 +28,11 @@ public class Follow_upsService implements Idao<Follow_ups,Long> {
     }
 
     @Override
+    public void update(Follow_ups obje) {
+        this.followUpsRepository.save(obje);
+    }
+
+    @Override
     public void save(Follow_ups obje){
         this.followUpsRepository.save(obje);
     }

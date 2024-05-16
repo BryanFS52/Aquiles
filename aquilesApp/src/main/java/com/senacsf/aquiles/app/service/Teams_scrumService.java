@@ -25,6 +25,12 @@ public class Teams_scrumService implements Idao<Teams_scrum, Long> {
     public Teams_scrum getById(Long aLong) {
             return null;
     }
+
+    @Override
+    public void update(Teams_scrum obje) {
+        this.teamsScrumRepository.save(obje);
+    }
+
     @Override
     public void save(Teams_scrum obje) {
         this.teamsScrumRepository.save(obje);

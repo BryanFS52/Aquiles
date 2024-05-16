@@ -3,7 +3,7 @@ package com.senacsf.aquiles.app.business;
 import com.senacsf.aquiles.app.dto.TeamsScrumDto;
 import com.senacsf.aquiles.app.entities.Teams_scrum;
 import com.senacsf.aquiles.app.service.Teams_scrumService;
-import com.senacsf.aquiles.app.utilites.CustomException;
+import com.senacsf.aquiles.app.utilities.CustomException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,6 +30,15 @@ public class TeamsScrumBusiness {
             return teamsScrumDtoList;
         } catch (Exception e) {
             throw new CustomException("Error getting teams scrum");
+        }
+    }
+
+    public void update(TeamsScrumDto teamsScrumDto) {
+        try {
+            Teams_scrum teamsScrum = modelMapper.map(teamsScrumDto, Teams_scrum.class);
+            teamsScrumService.save(teamsScrum);
+        } catch (Exception e) {
+            throw new CustomException("Error saving teams scrum");
         }
     }
 

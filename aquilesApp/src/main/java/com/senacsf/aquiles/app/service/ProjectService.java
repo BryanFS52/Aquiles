@@ -25,6 +25,11 @@ public class ProjectService implements Idao<Project, Long> {
     }
 
     @Override
+    public void update(Project obje) {
+        this.projectRepository.save(obje);
+    }
+
+    @Override
     public void save(Project obje) {
         this.projectRepository.save(obje);
     }

@@ -25,6 +25,10 @@ public class AttendancesService implements Idao<Attendances, Long> {
     }
 
     @Override
+    public void update(Attendances obje) {
+        this.attendancesRepository.save(obje);
+    }
+    @Override
     public void save(Attendances obje){
         this.attendancesRepository.save(obje);
     }
