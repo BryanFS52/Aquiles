@@ -20,8 +20,12 @@ public class Teams_scrum implements Serializable {
     @Column (name = "team_scrum_id", nullable = false)
     private Long team_scrum_id;
 
-    @Column(name = "name_project", nullable = false,length = 100)
-    private  String name_project;
+    /*@Column(name = "name_project", nullable = false,length = 100)
+    private  String name_project;*/
+
+    @Column(name = "name_project", nullable = false, length = 100)
+    private  String nameProject;
+
 
     @OneToMany (mappedBy = "fk_team_scrum_id" , fetch = FetchType.LAZY , cascade = CascadeType.ALL)
     private Set<Students> studentSet;

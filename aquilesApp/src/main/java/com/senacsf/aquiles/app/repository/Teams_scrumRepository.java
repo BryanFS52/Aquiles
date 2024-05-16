@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface Teams_scrumRepository extends JpaRepository<Teams_scrum, Long> {
+
+    // Método para buscar un proyecto por nombre de proyecto
+    Teams_scrum findByNameProject(String name_Project);
 }

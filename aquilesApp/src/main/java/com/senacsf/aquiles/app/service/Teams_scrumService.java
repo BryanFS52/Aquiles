@@ -15,6 +15,9 @@ public class Teams_scrumService implements Idao<Teams_scrum, Long> {
     @Autowired
     Teams_scrumRepository teamsScrumRepository;
 
+    public Teams_scrum findByNameProject(String name_Project) {
+        return teamsScrumRepository.findByNameProject(name_Project);
+    }
 
     @Override
     public List<Teams_scrum> findAll() {
@@ -29,6 +32,12 @@ public class Teams_scrumService implements Idao<Teams_scrum, Long> {
     @Override
     public void update(Teams_scrum obje) {
         this.teamsScrumRepository.save(obje);
+    }
+
+    @Override
+    public void save(Teams_scrum obje) {
+        this.teamsScrumRepository.save(obje);
+
     }
 
     @Override
