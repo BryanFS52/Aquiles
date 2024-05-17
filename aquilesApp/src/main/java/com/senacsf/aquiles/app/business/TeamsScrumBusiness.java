@@ -71,13 +71,12 @@ public class TeamsScrumBusiness { // Define una clase de negocio para manejar op
             if (existingProject != null) {
                 throw new CustomException("The project with a name " + nameProject + " already exists."); // Lanzar una excepción si el proyecto ya existe
             }
-
             // Mapear el DTO a la entidad Teams_scrum
             Teams_scrum teamsScrum = modelMapper.map(teamsScrumDto, Teams_scrum.class);
             // Guardar el nuevo equipo scrum usando el servicio
             teamsScrumService.save(teamsScrum);
         } catch (Exception e) {
-            throw new CustomException("Error saving teams scrum"); // Lanzar una excepción personalizada en caso de error
+            throw new CustomException("Error al guardar"); // Lanzar una excepción personalizada en caso de error
         }
     }
 
