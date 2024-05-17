@@ -25,23 +25,23 @@ public class ChecklistSubstantationListService implements Idao<ChecklistSubstant
     }
 
     @Override
-    public void update(ChecklistSubstantiationList obje) {
-        this.checklistSubstantiationListRepository.save(obje);
+    public void update(ChecklistSubstantiationList entity) {
+        this.checklistSubstantiationListRepository.save(entity);
     }
 
     @Override
-    public void save(ChecklistSubstantiationList obje) {
-        this.checklistSubstantiationListRepository.save(obje);
+    public ChecklistSubstantiationList save(ChecklistSubstantiationList entity) {
+        return this.checklistSubstantiationListRepository.save(entity);
     }
 
     @Override
-    public void create(ChecklistSubstantiationList obje) {
-        this.checklistSubstantiationListRepository.save(obje);
+    public void create(ChecklistSubstantiationList entity) {
+        this.checklistSubstantiationListRepository.save(entity);
     }
 
     @Override
-    public void delete(ChecklistSubstantiationList obje) {
-        this.checklistSubstantiationListRepository.delete(obje);
+    public void delete(ChecklistSubstantiationList entity) {
+        this.checklistSubstantiationListRepository.delete(entity);
     }
 
 

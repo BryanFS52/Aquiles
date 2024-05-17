@@ -27,22 +27,22 @@ public class Follow_upsService implements Idao<Follow_ups, Long> {
     }
 
     @Override
-    public void update(Follow_ups obje) {
-        this.followUpsRepository.save(obje);
+    public void update(Follow_ups entity) {
+        this.followUpsRepository.save(entity);
     }
 
     @Override
-    public void save(Follow_ups obje) {
-        this.followUpsRepository.save(obje);
+    public Follow_ups save(Follow_ups entity) {
+        return this.followUpsRepository.save(entity);
     }
 
     @Override
-    public void create(Follow_ups obje) {
-        this.followUpsRepository.save(obje);
+    public void create(Follow_ups entity) {
+        this.followUpsRepository.save(entity);
     }
 
     @Override
-    public void delete(Follow_ups obje) {
-        this.followUpsRepository.delete(obje);
+    public void delete(Follow_ups entity) {
+        this.followUpsRepository.delete(entity);
     }
 }

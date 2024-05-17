@@ -23,22 +23,22 @@ public class DiarySustainationsService implements Idao<DiarySustainations, Long>
     }
 
     @Override
-    public void update(DiarySustainations obje) {
-        this.diarySustainationsRepository.save(obje);
+    public void update(DiarySustainations entity) {
+        this.diarySustainationsRepository.save(entity);
     }
 
     @Override
-    public void save(DiarySustainations obje) {
-        this.diarySustainationsRepository.save(obje);
+    public DiarySustainations save(DiarySustainations entity) {
+        return this.diarySustainationsRepository.save(entity);
     }
 
     @Override
-    public void create(DiarySustainations obje) {
-        this.diarySustainationsRepository.save(obje);
+    public void create(DiarySustainations entity) {
+        this.diarySustainationsRepository.save(entity);
     }
 
     @Override
-    public void delete(DiarySustainations obje) {
-        this.diarySustainationsRepository.delete(obje);
+    public void delete(DiarySustainations entity) {
+        this.diarySustainationsRepository.delete(entity);
     }
 }

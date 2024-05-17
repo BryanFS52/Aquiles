@@ -25,23 +25,23 @@ public class AttendancesService implements Idao<Attendances, Long> {
     }
 
     @Override
-    public void update(Attendances obje) {
-        this.attendancesRepository.save(obje);
+    public void update(Attendances entity) {
+        this.attendancesRepository.save(entity);
     }
 
     @Override
-    public void save(Attendances obje) {
-        this.attendancesRepository.save(obje);
+    public Attendances save(Attendances entity) {
+        return this.attendancesRepository.save(entity);
     }
 
     @Override
-    public void create(Attendances obje) {
-        this.attendancesRepository.save(obje);
+    public void create(Attendances entity) {
+        this.attendancesRepository.save(entity);
     }
 
     @Override
-    public void delete(Attendances obje) {
-        this.attendancesRepository.delete(obje);
+    public void delete(Attendances entity) {
+        this.attendancesRepository.delete(entity);
     }
 
 }

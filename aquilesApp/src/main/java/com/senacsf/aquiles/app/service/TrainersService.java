@@ -26,24 +26,24 @@ public class TrainersService implements Idao<Trainers, Long> {
     }
 
     @Override
-    public void update(Trainers obje) {
-        this.trainersRepository.save(obje);
+    public void update(Trainers entity) {
+        this.trainersRepository.save(entity);
     }
 
     @Override
-    public void save(Trainers obje) {
-        this.trainersRepository.save(obje);
-
-    }
-
-    @Override
-    public void create(Trainers obje) {
-        this.trainersRepository.save(obje);
+    public Trainers save(Trainers entity) {
+        return this.trainersRepository.save(entity);
 
     }
 
     @Override
-    public void delete(Trainers obje) {
-        this.trainersRepository.delete(obje);
+    public void create(Trainers entity) {
+        this.trainersRepository.save(entity);
+
+    }
+
+    @Override
+    public void delete(Trainers entity) {
+        this.trainersRepository.delete(entity);
     }
 }

@@ -26,22 +26,22 @@ public class StudentsService implements Idao<Students, Long> {
     }
 
     @Override
-    public void update(Students obje) {
-        this.studentsRepository.save(obje);
+    public void update(Students entity) {
+        this.studentsRepository.save(entity);
     }
 
     @Override
-    public void save(Students obje) {
-        this.studentsRepository.save(obje);
+    public Students save(Students entity) {
+        return this.studentsRepository.save(entity);
     }
 
     @Override
-    public void create(Students obje) {
-        this.studentsRepository.save(obje);
+    public void create(Students entity) {
+        this.studentsRepository.save(entity);
     }
 
     @Override
-    public void delete(Students obje) {
-        this.studentsRepository.delete(obje);
+    public void delete(Students entity) {
+        this.studentsRepository.delete(entity);
     }
 }
