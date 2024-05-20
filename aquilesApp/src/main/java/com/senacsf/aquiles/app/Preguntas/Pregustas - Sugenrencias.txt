@@ -1,0 +1,2 @@
+1.	Consultar con base a la tabla juries del modelo “no serequiere tener como entidad, se propone tener solo de tipo de relación”
+2.	Preguntar si todas las entidades se requieren los Dto y los Business 
