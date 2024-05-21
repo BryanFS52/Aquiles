@@ -4,9 +4,12 @@ import com.senacsf.aquiles.app.entities.Excuses;
 import com.senacsf.aquiles.app.repository.ExcusesRepository;
 import com.senacsf.aquiles.app.service.dao.Idao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
+@Service
 public class ExcusesService implements Idao<Excuses, Long> {
 
     @Autowired
@@ -14,12 +17,13 @@ public class ExcusesService implements Idao<Excuses, Long> {
 
     @Override
     public List<Excuses> findAll() {
-        return List.of();
+        return excusesRepository.findAll();
     }
 
     @Override
-    public Excuses getById(Long aLong) {
-        return null;
+    public Excuses getById(Long id) {
+        Optional<Excuses> optionalExcuses = excusesRepository.findById(id);
+        return optionalExcuses.orElse(null);
     }
 
     @Override
