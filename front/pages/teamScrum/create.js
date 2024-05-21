@@ -10,7 +10,7 @@ const CreateTeamScrum = () => {
     const onSubmit = async (data) => {
         await createTeamScrum(data);
         reset();
-        router.push('/teams-scrum');
+        router.push('/list');
     };
 
     return (
