@@ -1,20 +1,19 @@
 import axios from "axios";
 
-const endpoint = 'http://localhost:8080/api/teams-scrum'
+const endpoint = 'http://localhost:8080/api/teams-scrum';
 
-export const listTeamsScrum = async () => {
-    const response = await axios.get(`${endpoint}/teams`);
-    return response.data;
+export const listTeamsScrum = () => {
+    return axios.get(`${endpoint}/all`).then(response => response.data);
 };
 
-export const createTeamScrum = async (team) => {
-    await axios.post(`${endpoint}/createT`, team);
+export const createTeamScrum = (team) => {
+    return axios.post(`${endpoint}/create`, team);
 };
 
-export const updateTeamScrum = async (team) => {
-    await axios.put(`${endpoint}/updateT`, team);
+export const updateTeamScrum = (team) => {
+    return axios.put(`${endpoint}/update`, team);
 };
 
-export const deleteTeamScrum = async (id) => {
-    await axios.delete(`${endpoint}/deleteT/${id}`);
+export const deleteTeamScrum = (id) => {
+    return axios.delete(`${endpoint}/delete/${id}`);
 };
