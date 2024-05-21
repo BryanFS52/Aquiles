@@ -1,0 +1,62 @@
+/* styles.css */
+.container {
+    max-width: 32rem; /* equivalente a max-w-md en Tailwind CSS */
+    margin-left: auto; /* equivalente a mx-auto en Tailwind CSS */
+    margin-right: auto; /* equivalente a mx-auto en Tailwind CSS */
+    margin-top: 2.5rem; /* equivalente a my-10 en Tailwind CSS */
+    margin-bottom: 2.5rem; /* equivalente a my-10 en Tailwind CSS */
+    padding: 1.5rem; /* equivalente a p-6 en Tailwind CSS */
+    background-color: #fff; /* equivalente a bg-white en Tailwind CSS */
+    border-radius: 0.375rem; /* equivalente a rounded-md en Tailwind CSS */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); /* equivalente a shadow-md en Tailwind CSS */
+  }
+  
+  .title {
+    font-size: 1.875rem; /* equivalente a text-2xl en Tailwind CSS */
+    font-weight: 700; /* equivalente a font-bold en Tailwind CSS */
+    margin-bottom: 1.5rem; /* equivalente a mb-6 en Tailwind CSS */
+  }
+  
+  .inputWrapper {
+    margin-bottom: 1rem; /* equivalente a mb-4 en Tailwind CSS */
+  }
+  
+  .label {
+    display: block;
+    font-size: 0.875rem; /* equivalente a text-sm en Tailwind CSS */
+    font-weight: 500; /* equivalente a font-medium en Tailwind CSS */
+    color: #4b5563; /* equivalente a text-gray-700 en Tailwind CSS */
+  }
+  
+  .input {
+    margin-top: 0.25rem; /* equivalente a mt-1 en Tailwind CSS */
+    padding: 0.5rem; /* equivalente a p-2 en Tailwind CSS */
+    border-width: 1px; /* equivalente a border en Tailwind CSS */
+    border-color: #e5e7eb; /* equivalente a border-gray-300 en Tailwind CSS */
+    border-radius: 0.375rem; /* equivalente a rounded-md en Tailwind CSS */
+    width: 100%; /* equivalente a w-full en Tailwind CSS */
+    outline: none; /* equivalente a focus:outline-none en Tailwind CSS */
+  }
+  
+  .button {
+    padding: 0.5rem 1rem; /* equivalente a px-4 py-2 en Tailwind CSS */
+    font-size: 0.875rem; /* equivalente a text-sm en Tailwind CSS */
+    font-weight: 500; /* equivalente a font-medium en Tailwind CSS */
+    border-radius: 0.375rem; /* equivalente a rounded-md en Tailwind CSS */
+    outline: none; /* equivalente a focus:outline-none en Tailwind CSS */
+  }
+  
+  .cancelButton {
+    color: #4b5563; /* equivalente a text-gray-700 en Tailwind CSS */
+    background-color: #edf2f7; /* equivalente a bg-gray-200 en Tailwind CSS */
+  }
+  
+  .registerButton {
+    color: #fff; /* equivalente a text-white en Tailwind CSS */
+    background-color: #3b82f6; /* equivalente a bg-blue-600 en Tailwind CSS */
+  }
+  
+  .registerButton:hover {
+    background-color: #2563eb; /* equivalente a hover:bg-blue-700 en Tailwind CSS */
+  }
+  
