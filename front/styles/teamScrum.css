@@ -1,4 +1,4 @@
-.container {
+.containerCreate {
   font-family:'Times New Roman', Times, serif;
   max-width: 32rem; 
   margin-left: auto;
@@ -11,7 +11,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); 
 }
 
-.title {
+.titleCreate {
   text-align: center;
   font-size: 1.900rem; 
   font-weight: 80; 
@@ -20,7 +20,7 @@
 }
 
 /* estilo de la linea del titulo */
-.title::after {
+.titleCreate::after {
   content: '';
   display: block;
   width: 18%; /* Ancho de la línea */
@@ -33,20 +33,27 @@
   border-radius: 50px; /* Hace que las esquinas sean totalmente redondas */
 }
 
-.inputWrapper {
+.cajaInput {
   margin-bottom: 1rem;
   text-align: center;
 }
 
-.label {
+.label1 {
   display: block;
   font-size: 1rem;
   font-weight: 500;
   margin-right: 25%;
 }
+.label2 {
+  display: block;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-right: 16%;
+}
 
 .input {
   font-family:'Times New Roman', Times, serif;
+  font-size: 0.980rem; 
   margin-top: 0.30rem; 
   padding: 0.60rem; 
   border-width: 1px;
@@ -56,11 +63,11 @@
   border-color: #000000;
 }
 
-.contButton{
+.contButtonCreate{
   text-align: center;
 }
 
-.button {
+.buttonCreate {
   font-family:'Times New Roman', Times, serif;
   padding: 1rem 0.9rem; 
   font-size: 0.990rem; 
