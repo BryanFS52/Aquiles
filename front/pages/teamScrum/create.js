@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
-import { createTeamScrum, listTeamsScrum } from "../../src/app/services/teamScrumService";
+import { createTeamScrum } from "../../src/app/services/teamScrumService";
 import styles from "../../resources/styles/teamScrum.css"
 
 const CreateTeamScrum = () => {

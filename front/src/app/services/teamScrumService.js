@@ -17,3 +17,7 @@ export const updateTeamScrum = (team) => {
 export const deleteTeamScrum = (id) => {
     return axios.delete(`${endpoint}/delete/${id}`);
 };
+
+export const getTeamScrumById = (id) => {
+    return axios.get(`${endpoint}/all/${id}`).then(response => response.data);
+};
