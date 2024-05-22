@@ -17,7 +17,7 @@ public class StudentsService implements Idao<Students, Long> {
 
     @Override
     public List<Students> findAll() {
-        return List.of();
+        return studentsRepository.findAll();
     }
 
     @Override

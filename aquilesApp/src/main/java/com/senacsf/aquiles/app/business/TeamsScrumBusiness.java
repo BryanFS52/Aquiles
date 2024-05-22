@@ -89,7 +89,7 @@ public class TeamsScrumBusiness { // Define una clase de negocio para manejar op
             // Guardar el nuevo equipo scrum usando el servicio
             teamsScrumService.save(teamsScrum);
         } catch (Exception e) {
-            throw new CustomException("Error al guardar"); // Lanzar una excepción personalizada en caso de error
+            throw new CustomException("Error creating Teams Scrum"); // Lanzar una excepción personalizada en caso de error
         }
     }
 
