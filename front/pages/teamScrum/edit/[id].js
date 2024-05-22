@@ -32,7 +32,7 @@ const EditTeamScrum = ({id}) => {
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="cajaInput">
                     <label htmlFor="nameProject" className="label1">Nombre del proyecto</label>
-                    <input {...register('nameProject', { required: true })} id="nameProject" className="input" />
+                    <input {...register('nameProject', { required: true })} id="nameProject" className="input" value={nameProject} />
                 </div>
                 <div className="cajaInput">
                     <label htmlFor="team_scrum_id" className="label2">Asignar numero de proyecto proyecto</label>
