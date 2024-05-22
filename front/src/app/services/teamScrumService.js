@@ -19,5 +19,5 @@ export const deleteTeamScrum = (id) => {
 };
 
 export const getTeamScrumById = (id) => {
-    return axios.get(`${endpoint}/all/${id}`).then(response => response.data);
+    return axios.get(`${endpoint}/${id}`).then(response => response.data);
 };

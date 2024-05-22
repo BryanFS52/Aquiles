@@ -10,8 +10,8 @@ const EditTeamScrum = ({id}) => {
     const [team_scrum_id, setTeam_scrum_id] = useState('');
 
     useEffect(() => {
-        const fetchData = async () => {
-            const data = await getTeamScrumById(id);
+        const fetchData = () => {
+            const data = getTeamScrumById(id);
             setValue('nameProject', data.nameProject);
             setTeam_scrum_id(data.team_scrum_id);
         };
