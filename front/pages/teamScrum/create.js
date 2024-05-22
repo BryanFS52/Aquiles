@@ -11,7 +11,7 @@ const CreateTeamScrum = () => {
     const onSubmit = async (data) => {
         await createTeamScrum(data);
         reset();
-        router.push('/list');
+        router.push('./list');
     };
 
     return (
@@ -23,7 +23,7 @@ const CreateTeamScrum = () => {
                     <input {...register('nameProject', { required: true })} id="nameProject" className="input" />
                 </div>
                 <div className="contButtonCreate">
-                    <button type="button" className="buttonCreate cancelButton" onClick={() => router.push('/list')} >
+                    <button type="button" className="buttonCreate cancelButton" onClick={() => router.push('./list')} >
                         Cancelar
                     </button>
                     <button type="submit" className="buttonCreate registerButton">
