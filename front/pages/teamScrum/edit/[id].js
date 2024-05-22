@@ -11,14 +11,15 @@ const EditTeamScrum = ({id}) => {
 
     useEffect(() => {
         const fetchData = () => {
-            try {
-                const data = getTeamScrumById(id);
+            getTeamScrumById(id)
+            .then(data => {
                 setTeamData(data);
-            } catch (error) {
+            })
+            .catch(error => {
                 console.error('Error al obtener datos:', error);
-            }
+            });
         };
-
+        
         fetchData();
     }, [id]);
 
