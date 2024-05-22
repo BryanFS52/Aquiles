@@ -43,9 +43,9 @@ const EditTeamScrum = ({id}) => {
                 </div>
                 <div className="cajaInput">
                     <label htmlFor="team_scrum_id" className="label2">Número de proyecto</label>
-                    <div className="inputIcon">
+                    <div className="inputIconEdit">
                         <input {...register('team_scrum_id')} id="team_scrum_id" className="input2" readOnly />
-                        <img src={candado.src} alt="candado" className="icon" />
+                        <img src={candado.src} alt="candado" className="iconEdit" />
                     </div>
                 </div>
                 <div className="contButtonCreate">
