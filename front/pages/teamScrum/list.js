@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import styles from "../../styles/teamScrum.css"
+import React, { useState } from "react";
+import Image from "next/image";
+import styles from "../../styles/teamScrum.css";
+
 
 const ListaProject = () => {
   const [activeItem, setActiveItem] = useState(null);
@@ -8,34 +10,97 @@ const ListaProject = () => {
     setActiveItem(item);
   };
 
+  const imageSrc = "/resource/img/logo.png"; 
+  
+
+  const menuItems = [
+    { name: "Asistencia",
+      href: "/asistencia",
+      imageSrc: "/resource/img/asistencia.png"
+    },
+
+
+    { name: "Teams",
+    href: "/teams",
+    imageSrc: "/resource/img/teams.png"
+  },
+
+    { name: "Aprendices",
+      href: "/aprendices",
+      imageSrc: "/resource/img/aprendices.png"
+    },
+
+    { name: "Proyectos",
+      href: "/proyectos",
+      imageSrc:"/resource/img/proyecto.png"
+    },
+    
+  ];
+
   return (
-
     <div>
-        <h1 className="title">Proyectos</h1>
-        
-        <br></br><br></br>
 
-    <nav className="menu">
-    <div className="inputWrapper">
-                    <label htmlFor="nameProject" className="label">Proyectos Formativos (C.S.F)</label>
+      <nav className="menu">
+        <div className="menu-content">
+          <Image src={imageSrc} alt="Imagen de Proyectos Formativos" width={35} height={35} />
+
+          <label htmlFor="nameProject">Proyectos Formativos (C.S.F.)</label>
+
         </div>
-      <ul>
+
+        <div className="flex-container">
+          <div className="inputWrapper"></div>
+        </div>
+
+        <div className="inputWrapper"></div>
+        <br></br>
+
         <ul>
-          <a href="/asistencia" onClick={() => handleClick('asistencia')}>Asistencia</a>
-        </ul>
-        <ul>
-          <a href="/teams" onClick={() => handleClick('teams')}>Teams</a>
-        </ul>
-        <ul>
-          <a href="/aprendices" onClick={() => handleClick('aprendices')}>Aprendices</a>
-        </ul>
-        <ul>
-          <a href="/proyectos" onClick={() => handleClick('proyectos')}>Proyectos</a>
-        </ul> 
-      </ul>
-    </nav>
+          {menuItems.map((item) => (
+            <li key={item.name}>
+              <a href={item.href} onClick={() => handleClick(item.name)}>
+              <img src={item.imageSrc} alt={item.name} width={20} height={20} /> 
+                {item.name}
+              </a>
+            </li>
+          ))}
+        </ul>  
+      </nav>
+
+      
+      <div className="container1">
+          
+      {
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Edad</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Juan</td>
+        <td>Perez</td>
+        <td>30</td>
+      </tr>
+      <tr>
+        <td>Maria</td>
+        <td>Garcia</td>
+        <td>25</td>
+      </tr>
+    </tbody>
+  </table>
+}
+      
+      </div>
+
+      
     </div>
   );
 };
+
 
 export default ListaProject;
