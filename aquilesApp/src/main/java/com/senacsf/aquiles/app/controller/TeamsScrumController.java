@@ -19,6 +19,13 @@ public class TeamsScrumController {
     public List<TeamsScrumDto> getAllTeamsScrum() {
         return teamsScrumBusiness.findAll(); // Llama al método findAll del negocio y devuelve la lista de DTOs de equipos scrum
     }
+
+    // Método para obtener un TeamScrum por su ID
+    @GetMapping("/{id}") // Anotación para manejar solicitudes GET en la ruta /{id}
+    public TeamsScrumDto getTeamScrumById(@PathVariable("id") Long teamScrumId) {
+        return teamsScrumBusiness.findTeamById(teamScrumId); // Llama al método findTeamById del negocio y devuelve el DTO del equipo scrum
+    }
+
     //Método para crear un TeamScrum
     @PostMapping("/create") // Anotación para manejar solicitudes POST en la ruta /create
     public void createTeamScrum(@RequestBody TeamsScrumDto teamsScrumDto) {
