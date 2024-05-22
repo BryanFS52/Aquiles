@@ -1,0 +1,97 @@
+.containerCreate {
+  font-family:'Times New Roman', Times, serif;
+  max-width: 32rem; 
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 2.5rem; 
+  margin-bottom: 2.5rem; 
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); 
+}
+
+.titleCreate {
+  text-align: center;
+  font-size: 1.900rem; 
+  font-weight: 80; 
+  margin-bottom: 1.5rem; 
+  position: relative;
+}
+
+/* estilo de la linea del titulo */
+.titleCreate::after {
+  content: '';
+  display: block;
+  width: 18%; /* Ancho de la línea */
+  height: 3px; /* Grosor de la línea */
+  background-color: #00324D; /* Color de la línea */
+  margin: 0.5rem auto 0; /* Espaciado alrededor de la línea */
+  position: absolute;
+  bottom: -3px; /* Ajusta la posición vertical de la línea */
+  left: 40%; /* Centra la línea horizontalmente */
+  border-radius: 50px; /* Hace que las esquinas sean totalmente redondas */
+}
+
+.cajaInput {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.label1 {
+  display: block;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-right: 25%;
+}
+/*.label2 {
+  display: block;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-right: 16%;
+}*/
+
+.input {
+  font-family:'Times New Roman', Times, serif;
+  font-size: 0.980rem; 
+  margin-top: 0.30rem; 
+  padding: 0.60rem; 
+  border-width: 1px;
+  border-radius: 0.375rem; 
+  width: 50%; 
+  outline: none; 
+  border-color: #000000;
+}
+
+.contButtonCreate{
+  text-align: center;
+}
+
+.buttonCreate {
+  font-family:'Times New Roman', Times, serif;
+  padding: 1rem 0.9rem; 
+  font-size: 0.990rem; 
+  font-weight: 500; 
+  border-radius: 0.375rem; 
+  outline: none; 
+  margin-top: 20px;
+}
+
+.cancelButton {
+  color: #4b5563;
+  background-color: #fff; 
+  border-color: #000000;
+  letter-spacing: 1px;
+  margin-right: 10px;
+}
+
+.registerButton {
+  color: #fff; 
+  background-color: #00324D;
+  letter-spacing: 1px;
+}
+
+/* estilo del mouse cuando pase por los botones */
+.registerButton:hover, .cancelButton:hover {
+  cursor: pointer;
+}
