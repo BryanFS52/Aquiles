@@ -1,7 +1,6 @@
 package com.senacsf.aquiles.app.repository; // Declara el paquete al que pertenece esta interfaz
 
 import com.senacsf.aquiles.app.entities.Teams_scrum; // Importa la entidad Teams_scrum
-
 import org.springframework.data.jpa.repository.JpaRepository; // Importa la interfaz JpaRepository de Spring Data JPA
 import org.springframework.stereotype.Repository; // Importa la anotación Repository de Spring
 

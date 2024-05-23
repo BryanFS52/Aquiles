@@ -16,12 +16,12 @@ public class ProjectService implements Idao<Project, Long> {
 
     @Override
     public List<Project> findAll() {
-        return List.of();
+        return projectRepository.findAll();
     }
 
     @Override
-    public Project getById(Long aLong) {
-        return null;
+    public Project getById(Long id) {
+        return projectRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -42,6 +42,10 @@ public class ProjectService implements Idao<Project, Long> {
     @Override
     public void delete(Project entity) {
         this.projectRepository.delete(entity);
+    }
+
+    public Project findByDescription(String description) {
+        return projectRepository.findByDescription(description);
     }
 
 }
