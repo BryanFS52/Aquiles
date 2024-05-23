@@ -1,0 +1,958 @@
+{
+	"info": {
+		"_postman_id": "ddb9ce0e-003a-4c9a-9711-2286b00435e1",
+		"name": "Aqulles",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35017499"
+	},
+	"item": [
+		{
+			"name": "AttendancesController",
+			"item": [
+				{
+					"name": "Maneja las solicitudes GET para obtener todos los attendance",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/attendances/all",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var template = `\r",
+											"<style type=\"text/css\">\r",
+											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+											"    .tftable tr {background-color:#ffffff;}\r",
+											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+											"    .tftable tr:hover {background-color:#e0ffff;}\r",
+											"</style>\r",
+											"\r",
+											"<table class=\"tftable\" border=\"1\">\r",
+											"    <tr>\r",
+											"        <th>Attendance ID</th>\r",
+											"        <th>Attendance Date</th>\r",
+											"        <th>Attendance State</th>\r",
+											"    </tr>\r",
+											"    \r",
+											"    {{#each response}}\r",
+											"        <tr>\r",
+											"            <td>{{attendance_id}}</td>\r",
+											"            <td>{{attendance_date}}</td>\r",
+											"            <td>{{attendance_state}}</td>\r",
+											"        </tr>\r",
+											"    {{/each}}\r",
+											"</table>\r",
+											"`;\r",
+											"\r",
+											"function constructVisualizerPayload() {\r",
+											"    return {response: pm.response.json()}\r",
+											"}\r",
+											"\r",
+											"pm.visualizer.set(template, constructVisualizerPayload());"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/attendances/all",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"attendances",
+										"all"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Maneja las solicitudes POST para crear un nuevo attendance",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/attendances/create",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var template = `\r",
+											"<style type=\"text/css\">\r",
+											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+											"    .tftable tr {background-color:#ffffff;}\r",
+											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+											"    .tftable tr:hover {background-color:#e0ffff;}\r",
+											"</style>\r",
+											"\r",
+											"<table class=\"tftable\" border=\"1\">\r",
+											"    <tr>\r",
+											"        <th>Timestamp</th>\r",
+											"        <th>Status</th>\r",
+											"        <th>Error</th>\r",
+											"        <th>Trace</th>\r",
+											"        <th>Message</th>\r",
+											"        <th>Path</th>\r",
+											"    </tr>\r",
+											"    <tr>\r",
+											"        <td>{{response.timestamp}}</td>\r",
+											"        <td>{{response.status}}</td>\r",
+											"        <td>{{response.error}}</td>\r",
+											"        <td>{{response.trace}}</td>\r",
+											"        <td>{{response.message}}</td>\r",
+											"        <td>{{response.path}}</td>\r",
+											"    </tr>\r",
+											"</table>\r",
+											"`;\r",
+											"\r",
+											"function constructVisualizerPayload() {\r",
+											"    return { response: pm.response.json() }\r",
+											"}\r",
+											"\r",
+											"pm.visualizer.set(template, constructVisualizerPayload());"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/attendances/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"attendances",
+										"create"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Maneja las solicitudes PUT para actualizar un attendance existente",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/attendances/update",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"attendance_id\": 5,\r\n  \"attendance_date\": \"2024-05-23\",\r\n  \"attendance_state\": \"0\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/attendances/update",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"attendances",
+										"update"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Maneja las solicitudes DELETE para eliminar un estudiante por su ID",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/attendances/delete/Colocar el id que requiere borrar",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/attendances/delete/5",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"attendances",
+										"delete",
+										"5"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "ExcusesController",
+			"item": [
+				{
+					"name": "Maneja las solicitudes GET para obtener todos los excuses",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/excuses/all",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var template = `\r",
+											"<canvas id=\"myChart\" height=\"75\"></canvas>\r",
+											"\r",
+											"<script src=\"https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js\"></script> \r",
+											"\r",
+											"<script>\r",
+											"    var ctx = document.getElementById(\"myChart\");\r",
+											"\r",
+											"    var myChart = new Chart(ctx, {\r",
+											"        type: \"bar\",\r",
+											"        data: {\r",
+											"            labels: [],\r",
+											"            datasets: [{\r",
+											"                data: [],\r",
+											"                \r",
+											"                // Change these colours to customize the chart\r",
+											"                backgroundColor: [\"#003f5c\", \"#58508d\", \"#bc5090\", \"#ff6361\", \"#ffa600\"],\r",
+											"            }]\r",
+											"        },\r",
+											"        options: {\r",
+											"            legend: { display: false },\r",
+											"            title: {\r",
+											"                display: true,\r",
+											"                text: 'Excuse ID'\r",
+											"            },\r",
+											"            scales: {\r",
+											"                xAxes: [{\r",
+											"                    display: true,\r",
+											"                    scaleLabel: {\r",
+											"                        display: true,\r",
+											"                        labelString: 'Excuse ID'\r",
+											"                    }\r",
+											"                }],\r",
+											"                yAxes: [{\r",
+											"                    display: true,\r",
+											"                    scaleLabel: {\r",
+											"                        display: true,\r",
+											"                        labelString: 'Count'\r",
+											"                    }\r",
+											"                }]\r",
+											"            }\r",
+											"        }\r",
+											"\r",
+											"    });\r",
+											"\r",
+											"    // Access the data passed to pm.visualizer.set() from the JavaScript\r",
+											"    // code of the Visualizer template\r",
+											"    pm.getData(function (err, value) {\r",
+											"        myChart.data.datasets[0].data = value.response.map(excuse => excuse.excuse_id);\r",
+											"        myChart.data.labels = value.response.map(excuse => excuse.excuse_id);\r",
+											"        myChart.update();\r",
+											"    });\r",
+											"\r",
+											"</script>`;\r",
+											"\r",
+											"function constructVisualizerPayload() {\r",
+											"    var res = pm.response.json();\r",
+											"    \r",
+											"    var visualizerData = res.map(excuse => {\r",
+											"        return {\r",
+											"            excuse_id: excuse.excuse_id,\r",
+											"            excuse_description: excuse.excuse_description,\r",
+											"            excuse_document: excuse.excuse_document\r",
+											"        };\r",
+											"    });\r",
+											"\r",
+											"    return {response: visualizerData};\r",
+											"}\r",
+											"\r",
+											"pm.visualizer.set(template, constructVisualizerPayload());"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/excuses/all",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"excuses",
+										"all"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Maneja las solicitudes POST para crear un nuevo excuses",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/excuses/create",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var template = `\r",
+											"<style type=\"text/css\">\r",
+											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+											"    .tftable tr {background-color:#ffffff;}\r",
+											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+											"    .tftable tr:hover {background-color:#e0ffff;}\r",
+											"</style>\r",
+											"\r",
+											"<table class=\"tftable\" border=\"1\">\r",
+											"    <tr>\r",
+											"        <th>ISO Code</th>\r",
+											"        <th>Language</th>\r",
+											"    </tr>\r",
+											"    \r",
+											"    {{#each response.soap:Envelope.soap:Body.m:ListOfLanguagesByNameResponse.m:ListOfLanguagesByNameResult.m:tLanguage}}\r",
+											"        <tr>\r",
+											"            <td>{{m:sISOCode}}</td>\r",
+											"            <td>{{m:sName}}</td>\r",
+											"        </tr>\r",
+											"    {{/each}}\r",
+											"</table>\r",
+											"`;\r",
+											"\r",
+											"function constructVisualizerPayload() {\r",
+											"    var jsonObject = xml2Json(pm.response.text());\r",
+											"            \r",
+											"    return { response: jsonObject }\r",
+											"}\r",
+											"\r",
+											"pm.visualizer.set(template, constructVisualizerPayload());"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"excuse_description\": \"Ausencia por enfermedad con certificado médico adjunto.\",\r\n  \"excuse_document\": \"https://example.com/excuse-documents/EX-12345.pdf\"  \r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/excuses/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"excuses",
+										"create"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Maneja las solicitudes PUT para actualizar un excuses",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/excuses/update",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"team_scrum_id\": ???,\r\n  \"nameProject\": \"XXX\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/teams-scrum/update",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"teams-scrum",
+										"update"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Maneja las solicitudes DELETE para eliminar un excuses por su ID",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/excuses/delete/Colocar el id que requiere borrar",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/teams-scrum/delete/???",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"teams-scrum",
+										"delete",
+										""
+									],
+									"query": [
+										{
+											"key": "??",
+											"value": null
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "TeamsScrumController",
+			"item": [
+				{
+					"name": "Maneja las solicitudes GET para obtener todos los teams-scrum",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/teams-scrum/all",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var template = `\r",
+											"<style type=\"text/css\">\r",
+											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+											"    .tftable tr {background-color:#ffffff;}\r",
+											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+											"    .tftable tr:hover {background-color:#e0ffff;}\r",
+											"</style>\r",
+											"\r",
+											"<table class=\"tftable\" border=\"1\">\r",
+											"    <tr>\r",
+											"        <th>Team Scrum ID</th>\r",
+											"        <th>Name Project</th>\r",
+											"    </tr>\r",
+											"    \r",
+											"    {{#each response}}\r",
+											"        <tr>\r",
+											"            <td>{{team_scrum_id}}</td>\r",
+											"            <td>{{nameProject}}</td>\r",
+											"        </tr>\r",
+											"    {{/each}}\r",
+											"</table>\r",
+											"`;\r",
+											"\r",
+											"function constructVisualizerPayload() {\r",
+											"    return { response: pm.response.json() }\r",
+											"}\r",
+											"\r",
+											"pm.visualizer.set(template, constructVisualizerPayload());"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/teams-scrum/all",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"teams-scrum",
+										"all"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Maneja las solicitudes POST para crear un nuevo teams-scrum",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/teams-scrum/create",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var template = `\r",
+											"<style type=\"text/css\">\r",
+											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+											"    .tftable tr {background-color:#ffffff;}\r",
+											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+											"    .tftable tr:hover {background-color:#e0ffff;}\r",
+											"</style>\r",
+											"\r",
+											"<table class=\"tftable\" border=\"1\">\r",
+											"    <tr>\r",
+											"        <th>ISO Code</th>\r",
+											"        <th>Language</th>\r",
+											"    </tr>\r",
+											"    \r",
+											"    {{#each response.soap:Envelope.soap:Body.m:ListOfLanguagesByNameResponse.m:ListOfLanguagesByNameResult.m:tLanguage}}\r",
+											"        <tr>\r",
+											"            <td>{{m:sISOCode}}</td>\r",
+											"            <td>{{m:sName}}</td>\r",
+											"        </tr>\r",
+											"    {{/each}}\r",
+											"</table>\r",
+											"`;\r",
+											"\r",
+											"function constructVisualizerPayload() {\r",
+											"    var jsonObject = xml2Json(pm.response.text());\r",
+											"            \r",
+											"    return { response: jsonObject }\r",
+											"}\r",
+											"\r",
+											"pm.visualizer.set(template, constructVisualizerPayload());"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \r\n    \"nameProject\": \"Aquiles\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/teams-scrum/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"teams-scrum",
+										"create"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Maneja las solicitudes PUT para actualizar un teams-scrum existente",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/teams-scrum/update",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"team_scrum_id\": ???,\r\n  \"nameProject\": \"XXX\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/teams-scrum/update",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"teams-scrum",
+										"update"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Maneja las solicitudes DELETE para eliminar un teams-scrum por su ID",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/teams-scrum/delete/Colocar el id que requiere borrar",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/teams-scrum/delete/???",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"teams-scrum",
+										"delete",
+										""
+									],
+									"query": [
+										{
+											"key": "??",
+											"value": null
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "ProjectController (DJOP) (Description, Justification, Objectives, Problem)",
+			"item": [
+				{
+					"name": "Maneja las solicitudes GET para obtener todos los DJOP de los projects",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/projects/all",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var template = `\r",
+											"<style type=\"text/css\">\r",
+											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+											"    .tftable tr {background-color:#ffffff;}\r",
+											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+											"    .tftable tr:hover {background-color:#e0ffff;}\r",
+											"</style>\r",
+											"\r",
+											"<table class=\"tftable\" border=\"1\">\r",
+											"    <tr>\r",
+											"        <th>Project ID</th>\r",
+											"        <th>Description</th>\r",
+											"        <th>Problem</th>\r",
+											"        <th>Objectives</th>\r",
+											"        <th>Justification</th>\r",
+											"        <th>Team Scrum ID</th>\r",
+											"    </tr>\r",
+											"    \r",
+											"    {{#each response}}\r",
+											"        <tr>\r",
+											"            <td>{{projectId}}</td>\r",
+											"            <td>{{description}}</td>\r",
+											"            <td>{{problem}}</td>\r",
+											"            <td>{{objectives}}</td>\r",
+											"            <td>{{justification}}</td>\r",
+											"            <td>{{fk_team_scrum_id}}</td>\r",
+											"        </tr>\r",
+											"    {{/each}}\r",
+											"</table>\r",
+											"`;\r",
+											"\r",
+											"function constructVisualizerPayload() {\r",
+											"    return {response: pm.response.json()}\r",
+											"}\r",
+											"\r",
+											"pm.visualizer.set(template, constructVisualizerPayload());"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/projects/all",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"projects",
+										"all"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "http://localhost:8080/api/projects/all get_project_details()",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var template = `\r",
+											"<style type=\"text/css\">\r",
+											"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}\r",
+											"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}\r",
+											"    .tftable tr {background-color:#ffffff;}\r",
+											"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}\r",
+											"    .tftable tr:hover {background-color:#e0ffff;}\r",
+											"</style>\r",
+											"\r",
+											"<table class=\"tftable\" border=\"1\">\r",
+											"    <tr>       \r",
+											"        <th>Descripción</th>\r",
+											"        <th> Problema</th>\r",
+											"        <th>Objetivo</th>\r",
+											"        <th>Justificación</th>       \r",
+											"    </tr>\r",
+											"    \r",
+											"    {{#each response}}\r",
+											"        <tr>           \r",
+											"            <td>{{description}}</td>\r",
+											"            <td>{{problem}}</td>\r",
+											"            <td>{{objectives}}</td>\r",
+											"            <td>{{justification}}</td>            \r",
+											"        </tr>\r",
+											"    {{/each}}\r",
+											"</table>\r",
+											"`;\r",
+											"\r",
+											"function constructVisualizerPayload() {\r",
+											"    return {response: pm.response.json()}\r",
+											"}\r",
+											"\r",
+											"pm.visualizer.set(template, constructVisualizerPayload());"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/projects/details",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"projects",
+										"details"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Maneja las solicitudes POST para crear y asociar las DJOP del project a un team_scrum",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/projects/create",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{  \r\n  \"description\": \"Proyecto para la asistencia y seguimiento de proyecto de formación\",\r\n  \"problem\": \"Dificultad para gestionar y monitorear el progreso de los proyectos de formación.\",\r\n  \"objectives\": \"Desarrollar una plataforma que permita a los instructores y coordinadores brindar asistencia y seguimiento a los estudiantes durante los proyectos de formación.\",\r\n  \"justification\": \"Esta plataforma permitirá mejorar la comunicación, la colaboración y el seguimiento del progreso en los proyectos de formación, lo que a su vez conducirá a una mayor tasa de éxito y satisfacción de los estudiantes.\",\r\n  \"fk_team_scrum_id\": 24 // Replace with actual team scrum ID\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/projects/create",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"projects",
+										"create"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Maneja las solicitudes PUT para actualizar los DJOP",
+					"item": [
+						{
+							"name": "http://localhost:8080/api/projects/update",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"projectId\": ???,\r\n    \"description\": \"Prueba 1\",\r\n    \"problem\": \"Prueba 2\",\r\n    \"objectives\": \"Prueba 3\",\r\n    \"justification\": \"Prueba 4\",\r\n    \"fk_team_scrum_id\": ???\r\n}\r\n\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/api/projects/update",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"projects",
+										"update"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Maneja las solicitudes DELETE para eliminar un estudiante por su ID",
+					"item": []
+				}
+			]
+		}
+	]
+}

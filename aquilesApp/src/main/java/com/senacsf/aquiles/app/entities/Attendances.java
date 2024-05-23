@@ -16,7 +16,7 @@ import java.util.Date;
 @Table(name = "attendances")
 public class Attendances implements Serializable {
 
-    //creacion de enum para el estado de la asistencia
+    //creación de enum para el estado de la asistencia
     public enum Enum_attendance_state {
         PRESENTE, RETARDO, FALLA, EXCUSA
     }

@@ -112,15 +112,19 @@ public class ProjectBusiness {
     // Método para obtener detalles del proyecto usando la función almacenada
     public List<ProjectDetailsDto> getProjectDetails() {
         try {
+            // Definir la consulta SQL para llamar a la función almacenada
             String sql = "SELECT * FROM get_project_details()";
+
+            // Ejecutar la consulta SQL y mapear el resultado a una lista de ProjectDetailsDto
             return jdbcTemplate.query(sql, (rs, rowNum) -> new ProjectDetailsDto(
-                    rs.getString("description"),
-                    rs.getString("problem"),
-                    rs.getString("objectives"),
-                    rs.getString("justification"),
-                    rs.getString("name_project")
+                    rs.getString("description"),   // Obtener la columna 'description' del resultado y asignarla al campo correspondiente en ProjectDetailsDto
+                    rs.getString("problem"),       // Obtener la columna 'problem' del resultado y asignarla al campo correspondiente en ProjectDetailsDto
+                    rs.getString("objectives"),    // Obtener la columna 'objectives' del resultado y asignarla al campo correspondiente en ProjectDetailsDto
+                    rs.getString("justification"), // Obtener la columna 'justification' del resultado y asignarla al campo correspondiente en ProjectDetailsDto
+                    rs.getString("name_project")   // Obtener la columna 'name_project' del resultado y asignarla al campo correspondiente en ProjectDetailsDto
             ));
         } catch (Exception e) {
+            // Capturar cualquier excepción y lanzar una CustomException con un mensaje de error
             throw new CustomException("Error getting project details");
         }
     }
