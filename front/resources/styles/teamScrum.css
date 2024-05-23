@@ -121,3 +121,71 @@
   width: 20px; 
   height: auto;
 }
+
+
+/* ESTILO D LA LISTA */
+.menu {
+    background-color: #00324D;
+    padding: 20px;
+    width: 11%;
+    height: 100%;
+    top: 0%;
+    position: fixed;
+    left: 0%;
+  }
+
+  .menu ul {
+    list-style: none;
+    margin-top: 30%;
+    padding: 0;
+  }
+  
+  
+  .menu li {
+    margin-bottom: 10px;
+    
+  }
+  
+  .menu a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: white;
+  }
+  
+  .menu-content {
+    display: flex;
+    align-items: center; 
+    color:#FFFFFFF2;
+    padding: 3px;
+    font-size: 90%;
+    text-align: center;
+  }
+
+  .menu-content img {
+    margin-right: 15px;
+  }
+
+li {
+  display: flex;
+  align-items: center; 
+  font-size: 0.990rem;
+  color:#FFFFFFF2;
+  padding: 8px;
+  font-size: 20px;
+
+ }
+
+ li img {
+  margin-right: 15px;
+  width: 30px;
+  height: 30px;
+ }
+
+ .menu-final{
+  margin-top: 170%;
+ }
+
+ .menu-config{
+  margin-top: -10%;
+ }
