@@ -1,5 +1,6 @@
 package com.senacsf.aquiles.app.business;
 
+import com.senacsf.aquiles.app.dto.ProjectDetailsDto;
 import com.senacsf.aquiles.app.dto.ProjectDto;
 import com.senacsf.aquiles.app.dto.TeamsScrumDto;
 import com.senacsf.aquiles.app.entities.Project;
@@ -9,6 +10,7 @@ import com.senacsf.aquiles.app.service.Teams_scrumService;
 import com.senacsf.aquiles.app.utilities.CustomException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -24,6 +26,9 @@ public class ProjectBusiness {
 
     @Autowired
     private Teams_scrumService teamsScrumService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -101,6 +106,22 @@ public class ProjectBusiness {
 
         } catch (Exception e) {
             throw new CustomException("Error updating project");
+        }
+    }
+
+    // Método para obtener detalles del proyecto usando la función almacenada
+    public List<ProjectDetailsDto> getProjectDetails() {
+        try {
+            String sql = "SELECT * FROM get_project_details()";
+            return jdbcTemplate.query(sql, (rs, rowNum) -> new ProjectDetailsDto(
+                    rs.getString("description"),
+                    rs.getString("problem"),
+                    rs.getString("objectives"),
+                    rs.getString("justification"),
+                    rs.getString("name_project")
+            ));
+        } catch (Exception e) {
+            throw new CustomException("Error getting project details");
         }
     }
 

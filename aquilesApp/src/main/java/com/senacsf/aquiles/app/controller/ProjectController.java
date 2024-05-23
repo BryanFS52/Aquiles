@@ -1,6 +1,7 @@
 package com.senacsf.aquiles.app.controller;
 
 import com.senacsf.aquiles.app.business.ProjectBusiness;
+import com.senacsf.aquiles.app.dto.ProjectDetailsDto;
 import com.senacsf.aquiles.app.dto.ProjectDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,5 +30,9 @@ public class ProjectController {
         projectBusiness.update(projectDto);
     }
 
+    @GetMapping("/details")
+    public List<ProjectDetailsDto> getProjectDetails() {
+        return projectBusiness.getProjectDetails();
+    }
 
 }
