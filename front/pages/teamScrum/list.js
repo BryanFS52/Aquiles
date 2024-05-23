@@ -75,22 +75,102 @@ const ListaProject = () => {
   <table>
     <thead>
       <tr>
-        <th>Nombre</th>
-        <th>Apellido</th>
-        <th>Edad</th>
+        <th>Nombre proyecto</th>
+        <th>Gestion Aprendices</th>
+        <th>Descripcion</th>
+        <th>Ficha</th>
+        <th>Editar/ Eliminacion de Proyectos</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td>Juan</td>
-        <td>Perez</td>
-        <td>30</td>
+        <td>Hermes</td>
+        <td>5 aprendices</td>
+        <td>proyecto educativo</td>
+        <td>545451</td>
+        <td>
+          <button className="edit">
+        <Image src="/resource/img/editar.png" alt="Editar/ Eliminacion de Proyectos" width={20} height={20} />
+        </button>
+        <button className="delete">
+        <Image src="/resource/img/delete.png" alt="Eliminar/ Eliminacion de Proyectos" width={20} height={20} />
+        </button>
+        </td>
       </tr>
       <tr>
-        <td>Maria</td>
-        <td>Garcia</td>
-        <td>25</td>
+        <td>Olimpo</td>
+        <td>2 aprendices</td>
+        <td>proyecto institucional</td>
+        <td>2564542</td>
+        <td>
+          <button className="edit">
+        <Image src="/resource/img/editar.png" alt="Editar/ Eliminacion de Proyectos" width={20} height={20} />
+        </button>
+        <button className="delete">
+        <Image src="/resource/img/delete.png" alt="Eliminar/ Eliminacion de Proyectos" width={20} height={20} />
+        </button>
+        </td>
       </tr>
+
+      <tr>
+    <td>Inventario</td>
+    <td>10 aprendices</td>
+    <td>proyecto </td>
+    <td>18578</td>
+    <td>
+      <button className="edit">
+    <Image src="/resource/img/editar.png" alt="Editar/ Eliminacion de Proyectos" width={20} height={20} />
+    </button>
+    <button className="delete">
+    <Image src="/resource/img/delete.png" alt="Eliminar/ Eliminacion de Proyectos" width={20} height={20} />
+    </button>
+    </td>
+  </tr>
+
+  <tr>
+    <td>Novedades</td>
+    <td>4 aprendices</td>
+    <td>proyecto sena</td>
+    <td>1213545</td>
+    <td>
+      <button className="edit">
+    <Image src="/resource/img/editar.png" alt="Editar/ Eliminacion de Proyectos" width={20} height={20} />
+    </button>
+    <button className="delete">
+    <Image src="/resource/img/delete.png" alt="Eliminar/ Eliminacion de Proyectos" width={20} height={20} />
+    </button>
+    </td>
+  </tr>
+
+  <tr>
+    <td>Olimpo</td>
+    <td>8 aprendices</td>
+    <td>proyecto principal</td>
+    <td>5667452</td>
+    <td>
+      <button className="edit">
+    <Image src="/resource/img/editar.png" alt="Editar/ Eliminacion de Proyectos" width={20} height={20} />
+    </button>
+    <button className="delete">
+    <Image src="/resource/img/delete.png" alt="Eliminar/ Eliminacion de Proyectos" width={20} height={20} />
+    </button>
+    </td>
+  </tr>
+
+  <tr>
+    <td>Inventario</td>
+    <td>6 aprendices</td>
+    <td>Invntario de almacen</td>
+    <td>9826541</td>
+    <td>
+      <button className="edit">
+    <Image src="/resource/img/editar.png" alt="Editar/ Eliminacion de Proyectos" width={20} height={20} />
+    </button>
+    <button className="delete">
+    <Image src="/resource/img/delete.png" alt="Eliminar/ Eliminacion de Proyectos" width={20} height={20} />
+    </button>
+    </td>
+  </tr>
     </tbody>
   </table>
 }
