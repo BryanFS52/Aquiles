@@ -38,6 +38,19 @@ public class TeamsScrumBusiness { // Define una clase de negocio para manejar op
         }
     }
 
+    // Método para obtener un equipo scrum por su ID
+    public TeamsScrumDto findTeamById(Long id) {
+        try {
+            Teams_scrum teamsScrum = teamsScrumService.getById(id); // Obtener el equipo scrum por su ID usando el servicio
+            if (teamsScrum == null) {
+                throw new CustomException("Teams scrum with id " + id + " not found"); // Lanzar una excepción si el equipo scrum no se encuentra
+            }
+            return modelMapper.map(teamsScrum, TeamsScrumDto.class); // Mapear la entidad a su DTO y retornarlo
+        } catch (Exception e) {
+            throw new CustomException("Error getting teams scrum by ID"); // Lanzar una excepción personalizada en caso de error
+        }
+    }
+
     // Método para actualizar un equipo scrum
     public void update(TeamsScrumDto teamsScrumDto) {
         try {
@@ -76,7 +89,7 @@ public class TeamsScrumBusiness { // Define una clase de negocio para manejar op
             // Guardar el nuevo equipo scrum usando el servicio
             teamsScrumService.save(teamsScrum);
         } catch (Exception e) {
-            throw new CustomException("Error al guardar"); // Lanzar una excepción personalizada en caso de error
+            throw new CustomException("Error creating Teams Scrum"); // Lanzar una excepción personalizada en caso de error
         }
     }
 
