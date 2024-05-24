@@ -1,17 +1,10 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import styles from "../../resources/styles/teamScrum.css";
-import iconoap from "../../resources/img/aprendices.png";
-import iconoasi from "../../resources/img/asistencia.png";
-import iconopro from "../../resources/img/proyecto.png";
-import iconolog from "../../resources/img/logo.png";
-import iconote from "../../resources/img/teams.png";
-import iconofi from "../../resources/img/ficha.png";
-import iconoprog from "../../resources/img/programa.png";
-import iconosalida from "../../resources/img/salir.png";
-import iconoconf from "../../resources/img/config.png";
-
-
+import iconocoinf from "../../resources/img/info.png";
+import icononoti from "../../resources/img/noti.png";
+import iconoper from "../../resources/img/persona.png";
+import Menu from "../../components/menu.js";
 
 const ListaProject = () => {
   const [activeItem, setActiveItem] = useState(null);
@@ -21,120 +14,227 @@ const ListaProject = () => {
   };
 
   return (
-    <div>
-      <nav className="menu">
-        <div className="menu-content">
-          <Image
-            src={iconolog}
-            alt="Imagen de Proyectos Formativos"
-            width={35}
-            height={35}
-          />
 
-          <label>PROYECTOS FORMATIVOS (C.S.F.)</label>
-        </div>
+    <div className="header">
+      <header>
+        <div className="container">
+          <div className="left"></div>
+          <div className="right">
+            <button className="notification-button">
+              <Image src={icononoti} alt="Ficha" width={30} height={30} />
+              <span className="notification-count">1</span>
+              <span className="bell-icon"></span>
+            </button>
 
-        <ul>            
-            <li>
-              <div className="menu-content">
-                <Image
-                  src={iconofi}
-                  alt="Ficha"
-                  width={35}
-                  height={35}
-                />
-
-                <label className="textMenu">Fichas</label>
-              </div>
-            </li>
-            <li>
-              <div className="menu-content">
-                <Image
-                  src={iconoprog}
-                  alt="Programa"
-                  width={35}
-                  height={35}
-                />
-
-                <label className="textMenu">Programas</label>
-              </div>
-            </li>
-            <li>
-              <div className="menu-content">
-                <Image
-                  src={iconoasi}
-                  alt="Asistencia"
-                  width={35}
-                  height={35}
-                />
-
-                <label>Asistencia</label>
-              </div>
-            </li>
-            <li>
-              <div className="menu-content">
-                <Image
-                  src={iconote}
-                  alt="Teams"
-                  width={35}
-                  height={35}
-                />
-
-                <label>Teams</label>
-              </div>
-            </li>
-            <li>
-              <div className="menu-content">
-                <Image
-                  src={iconoap}
-                  alt="Aprendices"
-                  width={35}
-                  height={35}
-                />
-
-                <label>Aprendices</label>
-              </div>
-            </li>
-            <li>
-              <div className="menu-content">
-                <Image
-                  src={iconopro}
-                  alt="Proyectos"
-                  width={35}
-                  height={35}
-                />
-
-                <label>Proyectos</label>
-              </div>
-            </li>
-            <div className="menu-final">
-              <li>
-                <div className="menu-content">
-                  <Image
-                    src={iconosalida}
-                    alt="Salir"
-                    width={35}
-                    height={35}
-                  />
-
-                  <label>Salir</label>
-                </div>
-              </li>
-              <li className="menu-config">
-                <div className="menu-content">
-                  <Image
-                    src={iconoconf}
-                    alt="Configuraciones"
-                    width={35}
-                    height={35}
-                  />
-
-                  <label>Configuraciones</label>
-                </div>
-              </li>
+            <div className="profile">
+              <Image src={iconoper} alt="Ficha" width={30} height={30} />
+              <span className="profile-name">Sebastian Rivera</span>
             </div>
-        </ul>
-      </nav>
+          </div>
+        </div>
+      </header>
+
+      <div className="principal">
+        <h1 className="title-team">Teams Scrums</h1>
+
+        <div>
+          <Menu />
+
+          <div className="card-general">
+            <div class="card">
+              <div class="card-body">
+                <div class="container-principio">
+                  <label>Nombre Proyecto</label>
+                  <a href="#" class="item-button">
+                    Ver más
+                  </a>
+                </div>
+                <br></br>
+                <div class="container-medio">
+                  <label>Desarrollo de la Aplicación Movil</label>
+                </div>
+                <br></br>
+                <div class="container-princ">
+                  <label>Team Numero</label>
+                </div>
+                <br></br>
+                <div class="container-medio">
+                  <label>Equipo 5</label>
+                </div>
+                <br></br>
+                <div class="container-princ">
+                  <label>Agregar Informacion</label>
+                  <div>
+                    <button class="custom-button">
+                      <Image src={iconocoinf} alt="" width={20} height={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-body">
+                <div class="container-principio">
+                  <label>Nombre Proyecto</label>
+                  <a href="#" class="item-button">
+                    Ver más
+                  </a>
+                </div>
+                <br></br>
+                <div class="container-medio">
+                  <label>Desarrollo de la Aplicación Movil</label>
+                </div>
+                <br></br>
+                <div class="container-princ">
+                  <label>Team Numero</label>
+                </div>
+                <br></br>
+                <div class="container-medio">
+                  <label>Equipo 5</label>
+                </div>
+                <br></br>
+                <div class="container-princ">
+                  <label>Agregar Informacion</label>
+                  <div>
+                    <button class="custom-button">
+                      <Image src={iconocoinf} alt="" width={20} height={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-body">
+                <div class="container-principio">
+                  <label>Nombre Proyecto</label>
+                  <a href="#" class="item-button">
+                    Ver más
+                  </a>
+                </div>
+                <br></br>
+                <div class="container-medio">
+                  <label>Desarrollo de la Aplicación Movil</label>
+                </div>
+                <br></br>
+                <div class="container-princ">
+                  <label>Team Numero</label>
+                </div>
+                <br></br>
+                <div class="container-medio">
+                  <label>Equipo 5</label>
+                </div>
+                <br></br>
+                <div class="container-princ">
+                  <label>Agregar Informacion</label>
+                  <div>
+                    <button class="custom-button">
+                      <Image src={iconocoinf} alt="" width={20} height={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="card-general">
+            <div class="card">
+              <div class="card-body">
+                <div class="container-principio">
+                  <label>Nombre Proyecto</label>
+                  <a href="#" class="item-button">
+                    Ver más
+                  </a>
+                </div>
+                <br></br>
+                <div class="container-medio">
+                  <label>Desarrollo de la Aplicación Movil</label>
+                </div>
+                <br></br>
+                <div class="container-princ">
+                  <label>Team Numero</label>
+                </div>
+                <br></br>
+                <div class="container-medio">
+                  <label>Equipo 5</label>
+                </div>
+                <br></br>
+                <div class="container-princ">
+                  <label>Agregar Informacion</label>
+                  <div>
+                    <button class="custom-button">
+                      <Image src={iconocoinf} alt="" width={20} height={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <div class="container-principio">
+                  <label>Nombre Proyecto</label>
+                  <a href="#" class="item-button">
+                    Ver más
+                  </a>
+                </div>
+                <br></br>
+                <div class="container-medio">
+                  <label>Desarrollo de la Aplicación Movil</label>
+                </div>
+                <br></br>
+                <div class="container-princ">
+                  <label>Team Numero</label>
+                </div>
+                <br></br>
+                <div class="container-medio">
+                  <label>Equipo 5</label>
+                </div>
+                <br></br>
+                <div class="container-princ">
+                  <label>Agregar Informacion</label>
+                  <div>
+                    <button class="custom-button">
+                      <Image src={iconocoinf} alt="" width={20} height={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <div class="container-principio">
+                  <label>Nombre Proyecto</label>
+                  <a href="#" class="item-button">
+                    Ver más
+                  </a>
+                </div>
+                <br></br>
+                <div class="container-medio">
+                  <label>Desarrollo de la Aplicación Movil</label>
+                </div>
+                <br></br>
+                <div class="container-princ">
+                  <label>Team Numero</label>
+                </div>
+                <br></br>
+                <div class="container-medio">
+                  <label>Equipo 5</label>
+                </div>
+                <br></br>
+                <div class="container-princ">
+                  <label>Agregar Informacion</label>
+                  <div>
+                    <button class="custom-button">
+                      <Image src={iconocoinf} alt="" width={20} height={20} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
