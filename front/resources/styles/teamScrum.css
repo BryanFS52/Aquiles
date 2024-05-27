@@ -1,15 +1,16 @@
 /*ESTILO DE LOS FORMULARIOS*/
 .containerCreate {
-  font-family:'Times New Roman', Times, serif;
+  font-family: Arial, Helvetica, sans-serif;
   max-width: 32rem; 
   margin-left: auto;
   margin-right: auto;
   margin-top: 2.5rem; 
   margin-bottom: 2.5rem; 
   padding: 1.5rem;
-  background-color: #fff;
+  background-color: #F7F4F3;
   border-radius: 0.375rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); 
+  
 }
 
 .titleCreate {
@@ -53,7 +54,7 @@
 }
 
 .input {
-  font-family:'Times New Roman', Times, serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 0.980rem; 
   margin-top: 0.30rem; 
   padding: 0.60rem; 
@@ -64,8 +65,8 @@
   border-color: #000000;
 }
 .input2 {
-  font-family:'Times New Roman', Times, serif;
-  font-size: 0.980rem; 
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.960rem; 
   margin-top: 0.30rem; 
   padding: 0.60rem; 
   border-width: 1px;
@@ -81,7 +82,7 @@
 }
 
 .buttonCreate {
-  font-family:'Times New Roman', Times, serif;
+  font-family: Arial, Helvetica, sans-serif;
   padding: 1rem 0.9rem; 
   font-size: 0.990rem; 
   font-weight: 500; 
@@ -120,4 +121,220 @@
   right: 26%; 
   width: 20px; 
   height: auto;
+}
+
+
+/* ESTILO D LA LISTA */
+.menu {
+    background-color: #00324D;
+    padding: 20px;
+    width: 11%;
+    height: 100%;
+    top: 0%;
+    position: fixed;
+    left: 0%;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .menu ul {
+    list-style: none;
+    margin-top: 30%;
+    padding: 0;
+  }
+  
+  
+  .menu li {
+    margin-bottom: 10px;
+    
+  }
+  
+  .menu a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: white;
+  }
+  
+  .menu-content {
+    display: flex;
+    align-items: center; 
+    color:#FFFFFFF2;
+    padding: 3px;
+    font-size: 90%;
+    text-align: center;
+  }
+
+  .menu-content img {
+    margin-right: 15px;
+  }
+
+li {
+  display: flex;
+  align-items: center; 
+  font-size: 0.990rem;
+  color:#FFFFFFF2;
+  padding: 8px;
+  font-size: 20px;
+
+ }
+
+ li img {
+  margin-right: 15px;
+  width: 30px;
+  height: 30px;
+ }
+
+ .menu-final{
+  margin-top: 170%;
+ }
+
+ .menu-config{
+  margin-top: -10%;
+ }
+
+ .principal{
+  text-align: right;
+  font-size: 16px;
+  padding: 7%;
+  margin-right: 1240px;
+  
+ }
+
+ .card-general{
+  display: flex;
+  margin-top: 15%;
+  width: 470%; 
+ }
+
+ .card {
+  width: 500%; 
+  border: 1px solid #ad9494;
+  border-radius: 10px;
+  padding: 20px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  background-image: url('../img/deco.png');
+  background-size: cover;
+  background-position: center;
+  margin-left: 150px;
+}
+
+.container-princ {
+  font-size: 18px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: left;
+  display: flex; 
+  align-items: center; 
+    
+}
+
+.container-medio {
+  font-size: 12px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: left;
+  
+}
+
+.container-principio{
+  justify-content: space-between; 
+  font-size: 18px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: left;
+  display: flex; 
+  align-items: center; 
+}
+
+.item-button {
+  color: rgb(255, 255, 255); 
+  text-decoration: none; 
+}
+
+.item-button:hover {
+  text-decoration: underline; 
+}
+
+.custom-button {
+  background-color: transparent; 
+  border: none; 
+  padding: 0;
+  cursor: pointer; 
+}
+
+.custom-button:hover {
+  opacity: 0.8; 
+  text-decoration: none;
+}
+
+.title-team{
+  font-family: Arial, Helvetica, sans-serif;
+  position: relative;
+}
+
+.title-team::after {
+  content: '';
+  display: block;
+  width: 210%; 
+  height: 2px; 
+  background-color: #c7c7c7; 
+  margin: 0.5rem auto 0; 
+  position: absolute;
+  bottom: -3px; 
+  left: 40%; 
+  border-radius: 50px;
+}
+
+header {
+  background-color: #D9D9D9;
+  padding: 10px 20px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+}
+
+.notification-button {
+  position: relative;
+  background-color: transparent;
+  border: none;
+  margin-left: 100px;
+  cursor: pointer;
+}
+
+.notification-count {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  background-color: red;
+  color: white;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 50%;
+}
+
+.bell-icon {
+  font-size: 20px;
+}
+
+.profile {
+  display: flex;
+  align-items: row;
+  margin-left: 1250px;
+}
+
+.profile-name {
+  font-weight: bold;
+  order: 1;
+  margin-left: 12px;
 }
