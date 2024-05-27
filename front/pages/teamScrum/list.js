@@ -10,16 +10,14 @@ import agregar from "../../resources/img/agregar.png";
 import iconodes from "../../resources/img/despliegue.png";
 import { listTeamsScrum } from "../../src/app/services/teamScrumService";
 
-
 const ListaProject = () => {
   const [teamsScrum, setTeamsScrum] = useState([]);
 
   useEffect(() => {
     listTeamsScrum()
-      
       .then((data) => {
         setTeamsScrum(data);
-        console.log(teamsScrum)
+        console.log(teamsScrum);
       })
       .catch((error) => {
         console.error("Error fetching teams scrum:", error);
@@ -27,7 +25,6 @@ const ListaProject = () => {
   }, []);
 
   return (
-
     <div className="header">
       <header>
         <div className="container">
@@ -65,45 +62,50 @@ const ListaProject = () => {
           </div>
 
           <div className="card-general">
-            {teamsScrum.map((team) => (
-              <div key={team.team_scrum_id} className="card">
-                <div className="card-body">
-                  <div className="container-principio">
-                    <label>Nombre Proyecto</label>
-                    <a href="#" className="item-button">
-                      Ver más
-                    </a>
-                  </div>
-                  <br />
-                  <div className="container-medio">
-                    <label>{team.nameProject}</label>
-                  </div>
-                  <br />
-                  <div className="container-princ">
-                    <label>Team Numero</label>
-                  </div>
-                  <br />
-                  <div className="container-medio">
-                    <label>{team.team_scrum_id}</label>
-                  </div>
-                  <br />
-                  <div className="container-princ">
-                    <label>Agregar Informacion</label>
-                    <div>
-                      <button className="custom-button">
-                        <Image src={iconocoinf} alt="" width={20} height={20} />
-                      </button>
+            <div className="card-group">
+              {teamsScrum.map((team) => (
+                <div key={team.team_scrum_id} className="card">
+                  <div className="card-body">
+                    <div className="container-principio">
+                      <label>Nombre Proyecto</label>
+                      <a href="#" className="item-button">
+                        Ver más
+                      </a>
+                    </div>
+                    <br />
+                    <div className="container-medio">
+                      <label>{team.nameProject}</label>
+                    </div>
+                    <br />
+                    <div className="container-princ">
+                      <label>Team Numero</label>
+                    </div>
+                    <br />
+                    <div className="container-medio">
+                      <label>{team.team_scrum_id}</label>
+                    </div>
+                    <br />
+                    <div className="container-princ">
+                      <label>Agregar Informacion</label>
+                      <div>
+                        <button className="custom-button">
+                          <Image
+                            src={iconocoinf}
+                            alt=""
+                            width={20}
+                            height={20}
+                          />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
     </div>
-
-
   );
 };
 
