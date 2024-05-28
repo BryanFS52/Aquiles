@@ -366,3 +366,103 @@ header {
   order: 1;
   margin-left: 12px;
 }
+
+.modal {
+  top: 30%;
+  position: fixed;
+  left: 35%;
+  width: 30%;
+  height: 40%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-complete {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Esta linea de codigo es la que da el color azul transparente de fondo a toda la pagina, cuando se abre el modal para agregar teams */
+  background-color: rgba(0, 50, 77, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  width: 80%;
+  height: 20%;
+  background-color: #ffffff;
+  padding: 20%;
+  border-radius: 3%;
+  box-shadow: "0 0 10px rgba(0, 0, 0, 0.2)";
+}
+
+.title-model {
+  position: absolute;
+  top: 9%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.title-model::after {
+  content: "";
+  display: block;
+  width: 50%;
+  height: 2px;
+  background-color: #00324d;
+  margin: 0.5rem auto 0;
+  position: absolute;
+  bottom: -3px;
+  right: 30%;
+  border-radius: 50px;
+  top: 55%;
+}
+
+.caption {
+  position: absolute;
+  top: 35%;
+  transform: translate(-50%);
+  left: 33%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.caja-text {
+  width: 100%;
+  height: 60%;
+  margin-right: 50%;
+  border-radius: 5%;
+  background-color: #fff;
+  right: 8%;
+  border: 1px solid rgb(58, 58, 58);
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.button-cancel {
+  margin: 0 10px;
+  padding: 19px 45px;
+  background-color: #ffffff;
+  color: rgb(0, 0, 0);
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid rgb(58, 58, 58);
+}
+
+.button-registrer {
+  margin: 0 10px;
+  padding: 19px 45px;
+  background-color: #00324d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

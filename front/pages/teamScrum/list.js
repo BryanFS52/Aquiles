@@ -12,6 +12,7 @@ import { listTeamsScrum } from "../../src/app/services/teamScrumService";
 
 const ListaProject = () => {
   const [teamsScrum, setTeamsScrum] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     listTeamsScrum()
@@ -23,6 +24,14 @@ const ListaProject = () => {
         console.error("Error fetching teams scrum:", error);
       });
   }, []);
+
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="header">
@@ -56,7 +65,7 @@ const ListaProject = () => {
           <Menu />
 
           <div>
-            <button className="button-agregar">
+            <button className="button-agregar" onClick={handleModalOpen}>
               <Image src={agregar} alt="agregar" width={25} height={18} />
             </button>
           </div>
@@ -104,6 +113,32 @@ const ListaProject = () => {
             </div>
           </div>
         </div>
+
+        {isModalOpen && (
+          <div className="modal-complete">
+            <div className="modal">
+              <div className="modal-content">
+                <div className="title-model">
+                  <h2>Nuevo Proyecto</h2>
+                </div>
+                <div className="caption">
+                  <p>Nombre del proyecto</p>
+                </div>
+                <br></br>
+
+                <input className="caja-text"></input>
+
+                <br></br>
+                <br></br>
+                <br></br>
+                <div className="buttons">
+                  <button className="button-cancel">Cancelar</button>
+                  <button className="button-registrer">Registrar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
