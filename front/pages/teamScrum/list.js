@@ -8,10 +8,14 @@ import iconoper from "../../resources/img/persona.png";
 import Menu from "../../components/menu.js";
 import agregar from "../../resources/img/agregar.png";
 import iconodes from "../../resources/img/despliegue.png";
-import { listTeamsScrum } from "../../src/app/services/teamScrumService";
+import {
+  listTeamsScrum,
+  createTeamScrum,
+} from "../../src/app/services/teamScrumService";
 
 const ListaProject = () => {
   const [teamsScrum, setTeamsScrum] = useState([]);
+  const [newTeam, setNewTeam] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -31,6 +35,17 @@ const ListaProject = () => {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
+  };
+
+  const handleRegister = async () => {
+    try {
+      await createTeamScrum(newTeam);
+      listTeamsScrum().then((data) => {
+        setTeamsScrum(data);
+      });
+    } catch (error) {
+      console.error("Error creating team scrum:", error);
+    }
   };
 
   return (
@@ -126,14 +141,24 @@ const ListaProject = () => {
                 </div>
                 <br></br>
 
-                <input className="caja-text"></input>
+                <input
+                  className="caja-text"
+                  value={newTeam.nameProject || ""}
+                  onChange={(e) =>
+                    setNewTeam({ ...newTeam, nameProject: e.target.value })
+                  }
+                />
 
                 <br></br>
                 <br></br>
                 <br></br>
                 <div className="buttons">
-                  <button className="button-cancel">Cancelar</button>
-                  <button className="button-registrer">Registrar</button>
+                  <button className="button-cancel" onClick={handleModalClose}>
+                    Cancelar
+                  </button>
+                  <button className="button-registrer" onClick={handleRegister}>
+                    Registrar
+                  </button>
                 </div>
               </div>
             </div>
