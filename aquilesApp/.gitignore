@@ -37,5 +37,5 @@ out/
 .vscode/
 
 # Ignorar el archivo application.yml de Spring Boot
-/src/main/resources/application.yml
+application.yml
 
