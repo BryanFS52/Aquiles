@@ -44,4 +44,5 @@ public class Attendances implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_idStudent", referencedColumnName = "student_id")
     private Students fk_idStudent;
+
 }
