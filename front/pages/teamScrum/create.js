@@ -4,14 +4,15 @@ import { useRouter } from "next/router";
 import { createTeamScrum } from "../../src/app/services/teamScrumService";
 import styles from "../../resources/styles/teamScrum.css"
 
-const CreateTeamScrum = () => {
+const CreateTeamScrum = ({ closeModal }) => {
     const { register, handleSubmit, reset } = useForm();
     const router = useRouter();
 
     const onSubmit = async (data) => {
         await createTeamScrum(data);
         reset();
-        router.push('./list');
+        closeModal();
+        router.reload();
     };
 
     return (
@@ -23,7 +24,7 @@ const CreateTeamScrum = () => {
                     <input {...register('nameProject', { required: true })} id="nameProject" className="input" />
                 </div>
                 <div className="contButtonCreate">
-                    <button type="button" className="buttonCreate cancelButton" onClick={() => router.push('./list')} >
+                    <button type="button" className="buttonCreate cancelButton" onClick={closeModal} >
                         Cancelar
                     </button>
                     <button type="submit" className="buttonCreate registerButton">
