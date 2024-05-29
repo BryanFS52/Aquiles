@@ -149,7 +149,7 @@
   display: block;
   padding: 10px 15px;
   text-decoration: none;
-  color: white;
+  color: rgb(255, 0, 0);
 }
 
 .menu-content {
@@ -378,6 +378,7 @@ header {
   align-items: center;
 }
 
+/* Diseño para que el modal pueda tomar el fondo azul transparente en toda la pagina */
 .modal-complete {
   position: fixed;
   top: 0;
@@ -391,6 +392,7 @@ header {
   align-items: center;
 }
 
+/* Este estilo aplica para poderle dar diseño al modal principal */
 .modal-content {
   width: 80%;
   height: 20%;
@@ -465,4 +467,121 @@ header {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+/* diseño del modal #2 para agregar informacion */
+.modal-number2{
+  top: 50%;
+  position: absolute;
+  left: 50%;
+  width: 632px;
+  height: 625px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+  transform: translate(-50%, -50%);
+}
+
+
+.modal-contentnumber{
+  width: 80%;
+  height: 20%;
+  background-color: #ffffff;
+  padding: 20%;
+  border-radius: 3%;
+  box-shadow: "0 0 10px rgba(0, 0, 0, 0.2)";
+}
+
+.caption-2{
+  position: absolute;
+  top: 21%;
+  transform: translate(-50%);
+  left: 50%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.caja-text-2{
+  position: absolute;
+  width: 244px;
+  height: 30px;
+  border-radius: 5%;
+  background-color: #fff;
+  border: 1px solid rgb(177, 175, 176);
+  top: 30%;
+  left: 30%;
+}
+
+.new-text{
+  position: absolute;
+  transform: translate(-50%);
+  left: 50%;
+  top: 39%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.title-model-2{
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.title-model-2::after {
+  content: "";
+  display: block;
+  width: 50%;
+  height: 2px;
+  background-color: #000000;
+  margin: 0.5rem auto 0;
+  position: absolute;
+  bottom: -3px;
+  right: 30%;
+  border-radius: 50px;
+  top: 55%;
+}
+
+.button-edit{
+  margin: 0 10px;
+  padding: 19px 45px;
+  background-color: #00324d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.button-close{
+  margin: 0 10px;
+  padding: 19px 45px;
+  background-color: #00324d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* estilos de la tabla para listar integrantes del team */
+.table-model {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #dddddd; /* Borde de la tabla */
+}
+
+.table-model th,
+.table-model td {
+  padding: 8px;
+  text-align: left;
+  border: 1px solid #dddddd;
+}
+
+.table-model th {
+  border-bottom: 1px solid #dddddd; /* Borde inferior de las celdas del encabezado */
+}
+/* ... */
+.text-table{
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  font-weight: normal;
 }

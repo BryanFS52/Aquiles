@@ -8,15 +8,13 @@ import iconoper from "../../resources/img/persona.png";
 import Menu from "../../components/menu.js";
 import agregar from "../../resources/img/agregar.png";
 import iconodes from "../../resources/img/despliegue.png";
-import {
-  listTeamsScrum,
-  createTeamScrum,
-} from "../../src/app/services/teamScrumService";
+import {listTeamsScrum,createTeamScrum} from "../../src/app/services/teamScrumService";
 
 const ListaProject = () => {
   const [teamsScrum, setTeamsScrum] = useState([]);
   const [newTeam, setNewTeam] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [infoModalOpen, setinfoModalOpen] = useState(false);
 
   useEffect(() => {
     listTeamsScrum()
@@ -29,25 +27,33 @@ const ListaProject = () => {
       });
   }, []);
 
-  const handleModalOpen = () => {
+  // modal2
+  const handleModalOpeninfo = () => {
     setIsModalOpen(true);
   };
-
-  const handleModalClose = () => {
+  const handleModalCloseinfo = () => {
     setIsModalOpen(false);
   };
 
+  // ....//
+
   const handleRegister = async () => {
+    if (!newTeam.nameProject) {
+      alert("Por favor ingresa un nombre de proyecto.");
+      return;
+    }
     try {
       await createTeamScrum(newTeam);
       listTeamsScrum().then((data) => {
         setTeamsScrum(data);
       });
+      setNewTeam({});
+
+      handleModalClose();
     } catch (error) {
-      console.error("Error creating team scrum:", error);
+      console.error("Error al crear un teamScrum:", error);
     }
   };
-
   return (
     <div className="header">
       <header>
@@ -80,7 +86,7 @@ const ListaProject = () => {
           <Menu />
 
           <div>
-            <button className="button-agregar" onClick={handleModalOpen}>
+            <button className="button-agregar" >
               <Image src={agregar} alt="agregar" width={25} height={18} />
             </button>
           </div>
@@ -112,7 +118,7 @@ const ListaProject = () => {
                     <div className="container-princ">
                       <label>Agregar Informacion</label>
                       <div>
-                        <button className="custom-button">
+                        <button className="custom-button" onClick={handleModalOpeninfo}>
                           <Image
                             src={iconocoinf}
                             alt=""
@@ -129,36 +135,53 @@ const ListaProject = () => {
           </div>
         </div>
 
+        {/* 2 modal */}
         {isModalOpen && (
           <div className="modal-complete">
-            <div className="modal">
-              <div className="modal-content">
-                <div className="title-model">
-                  <h2>Nuevo Proyecto</h2>
+            <div className="modal-number2">
+              <div className="modal-contentnumber">
+                <div className="title-model-2">
+                  <h2>Información del Team</h2>
                 </div>
-                <div className="caption">
-                  <p>Nombre del proyecto</p>
+                <div className="caption-2">
+                  <p>Nombre del Team</p>
                 </div>
                 <br></br>
 
-                <input
-                  className="caja-text"
+                <input className="caja-text-2"
+                  placeholder=""
                   value={newTeam.nameProject || ""}
                   onChange={(e) =>
                     setNewTeam({ ...newTeam, nameProject: e.target.value })
                   }
                 />
+                  <div className="new-text">
+                    <p>Integrantes</p>
+                  </div>
+                  <br></br><br></br>
+                  <table className="table-model">
+                  <thead>
+                    <tr>
+                    <th className="text-table">Numero Doc</th>
+                    <th className="text-table">Nombre Completo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                    <td>1259775065</td>
+                    <td>Harold Samuel Moreno Perraga</td>
+                    </tr> 
+                    <tr>
+                    <td>6548481451</td>
+                    <td>Michael Felipe Laiton Chaparro</td>
+                    </tr>             
+                  </tbody>
+                  </table>
 
-                <br></br>
-                <br></br>
-                <br></br>
+                <br></br><br></br><br></br><br></br><br></br>
                 <div className="buttons">
-                  <button className="button-cancel" onClick={handleModalClose}>
-                    Cancelar
-                  </button>
-                  <button className="button-registrer" onClick={handleRegister}>
-                    Registrar
-                  </button>
+                  <button className="button-edit" onClick={handleRegister}>Editar Informacion</button>
+                  <button className="button-close" onClick={handleModalCloseinfo}>Cerrar</button>
                 </div>
               </div>
             </div>
