@@ -144,9 +144,38 @@ const ListProject = () => {
           </div>
         </div>
 
-        {/* 2 modal */}
+        {isAddModalOpen && (
+          <div className="modal">
+            <div className="modal-content">
+              <span className="close" onClick={closeAddModal}>&times;</span>
+              <CreateTeamScrum closeModal={closeAddModal}/>
+            </div>
+          </div>
+        )}
+
         {isInfoModalOpen && (
           <div className="modal-complete">
+
+            {/* la clase navigational-buttons es provisional y lo mismo los onClick ya que no se ha realizado los metodos para redirigirlos */}
+              <div className="caja-buttons">
+                <div className="caja-button-info">
+                  <button className="button-info" onClick={openInfoModal}>Informacion</button>
+                </div>
+                <div className="caja-button-des">
+                  <button className="button-des" onClick={openInfoModal}>Descripcion</button>
+                </div>
+                <div className="caja-button-prom">
+                  <button className="button-prom" onClick={openInfoModal}>Problematica</button>
+                </div>
+                <div className="caja-button-ob">
+                  <button className="button-obj" onClick={openInfoModal}>Objetivos</button>
+                </div>
+                <div className="caja-button-just">
+                  <button className="button-just" onClick={openInfoModal}>Justificacion</button>
+                </div>
+              </div>
+            {/* ....Aqui termina los botones.... */}
+
             <div className="modal-number2">
               <div className="modal-contentnumber">
                 <div className="title-model-2">
@@ -155,7 +184,6 @@ const ListProject = () => {
                 <div className="caption-2">
                   <p>Nombre del Team</p>
                 </div>
-                <br></br>
 
                 <input className="caja-text-2"
                   placeholder=""
@@ -167,27 +195,26 @@ const ListProject = () => {
                   <div className="new-text">
                     <p>Integrantes</p>
                   </div>
-                  <br></br><br></br>
+                  
                   <table className="table-model">
-                  <thead>
-                    <tr>
-                    <th className="text-table">Numero Doc</th>
-                    <th className="text-table">Nombre Completo</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                    <td>1259775065</td>
-                    <td>Harold Samuel Moreno Perraga</td>
-                    </tr> 
-                    <tr>
-                    <td>6548481451</td>
-                    <td>Michael Felipe Laiton Chaparro</td>
-                    </tr>             
-                  </tbody>
+                    <thead>
+                      <tr>
+                        <th className="text-table">Numero Doc</th>
+                        <th className="text-table">Nombre Completo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>1259775065</td>
+                        <td>Harold Samuel Moreno Perraga</td>
+                      </tr> 
+                      <tr>
+                        <td>6548481451</td>
+                        <td>Michael Felipe Laiton Chaparro</td>
+                      </tr>             
+                    </tbody>
                   </table>
 
-                <br></br><br></br><br></br><br></br><br></br>
                 <div className="buttons">
                   <button className="button-edit" onClick={handleRegister}>Editar Informacion</button>
                   <button className="button-close" onClick={closeInfoModal}>Cerrar</button>
@@ -197,15 +224,6 @@ const ListProject = () => {
           </div>
         )}
       </div>
-
-      {isAddModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={closeAddModal}>&times;</span>
-            <CreateTeamScrum closeModal={closeAddModal}/>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
