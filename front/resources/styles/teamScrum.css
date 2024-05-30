@@ -164,8 +164,7 @@ label {
   top: 10%;
 }
 
-/* estilo de la linea del titulo */
-.titleCreate::after {
+.titleCreate::after { /* estilo de la linea del titulo */
   content: "";
   display: block;
   width: 18%; /* Ancho de la línea */
@@ -234,7 +233,6 @@ label {
   margin-top: 20px;
 }
 
-
 .cancelButton {
   color: #4b5563;
   background-color: #fff;
@@ -249,9 +247,7 @@ label {
   letter-spacing: 1px;
 }
 
-/* estilo del mouse cuando pase por los botones */
-.registerButton:hover,
-.cancelButton:hover {
+.registerButton:hover, .cancelButton:hover { 
   cursor: pointer;
 }
 
@@ -268,7 +264,8 @@ label {
   height: auto;
 }
 
-/* ESTILO D LA LISTA */
+
+/* ESTILO DEL MENU  */
 .menu {
   background-color: #00324d;
   padding: 20px;
@@ -346,15 +343,8 @@ li img {
   margin-top: -60px;
 }
 
-.button-agregar {
-  border: 1px solid #00314d;
-  border-radius: 5px;
-  background-color: #00314d;
-  cursor: pointer;
-  margin-right: -1310px;
-  margin-top: -0.5%;
-}
 
+/* ESTILO DE LA LISTA */
 .card-general {
   display: flex;
   margin-top: 15%;
@@ -387,7 +377,15 @@ li img {
   margin-top: -0.5%;
 }
 
-/* 2° modal */
+.button-agregar {
+  border: 1px solid #00314d;
+  border-radius: 5px;
+  background-color: #00314d;
+  cursor: pointer;
+  margin-right: -1310px;
+  margin-top: -0.5%;
+}
+
 .container-princ {
   font-size: 1.125rem; /* 18px */
   font-family: Arial, Helvetica, sans-serif;
@@ -516,7 +514,49 @@ header {
   margin-left: 12px;
 }
 
-/* Estilos para el modal de agregar informacion*/
+
+/* ESTILO PARA EL MODAL DE AGREGAR TEAM */
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  background-color: rgba(3, 56, 113, 0.3);
+}
+
+.modal-content {
+  background-color: white;
+  margin: 15% auto;
+  padding: -10px;
+  border: 1px solid #ad9494;
+  width: 80%;
+  max-width: 550px;
+  position: relative;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  margin-right: 10px;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+
+/* ESTILO PARA EL MODAL DE AGREGAR INFORMACION */
 .modal {
   display: flex;
   justify-content: center;

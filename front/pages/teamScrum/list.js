@@ -198,7 +198,7 @@ const ListProject = () => {
         )}
       </div>
 
-      {isAddModalOpen  && (
+      {isAddModalOpen && (
         <div className="modal">
           <div className="modal-content">
             <span className="close" onClick={closeAddModal}>&times;</span>
