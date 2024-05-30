@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Image from "next/image";
 import styles from "../../resources/styles/teamScrum.css";
 import iconocoinf from "../../resources/img/info.png";
@@ -8,15 +7,15 @@ import iconoper from "../../resources/img/persona.png";
 import Menu from "../../components/menu.js";
 import agregar from "../../resources/img/agregar.png";
 import iconodes from "../../resources/img/despliegue.png";
-import {
-  listTeamsScrum,
-  createTeamScrum,
-} from "../../src/app/services/teamScrumService";
+import { listTeamsScrum } from "../../src/app/services/teamScrumService";
+import CreateTeamScrum from "./create";
 
-const ListaProject = () => {
+const ListProject = () => {
   const [teamsScrum, setTeamsScrum] = useState([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false); 
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [newTeam, setNewTeam] = useState({});
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   useEffect(() => {
     listTeamsScrum()
@@ -29,22 +28,38 @@ const ListaProject = () => {
       });
   }, []);
 
-  const handleModalOpen = () => {
-    setIsModalOpen(true);
+  const openAddModal = () => {
+    setIsAddModalOpen(true);
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
+  const closeAddModal = () => {
+    setIsAddModalOpen(false);
+  };
+
+  // ...
+  const openInfoModal = () => {
+    setIsInfoModalOpen(true);
+  };
+
+  const closeInfoModal = () => {
+    setIsInfoModalOpen(false);
   };
 
   const handleRegister = async () => {
+    if (!newTeam.nameProject) {
+      alert("Por favor ingresa un nombre de proyecto.");
+      return;
+    }
     try {
       await createTeamScrum(newTeam);
       listTeamsScrum().then((data) => {
         setTeamsScrum(data);
       });
+      setNewTeam({});
+
+      closeAddModal();
     } catch (error) {
-      console.error("Error creating team scrum:", error);
+      console.error("Error al crear un teamScrum:", error);
     }
   };
 
@@ -80,7 +95,7 @@ const ListaProject = () => {
           <Menu />
 
           <div>
-            <button className="button-agregar" onClick={handleModalOpen}>
+            <button className="button-agregar" onClick={openAddModal}>
               <Image src={agregar} alt="agregar" width={25} height={18} />
             </button>
           </div>
@@ -112,7 +127,7 @@ const ListaProject = () => {
                     <div className="container-princ">
                       <label>Agregar Informacion</label>
                       <div>
-                        <button className="custom-button">
+                        <button className="custom-button" onClick={openInfoModal}>
                           <Image
                             src={iconocoinf}
                             alt=""
@@ -129,44 +144,70 @@ const ListaProject = () => {
           </div>
         </div>
 
-        {isModalOpen && (
+        {/* 2 modal */}
+        {isInfoModalOpen && (
           <div className="modal-complete">
-            <div className="modal">
-              <div className="modal-content">
-                <div className="title-model">
-                  <h2>Nuevo Proyecto</h2>
+            <div className="modal-number2">
+              <div className="modal-contentnumber">
+                <div className="title-model-2">
+                  <h2>Información del Team</h2>
                 </div>
-                <div className="caption">
-                  <p>Nombre del proyecto</p>
+                <div className="caption-2">
+                  <p>Nombre del Team</p>
                 </div>
                 <br></br>
 
-                <input
-                  className="caja-text"
+                <input className="caja-text-2"
+                  placeholder=""
                   value={newTeam.nameProject || ""}
                   onChange={(e) =>
                     setNewTeam({ ...newTeam, nameProject: e.target.value })
                   }
                 />
+                  <div className="new-text">
+                    <p>Integrantes</p>
+                  </div>
+                  <br></br><br></br>
+                  <table className="table-model">
+                  <thead>
+                    <tr>
+                    <th className="text-table">Numero Doc</th>
+                    <th className="text-table">Nombre Completo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                    <td>1259775065</td>
+                    <td>Harold Samuel Moreno Perraga</td>
+                    </tr> 
+                    <tr>
+                    <td>6548481451</td>
+                    <td>Michael Felipe Laiton Chaparro</td>
+                    </tr>             
+                  </tbody>
+                  </table>
 
-                <br></br>
-                <br></br>
-                <br></br>
+                <br></br><br></br><br></br><br></br><br></br>
                 <div className="buttons">
-                  <button className="button-cancel" onClick={handleModalClose}>
-                    Cancelar
-                  </button>
-                  <button className="button-registrer" onClick={handleRegister}>
-                    Registrar
-                  </button>
+                  <button className="button-edit" onClick={handleRegister}>Editar Informacion</button>
+                  <button className="button-close" onClick={closeInfoModal}>Cerrar</button>
                 </div>
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {isAddModalOpen  && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={closeAddModal}>&times;</span>
+            <CreateTeamScrum closeModal={closeAddModal}/>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default ListaProject;
+export default ListProject;
