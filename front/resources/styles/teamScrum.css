@@ -147,12 +147,13 @@ label {
 .containerCreate {
   font-family: Arial, Helvetica, sans-serif;
   max-width: 32rem;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 2.5rem;
+  margin: auto;
+  margin-top: 10%;
   margin-bottom: 2.5rem;
   padding: 1.5rem;
-}
+  background-color: #fff;
+  
+  }
 
 .titleCreate {
   text-align: center;
@@ -160,6 +161,7 @@ label {
   font-weight: 80;
   margin-bottom: 1.5rem;
   position: relative;
+  top: 10%;
 }
 
 /* estilo de la linea del titulo */
@@ -231,6 +233,7 @@ label {
   outline: none;
   margin-top: 20px;
 }
+
 
 .cancelButton {
   color: #4b5563;
@@ -355,8 +358,7 @@ li img {
 .card-general {
   display: flex;
   margin-top: 15%;
-  /* esta es linea de codigo que centra las card */
-  justify-content: center;
+  justify-content: center;  /* esta es linea de codigo que centra las card */
   width: 470%;
 }
 
@@ -385,6 +387,7 @@ li img {
   margin-top: -0.5%;
 }
 
+/* 2° modal */
 .container-princ {
   font-size: 1.125rem; /* 18px */
   font-family: Arial, Helvetica, sans-serif;
@@ -513,7 +516,7 @@ header {
   margin-left: 12px;
 }
 
-/* Estilos para el modal de crear team*/
+/* Estilos para el modal de agregar informacion*/
 .modal {
   display: flex;
   justify-content: center;
@@ -527,10 +530,12 @@ header {
   left: 0;
   top: 0;
   width: 100%;
+  height: 100%;
   background-color: rgba(3, 56, 113, 0.3);
 }
 
-/* Este estilo aplica para poderle dar diseño al modal principal */
+
+/* Este estilo aplica para poderle dar diseño al  segundo modal de agregar informacion */
 .modal-content {
   background-color: white;
   margin: 15% auto;
@@ -543,31 +548,6 @@ header {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
-.close {
-  color: #aaa;
-  float: right;
-  margin-right: 10px;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-  border: 1px solid rgb(58, 58, 58);
-}
-
-.button-registrer {
-  margin: 0 10px;
-  padding: 19px 45px;
-  background-color: #00324d;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
 
 /* diseño del modal #2 para agregar informacion */
 .modal-number2{
@@ -593,6 +573,7 @@ header {
   box-shadow: "0 0 10px rgba(0, 0, 0, 0.2)";
 }
 
+/* subtitulo del segundo modal */
 .caption-2{
   position: absolute;
   top: 21%;
@@ -601,6 +582,7 @@ header {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* caja de texto del segundo modal */
 .caja-text-2{
   position: absolute;
   width: 244px;
@@ -612,6 +594,7 @@ header {
   left: 30%;
 }
 
+/* texto de integrantes del segundo modal */
 .new-text{
   position: absolute;
   transform: translate(-50%);
@@ -620,6 +603,7 @@ header {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Información del Team segundo modal */
 .title-model-2{
   position: absolute;
   top: 8%;
@@ -627,6 +611,7 @@ header {
   transform: translateX(-50%);
   font-family: Arial, Helvetica, sans-serif;
 }
+
 
 .title-model-2::after {
   content: "";
@@ -642,6 +627,7 @@ header {
   top: 55%;
 }
 
+/* boton de editar informacion del segundo modal */
 .button-edit{
   margin: 0 10px;
   padding: 19px 45px;
@@ -652,6 +638,7 @@ header {
   cursor: pointer;
 }
 
+/* boton de cerrar segundo modal */
 .button-close{
   margin: 0 10px;
   padding: 19px 45px;
@@ -685,4 +672,3 @@ header {
   font-size: 14px;
   font-weight: normal;
 }
-

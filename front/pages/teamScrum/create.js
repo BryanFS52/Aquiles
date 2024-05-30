@@ -16,7 +16,9 @@ const CreateTeamScrum = ({ closeModal }) => {
     };
 
     return (
-        <div className="containerCreate">
+        <div>
+        <div className="modal-complete">
+        <div className="containerCreate">        
             <h1 className="titleCreate">Nuevo Proyecto</h1>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="cajaInput">
@@ -31,7 +33,9 @@ const CreateTeamScrum = ({ closeModal }) => {
                         Registrar
                     </button>
                 </div>
-            </form>
+            </form>         
+        </div>
+        </div>
         </div>
     );
 }
