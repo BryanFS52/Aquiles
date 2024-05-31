@@ -665,23 +665,29 @@ header {
 
 .button-edit{ /* boton de editar informacion del segundo modal */
   margin: 0 10px;
-  padding: 19px 45px;
+  padding: 12px 50px;
   background-color: #00324d;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  position: fixed;
+  left: 50px;
 }
+
 
 .button-close{ /* boton de cerrar segundo modal */
   margin: 0 10px;
-  padding: 19px 45px;
+  padding: 12px 75px;
   background-color: #00324d;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  position: fixed;
+  right: 40px;
 }
+
 
 .table-model { /* estilos de la tabla para listar integrantes del team */
   width: 100%;

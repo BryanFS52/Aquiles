@@ -9,11 +9,13 @@ import agregar from "../../resources/img/agregar.png";
 import iconodes from "../../resources/img/despliegue.png";
 import { listTeamsScrum } from "../../src/app/services/teamScrumService";
 import CreateTeamScrum from "./create";
+import { fabClasses } from "@mui/material";
 
 const ListProject = () => {
   const [teamsScrum, setTeamsScrum] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false); 
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [isDesModalOpen, setIsDesModalOpen] = useState(false); 
   const [newTeam, setNewTeam] = useState({});
 
 
@@ -36,13 +38,23 @@ const ListProject = () => {
     setIsAddModalOpen(false);
   };
 
-  // ...
-  const openInfoModal = () => {
+
+  const openInfoModal = () => { // ... segundo modal
     setIsInfoModalOpen(true);
   };
 
   const closeInfoModal = () => {
     setIsInfoModalOpen(false);
+  };
+  //...
+
+
+  const openDesModal = ()=> {
+    setIsDesModalOpen (true);
+  };
+
+  const closeDesModal = ()=> {
+    setIsDesModalOpen (false);
   };
 
   const handleRegister = async () => {
@@ -107,7 +119,7 @@ const ListProject = () => {
                   <div className="card-body">
                     <div className="container-principio">
                       <label>Nombre Proyecto</label>
-                      <a href="#" className="item-button">
+                      <a href="#" className="item-button"  onClick={openInfoModal}>
                         Ver más
                       </a>
                     </div>
@@ -127,7 +139,7 @@ const ListProject = () => {
                     <div className="container-princ">
                       <label>Agregar Informacion</label>
                       <div>
-                        <button className="custom-button" onClick={openInfoModal}>
+                        <button className="custom-button">
                           <Image
                             src={iconocoinf}
                             alt=""
@@ -162,7 +174,7 @@ const ListProject = () => {
                   <button className="button-info" onClick={openInfoModal}>Informacion</button>
                 </div>
                 <div className="caja-button-des">
-                  <button className="button-des" onClick={openInfoModal}>Descripcion</button>
+                  <button className="button-des" onClick={openDesModal}>Descripcion</button>
                 </div>
                 <div className="caja-button-prom">
                   <button className="button-prom" onClick={openInfoModal}>Problematica</button>
@@ -223,6 +235,16 @@ const ListProject = () => {
             </div>
           </div>
         )}
+
+          {isDesModalOpen && (
+                    <div className="prueba">
+                      <div className="moon">
+                      </div>
+                      <div>
+                        <p>priuis</p>
+                      </div>
+                    </div>
+                  )}
       </div>
     </div>
   );
