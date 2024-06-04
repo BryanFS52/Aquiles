@@ -759,7 +759,7 @@ header {
 
 
 /* ESTILO PARA EL MODAL DE DESCRIPCION (3)*/
-.caja-text-modal-3 { /* caja de texto del tercer modal */
+.caja-text-modal-3 {
   position: absolute;
   width: 500px;
   height: 180px;
@@ -776,8 +776,8 @@ header {
 }
 
 
-/* ESTILO PARA EL MODAL DE PROBLEMATICA (4)*/
-.caja-text-modal { /* caja de texto del tercer modal */
+/* ESTILO PARA EL MODAL DE PROBLEMATICA, OBJETIVOS Y JUSTIFICACION (4 - 5 - 6)*/
+.caja-text-modal {
   position: absolute;
   width: 500px;
   height: 300px;
