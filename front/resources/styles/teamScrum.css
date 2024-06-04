@@ -556,7 +556,7 @@ header {
 }
 
 
-/* ESTILO PARA EL MODAL DE AGREGAR INFORMACION (2)*/
+/* ESTILO PARA EL MODAL DE INFORMACION PROYECTO (2)*/
 .modal {
   display: flex;
   justify-content: center;
@@ -758,3 +758,33 @@ header {
 }
 
 
+/* ESTILO PARA EL MODAL DE DESCRIPCION (3)*/
+.caja-text-modal-3 { /* caja de texto del tercer modal */
+  position: absolute;
+  width: 500px;
+  height: 180px;
+  border-radius: 0.375rem;
+  background-color: #fff;
+  border: 1px solid rgb(177, 175, 176);
+  top: 30%;
+  left: 10%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.buttons-modal {
+  margin-top: 75%;
+}
+
+
+/* ESTILO PARA EL MODAL DE PROBLEMATICA (4)*/
+.caja-text-modal { /* caja de texto del tercer modal */
+  position: absolute;
+  width: 500px;
+  height: 300px;
+  border-radius: 0.375rem;
+  background-color: #fff;
+  border: 1px solid rgb(177, 175, 176);
+  top: 30%;
+  left: 10%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}

@@ -39,6 +39,10 @@ const ListProject = () => {
   };
 
   const openInfoModal = () => {
+    setIsDesModalOpen(false);
+    setIsProModalOpen(false);
+    setIsObModalOpen(false);
+    setIsJustModalOpen(false);
     setIsInfoModalOpen(true);
   };
 
@@ -47,6 +51,10 @@ const ListProject = () => {
   };
 
   const openDesModal = () => {
+    setIsInfoModalOpen(false);
+    setIsProModalOpen(false);
+    setIsObModalOpen(false);
+    setIsJustModalOpen(false);
     setIsDesModalOpen(true);
   };
 
@@ -56,6 +64,10 @@ const ListProject = () => {
 
   
   const openProModal = () => {
+    setIsInfoModalOpen(false);
+    setIsDesModalOpen(false);
+    setIsObModalOpen(false);
+    setIsJustModalOpen(false);
     setIsProModalOpen(true);
   };
 
@@ -65,6 +77,10 @@ const ListProject = () => {
 
   
   const openObModal = () => {
+    setIsInfoModalOpen(false);
+    setIsDesModalOpen(false);
+    setIsProModalOpen(false);
+    setIsJustModalOpen(false);
     setIsObModalOpen(true);
   };
 
@@ -74,6 +90,10 @@ const ListProject = () => {
 
   
   const openJustModal = () => {
+    setIsInfoModalOpen(false);
+    setIsDesModalOpen(false);
+    setIsProModalOpen(false);
+    setIsObModalOpen(false);
     setIsJustModalOpen(true);
   };
 
@@ -248,7 +268,7 @@ const ListProject = () => {
                 </table>
 
                 <div className="buttons">
-                  <button className="button-edit" onClick={handleRegister}>Editar Informacion</button>
+                  <button className="button-edit" onClick={handleRegister}>Editar Información</button>
                   <button className="button-close" onClick={closeInfoModal}>Cerrar</button>
                 </div>
               </div>
@@ -279,14 +299,15 @@ const ListProject = () => {
             <div className="modal-number2">
               <div className="modal-contentnumber">
                 <div className="title-model-2">
-                  <h2>Descripción del Proyecto</h2>
+                  <h2>Descripción</h2>
                 </div>
                 <div className="caption-2">
                   <p>Descripción del Proyecto</p>
                 </div>
+                <input className="caja-text-modal-3" placeholder="" value=""/>
 
-                <div className="buttons">
-                  <button className="button-edit" onClick={handleRegister}>Editar Descripción</button>
+                <div className="buttons-modal">
+                  <button className="button-edit" onClick={handleRegister}>Editar Información</button>
                   <button className="button-close" onClick={closeDesModal}>Cerrar</button>
                 </div>
               </div>
@@ -317,14 +338,15 @@ const ListProject = () => {
             <div className="modal-number2">
               <div className="modal-contentnumber">
                 <div className="title-model-2">
-                  <h2>Problematica del Proyecto</h2>
+                  <h2>Problematica</h2>
                 </div>
                 <div className="caption-2">
                   <p>Problematica del Proyecto</p>
                 </div>
+                <input className="caja-text-modal" placeholder="" value=""/>
 
-                <div className="buttons">
-                  <button className="button-edit" onClick={handleRegister}>Editar Descripción</button>
+                <div className="buttons-modal">
+                  <button className="button-edit" onClick={handleRegister}>Editar Información</button>
                   <button className="button-close" onClick={closeProModal}>Cerrar</button>
                 </div>
               </div>
@@ -355,14 +377,15 @@ const ListProject = () => {
             <div className="modal-number2">
               <div className="modal-contentnumber">
                 <div className="title-model-2">
-                  <h2>Objetivos del Proyecto</h2>
+                  <h2>Objetivos</h2>
                 </div>
                 <div className="caption-2">
                   <p>Objetivos del Proyecto</p>
                 </div>
+                <input className="caja-text-modal" placeholder="" value=""/>
 
-                <div className="buttons">
-                  <button className="button-edit" onClick={handleRegister}>Editar Descripción</button>
+                <div className="buttons-modal">
+                  <button className="button-edit" onClick={handleRegister}>Editar Información</button>
                   <button className="button-close" onClick={closeObModal}>Cerrar</button>
                 </div>
               </div>
@@ -393,14 +416,15 @@ const ListProject = () => {
             <div className="modal-number2">
               <div className="modal-contentnumber">
                 <div className="title-model-2">
-                  <h2>Justificación del Proyecto</h2>
+                  <h2>Justificación</h2>
                 </div>
                 <div className="caption-2">
                   <p>Justificación del Proyecto</p>
                 </div>
+                <input className="caja-text-modal" placeholder="" value=""/>
 
-                <div className="buttons">
-                  <button className="button-edit" onClick={handleRegister}>Editar Descripción</button>
+                <div className="buttons-modal">
+                  <button className="button-edit" onClick={handleRegister}>Editar Información</button>
                   <button className="button-close" onClick={closeJustModal}>Cerrar</button>
                 </div>
               </div>
