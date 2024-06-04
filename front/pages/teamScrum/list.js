@@ -9,21 +9,21 @@ import agregar from "../../resources/img/agregar.png";
 import iconodes from "../../resources/img/despliegue.png";
 import { listTeamsScrum } from "../../src/app/services/teamScrumService";
 import CreateTeamScrum from "./create";
-import { fabClasses } from "@mui/material";
 
 const ListProject = () => {
   const [teamsScrum, setTeamsScrum] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false); 
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isDesModalOpen, setIsDesModalOpen] = useState(false); 
+  const [isProModalOpen, setIsProModalOpen] = useState(false); 
+  const [isObModalOpen, setIsObModalOpen] = useState(false); 
+  const [isJustModalOpen, setIsJustModalOpen] = useState(false); 
   const [newTeam, setNewTeam] = useState({});
-
 
   useEffect(() => {
     listTeamsScrum()
       .then((data) => {
         setTeamsScrum(data);
-        console.log(teamsScrum);
       })
       .catch((error) => {
         console.error("Error fetching teams scrum:", error);
@@ -38,23 +38,47 @@ const ListProject = () => {
     setIsAddModalOpen(false);
   };
 
-
-  const openInfoModal = () => { // ... segundo modal
+  const openInfoModal = () => {
     setIsInfoModalOpen(true);
   };
 
   const closeInfoModal = () => {
     setIsInfoModalOpen(false);
   };
-  //...
 
-
-  const openDesModal = ()=> {
-    setIsDesModalOpen (true);
+  const openDesModal = () => {
+    setIsDesModalOpen(true);
   };
 
-  const closeDesModal = ()=> {
-    setIsDesModalOpen (false);
+  const closeDesModal = () => {
+    setIsDesModalOpen(false);
+  };
+
+  
+  const openProModal = () => {
+    setIsProModalOpen(true);
+  };
+
+  const closeProModal = () => {
+    setIsProModalOpen(false);
+  };
+
+  
+  const openObModal = () => {
+    setIsObModalOpen(true);
+  };
+
+  const closeObModal = () => {
+    setIsObModalOpen(false);
+  };
+
+  
+  const openJustModal = () => {
+    setIsJustModalOpen(true);
+  };
+
+  const closeJustModal = () => {
+    setIsJustModalOpen(false);
   };
 
   const handleRegister = async () => {
@@ -68,11 +92,15 @@ const ListProject = () => {
         setTeamsScrum(data);
       });
       setNewTeam({});
-
       closeAddModal();
     } catch (error) {
       console.error("Error al crear un teamScrum:", error);
     }
+  };
+
+  const handleButtonClick = (openModal) => {
+    closeInfoModal();
+    openModal();
   };
 
   return (
@@ -119,7 +147,7 @@ const ListProject = () => {
                   <div className="card-body">
                     <div className="container-principio">
                       <label>Nombre Proyecto</label>
-                      <a href="#" className="item-button"  onClick={openInfoModal}>
+                      <a href="#" className="item-button" onClick={openInfoModal}>
                         Ver más
                       </a>
                     </div>
@@ -140,12 +168,7 @@ const ListProject = () => {
                       <label>Agregar Informacion</label>
                       <div>
                         <button className="custom-button">
-                          <Image
-                            src={iconocoinf}
-                            alt=""
-                            width={20}
-                            height={20}
-                          />
+                          <Image src={iconocoinf} alt="" width={20} height={20} />
                         </button>
                       </div>
                     </div>
@@ -167,26 +190,23 @@ const ListProject = () => {
 
         {isInfoModalOpen && (
           <div className="modal-complete">
-
-            {/* la clase navigational-buttons es provisional y lo mismo los onClick ya que no se ha realizado los metodos para redirigirlos */}
-              <div className="caja-buttons">
-                <div className="caja-button-info">
-                  <button className="button-info" onClick={openInfoModal}>Informacion</button>
-                </div>
-                <div className="caja-button-des">
-                  <button className="button-des" onClick={openDesModal}>Descripcion</button>
-                </div>
-                <div className="caja-button-prom">
-                  <button className="button-prom" onClick={openInfoModal}>Problematica</button>
-                </div>
-                <div className="caja-button-ob">
-                  <button className="button-obj" onClick={openInfoModal}>Objetivos</button>
-                </div>
-                <div className="caja-button-just">
-                  <button className="button-just" onClick={openInfoModal}>Justificacion</button>
-                </div>
+            <div className="caja-buttons">
+              <div className="caja-button-info">
+                <button className="button-info" onClick={() => handleButtonClick(openInfoModal)}>Informacion</button>
               </div>
-            {/* ....Aqui termina los botones.... */}
+              <div className="caja-button-des">
+                <button className="button-des" onClick={() => handleButtonClick(openDesModal)}>Descripcion</button>
+              </div>
+              <div className="caja-button-prom">
+                <button className="button-prom" onClick={() => handleButtonClick(openProModal)}>Problematica</button>
+              </div>
+              <div className="caja-button-ob">
+                <button className="button-obj" onClick={() => handleButtonClick(openObModal)}>Objetivos</button>
+              </div>
+              <div className="caja-button-just">
+                <button className="button-just" onClick={() => handleButtonClick(openJustModal)}>Justificacion</button>
+              </div>
+            </div>
 
             <div className="modal-number2">
               <div className="modal-contentnumber">
@@ -204,28 +224,28 @@ const ListProject = () => {
                     setNewTeam({ ...newTeam, nameProject: e.target.value })
                   }
                 />
-                  <div className="new-text">
-                    <p>Integrantes</p>
-                  </div>
+                <div className="new-text">
+                  <p>Integrantes</p>
+                </div>
                   
-                  <table className="table-model">
-                    <thead>
-                      <tr>
-                        <th className="text-table">Numero Doc</th>
-                        <th className="text-table">Nombre Completo</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>1259775065</td>
-                        <td>Harold Samuel Moreno Perraga</td>
-                      </tr> 
-                      <tr>
-                        <td>6548481451</td>
-                        <td>Michael Felipe Laiton Chaparro</td>
-                      </tr>             
-                    </tbody>
-                  </table>
+                <table className="table-model">
+                  <thead>
+                    <tr>
+                      <th className="text-table">Numero Doc</th>
+                      <th className="text-table">Nombre Completo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1259775065</td>
+                      <td>Harold Samuel Moreno Perraga</td>
+                    </tr> 
+                    <tr>
+                      <td>6548481451</td>
+                      <td>Michael Felipe Laiton Chaparro</td>
+                    </tr>             
+                  </tbody>
+                </table>
 
                 <div className="buttons">
                   <button className="button-edit" onClick={handleRegister}>Editar Informacion</button>
@@ -236,15 +256,157 @@ const ListProject = () => {
           </div>
         )}
 
-          {isDesModalOpen && (
-                    <div className="prueba">
-                      <div className="moon">
-                      </div>
-                      <div>
-                        <p>priuis</p>
-                      </div>
-                    </div>
-                  )}
+        {isDesModalOpen && (
+          <div className="modal-complete">
+            <div className="caja-buttons">
+              <div className="caja-button-info">
+                <button className="button-info" onClick={() => handleButtonClick(openInfoModal)}>Informacion</button>
+              </div>
+              <div className="caja-button-des">
+                <button className="button-des" onClick={() => handleButtonClick(openDesModal)}>Descripcion</button>
+              </div>
+              <div className="caja-button-prom">
+                <button className="button-prom" onClick={() => handleButtonClick(openProModal)}>Problematica</button>
+              </div>
+              <div className="caja-button-ob">
+                <button className="button-obj" onClick={() => handleButtonClick(openObModal)}>Objetivos</button>
+              </div>
+              <div className="caja-button-just">
+                <button className="button-just" onClick={() => handleButtonClick(openJustModal)}>Justificacion</button>
+              </div>
+            </div>
+
+            <div className="modal-number2">
+              <div className="modal-contentnumber">
+                <div className="title-model-2">
+                  <h2>Descripción del Proyecto</h2>
+                </div>
+                <div className="caption-2">
+                  <p>Descripción del Proyecto</p>
+                </div>
+
+                <div className="buttons">
+                  <button className="button-edit" onClick={handleRegister}>Editar Descripción</button>
+                  <button className="button-close" onClick={closeDesModal}>Cerrar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isProModalOpen && (
+          <div className="modal-complete">
+            <div className="caja-buttons">
+              <div className="caja-button-info">
+                <button className="button-info" onClick={() => handleButtonClick(openInfoModal)}>Informacion</button>
+              </div>
+              <div className="caja-button-des">
+                <button className="button-des" onClick={() => handleButtonClick(openDesModal)}>Descripcion</button>
+              </div>
+              <div className="caja-button-prom">
+                <button className="button-prom" onClick={() => handleButtonClick(openProModal)}>Problematica</button>
+              </div>
+              <div className="caja-button-ob">
+                <button className="button-obj" onClick={() => handleButtonClick(openObModal)}>Objetivos</button>
+              </div>
+              <div className="caja-button-just">
+                <button className="button-just" onClick={() => handleButtonClick(openJustModal)}>Justificacion</button>
+              </div>
+            </div>
+
+            <div className="modal-number2">
+              <div className="modal-contentnumber">
+                <div className="title-model-2">
+                  <h2>Problematica del Proyecto</h2>
+                </div>
+                <div className="caption-2">
+                  <p>Problematica del Proyecto</p>
+                </div>
+
+                <div className="buttons">
+                  <button className="button-edit" onClick={handleRegister}>Editar Descripción</button>
+                  <button className="button-close" onClick={closeProModal}>Cerrar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isObModalOpen && (
+          <div className="modal-complete">
+            <div className="caja-buttons">
+              <div className="caja-button-info">
+                <button className="button-info" onClick={() => handleButtonClick(openInfoModal)}>Informacion</button>
+              </div>
+              <div className="caja-button-des">
+                <button className="button-des" onClick={() => handleButtonClick(openDesModal)}>Descripcion</button>
+              </div>
+              <div className="caja-button-prom">
+                <button className="button-prom" onClick={() => handleButtonClick(openProModal)}>Problematica</button>
+              </div>
+              <div className="caja-button-ob">
+                <button className="button-obj" onClick={() => handleButtonClick(openObModal)}>Objetivos</button>
+              </div>
+              <div className="caja-button-just">
+                <button className="button-just" onClick={() => handleButtonClick(openJustModal)}>Justificacion</button>
+              </div>
+            </div>
+
+            <div className="modal-number2">
+              <div className="modal-contentnumber">
+                <div className="title-model-2">
+                  <h2>Objetivos del Proyecto</h2>
+                </div>
+                <div className="caption-2">
+                  <p>Objetivos del Proyecto</p>
+                </div>
+
+                <div className="buttons">
+                  <button className="button-edit" onClick={handleRegister}>Editar Descripción</button>
+                  <button className="button-close" onClick={closeObModal}>Cerrar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isJustModalOpen && (
+          <div className="modal-complete">
+            <div className="caja-buttons">
+              <div className="caja-button-info">
+                <button className="button-info" onClick={() => handleButtonClick(openInfoModal)}>Informacion</button>
+              </div>
+              <div className="caja-button-des">
+                <button className="button-des" onClick={() => handleButtonClick(openDesModal)}>Descripcion</button>
+              </div>
+              <div className="caja-button-prom">
+                <button className="button-prom" onClick={() => handleButtonClick(openProModal)}>Problematica</button>
+              </div>
+              <div className="caja-button-ob">
+                <button className="button-obj" onClick={() => handleButtonClick(openObModal)}>Objetivos</button>
+              </div>
+              <div className="caja-button-just">
+                <button className="button-just" onClick={() => handleButtonClick(openJustModal)}>Justificacion</button>
+              </div>
+            </div>
+
+            <div className="modal-number2">
+              <div className="modal-contentnumber">
+                <div className="title-model-2">
+                  <h2>Justificación del Proyecto</h2>
+                </div>
+                <div className="caption-2">
+                  <p>Justificación del Proyecto</p>
+                </div>
+
+                <div className="buttons">
+                  <button className="button-edit" onClick={handleRegister}>Editar Descripción</button>
+                  <button className="button-close" onClick={closeJustModal}>Cerrar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
