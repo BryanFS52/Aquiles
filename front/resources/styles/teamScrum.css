@@ -556,7 +556,7 @@ header {
 }
 
 
-/* ESTILO PARA EL MODAL DE AGREGAR INFORMACION (2)*/
+/* ESTILO PARA EL MODAL DE INFORMACION PROYECTO (2)*/
 .modal {
   display: flex;
   justify-content: center;
@@ -757,3 +757,205 @@ header {
   background-color: #e0e0e0;
 }
 
+
+/* ESTILO PARA EL MODAL DE DESCRIPCION (3)*/
+.caja-text-modal-3 {
+  position: absolute;
+  width: 500px;
+  height: 180px;
+  border-radius: 0.375rem;
+  background-color: #fff;
+  border: 1px solid rgb(177, 175, 176);
+  top: 30%;
+  left: 10%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.buttons-modal {
+  margin-top: 75%;
+}
+
+
+/* ESTILO PARA EL MODAL DE PROBLEMATICA, OBJETIVOS Y JUSTIFICACION (4 - 5 - 6)*/
+.caja-text-modal {
+  position: absolute;
+  width: 500px;
+  height: 300px;
+  border-radius: 0.375rem;
+  background-color: #fff;
+  border: 1px solid rgb(177, 175, 176);
+  top: 30%;
+  left: 10%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* tercer modal */
+
+.modal-team {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(3, 56, 113, 0.3);
+}
+
+.modal-teams {
+  top: 50%;
+  position: absolute;
+  left: 50%;
+  width: 1050px;
+  height: 687px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+  transform: translate(-50%, -50%);
+  border: 1px solid #bdbbbb;
+  border-radius: 0 10px 10px 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.modal-3 {
+  width: 90%;
+  height: 90%;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 3%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.model-title3 {
+  position: relative;
+  top: 0%;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.model-title3::after {
+  content: "";
+  display: block;
+  width: 80%;
+  height: 2px;
+  background-color: #00314D;
+  margin: 0.5rem auto 0;
+  border-radius: 50px;
+}
+
+.caption-3 {
+  margin-top: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-right: 90%;
+  margin-top: -2%;
+}
+
+.modal-content {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.item1 {
+  background-color: #FFFFFF;
+  width: 30%;
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  border: 1px solid #bdbbbb;
+  padding: 20px;
+  margin-right: 65%;
+  margin-top: -0%;
+}
+
+.search-bar {
+  width: 80%;
+  height: 4%;
+  padding: 10px 10px 10px 40px;;
+  margin-bottom: 20px;
+  border: 1px solid #bdbbbb;
+  border-radius: 10px;
+  font-size: 16px;
+  background: url('../../resources//img/Busqueda.png') no-repeat 10px center;
+  background-size: 20px 20px;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: -6%;
+  margin-right: 33%;
+}
+
+.text-modal3 {
+  font-family: Arial, Helvetica, sans-serif;
+  margin-right: 20%;
+}
+
+.modal3card {
+  border: 1px solid #b1b0b0;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #D9D9D9;
+  background-size: cover;
+  background-position: center;
+  width: 30%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-modal3 {
+  text-align: center;
+}
+
+.buttons {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 50px;
+  margin-top: 20px;
+}
+
+.button-close-modal3 {
+  padding: 12px 75px;
+  background-color: #9D9D9D;
+  color: rgb(0, 0, 0);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.button-edit-modal3 {
+  padding: 12px 50px;
+  background-color: #00324d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.checkbox-list {
+  display: flex;
+  flex-direction: column; 
+}
+
+.checkbox-list label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.checkbox-list input[type="checkbox"] {
+  margin-left: 10px; 
+}
+
+.checkbox-list .text-modal3 {
+  font-family: Arial, Helvetica, sans-serif;
+}
