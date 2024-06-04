@@ -1,11 +1,11 @@
 spring:
   application:
-    name: BDAquiles
+    name: DBAquiles
 
   datasource:
     url: jdbc:postgresql://localhost:5432/DBAquiles
     username: postgres
-    password: "fabrica2024*"
+    password: "123"
     driver-class-name: org.postgresql.Driver
 
   jpa:
