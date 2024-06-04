@@ -147,12 +147,13 @@ label {
 .containerCreate {
   font-family: Arial, Helvetica, sans-serif;
   max-width: 32rem;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 2.5rem;
+  margin: auto;
+  margin-top: 10%;
   margin-bottom: 2.5rem;
   padding: 1.5rem;
-}
+  background-color: #fff;
+  
+  }
 
 .titleCreate {
   text-align: center;
@@ -160,10 +161,10 @@ label {
   font-weight: 80;
   margin-bottom: 1.5rem;
   position: relative;
+  top: 10%;
 }
 
-/* estilo de la linea del titulo */
-.titleCreate::after {
+.titleCreate::after { /* estilo de la linea del titulo */
   content: "";
   display: block;
   width: 18%; /* Ancho de la línea */
@@ -246,9 +247,7 @@ label {
   letter-spacing: 1px;
 }
 
-/* estilo del mouse cuando pase por los botones */
-.registerButton:hover,
-.cancelButton:hover {
+.registerButton:hover, .cancelButton:hover { 
   cursor: pointer;
 }
 
@@ -265,7 +264,8 @@ label {
   height: auto;
 }
 
-/* ESTILO D LA LISTA */
+
+/* ESTILO DEL MENU  */
 .menu {
   background-color: #00324d;
   padding: 20px;
@@ -343,20 +343,12 @@ li img {
   margin-top: -60px;
 }
 
-.button-agregar {
-  border: 1px solid #00314d;
-  border-radius: 5px;
-  background-color: #00314d;
-  cursor: pointer;
-  margin-right: -1310px;
-  margin-top: -0.5%;
-}
 
+/* ESTILO DE LA LISTA */
 .card-general {
   display: flex;
   margin-top: 15%;
-  /* esta es linea de codigo que centra las card */
-  justify-content: center;
+  justify-content: center;  /* esta es linea de codigo que centra las card */
   width: 470%;
 }
 
@@ -382,6 +374,15 @@ li img {
   background-size: cover;
   background-position: center;
   margin-left: 150px;
+  margin-top: -0.5%;
+}
+
+.button-agregar {
+  border: 1px solid #00314d;
+  border-radius: 5px;
+  background-color: #00314d;
+  cursor: pointer;
+  margin-right: -1310px;
   margin-top: -0.5%;
 }
 
@@ -513,15 +514,12 @@ header {
   margin-left: 12px;
 }
 
-/* Estilos para el modal de crear team*/
+
+/* ESTILO PARA EL MODAL DE AGREGAR TEAM (1)*/
 .modal {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-/* Diseño para que el modal pueda tomar el fondo azul transparente en toda la pagina */
-.modal-complete {
   position: fixed;
   z-index: 1;
   left: 0;
@@ -530,7 +528,6 @@ header {
   background-color: rgba(3, 56, 113, 0.3);
 }
 
-/* Este estilo aplica para poderle dar diseño al modal principal */
 .modal-content {
   background-color: white;
   margin: 15% auto;
@@ -556,21 +553,39 @@ header {
   color: black;
   text-decoration: none;
   cursor: pointer;
-  border: 1px solid rgb(58, 58, 58);
 }
 
-.button-registrer {
-  margin: 0 10px;
-  padding: 19px 45px;
-  background-color: #00324d;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+
+/* ESTILO PARA EL MODAL DE AGREGAR INFORMACION (2)*/
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* diseño del modal #2 para agregar informacion */
-.modal-number2{
+.modal-complete { /* Diseño para que el modal pueda tomar el fondo azul transparente en toda la pagina */
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(3, 56, 113, 0.3);
+}
+
+.modal-content { /* Este estilo aplica para poderle dar diseño al  segundo modal de agregar informacion */
+  background-color: white;
+  margin: 15% auto;
+  padding: -10px;
+  border: 1px solid #ad9494;
+  width: 80%;
+  max-width: 550px;
+  position: relative;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.modal-number2{ 
   top: 50%;
   position: absolute;
   left: 50%;
@@ -581,6 +596,9 @@ header {
   align-items: center;
   background-color: #ffffff;
   transform: translate(-50%, -50%);
+  border: 1px solid #bdbbbb;
+  border-radius: 0 10px 10px 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 
@@ -590,10 +608,9 @@ header {
   background-color: #ffffff;
   padding: 20%;
   border-radius: 3%;
-  box-shadow: "0 0 10px rgba(0, 0, 0, 0.2)";
 }
 
-.caption-2{
+.caption-2{ /* subtitulo del segundo modal */
   position: absolute;
   top: 21%;
   transform: translate(-50%);
@@ -601,32 +618,36 @@ header {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.caja-text-2{
+.caja-text-2{ /* caja de texto del segundo modal */
   position: absolute;
   width: 244px;
   height: 30px;
-  border-radius: 5%;
+  border-radius: 0.375rem;
   background-color: #fff;
   border: 1px solid rgb(177, 175, 176);
   top: 30%;
   left: 30%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.new-text{
+
+.new-text{ /* texto de integrantes del segundo modal */
   position: absolute;
   transform: translate(-50%);
   left: 50%;
   top: 39%;
   font-family: Arial, Helvetica, sans-serif;
+  
 }
 
-.title-model-2{
+.title-model-2{ /* Información del Team segundo modal */
   position: absolute;
   top: 8%;
   left: 50%;
   transform: translateX(-50%);
   font-family: Arial, Helvetica, sans-serif;
 }
+
 
 .title-model-2::after {
   content: "";
@@ -642,31 +663,40 @@ header {
   top: 55%;
 }
 
-.button-edit{
+.button-edit{ /* boton de editar informacion del segundo modal */
   margin: 0 10px;
-  padding: 19px 45px;
+  padding: 12px 50px;
   background-color: #00324d;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  position: fixed;
+  left: 50px;
 }
 
-.button-close{
+
+.button-close{ /* boton de cerrar segundo modal */
   margin: 0 10px;
-  padding: 19px 45px;
+  padding: 12px 75px;
   background-color: #00324d;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  position: fixed;
+  right: 40px;
 }
 
-/* estilos de la tabla para listar integrantes del team */
-.table-model {
+
+.table-model { /* estilos de la tabla para listar integrantes del team */
   width: 100%;
   border-collapse: collapse;
   border: 1px solid #dddddd; /* Borde de la tabla */
+  margin-bottom: 20%;
+  margin-top: 12%;
+  border-radius: 10px;
+  
 }
 
 .table-model th,
@@ -679,10 +709,51 @@ header {
 .table-model th {
   border-bottom: 1px solid #dddddd; /* Borde inferior de las celdas del encabezado */
 }
-/* ... */
+ 
 .text-table{
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
   font-weight: normal;
+}
+
+.caja-buttons { /* estilos para los botones navegables del modal para agregar informacion */
+  position: absolute;
+  top: 14.5%;
+  left: 33%;
+  display: flex;
+  flex-direction: row;
+}
+
+.caja-button-info ,
+.caja-button-des ,
+.caja-button-prom ,
+.caja-button-ob ,
+.caja-button-just {
+  padding: 6px 3px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.caja-button-info{
+  border-radius: 10px 0 0 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.caja-button-info button,
+.caja-button-des button,
+.caja-button-prom button,
+.caja-button-ob button,
+.caja-button-just button{
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.caja-button-info:hover,
+.caja-button-des:hover,
+.caja-button-prom:hover,
+.caja-button-ob:hover,
+.caja-button-just:hover {
+  background-color: #e0e0e0;
 }
 
