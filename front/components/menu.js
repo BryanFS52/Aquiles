@@ -27,7 +27,7 @@ const Menu = () => {
                   height={35}
                 />
 
-                <label>PROYECTOS FORMATIVOS (C.S.F.)</label>
+                <label  className="textMenu">PROYECTOS FORMATIVOS (C.S.F.)</label>
               </div>
 
               <ul>
@@ -76,7 +76,7 @@ const Menu = () => {
                       </button>
                     </div>
 
-                    <label>Asistencia</label>
+                    <label className="textMenu">Asistencia</label>
                   </div>
                 </li>
                 <li>
@@ -92,7 +92,7 @@ const Menu = () => {
                       </button>
                     </div>
 
-                    <label>Teams</label>
+                    <label className="textMenu">Teams</label>
                   </div>
                 </li>
 
@@ -109,7 +109,7 @@ const Menu = () => {
                       </button>
                     </div>
 
-                    <label>Aprendices</label>
+                    <label className="textMenu">Aprendices</label>
                   </div>
                 </li>
 
@@ -126,7 +126,7 @@ const Menu = () => {
                       </button>
                     </div>
 
-                    <label>Proyectos</label>
+                    <label className="textMenu">Proyectos</label>
                   </div>
                 </li>
                 <div className="menu-final">
@@ -143,7 +143,7 @@ const Menu = () => {
                         </button>
                       </div>
 
-                      <label>Salir</label>
+                      <label className="textMenu">Salir</label>
                     </div>
                   </li>
 
@@ -159,7 +159,7 @@ const Menu = () => {
                       </button>
                     </div>
                     <div className="menu-content">
-                      <label>Configuraciones</label>
+                      <label className="textMenu">Configuraciones</label>
                     </div>
                   </li>
                 </div>

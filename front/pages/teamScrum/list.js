@@ -1,20 +1,69 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import styles from "../../resources/styles/teamScrum.css";
 import iconocoinf from "../../resources/img/info.png";
 import icononoti from "../../resources/img/noti.png";
 import iconoper from "../../resources/img/persona.png";
 import Menu from "../../components/menu.js";
+import agregar from "../../resources/img/agregar.png";
+import iconodes from "../../resources/img/despliegue.png";
+import { listTeamsScrum } from "../../src/app/services/teamScrumService";
+import CreateTeamScrum from "./create";
 
-const ListaProject = () => {
-  const [activeItem, setActiveItem] = useState(null);
+const ListProject = () => {
+  const [teamsScrum, setTeamsScrum] = useState([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false); 
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [newTeam, setNewTeam] = useState({});
 
-  const handleClick = (item) => {
-    setActiveItem(item);
+
+  useEffect(() => {
+    listTeamsScrum()
+      .then((data) => {
+        setTeamsScrum(data);
+        console.log(teamsScrum);
+      })
+      .catch((error) => {
+        console.error("Error fetching teams scrum:", error);
+      });
+  }, []);
+
+  const openAddModal = () => {
+    setIsAddModalOpen(true);
+  };
+
+  const closeAddModal = () => {
+    setIsAddModalOpen(false);
+  };
+
+  // ...
+  const openInfoModal = () => {
+    setIsInfoModalOpen(true);
+  };
+
+  const closeInfoModal = () => {
+    setIsInfoModalOpen(false);
+  };
+
+  const handleRegister = async () => {
+    if (!newTeam.nameProject) {
+      alert("Por favor ingresa un nombre de proyecto.");
+      return;
+    }
+    try {
+      await createTeamScrum(newTeam);
+      listTeamsScrum().then((data) => {
+        setTeamsScrum(data);
+      });
+      setNewTeam({});
+
+      closeAddModal();
+    } catch (error) {
+      console.error("Error al crear un teamScrum:", error);
+    }
   };
 
   return (
-
     <div className="header">
       <header>
         <div className="container">
@@ -27,9 +76,14 @@ const ListaProject = () => {
             </button>
 
             <div className="profile">
-              <Image src={iconoper} alt="Ficha" width={30} height={30} />
-              <span className="profile-name">Sebastian Rivera</span>
+              <span>juan</span>
+              <Image src={iconoper} alt="Ficha" width={45} height={30} />
             </div>
+            <aside>
+              <button className="despliegue">
+                <Image src={iconodes} alt="Ficha" width={30} height={20} />
+              </button>
+            </aside>
           </div>
         </div>
       </header>
@@ -40,203 +94,120 @@ const ListaProject = () => {
         <div>
           <Menu />
 
-          <div className="card-general">
-            <div class="card">
-              <div class="card-body">
-                <div class="container-principio">
-                  <label>Nombre Proyecto</label>
-                  <a href="#" class="item-button">
-                    Ver más
-                  </a>
-                </div>
-                <br></br>
-                <div class="container-medio">
-                  <label>Desarrollo de la Aplicación Movil</label>
-                </div>
-                <br></br>
-                <div class="container-princ">
-                  <label>Team Numero</label>
-                </div>
-                <br></br>
-                <div class="container-medio">
-                  <label>Equipo 5</label>
-                </div>
-                <br></br>
-                <div class="container-princ">
-                  <label>Agregar Informacion</label>
-                  <div>
-                    <button class="custom-button">
-                      <Image src={iconocoinf} alt="" width={20} height={20} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-body">
-                <div class="container-principio">
-                  <label>Nombre Proyecto</label>
-                  <a href="#" class="item-button">
-                    Ver más
-                  </a>
-                </div>
-                <br></br>
-                <div class="container-medio">
-                  <label>Desarrollo de la Aplicación Movil</label>
-                </div>
-                <br></br>
-                <div class="container-princ">
-                  <label>Team Numero</label>
-                </div>
-                <br></br>
-                <div class="container-medio">
-                  <label>Equipo 5</label>
-                </div>
-                <br></br>
-                <div class="container-princ">
-                  <label>Agregar Informacion</label>
-                  <div>
-                    <button class="custom-button">
-                      <Image src={iconocoinf} alt="" width={20} height={20} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-body">
-                <div class="container-principio">
-                  <label>Nombre Proyecto</label>
-                  <a href="#" class="item-button">
-                    Ver más
-                  </a>
-                </div>
-                <br></br>
-                <div class="container-medio">
-                  <label>Desarrollo de la Aplicación Movil</label>
-                </div>
-                <br></br>
-                <div class="container-princ">
-                  <label>Team Numero</label>
-                </div>
-                <br></br>
-                <div class="container-medio">
-                  <label>Equipo 5</label>
-                </div>
-                <br></br>
-                <div class="container-princ">
-                  <label>Agregar Informacion</label>
-                  <div>
-                    <button class="custom-button">
-                      <Image src={iconocoinf} alt="" width={20} height={20} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div>
+            <button className="button-agregar" onClick={openAddModal}>
+              <Image src={agregar} alt="agregar" width={25} height={18} />
+            </button>
           </div>
 
           <div className="card-general">
-            <div class="card">
-              <div class="card-body">
-                <div class="container-principio">
-                  <label>Nombre Proyecto</label>
-                  <a href="#" class="item-button">
-                    Ver más
-                  </a>
-                </div>
-                <br></br>
-                <div class="container-medio">
-                  <label>Desarrollo de la Aplicación Movil</label>
-                </div>
-                <br></br>
-                <div class="container-princ">
-                  <label>Team Numero</label>
-                </div>
-                <br></br>
-                <div class="container-medio">
-                  <label>Equipo 5</label>
-                </div>
-                <br></br>
-                <div class="container-princ">
-                  <label>Agregar Informacion</label>
-                  <div>
-                    <button class="custom-button">
-                      <Image src={iconocoinf} alt="" width={20} height={20} />
-                    </button>
+            <div className="card-group">
+              {teamsScrum.map((team) => (
+                <div key={team.team_scrum_id} className="card">
+                  <div className="card-body">
+                    <div className="container-principio">
+                      <label>Nombre Proyecto</label>
+                      <a href="#" className="item-button">
+                        Ver más
+                      </a>
+                    </div>
+                    <br />
+                    <div className="container-medio">
+                      <label>{team.nameProject}</label>
+                    </div>
+                    <br />
+                    <div className="container-princ">
+                      <label>Team Numero</label>
+                    </div>
+                    <br />
+                    <div className="container-medio">
+                      <label>{team.team_scrum_id}</label>
+                    </div>
+                    <br />
+                    <div className="container-princ">
+                      <label>Agregar Informacion</label>
+                      <div>
+                        <button className="custom-button" onClick={openInfoModal}>
+                          <Image
+                            src={iconocoinf}
+                            alt=""
+                            width={20}
+                            height={20}
+                          />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-body">
-                <div class="container-principio">
-                  <label>Nombre Proyecto</label>
-                  <a href="#" class="item-button">
-                    Ver más
-                  </a>
-                </div>
-                <br></br>
-                <div class="container-medio">
-                  <label>Desarrollo de la Aplicación Movil</label>
-                </div>
-                <br></br>
-                <div class="container-princ">
-                  <label>Team Numero</label>
-                </div>
-                <br></br>
-                <div class="container-medio">
-                  <label>Equipo 5</label>
-                </div>
-                <br></br>
-                <div class="container-princ">
-                  <label>Agregar Informacion</label>
-                  <div>
-                    <button class="custom-button">
-                      <Image src={iconocoinf} alt="" width={20} height={20} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-body">
-                <div class="container-principio">
-                  <label>Nombre Proyecto</label>
-                  <a href="#" class="item-button">
-                    Ver más
-                  </a>
-                </div>
-                <br></br>
-                <div class="container-medio">
-                  <label>Desarrollo de la Aplicación Movil</label>
-                </div>
-                <br></br>
-                <div class="container-princ">
-                  <label>Team Numero</label>
-                </div>
-                <br></br>
-                <div class="container-medio">
-                  <label>Equipo 5</label>
-                </div>
-                <br></br>
-                <div class="container-princ">
-                  <label>Agregar Informacion</label>
-                  <div>
-                    <button class="custom-button">
-                      <Image src={iconocoinf} alt="" width={20} height={20} />
-                    </button>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
+
+        {/* 2 modal */}
+        {isInfoModalOpen && (
+          <div className="modal-complete">
+            <div className="modal-number2">
+              <div className="modal-contentnumber">
+                <div className="title-model-2">
+                  <h2>Información del Team</h2>
+                </div>
+                <div className="caption-2">
+                  <p>Nombre del Team</p>
+                </div>
+                <br></br>
+
+                <input className="caja-text-2"
+                  placeholder=""
+                  value={newTeam.nameProject || ""}
+                  onChange={(e) =>
+                    setNewTeam({ ...newTeam, nameProject: e.target.value })
+                  }
+                />
+                  <div className="new-text">
+                    <p>Integrantes</p>
+                  </div>
+                  <br></br><br></br>
+                  <table className="table-model">
+                  <thead>
+                    <tr>
+                    <th className="text-table">Numero Doc</th>
+                    <th className="text-table">Nombre Completo</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                    <td>1259775065</td>
+                    <td>Harold Samuel Moreno Perraga</td>
+                    </tr> 
+                    <tr>
+                    <td>6548481451</td>
+                    <td>Michael Felipe Laiton Chaparro</td>
+                    </tr>             
+                  </tbody>
+                  </table>
+
+                <br></br><br></br><br></br><br></br><br></br>
+                <div className="buttons">
+                  <button className="button-edit" onClick={handleRegister}>Editar Informacion</button>
+                  <button className="button-close" onClick={closeInfoModal}>Cerrar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {isAddModalOpen  && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={closeAddModal}>&times;</span>
+            <CreateTeamScrum closeModal={closeAddModal}/>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default ListaProject;
+export default ListProject;

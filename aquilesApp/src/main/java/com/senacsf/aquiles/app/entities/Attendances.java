@@ -16,7 +16,7 @@ import java.util.Date;
 @Table(name = "attendances")
 public class Attendances implements Serializable {
 
-    //creacion de enum para el estado de la asistencia
+    //creación de enum para el estado de la asistencia
     public enum Enum_attendance_state {
         PRESENTE, RETARDO, FALLA, EXCUSA
     }
@@ -44,4 +44,5 @@ public class Attendances implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_idStudent", referencedColumnName = "student_id")
     private Students fk_idStudent;
+
 }

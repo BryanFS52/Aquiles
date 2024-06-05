@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { updateTeamScrum, getTeamScrumById } from "../../../src/app/services/teamScrumService";
 import styles from "../../../resources/styles/teamScrum.css"
-import candado from "../../../resources/img/iconoCandado.png"
+import candado from "../../../resources/img/iconoContraseña.png"
 
 const EditTeamScrum = ({id}) => {
     const { register, handleSubmit, reset, setValue } = useForm();
