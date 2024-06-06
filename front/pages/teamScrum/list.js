@@ -466,54 +466,41 @@ const ListProject = () => {
                   <p>Aprendices</p>
                 </div>
                 
+                <div className="modal3-content3">
                 <div className="item1">
                     <input type="text" className="search-bar" placeholder="Filtrar Aprendices"/>
                     <div className="checkbox-list">
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
+                    {aprendices.map((aprendiz, index) => (
+                            <label key={index}>
+                              <span className="text-modal3">{aprendiz}</span>
+                              <input
+                                type="checkbox"
+                                checked={aprendicesSeleccionados.includes(aprendiz)}
+                                onChange={() => manejarCambioCheckbox(aprendiz)}
+                              />
+                            </label>
+                          ))}
                     </div>
                   </div>
-                
-                <div className="modal3card">
+
+                  <div className="modal3card">
                   <div className="card-modal3">
+                  {aprendicesSeleccionados.map((aprendiz, index) => (
+                            <React.Fragment key={index}>
                   <Image src={iconoapreselecc} alt="" width={20} height={20} />
-                    <label className="text-card-modal3">Michel Felipe Laiton Chaparro</label><br />
-                    <label className="text-card-modal3">Michel Felipe Laiton Chaparro</label>
+                  <label className="text-card-modal3">{aprendiz}</label>
+                            </React.Fragment>
+                          ))}
                   </div>
-                  <div>
-                    <p className="texto">prueba</p>
                   </div>
-                </div>
+                
+                <div className="descripcion-seccion">
+                        <textarea className="descripcion" placeholder="Descripción"></textarea>
+                        <textarea className="problematica" placeholder="Problemática"></textarea>
+                        <textarea className="justificacion" placeholder="Justificación"></textarea>
+                        <textarea className="objectivo" placeholder="Objetivo"></textarea>
+                      </div>
+                    </div>
 
                 <div className="buttons">
                   <button className="button-close-modal3" onClick={closeAgregarModal}>Cancelar</button>

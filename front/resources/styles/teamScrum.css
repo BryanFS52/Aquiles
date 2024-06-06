@@ -790,7 +790,7 @@ header {
 
 /* tercer modal */
 
-.modal-team {
+.modal-team{
   position: fixed;
   z-index: 1;
   left: 0;
@@ -800,7 +800,7 @@ header {
   background-color: rgba(3, 56, 113, 0.3);
 }
 
-.modal-teams {
+.modal-teams{  /*modal (parte blanca) */
   top: 50%;
   position: absolute;
   left: 50%;
@@ -816,7 +816,7 @@ header {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-.modal-3 {
+.modal-3{
   width: 90%;
   height: 90%;
   background-color: #ffffff;
@@ -828,7 +828,7 @@ header {
   justify-content: space-between;
 }
 
-.model-title3 {
+.model-title3{
   position: relative;
   top: 0%;
   text-align: center;
@@ -846,23 +846,23 @@ header {
   margin-top: -9%;
 }
 
-.caption-3 {
+.caption-3{
   margin-top: 20px;
   font-family: Arial, Helvetica, sans-serif;
   margin-right: 90%;
   margin-top: -0%;
 }
 
-.modal-content {
+.modal3-content3{
   display: flex;
   width: 100%;
   justify-content: space-between;
   margin-top: 20px;
 }
 
-.item1 {
+.item1{
   background-color: #ffffff;
-  width: 30%;
+  width: 29%;
   height: 100%;
   font-family: Arial, Helvetica, sans-serif;
   border-radius: 10px;
@@ -871,11 +871,12 @@ header {
   align-items: flex-start;
   border: 1px solid #bdbbbb;
   padding: 20px;
-  margin-right: 65%;
+  margin-right: 5%;
   height: 400px;
+  margin-top: -5%;
 }
 
-.search-bar {
+.search-bar{
   width: calc(100% - 20px);
   height: 4%;
   padding: 10px 10px 10px 40px;
@@ -888,65 +889,10 @@ header {
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
   margin-top: -6%;
+  margin-left: -6%;
 }
 
-.text-modal3 {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  text-align: left;
-  color: #000000;
-}
-
-.modal3card {
-  border: 1px solid #b1b0b0;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: #d9d9d9;
-  background-size: cover;
-  background-position: center;
-  width: 28%;
-  height: 20%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-top: -10%;
-}
-
-.text-card-modal3 {
-  text-align: left;
-  color: #000000;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 15px;
-}
-.buttons {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 50px;
-  margin-top: 20px;
-}
-
-.button-close-modal3 {
-  padding: 12px 75px;
-  background-color: #d9d9d9;
-  color: rgb(0, 0, 0);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.button-edit-modal3 {
-  padding: 12px 50px;
-  background-color: #00324d;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.checkbox-list {
+.checkbox-list{
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -956,43 +902,66 @@ header {
   max-height: calc(100% - 120px);
 }
 
-.checkbox-list label {
+.checkbox-list label{
   display: flex;
   justify-content: center;
   margin-bottom: 10px;
   padding-top: 5px;
 }
 
-.checkbox-list input[type="checkbox"] {
-  margin-left: auto;
-}
-
-.checkbox-list .text-modal3 {
+.text-modal3{
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
   text-align: left;
-  margin-left: 0;
-  padding-left: 0;
+  color: #000000;
 }
 
-.card-modal3 {
+.text-card-modal3{
+  text-align: left;
+  color: #000000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+}
+
+.descripcion-seccion{
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+}
+
+.description, .problematic, .justification, .objective {
+  margin-bottom: 10px;
+  width: 100%;
+  height: 50px;
+  border: 1px solid #bdbbbb;
+  border-radius: 10px;
+  padding: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+}
+
+.buttons{
+  width: 100%;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  width: 100%;
+  padding: 0 50px;
+  margin-top: 20px;
 }
 
-.card-modal3 > img {
-  order: 2;
-  margin-top: -27%;
-  margin-left: 28%;
+.button-close-modal3{
+  padding: 12px 75px;
+  background-color: #D9D9D9;
+  color: rgb(0, 0, 0);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.card-modal3 > div {
-  flex-grow: 1;
-  order: 1;
-}
-
-.texto{
-  color: #f80808c0;
+.button-edit-modal3{
+  padding: 12px 50px;
+  background-color: #00324d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
