@@ -21,6 +21,8 @@ const ListProject = () => {
   const [isObModalOpen, setIsObModalOpen] = useState(false); 
   const [isJustModalOpen, setIsJustModalOpen] = useState(false);
   const [isAgregarModalOpen, setIsAgregarModalOpen] = useState(false);
+  const [aprendicesSeleccionados, setAprendicesSeleccionados] = useState([]);
+  const aprendices = ["Michael Felipe Laiton Chaparro", "laura soto"];
   const [newTeam, setNewTeam] = useState({});
 
   useEffect(() => {
@@ -110,6 +112,16 @@ const ListProject = () => {
 
   const closeAgregarModal = () => {
     setIsAgregarModalOpen(false);
+  };
+
+  const manejarCambioCheckbox = (aprendiz) => {
+    setAprendicesSeleccionados((prev) => {
+      if (prev.includes(aprendiz)) {
+        return prev.filter((item) => item !== aprendiz);
+      } else {
+        return [...prev, aprendiz];
+      }
+    });
   };
 
   const handleRegister = async () => {
