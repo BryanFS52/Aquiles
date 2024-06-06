@@ -8,6 +8,7 @@ import Menu from "../../components/menu.js";
 import agregar from "../../resources/img/agregar.png";
 import iconodes from "../../resources/img/despliegue.png";
 import iconobus from "../../resources/img/Busqueda.png";
+import iconoapreselecc from "../../resources/img/Apre-seleccionados.png";
 import { listTeamsScrum } from "../../src/app/services/teamScrumService";
 import CreateTeamScrum from "./create";
 
@@ -18,7 +19,7 @@ const ListProject = () => {
   const [isDesModalOpen, setIsDesModalOpen] = useState(false); 
   const [isProModalOpen, setIsProModalOpen] = useState(false); 
   const [isObModalOpen, setIsObModalOpen] = useState(false); 
-  const [isJustModalOpen, setIsJustModalOpen] = useState(false); 
+  const [isJustModalOpen, setIsJustModalOpen] = useState(false);
   const [isAgregarModalOpen, setIsAgregarModalOpen] = useState(false);
   const [newTeam, setNewTeam] = useState({});
 
@@ -452,37 +453,50 @@ const ListProject = () => {
                 <div className="caption-3">
                   <p>Aprendices</p>
                 </div>
-
+                
                 <div className="item1">
-                  <input type="text" className="search-bar" placeholder="Filtrar Aprendices"/>
-                  <div className="checkbox-list">
-                  <label>
-                    <input type="checkbox" />
-                      <p className="text-modal3">Michel Felipe Laiton Chaparro</p>
-                  </label>
-                  <label>
-                    <input type="checkbox" />
-                  <p className="text-modal3">Michel Felipe Laiton Chaparro</p>
-                  </label>
-                  <label>
-                    <input type="checkbox" />
-                  <p className="text-modal3">Michel Felipe Laiton Chaparro</p>
-                  </label>
-                  <label>
-                    <input type="checkbox" />
-                  <p className="text-modal3">Michel Felipe Laiton Chaparro</p>
-                  </label>
-                  <label>
-                    <input type="checkbox" />
-                  <p className="text-modal3">Michel Felipe Laiton Chaparro</p>
-                  </label>
+                    <input type="text" className="search-bar" placeholder="Filtrar Aprendices"/>
+                    <div className="checkbox-list">
+                      <label>
+                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
+                        <input type="checkbox" />
+                      </label>
+                      <label>
+                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
+                        <input type="checkbox" />
+                      </label>
+                      <label>
+                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
+                        <input type="checkbox" />
+                      </label>
+                      <label>
+                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
+                        <input type="checkbox" />
+                      </label>
+                      <label>
+                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
+                        <input type="checkbox" />
+                      </label>
+                      <label>
+                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
+                        <input type="checkbox" />
+                      </label>
+                      <label>
+                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
+                        <input type="checkbox" />
+                      </label>
+                      <label>
+                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
+                        <input type="checkbox" />
+                      </label>
+                    </div>
                   </div>
-                </div>
                 
                 <div className="modal3card">
                   <div className="card-modal3">
-                    <label>Michel Felipe Laiton Chaparro</label><br />
-                    <label>Michel Felipe Laiton Chaparro</label>
+                  <Image src={iconoapreselecc} alt="" width={20} height={20} />
+                    <label className="text-card-modal3">Michel Felipe Laiton Chaparro</label><br />
+                    <label className="text-card-modal3">Michel Felipe Laiton Chaparro</label>
                   </div>
                 </div>
 
@@ -494,11 +508,6 @@ const ListProject = () => {
             </div>
           </div>
         )}
-
-
-
-
-
       </div>
     </div>
   );
