@@ -719,8 +719,8 @@ header {
 .caja-buttons {
   /* estilos para los botones navegables del modal para agregar informacion */
   position: absolute;
-  top: 14.5%;
-  left: 33%;
+  top: 14.2%;
+  left: 32.9%;
   display: flex;
   flex-direction: row;
 }
