@@ -597,7 +597,7 @@ header {
   background-color: #ffffff;
   transform: translate(-50%, -50%);
   border: 1px solid #bdbbbb;
-  border-radius: 0 10px 10px 10px;
+  border-radius: 10px 10px 10px 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
@@ -717,45 +717,18 @@ header {
 }
 
 .caja-buttons {
-  /* estilos para los botones navegables del modal para agregar informacion */
   position: absolute;
-  top: 14.2%;
-  left: 32.9%;
-  display: flex;
-  flex-direction: row;
+  top: 15px;
+  left: 80px;
 }
 
-.caja-button-info,
-.caja-button-des,
-.caja-button-prom,
-.caja-button-ob,
-.caja-button-just {
-  padding: 6px 3px;
+.caja-buttons button {
+  margin-right: 10px;
+  padding: 10px 10px;
   background-color: #fff;
   border: 1px solid #ccc;
+  border-radius: 5px;
   cursor: pointer;
-}
-
-.caja-button-info {
-  border-radius: 10px 0 0 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-}
-
-.caja-button-info button,
-.caja-button-des button,
-.caja-button-prom button,
-.caja-button-ob button,
-.caja-button-just button {
-  background-color: transparent;
-  border-color: transparent;
-}
-
-.caja-button-info:hover,
-.caja-button-des:hover,
-.caja-button-prom:hover,
-.caja-button-ob:hover,
-.caja-button-just:hover {
-  background-color: #e0e0e0;
 }
 
 /* ESTILO PARA EL MODAL DE DESCRIPCION (3)*/
