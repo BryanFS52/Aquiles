@@ -510,6 +510,9 @@ const ListProject = () => {
                     <label className="text-card-modal3">Michel Felipe Laiton Chaparro</label><br />
                     <label className="text-card-modal3">Michel Felipe Laiton Chaparro</label>
                   </div>
+                  <div>
+                    <p className="texto">prueba</p>
+                  </div>
                 </div>
 
                 <div className="buttons">

@@ -992,3 +992,7 @@ header {
   flex-grow: 1;
   order: 1;
 }
+
+.texto{
+  color: #f80808c0;
+}
