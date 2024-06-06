@@ -149,10 +149,9 @@ label {
   margin: auto;
   margin-top: 10%;
   margin-bottom: 2.5rem;
-  padding: 1.5rem;
+  padding: 2rem;
   background-color: #fff;
-  
-  }
+}
 
 .titleCreate {
   text-align: center;
@@ -717,7 +716,7 @@ header {
 
 .caja-buttons { /* estilos para los botones navegables del modal para agregar informacion */
   position: absolute;
-  top: 12%;
+  top: 13.5%;
   left: 32.9%;
   display: flex;
   flex-direction: row;
