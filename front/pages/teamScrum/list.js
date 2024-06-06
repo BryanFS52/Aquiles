@@ -455,18 +455,43 @@ const ListProject = () => {
           </div>
         )}
 
+
+
         {isAgregarModalOpen && (
-          <div className="modal-team">
+
+          // sombra azul
+           <div className="modal-team">
+
+            {/* fondo blanco modal */}
             <div className="modal-teams">
-              <div className="modal-3">
+
+              {/* SOMBRA GRIS */}
+              <div className="modal-3">                
+
                 <div className="model-title3">
                   <h2>Creación del Team</h2>
                 </div>
-                <div className="caption-3">
-                  <p>Aprendices</p>
-                </div>
-                
+
+                {/* div general */}
+                                                       
+                <div className="caption-3"> 
+    <p>Aprendices</p> 
+</div> 
+
                 <div className="modal3-content3">
+
+                  <div>
+
+                
+                
+                
+
+                <div className="card-aprendiz">
+
+                
+                
+                
+
                 <div className="item1">
                     <input type="text" className="search-bar" placeholder="Filtrar Aprendices"/>
                     <div className="checkbox-list">
@@ -483,6 +508,17 @@ const ListProject = () => {
                     </div>
                   </div>
 
+                  </div>
+
+                  </div>
+
+
+
+
+
+
+
+                  
                   <div className="modal3card">
                   <div className="card-modal3">
                   {aprendicesSeleccionados.map((aprendiz, index) => (
@@ -500,16 +536,29 @@ const ListProject = () => {
                         <textarea className="justificacion" placeholder="Justificación"></textarea>
                         <textarea className="objectivo" placeholder="Objetivo"></textarea>
                       </div>
+
                     </div>
+
+               
+                {/* div general */}
 
                 <div className="buttons">
                   <button className="button-close-modal3" onClick={closeAgregarModal}>Cancelar</button>
                   <button className="button-edit-modal3" onClick={handleRegister}>Crear</button>
                 </div>
+
               </div>
+              {/* SOMBRA GRIS */}
+
             </div>
+            {/* fondo blanco modal */}
+
           </div>
+          // sombra azul
         )}
+
+
+
       </div>
     </div>
   );
