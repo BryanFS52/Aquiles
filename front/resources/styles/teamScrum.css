@@ -607,6 +607,7 @@ header {
   background-color: #ffffff;
   padding: 20%;
   border-radius: 3%;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .caption-2 {
@@ -629,6 +630,14 @@ header {
   top: 30%;
   left: 30%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.text-2 {
+  text-align: left;
+  margin-top: 5px;
+  margin-right: 10px;
+  margin-left: 10px;
+  margin-bottom: 5px;
 }
 
 .new-text {
@@ -719,11 +728,11 @@ header {
 .caja-buttons {
   position: absolute;
   top: 15px;
-  left: 80px;
+  left: 40px;
 }
 
 .caja-buttons button {
-  margin-right: 10px;
+  margin-right: 25px;
   padding: 10px 10px;
   background-color: #fff;
   border: 1px solid #ccc;
@@ -744,6 +753,14 @@ header {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+.text-modal-3 {
+  text-align: left;
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
 .buttons-modal {
   margin-top: 75%;
 }
@@ -759,6 +776,15 @@ header {
   top: 30%;
   left: 10%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.text-modal {
+  text-align: left;
+  margin-top: 6px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  font-size: 15px;
 }
 
 /* tercer modal */
