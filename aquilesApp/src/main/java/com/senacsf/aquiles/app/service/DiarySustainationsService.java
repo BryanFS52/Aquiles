@@ -4,9 +4,12 @@ import com.senacsf.aquiles.app.entities.DiarySustainations;
 import com.senacsf.aquiles.app.repository.DiarySustainationsRepository;
 import com.senacsf.aquiles.app.service.dao.Idao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
+@Component
 public class DiarySustainationsService implements Idao<DiarySustainations, Long> {
 
     @Autowired
@@ -14,12 +17,13 @@ public class DiarySustainationsService implements Idao<DiarySustainations, Long>
 
     @Override
     public List<DiarySustainations> findAll() {
-        return List.of();
+        return diarySustainationsRepository.findAll();
     }
 
     @Override
-    public DiarySustainations getById(Long aLong) {
-        return null;
+    public DiarySustainations getById(Long id) {
+        Optional<DiarySustainations> optionalDiarySustainations = diarySustainationsRepository.findById(id);
+        return optionalDiarySustainations.orElse(null);
     }
 
     @Override

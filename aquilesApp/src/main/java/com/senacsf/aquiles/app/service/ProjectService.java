@@ -12,7 +12,7 @@ import java.util.List;
 public class ProjectService implements Idao<Project, Long> {
 
     @Autowired
-    ProjectRepository projectRepository;
+    private ProjectRepository projectRepository;
 
     @Override
     public List<Project> findAll() {
@@ -20,8 +20,8 @@ public class ProjectService implements Idao<Project, Long> {
     }
 
     @Override
-    public Project getById(Long id) {
-        return projectRepository.findById(id).orElse(null);
+    public Project getById(Long projectId) {
+        return projectRepository.findById(projectId).orElse(null);
     }
 
     @Override

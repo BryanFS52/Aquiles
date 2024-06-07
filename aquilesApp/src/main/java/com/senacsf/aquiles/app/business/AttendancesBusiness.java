@@ -1,9 +1,7 @@
 package com.senacsf.aquiles.app.business;
 
 import com.senacsf.aquiles.app.dto.AttenancesDto;
-import com.senacsf.aquiles.app.dto.TeamsScrumDto;
 import com.senacsf.aquiles.app.entities.Attendances;
-import com.senacsf.aquiles.app.entities.Teams_scrum;
 import com.senacsf.aquiles.app.service.AttendancesService;
 import com.senacsf.aquiles.app.utilities.CustomException;
 import org.modelmapper.ModelMapper;
