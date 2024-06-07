@@ -475,22 +475,14 @@ const ListProject = () => {
                 {/* div general */}
                                                        
                 <div className="caption-3"> 
-    <p>Aprendices</p> 
-</div> 
+                    <p>Aprendices</p> 
+                </div> 
 
                 <div className="modal3-content3">
 
                   <div>
-
                 
-                
-                
-
                 <div className="card-aprendiz">
-
-                
-                
-                
 
                 <div className="item1">
                     <input type="text" className="search-bar" placeholder="Filtrar Aprendices"/>
@@ -512,30 +504,47 @@ const ListProject = () => {
 
                   </div>
 
+                  <div className="card-gris-modal">
 
+                  <div className="titulo-seleccionados">
 
+                    <p>Aprendices Seleccionados</p>
 
+                    </div>
 
+                  <div className="modal3card">  {/* tarjeta gris para la descripcion */}
 
-
-                  
-                  <div className="modal3card">
                   <div className="card-modal3">
+
                   {aprendicesSeleccionados.map((aprendiz, index) => (
                             <React.Fragment key={index}>
+
                   <Image src={iconoapreselecc} alt="" width={20} height={20} />
+
                   <label className="text-card-modal3">{aprendiz}</label>
                             </React.Fragment>
                           ))}
+
                   </div>
+
                   </div>
-                
-                <div className="descripcion-seccion">
-                        <textarea className="descripcion" placeholder="Descripción"></textarea>
-                        <textarea className="problematica" placeholder="Problemática"></textarea>
-                        <textarea className="justificacion" placeholder="Justificación"></textarea>
-                        <textarea className="objectivo" placeholder="Objetivo"></textarea>
-                      </div>
+
+                  <div className="title-problmatica">
+                      <p>Problematica</p>
+                  </div>
+
+                  <div className="tarjeta">
+                  </div>
+                  
+
+                  <div className="title-objetivo">
+                      <p>Objetivo</p>
+                  </div>
+
+                  <div className="tarjeta-object">
+                  </div>
+                  
+                  </div> 
 
                     </div>
 
