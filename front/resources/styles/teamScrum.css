@@ -167,13 +167,13 @@ label {
 .titleCreate::after { /* estilo de la linea del titulo */
   content: "";
   display: block;
-  width: 50%; /* Ancho de la línea */
+  width: 22%; /* Ancho de la línea */
   height: 9%; /* Grosor de la línea */
   background-color: #00324d; /* Color de la línea */
   margin: 0.5rem auto 0; /* Espaciado alrededor de la línea */
   position: absolute;
   bottom: -9%; /* Ajusta la posición vertical de la línea */
-  left: 20%; /* Centra la línea horizontalmente */
+  left: 38%; /* Centra la línea horizontalmente */
   border-radius: 50px; /* Hace que las esquinas sean totalmente redondas */
 }
 
@@ -186,7 +186,7 @@ label {
   display: block;
   font-size: 1rem;
   font-weight: 500;
-  margin-left: -22%;
+  margin-left: -14%;
 }
 .label2 {
   display: block;
@@ -202,7 +202,7 @@ label {
   padding: 0.6rem;
   border-width: 1px;
   border-radius: 0.375rem;
-  width: 93%;
+  width: 45%;
   outline: none;
   border-color: #000000;
 }
