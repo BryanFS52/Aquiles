@@ -487,6 +487,7 @@ const ListProject = () => {
 
                   </div>
 
+                 
                   <div className="card-gris-modal">
 
                   <div className="titulo-seleccionados">
@@ -508,7 +509,26 @@ const ListProject = () => {
                             </React.Fragment>
                           ))}
 
-                  </div>
+                                <div className="card-gris-modal-2">
+
+                                <div className="title-descripcion">
+                                    <p>Descripcion</p>
+                                </div>
+
+                                <div className="tarjeta-descripcion">
+                                </div>
+
+
+                                <div className="title-justificacion">
+                                    <p>Justificacion</p>
+                                </div>
+
+                                <div className="tarjeta-justificacion">
+                                </div>
+
+                                </div> 
+
+                  </div>       
 
                   </div>
 
@@ -517,8 +537,7 @@ const ListProject = () => {
                   </div>
 
                   <div className="tarjeta">
-                  </div>
-                  
+                  </div> 
 
                   <div className="title-objetivo">
                       <p>Objetivo</p>
@@ -528,8 +547,7 @@ const ListProject = () => {
                   </div>
                   
                   </div> 
-
-                    </div>
+                  </div>
 
                
                 {/* div general */}
