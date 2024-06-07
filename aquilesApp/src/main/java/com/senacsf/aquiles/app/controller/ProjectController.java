@@ -3,7 +3,10 @@ package com.senacsf.aquiles.app.controller;
 import com.senacsf.aquiles.app.business.ProjectBusiness;
 import com.senacsf.aquiles.app.dto.ProjectDetailsDto;
 import com.senacsf.aquiles.app.dto.ProjectDto;
+import com.senacsf.aquiles.app.entities.Project;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +36,16 @@ public class ProjectController {
     @GetMapping("/details")
     public List<ProjectDetailsDto> getProjectDetails() {
         return projectBusiness.getProjectDetails();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProjectDto> getById(@PathVariable("id") Long projectId) {
+        ProjectDto projectDto = projectBusiness.getById(projectId);
+        if (projectDto != null) {
+            return ResponseEntity.ok(projectDto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }
