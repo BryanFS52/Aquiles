@@ -233,25 +233,15 @@ const ListProject = () => {
 
         {isInfoModalOpen && (
           <div className="modal-complete">
-            <div className="caja-buttons">
-              <div className="caja-button-info">
+            <div className="modal-number2">
+              <div className="caja-buttons">
                 <button className="button-info" onClick={() => handleButtonClick(openInfoModal)}>Informacion</button>
-              </div>
-              <div className="caja-button-des">
                 <button className="button-des" onClick={() => handleButtonClick(openDesModal)}>Descripcion</button>
-              </div>
-              <div className="caja-button-prom">
                 <button className="button-prom" onClick={() => handleButtonClick(openProModal)}>Problematica</button>
-              </div>
-              <div className="caja-button-ob">
                 <button className="button-obj" onClick={() => handleButtonClick(openObModal)}>Objetivos</button>
-              </div>
-              <div className="caja-button-just">
                 <button className="button-just" onClick={() => handleButtonClick(openJustModal)}>Justificacion</button>
               </div>
-            </div>
 
-            <div className="modal-number2">
               <div className="modal-contentnumber">
                 <div className="title-model-2">
                   <h2>Información del Team</h2>
@@ -259,14 +249,16 @@ const ListProject = () => {
                 <div className="caption-2">
                   <p>Nombre del Team</p>
                 </div>
-
-                <input className="caja-text-2"
-                  placeholder=""
-                  value={newTeam.nameProject || ""}
-                  onChange={(e) =>
-                    setNewTeam({ ...newTeam, nameProject: e.target.value })
-                  }
-                />
+                <div className="caja-text-2">
+                  {/*<input className="text-2"
+                    placeholder=""
+                    value={newTeam.nameProject || ""}
+                    onChange={(e) =>
+                      setNewTeam({ ...newTeam, nameProject: e.target.value })
+                    }
+                  />*/}
+                  <p className="text-2">AquilesApp</p>
+                </div>
                 <div className="new-text">
                   <p>Integrantes</p>
                 </div>
@@ -301,25 +293,15 @@ const ListProject = () => {
 
         {isDesModalOpen && (
           <div className="modal-complete">
-            <div className="caja-buttons">
-              <div className="caja-button-info">
+            <div className="modal-number2">
+              <div className="caja-buttons">
                 <button className="button-info" onClick={() => handleButtonClick(openInfoModal)}>Informacion</button>
-              </div>
-              <div className="caja-button-des">
                 <button className="button-des" onClick={() => handleButtonClick(openDesModal)}>Descripcion</button>
-              </div>
-              <div className="caja-button-prom">
                 <button className="button-prom" onClick={() => handleButtonClick(openProModal)}>Problematica</button>
-              </div>
-              <div className="caja-button-ob">
                 <button className="button-obj" onClick={() => handleButtonClick(openObModal)}>Objetivos</button>
-              </div>
-              <div className="caja-button-just">
                 <button className="button-just" onClick={() => handleButtonClick(openJustModal)}>Justificacion</button>
               </div>
-            </div>
 
-            <div className="modal-number2">
               <div className="modal-contentnumber">
                 <div className="title-model-2">
                   <h2>Descripción</h2>
@@ -327,7 +309,15 @@ const ListProject = () => {
                 <div className="caption-2">
                   <p>Descripción del Proyecto</p>
                 </div>
-                <input className="caja-text-modal-3" placeholder="" value=""/>
+                <div className="caja-text-modal-3"> 
+                  {/*<input className="text-modal-3" placeholder="" value=""/>*/}
+                  <p className="text-modal-3">
+                    Desarrollo de la Aplicación Móvil de Gestión de Asistencia" tiene como objetivo crear una solución integral para el seguimiento y la gestión de la asistencia
+                    en instituciones educativas y empresas.
+                    Esta aplicación proporcionará a los usuarios una plataforma fácil de usar para registrar, monitorear y analizar la asistencia de estudiantes y empleados en 
+                    tiempo real.
+                  </p>
+                </div>
 
                 <div className="buttons-modal">
                   <button className="button-edit" onClick={handleRegister}>Editar Información</button>
@@ -340,25 +330,15 @@ const ListProject = () => {
 
         {isProModalOpen && (
           <div className="modal-complete">
-            <div className="caja-buttons">
-              <div className="caja-button-info">
+            <div className="modal-number2">
+              <div className="caja-buttons">
                 <button className="button-info" onClick={() => handleButtonClick(openInfoModal)}>Informacion</button>
-              </div>
-              <div className="caja-button-des">
                 <button className="button-des" onClick={() => handleButtonClick(openDesModal)}>Descripcion</button>
-              </div>
-              <div className="caja-button-prom">
                 <button className="button-prom" onClick={() => handleButtonClick(openProModal)}>Problematica</button>
-              </div>
-              <div className="caja-button-ob">
                 <button className="button-obj" onClick={() => handleButtonClick(openObModal)}>Objetivos</button>
-              </div>
-              <div className="caja-button-just">
                 <button className="button-just" onClick={() => handleButtonClick(openJustModal)}>Justificacion</button>
               </div>
-            </div>
 
-            <div className="modal-number2">
               <div className="modal-contentnumber">
                 <div className="title-model-2">
                   <h2>Problematica</h2>
@@ -366,8 +346,15 @@ const ListProject = () => {
                 <div className="caption-2">
                   <p>Problematica del Proyecto</p>
                 </div>
-                <input className="caja-text-modal" placeholder="" value=""/>
-
+                <div className="caja-text-modal">
+                  {/*<input className="text-modal" placeholder="" value=""/>*/}
+                  <p className="text-modal">
+                    La gestión tradicional de la asistencia en instituciones educativas y empresas presenta varios desafíos y limitaciones que impactan negativamente en la eficiencia, precisión y efectividad del proceso. A continuación, se detallan las principales problemáticas que el proyecto "Desarrollo de la Aplicación Móvil de Gestión de Asistencia" pretende abordar: <br></br>
+                    1. Errores Humanos: El registro manual de la asistencia, ya sea en hojas de papel o mediante sistemas arcaicos, es propenso a errores humanos. Estos errores pueden incluir omisiones, registros incorrectos o duplicados, lo que afecta la precisión de los datos y dificulta la toma de decisiones informadas.<br></br>
+                    2. Pérdida de Tiempo: Los métodos tradicionales de registro y seguimiento de asistencia son lentos y laboriosos, requiriendo una inversión considerable de tiempo por parte de maestros, administradores y empleados. Este tiempo podría aprovecharse mejor en actividades educativas o productivas.
+                  </p>
+                </div>
+                
                 <div className="buttons-modal">
                   <button className="button-edit" onClick={handleRegister}>Editar Información</button>
                   <button className="button-close" onClick={closeProModal}>Cerrar</button>
@@ -379,25 +366,15 @@ const ListProject = () => {
 
         {isObModalOpen && (
           <div className="modal-complete">
-            <div className="caja-buttons">
-              <div className="caja-button-info">
+            <div className="modal-number2">
+              <div className="caja-buttons">
                 <button className="button-info" onClick={() => handleButtonClick(openInfoModal)}>Informacion</button>
-              </div>
-              <div className="caja-button-des">
                 <button className="button-des" onClick={() => handleButtonClick(openDesModal)}>Descripcion</button>
-              </div>
-              <div className="caja-button-prom">
                 <button className="button-prom" onClick={() => handleButtonClick(openProModal)}>Problematica</button>
-              </div>
-              <div className="caja-button-ob">
                 <button className="button-obj" onClick={() => handleButtonClick(openObModal)}>Objetivos</button>
-              </div>
-              <div className="caja-button-just">
                 <button className="button-just" onClick={() => handleButtonClick(openJustModal)}>Justificacion</button>
               </div>
-            </div>
 
-            <div className="modal-number2">
               <div className="modal-contentnumber">
                 <div className="title-model-2">
                   <h2>Objetivos</h2>
@@ -405,7 +382,14 @@ const ListProject = () => {
                 <div className="caption-2">
                   <p>Objetivos del Proyecto</p>
                 </div>
-                <input className="caja-text-modal" placeholder="" value=""/>
+                <div className="caja-text-modal">
+                  {/*<input className="text-modal" placeholder="" value=""/>*/}
+                  <p className="text-modal">
+                    El proyecto "Desarrollo de la Aplicación Móvil de Gestión de Asistencia" propone una solución digital integral para abordar las problemáticas identificadas en la gestión tradicional de la asistencia. La aplicación móvil proporcionará una plataforma moderna y eficiente que optimizará el proceso de registro, seguimiento y análisis de la asistencia. A continuación, se detallan las características clave de la solución: <br></br>
+                    1. Automatización del Registro de Asistencia: La aplicación permitirá registrar la asistencia de manera rápida y precisa mediante el uso de tecnologías avanzadas como códigos QR, tarjetas NFC y entradas manuales. Esto reducirá significativamente los errores humanos y el tiempo necesario para el registro.<br></br>
+                    2. Accesibilidad en Tiempo Real: Los datos de asistencia estarán disponibles en tiempo real, permitiendo a los usuarios autorizados acceder y compartir información de manera instantánea desde cualquier lugar y en cualquier momento. Esto mejorará la transparencia y la comunicación entre estudiantes, empleados, padres y administradores.
+                  </p>
+                </div>
 
                 <div className="buttons-modal">
                   <button className="button-edit" onClick={handleRegister}>Editar Información</button>
@@ -418,25 +402,15 @@ const ListProject = () => {
 
         {isJustModalOpen && (
           <div className="modal-complete">
-            <div className="caja-buttons">
-              <div className="caja-button-info">
+            <div className="modal-number2">
+              <div className="caja-buttons">
                 <button className="button-info" onClick={() => handleButtonClick(openInfoModal)}>Informacion</button>
-              </div>
-              <div className="caja-button-des">
                 <button className="button-des" onClick={() => handleButtonClick(openDesModal)}>Descripcion</button>
-              </div>
-              <div className="caja-button-prom">
                 <button className="button-prom" onClick={() => handleButtonClick(openProModal)}>Problematica</button>
-              </div>
-              <div className="caja-button-ob">
                 <button className="button-obj" onClick={() => handleButtonClick(openObModal)}>Objetivos</button>
-              </div>
-              <div className="caja-button-just">
                 <button className="button-just" onClick={() => handleButtonClick(openJustModal)}>Justificacion</button>
               </div>
-            </div>
-
-            <div className="modal-number2">
+              
               <div className="modal-contentnumber">
                 <div className="title-model-2">
                   <h2>Justificación</h2>
@@ -444,7 +418,16 @@ const ListProject = () => {
                 <div className="caption-2">
                   <p>Justificación del Proyecto</p>
                 </div>
-                <input className="caja-text-modal" placeholder="" value=""/>
+                <div className="caja-text-modal">
+                  {/*<input className="text-modal" placeholder="" value=""/>*/}
+                  <p className="text-modal">
+                    Características del Proyecto:<br></br>
+                    1. Interfaz de Usuario Intuitiva: La aplicación contará con un diseño limpio y fácil de navegar, permitiendo a los usuarios registrar la asistencia con unos pocos toques. La interfaz será compatible con dispositivos iOS y Android.<br></br>
+                    2. Funcionalidad de Registro Rápido: Los usuarios podrán registrar la asistencia mediante diversas opciones, como códigos QR, tarjetas NFC, o introducción manual de datos. Esto garantizará flexibilidad y rapidez en el proceso de registro.<br></br>
+                    3. Gestión de Usuarios: La aplicación permitirá la creación y gestión de perfiles para estudiantes, empleados, maestros y administradores, con diferentes niveles de acceso y permisos.<br></br>
+                    4. Notificaciones y Recordatorios: Se implementarán notificaciones automáticas para alertar a los usuarios sobre ausencias, retardos y eventos importantes, ayudando a mantener una comunicación efectiva entre todas las partes involucradas.
+                  </p>
+                </div>
 
                 <div className="buttons-modal">
                   <button className="button-edit" onClick={handleRegister}>Editar Información</button>
@@ -455,74 +438,137 @@ const ListProject = () => {
           </div>
         )}
 
+
+
         {isAgregarModalOpen && (
-          <div className="modal-team">
+
+          // sombra azul
+           <div className="modal-team">
+
+            {/* fondo blanco modal */}
             <div className="modal-teams">
-              <div className="modal-3">
+
+              {/* SOMBRA GRIS */}
+              <div className="modal-3">                
+
                 <div className="model-title3">
                   <h2>Creación del Team</h2>
                 </div>
-                <div className="caption-3">
-                  <p>Aprendices</p>
-                </div>
+
+                {/* div general */}
+                                                       
+                <div className="caption-3"> 
+                    <p>Aprendices</p> 
+                </div> 
+
+                <div className="modal3-content3">
+
+                  <div>
                 
+                <div className="card-aprendiz">
+
                 <div className="item1">
                     <input type="text" className="search-bar" placeholder="Filtrar Aprendices"/>
                     <div className="checkbox-list">
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
-                      <label>
-                        <span className="text-modal3">Michel Felipe Laiton Chaparro</span>
-                        <input type="checkbox" />
-                      </label>
+                    {aprendices.map((aprendiz, index) => (
+                            <label key={index}>
+                              <span className="text-modal3">{aprendiz}</span>
+                              <input
+                                type="checkbox"
+                                checked={aprendicesSeleccionados.includes(aprendiz)}
+                                onChange={() => manejarCambioCheckbox(aprendiz)}
+                              />
+                            </label>
+                          ))}
                     </div>
                   </div>
-                
-                <div className="modal3card">
+
+                  </div>
+
+                  </div>
+
+                 
+                  <div className="card-gris-modal">
+
+                  <div className="titulo-seleccionados">
+
+                    <p>Aprendices Seleccionados</p>
+
+                    </div>
+
+                  <div className="modal3card">  {/* tarjeta gris para la descripcion */}
+
                   <div className="card-modal3">
+
+                  {aprendicesSeleccionados.map((aprendiz, index) => (
+                            <React.Fragment key={index}>
+
                   <Image src={iconoapreselecc} alt="" width={20} height={20} />
-                    <label className="text-card-modal3">Michel Felipe Laiton Chaparro</label><br />
-                    <label className="text-card-modal3">Michel Felipe Laiton Chaparro</label>
+
+                  <label className="text-card-modal3">{aprendiz}</label>
+                            </React.Fragment>
+                          ))}
+
+                                <div className="card-gris-modal-2">
+
+                                <div className="title-descripcion">
+                                    <p>Descripcion</p>
+                                </div>
+
+                                <div className="tarjeta-descripcion">
+                                </div>
+
+
+                                <div className="title-justificacion">
+                                    <p>Justificacion</p>
+                                </div>
+
+                                <div className="tarjeta-justificacion">
+                                </div>
+
+                                </div> 
+
+                  </div>       
+
                   </div>
-                  <div>
-                    <p className="texto">prueba</p>
+
+                  <div className="title-problmatica">
+                      <p>Problematica</p>
                   </div>
-                </div>
+
+                  <div className="tarjeta">
+                  </div> 
+
+                  <div className="title-objetivo">
+                      <p>Objetivo</p>
+                  </div>
+
+                  <div className="tarjeta-object">
+                  </div>
+                  
+                  </div> 
+                  </div>
+
+               
+                {/* div general */}
 
                 <div className="buttons">
                   <button className="button-close-modal3" onClick={closeAgregarModal}>Cancelar</button>
                   <button className="button-edit-modal3" onClick={handleRegister}>Crear</button>
                 </div>
+
               </div>
+              {/* SOMBRA GRIS */}
+
             </div>
+            {/* fondo blanco modal */}
+
           </div>
+          // sombra azul
         )}
+
+
+
       </div>
     </div>
   );

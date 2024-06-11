@@ -129,4 +129,9 @@ public class ProjectBusiness {
         }
     }
 
+    public ProjectDto getById(Long projectId) {
+        Project project = projectService.getById(projectId);
+        return modelMapper.map(project, ProjectDto.class); // Convertir Project a ProjectDto
+    }
+
 }
