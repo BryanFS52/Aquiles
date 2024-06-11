@@ -250,7 +250,7 @@ const ListProject = () => {
                   <p>Nombre del Team</p>
                 </div>
                 <div className="caja-text-2">
-                  {/*<input className="caja-text-2"
+                  {/*<input className="text-2"
                     placeholder=""
                     value={newTeam.nameProject || ""}
                     onChange={(e) =>
