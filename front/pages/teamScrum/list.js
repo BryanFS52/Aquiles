@@ -22,7 +22,7 @@ const ListProject = () => {
   const [isJustModalOpen, setIsJustModalOpen] = useState(false);
   const [isAgregarModalOpen, setIsAgregarModalOpen] = useState(false);
   const [aprendicesSeleccionados, setAprendicesSeleccionados] = useState([]);
-  const aprendices = ["Michael Felipe Laiton Chaparro", "laura soto"];
+  const aprendices = ["Michael Felipe Laiton Chaparro", "laura soto", "Juan Felipe Orozco Bermudez", "Lina Maria Soto Ruiz"];
   const [newTeam, setNewTeam] = useState({});
 
   useEffect(() => {
@@ -477,7 +477,7 @@ const ListProject = () => {
                                 type="checkbox"
                                 checked={aprendicesSeleccionados.includes(aprendiz)}
                                 onChange={() => manejarCambioCheckbox(aprendiz)}
-                              />
+                              />          
                             </label>
                           ))}
                     </div>
@@ -497,13 +497,14 @@ const ListProject = () => {
                     </div>
 
                   <div className="modal3card">  {/* tarjeta gris para la descripcion */}
+                    <div className="image-modal3card">
+                    </div>
 
                   <div className="card-modal3">
 
                   {aprendicesSeleccionados.map((aprendiz, index) => (
-                            <React.Fragment key={index}>
 
-                  <Image src={iconoapreselecc} alt="" width={20} height={20} />
+                        <React.Fragment key={index}>
 
                   <label className="text-card-modal3">{aprendiz}</label>
                             </React.Fragment>
@@ -511,21 +512,20 @@ const ListProject = () => {
 
                                 <div className="card-gris-modal-2">
 
-                                <div className="title-descripcion">
+                                <div className="title-descripcion-modal3">
                                     <p>Descripcion</p>
                                 </div>
 
-                                <div className="tarjeta-descripcion">
+                                <div className="tarjeta-descripcion-modal3">
                                 </div>
 
 
-                                <div className="title-justificacion">
+                                <div className="title-justificacion-modal3">
                                     <p>Justificacion</p>
                                 </div>
 
-                                <div className="tarjeta-justificacion">
+                                <div className="tarjeta-justificacion-modal3">
                                 </div>
-
                                 </div> 
 
                   </div>       
@@ -538,19 +538,18 @@ const ListProject = () => {
 
                   <div className="tarjeta">
                   </div> 
-
-                  <div className="title-objetivo">
+                  </div> 
+                  </div>
+                  
+               
+                {/* div general */}
+                
+                <div className="title-objetivo">
                       <p>Objetivo</p>
                   </div>
 
                   <div className="tarjeta-object">
                   </div>
-                  
-                  </div> 
-                  </div>
-
-               
-                {/* div general */}
 
                 <div className="buttons">
                   <button className="button-close-modal3" onClick={closeAgregarModal}>Cancelar</button>

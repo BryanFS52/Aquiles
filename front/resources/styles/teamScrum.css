@@ -164,7 +164,8 @@ label {
   top: -1%;
 }
 
-.titleCreate::after { /* estilo de la linea del titulo */
+.titleCreate::after {
+  /* estilo de la linea del titulo */
   content: "";
   display: block;
   width: 50%; /* Ancho de la línea */
@@ -247,7 +248,8 @@ label {
   letter-spacing: 1px;
 }
 
-.registerButton:hover, .cancelButton:hover { 
+.registerButton:hover,
+.cancelButton:hover {
   cursor: pointer;
 }
 
@@ -790,7 +792,7 @@ header {
 
 /* tercer modal */
 
-.modal-team{
+.modal-team {
   position: fixed;
   z-index: 1;
   left: 0;
@@ -800,7 +802,8 @@ header {
   background-color: rgba(3, 56, 113, 0.3);
 }
 
-.modal-teams{  /*modal (parte blanca) */
+.modal-teams {
+  /*modal (parte blanca) */
   top: 50%;
   position: absolute;
   left: 50%;
@@ -816,7 +819,7 @@ header {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-.modal-3{
+.modal-3 {
   width: 90%;
   height: 90%;
   background-color: #ffffff;
@@ -828,30 +831,29 @@ header {
   justify-content: space-between;
 }
 
-.modal3-general3{
+.modal3-general3 {
   width: 100%;
   background-color: #103cff;
 }
 
-.caption-3{
+.caption-3 {
   margin-top: -20px;
   font-family: Arial, Helvetica, sans-serif;
   margin-right: 90%;
   margin-bottom: 30%;
 }
 
-.card-aprendiz{
+.card-aprendiz {
   width: 300%;
   margin-top: -30%;
 }
-
 
 .modal3card {
   border: 1px solid #b1b0b0;
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: #D9D9D9;
+  background-color: #d9d9d9;
   background-size: cover;
   background-position: center;
   width: auto;
@@ -863,33 +865,36 @@ header {
   right: 50%;
 }
 
-.card-gris-modal{
+.image-modal3card{
+  margin-top: -8%;
+  margin-right: -50%;
+}
+
+.card-gris-modal {
   background-color: #ffffff;
   margin-top: -40%;
   margin-right: 35%;
   font-family: Arial, Helvetica, sans-serif;
- 
 }
 
-.text-modal3card{
+.text-modal3card {
   color: #000000;
   font-family: Arial, Helvetica, sans-serif;
   margin-top: -8%;
-  font-size: 14px;   
+  font-size: 14px;
 }
 
-.title-problmatica{
+.title-problmatica {
   margin-right: 70%;
-
 }
 
-.card-problematica-3{
+.card-problematica-3 {
   width: 100%;
   margin-top: -30%;
 }
 
-.tarjeta{
-  background-color: #FFFFFF;
+.tarjeta {
+  background-color: #ffffff;
   border: 1px solid #8f8d8d;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 85.4%;
@@ -901,24 +906,26 @@ header {
   margin-right: 5%;
 }
 
-.title-objetivo{
-  margin-right: 78%;
+.title-objetivo {
+  margin-right: -15%;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-.tarjeta-object{
-  background-color: #FFFFFF;
+.tarjeta-object {
+  background-color: #ffffff;
   border: 1px solid #8f8d8d;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 85.4%;
-  height: 14%;
+  width: 26%;
+  height: 10%;
   font-family: Arial, Helvetica, sans-serif;
   border-radius: 10px;
   display: flex;
   padding: 20px;
-  right: 80%;
+  margin-right: -35%;
+  margin-top: -26%;
 }
 
-.model-title3{
+.model-title3 {
   position: relative;
   top: 0%;
   text-align: center;
@@ -936,9 +943,7 @@ header {
   margin-top: -9%;
 }
 
-
-
-.modal3-content3{
+.modal3-content3 {
   display: flex;
   width: 100%;
   justify-content: space-between;
@@ -946,7 +951,7 @@ header {
   background-color: #ffffff;
 }
 
-.item1{
+.item1 {
   background-color: #ffffff;
   width: 29%;
   height: 100%;
@@ -962,7 +967,7 @@ header {
   margin-top: -38.5%;
 }
 
-.search-bar{
+.search-bar {
   width: calc(100% - 20px);
   height: 4%;
   padding: 10px 10px 10px 40px;
@@ -978,7 +983,7 @@ header {
   margin-left: -6%;
 }
 
-.checkbox-list{
+.checkbox-list {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -988,7 +993,7 @@ header {
   max-height: calc(100% - 120px);
 }
 
-.checkbox-list label{
+.checkbox-list label {
   display: flex;
   justify-content: center;
   margin-bottom: 10px;
@@ -1011,22 +1016,21 @@ header {
   width: 100%;
 }
 
-.text-modal3{
+.text-modal3 {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
   text-align: left;
   color: #000000;
 }
 
-.text-card-modal3{
+.text-card-modal3 {
   text-align: left;
   color: #000000;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 15px;
 }
 
-
-.buttons{
+.buttons {
   width: 50%;
   display: flex;
   justify-content: space-between;
@@ -1034,10 +1038,10 @@ header {
   margin-top: 20px;
 }
 
-.button-close-modal3{
+.button-close-modal3 {
   width: 25%;
   height: 200%;
-  background-color: #9D9D9D;
+  background-color: #9d9d9d;
   color: rgb(0, 0, 0);
   font-size: 17px;
   border: none;
@@ -1045,7 +1049,7 @@ header {
   cursor: pointer;
 }
 
-.button-edit-modal3{
+.button-edit-modal3 {
   width: 25%;
   height: 200%;
   background-color: #00324d;
@@ -1056,7 +1060,7 @@ header {
   cursor: pointer;
 }
 
-.titulo-seleccionados{
+.titulo-seleccionados {
   margin-top: -8%;
   margin-bottom: 10%;
   font-size: 17px;
@@ -1064,9 +1068,8 @@ header {
   margin-right: 27%;
 }
 
-
-.descripcion{
-  background-color: #FFFFFF;
+.descripcion {
+  background-color: #ffffff;
   border: 1px solid #8f8d8d;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 85.4%;
@@ -1078,13 +1081,12 @@ header {
   margin-left: -100%;
 }
 
-.title-descripcion{
+.title-descripcion {
   margin-right: -100%;
-
 }
 
 /* segundo div para la descripcion y para la justificacion */
-.card-gris-modal-2{
+.card-gris-modal-2 {
   background-color: #ffffff;
   margin-top: -44%;
   margin-left: 120%;
@@ -1092,12 +1094,12 @@ header {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.title-descripcion{
-margin-right: 70%;
+.title-descripcion-modal3 {
+  margin-right: 70%;
 }
 
-.tarjeta-descripcion{
-  background-color: #FFFFFF;
+.tarjeta-descripcion-modal3 {
+  background-color: #ffffff;
   border: 1px solid #8f8d8d;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 75%;
@@ -1109,12 +1111,12 @@ margin-right: 70%;
   margin-right: 5%;
 }
 
-.title-justificacion{
+.title-justificacion-modal3 {
   margin-right: 78%;
 }
 
-.tarjeta-justificacion{
-  background-color: #FFFFFF;
+.tarjeta-justificacion-modal3 {
+  background-color: #ffffff;
   border: 1px solid #8f8d8d;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 75%;
