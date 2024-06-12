@@ -543,12 +543,15 @@ const ListProject = () => {
                   
                
                 {/* div general */}
-                
+                  
                 <div className="title-objetivo">
-                      <p>Objetivo</p>
+                      <p>objetivo</p>
                   </div>
 
                   <div className="tarjeta-object">
+                    <div className="text-object">
+                      <p>Objetivo</p>
+                    </div>
                   </div>
 
                 <div className="buttons">
