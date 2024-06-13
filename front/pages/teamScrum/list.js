@@ -438,135 +438,134 @@ const ListProject = () => {
           </div>
         )}
 
-
-
         {isAgregarModalOpen && (
 
-          // sombra azul
-           <div className="modal-team">
+        // sombra azul
+        <div className="modal-team">
 
-            {/* fondo blanco modal */}
-            <div className="modal-teams">
+          {/* fondo blanco modal */}
+          <div className="modal-teams">
 
-              {/* SOMBRA GRIS */}
-              <div className="modal-3">                
+            {/* SOMBRA GRIS */}
+            <div className="modal-3">                
 
-                <div className="model-title3">
-                  <h2>Creación del Team</h2>
-                </div>
-
-                {/* div general */}
-                                                       
-                <div className="caption-3"> 
-                    <p>Aprendices</p> 
-                </div> 
-
-                <div className="modal3-content3">
-
-                  <div>
-                
-                <div className="card-aprendiz">
-
-                <div className="item1">
-                    <input type="text" className="search-bar" placeholder="Filtrar Aprendices"/>
-                    <div className="checkbox-list">
-                    {aprendices.map((aprendiz, index) => (
-                            <label key={index}>
-                              <span className="text-modal3">{aprendiz}</span>
-                              <input
-                                type="checkbox"
-                                checked={aprendicesSeleccionados.includes(aprendiz)}
-                                onChange={() => manejarCambioCheckbox(aprendiz)}
-                              />          
-                            </label>
-                          ))}
-                    </div>
-                  </div>
-
-                  </div>
-
-                  </div>
-
-                 
-                  <div className="card-gris-modal">
-
-                  <div className="titulo-seleccionados">
-
-                    <p>Aprendices Seleccionados</p>
-
-                    </div>
-
-                  <div className="modal3card">  {/* tarjeta gris para la descripcion */}
-                    <div className="image-modal3card">
-                    </div>
-
-                  <div className="card-modal3">
-
-                  {aprendicesSeleccionados.map((aprendiz, index) => (
-
-                        <React.Fragment key={index}>
-
-                  <label className="text-card-modal3">{aprendiz}</label>
-                            </React.Fragment>
-                          ))}
-
-                                <div className="card-gris-modal-2">
-
-                                <div className="title-descripcion-modal3">
-                                    <p>Descripcion</p>
-                                </div>
-
-                                <div className="tarjeta-descripcion-modal3">
-                                </div>
-
-
-                                <div className="title-justificacion-modal3">
-                                    <p>Justificacion</p>
-                                </div>
-
-                                <div className="tarjeta-justificacion-modal3">
-                                </div>
-                                </div> 
-
-                  </div>       
-
-                  </div>
-
-                  <div className="title-problmatica">
-                      <p>Problematica</p>
-                  </div>
-
-                  <div className="tarjeta">
-                  </div> 
-                  </div> 
-                  </div>
-                  
-               
-                {/* div general */}
-                
-                <div className="title-objetivo">
-                      <p>Objetivo</p>
-                  </div>
-
-                  <div className="tarjeta-object">
-                  </div>
-
-                <div className="buttons">
-                  <button className="button-close-modal3" onClick={closeAgregarModal}>Cancelar</button>
-                  <button className="button-edit-modal3" onClick={handleRegister}>Crear</button>
-                </div>
-
+              <div className="model-title3">
+                <h2>Creación del Team</h2>
               </div>
-              {/* SOMBRA GRIS */}
+
+              {/* div general */}
+                                                    
+              <div className="caption-3"> 
+                  <p>Aprendices</p> 
+              </div> 
+
+              <div className="modal3-content3">
+
+                <div>
+              
+              <div className="card-aprendiz">
+
+              <div className="item1">
+                  <input type="text" className="search-bar" placeholder="Filtrar Aprendices"/>
+                  <div className="checkbox-list">
+                  {aprendices.map((aprendiz, index) => (
+                          <label key={index}>
+                            <span className="text-modal3">{aprendiz}</span>
+                            <input
+                              type="checkbox"
+                              checked={aprendicesSeleccionados.includes(aprendiz)}
+                              onChange={() => manejarCambioCheckbox(aprendiz)}
+                            />          
+                          </label>
+                        ))}
+                  </div>
+                </div>
+
+                </div>
+
+                </div>
+
+              
+                <div className="card-gris-modal">
+
+                <div className="titulo-seleccionados">
+
+                  <p>Aprendices Seleccionados</p>
+
+                  </div>
+
+                <div className="modal3card">  {/* tarjeta gris para la descripcion */}
+                  <div className="image-modal3card">
+                  </div>
+
+                <div className="card-modal3">
+
+                {aprendicesSeleccionados.map((aprendiz, index) => (
+
+                      <React.Fragment key={index}>
+
+                <label className="text-card-modal3">{aprendiz}</label>
+                          </React.Fragment>
+                        ))}
+
+                              <div className="card-gris-modal-2">
+
+                              <div className="title-descripcion-modal3">
+                                  <p>Descripcion</p>
+                              </div>
+
+                              <div className="tarjeta-descripcion-modal3">
+                              </div>
+
+
+                              <div className="title-justificacion-modal3">
+                                  <p>Justificacion</p>
+                              </div>
+
+                              <div className="tarjeta-justificacion-modal3">
+                              </div>
+                              </div> 
+
+                </div>       
+
+                </div>
+
+                <div className="title-problmatica">
+                    <p>Problematica</p>
+                </div>
+
+                <div className="tarjeta">
+                </div> 
+                </div> 
+                </div>
+                
+            
+              {/* div general */}
+                
+              <div className="title-objetivo">
+                    <p>objetivo</p>
+                </div>
+
+                <div className="tarjeta-object">
+                  <div className="text-object">
+                    <p>Objetivo</p>
+                  </div>
+                </div>
+
+              <div className="buttons">
+                <button className="button-close-modal3" onClick={closeAgregarModal}>Cancelar</button>
+                <button className="button-edit-modal3" onClick={handleRegister}>Crear</button>
+              </div>
 
             </div>
-            {/* fondo blanco modal */}
+            {/* SOMBRA GRIS */}
 
           </div>
-          // sombra azul
+          {/* fondo blanco modal */}
+
+        </div>
+        // sombra azul
         )}
-
-
 
       </div>
     </div>
