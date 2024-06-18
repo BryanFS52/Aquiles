@@ -1,4 +1,4 @@
-import styles from "../../resources/styles/teamScrum.css"
+import styles from "../../resources/styles/login.css"
 import tipoDoc from "../../resources/img/iconoTD.png"
 import numDoc from "../../resources/img/iconoNumDoc.png"
 import contra from "../../resources/img/iconoContraseña.png"
