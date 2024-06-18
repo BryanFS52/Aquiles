@@ -1,0 +1,3 @@
+1.	Se requiere implementar un QR para la asistencia y este lo lleve a una vista y se pueda cambiar el estado "PRESENTE"
+y quede asociado al estudiante que tiene la sesión iniciada.
+

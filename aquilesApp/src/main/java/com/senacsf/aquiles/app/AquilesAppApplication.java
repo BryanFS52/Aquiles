@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class AquilesAppApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(AquilesAppApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(AquilesAppApplication.class, args);
+    }
 
 }
