@@ -1,17 +1,14 @@
 'use client'
 
 import Link from 'next/link';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { GiPadlock } from "react-icons/gi";
 import { faLock, faEye, faEyeSlash, faLink } from '@fortawesome/free-solid-svg-icons';
-import { MdOutlineNumbers } from "react-icons/md";
-import { HiIdentification } from "react-icons/hi";
+import { BsPersonCircle } from "react-icons/bs";
+import { HiMiniIdentification } from "react-icons/hi2";
 import Image from 'next/image';
-import logo from "../public/img/logo.png";
 import logoSena from "../public/img/LogoSena.png";
 
-
 export default function Login() {
-
 
     return (
         <div className="w-screen h-screen flex justify-center items-center bg-white">
@@ -19,10 +16,9 @@ export default function Login() {
             <div className="xl:w-1/2 h-full flex justify-center items-center sm:w-full">
                 <div className="xl:w-1/2  p-5 sm:">
                     <div className="flex items-center">
-                      <Image src={logo} alt="LogoEmpresa" className="w-10 h-auto"/>
                       <div className="flex flex-col px-2 text-custom-blue">
-                        <h1 className="text-3xl font-medium ">Sena Stock</h1>
-                        <p className="text-[6px] font-light">Transformando vidas, construyendo futuro.</p>
+                        <h1 className="text-3xl font-medium ">TDA</h1>
+                        <p className="text-[6px] font-light">Transformando el futuro con las nuevas habilidades del SENA.</p>
                       </div>
                     </div>
                     <div className="text-custom-blue pt-10">
@@ -36,7 +32,7 @@ export default function Login() {
                         <form >
                           <div className="flex flex-col items-center">
                             <div className="flex items-center w-full mt-4 rounded border-solid border-2 ">
-                              <HiIdentification className="w-4 mr-2 mx-3" />
+                              <HiMiniIdentification className="w-4 mr-2 mx-3 h-5 text-gray-500" />
                               <select name="select" className='outline-none text-sm w-full h-9 text-custom-blue'>
                                 <option value="">Selecciona una opción</option>
                                 <option value="cc">Cédula de Ciudadania</option>
@@ -48,12 +44,12 @@ export default function Login() {
                             </div>
 
                             <div className=" flex items-center w-full mt-4 rounded border-solid border-2 text-custom-blue">
-                              <MdOutlineNumbers className="w-4 mr-2 mx-3" />
-                              <input type="number" name="document" placeholder='Documento' className='outline-none text-sm w-full h-9 text-custom-blue' />
+                              <BsPersonCircle className="w-4 mr-2 mx-3 h-5  text-gray-500" />
+                              <input type="text" name="document" placeholder='Documento' className='outline-none text-sm w-full h-9 text-custom-blue' />
                             </div> 
     
                             <div className=" flex items-center w-full mt-4 rounded border-solid border-2 ">
-                              <FontAwesomeIcon icon={faLock} className="w-4 mr-2 mx-3" />
+                              <GiPadlock icon={faLock} className="w-4 mr-2 mx-3 h-5 text-gray-500" />
                               <input type="password" name="password" placeholder='Contraseña' className='outline-none text-sm w-full h-9 text-custom-blue' />
                             </div>
                           </div>
@@ -79,9 +75,9 @@ export default function Login() {
                     </div>
                 </div>
             </div>
-            <div className="w-1/2 justify-center items-center bg-cover bg-center h-screen hidden xl:block" style={{ backgroundImage: "url('/img/fondo1.jpg')"}}>
+            <div className="w-1/2 justify-center items-center bg-cover bg-center h-screen hidden xl:block" style={{ backgroundImage: "url('/img/fondo-login.png')"}}>
                 <div className="relative w-full h-full">
-                    <div className="absolute inset-0 bg-black opacity-50"></div>
+                    <div className="absolute inset-0 bg-black opacity-20"></div>
                     <div className="relative z-10 h-full flex flex-col justify-between p-10 text-center text-white">
                       <div className='flex justify-end '> 
                         <div className="w-36">
@@ -90,7 +86,7 @@ export default function Login() {
                       </div>
                       <div >
                         <div className='flex justify-center'>
-                          <div className='rounded-md relative' style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                          <div className='rounded-md relative' style={{ backgroundColor: 'rgba(0, 0, 0, 0.0)' }}>
                             <p className='text-xl text-left px-4 py-4'>
                             ¡Únete a la comunidad educativa del SENA y <br />
                             potencia tu futuro! Regístrate ahora para <br />
@@ -101,11 +97,8 @@ export default function Login() {
                           
                           </div>
                           <div className='flex items-center justify-end'>
-                            <div>
-                              <Image src={logo} alt="LogoEmpresa" className="w-10 h-auto"/>
-                          </div>
                           <div>
-                            <span className='text-2xl'>Sena Stock</span>
+                            <span className='text-xs'>Potenciando la asistencia </span>
                         </div>
                       </div>
                   </div>

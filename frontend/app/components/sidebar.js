@@ -26,7 +26,7 @@ export const Sidebar = () => {
                     {/*LOGO*/}
                     <div className="flex items-center mb-10">
                         <Image src={logoSena} alt="Logo Sena" className="w-20" />
-                        <span className="text-2xl">SENA Stock</span>
+                        <span className="text-2xl">PROYECTOS FORMATIVOS (C.S.F.) </span>
                     </div>
 
                     <ul className='text-white'>
