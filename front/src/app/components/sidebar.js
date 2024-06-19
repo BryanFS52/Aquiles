@@ -1,20 +1,10 @@
 "use client"
-import { FaLaptopCode } from "react-icons/fa";
 
 import Image from "next/image";
-import styles from "../../../resources/styles/teamScrum.css";
-import iconoap from "../../../resources/img/aprendices.png";
-import iconoasi from "../../../resources/img/asistencia.png";
-import iconopro from "../../../resources/img/proyecto.png";
-import iconolog from "../../../resources/img/logo.png";
-import iconote from "../../../resources/img/teams.png";
-import iconofi from "../../../resources/img/ficha.png";
-import iconoprog from "../../../resources/img/programa.png";
-import iconosalida from "../../../resources/img/salir.png";
-import iconoconf from "../../../resources/img/config.png";
 import { IoPersonSharp } from "react-icons/io5";
 
 import Link from "next/link";
+import styles from "../../../public/styles/teamScrum.css"
 import { BsPersonFillCheck } from "react-icons/bs";
 import { HiUserGroup } from "react-icons/hi2";
 import { PiStudentFill } from "react-icons/pi";
@@ -29,12 +19,6 @@ export const Sidebar = () => {
     <div className="principal">
       <nav className="menu">
           <div className="flex items-center justify-between ">
-            <Image
-              src={iconolog}
-              alt="Imagen de Proyectos Formativos"
-              width={35}  
-              height={35}
-            />
 
             <label  className="text-white font-bold ml-5">PROYECTOS FORMATIVOS (C.S.F.)</label>
           </div>
@@ -51,7 +35,7 @@ export const Sidebar = () => {
             <li>
               <div className="menu-content">
                   <Link href="/fichas" class="custom-button">
-                  <FaLaptopCode /> Programas
+                    Programas
                   </Link>
               </div>
             </li>

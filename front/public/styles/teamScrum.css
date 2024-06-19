@@ -9,7 +9,7 @@
 
 /*ESTILO DEL LOGIN*/
 .fondo-login {
-  background-image: url("../img/fondoLogin.png");
+  background-image: url("../img/fondo-login.png");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -371,7 +371,7 @@ label {
   margin: 15%;
 }
 
-.card {
+/* .card {
   border: 1px solid #ad9494;
   border-radius: 10px;
   padding: 20px;
@@ -381,7 +381,7 @@ label {
   background-position: center;
   margin-left: 150px;
   margin-top: -0.5%;
-}
+} */
 
 .button-agregar {
   border: 1px solid #00314d;
@@ -963,7 +963,7 @@ label {
   margin-top: -38.5%;
 }
 
-.search-bar {
+/* .search-bar {
   width: calc(100% - 20px);
   height: 4%;
   padding: 10px 10px 10px 40px;
@@ -977,7 +977,7 @@ label {
   font-family: Arial, Helvetica, sans-serif;
   margin-top: -6%;
   margin-left: -6%;
-}
+} */
 
 .checkbox-list {
   display: flex;

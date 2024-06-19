@@ -1,4 +1,4 @@
-import Login from "./(routes)/Auth/Login";
+import Login from "../app/(routes)/Auth/Login";
 import React from 'react';
 
 const page = () => {
