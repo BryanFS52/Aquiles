@@ -21,6 +21,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/auth/login").permitAll() // Permitir acceso sin autenticación a este endpoint
                                 .requestMatchers("/api/teams-scrum/all").permitAll() // Permitir acceso sin autenticación a este endpoint
                                 .requestMatchers("/api/teams-scrum/create").permitAll() // Permitir acceso sin autenticación a este endpoint
+                                .requestMatchers("/api/team-scrum/update").permitAll()
                                 .anyRequest().authenticated()
                 );
         return http.build();

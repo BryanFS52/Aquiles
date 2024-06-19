@@ -28,3 +28,7 @@ spring:
     show-sql: true
   main:
     allow-circular-references: true
+
+olimpo:
+  auth:
+    url: https://localhost:8081/api/auth/login
