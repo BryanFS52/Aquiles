@@ -15,7 +15,7 @@ export default function Home () {
         <h1 className="font-serif text-4xl pb-3 border-b-2 border-gray-400 w-1/2">Teams Scrums </h1>
         <br/>
         
-        <li className="h-9 w-14 flex items-center justify-center border-2 rounded-lg bg-cyan-950 hover:bg-green-600  ml-auto">
+        <li className="h-9 w-14 flex items-center justify-center border-2 rounded-lg bg-cyan-900 hover:bg-green-600  ml-auto">
                     <a href="#">
                         {""}
                         <MdAdd className="w-8 h-8"/>

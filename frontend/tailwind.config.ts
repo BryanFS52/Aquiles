@@ -31,9 +31,6 @@ const config: Config = {
           },
         },
       },
-      clipPath: {
-        'triangle-right-bottom': 'polygon(50% 0%, 100% 100%, 0% 100%)',
-      },
       animation: {
         "show-Content": "showContent 0.5s 0.7s ease-in-out 1 forwards ",
       },
