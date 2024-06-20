@@ -20,7 +20,7 @@ const config: Config = {
       colors: {
         'custom-blue': '#00324D',
         'custom-blues': '#39A900',
-        'sena-blue': '#82DEF0'
+        'sena-red': '#dc2626'
       },
       keyframes: {
         showContent: {
@@ -30,6 +30,9 @@ const config: Config = {
             opacity: "1",
           },
         },
+      },
+      clipPath: {
+        'triangle-right-bottom': 'polygon(50% 0%, 100% 100%, 0% 100%)',
       },
       animation: {
         "show-Content": "showContent 0.5s 0.7s ease-in-out 1 forwards ",

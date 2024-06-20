@@ -64,6 +64,7 @@ export default function Login() {
                                 <p className='hover:text-custom-blues'>¿Olvido su contraseña?</p>
                               </Link>
                             </div>
+                            
                           </div>
     
                           <Link href="/home" passHref>
