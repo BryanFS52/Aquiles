@@ -55,94 +55,70 @@ export default function Login() {
 										</select>
 									</div>
 
-									<div className=" flex items-center w-full mt-4 rounded border-solid border-2 text-custom-blue">
-										<BsPersonCircle className="w-4 mr-2 mx-3 h-5  text-gray-500" />
-										<input
-											type="text"
-											name="document"
-											placeholder="Documento"
-											className="outline-none text-sm w-full h-9 text-custom-blue"
-										/>
-									</div>
-
-									<div className=" flex items-center w-full mt-4 rounded border-solid border-2 ">
-										<GiPadlock
-											icon={faLock}
-											className="w-4 mr-2 mx-3 h-5 text-gray-500"
-										/>
-										<input
-											type="password"
-											name="password"
-											placeholder="Contraseña"
-											className="outline-none text-sm w-full h-9 text-custom-blue"
-										/>
-									</div>
-								</div>
-								<div className="flex justify-between mt-4 items-center text-custom-blue">
-									<div className="flex text-center	">
-										<input type="checkbox" className="mr-2" />
-										<label htmlFor="" className="text-xs">
-											Recordar
-										</label>
-									</div>
-									<div className="text-xs ">
-										<Link href="">
-											<p className="hover:text-custom-blues">
-												¿Olvido su contraseña?
-											</p>
-										</Link>
-									</div>
-								</div>
-
-								<Link href="/home" passHref>
-									<button
-										className="bg-custom-blue w-full p-2 text-white font-medium rounded mt-20 hover:bg-custom-blues"
-										type="submit"
-									>
-										Iniciar Sesión
-									</button>
-								</Link>
-							</form>
-						</div>
-					</div>
-				</div>
-				<div
-					className="w-[85%] h-[100%] justify-center items-center object-cover bg-cover bg-center h-screen hidden xl:block"
-					style={{ backgroundImage: "url('/img/fondo-login.png')"}}
-				>
-					<div className="relative w-full h-full">
-						<div className="absolute inset-0 bg-black opacity-20"></div>
-						<div className="relative z-10 h-full flex flex-col justify-between p-10 text-center text-white">
-							<div className="flex justify-end ">
-								<div className="w-36">
-									<Image src={logoSena} alt="" className="" />
-								</div>
-							</div>
-							<div>
-								<div className="flex justify-center">
-									<div
-										className="rounded-md relative"
-										style={{ backgroundColor: "rgba(0, 0, 0, 0.0)" }}
-									>
-										<p className="text-xl text-left px-4 py-4">
-											¡Únete a la comunidad educativa del SENA y <br />
-											potencia tu futuro! Regístrate ahora para <br />
-											acceder a una amplia gama de programas de <br />
-											formación y oportunidades de crecimiento <br />
-											profesional.
-										</p>
-									</div>
-								</div>
-								<div className="flex items-center justify-end">
-									<div>
-										<span className="text-xs">Potenciando la asistencia </span>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
+                            <div className=" flex items-center w-full mt-4 rounded border-solid border-2 text-custom-blue">
+                              <BsPersonCircle className="w-4 mr-2 mx-3 h-5  text-gray-500" />
+                              <input type="text" name="document" placeholder='Documento' className='outline-none text-sm w-full h-9 text-custom-blue' />
+                            </div> 
+    
+                            <div className=" flex items-center w-full mt-4 rounded border-solid border-2 ">
+                              <GiPadlock icon={faLock} className="w-4 mr-2 mx-3 h-5 text-gray-500" />
+                              <input type="password" name="password" placeholder='Contraseña' className='outline-none text-sm w-full h-9 text-custom-blue' />
+                            </div>
+                          </div>
+                          <div className="flex justify-between mt-4 items-center text-custom-blue">
+                            <div className="flex text-center	">
+                              <input type="checkbox" className='mr-2'/>
+                              <label htmlFor="" className='text-xs'>Recordar</label>
+                              
+                            </div>
+                            <div className="text-xs ">
+                              <Link href="" >
+                                <p className='hover:text-custom-blues'>¿Olvido su contraseña?</p>
+                              </Link>
+                            </div>
+                            
+                          </div>
+    
+                          <Link href="/home" passHref>
+                            <button className='bg-custom-blue w-full p-2 text-white font-medium rounded mt-20 hover:bg-custom-blues' type='submit'>
+                              Iniciar Sesion
+                            </button>
+                          </Link>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div className="w-1/2 justify-center items-center bg-cover bg-center h-screen hidden xl:block" style={{ backgroundImage: "url('/img/fondo-login.png')"}}>
+                <div className="relative w-full h-full">
+                    <div className="absolute inset-0 bg-black opacity-20"></div>
+                    <div className="relative z-10 h-full flex flex-col justify-between p-10 text-center text-white">
+                      <div className='flex justify-end '> 
+                        <div className="w-36">
+                          <Image src={logoSena} alt="" className="" />
+                        </div>
+                      </div>
+                      <div >
+                        <div className='flex justify-center'>
+                          <div className='rounded-md relative' style={{ backgroundColor: 'rgba(0, 0, 0, 0.0)' }}>
+                            <p className='text-xl text-left px-4 py-4'>
+                            ¡Únete a la comunidad educativa del SENA y <br />
+                            potencia tu futuro! Regístrate ahora para <br />
+                            acceder a una amplia gama de programas de <br />
+                            formación y oportunidades de crecimiento <br />
+                            profesional.</p>
+                          </div>
+                          
+                          </div>
+                          <div className='flex items-center justify-end'>
+                          <div>
+                            <span className='text-xs'>Potenciando la asistencia </span>
+                        </div>
+                      </div>
+                  </div>
+                    </div>     
+                </div>   
+              </div>  
+          </div>
+        </div>
+    );
 }

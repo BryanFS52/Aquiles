@@ -20,7 +20,7 @@ const config: Config = {
       colors: {
         'custom-blue': '#00324D',
         'custom-blues': '#39A900',
-        'sena-blue': '#82DEF0'
+        'sena-red': '#dc2626'
       },
       keyframes: {
         showContent: {
