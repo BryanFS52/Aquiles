@@ -9,18 +9,18 @@ server:
 spring:
 
   application:
-    name: DBAquiles
+    name: Aquiles
 
   datasource:
     url: jdbc:postgresql://localhost:5432/DBAquiles
     username: postgres
-    password: "fabrica2023*"
+    password: "fabrica2024*"
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
-#      ddl-auto: none
+#      ddl-auto: create-drop
+      ddl-auto: none
 
     properties:
       hibernate:

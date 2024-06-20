@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.fondo-login{
-    clip-path: inset(0 0 0 0);
-
+::-webkit-scrollbar{
+  width: 0;
 }
