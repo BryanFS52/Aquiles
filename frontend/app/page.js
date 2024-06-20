@@ -12,6 +12,7 @@ import { BsPersonCircle } from "react-icons/bs";
 import { HiMiniIdentification } from "react-icons/hi2";
 import Image from "next/image";
 import logoSena from "../public/img/LogoSena.png";
+import { height } from "@fortawesome/free-solid-svg-icons/fa0";
 
 export default function Login() {
 	return (
@@ -106,7 +107,7 @@ export default function Login() {
 					</div>
 				</div>
 				<div
-					className="w-1/2 justify-center items-center bg-cover bg-center h-screen hidden xl:block"
+					className="w-[85%] h-[100%] justify-center items-center object-cover bg-cover bg-center h-screen hidden xl:block"
 					style={{ backgroundImage: "url('/img/fondo-login.png')"}}
 				>
 					<div className="relative w-full h-full">
