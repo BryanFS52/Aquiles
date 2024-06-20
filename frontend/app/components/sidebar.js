@@ -2,13 +2,14 @@
 import Link from 'next/link';
 import React, { useState,  } from 'react';
 import { FiAlignRight } from "react-icons/fi";
-import { FaHome,FaDesktop, FaPowerOff } from "react-icons/fa";
-import { MdInventory } from "react-icons/md";
-import { FaTableList } from "react-icons/fa6";
+import { HiUserGroup } from "react-icons/hi2";
+import { FaLaptopCode } from "react-icons/fa";
+import { BsPersonCheck } from "react-icons/bs";
 import { IoSettings } from "react-icons/io5";
 import { RiCheckboxBlankCircleFill } from "react-icons/ri";
-import { FaPersonChalkboard } from "react-icons/fa6";
+import { PiStudentFill } from "react-icons/pi";
 import { IoClose } from "react-icons/io5";
+import { IoPersonSharp } from "react-icons/io5";
 import Image from 'next/image';
 import logoSena from "../../public/img/LogoSena.png";
 
@@ -26,39 +27,45 @@ export const Sidebar = () => {
                     {/*LOGO*/}
                     <div className="flex items-center mb-10">
                         <Image src={logoSena} alt="Logo Sena" className="w-20" />
-                        <span className="text-2xl">PROYECTOS FORMATIVOS (C.S.F.) </span>
+                        <span className="text-2xs">PROYECTOS FORMATIVOS (C.S.F.) </span>
                     </div>
 
                     <ul className='text-white'>
                         
                         <li>
                             <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <FaHome/>
-                                Home
+                                <IoPersonSharp/>
+                                Fichas
                             </Link>
                         </li>
                         <li>
                             <Link href="/inventario" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <MdInventory/>
-                                Inventario
+                                <FaLaptopCode />
+                                Programas
                             </Link>
                         </li>
                         <li>
                             <Link href="#" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <FaTableList/>
-                                Products
+                                <BsPersonCheck />
+                                Asistencia
                             </Link>
                         </li>
                         <li>
                             <Link href="#" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <FaDesktop />
-                                Articles
+                                <HiUserGroup  />
+                                Teams
                             </Link>
                         </li>
                         <li>
                             <Link href="/roles" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <FaPersonChalkboard />
-                                roles
+                                <PiStudentFill  />
+                                Aprendices
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="#" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <BsPersonCheck />
+                                Proyectos
                             </Link>
                         </li>
                     </ul>
@@ -71,7 +78,7 @@ export const Sidebar = () => {
                     <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> <IoSettings/>
                         Configuracion 
                     </li>
-                    <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> <FaPowerOff/>
+                    <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> <HiUserGroup />
                         Cerrar Sesion
                     </li>
 
