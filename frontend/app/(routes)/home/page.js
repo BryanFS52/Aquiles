@@ -47,7 +47,7 @@ export default function Home() {
 
                 
 								<Link href="/home" className="ml-2">
-									<MdAddCircle className="inline-block text-2xl text-cyan-900" />
+									<MdAddCircle className="inline-block text-2xl text-cyan-920" />
 								</Link>
 								<Link href="/home" className="ml-2 ml-auto">
 									<FaTrashAlt className="inline-block text-2xl text-cyan-900" />
