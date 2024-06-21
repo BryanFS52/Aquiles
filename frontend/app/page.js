@@ -11,7 +11,7 @@ import {
 import { BsPersonCircle } from "react-icons/bs";
 import { HiMiniIdentification } from "react-icons/hi2";
 import Image from "next/image";
-import logoSena2 from "../public/img/fondo-login.png";
+import logoSena from "../public/img/LogoSena.png";
 import { height } from "@fortawesome/free-solid-svg-icons/fa0";
 
 export default function Login() {
@@ -88,13 +88,13 @@ export default function Login() {
                     </div>
                 </div>
             </div>
-            <div className="w-1/2 justify-center items-center bg-cover bg-center h-screen hidden xl:block" style={{ backgroundImage: "url('/img/fondo-login.png')"}}>
+            <div className="w-[100%] w-[70%] justify-center items-center bg-cover bg-center h-screen hidden xl:block" style={{ backgroundImage: "url('/img/fondo-login.png')"}}>
                 <div className="relative w-full h-full">
                     <div className="absolute inset-0 bg-black opacity-20"></div>
                     <div className="relative z-10 h-full flex flex-col justify-between p-10 text-center text-white">
                       <div className='flex justify-end '> 
                         <div className="w-36">
-                          <Image src={logoSena2} alt="" className="" />
+                          <Image src={logoSena} alt="" className="" />
                         </div>
                       </div>
                       <div >
