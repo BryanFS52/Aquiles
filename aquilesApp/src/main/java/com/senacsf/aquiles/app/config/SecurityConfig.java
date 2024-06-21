@@ -7,27 +7,32 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
-@Configuration
-@EnableWebSecurity
+@Configuration // Indica que esta clase es una clase de configuración de Spring
+@EnableWebSecurity // Habilita la seguridad web en la aplicación Spring
 public class SecurityConfig {
 
-    @Bean
+    @Bean // Declara un bean de Spring
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF solo para desarrollo
-                .authorizeHttpRequests(authorizeRequests ->
+//                .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // Configura CSRF con un repositorio de tokens CSRF basado en cookies que permite acceso a través de JavaScript
+//                .and() // Concatena configuraciones adicionales
+                .authorizeHttpRequests(authorizeRequests -> // Configura la autorización de las solicitudes HTTP
                         authorizeRequests
-                                .requestMatchers("/api/auth/login").permitAll() // Permitir acceso sin autenticación a este endpoint
-                                .requestMatchers("/api/teams-scrum/all").permitAll() // Permitir acceso sin autenticación a este endpoint
-                                .requestMatchers("/api/teams-scrum/create").permitAll() // Permitir acceso sin autenticación a este endpoint
-                                .anyRequest().authenticated()
+                                .requestMatchers("/api/auth/login").permitAll() // Permite acceso sin autenticación a este endpoint
+                                .requestMatchers("/api/teams-scrum/all").permitAll() // Permite acceso sin autenticación a este endpoint
+                                .requestMatchers("/api/teams-scrum/create").permitAll() // Permite acceso sin autenticación a este endpoint
+                                .requestMatchers("/api/teams-scrum/update").permitAll() // Permite acceso sin autenticación a este endpoint
+                                .requestMatchers("/api/teams-scrum/delete/{id}").permitAll() // Permite acceso sin autenticación a este endpoint
+                                .anyRequest().authenticated() // Requiere autenticación para cualquier otra solicitud
                 );
-        return http.build();
+        return http.build(); // Construye el objeto SecurityFilterChain
     }
 
-    @Bean
+    @Bean // Declara un bean de Spring
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(); // Proporciona una implementación de codificación de contraseñas basada en BCrypt
     }
 }
