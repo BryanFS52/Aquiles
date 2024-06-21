@@ -84,7 +84,7 @@ export const Sidebar = () => {
 
                 </ul>
                    {/* bton */}
-                    <button onClick={toggleMenu} className='text-white bg-sena-blue fixed bottom-4 right-4 p-2 text-lg rounded-full lg:hidden'>
+                    <button onClick={toggleMenu} className='text-white bg-custom-blue fixed bottom-4 right-4 p-2 text-lg rounded-full lg:hidden'>
 
                         {showMenu ? <IoClose/> : <FiAlignRight/>}
                     </button>
