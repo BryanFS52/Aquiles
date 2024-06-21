@@ -26,12 +26,18 @@ export default function Home() {
 					</li>
 
 					<div className="w-1/3 h-56 rounded-lg overflow-hidden shadow-lg bg-zinc-200 relative">
-          <div className="triangle absolute top-0 right-0 transform rotate-45 h-8 w-8 bg-cyan-900"></div>
+					<div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-cyan-900 border-l-[240px] border-l-transparent -z-1"></div>
+						
 						<div className="px-6 py-4">
-							<div className="font-serif text-xl mb-2">Nombre del Proyecto</div>
+							<div className="flex ">
+								<span className="font-serif text-xl mb-2">Nombre del Proyecto</span>
+								<button className="relative z-20 ml-auto text-white"> Ver Más</button>
+							</div>
+
 							<p className="text-black-700 text-base text-xs">
 								Desarrollo de la Aplicación Móvil
 							</p>
+							
 							<br />
 							<div className="font-serif text-xl mb-2">Team Número</div>
 							<p className="text-black-700 text-base text-xs">Equipo 5</p>
