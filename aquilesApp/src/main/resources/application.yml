@@ -1,30 +1,30 @@
 server:
-  port: 8080
+  port: 8080 # Configura el puerto en el que el servidor escuchará
   ssl:
-    key-store: classpath:keystore.p12
-    key-store-password: fabrica2023*
-    key-store-type: PKCS12
-    key-alias: tomcat
+    key-store: classpath:keystore.p12 # Especifica la ubicación del almacén de claves SSL en el classpath
+    key-store-password: fabrica2023* # Contraseña para acceder al almacén de claves SSL
+    key-store-type: PKCS12 # Tipo de almacén de claves, en este caso PKCS12
+    key-alias: tomcat # Alias de la clave dentro del almacén de claves
 
 spring:
-
   application:
-    name: Aquiles
+    name: Aquiles # Nombre de la aplicación Spring
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/DBAquiles
-    username: postgres
-    password: "fabrica2024*"
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/DBAquiles # URL de la base de datos PostgreSQL
+    username: postgres # Nombre de usuario para la base de datos
+    password: "fabrica2023*" # Contraseña para la base de datos
+    driver-class-name: org.postgresql.Driver # Clase del driver para PostgreSQL
 
   jpa:
     hibernate:
-#      ddl-auto: create-drop
-      ddl-auto: none
+      #      ddl-auto: create-drop # Crea y elimina las tablas de la base de datos en cada inicio (deshabilitado)
+      ddl-auto: none # No realiza ninguna acción automática sobre las tablas de la base de datos
 
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect # Dialecto de Hibernate para PostgreSQL
+    show-sql: true # Muestra las consultas SQL en la consola
+
   main:
-    allow-circular-references: true
+    allow-circular-references: true # Permite referencias circulares en los beans de Spring (útil en algunos casos específicos)
