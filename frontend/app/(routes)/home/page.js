@@ -27,11 +27,11 @@ export default function Home() {
 
 					<div className="w-1/3 h-56 rounded-lg overflow-hidden shadow-lg bg-zinc-200 relative">
 					<div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-cyan-900 border-l-[240px] border-l-transparent -z-1"></div>
-						
 						<div className="px-6 py-4">
 							<div className="flex ">
 								<span className="font-serif text-xl mb-2">Nombre del Proyecto</span>
-								<button className="relative z-20 ml-auto text-white"> Ver Más</button>
+								<button className="font-serif text-xl mb-2 relative z-20 ml-auto text-white after:block after:w-full after:h-[1px] after:bg-white after:mt-[4px]">Ver Más</button>
+
 							</div>
 
 							<p className="text-black-700 text-base text-xs">
