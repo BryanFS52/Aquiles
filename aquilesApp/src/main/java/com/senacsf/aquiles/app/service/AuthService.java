@@ -21,3 +21,4 @@ public class AuthService {
         return restTemplate.postForObject(olimpoAuthUrl, loginRequest, LoginResponseDto.class);
     }
 }
+

@@ -29,4 +29,4 @@ spring:
 
 olimpo:
   auth:
-    url: http://localhost:8081/api/auth/login
+    url: https://localhost:8081/api/auth/login
