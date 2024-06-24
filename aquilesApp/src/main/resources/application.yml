@@ -1,12 +1,12 @@
 spring:
 
   application:
-    name: Aquiles
+    name: DBAquiles
 
   datasource:
     url: jdbc:postgresql://localhost:5432/DBAquiles
     username: postgres
-    password: "fabrica2024*"
+    password: "fabrica2023*"
     driver-class-name: org.postgresql.Driver
 
   jpa:

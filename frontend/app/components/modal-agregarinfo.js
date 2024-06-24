@@ -41,9 +41,10 @@ const Modal = ({ isOpen, onClose }) => {
                     <div className=' flex flex-col my-6 items-center '>
                         <span className="text-base font-serif text-black-700 ">Nombre del Team</span>
                         <input type="text" name="document" placeholder='Nombre del Team' className='rounded-lg border-solid border-2 text-custom-blue mt-1 w-auto shadow-lg shadow-gray-500/50 px-1'/>
-                    </div>                
+                    </div>  <br/>              
                 <div>
-                    <span >Integrantes</span>
+                <div className=' flex flex-col my-6 items-center '>
+                    <span className='font-serif text-black-700'>Integrantes</span>
                     <div className="flex flex-col">
                     <div className="overflow-x-auto">
                         <div className="py-2 align-middle inline-block min-w-full">
@@ -74,6 +75,7 @@ const Modal = ({ isOpen, onClose }) => {
                             </table>
                         </div>
                         </div>
+                    </div>
                     </div>
                     </div>
                 </div>
