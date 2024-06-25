@@ -9,14 +9,15 @@ import ModalNewProject from '../../components/Modals/modalNewProject';
 import { MdAddCircle } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
 import ModalComponent from '../../components/Modals/modalComponent';
-import { MdAdd } from "react-icons/md";
-import {GoChecklist} from "react-icons/GoChecklist";
+import ModalAddinformation from '../../components/modalAddInformation/modalAddinformation';
 
 export default function 
 Home () {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [openAgregarInfo, setOpenModal] = useState(false);
+  const [Addinformation, openModals] = useState(false);
+
 
   const handleOpenModal = () => {
     setModalOpen(true);
@@ -33,6 +34,15 @@ Home () {
   const CloseModal = () => {
     setOpenModal(false);
   };
+
+  const modalsOpen = () => {
+    openModals(true);
+  };
+
+  const modalClose = () => {
+    openModals(false);
+  };
+
 
     return(
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
@@ -66,13 +76,16 @@ Home () {
                 <div class="font-serif text-xl mb-2">Team Número</div>
                 <p class="text-black-700 text-base text-xs">Equipo 5</p><br/>
                 <div class="font-serif text-xl mb-2 flex">
+                  
                   <span>Agregar Información</span>
-                  <Link href="/home" className="ml-2">
-									<MdAddCircle className="inline-block text-2xl text-cyan-900" />
-								</Link>
-								<Link href="/home" className="ml-2 ml-auto">
+
+                  <button onClick={modalsOpen} className="font-serif text-xl mb-2 relative z-20 ml-auto text-white after:block after:w-full after:h-[px] after:bg-white after:mt-[4px]">
+                  <MdAddCircle className="inline-block text-2xl text-cyan-900" />
+                  </button>
+                  <ModalAddinformation isOpen={Addinformation} onClose={modalClose} /> {/* se llama la funcion del modal para que pueda abrir y cerrar */}
+
+
 									<FaTrashAlt className="inline-block text-2xl text-cyan-900" />
-								</Link>
                     <button onClick={OpenModal} className="ml-2"> {/*se llama la funcion de javascript para que el modal se abra en la imagen */}
                     </button>
                 </div>
