@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import React from 'react';
 
-const Modal = ({ isOpen, onClose }) => {
+const ModalNewProject = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
@@ -42,4 +42,4 @@ const Modal = ({ isOpen, onClose }) => {
   );
 };
 
-export default Modal;
+export default ModalNewProject;
