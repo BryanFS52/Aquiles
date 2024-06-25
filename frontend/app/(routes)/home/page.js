@@ -7,6 +7,7 @@ import { Sidebar } from "../../components/sidebar";
 import { MdAddCircle } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
 import { MdAdd } from "react-icons/md";
+import {GoChecklist} from "react-icons/GoChecklist";
 
 export default function Home() {
 	return (
