@@ -5,6 +5,9 @@ server:
     key-store-password: fabrica2023*
     key-store-type: PKCS12
     key-alias: tomcat
+    trust-store: classpath:truststore.jks # Agregar esta línea
+    trust-store-password: fabrica2023* # Reemplazar con la contraseña del truststore
+    trust-store-type: PKCS12
 
 spring:
   application:
@@ -18,8 +21,8 @@ spring:
 
   jpa:
     hibernate:
-       ddl-auto: create-drop
-#      ddl-auto: none
+      ddl-auto: create-drop
+    #      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -30,3 +33,5 @@ spring:
 olimpo:
   auth:
     url: https://localhost:8081/api/auth/login
+    cert:
+      path: classpath:olimpo_cert.pem

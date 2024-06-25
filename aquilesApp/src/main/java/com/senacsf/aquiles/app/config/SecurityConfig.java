@@ -26,6 +26,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/teams-scrum/create").permitAll() // Permite acceso sin autenticación a este endpoint
                                 .requestMatchers("/api/teams-scrum/update").permitAll() // Permite acceso sin autenticación a este endpoint
                                 .requestMatchers("/api/teams-scrum/delete/{id}").permitAll() // Permite acceso sin autenticación a este endpoint
+                                .requestMatchers("https://localhost:8081/api/auth/login").permitAll()
+                                .requestMatchers("https://localhost:8080/api/auth/login").permitAll()
                                 .anyRequest().authenticated() // Requiere autenticación para cualquier otra solicitud
                 );
         return http.build(); // Construye el objeto SecurityFilterChain

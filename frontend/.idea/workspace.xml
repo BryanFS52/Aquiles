@@ -5,9 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="813ee7d1-0bcd-46d4-ae30-ec9773120d05" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/RestTemplateConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/controller/AquilesController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/controller/AuthController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/service/OlimpoService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../aquilesApp/src/main/resources/truststore.jks" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aquilesApp/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/CorsConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/CorsConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/RestTemplateConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/RestTemplateConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/controller/LoginController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/controller/ProjectController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/controller/ProjectController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/service/AuthService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../front/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
