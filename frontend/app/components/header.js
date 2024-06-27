@@ -16,14 +16,15 @@ export const Header = () => {
                 </li>
             </ul>
         </div> 
-                        <div className='flex items-center gap-2 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> 
+                        <Link href='/perfil' className='flex items-center gap-2 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> 
                             <div className="flex flex-col">
                                 <span className="text-end">Usuario</span>
                                 <span className="text-xs">Aprendices</span>
                             </div>
+                            
                             <img src="https://img.freepik.com/foto-gratis/joven-bella-mujer-pie-sobre-pared-blanca_114579-90514.jpg" 
                             className='w-10 h-10 object-cover rounded-full'/>
-                    </div>
+                    </Link>
             </header>
     );
 };
