@@ -1,9 +1,31 @@
 "use client"
-
+import React, { useState, react } from 'react';
 import Link from 'next/link';
-import React from 'react';
+import { createTeamScrum } from "../../services/teamScrumService";
 
 const ModalNewProject = ({ isOpen, onClose }) => {
+
+const [teamData, setTeamData] = useState({
+  nameProject: '',
+});
+
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+  setTeamData({ ...teamData, [name]: value });
+};
+
+const handleCreateTeam = () => {
+  createTeamScrum(teamData)
+      .then(() => {
+          console.log('Equipo Scrum creado exitosamente');
+          window.location.href = '/home';
+      })
+      .catch(error => {
+          console.error('Error al crear equipo Scrum', error);
+      });
+};
+
+
   if (!isOpen) return null;
 
   return (
@@ -23,17 +45,28 @@ const ModalNewProject = ({ isOpen, onClose }) => {
                   <p className="text-sm font-serif text-black-700">Nombre del Proyecto</p>
 
                   <div className="rounded-lg border-solid border-2 text-custom-blue ">
-                      <input type="text" name="document" placeholder='Nombre del Proyecto' className='text-base text-gray-950 p-4' />
+                  <input
+                      type="text"
+                      name="nameProject"
+                      placeholder="Nombre del Proyecto"
+                      value={teamData.nameProject}
+                      onChange={handleInputChange}
+                  />
+
                   </div>
               </div>
                 <div className='flex text-xs space-x-4'>
-                  <button href="/home" className='hover:bg-gray-500 rounded-md transition-colors bg-white px-8 py-4 border text-black ' 
+                  <button className='hover:bg-gray-500 rounded-md transition-colors bg-white px-8 py-4 border text-black ' 
                   onClick={onClose}>
                       Cancelar
                   </button>
-                  <button href="/home" className='hover:bg-gray-500 rounded-md transition-colors bg-custom-blue px-8 py-4 border text-white '>
-                      Registrar
+                  <button
+                        className='hover:bg-gray-500 rounded-md transition-colors bg-custom-blue px-8 py-4 border text-white'
+                        onClick={handleCreateTeam} // Asocia la función handleCreateTeam al evento de clic del botón
+                    >
+                        Registrar Equipo
                   </button>
+
                 </div>
             </div>
         </div>
