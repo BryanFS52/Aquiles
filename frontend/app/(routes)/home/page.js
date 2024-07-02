@@ -10,9 +10,6 @@ import { MdAddCircle } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
 import ModalComponent from '../../components/Modals/modalComponent';
 import { listTeamsScrum, createTeamScrum } from '../../services/teamScrumService'; // Importacion de los métodos del servicio
-import { MdAdd } from "react-icons/md";
-import {GoChecklist} from "react-icons/GoChecklist";
-import ModalAddinformation from '../../components/modalAddInformation/modalAddinformation';
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -59,15 +56,6 @@ export default function Home() {
   const CloseModal = () => {
     setOpenModal(false);
   };
-
-  const modalsOpen = () => {
-    openModals(true);
-  };
-
-  const modalClose = () => {
-    openModals(false);
-  };
-
 
   return (
       <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
