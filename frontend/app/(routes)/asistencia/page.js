@@ -4,6 +4,7 @@ import React from "react";
 import { Header } from "@/app/components/header"; //importaciones del header y del sidebar para hacer el llamado
 import { Sidebar } from "@/app/components/sidebar";
 import { Attendance } from "@/app/components/attendance";
+import { Table } from "@/app/components/table";
 
 
 export default function Asistencia () {
@@ -15,9 +16,6 @@ export default function Asistencia () {
                 <Header />
             <div>
                 <Attendance/>
-                
-
-         
           </div>
           </div>
                 

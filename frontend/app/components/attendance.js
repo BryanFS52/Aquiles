@@ -8,6 +8,7 @@ import { IoMdCheckmark } from "react-icons/io";
 import { TbLetterR } from "react-icons/tb";
 import { TbLetterX } from "react-icons/tb";
 import { TbLetterJ } from "react-icons/tb"; 
+import { Table } from "../components/table"
 
 export const Attendance = () => {
     return(
@@ -106,11 +107,13 @@ export const Attendance = () => {
                         <TbLetterJ className="absolute top-1/2 transform -translate-y-1/2 left-2 text-blue-500 w-4 h-4" />
                       </div>
                     </div>
+                    </div>
                   </div>
                 </div>
               </div>
-              </div>
-
+                <div>
+                        <Table/>
+                </div>
             </div>
         </div>
     )
