@@ -5,9 +5,30 @@ import React, { useState,  } from 'react';
 import { GoSearch } from "react-icons/go";
 import { MdOutlineQrCodeScanner } from "react-icons/md";
 import { VscEye } from "react-icons/vsc";
-
+import ModalInfoficha from "../components/Modals/modalInfoficha";
+import ModalQR from "../components/Modals/modalQR";
 
 export const Table = () => {
+
+const [modalOpen, setModalOpen] = useState(false); // de linea 16 a linea 21 se crea la funcion para la logica del modal de ver info de ficha
+const [modalQROpen, setModalQROpen] = useState(false); // de linea 23 a linea 30 se crea la funcion para la logica del modal de QR
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+
+  };
+  const handleOpenQRModal = () => {
+    setModalQROpen(true);
+  };
+
+  const handleCloseQRModal = () => {
+    setModalQROpen(false);
+  };
+
     return(
 
     <div className=" w-11/12 h-96  rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ml-10 mt-10">
@@ -31,16 +52,24 @@ export const Table = () => {
                 </div>
             </form>
     <div className="ml-auto mr-4">
-        <button type="button" className="text-white font-serif h-11 w-36 rounded-lg text-sm px-5 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center">
+        <button type="button" className="text-white font-serif h-11 w-36 rounded-lg text-sm px-5 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center"
+            onClick={handleOpenQRModal}
+            >
             Generar QR
             <MdOutlineQrCodeScanner className="ml-2" />
         </button>
+        <ModalQR isOpen={modalQROpen} onClose={handleCloseQRModal}/>
     </div>
     <div>
-        <button type="button" className="text-white font-serif h-11 w-56 rounded-lg text-xs px-5 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center">
+
+        <button type="button" className="text-white font-serif h-11 w-56 rounded-lg text-xs px-5 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center"
+        onClick={handleOpenModal}
+        >
             Ver información de la ficha
             <VscEye className="w-5 h-5 ml-2" />
         </button>
+        <ModalInfoficha isOpen={modalOpen} onClose={handleCloseModal}/>
+
     </div>
     </div><br/>
 
