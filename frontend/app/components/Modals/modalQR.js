@@ -1,10 +1,18 @@
 "use client"
 import React, { useState } from 'react';
 import { BsQrCode } from "react-icons/bs";
+import ModalTerminarQr from "../Modals/modalTerminarQr";
 
 const ModalQR = ({ isOpen, onClose }) => {   // se crea los eventos de cerrar y abri el modal
 
+  const [showNextModal, setShowNextModal] = useState(false);   //se crea la logica y evento para pasar al siguiente modal
+  
   if (!isOpen) return null;
+  
+  const handleNext = () => {
+  setShowNextModal(true);
+
+    }
 
   return (
 
@@ -33,16 +41,26 @@ const ModalQR = ({ isOpen, onClose }) => {   // se crea los eventos de cerrar y 
                     </span>
                 </div>
 
-          <div className='flex justify-end mt-5'>
-            <button
-            className='hover:bg-custom-blue rounded-md transition-colors bg-custom-blue px-4 py-2 border text-white text-lg w-36 h-10 font-serif' //En la linea de abajo se hace el llamado al evento de cerrar el modal
+          <div className='flex justify-end mt-20'>
+          <button
+            className='hover:bg-red-600 rounded-md transition-colors bg-red-600 px-4 py-2 border text-white text-lg w-36 h-10 font-serif mr-60' //En la linea de abajo se hace el llamado al evento de cerrar el modal
             onClick={onClose}>  
+              Eliminar
+            </button>
+
+            <button
+            className='hover:bg-custom-blue rounded-md transition-colors bg-custom-blue px-4 py-2 border text-white text-lg w-36 h-10 font-serif'
+            onClick={handleNext}>
               Siguiente
             </button>
+            {showNextModal &&(
+            <ModalTerminarQr isOpen={true} onClose={() => setShowNextModal(false)}/>  //se hace llamado al siguiente modal
+            )}
           </div>
         </div>
       </div>
     </div>
+
   );
 }
 

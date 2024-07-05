@@ -32,10 +32,9 @@ const ModalTerminarQr = ({ isOpen, onClose }) => {   // se crea los eventos de c
                         15:00 MIN
                     </span>
                 </div>
-
-          <div className='flex justify-end mt-5'>
+          <div className='flex justify-end mt-20'>
             <button
-            className='hover:bg-custom-blue rounded-md transition-colors bg-custom-blue px-4 py-2 border text-white text-lg w-36 h-10 font-serif' //En la linea de abajo se hace el llamado al evento de cerrar el modal
+            className='hover:bg-red-600 rounded-md transition-colors bg-red-600 px-4 py-2 border text-white text-lg w-36 h-10 font-serif' //En la linea de abajo se hace el llamado al evento de cerrar el modal
             onClick={onClose}>  
               Terminar
             </button>
