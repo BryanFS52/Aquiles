@@ -7,6 +7,7 @@ import { MdOutlineQrCodeScanner } from "react-icons/md";
 import { VscEye } from "react-icons/vsc";
 import ModalInfoficha from "../components/Modals/modalInfoficha";
 import ModalQR from "../components/Modals/modalQR";
+import Aprendiceslist from "../(routes)/aprendicelist/page";
 
 export const Table = () => {
 
@@ -79,7 +80,7 @@ const [modalQROpen, setModalQROpen] = useState(false); // de linea 23 a linea 30
         </button>
     </div>
 
-    </div><br/>
+    </div>
 
     {/* Tabla de lista de asistencia */}
     <div className="mt-4 w-full h-64 overflow-x-auto overflow-y-auto bg-purple-400">

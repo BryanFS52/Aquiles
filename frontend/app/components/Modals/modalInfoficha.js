@@ -45,11 +45,11 @@ const ModalInfoficha = ({ isOpen, onClose }) => {   // se crea los eventos de ce
                 <label className="font-serif text-lg mb-1 block">Fecha</label>
                 <input type="text" placeholder='Seleccionar Fecha' className="rounded-md bg-white border-gray-300 shadow-md border-2 w-full md:w-56 px-3 py-2" />
               </div>
+              
               <div className="flex-1">
                 <label className="font-serif text-lg mb-1 block">Componente</label>
                 <input type='text' placeholder='Seleccionar' className="rounded-md bg-white border-gray-300 shadow-md border-2 w-full md:w-56 px-3 py-2" />
               </div>
-              
             </div>
 
             <div className="mb-4 md:flex md:space-x-4 ml-56">

@@ -34,7 +34,7 @@ export const Sidebar = () => {
 
                     <ul className='text-white'>
                         <li>
-                            <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <IoPersonSharp/>
                                 Fichas
                             </Link>
@@ -58,7 +58,7 @@ export const Sidebar = () => {
                             </Link>
                         </li>
                         <li>
-                            <Link href="/roles" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <Link href="/aprendicelist" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <PiStudentFill  />
                                 Aprendices
                             </Link>
