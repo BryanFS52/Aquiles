@@ -8,9 +8,21 @@ import { IoMdCheckmark } from "react-icons/io";
 import { TbLetterR } from "react-icons/tb";
 import { TbLetterX } from "react-icons/tb";
 import { TbLetterJ } from "react-icons/tb"; 
-import { Table } from "../components/table"
+import { Table } from "../components/table";
+import ModalAsistencia from "../components/Modals/modalAsistencia";
 
 export const Attendance = () => {
+
+  const [modalOpen, setModalOpen] = useState(false); // de linea 16 a linea 25 se crea la funcion para la logica de los modales
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+
+  };
     return(
         
         <div>
@@ -71,8 +83,7 @@ export const Attendance = () => {
 
               <div className="flex w-96 h-52 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ">
                   <div className="z-50 justify-end space-y-3">
-                  <span className="font-serif text-xl ml-32">Leyenda</span>
-
+                  <span className="font-serif font-semibold text-balg ml-16">Información de asistencia</span>
                   <div className="flex">
                     <div className="flex items-center mr-8">
                       <span className="font-serif text-lg">Asistencia</span>
@@ -101,13 +112,21 @@ export const Attendance = () => {
                     </div>
 
                     <div className="flex items-center">
-                      <span className="font-serif text-lg">Justificación</span>
-                      <div className="relative ml-4">
+                      <span className="font-serif text-lg ml-4">Justificación</span>
+                      <div className="relative ml-5">
                         <input className="rounded-md border-gray-200 border-2 pl-8 w-5 h-5"/>
                         <TbLetterJ className="absolute top-1/2 transform -translate-y-1/2 left-2 text-blue-500 w-4 h-4" />
                       </div>
                     </div>
                     </div>
+
+                    <button type="button" className=" text-white rounded-lg text-sm dark:bg-custom-blue dark:hover:bg-custom-blue w-64 h-10 mr-10 ml-10" 
+                     onClick={handleOpenModal}
+                     >
+                      Ver información de la asistencia
+                    </button>
+                        <ModalAsistencia isOpen={modalOpen} onClose={handleCloseModal}/> {/*se llama la funcion logica para abrir y Cerrar el modal */}
+
                   </div>
                 </div>
               </div>
