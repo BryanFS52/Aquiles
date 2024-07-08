@@ -1,22 +1,36 @@
-spring:
+server:
+  port: 8080
+  ssl:
+    key-store: classpath:keystore.p12
+    key-store-password: fabrica2023*
+    key-store-type: PKCS12
+    key-alias: tomcat
 
+spring:
   application:
     name: DBAquiles
 
   datasource:
     url: jdbc:postgresql://localhost:5432/DBAquiles
     username: postgres
-    password: "fabrica2024*"
+    password: "fabrica2023*"
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
       ddl-auto: create-drop
-#      ddl-auto: none
+    #      ddl-auto: none
 
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
-  main:
-    allow-circular-references: true
+
+olimpo:
+  auth:
+    url: https://localhost:8081/api/auth/login
+    cert:
+      path: classpath:olimpo_cert.pem
+
+main:
+  allow-circular-references: true
