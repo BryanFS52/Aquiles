@@ -52,7 +52,7 @@ const [modalQROpen, setModalQROpen] = useState(false); // de linea 23 a linea 30
                     <input type="date" className="h-7 block w-52 pl-10 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300" placeholder="Buscar por fechas" />
                 </div>
             </form>
-    <div className="ml-32 mr-4">
+    <div className="ml-42 mr-7">
         <button type="button" className="text-white font-serif h-11 w-36  rounded-lg text-sm px-5 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center"
             onClick={handleOpenQRModal}
             >

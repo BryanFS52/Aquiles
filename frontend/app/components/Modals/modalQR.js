@@ -23,7 +23,7 @@ const ModalQR = ({ isOpen, onClose }) => {   // se crea los eventos de cerrar y 
       <div className="relative w-full max-w-xl mx-auto my-12 bg-white rounded-lg shadow-lg">
         <div className="p-5">
           <div className='flex justify-center items-center'>
-            <h1 className="text-2xl font-serif border-b-2 border-black">QR Para la toma de asistencia</h1>
+            <h1 className="text-2xl font-serif border-b-2 border-black">Codigo QR Para la Toma de Asistencia</h1>
           </div><br/><br/>
 
         <div className='flex justify-start'>
