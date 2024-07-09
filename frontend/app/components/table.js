@@ -52,7 +52,7 @@ const [modalQROpen, setModalQROpen] = useState(false); // de linea 23 a linea 30
                     <input type="date" className="h-7 block w-52 pl-10 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300" placeholder="Buscar por fechas" />
                 </div>
             </form>
-    <div className="ml-42 mr-7">
+    <div className="ml-28 mr-7">
         <button type="button" className="text-white font-serif h-11 w-36  rounded-lg text-sm px-5 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center"
             onClick={handleOpenQRModal}
             >
@@ -83,53 +83,18 @@ const [modalQROpen, setModalQROpen] = useState(false); // de linea 23 a linea 30
     </div>
 
     {/* Tabla de lista de asistencia */}
-    <div className="mt-4 w-full h-64 overflow-x-auto overflow-y-auto bg-purple-400">
-        <div className=" bg-green-400 flex w-full space-x-36">
-
-    <div className="ml-96 border-2 border-red-400">
-            <span className="mx-7">
-                Semana 1
-            </span>
-        </div>
-
-        <div>
-            <span>
-                Semana 2
-            </span>
-        </div>
-
-        <div>
-            <span>
-                Semana 3
-            </span>
-        </div>
-
-        <div>
-            <span>
-                Semana 4
-            </span>
-        </div>
-        </div>
     <table className="min-w-full text-left table-auto bg-white">
         <thead>
             <tr>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">Número de Documento</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">Nombres y Apellidos</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">L</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">J</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">V</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">S</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">D</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">L</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">J</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">V</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">S</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">D</th>
                 
+                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">Número de Documento</th>
+                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">Nombres y Apellidos</th>                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">L</th>
+                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">J</th>
+                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">V</th>
+                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">S</th>
+                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">D</th>
             </tr>
         </thead>
         <tbody>
@@ -141,33 +106,11 @@ const [modalQROpen, setModalQROpen] = useState(false); // de linea 23 a linea 30
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-blue-500 font-bold">J</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-            </tr>
+                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
+            </tr> 
+
             <tr>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm">10078459687</td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm">Michael Felipe Laiton Chaparro</td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
             </tr>
             <tr>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm">10078459687</td>
@@ -177,33 +120,8 @@ const [modalQROpen, setModalQROpen] = useState(false); // de linea 23 a linea 30
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-blue-500 font-bold">J</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-            </tr>
-            <tr>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm">10078459687</td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm">Michael Felipe Laiton Chaparro</td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-blue-500 font-bold">J</span></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
             </tr>
             <tr>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm">10078459687</td>
@@ -213,15 +131,8 @@ const [modalQROpen, setModalQROpen] = useState(false); // de linea 23 a linea 30
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-blue-500 font-bold">J</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
             </tr>
             <tr>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm">10078459687</td>
@@ -231,19 +142,11 @@ const [modalQROpen, setModalQROpen] = useState(false); // de linea 23 a linea 30
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
                 <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-blue-500 font-bold">J</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"></td>
             </tr>
         </tbody>
     </table>
-</div>
 </div>
 
     )
