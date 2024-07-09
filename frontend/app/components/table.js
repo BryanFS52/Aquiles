@@ -13,6 +13,14 @@ export const Table = () => {
 
 const [modalOpen, setModalOpen] = useState(false); // de linea 16 a linea 21 se crea la funcion para la logica del modal de ver info de ficha
 const [modalQROpen, setModalQROpen] = useState(false); // de linea 23 a linea 30 se crea la funcion para la logica del modal de QR
+const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la tabla de asistencia 
+
+  const toggleAttendance = (index, day, weekIndex) => {  
+    const updatedAttendees = [...attendees];
+    updatedAttendees[index].weeks[weekIndex][day] = !updatedAttendees[index].weeks[weekIndex][day];
+    setAttendees(updatedAttendees);
+  };
+
 
   const handleOpenModal = () => {
     setModalOpen(true);
@@ -32,9 +40,8 @@ const [modalQROpen, setModalQROpen] = useState(false); // de linea 23 a linea 30
 
     return(
 
-    <div className=" w-11/12 h-96  rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ml-10 mt-10">
+    <div className=" w-11/12 h-auto  rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ml-10 mt-10"> 
         <div className="flex bg-white w-full h-14">
-
             <form className="w-72 h-10">   
                 <div className="relative">
                     <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -79,75 +86,126 @@ const [modalQROpen, setModalQROpen] = useState(false); // de linea 23 a linea 30
             Finalizar Asistencia
         </button>
     </div>
-
     </div>
 
     {/* Tabla de lista de asistencia */}
-    <table className="min-w-full text-left table-auto bg-white">
-        <thead>
+    <div className="container mx-auto">
+    <div className="overflow-x-auto mt-4 bg-red-500 mb-5">
+
+        <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-auto">
+          <thead className="bg-gray-50">
             <tr>
+              <th className="px-10 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300"></th>
+              <th className="px-28 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300"></th>
+              {[...Array(4)].map((_, weekIndex) => (
+                <th key={weekIndex} colSpan={7} className="px-2 py-3 text-center text-xs font-semibold text-black uppercase tracking-wider border-2 border-gray-300 font-serif ">Semana {weekIndex + 1}</th>
+              ))}
+            </tr>
+            <tr>
+                <th className="px-10 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300">Número de Documento</th>
+                <th className="px-6 py-3 text-xs text-center font-medium text-black uppercase tracking-wider border-2 border-gray-300">Nombre y Apellido</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">L</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">J</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">V</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">S</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">D</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">L</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">J</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">V</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">S</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">D</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">L</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">J</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">V</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">S</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">D</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">L</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">J</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">V</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">S</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">D</th>
                 
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">Número de Documento</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">Nombres y Apellidos</th>                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">L</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">J</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">V</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">S</th>
-                <th className="px-4 py-3 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">D</th>
             </tr>
-        </thead>
-        <tbody>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-300">
+          <tr>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm">10078459687</td>
+                <td className="px-2 border-2 border-gray-300 text-sm">Michael Felipe Laiton Chaparro</td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-blue-500 font-bold">J</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-blue-500 font-bold">J</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-blue-500 font-bold">J</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+            </tr>
             <tr>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm">10078459687</td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm">Michael Felipe Laiton Chaparro</td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-            </tr> 
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm">10078459687</td>
+                <td className="px-2 border-2 border-gray-300 text-sm">Michael Felipe Laiton Chaparro</td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-blue-500 font-bold">J</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-blue-500 font-bold">J</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-blue-500 font-bold">J</span></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
+                
+            </tr>
+          </tbody>
+        </table>
+        </div>
+    </div>
+    </div>
+  );
+};
 
-            <tr>
-            </tr>
-            <tr>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm">10078459687</td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm">Michael Felipe Laiton Chaparro</td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
-            </tr>
-            <tr>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm">10078459687</td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm">Michael Felipe Laiton Chaparro</td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-            </tr>
-            <tr>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm">10078459687</td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm">Michael Felipe Laiton Chaparro</td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-blue-500 font-bold">J</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-200 text-sm"><span className="text-red-500 font-bold">X</span></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-    )
-}
