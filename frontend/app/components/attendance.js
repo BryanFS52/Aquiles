@@ -33,7 +33,7 @@ export const Attendance = () => {
                   <div className="z-50 justify-end space-y-3">
 
                   <div className= "flex">
-                    <span className="font-serif text-lg">Institución</span>
+                    <span className="font-serif text-lg">Institución:</span>
                     <div className="ml-8 relative">
                     <input type="text" name="nameProject" placeholder="Centro al que pertenece" className="bg-neutral-300 rounded-lg border-gray-400 border-2"/>
                     <GiPadlock className="absolute top-0 left-48 h-full flex "/>
@@ -41,23 +41,23 @@ export const Attendance = () => {
                   </div>
 
                   <div className="flex">
-                    <span className="font-serif text-lg">Responsable</span>
+                    <span className="font-serif text-lg">Instructor:</span>
                     <div className="ml-auto">
-                    <input type="text" name="nameProject" placeholder="Responsable" className="rounded-lg bg-white border-gray-300 border-2 "/>
+                    <input type="text" name="nameProject" placeholder="Nombre del Instructor" className="rounded-lg bg-white border-gray-300 border-2 "/>
                     </div>
                   </div>
 
                   <div className=" flex">
-                    <span className="font-serif text-lg">Fecha</span>
+                    <span className="font-serif text-lg">Fecha:</span>
                     <div className="ml-16">
                     <input type="date" name="nameProject" placeholder="Fecha" className="bg-white rounded-lg border-2 border-gray-300"/>
                     </div>
                   </div>
 
                   <div className=" flex">
-                    <span className="font-serif text-lg">Materia</span>
+                    <span className="font-serif text-lg">Componente:</span>
                     <div className="ml-auto relative">
-                    <input type="text" name="nameProject" placeholder="Materia" className="bg-white rounded-lg border-2 border-gray-300"/>
+                    <input type="text" name="nameProject" placeholder="" className="bg-white rounded-lg border-2 border-gray-300"/>
                     </div>
                   </div>
                 </div>
