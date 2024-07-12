@@ -69,6 +69,12 @@ export const Sidebar = () => {
                                 Proyectos
                             </Link>
                         </li>
+                        <li>
+                            <Link href="/justificaciones" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <TfiBlackboard />
+                                Justificaciones
+                            </Link>
+                        </li>
                     </ul>
                 </div>
                 <ul>

@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from 'react'; 
 import Link from "next/link";
 import { GiPadlock } from "react-icons/gi";
 import {faLock,faEye,faEyeSlash,faLink,} from "@fortawesome/free-solid-svg-icons";
@@ -8,8 +9,20 @@ import { HiMiniIdentification } from "react-icons/hi2";
 import Image from "next/image";
 import logoSena from "../public/img/LogoSena.png";
 import { height } from "@fortawesome/free-solid-svg-icons/fa0";
+import ModalOlvidoContraseña from "../app/components/Modals/modalOlvidoContraseña";
 
 export default function Login() {
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    
+    setModalOpen(false);
+  };
+
 	return (
 		<div className="w-screen h-screen flex justify-center items-center bg-white">
 			<div className="w-full h-full flex justify-between items-center">
@@ -67,9 +80,11 @@ export default function Login() {
                               
                             </div>
                             <div className="text-xs ">
-                              <Link href="" >
-                                <p className='hover:text-custom-blues'>¿Olvido su contraseña?</p>
-                              </Link>
+                            <Link href="">
+                                <p className='hover:text-custom-blues' onClick={handleOpenModal}>¿Olvidó su contraseña?</p>
+                            </Link>
+                                <ModalOlvidoContraseña isOpen={modalOpen} onClose={handleCloseModal}/>
+
                             </div>
                             
                           </div>
