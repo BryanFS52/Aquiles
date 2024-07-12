@@ -7,7 +7,6 @@ import { MdOutlineQrCodeScanner } from "react-icons/md";
 import { VscEye } from "react-icons/vsc";
 import ModalInfoficha from "../components/Modals/modalInfoficha";
 import ModalQR from "../components/Modals/modalQR";
-import Aprendiceslist from "../(routes)/aprendicelist/page";
 
 export const Table = () => {
 
@@ -90,7 +89,7 @@ const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la ta
 
     {/* Tabla de lista de asistencia */}
     <div className="container mx-auto">
-    <div className="overflow-x-auto mt-4 bg-red-500 mb-5">
+    <div className="overflow-x-auto mt-4 bg-gray-100 mb-5">
 
         <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-auto">
           <thead className="bg-gray-50">
