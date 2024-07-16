@@ -6,6 +6,7 @@ import { GrAttachment } from "react-icons/gr";
 import Image from "next/image";
 import persona from "../../../public/img/persona.jpg";
 import { IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowBack } from "react-icons/io";
 
 export default function Options() {
   return (
@@ -62,12 +63,16 @@ export default function Options() {
             </tbody>
             </table>
             </div>
-            <div className="pt-96 ml-96">
-            <button type="button" className="text-custom-blue font-medium flex items-center ">
-                Siguiente
-            <IoIosArrowForward className="text-custom-blue ml-2 w-5 h-4"/>
+            <div className="flex pt-96 justify-center">
+                <button type="button" className="text-custom-blue font-medium flex items-center font-serif text-lg">
+                <IoIosArrowBack  className="text-custom-blue ml-2 w-5 h-4" />
+                    Anterior
+                </button>
 
-            </button>
+                <button type="button" className="text-custom-blue font-medium flex items-center ml-32 font-serif text-lg">
+                    Siguiente
+                    <IoIosArrowForward className="text-custom-blue ml-2 w-5 h-4" />
+                </button>
             </div>
         </div>
       </div>

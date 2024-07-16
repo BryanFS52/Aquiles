@@ -10,7 +10,7 @@ import { MdAddCircle } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
 import ModalComponent from '../../components/Modals/modalComponent';
 import { listTeamsScrum, createTeamScrum } from '../../services/teamScrumService'; // Importacion de los métodos del servicio
-import ModalAddInformation from '../../components/ModalAddInformation/modalAddInformation';
+import ModalAddInformation from '../../components/Modals/modalAddInformation';
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
