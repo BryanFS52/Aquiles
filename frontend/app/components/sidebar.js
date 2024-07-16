@@ -33,19 +33,17 @@ export const Sidebar = () => {
                     </div>
 
                     <ul className='text-white'>
-                        <li>
-                            <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <IoPersonSharp/>
-                                Fichas
-                            </Link>
-                        </li>
-                        <li>
+                         <li>
                             <Link href="/inventario" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <FaLaptopCode />
                                 Programas
                             </Link>
                         </li>
                         <li>
+                            <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <IoPersonSharp/>
+                                Fichas
+                            </Link>
                             <Link href="/asistencia" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <BsPersonCheck />
                                 Asistencia
@@ -58,15 +56,15 @@ export const Sidebar = () => {
                             </Link>
                         </li>
                         <li>
-                            <Link href="/aprendicelist" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <PiStudentFill  />
-                                Aprendices
-                            </Link>
-                        </li>
-                        <li>
                             <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <TfiBlackboard />
                                 Proyectos
+                            </Link>
+                        </li>
+                        <li>
+                            <Link href="/aprendicelist" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <PiStudentFill  />
+                                Aprendices
                             </Link>
                         </li>
                     </ul>
