@@ -1,3 +1,5 @@
+"use client"
+
 import React from "react";
 import { Header } from "@/app/components/header"; //importaciones del header y del sidebar para hacer el llamado
 import { Sidebar } from "@/app/components/sidebar";
