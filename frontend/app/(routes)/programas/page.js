@@ -40,7 +40,6 @@ export default function Programas() {
                 </div>
               </div>
               <AiOutlineStock className="z-50 text-5xl text-white ml-auto w-40" />
-
               <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-cyan-900 border-l-[240px] border-l-transparent -z-1"></div>
             </div>
 

@@ -8,6 +8,7 @@ import Link from "next/link";
 import { IoIosArrowDown } from "react-icons/io";
 
 export default function AsistenciaAprendiz () {
+
     return(
         
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
@@ -17,14 +18,13 @@ export default function AsistenciaAprendiz () {
 
             <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full">
                 <h1 className="text-4xl pb-3 border-b-2 border-gray-400 w-1/2 mb-12 font-serif"> Mi Asistencia</h1>
-                <div className=" flex w-5/6
-                 h-auto border-2 border-gray-400 rounded-lg overflow-hidden shadow-lg bg-zinc-100 relative mb-4 p-4 ml-28 ">
+                <div className=" flex w-3/4 h-auto border-2 border-gray-400 rounded-lg overflow-hidden shadow-lg bg-zinc-100 relative mb-4 p-4 ml-28 ">
                 <div className="container mx-auto">
-                <div className="w-11/12 h-auto rounded-lg overflow-hidden shadow-lg bg-custom-blue border-2 border-gray-300 relative mb-4 p-3 ml-10 mt-10 justify-center"> 
+                <div className="w-11/12 h-auto rounded-lg overflow-hidden shadow-lg bg-custom-blue border-2 border-gray-300 relative mb-4 p-3 ml-16 mt-10 justify-center"> 
                 <div className="flex bg-custom-blue w-full h-14">
-                    <h1 className="text-green-600 font-serif font-medium text-3xl pt-3">Junio</h1>
+                    <h1 className="text-green-600 font-serif font-medium text-3xl pt-3 ml-6">Junio</h1>
                     
-                        <form className="w-72 h-10 ml-96 pt-3 pl-7">
+                        <form className="w-72 h-10 ml-60 pt-3 pl-7">
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <GoSearch className="text-gray-400 ml-40" />
@@ -39,16 +39,15 @@ export default function AsistenciaAprendiz () {
                                     <GoSearch className="text-gray-400" />
                                 </div>
                                 <input type="search" className="font-serif h-8 block w-52 pl-10 pr-10 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300" placeholder="Filtrar por"/>
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none">
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-7 pointer-events-none">
                                     <IoIosArrowDown  className="text-black" />
                                 </div>
                             </div>
                         </form>
+                </div>
 
-                </div>
-                
-                </div>
-                <table className="w-1/2 text-sm text-left text-black dark:text-black border-2 border-gray-400 ml-32">
+            <div className="w-full overflow-x-auto">
+            <table className="w-full text-sm text-left text-black dark:text-black border-2 border-gray-400 ml-0">
             <thead className="text-base font-serif dark:bg-[#265067] dark:text-white text-center">
             <tr>
                 <th className="px-7 py-3 border-2 border-gray-400"> Domingo</th>
@@ -185,6 +184,9 @@ export default function AsistenciaAprendiz () {
 
             </tbody>
             </table>
+            </div>
+                </div>
+
                 </div>
                 </div>
             </div>
