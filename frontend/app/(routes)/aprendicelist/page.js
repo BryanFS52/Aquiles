@@ -1,17 +1,26 @@
-import React from "react";
+"use client"
+
+import React, { useState } from "react";
 import { Header } from "@/app/components/header"; //importaciones de los componentes header y sidebar para no tener que volver a crearlos
 import { Sidebar } from "@/app/components/sidebar";
 import { PiStudentFill } from "react-icons/pi";
+import { ImMail4 } from "react-icons/im";
+import Link from "next/link";
+import ModalCorreo from "../../components/Modals/modalCorreo";
 
 export default function Aprendiceslist () {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
     return(
 
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
         <Sidebar />
         <div className="xl:col-span-5">
           <Header />
-
-        <div>
         <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full relative bg-neutral-100 space-y-5 ">
           <h1 className="font-serif text-4xl pb-3 border-b-2 border-black w-80">Lista de Asistencia</h1>
             <div className="flex px-9 space-x-24">
@@ -48,6 +57,7 @@ export default function Aprendiceslist () {
                   </div>
                 </div>
               </div>
+              <ModalCorreo isOpen={isModalOpen} onClose={toggleModal} />
                 </div>
                 <div className="flex w-1/2 h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative ml-80 p-4 ">
                     <div className="z-50 justify-end space-y-3">
@@ -75,6 +85,21 @@ export default function Aprendiceslist () {
                                     <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">Michael Felipe Laiton Chaparro</td>
                                     <td className="px-4 py-2 border-2 border-gray-200 text-sm text-green-600 font-semibold">✓</td>
                                 </tr>
+
+                                <tr>
+                                <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700"> 10078459687 </td>
+                                <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700"> Michael Felipe Laiton Chaparro </td>
+                                <td className="px-4 py-2 border-2 border-gray-200 text-sm text-red-600 font-semibold"> X </td>
+                                <td className="cursor-pointer" onClick={toggleModal}>
+                                  <ImMail4 className="w-6 h-6 ml-2" />
+                                </td>
+                              </tr>
+
+                                <tr>
+                                    <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">10078459687</td>
+                                    <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">Michael Felipe Laiton Chaparro</td>
+                                    <td className="px-4 py-2 border-2 border-gray-200 text-sm text-green-600 font-semibold">✓</td>
+                                </tr>
                                 </tbody>
                         </table>
                         <div className="flex justify-end mr-12">
@@ -85,7 +110,6 @@ export default function Aprendiceslist () {
                         </div>
                     </div>
                 </div>
-        </div>
         </div>
         </div>
         </div>
