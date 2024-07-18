@@ -30,68 +30,73 @@ export const Sidebar = () => {
                     <div className="flex items-center mb-10 space-x-5">
                         <Image src={logoSena} alt="Logo Sena" className="w-11
                         " />
-                        <span className="text-xs">PROYECTOS FORMATIVOS (C.S.F.) </span>
+                        <span className="text-s">PROYECTOS FORMATIVOS (C.S.F.) </span>
                     </div>
 
                     <ul className='text-white'>
-                         <li>
-                            <Link href="/inventario" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <FaLaptopCode />
-                                Programas
-                            </Link>
-                        </li>
+                        
+                        
                         <li>
                             <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <IoPersonSharp/>
                                 Fichas
                             </Link>
+                        </li>
+
+                        <li>
+                            <Link href="/inventario" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <FaLaptopCode />
+                                Programas
+                            </Link>
+                        </li>
+
+                        <li>
                             <Link href="/asistencia" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <BsPersonCheck />
                                 Asistencia
                             </Link>
                         </li>
+
                         <li>
                             <Link href="#" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <HiUserGroup  />
                                 Teams
                             </Link>
                         </li>
+
                         <li>
                             <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <TfiBlackboard />
                                 Proyectos
                             </Link>
                         </li>
-                        <li>
-                            <Link href="/aprendicelist" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <PiStudentFill  />
-                                Aprendices
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <TfiBlackboard />
-                                Proyectos
-                            </Link>
-                        </li>
+
                         <li>
                             <Link href="/justificaciones" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <GiNotebook/>
                                 Justificaciones
                             </Link>
                         </li>
+
+                        <li>
+                            <Link href="/aprendicelist" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <PiStudentFill  />
+                                Aprendices
+                            </Link>
+                        </li>
                     </ul>
                 </div>
+
                 <ul>
                     {/* <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> <img src="https://img.freepik.com/foto-gratis/joven-bella-mujer-pie-sobre-pared-blanca_114579-90514.jpg" className='w-6 h-6 object-cover rounded-full' />
                         <RiCheckboxBlankCircleFill className='absolute text-green-600 left-16 translate-y-2 text-xs'/>
                         Usuario
                     </li>  */}
                     <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> <IoMdLogOut />
-                        Cerrar Sesion
+                        Cerrar Sesión
                     </li>
                     <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> <IoSettings/>
-                        Configuracion 
+                        Configuración 
                     </li>
 
                 </ul>
