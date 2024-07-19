@@ -5,19 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="813ee7d1-0bcd-46d4-ae30-ec9773120d05" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/controller/AquilesController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/controller/AuthController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/service/AuthService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/service/OlimpoService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../aquilesApp/src/main/resources/truststore.jks" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../aquilesApp/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/AppConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/AppConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/CorsConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/CorsConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/controller/ProjectController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/controller/ProjectController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/postman/Aqulles.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/postman/Aqulles.postman_collection.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../front/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/resources/keystore.p12" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/resources/truststore.jks" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front/.idea/front.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../front/.idea/workspace.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +40,7 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Merging fabioDev&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;fabioDev&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/sena/Desktop/Aquiles/aquilesApp/frontend&quot;
   }

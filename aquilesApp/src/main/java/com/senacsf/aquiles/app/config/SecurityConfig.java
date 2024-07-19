@@ -20,7 +20,6 @@ public class SecurityConfig {
 //                .and() // Concatena configuraciones adicionales
                 .authorizeHttpRequests(authorizeRequests -> // Configura la autorización de las solicitudes HTTP
                         authorizeRequests
-                                .requestMatchers("/api/auth/login").permitAll() // Permite acceso sin autenticación a este endpoint
                                 .requestMatchers("/api/teams-scrum/all").permitAll() // Permite acceso sin autenticación a este endpoint
                                 .requestMatchers("/api/teams-scrum/create").permitAll() // Permite acceso sin autenticación a este endpoint
                                 .requestMatchers("/api/teams-scrum/update").permitAll() // Permite acceso sin autenticación a este endpoint
