@@ -5,20 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="813ee7d1-0bcd-46d4-ae30-ec9773120d05" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/postman/Aqulles.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/java/com/senacsf/aquiles/app/postman/Aqulles.postman_collection.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/resources/keystore.p12" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/resources/truststore.jks" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front/.idea/front.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../front/.idea/workspace.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
