@@ -33,6 +33,14 @@ export const Sidebaraprendiz = () => {
                     </div>
 
                     <ul className='text-white'>
+
+                    <li>
+                            <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <IoPersonSharp/>
+                                Ficha
+                            </Link>
+                        </li>
+
                     <li>
                             <Link href="/asistencia" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <BsPersonCheck />
@@ -43,7 +51,7 @@ export const Sidebaraprendiz = () => {
                         <li>
                             <Link href="#" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <HiUserGroup  />
-                                Teams
+                                Team
                             </Link>
                         </li>
 
@@ -51,13 +59,6 @@ export const Sidebaraprendiz = () => {
                             <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <TfiBlackboard />
                                 Proyectos
-                            </Link>
-                        </li>
-
-                        <li>
-                            <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <IoPersonSharp/>
-                                Ficha
                             </Link>
                         </li>
                         
@@ -75,10 +76,10 @@ export const Sidebaraprendiz = () => {
                         Usuario
                     </li>  */}
                     <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> <IoMdLogOut />
-                        Cerrar Sesion
+                        Cerrar SesiÓn
                     </li>
                     <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> <IoSettings/>
-                        Configuracion 
+                        Configuración 
                     </li>
 
                 </ul>

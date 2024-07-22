@@ -3,10 +3,14 @@
 import Link from "next/link";
 import React, { useState,  } from 'react';
 import { GoSearch } from "react-icons/go";
-import { MdOutlineQrCodeScanner } from "react-icons/md";
+import { BsQrCode } from "react-icons/bs";
+import { FaEye } from "react-icons/fa";
+
 import { VscEye } from "react-icons/vsc";
+import { IoMdExit } from "react-icons/io";
 import ModalInfoficha from "../components/Modals/modalInfoficha";
 import ModalQR from "../components/Modals/modalQR";
+
 
 export const Table = () => {
 
@@ -44,7 +48,7 @@ const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la ta
                     <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <GoSearch className="text-gray-400" />
                     </div>
-                    <input type="search" className="h-7 block w-52 pl-10 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300" placeholder="Buscar aprendiz." />
+                    <input type="search" className="h-7 block w-52 pl-10 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300" placeholder="Buscar aprendiz:" />
                 </div>
             </form>
 
@@ -57,35 +61,33 @@ const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la ta
                 </div>
             </form>
     <div className="ml-28 mr-7">
-        <button type="button" className="text-white font-serif h-11 w-36  rounded-lg text-sm px-5 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center"
-            onClick={handleOpenQRModal}
+      <button type="button" className="text-white font-serif h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
+          onClick={handleOpenQRModal}
           >
-            Generar QR
-            <MdOutlineQrCodeScanner className="ml-2" />
-        </button>
-        <ModalQR isOpen={modalQROpen} onClose={handleCloseQRModal}/>
+          Generar QR
+            <BsQrCode className="w-4 h-4 ml-3" />
+      </button>
+           <ModalQR isOpen={modalQROpen} onClose={handleCloseQRModal}/>
     </div>
-    <div>
-
-          <button
-            type="button"
-            className="text-white font-serif h-11 w-56 rounded-lg text-xs px-5 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
-            onClick={handleOpenModal}
-          >
-            Ver información de la ficha
-            <VscEye className="w-5 h-5 ml-2" />
-          </button>
-          <ModalInfoficha isOpen={modalOpen} onClose={handleCloseModal} />
-
+    
+    <div className="mr-7">
+      <button
+        type="button"
+        className="text-white font-serif h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
+        onClick={handleOpenModal}
+      >
+         Ver información de la ficha
+        <FaEye className="w-5 h-5 ml-2" />
+      </button>
+        <ModalInfoficha isOpen={modalOpen} onClose={handleCloseModal} />
     </div>
-
-    <div className="ml-auto mr-4">
-        <button type="button" className="text-white font-serif h-11 w-44 rounded-lg text-sm px-5 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center"
-            >
-            Finalizar Asistencia
-          </button>
-        </div>
-      </div>
+    
+         <Link href="/EndAttendance" className='text-white font-serif h-11 w-44 rounded-lg text-sm px-2 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center'>
+             Continuar Asistencia
+          <IoMdExit className="w-5 h-5 ml-2" />
+        </Link>
+        
+    </div>
 
     {/* Tabla de lista de asistencia */}
     <div className="container mx-auto">
