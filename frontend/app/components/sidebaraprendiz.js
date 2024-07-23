@@ -7,7 +7,6 @@ import { FaLaptopCode } from "react-icons/fa";
 import { BsPersonCheck } from "react-icons/bs";
 import { IoMdLogOut } from "react-icons/io";
 import { TfiBlackboard } from "react-icons/tfi";
-import { GiNotebook } from "react-icons/gi";
 import { IoSettings } from "react-icons/io5";
 // import { RiCheckboxBlankCircleFill } from "react-icons/ri";
 import { PiStudentFill } from "react-icons/pi";
@@ -16,7 +15,7 @@ import { IoPersonSharp } from "react-icons/io5";
 import Image from 'next/image';
 import logoSena from "../../public/img/Logo-sena-green.png";
 
-export const Sidebar = () => {
+export const Sidebaraprendiz = () => {
     const [showMenu, setShowMenu] = useState(false);
 
     const toggleMenu = () => {
@@ -34,46 +33,38 @@ export const Sidebar = () => {
                     </div>
 
                     <ul className='text-white'>
-                        <li>
-                            <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <IoPersonSharp/>
-                                Fichas
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/programas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <FaLaptopCode />
-                                Programas
-                            </Link>
-                        </li>
-                        <li>
-                            <Link href="/asistencia" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                    <li>
+                            <Link href="/asistenciaAprendiz" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <BsPersonCheck />
                                 Asistencia
                             </Link>
                         </li>
+
                         <li>
-                            <Link href="#" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <Link href="/teamScrum" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <HiUserGroup  />
                                 Teams
                             </Link>
                         </li>
-                        <li>
-                            <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <PiStudentFill  />
-                                Aprendices
-                            </Link>
-                        </li>
+
                         <li>
                             <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <TfiBlackboard />
                                 Proyectos
                             </Link>
                         </li>
+
                         <li>
-                            <Link href="/justificaciones" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <GiNotebook/>
-                                Justificaciones
+                            <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <IoPersonSharp/>
+                                Ficha
+                            </Link>
+                        </li>
+                        
+                        <li>
+                            <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <PiStudentFill  />
+                                Aprendices
                             </Link>
                         </li>
                     </ul>

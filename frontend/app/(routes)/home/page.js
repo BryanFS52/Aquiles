@@ -10,12 +10,13 @@ import { MdAddCircle } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
 import ModalComponent from '../../components/Modals/modalComponent';
 import { listTeamsScrum, createTeamScrum } from '../../services/teamScrumService'; // Importacion de los métodos del servicio
+import ModalAddInformation from '../../components/Modals/modalAddInformation';
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const [openAgregarInfo, setOpenModal] = useState(false);
   const [teams, setTeams] = useState([]); 
-
+  
   useEffect(() => {
     fetchTeams(); 
   }, []);
@@ -57,6 +58,17 @@ export default function Home() {
     setOpenModal(false);
   };
 
+  const [openAddInfoModal, setOpenAddInfoModal] = useState(false);
+
+  const handleOpenAddInfoModal = () => {
+   setOpenAddInfoModal(true);
+  };
+
+const handleCloseAddInfoModal = () => {
+    setOpenAddInfoModal(false);
+  };
+
+
   return (
       <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
         <Sidebar />
@@ -66,9 +78,9 @@ export default function Home() {
           <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full relative">
             <h1 className="font-serif text-4xl pb-3 border-b-2 border-gray-400 w-1/2">Teams Scrums</h1>
             <br />
-            <li className="h-9 w-14 flex items-center justify-center border-2 rounded-lg bg-cyan-900 hover:bg-green-600 ml-auto">
+            <li className="h-9 w-14 flex items-center justify-center border-2 rounded-lg bg-[#00324d] hover:bg-green-600 ml-auto">
               <a href="#" onClick={handleOpenModal}>
-                <MdAdd className="w-8 h-8" />
+                <MdAdd className="w-8 h-8 text-white"/>
               </a>
             </li>
             <ModalNewProject isOpen={modalOpen} onClose={handleCloseModal} onCreate={handleCreateTeam} />
@@ -76,7 +88,7 @@ export default function Home() {
             <div className="grid grid-cols-3 gap-4 mt-8">
               {teams.map((team) => (
                 <div key={team.team_scrum_id} className="w-full rounded-lg overflow-hidden shadow-lg bg-zinc-200 relative mb-4">
-                  <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-cyan-900 border-l-[240px] border-l-transparent -z-1"></div>
+                  <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-[#00324d] border-l-[240px] border-l-transparent -z-1"></div>
                   <div className="px-6 py-4">
                     <div className="flex">
                       <span className="font-serif text-xl mb-2">Nombre del Proyecto</span>
@@ -92,19 +104,20 @@ export default function Home() {
                     <br />
                     <div className="font-serif text-xl mb-2 flex">
                       <span>Agregar Información</span>
-                      <Link href="/home" className="ml-2">
-                        <MdAddCircle className="inline-block text-2xl text-cyan-900" />
-                      </Link>
-                      <Link href="/home" className="ml-2 ml-auto">
-                        <FaTrashAlt className="inline-block text-2xl text-cyan-900" />
-                      </Link>
-                      <button onClick={OpenModal} className="ml-2">
+
+                      <button onClick={handleOpenAddInfoModal} className="ml-2">
+                      <MdAddCircle className="inline-block text-2xl text-[#00324d]" />
                       </button>
+                      <Link href="/home" className="ml-2 ml-auto">
+                        <FaTrashAlt className="inline-block text-2xl text-[#00324d]" />
+                      </Link>
+
                     </div>
                   </div>
                 </div>
               ))}
             </div>
+            <ModalAddInformation isOpen={openAddInfoModal} onClose={handleCloseAddInfoModal} />
             <ModalComponent isOpen={openAgregarInfo} onClose={CloseModal} />
           </div>
         </div>
