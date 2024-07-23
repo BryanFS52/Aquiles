@@ -34,8 +34,11 @@ export const Sidebar = () => {
                     </div>
 
                     <ul className='text-white'>
+<<<<<<< HEAD
                         
                         
+=======
+>>>>>>> keihslaDev
                         <li>
                             <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <IoPersonSharp/>
@@ -44,7 +47,11 @@ export const Sidebar = () => {
                         </li>
 
                         <li>
+<<<<<<< HEAD
                             <Link href="/inventario" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+=======
+                            <Link href="/programas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+>>>>>>> keihslaDev
                                 <FaLaptopCode />
                                 Programas
                             </Link>
@@ -65,6 +72,15 @@ export const Sidebar = () => {
                         </li>
 
                         <li>
+<<<<<<< HEAD
+=======
+                            <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <PiStudentFill  />
+                                Aprendices
+                            </Link>
+                        </li>
+                        <li>
+>>>>>>> keihslaDev
                             <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <TfiBlackboard />
                                 Proyectos
@@ -75,6 +91,7 @@ export const Sidebar = () => {
                             <Link href="/justificaciones" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <GiNotebook/>
                                 Justificaciones
+<<<<<<< HEAD
                             </Link>
                         </li>
 
@@ -82,6 +99,8 @@ export const Sidebar = () => {
                             <Link href="/aprendicelist" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <PiStudentFill  />
                                 Aprendices
+=======
+>>>>>>> keihslaDev
                             </Link>
                         </li>
                     </ul>

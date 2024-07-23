@@ -42,14 +42,14 @@ export const Sidebaraprendiz = () => {
                         </li>
 
                     <li>
-                            <Link href="/asistencia" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <Link href="/asistenciaAprendiz" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <BsPersonCheck />
                                 Asistencia
                             </Link>
                         </li>
 
                         <li>
-                            <Link href="#" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <Link href="/teamScrum" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <HiUserGroup  />
                                 Team
                             </Link>
