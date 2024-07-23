@@ -2,23 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-<<<<<<< HEAD
-=======
-::-webkit-scrollbar{
-  width: 0;
-}
-
-.semicircle::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 45px; 
-  height: 45px; 
-  background-color: #f44336; 
-  border-bottom-right-radius: 100px;
-}
->>>>>>> keihslaDev
 ::-webkit-scrollbar {
   width: 1px;
   height: 9px;
@@ -37,7 +20,6 @@
   background: #01b001;
 }
 
-<<<<<<< HEAD
 ::-webkit-scrollbar{
   width: 0;
 }
@@ -52,5 +34,3 @@
   background-color: #f44336; 
   border-bottom-right-radius: 100px;
 }
-=======
->>>>>>> keihslaDev

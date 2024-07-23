@@ -64,7 +64,6 @@ const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la ta
       <button type="button" className="text-white font-serif h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
           onClick={handleOpenQRModal}
           >
-<<<<<<< HEAD
           Generar QR
             <BsQrCode className="w-4 h-4 ml-3" />
       </button>
@@ -205,29 +204,6 @@ const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la ta
             </tr>
           </tbody>
         </table>
-=======
-            Generar QR
-            <MdOutlineQrCodeScanner className="ml-2" />
-          </button>
-          <ModalQR isOpen={modalQROpen} onClose={handleCloseQRModal} />
-
-          <button
-            type="button"
-            className="text-white font-serif h-11 w-56 rounded-lg text-xs px-5 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
-            onClick={handleOpenModal}
-          >
-            Ver información de la ficha
-            <VscEye className="w-5 h-5 ml-2" />
-          </button>
-          <ModalInfoficha isOpen={modalOpen} onClose={handleCloseModal} />
-
-          <button
-            type="button"
-            className="text-white font-serif h-11 w-44 rounded-lg text-sm px-5 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
-          >
-            Finalizar Asistencia
-          </button>
->>>>>>> keihslaDev
         </div>
     </div>
     </div>
