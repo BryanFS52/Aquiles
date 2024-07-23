@@ -5,50 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="813ee7d1-0bcd-46d4-ae30-ec9773120d05" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/aquilesApp.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/gradle.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/modules/aquilesApp.aquilesApp.main.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(routes)/aprendicelist/page.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(routes)/aprendiz/page.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(routes)/asistenciaAprendiz/page.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(routes)/justificacionaprendiz/page.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(routes)/justificaciones/page.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(routes)/programas/page.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(routes)/teamScrum/page.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/components/Modals/EndAttendance.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/components/Modals/modalAddInformation.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/components/Modals/modalAsistencia.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/components/Modals/modalCorreo.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/components/Modals/modalInfoficha.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/components/Modals/modalOlvidoContraseña.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/components/Modals/modalQR.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/components/Modals/modalTerminarQr.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/components/sidebaraprendiz.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/components/table.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/img/CheckingList.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/img/Close_List.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/img/J_List.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/img/RList.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/img/aquiles.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/img/persona.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../aquilesApp/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../aquilesApp/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(routes)/asistencia/page.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/(routes)/asistencia/page.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(routes)/fichasasignadas/page.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/(routes)/fichasasignadas/page.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(routes)/home/page.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/(routes)/home/page.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(routes)/options/page.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/attendance.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/attendance.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/components/sidebar.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/components/sidebar.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/globals.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/layout.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/layout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/page.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/page.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,9 +28,9 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "Merging fabioDev",
+    "git-widget-placeholder": "fabioDev",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/sena/Desktop/Aquiles/aquilesApp/frontend"
+    "last_opened_file_path": "/home/fabrica/Documentos/Aquiles/frontend"
   }
 }]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
