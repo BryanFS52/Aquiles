@@ -182,6 +182,18 @@ export default function AsistenciaAprendiz () {
                 <td className="px-6 py-9 border-2 border-gray-400 bg-gray-200"></td>
             </tr>
 
+            <tr className="bg-white dark:bg-white">
+                <th className="px-6 py-11 border-2 border-gray-400 relative">
+                <span className="absolute top-0 right-0 pr-2 font-kiwi-marumaru font-semibold text-3xl">30</span>
+                </th>
+                <td className="px-6 py-9 border-2 border-gray-400 bg-gray-200"></td>
+                <td className="px-6 py-9 border-2 border-gray-400 bg-gray-200"></td>
+                <td className="px-6 py-9 border-2 border-gray-400 bg-gray-200"></td>
+                <td className="px-6 py-9 border-2 border-gray-400 bg-gray-200"></td>
+                <td className="px-6 py-9 border-2 border-gray-400 bg-gray-200"></td>
+                <td className="px-6 py-9 border-2 border-gray-400 bg-gray-200"></td>
+            </tr>
+
             </tbody>
             </table>
             </div>
