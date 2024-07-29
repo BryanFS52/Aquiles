@@ -39,13 +39,8 @@ export default function AsistenciaAprendiz () {
                                     <GoSearch className="text-gray-400" />
                                 </div>
                                 <input type="search" className="font-serif h-8 block w-52 pl-10 pr-10 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300" placeholder="Filtrar por"/>
-<<<<<<< HEAD
                                 <div className="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none">
                                     <IoIosArrowDown  className="text-black mr-9" />
-=======
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-7 pointer-events-none">
-                                    <IoIosArrowDown  className="text-black" />
->>>>>>> keihslaDev
                                 </div>
                             </div>
                         </form>
