@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: DBAquiles
+    name: Aquiles
 
   datasource:
     url: jdbc:postgresql://localhost:5432/DBAquiles
@@ -20,6 +20,5 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
-
-main:
-  allow-circular-references: true
+  main:
+    allow-circular-references: true
