@@ -1,8 +1,8 @@
 "use client"
 
 import React from "react";
-import { Header } from "@/app/components/header"; //importaciones del header y del sidebar para hacer el llamado
-import { Sidebaraprendiz } from "@/app/components/sidebaraprendiz";
+import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
+import { Sidebaraprendiz } from "../../components/sidebaraprendiz";
 import { IoIosArrowDown } from "react-icons/io";
 
 export default function Justificacionaaprendiz() {

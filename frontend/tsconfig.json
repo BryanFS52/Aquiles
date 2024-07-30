@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -18,9 +22,27 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
-    }
+  "@/": ["./app/"]
+}
+
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/(routes)/home/page.js", "app/(routes)/inventario/page.js", "app/(routes)/roles/page.js", "app/components/estadistica.js", "app/components/header.js", "app/components/product.js", "app/components/sidebar.js", "app/page.js", "app/layout.js"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "*/.ts",
+    "*/.tsx",
+    ".next/types/*/.ts",
+    "app/(routes)/home/page.js",
+    "app/(routes)/inventario/page.js",
+    "app/(routes)/roles/page.js",
+    "app/components/estadistica.js",
+    "app/components/header.js",
+    "app/components/product.js",
+    "app/components/sidebar.js",
+    "app/page.js",
+    "app/layout.js",
+    ".next/types/*/.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
