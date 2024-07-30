@@ -1,19 +1,40 @@
 "use client"
 
 import React, { useState } from "react";
-import { Header } from "@/app/components/header"; //importaciones de los componentes header y sidebar para no tener que volver a crearlos
+import { Header } from "@/app/components/header";
 import { Sidebar } from "@/app/components/sidebar";
 import { PiStudentFill } from "react-icons/pi";
 import { ImMail4 } from "react-icons/im";
-import Link from "next/link";
-import ModalCorreo from "../../components/Modals/modalCorreo";
+import ModalCorreo from "@/app/components/Modals/modalCorreo";
+import axios from 'axios';
 
-export default function Aprendiceslist () {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export default function AprendicesList() {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedStudent, setSelectedStudent] = useState(null);
 
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
+    const toggleModal = (student) => {
+        setSelectedStudent(student);
+        setIsModalOpen(!isModalOpen);
+    };
+
+    const handleSendEmail = async () => {
+        try {
+            const response = await axios.post('/api/send-email', {
+                studentName: selectedStudent.name,
+                date: selectedStudent.date
+            });
+            if (response.status === 200) {
+                alert("Correo enviado con éxito");
+            } else {
+                alert("Hubo un error al enviar el correo");
+            }
+        } catch (error) {
+            console.error("Error al enviar el correo:", error);
+            alert("Hubo un error al enviar el correo");
+        }
+        setIsModalOpen(false);
+    };
+
 
     return(
 

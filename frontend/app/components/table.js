@@ -5,7 +5,6 @@ import React, { useState,  } from 'react';
 import { GoSearch } from "react-icons/go";
 import { BsQrCode } from "react-icons/bs";
 import { FaEye } from "react-icons/fa";
-
 import { VscEye } from "react-icons/vsc";
 import { IoMdExit } from "react-icons/io";
 import ModalInfoficha from "../components/Modals/modalInfoficha";
@@ -82,7 +81,7 @@ const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la ta
         <ModalInfoficha isOpen={modalOpen} onClose={handleCloseModal} />
     </div>
     
-         <Link href="/EndAttendance" className='text-white font-serif h-11 w-44 rounded-lg text-sm px-2 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center'>
+         <Link href="/aprendicelist" className='text-white font-serif h-11 w-44 rounded-lg text-sm px-2 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center'>
              Continuar Asistencia
           <IoMdExit className="w-5 h-5 ml-2" />
         </Link>
