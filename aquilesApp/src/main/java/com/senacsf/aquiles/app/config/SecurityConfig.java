@@ -24,6 +24,13 @@ public class SecurityConfig {
                                 .requestMatchers("/api/teams-scrum/create").permitAll() // Permite acceso sin autenticación a este endpoint
                                 .requestMatchers("/api/teams-scrum/update").permitAll() // Permite acceso sin autenticación a este endpoint
                                 .requestMatchers("/api/teams-scrum/delete/{id}").permitAll() // Permite acceso sin autenticación a este endpoint
+                                .requestMatchers("/api/send-notification").permitAll()
+                                .requestMatchers("/api/2fa/**").permitAll()
+                                .requestMatchers("/api/pdf/report").permitAll()
+                                .requestMatchers("/api/attendances/generateQRCode").permitAll()
+                                .requestMatchers("/api/excel/report").permitAll()
+
+
                                 .anyRequest().authenticated() // Requiere autenticación para cualquier otra solicitud
                 );
         return http.build(); // Construye el objeto SecurityFilterChain
