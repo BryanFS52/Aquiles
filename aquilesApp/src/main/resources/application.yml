@@ -1,6 +1,9 @@
+server:
+  port: 8080
+
 spring:
   application:
-    name: Aquiles
+    name: DBAquiles
 
   datasource:
     url: jdbc:postgresql://localhost:5432/DBAquiles
@@ -10,25 +13,13 @@ spring:
 
   jpa:
     hibernate:
-      # ddl-auto: create-drop
-      ddl-auto: none
+      ddl-auto: create-drop
+      #    ddl-auto: none
 
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
 
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: fosnotreply@gmail.com
-    password: blquyaiclscdoufe
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
-  main:
-    allow-circular-references: true
+main:
+  allow-circular-references: true
