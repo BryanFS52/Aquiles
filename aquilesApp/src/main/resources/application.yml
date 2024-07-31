@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-=======
-server:
-  port: 8080
-
->>>>>>> keihslaDev
 spring:
   application:
     name: DBAquiles
@@ -24,7 +18,6 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
 
-<<<<<<< HEAD
   mail:
     host: smtp.gmail.com
     port: 587
@@ -39,7 +32,3 @@ spring:
 
   main:
     allow-circular-references: true
-=======
-main:
-  allow-circular-references: true
->>>>>>> keihslaDev

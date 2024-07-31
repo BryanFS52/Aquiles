@@ -1,5 +1,5 @@
 import React from "react";
-import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
+import { Header } from "../../../app/components/header"; // importaciones del header y del sidebar para hacer el llamado
 import { Sidebar } from "../../components/sidebar";
 import { TbArrowBigRight } from "react-icons/tb";
 

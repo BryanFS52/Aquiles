@@ -164,7 +164,7 @@ export default function Login() {
             </div>
           </div>
         </div>
-        <div className="w-[100%] w-[70%] justify-center items-center bg-cover bg-center h-screen hidden xl:block" style={{ backgroundImage: "url('/img/fondo-login.png')"}}>
+        <div className="w-[70%] justify-center items-center bg-cover bg-center h-screen hidden xl:block" style={{ backgroundImage: "url('/img/fondo-login.png')"}}>
           <div className="relative w-full h-full">
             <div className="absolute inset-0 bg-black opacity-20"></div>
             <div className="relative z-10 h-full flex flex-col justify-between p-10 text-center text-white">

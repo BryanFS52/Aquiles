@@ -1,5 +1,5 @@
 import React from "react";
-import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
+import { Header } from "../../components/header"; //importaciones de los componentes header y sidebar para no tener que volver a crearlos
 import { Sidebar } from "../../components/sidebar";
 
 export default function Perfil() {
