@@ -23,37 +23,25 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.security:spring-security-web' // Agregado
-    implementation 'org.springframework.security:spring-security-config' // Agregado
+//    implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
+//    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation 'org.apache.httpcomponents:httpcore:4.4.14'
     //	fabioDev Model Mapper
     // https://mvnrepository.com/artifact/org.modelmapper/modelmapper
     implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.0'
-<<<<<<< HEAD
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
-    implementation 'com.google.zxing:core:3.5.0'
-    implementation 'com.google.zxing:javase:3.5.0'
-    implementation 'org.apache.poi:poi:5.2.3' // Para formatos XLS (HSSF)
-    implementation 'org.apache.poi:poi-ooxml:5.2.3' // Para formatos XLSX (XSSF)
-    implementation 'org.apache.pdfbox:pdfbox:2.0.28' // Usa la versión más reciente
-}
-
-
-
-
-=======
 
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.2'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 }
 
->>>>>>> keihslaDev
 tasks.named('test') {
     useJUnitPlatform()
 }
