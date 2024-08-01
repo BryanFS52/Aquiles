@@ -1,17 +1,20 @@
 package com.senacsf.aquiles.app.utilities;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-import org.springframework.stereotype.Component;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import javax.imageio.ImageIO;
+
+import org.springframework.stereotype.Component;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 @Component
 public class QrCodeGenerator {
@@ -22,7 +25,7 @@ public class QrCodeGenerator {
 
         for (int x = 0; x < 350; x++) {
             for (int y = 0; y < 350; y++) {
-                qrImage.setRGB(x, y, bitMatrix.get(x, y) ? 0x000000 : 0xFFFFFF);
+                qrImage.setRGB(x, y, bitMatrix.get(x, y) ? 0x00000 : 0xFFFFFF);
             }
         }
 
