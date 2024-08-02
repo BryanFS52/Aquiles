@@ -72,7 +72,7 @@ export default function ListaChequeo() {
                         <th className="px-4 py-3 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Si</th>
                         <th className="px-4 py-3 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">No</th>
                         <th className="px-4 py-3 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Observaciones</th>
-                    
+
                     </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-300">
