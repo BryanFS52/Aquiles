@@ -17,6 +17,8 @@ export default function Home() {
   const [openAgregarInfo, setOpenModal] = useState(false);
   const [teams, setTeams] = useState([]); 
   const [alert, setAlert] = useState({show: false, type: '', message: ''}); 
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [teamToDelete, setTeamToDelete] = useState(null);
 
   useEffect(() => {
     fetchTeams(); 
@@ -46,7 +48,7 @@ export default function Home() {
     createTeamScrum(team)
       .then(() => {
         fetchTeams(); 
-        setAlert({show: true, type: 'success', message: 'Proyecto registrado exitosamente.'});
+        setAlert({show: true, type: 'success', message: '¡Nuevo Proyecto!'});
         handleCloseModal(); // Cierra el modal de nuevo proyecto después de la creación exitosa del Team
 
         setTimeout(() => {
@@ -108,6 +110,17 @@ export default function Home() {
     setOpenAddInfoModal(false);
   };
 
+  const handleOpenConfirmModal = (teamId) => {
+    setTeamToDelete(teamId);
+    setConfirmModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    handleDeleteTeam(teamToDelete);
+    setConfirmModalOpen(false);
+  };
+  
+
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebar />
@@ -162,7 +175,7 @@ export default function Home() {
                     <button onClick={handleOpenAddInfoModal} className="ml-2">
                       <MdAddCircle className="inline-block text-2xl text-[#00324d]" />
                     </button>
-                    <button onClick={() => handleDeleteTeam(team.team_scrum_id)} className="ml-2 ml-auto">
+                    <button onClick={() => handleDeleteTeam(team.team_scrum_id)} className="ml-2 ">
                       <FaTrashAlt className="inline-block text-2xl text-[#00324d]" />
                     </button>
 
