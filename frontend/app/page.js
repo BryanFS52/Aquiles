@@ -69,11 +69,12 @@ export default function Login() {
   };
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center bg-white">
+		<div className="w-screen h-screen flex justify-center items-center bg-white">
       <div className="w-full h-full flex justify-between items-center">
         <div className="xl:w-1/2 h-full flex justify-center items-center sm:w-full">
-          <div className="xl:w-1/2 p-5 sm:">
-            <div className="flex items-center">
+          <div className="xl:w-1/2 p-5">
+            <div className="flex items-center mb-8">
+              <Image src={LogoAquiles} alt="TDA Logo" className="w-28" />
               <div className="flex flex-col px-2 text-custom-blue">
                 <h1 className="text-3xl font-medium ">TDA</h1>
                 <p className="text-[11px] font-light">
@@ -81,14 +82,14 @@ export default function Login() {
                 </p>
               </div>
             </div>
-            <div className="text-custom-blue pt-10">
-              <h1 className="text-4xl">Inicia Sesión</h1>
-              <p className="text-base pt-5">
-                ¡Bienvenido de vuelta!
-                <br />
-                Por favor, inicia sesión para acceder a tu cuenta.
-              </p>
-            </div>
+						<div className="text-custom-blue pt-10">
+							<h1 className="text-4xl">Inicia Sesión</h1>
+							<p className="text-base pt-5">
+								¡Bienvenido de vuelta!
+								<br />
+								Por favor, inicia sesión para acceder a tu cuenta.
+							</p>
+						</div>
 
             {error && (
               <div className="text-red-500 mt-4">
