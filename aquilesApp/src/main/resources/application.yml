@@ -4,7 +4,7 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/DBAquiles
-    username: fabrica
+    username: postgres
     password: "fabrica2024*"
     driver-class-name: org.postgresql.Driver
 

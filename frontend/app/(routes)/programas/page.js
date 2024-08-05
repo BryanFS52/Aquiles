@@ -1,6 +1,6 @@
 import React from "react";
-import { Header } from "@/app/components/header"; //importaciones del header y del sidebar para hacer el llamado
-import { Sidebar } from "@/app/components/sidebar";
+import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
+import { Sidebar } from "../../components/sidebar";
 import { FaComputer } from "react-icons/fa6";
 import { AiOutlineStock } from "react-icons/ai";
 import { GiTakeMyMoney } from "react-icons/gi";

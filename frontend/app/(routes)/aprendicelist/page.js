@@ -1,11 +1,11 @@
 "use client"
 
 import React, { useState } from "react";
-import { Header } from "@/app/components/header";
-import { Sidebar } from "@/app/components/sidebar";
+import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
+import { Sidebar } from "../../components/sidebar";
 import { PiStudentFill } from "react-icons/pi";
 import { ImMail4 } from "react-icons/im";
-import ModalCorreo from "@/app/components/Modals/modalCorreo";
+import ModalCorreo from "../../components/Modals/modalCorreo";
 import axios from 'axios';
 
 export default function AprendicesList() {

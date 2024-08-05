@@ -4,8 +4,25 @@ import React from "react";
 import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
 import { Sidebaraprendiz } from "../../components/sidebaraprendiz";
 import { IoIosArrowDown } from "react-icons/io";
+import {downloadReportPDF} from "../../services/PDFService";
 
-export default function Justificacionaaprendiz() {
+export default function ListaChequeoAprendiz() {
+        
+    const downloadrReportPDF = async () => {
+        try {
+            const blob = await downloadReportPDF();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'reporte.pdf'); // El nombre del archivo descargado
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        } catch (err) {
+            setError('Error al descargar el reporte PDF');
+        }
+    };
+
     return (
       <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
         <Sidebaraprendiz />
@@ -71,9 +88,9 @@ export default function Justificacionaaprendiz() {
             <button className="h-10 w-32 bg-gray-300 text-gray-700 rounded-lg border-2 border-neutral-400 focus:outline-none focus:border-slate-300">
               Cancelar
             </button>
-            <button className="h-10 w-32 bg-custom-blue text-white rounded-lg border-2 border-custom-blue focus:outline-none focus:border-slate-300">
-              Guardar
-            </button>
+            <button type="button" onClick={downloadrReportPDF} className="h-10 w-56 bg-blue-500 text-white rounded-lg focus:outline-none focus:bg-blue-600">
+                    Descargar PDF
+                  </button>
           </div>
         </form>
       </div>

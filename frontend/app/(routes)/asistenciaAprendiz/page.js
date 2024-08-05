@@ -1,8 +1,8 @@
 "use client"
 
 import React from "react";
-import { Header } from "@/app/components/header"; //importaciones del header y del sidebar para hacer el llamado
-import { Sidebaraprendiz } from "@/app/components/sidebaraprendiz";
+import { Header } from "../../components/header";
+import { Sidebaraprendiz } from "../../components/sidebaraprendiz";//importaciones del header y del sidebar para hacer el llamado
 import { GoSearch } from "react-icons/go";
 import Link from "next/link";
 import { IoIosArrowDown } from "react-icons/io";

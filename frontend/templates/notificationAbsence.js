@@ -8,7 +8,7 @@ const Notification = ({ studentName, date }) => {
                     <h1 className="text-2xl font-semibold">Notificación de Inasistencia</h1>
                 </div>
                 <div className="mt-4 leading-relaxed">
-                    <p>Estimado/a {studentName},</p>
+                    <p>Hola, {studentName}:,</p>
                     <p className="mt-2">Este es un recordatorio para informarte que tu inasistencia a la clase del {date} ha sido registrada.</p>
                     <p className="mt-2">Por favor, asegúrate de revisar las lecciones perdidas y ponerte al día con los materiales de la clase.</p>
                     <p className="mt-2">Si tienes alguna justificación válida, que son:</p>
