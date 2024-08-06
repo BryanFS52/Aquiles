@@ -8,7 +8,7 @@ import { GoSearch } from "react-icons/go";
 
 export default function ListaChequeo() {
         
-    const downloadrReportPDF = async () => {
+    const downloadReportPDF = async () => {
         try {
             const blob = await downloadReportPDF();
             const url = URL.createObjectURL(blob);
@@ -44,7 +44,7 @@ export default function ListaChequeo() {
                     <form className="w-72 h-10 ml-4">
                         <div className="relative">
                             <div>
-                            <button type="button" onClick={downloadrReportPDF} className="h-10 w-56 bg-blue-500 text-white rounded-lg focus:outline-none focus:bg-blue-600">
+                            <button type="button" onClick={downloadReportPDF} className="h-10 w-56 bg-blue-500 text-white rounded-lg focus:outline-none focus:bg-blue-600">
                             Descargar PDF
                             </button>
                          </div>

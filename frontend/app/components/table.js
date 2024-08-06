@@ -60,7 +60,7 @@ const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la ta
                 </div>
             </form>
     <div className="ml-28 mr-7">
-      <button type="button" className="text-white font-serif h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
+      <button type="button" className="text-white font-inter font-normal h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
           onClick={handleOpenQRModal}
           >
           Generar QR
@@ -72,7 +72,7 @@ const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la ta
     <div className="mr-7">
       <button
         type="button"
-        className="text-white font-serif h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
+        className="text-white font-inter font-normal h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
         onClick={handleOpenModal}
       >
          Ver información de la ficha
@@ -81,7 +81,7 @@ const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la ta
         <ModalInfoficha isOpen={modalOpen} onClose={handleCloseModal} />
     </div>
     
-         <Link href="/aprendicelist" className='text-white font-serif h-11 w-44 rounded-lg text-sm px-2 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center'>
+         <Link href="/aprendicelist" className='text-white font-inter font-normal h-11 w-44 rounded-lg text-sm px-2 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center'>
              Continuar Asistencia
           <IoMdExit className="w-5 h-5 ml-2" />
         </Link>
@@ -98,40 +98,40 @@ const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la ta
               <th className="px-10 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300"></th>
               <th className="px-28 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300"></th>
               {[...Array(4)].map((_, weekIndex) => (
-                <th key={weekIndex} colSpan={7} className="px-2 py-3 text-center text-xs font-semibold text-black uppercase tracking-wider border-2 border-gray-300 font-serif ">Semana {weekIndex + 1}</th>
+                <th key={weekIndex} colSpan={7} className="px-2 py-3 text-center text-xs font-semibold font-inter text-black uppercase tracking-wider border-2 border-gray-300">Semana {weekIndex + 1}</th>
               ))}
             </tr>
             <tr>
-                <th className="px-10 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300">Número de Documento</th>
-                <th className="px-6 py-3 text-xs text-center font-medium text-black uppercase tracking-wider border-2 border-gray-300">Nombre y Apellido</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">L</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">J</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">V</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">S</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">D</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">L</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">J</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">V</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">S</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">D</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">L</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">J</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">V</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">S</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">D</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">L</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">J</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">V</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">S</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-semibold text-gray-700">D</th>
+                <th className="px-10 py-3 text-left text-xs text-gray-700 uppercase tracking-wider border-2 border-gray-300 font-inter font-semibold">Número de Documento</th>
+                <th className="px-6 py-3 text-xs text-center text-gray-700 uppercase tracking-wider border-2 border-gray-300 font-inter font-semibold">Nombre y Apellido</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">L</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">J</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">V</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">S</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">D</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">L</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">J</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">V</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">S</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">D</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">L</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">J</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">V</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">S</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">D</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">L</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">J</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">V</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">S</th>
+                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">D</th>
                 
             </tr>
           </thead>
