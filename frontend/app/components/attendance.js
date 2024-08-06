@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React, { useState } from 'react';
-import { GiPadlock } from "react-icons/gi";
+import { HiLockClosed } from "react-icons/hi";
 import { PiStudentFill } from "react-icons/pi";
 import { IoMdCheckmark } from "react-icons/io";
 import { TbLetterR, TbLetterX, TbLetterJ } from "react-icons/tb";
@@ -31,14 +31,14 @@ export const Attendance = () => {
               <span className="font-inter font-semibold text-[#0e324d] text-sm sm:text-base">Institución:</span>
               <div className="font-inter font-normal text-black sm:text-base ml-auto relative w-2/3">
                 <input type="text" name="nameProject" placeholder="Centro al que pertenece" className="w-full bg-neutral-300 rounded-lg border-gray-400 border-2 pl-3 pr-10" />
-                <GiPadlock className="absolute top-0 right-2 h-full flex items-center" />
+                <HiLockClosed className="absolute top-0 right-2 h-full flex items-center" />
               </div>
             </div>
 
             <div className="flex">
               <span className="font-inter font-semibold text-[#0e324d] text-sm sm:text-base">Instructor:</span>
               <div className="font-inter font-normal text-black text-sm sm:text-base ml-auto w-2/3">
-                <input type="text" name="nameProject" placeholder="Nombre del Instructor" className="w-full rounded-lg bg-white border-gray-300 border-2 pl-3" />
+                <input type="text" name="nameProject" placeholder="Nombre del instructor" className="w-full rounded-lg bg-white border--300 border-2 pl-3" />
               </div>
             </div>
 
@@ -52,16 +52,15 @@ export const Attendance = () => {
             <div className="flex">
               <span className="font-inter font-semibold text-[#0e324d] text-sm sm:text-base">Componente:</span>
               <div className="font-inter font-normal text-black text-sm sm:text-base ml-auto w-2/3">
-                <input type="text" name="nameProject" placeholder="Componente" className="w-full bg-white rounded-lg border-2 border-gray-300 pl-3" />
+                <input type="text" name="nameProject" placeholder="Asignar componente" className="w-full bg-white rounded-lg border-2 border-gray-300 pl-3" />
               </div>
             </div>
-
+            
             <button
               type="button"
-              className="text-white rounded-lg text-sm bg-custom-blue hover:bg-custom-blue w-full h-10 mt-3"
-              onClick={handleOpenModal}
-            >
-              Enviar  
+              className="ml-auto text-white rounded-lg text-sm bg-custom-blue hover:bg-custom-blue w-32 h-10 mt-3"
+              onClick={handleOpenModal}>
+              Guardar
             </button>
 
           </div>
