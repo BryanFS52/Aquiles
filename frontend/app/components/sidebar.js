@@ -45,7 +45,7 @@ export const Sidebar = () => {
                         </li>
 
                         <li>
-                            <Link href="/#" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <Link href="/programas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <FaLaptopCode className='text-2xl' />
                                 Programas
                             </Link>
