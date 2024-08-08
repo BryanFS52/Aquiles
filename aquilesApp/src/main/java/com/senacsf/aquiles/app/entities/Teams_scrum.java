@@ -1,17 +1,18 @@
 package com.senacsf.aquiles.app.entities; // Declara el paquete al que pertenece esta clase
 
 import jakarta.persistence.*; // Importa las anotaciones de JPA
-import lombok.Getter; // Importa la anotación Getter de Lombok
-import lombok.NoArgsConstructor; // Importa la anotación NoArgsConstructor de Lombok
-import lombok.Setter; // Importa la anotación Setter de Lombok
+import lombok.*;
 
 import java.io.Serializable; // Importa la interfaz Serializable para la serialización de objetos
+import java.util.List; // Importa la clase List de java.util para manejar colecciones
 import java.util.Set; // Importa la clase Set de java.util para manejar colecciones sin duplicados
 
 @NoArgsConstructor // Anotación de Lombok para generar un constructor sin argumentos
 @Entity // Indica que esta clase es una entidad JPA
 @Getter // Anotación de Lombok para generar getters automáticos
 @Setter // Anotación de Lombok para generar setters automáticos
+@EqualsAndHashCode(exclude = {"studentList", "projectList"}) // Anotación de Lombok para generar equals y hashcode excluyendo las listas
+@ToString(exclude = {"studentList", "projectList"}) // Anotación de Lombok para generar toString excluyendo las listas
 @Table(name = "teams_scrum") // Especifica el nombre de la tabla en la base de datos
 public class Teams_scrum implements Serializable { // Implementa la interfaz Serializable para la serialización de objetos
 
@@ -24,8 +25,8 @@ public class Teams_scrum implements Serializable { // Implementa la interfaz Ser
     private String nameProject; // Propiedad que representa el nombre del proyecto
 
     @OneToMany(mappedBy = "fk_team_scrum_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL) // Mapea esta propiedad a una relación uno a muchos con la entidad Students
-    private Set<Students> studentSet; // Conjunto de estudiantes asociados a este equipo scrum
+    private List<Students> studentList; // Lista de estudiantes asociados a este equipo scrum
 
     @OneToMany(mappedBy = "fk_team_scrum_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL) // Mapea esta propiedad a una relación uno a muchos con la entidad Project
-    private Set<Project> projectSet; // Conjunto de proyectos asociados a este equipo scrum
+    private List<Project> projectList; // Lista de proyectos asociados a este equipo scrum
 }

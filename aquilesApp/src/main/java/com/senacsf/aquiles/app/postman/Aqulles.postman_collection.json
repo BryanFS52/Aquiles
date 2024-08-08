@@ -7,10 +7,10 @@
 	},
 	"item": [
 		{
-			"name": "AttendancesController",
+			"name": "Attendances",
 			"item": [
 				{
-					"name": "Maneja las solicitudes GET para obtener todos los attendance",
+					"name": "All",
 					"item": [
 						{
 							"name": "http://localhost:8080/api/attendances/all",
@@ -78,7 +78,7 @@
 					]
 				},
 				{
-					"name": "Maneja las solicitudes POST para crear un nuevo attendance",
+					"name": "Create",
 					"item": [
 						{
 							"name": "http://localhost:8080/api/attendances/create",
@@ -149,7 +149,7 @@
 					]
 				},
 				{
-					"name": "Maneja las solicitudes PUT para actualizar un attendance existente",
+					"name": "Update",
 					"item": [
 						{
 							"name": "http://localhost:8080/api/attendances/update",
@@ -184,7 +184,7 @@
 					]
 				},
 				{
-					"name": "Maneja las solicitudes DELETE para eliminar un estudiante por su ID",
+					"name": "Delete",
 					"item": [
 						{
 							"name": "http://localhost:8080/api/attendances/delete/Colocar el id que requiere borrar",
@@ -222,10 +222,10 @@
 			]
 		},
 		{
-			"name": "ExcusesController",
+			"name": "Excuses",
 			"item": [
 				{
-					"name": "Maneja las solicitudes GET para obtener todos los excuses",
+					"name": "All",
 					"item": [
 						{
 							"name": "http://localhost:8080/api/excuses/all",
@@ -332,7 +332,7 @@
 					]
 				},
 				{
-					"name": "Maneja las solicitudes POST para crear un nuevo excuses",
+					"name": "Create",
 					"item": [
 						{
 							"name": "http://localhost:8080/api/excuses/create",
@@ -409,7 +409,7 @@
 					]
 				},
 				{
-					"name": "Maneja las solicitudes PUT para actualizar un excuses",
+					"name": "Update",
 					"item": [
 						{
 							"name": "http://localhost:8080/api/excuses/update",
@@ -444,7 +444,7 @@
 					]
 				},
 				{
-					"name": "Maneja las solicitudes DELETE para eliminar un excuses por su ID",
+					"name": "Delete",
 					"item": [
 						{
 							"name": "http://localhost:8080/api/excuses/delete/Colocar el id que requiere borrar",
@@ -482,13 +482,13 @@
 			]
 		},
 		{
-			"name": "TeamsScrumController",
+			"name": "Teams Scrum",
 			"item": [
 				{
-					"name": "Maneja las solicitudes GET para obtener todos los teams-scrum",
+					"name": "All",
 					"item": [
 						{
-							"name": "http://localhost:8080/api/teams-scrum/all",
+							"name": "All",
 							"event": [
 								{
 									"listen": "test",
@@ -551,10 +551,10 @@
 					]
 				},
 				{
-					"name": "Maneja las solicitudes POST para crear un nuevo teams-scrum",
+					"name": "Create",
 					"item": [
 						{
-							"name": "http://localhost:8080/api/teams-scrum/create",
+							"name": "Create",
 							"event": [
 								{
 									"listen": "test",
@@ -602,7 +602,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \r\n    \"nameProject\": \"Aquiles\"\r\n}\r\n",
+									"raw": "{\r\n    \r\n    \"nameProject\": \"X\"\r\n}\r\n",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -628,16 +628,16 @@
 					]
 				},
 				{
-					"name": "Maneja las solicitudes PUT para actualizar un teams-scrum existente",
+					"name": "Update",
 					"item": [
 						{
-							"name": "http://localhost:8080/api/teams-scrum/update",
+							"name": "Update",
 							"request": {
 								"method": "PUT",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n  \"team_scrum_id\": ???,\r\n  \"nameProject\": \"XXX\"\r\n}\r\n",
+									"raw": "{\r\n  \"team_scrum_id\": 1,\r\n  \"nameProject\": \"SENA\"\r\n}\r\n",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -663,10 +663,10 @@
 					]
 				},
 				{
-					"name": "Maneja las solicitudes DELETE para eliminar un teams-scrum por su ID",
+					"name": "Delete",
 					"item": [
 						{
-							"name": "http://localhost:8080/api/teams-scrum/delete/Colocar el id que requiere borrar",
+							"name": "Delete",
 							"request": {
 								"method": "DELETE",
 								"header": [],
@@ -680,8 +680,8 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8080/api/teams-scrum/delete/???",
-									"protocol": "http",
+									"raw": "http://localhost:8080/api/teams-scrum/delete/1",
+									"protocol": "https",
 									"host": [
 										"localhost"
 									],
@@ -690,13 +690,7 @@
 										"api",
 										"teams-scrum",
 										"delete",
-										""
-									],
-									"query": [
-										{
-											"key": "??",
-											"value": null
-										}
+										"1"
 									]
 								}
 							},
@@ -707,10 +701,10 @@
 			]
 		},
 		{
-			"name": "ProjectController (DJOP) (Description, Justification, Objectives, Problem)",
+			"name": "Project (DJOP) (Description, Justification, Objectives, Problem)",
 			"item": [
 				{
-					"name": "Maneja las solicitudes GET para obtener todos los DJOP de los projects",
+					"name": "All",
 					"item": [
 						{
 							"name": "http://localhost:8080/api/projects/all",
@@ -792,7 +786,118 @@
 								}
 							},
 							"response": []
-						},
+						}
+					]
+				},
+				{
+					"name": "Id",
+					"item": [
+						{
+							"name": "http://localhost:8080/projects/???",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var template = `",
+											"<canvas id=\"myChart\" height=\"75\"></canvas>",
+											"",
+											"<script src=\"https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js\"></script> ",
+											"",
+											"<script>",
+											"    var ctx = document.getElementById(\"myChart\");",
+											"",
+											"    var myChart = new Chart(ctx, {",
+											"        type: \"bar\",",
+											"        data: {",
+											"            labels: [\"Project ID\", \"Description\", \"Problem\", \"Objectives\", \"Justification\", \"Team Scrum ID\"],",
+											"            datasets: [{",
+											"                data: [{{response.projectId}}, {{response.description.length}}, {{response.problem.length}}, {{response.objectives.length}}, {{response.justification.length}}, {{response.fk_team_scrum_id}}],",
+											"                ",
+											"                // Change these colours to customize the chart",
+											"                backgroundColor: [\"#003f5c\", \"#58508d\", \"#bc5090\", \"#ff6361\", \"#ffa600\", \"#003f5c\"],",
+											"            }]",
+											"        },",
+											"        options: {",
+											"            legend: { display: false },",
+											"            title: {",
+											"                display: true,",
+											"                text: 'Project Data'",
+											"            },",
+											"            scales: {",
+											"                xAxes: [{",
+											"                    display: true,",
+											"                    scaleLabel: {",
+											"                        display: true,",
+											"                        labelString: 'Fields'",
+											"                    }",
+											"                }],",
+											"                yAxes: [{",
+											"                    display: true,",
+											"                    scaleLabel: {",
+											"                        display: true,",
+											"                        labelString: 'Length'",
+											"                    }",
+											"                }]",
+											"            }",
+											"        }",
+											"",
+											"    });",
+											"",
+											"    // Access the data passed to pm.visualizer.set() from the JavaScript",
+											"    // code of the Visualizer template",
+											"    pm.getData(function (err, value) {",
+											"        myChart.update();",
+											"    });",
+											"",
+											"</script>`;",
+											"",
+											"function constructVisualizerPayload() {",
+											"    var res = pm.response.json();",
+											"    ",
+											"    var visualizerData = {",
+											"        projectId: res.projectId,",
+											"        description: res.description,",
+											"        problem: res.problem,",
+											"        objectives: res.objectives,",
+											"        justification: res.justification,",
+											"        fk_team_scrum_id: res.fk_team_scrum_id",
+											"    };",
+											"",
+											"    return {response: visualizerData};",
+											"}",
+											"",
+											"pm.visualizer.set(template, constructVisualizerPayload());"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8080/api/projects/1\n",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"projects",
+										"1\n"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Details",
+					"item": [
 						{
 							"name": "http://localhost:8080/api/projects/all get_project_details()",
 							"event": [
@@ -873,7 +978,7 @@
 					]
 				},
 				{
-					"name": "Maneja las solicitudes POST para crear y asociar las DJOP del project a un team_scrum",
+					"name": "Create",
 					"item": [
 						{
 							"name": "http://localhost:8080/api/projects/create",
@@ -882,7 +987,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{  \r\n  \"description\": \"Proyecto para la asistencia y seguimiento de proyecto de formación\",\r\n  \"problem\": \"Dificultad para gestionar y monitorear el progreso de los proyectos de formación.\",\r\n  \"objectives\": \"Desarrollar una plataforma que permita a los instructores y coordinadores brindar asistencia y seguimiento a los estudiantes durante los proyectos de formación.\",\r\n  \"justification\": \"Esta plataforma permitirá mejorar la comunicación, la colaboración y el seguimiento del progreso en los proyectos de formación, lo que a su vez conducirá a una mayor tasa de éxito y satisfacción de los estudiantes.\",\r\n  \"fk_team_scrum_id\": 24 // Replace with actual team scrum ID\r\n}\r\n",
+									"raw": "{  \r\n  \"description\": \"Proyecto para la asistencia y seguimiento de proyecto de formación\",\r\n  \"problem\": \"Dificultad para gestionar y monitorear el progreso de los proyectos de formación.\",\r\n  \"objectives\": \"Desarrollar una plataforma que permita a los instructores y coordinadores brindar asistencia y seguimiento a los estudiantes durante los proyectos de formación.\",\r\n  \"justification\": \"Esta plataforma permitirá mejorar la comunicación, la colaboración y el seguimiento del progreso en los proyectos de formación, lo que a su vez conducirá a una mayor tasa de éxito y satisfacción de los estudiantes.\",\r\n  \"fk_team_scrum_id\": 1 // Replace with actual team scrum ID\r\n}\r\n",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -908,7 +1013,7 @@
 					]
 				},
 				{
-					"name": "Maneja las solicitudes PUT para actualizar los DJOP",
+					"name": "Update",
 					"item": [
 						{
 							"name": "http://localhost:8080/api/projects/update",
@@ -943,7 +1048,7 @@
 					]
 				},
 				{
-					"name": "Maneja las solicitudes DELETE para eliminar un estudiante por su ID",
+					"name": "Delete",
 					"item": []
 				}
 			]
