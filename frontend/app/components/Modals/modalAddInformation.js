@@ -22,6 +22,7 @@ const ModalAddinformation = ({ isOpen, onClose }) => {
 					{/* Campo para Aprendices seleccionados */}
 					<div className="w-full mb-4">
 						<label className="block text-left mb-1 font-bold">
+							
 							Aprendices seleccionados
 						</label>
 						<select
