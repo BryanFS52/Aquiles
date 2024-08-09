@@ -1,107 +1,115 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const ModalAddinformation = ({ isOpen, onClose }) => {
-	if (!isOpen) return null;
+  if (!isOpen) return null;
 
-	// Estados para cada campo de entrada
-	const [selectedApprentices, setSelectedApprentices] = useState(
-		"Michael Felipe Laiton Chaparro"
-	);
-	const [description, setDescription] = useState("");
-	const [problem, setProblem] = useState("");
-	const [justification, setJustification] = useState("");
-	const [objective, setObjective] = useState("");
+  const [selectedApprentices, setSelectedApprentices] = useState([
+    'Michael Felipe Laiton Chaparro',
+    'Michael Felipe Laiton Chaparro',
+    'Michael Felipe Laiton Chaparro',
+    'Michael Felipe Laiton Chaparro',
+  ]);
 
-	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
-			<div className="fixed inset-0 bg-cyan-900 opacity-35"></div>
-			<div className="relative w-[90%] md:w-[35%] mx-auto my-12 bg-white rounded-lg shadow-lg">
-				<div className="p-8 flex flex-col items-center">
-					<h2 className="text-xl font-bold mb-4">Creación del Team</h2>
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
+      <div className="fixed inset-0 bg-custom-blue opacity-50"></div>
+      <div className="relative w-3/5 my-12 mx-auto bg-white rounded-lg shadow-xl border-2 border-gray-300 p-8">
+        <h2 className="font-inter font-semibold text-2xl pb-3 border-b-2 border-gray-600 w-max mx-auto">
+          Agregar información del Team
+        </h2>
 
-					{/* Campo para Aprendices seleccionados */}
-					<div className="w-full mb-4">
-						<label className="block text-left mb-1 font-bold">
-							
-							Aprendices seleccionados
-						</label>
-						<select
-							value={selectedApprentices}
-							onChange={(e) => setSelectedApprentices(e.target.value)}
-							className="w-full p-2 border rounded"
-						>
-							<option>Michael Felipe Laiton Chaparro</option>
-						</select>
+        <div className="grid grid-cols-5 gap-4 pt-12">
+          <div className="col-span-2">
+            <span className="font-inter font-semibold text-base">Aprendices</span>
+            
+
+			<div className="w-full h-[182%] bg-white rounded-lg shadow-xl border-2 border-gray-300 mt-2">
+				<form className="pt-3 px-4">
+					<div className="relative">
+					<input type="search" className="block w-full h-8 pl-8 pr-4 text-sm text-gray-900 border border-gray-300 rounded-lg" placeholder="Filtrar aprendices"/>
+					<svg className="absolute left-2 top-2 w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+						<path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+					</svg>
 					</div>
+				</form>
 
-					{/* Campo para Descripción */}
-					<div className="w-full mb-4">
-						<label className="block text-left mb-1 font-bold">
-							Descripción
-						</label>
-						<textarea
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-							className="w-full p-2 border rounded"
-							placeholder="Esto es una descripción de prueba"
-						></textarea>
-					</div>
+				<div className="pt-4 px-4 h-48 overflow-y-auto">
+					<table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-auto">
+					<tbody>
+						{selectedApprentices.map((apprentice, index) => (
+						<tr key={index}>
+							<td className="px-2 py-1 border-2 border-gray-300 text-sm">
+							{apprentice}
+							</td>
+							<td className="px-2 py-1 border-2 border-gray-300 text-green-500 font-semibold text-xl"> ✓</td>
+						</tr>
+						))}
+					</tbody>
+					</table>
+				</div>
+				</div>
+          </div>
+		  
+          <div className="col-span-3 flex flex-col items-end mr-48">
+            <span className="font-inter font-semibold text-base mr-20">Aprendices seleccionados</span>
+            <div className="w-auto bg-neutral-200 rounded-lg shadow-xl border-2 border-gray-300 mt-2 p-4">
+              {selectedApprentices.map((apprentice, index) => (
+                <div key={index} className="text-sm mb-1">
+                  {apprentice}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
-					{/* Campo para Problemática */}
-					<div className="w-full mb-4">
-						<label className="block text-left mb-1 font-bold">
-							Problemática
-						</label>
-						<textarea
-							value={problem}
-							onChange={(e) => setProblem(e.target.value)}
-							className="w-full p-2 border rounded"
-							placeholder="Esto es una problemática de prueba"
-						></textarea>
-					</div>
+        <div className="grid grid-cols-2 gap-4 ml-10 pb-10 -mt-4">
+		<div className="flex flex-col items-start ml-96">
+		<span className="font-inter font-semibold text-sm">Problematica</span>
+		<div className="w-72 h-24 bg-white rounded-lg shadow-xl border-2 border-gray-300 mt-2 p-4">
+			<textarea className="w-full h-full bg-transparent border-none outline-none resize-none" placeholder="Problematica"/>
+		</div>
+		</div>
 
-					{/* Campo para Justificación */}
-					<div className="w-full mb-4">
-						<label className="block text-left mb-1 font-bold">
-							Justificación
-						</label>
-						<textarea
-							value={justification}
-							onChange={(e) => setJustification(e.target.value)}
-							className="w-full p-2 border rounded"
-							placeholder="Esto es una justificación"
-						></textarea>
-					</div>
 
-					{/* Campo para Objetivo */}
-					<div className="w-full mb-4">
-						<label className="block text-left mb-1 font-bold">Objetivo</label>
-						<textarea
-							value={objective}
-							onChange={(e) => setObjective(e.target.value)}
-							className="w-full p-2 border rounded"
-							placeholder="Este es el objetivo"
-						></textarea>
-					</div>
-
-					<div className="flex justify-center mt-4">
-						<button
-							onClick={onClose}
-							className="rounded-md px-8 py-4 border bg-custom-blue text-white hover:text-gray-900 hover:bg-gray-300 transition-colors mr-4"
-						>
-							Cancelar
-						</button>
-						<button
-							onClick={onClose}
-							className="hover:bg-gray-500 rounded-md transition-colors bg-custom-blue px-8 py-4 border text-white"
-						>
-							Crear
-						</button>
-					</div>
+			<div className="flex flex-col items-start ml-52">
+				<span className="font-inter font-semibold text-sm">Descripcion</span>
+				<div className="w-72 h-24 bg-white rounded-lg shadow-xl border-2 border-gray-300 mt-2 p-4">
+				<textarea className="w-full h-full bg-transparent border-none outline-none resize-none" placeholder="Descripción"/>
 				</div>
 			</div>
 		</div>
-	);
+
+		<div className="grid grid-cols-2 gap-4 ml-10 pb-10 -mt-4">
+			<div className="flex flex-col items-start ml-96">
+				<span className="font-inter font-semibold text-sm">Objetivo</span>
+				<div className="w-72 h-24 bg-white rounded-lg shadow-xl border-2 border-gray-300 mt-2 p-4">
+				<textarea className="w-full h-full bg-transparent border-none outline-none resize-none" placeholder="Objetivo"/>
+				</div>
+			</div>
+
+			<div className="flex flex-col items-start ml-52">
+				<span className="font-inter font-semibold text-sm">Justificacion</span>
+				<div className="w-72 h-24 bg-white rounded-lg shadow-xl border-2 border-gray-300 mt-2 p-4">
+				<textarea className="w-full h-full bg-transparent border-none outline-none resize-none" placeholder="Justificación"/>
+				</div>
+			</div>
+		</div>
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={onClose}
+            className="w-44 rounded-md px-6 border-2 border-neutral-400 bg-neutral-200 text-black transition-colors mr-96 font-inter font-medium text-xl ">
+            Cancelar
+          </button>
+
+          <button
+            onClick="#"
+            className="w-44 rounded-md border-2 border-custom-blue transition-colors bg-custom-blue px-6 py-2 ml-10 text-white font-inter font-medium text-xl ">
+            Crear
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default ModalAddinformation;
