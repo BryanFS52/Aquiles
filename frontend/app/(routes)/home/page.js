@@ -152,17 +152,17 @@ export default function Home() {
 
           <ModalNewProject isOpen={modalOpen} onClose={handleCloseModal} onCreate={handleCreateTeam} />
 
-          <div className="grid grid-cols-3 gap-4 mt-8">
-            {teams.map((team) => (
-              <div key={team.team_scrum_id} className="w-full rounded-lg overflow-hidden shadow-lg bg-zinc-200 relative mb-4">
-                <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-[#00324d] border-l-[240px] border-l-transparent -z-1"></div>
-                <div className="px-6 py-4">
-                  <div className="flex">
-                    <span className="text-[#40b003] font-inter font-semibold text-xl sm:text-2xl mb-2">Nombre del Proyecto</span>
-                    <button onClick={OpenModal} className="font-inter font-semibold text-xl mb-2 relative z-20 ml-auto text-white after:block after:w-full after:h-[1px] after:bg-white after:mt-[4px]">
-                      Ver Más
-                    </button>
-                  </div>
+                  <div className="grid grid-cols-3 gap-4 mt-8">
+              {teams.map((team) => (
+                <div key={team.team_scrum_id} className="w-full rounded-lg overflow-hidden shadow-lg bg-zinc-200 relative mb-4">
+                  <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-[#00324d] border-l-[240px] border-l-transparent -z-1"></div>
+                  <div className="px-6 py-4">
+                    <div className="flex">
+                      <span className="text-[#40b003] font-inter font-semibold text-xl sm:text-2xl mb-2">Nombre del Proyecto</span>
+                      <button onClick={OpenModal} className="font-inter font-semibold text-xl mb-2 relative z-20 ml-auto text-white after:block after:w-full after:h-[1px] after:bg-white after:mt-[4px]">
+                        Ver Más
+                      </button>
+                    </div>
 
                   <p className="text-black-700 text-base ">{team.nameProject}</p>
                   <br />
