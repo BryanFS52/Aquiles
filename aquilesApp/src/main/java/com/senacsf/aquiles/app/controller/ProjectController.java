@@ -43,9 +43,6 @@ public class ProjectController {
             return handleException(e);
         }
     }
-<<<<<<< HEAD
-}
-=======
 
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> createProject(@Validated @RequestBody ProjectDto projectDto) {
@@ -80,4 +77,3 @@ public class ProjectController {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }
->>>>>>> origin/jeissonDev

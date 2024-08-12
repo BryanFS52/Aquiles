@@ -97,9 +97,7 @@ public class ProjectBusiness {
                 .orElseThrow(() -> new CustomException("Project with ID " + projectId + " does not exist."));
         return modelMapper.map(project, ProjectDto.class);
     }
-<<<<<<< HEAD
 
 }
-=======
-}
->>>>>>> origin/jeissonDev
+
+
