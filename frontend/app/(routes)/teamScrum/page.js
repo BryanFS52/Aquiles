@@ -15,7 +15,7 @@ export default function TeamScrum() {
           <Header />
 
           <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full">
-          <h1 className="text-4xl pb-3 border-b-2 border-gray-400 w-96 mb-12 font-serif">Teams Scrums</h1>
+          <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Teams Scrums</h1>
 
           <div className="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-md border-2 border-gray-200 flex">
       <div className="w-1/2 pr-4">

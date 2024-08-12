@@ -82,6 +82,17 @@ export const Sidebaraprendiz = () => {
                         Configuración 
                     </li>
 
+
+                    <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> 
+                        <FaGear className='text-2xl' />
+                        Configuración 
+                    </li>
+                    
+                    <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                        <IoMdLogOut className='text-2xl' />
+                        Cerrar Sesión
+                    </li>
+                    
                 </ul>
                    {/* bton */}
                     <button onClick={toggleMenu} className='text-white bg-custom-blue fixed bottom-4 right-4 p-2 text-lg rounded-full lg:hidden'>

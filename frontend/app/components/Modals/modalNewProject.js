@@ -36,23 +36,23 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
       <div className="relative md:w-2/6 h-[40%] max-w-3xl mx-auto my-12 bg-white rounded-lg shadow-lg">
         <div className="p-5 w-full h-full">
           <div className='flex justify-center items-center'>
-            <h1 className="text-2xl font-serif border-b-2 border-black">Nuevo Proyecto</h1>
+            <h1 className="font-inter font-semibold text-2xl border-b-2 border-black flex">Nuevo Proyecto</h1>
           </div>
           <div className='flex flex-col justify-center items-center h-full w-full'>
             <div className='pb-12'>
-              <p className="text-sm font-serif text-black-700">Nombre del Proyecto</p>
+              <p className="text-lg font-inter font-medium text-black-700">Nombre del Proyecto</p>
               <div className={`rounded-lg border-solid border-2 text-custom-blue ${inputError ? 'border-red-500' : 'border-gray-300'}`}>
-                <input type="text" name="nameProject" placeholder="Nombre del Proyecto" value={teamData.nameProject} onChange={handleInputChange} className={`${inputError ? 'text-red-500' : 'text-black'}`}/>        
+                <input type="text" name="nameProject" placeholder="Elije un nombre de proyecto" value={teamData.nameProject} onChange={handleInputChange} className={`${inputError ? 'text-red-500' : 'text-black'}`}/>        
               </div>
               {inputError && <p className="text-red-500 text-xs">Este campo es obligatorio.</p>}
 
             </div>
             <div className='flex text-xs space-x-4'>
-              <button className='hover:bg-gray-500 rounded-md transition-colors bg-white px-8 py-4 border text-black'
+              <button className='text-sm hover:bg-gray-500 rounded-md transition-colors bg-white px-8 py-4 border text-black'
                 onClick={onClose}>
                 Cancelar
               </button>
-              <button className='hover:bg-gray-500 rounded-md transition-colors bg-custom-blue px-8 py-4 border text-white' onClick={handleCreateTeam}>
+              <button className='text-sm hover:bg-gray-500 rounded-md transition-colors bg-custom-blue px-8 py-4 border text-white' onClick={handleCreateTeam}>
                 Registrar Equipo
               </button>
 

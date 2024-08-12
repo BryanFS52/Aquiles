@@ -30,7 +30,7 @@ export const Attendance = () => {
             <div className="flex">
               <span className="font-inter font-semibold text-[#0e324d] text-sm sm:text-base">Institución:</span>
               <div className="font-inter font-normal text-black sm:text-base ml-auto relative w-2/3">
-                <input type="text" name="nameProject" placeholder="Centro al que pertenece" className="w-full bg-neutral-300 rounded-lg border-gray-400 border-2 pl-3 pr-10" />
+                <input type="text" name="nameProject" placeholder="Centro al que pertenece" className=" w-full bg-neutral-300 rounded-lg border-gray-400 border-2 pl-3 pr-10" />
                 <HiLockClosed className="absolute top-0 right-2 h-full flex items-center" />
               </div>
             </div>
