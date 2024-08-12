@@ -53,14 +53,10 @@ public class AttendancesController {
             String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
             // Aquí solo estamos incluyendo la fecha y hora en el texto del QR
-            String qrText = String.format("http://localhost:8080/attendance/attendance-form.html?date=%s", formattedDate);
+            String qrText = formattedDate;
 
-            InputStream logoStream = getClass().getResourceAsStream("/img/logo.png");
-            if (logoStream == null) {
-                throw new IOException("Logo file not found");
-            }
-
-            byte[] qrCode = qrCodeGenerator.generateQRCodeImage(qrText, logoStream);
+            // Generar el código QR sin logo
+            byte[] qrCode = qrCodeGenerator.generateQRCodeImage(qrText);
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "image/png");
@@ -69,4 +65,5 @@ public class AttendancesController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
 }
