@@ -3,6 +3,7 @@
 import React from 'react';
 
 const ModalEliminarTeam = ({ isOpen, onClose, onConfirm }) => {
+  
   if (!isOpen) return null;
 
   return (
