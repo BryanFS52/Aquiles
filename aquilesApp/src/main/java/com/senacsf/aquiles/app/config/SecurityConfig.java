@@ -29,6 +29,9 @@ public class SecurityConfig {
                                 .requestMatchers("/api/pdf/report").permitAll()
                                 .requestMatchers("/api/attendances/generateQRCode").permitAll()
                                 .requestMatchers("/api/excel/report").permitAll()
+                                .requestMatchers("/api/projects/**").permitAll()
+                                .requestMatchers("/api/students/**").permitAll()
+                                .requestMatchers("/api/juries/**").permitAll()
 
 
                                 .anyRequest().authenticated() // Requiere autenticación para cualquier otra solicitud

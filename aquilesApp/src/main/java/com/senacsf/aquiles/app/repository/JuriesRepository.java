@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface JuriesRepository extends JpaRepository<Juries, Long> {
+    Juries findByJuryId(Long juryId);
 }
