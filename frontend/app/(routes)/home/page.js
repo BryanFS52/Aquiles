@@ -111,9 +111,9 @@ export default function Home() {
         <Header />
 
         <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full relative">
-          <h1 className="font-serif text-4xl pb-3 border-b-2 border-gray-400 w-1/2">Teams Scrums</h1>
+          <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Teams Scrums</h1>
           <br />
-          <li className="h-9 w-14 flex items-center justify-center border-2 rounded-lg bg-[#00324d] hover:bg-green-600 ml-auto">
+          <li className="h-9 w-14 flex items-center justify-center border-y-gray-950 rounded-lg bg-[#00324d] hover:bg-[#40b003] ml-auto">
             <a href="#" onClick={handleOpenModal}>
               <MdAdd className="w-8 h-8 text-white"/>
             </a>
@@ -128,26 +128,25 @@ export default function Home() {
                 <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-[#00324d] border-l-[240px] border-l-transparent -z-1"></div>
                 <div className="px-6 py-4">
                   <div className="flex">
-                    <span className="font-serif text-xl mb-2 text-green-600 font-semibold">Nombre del Proyecto</span>
-                    <button onClick={OpenModal} className="font-serif text-xl mb-2 relative z-20 ml-auto text-white after:block after:w-full after:h-[1px] after:bg-white after:mt-[4px]">
+                    <span className="text-[#40b003] font-inter font-semibold text-xl sm:text-2xl mb-2">Nombre del Proyecto</span>
+                    <button onClick={OpenModal} className="font-inter font-semibold text-xl mb-2 relative z-20 ml-auto text-white after:block after:w-full after:h-[1px] after:bg-white after:mt-[4px]">
                       Ver Más
                     </button>
                   </div>
 
-                  <p className="text-black-700 text-base text-sm">{team.nameProject}</p>
+                  <p className="text-black-700 text-base ">{team.nameProject}</p>
                   <br />
-                  <div className="font-serif text-xl mb-2 text-custom-blue font-semibold">Team Número</div>
-                  <p className="text-black-700 text-base text-sm">{team.team_scrum_id}</p>
+                  <div className="text-[#0e324d] font-inter font-semibold text-lg sm:text-xl mb-2">Team Número</div>
+                  <p className="text-black-700 text-base ">{team.team_scrum_id}</p>
                   <br />
-                  <div className="font-serif text-xl mb-2 flex">
+                  <div className="text-[#000000] font-inter font-medium text-xl mb-2 flex">
                     <span>Agregar Información</span>
 
                     <button onClick={handleOpenAddInfoModal} className="ml-2">
                       <MdAddCircle className="inline-block text-2xl text-[#00324d]" />
                     </button>
-
-                    <button onClick={() => handleOpenConfirmModal(team.team_scrum_id)} className="ml-2">
-                        <FaTrashAlt className="inline-block text-2xl text-[#00324d]" />
+                    <button onClick={() => handleDeleteTeam(team.team_scrum_id)} className="ml-44">
+                      <FaTrashAlt className="inline-block text-2xl text-[#00324d]" />
                     </button>
 
                   </div>

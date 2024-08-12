@@ -2,9 +2,12 @@
 
 import React from "react";
 import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
-import { Sidebaraprendiz } from "../../components/sidebaraprendiz";
+import { Sidebaraprendiz } from "../../components/sidebar";
 import {downloadReportPDF} from "../../services/PDFService";
 import { GoSearch } from "react-icons/go";
+import { Sidebar } from "@/components/sidebar";
+import { IoIosArrowDown } from "react-icons/io";
+
 
 export default function ListaChequeo() {
         
@@ -33,9 +36,44 @@ export default function ListaChequeo() {
     return(
 
             <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-            <Sidebaraprendiz />
+            <Sidebar />
             <div className="xl:col-span-5">
             <Header />
+
+            <div className="text-custom-blue font-bold text-2xl ml-10 py-6 border-b-2 border-gray-400 w-full sm:w-3/5 lg:w-2/5 mb-5 lg:mb-8">Lista de Chequeo Cierre de Trimestre 3-2024</div>
+            <div className="w-10/12 h-44 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ml-32 mt-10">
+            <div className="flex flex-col items-start space-y-4">
+                <div>
+                <span className="text-custom-blue text-base font-semibold font-inter">Ficha:</span>
+                <div className="relative inline-block ml-8">
+                    <input type="text" className="border-2 border-gray-300 rounded-lg ml-5"/>
+                    <IoIosArrowDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer" />
+                </div>
+                </div>
+                
+                <div>
+                <span className="text-custom-blue text-base font-semibold font-inter">Sede:</span>
+                <div className="relative inline-block ml-8">
+                    <input type="text" className="border-2 border-gray-300 rounded-lg ml-6"/>
+                    <IoIosArrowDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer" />
+                </div>
+                </div>
+
+                <div>
+                <span className="text-custom-blue text-base font-semibold font-inter">Jornada:</span>
+                <div className="relative inline-block ml-8">
+                    <input type="text" className="border-2 border-gray-300 rounded-lg"/>
+                    <IoIosArrowDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer" />
+                </div>
+                </div>
+                
+            </div>
+
+           
+            </div>
+
+            
+
 
 
             <div className=" w-11/12 h-auto  rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ml-10 mt-10"> 
@@ -50,10 +88,6 @@ export default function ListaChequeo() {
                          </div>
                     </div>
                 </form>
-    
-               
-            
-                
                 
             </div>
         
