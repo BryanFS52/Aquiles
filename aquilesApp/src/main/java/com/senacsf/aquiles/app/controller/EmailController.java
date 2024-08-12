@@ -16,7 +16,7 @@ public class EmailController {
     @GetMapping("/send-notification")
     public String sendNotification(@RequestParam String email) {
         try {
-            String subject = "Notificación de Inasistencia";
+            String subject = "Notificación para la Inasistencia";
             String templateName = "attendanceNotificationTemplate.html";
             emailService.sendAttendanceNotification(email, subject, templateName);
             return "Correo enviado con éxito";
