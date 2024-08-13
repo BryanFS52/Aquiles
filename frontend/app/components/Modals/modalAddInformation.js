@@ -34,7 +34,6 @@ const ModalAddinformation = ({ isOpen, onClose }) => {
       });
       return;
     }
-
    
     setIsError(false); 
   };
