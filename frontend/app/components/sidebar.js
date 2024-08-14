@@ -59,7 +59,7 @@ export const Sidebar = () => {
                         </li>
 
                         <li>
-                            <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <Link href="/teamScrum" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <HiUserGroup className='text-2xl' />
                                 Teams
                             </Link>
