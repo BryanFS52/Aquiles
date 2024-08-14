@@ -8,6 +8,7 @@ import { BsPersonCheck } from "react-icons/bs";
 import { IoMdLogOut } from "react-icons/io";
 import { TfiBlackboard } from "react-icons/tfi";
 import { IoSettings } from "react-icons/io5";
+import { FaGear } from "react-icons/fa6";
 // import { RiCheckboxBlankCircleFill } from "react-icons/ri";
 import { PiStudentFill } from "react-icons/pi";
 import { IoClose } from "react-icons/io5";
@@ -63,7 +64,7 @@ export const Sidebaraprendiz = () => {
                         </li>
                         
                         <li>
-                            <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <Link href="/aprendicesView" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <PiStudentFill  />
                                 Aprendices
                             </Link>
@@ -75,14 +76,7 @@ export const Sidebaraprendiz = () => {
                         <RiCheckboxBlankCircleFill className='absolute text-green-600 left-16 translate-y-2 text-xs'/>
                         Usuario
                     </li>  */}
-                    <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> <IoMdLogOut />
-                        Cerrar SesiÓn
-                    </li>
-                    <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> <IoSettings/>
-                        Configuración 
-                    </li>
-
-
+                  
                     <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> 
                         <FaGear className='text-2xl' />
                         Configuración 
