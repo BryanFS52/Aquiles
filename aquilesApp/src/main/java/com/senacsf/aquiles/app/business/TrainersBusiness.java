@@ -66,7 +66,7 @@ public class TrainersBusiness {
     public void create(TrainersDto trainersDto){
         try {
             BigInteger documentNumber = trainersDto.getDocument_number();
-            Trainers existingTrainer = trainersService.findByDocument_Number(documentNumber);
+            Trainers existingTrainer = trainersService.findByDocumentNumber(documentNumber);
             if ( existingTrainer != null){
                 throw  new CustomException("The trainer with document number " + documentNumber + "Already Exists");
             }
