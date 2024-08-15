@@ -3,18 +3,12 @@ package com.senacsf.aquiles.app.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileCopyUtils;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
 
 @Service
 public class EmailService {
@@ -22,28 +16,21 @@ public class EmailService {
     @Autowired
     private JavaMailSender emailSender;
 
-    public void sendAttendanceNotification(String to, String subject, String templateName) throws IOException, MessagingException {
-        // Carga el contenido del template HTML
-        Resource resource = new ClassPathResource("templates/" + templateName);
-        String htmlContent = new String(FileCopyUtils.copyToByteArray(resource.getInputStream()), StandardCharsets.UTF_8);
-
+    public void sendHtmlEmail(String to, String subject, String htmlContent) throws MessagingException {
         // Crear el mensaje de correo
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setTo(to);
-        helper.setSubject(subject);
-        helper.setText(htmlContent, true); // El segundo parámetro indica que el contenido es HTML
+        helper.setTo(to); // Establece el destinatario
+        helper.setSubject(subject); // Establece el asunto
+        helper.setText(htmlContent, true); // Establece el contenido HTML
+        FileSystemResource res = new FileSystemResource(new File("/home/fabrica/aquilesApp/frontend/public/img/Logo-sena-green.png"));
+        helper.addInline("logoImage", res);
 
         // Enviar el correo
         emailSender.send(message);
     }
 
-    public void sendEmail(String to, String code) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject("Your 2FA Code");
-        message.setText("Your authentication code is: " + code);
-        emailSender.send(message);
-    }
+    public void sendEmail(String email, String code) {
 
+    }
 }

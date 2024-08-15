@@ -72,11 +72,6 @@ export const Sidebaraprendiz = () => {
                     </ul>
                 </div>
                 <ul>
-                    {/* <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> <img src="https://img.freepik.com/foto-gratis/joven-bella-mujer-pie-sobre-pared-blanca_114579-90514.jpg" className='w-6 h-6 object-cover rounded-full' />
-                        <RiCheckboxBlankCircleFill className='absolute text-green-600 left-16 translate-y-2 text-xs'/>
-                        Usuario
-                    </li>  */}
-                  
                     <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> 
                         <FaGear className='text-2xl' />
                         Configuración 
