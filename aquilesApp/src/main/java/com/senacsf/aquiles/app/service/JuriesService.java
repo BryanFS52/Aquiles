@@ -1,6 +1,7 @@
 package com.senacsf.aquiles.app.service;
 
 import com.senacsf.aquiles.app.entities.Juries;
+import com.senacsf.aquiles.app.entities.Students;
 import com.senacsf.aquiles.app.repository.JuriesRepository;
 import com.senacsf.aquiles.app.service.dao.Idao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,10 @@ public class JuriesService implements Idao<Juries, Long> {
 
     @Autowired
     JuriesRepository juriesRepository;
+
+    public Juries findByJuryId(Long juryId){
+        return juriesRepository.findByJuryId(juryId);
+    }
 
     @Override
     public List<Juries> findAll() {

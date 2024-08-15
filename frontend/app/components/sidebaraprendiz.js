@@ -50,7 +50,7 @@ export const Sidebaraprendiz = () => {
                         </li>
 
                         <li>
-                            <Link href="/teamScrum" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <Link href="/teamScrumAprendiz" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <HiUserGroup  />
                                 Team
                             </Link>
@@ -64,7 +64,7 @@ export const Sidebaraprendiz = () => {
                         </li>
                         
                         <li>
-                            <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <Link href="/aprendicesView" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <PiStudentFill  />
                                 Aprendices
                             </Link>
@@ -72,7 +72,6 @@ export const Sidebaraprendiz = () => {
                     </ul>
                 </div>
                 <ul>
-
                     <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> 
                         <FaGear className='text-2xl' />
                         Configuración 

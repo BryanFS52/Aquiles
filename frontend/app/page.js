@@ -3,13 +3,11 @@
 import React, { useState } from 'react'; 
 import Link from "next/link";
 import { HiLockClosed } from "react-icons/hi";
-import {faLock,faEye,faEyeSlash,faLink,} from "@fortawesome/free-solid-svg-icons";
 import { BsPersonCircle } from "react-icons/bs";
 import { HiMiniIdentification } from "react-icons/hi2";
 import Image from "next/image";
 import logoSena from "../public/img/LogoSena.png";
 import LogoAquiles from "../public/img/LogoAquiles.png";
-import { height } from "@fortawesome/free-solid-svg-icons/fa0";
 import ModalOlvidoContraseña from "../app/components/Modals/modalOlvidoContraseña";
 import { useRouter } from 'next/navigation';
 

@@ -1,7 +1,8 @@
-package com.senacsf.aquiles.app.controller;
+    package com.senacsf.aquiles.app.controller;
 
 
-import com.senacsf.aquiles.app.service.PdfService;
+import java.io.IOException;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
+import com.senacsf.aquiles.app.service.PdfService;
 
 @RestController
 @RequestMapping("/api/pdf")

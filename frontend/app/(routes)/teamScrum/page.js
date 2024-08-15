@@ -1,55 +1,167 @@
-"use client"
+"use client";
 
-import React from "react";
-import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
-import { Sidebaraprendiz } from "../../components/sidebaraprendiz";
-import Image from 'next/image';
-import aquiles from "../../../public/img/aquiles.jpg";
-import { IoPersonCircleSharp } from "react-icons/io5";
+import React, { useState, useEffect } from 'react'; 
+import Link from "next/link";
+import { Header } from "../../components/header"; //importaciones del Header y el Sidebar
+import { Sidebar } from "../../components/sidebar";
+import { MdAdd } from "react-icons/md";
+import ModalNewProject from '../../components/Modals/modalNewProject';
+import { MdAddCircle } from "react-icons/md";
+import { FaTrashAlt } from "react-icons/fa";
+import ModalComponent from '../../components/Modals/modalComponent';
+import { listTeamsScrum, createTeamScrum, deleteTeamScrum } from '../../services/teamScrumService'; 
+import ModalAddInformation from '../../components/Modals/modalAddInformation';
+import ModalEliminarTeam from "../../components/Modals/modalEliminarTeam";
+import { ToastContainer, toast } from "react-toastify"; //importacion de la libreria ToastContainer para las alertas con la animacion 
+import 'react-toastify/dist/ReactToastify.css';
 
-export default function TeamScrum() {
-    return (
-      <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-        <Sidebaraprendiz />
-        <div className="xl:col-span-5">
-          <Header />
+export default function Home() {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [openAgregarInfo, setOpenAgregarInfo] = useState(false);
+  const [teams, setTeams] = useState([]); 
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [teamToDelete, setTeamToDelete] = useState(null);
+  const [openAddInfoModal, setOpenAddInfoModal] = useState(false);
 
-          <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full">
+  useEffect(() => {
+    fetchTeams(); 
+  }, []);
+
+  const fetchTeams = () => {
+    listTeamsScrum() 
+      .then(data => {
+        setTeams(data); 
+      })
+      .catch(error => {
+        console.error('Error fetching teams:', error);
+        toast.error('Error al obtener los equipos.');
+      });
+  };
+
+  const handleCreateTeam = (team) => {
+    if (!team.nameProject) {
+      toast.error('Por favor completa correctamente todos los campos obligatorios.');
+      return;
+    }
+
+    createTeamScrum(team)
+      .then(() => {
+        fetchTeams(); 
+        toast.success('¡Nuevo Proyecto creado con éxito!');
+        handleCloseModal(); // Cierra el modal de nuevo proyecto después de la creación exitosa del Team
+      })
+      .catch(error => {
+        console.error('Error creating team:', error);
+        toast.error('Error al crear equipo Scrum.');
+      });
+  };
+
+  const handleDeleteTeam = (teamId) => {
+    deleteTeamScrum(teamId)
+      .then(() => {
+        setTeams(teams.filter(team => team.team_scrum_id !== teamId));
+        toast.success('Equipo eliminado exitosamente.');
+      })
+      .catch(error => {
+        console.error('Error deleting team:', error);
+        toast.error('Error al eliminar equipo.');
+      });
+  };
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
+  const handleOpenAddInfoModal = () => {
+    setOpenAddInfoModal(true);
+  };
+
+  const handleCloseAddInfoModal = () => {
+    setOpenAddInfoModal(false);
+  };
+
+  const handleOpenAgregarInfo = () => {
+    setOpenAgregarInfo(true);
+  };
+
+  const handleCloseAgregarInfo = () => {
+    setOpenAgregarInfo(false);
+  };
+
+  const handleOpenConfirmModal = (teamId) => {
+    setTeamToDelete(teamId);
+    setConfirmModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    handleDeleteTeam(teamToDelete);
+    setConfirmModalOpen(false);
+  };
+
+  return (
+    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
+      <Sidebar />
+      <div className="xl:col-span-5">
+        <Header />
+
+        <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full relative">
           <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Teams Scrums</h1>
+          <br />
+          <li className="h-9 w-14 flex items-center justify-center border-y-gray-950 rounded-lg bg-[#00324d] hover:bg-[#40b003] ml-auto">
+            <a href="#" onClick={handleOpenModal}>
+              <MdAdd className="w-8 h-8 text-white"/>
+            </a>
+          </li>
 
-          <div className="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-md border-2 border-gray-200 flex">
-      <div className="w-1/2 pr-4">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <div className="w-16 h-16 relative">
-              <Image src={aquiles} alt="Team Logo" className="rounded-full w-36 h-16" />
-            </div>
-            <div className="ml-4">
-              <h1 className="text-2xl font-serif text-green-500">Team Scrum</h1>
-              <h2 className="text-xl text-gray-600 font-serif">Aquiles</h2>
-            </div>
-          </div>
-        </div>
-        <div className="mb-4">
-          <h3 className="text-lg font-bold">Número del Equipo</h3>
-          <p className="text-gray-700">Team 5</p>
-          <h3 className="text-lg font-bold pt-8">Aprendices</h3>
-          <ul>
-           {['Santiago Gómez Rodríguez', 'María González López', 'Juan Carlos López García', 'Carolina Gutiérrez Ramírez'].map((name, index) => (
-              <li key={index} className="flex items-center mb-2 pt-2">
-                <div className="w-6 h-6 bg-gray-300 rounded-full mr-2">
-                <IoPersonCircleSharp className="w-6 h-6"/>
+          {/* Modal para nuevo proyecto */}
+          <ModalNewProject isOpen={modalOpen} onClose={handleCloseModal} onCreate={handleCreateTeam} />
+
+          <div className="grid grid-cols-3 gap-4 mt-8">
+            {teams.length > 0 ? (
+              teams.map((team) => (
+                <div key={team.team_scrum_id} className="w-full rounded-lg overflow-hidden shadow-lg bg-zinc-200 relative mb-4">
+                  <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-[#00324d] border-l-[240px] border-l-transparent -z-1"></div>
+                  <div className="px-6 py-4">
+                    <div className="flex">
+                      <span className="text-[#40b003] font-inter font-semibold text-xl sm:text-2xl mb-2">Nombre del Proyecto</span>
+                      <button onClick={handleOpenAgregarInfo} className="font-inter font-semibold text-xl mb-2 relative z-20 ml-auto text-white after:block after:w-full after:h-[1px] after:bg-white after:mt-[4px]">
+                        Ver Más
+                      </button>
+                    </div>
+
+                    <p className="text-black-700 text-base ">{team.nameProject}</p>
+                    <br />
+                    <div className="text-[#0e324d] font-inter font-semibold text-lg sm:text-xl mb-2">Team Número</div>
+                    <p className="text-black-700 text-base ">{team.team_scrum_id}</p>
+                    <br />
+                    <div className="text-[#000000] font-inter font-medium text-xl mb-2 flex">
+                      <span>Agregar Información</span>
+
+                      <button onClick={handleOpenAddInfoModal} className="ml-2">
+                        <MdAddCircle className="inline-block text-2xl text-[#00324d]" />
+                      </button>
+                      <button onClick={() => handleOpenConfirmModal(team.team_scrum_id)} className="ml-44">
+                        <FaTrashAlt className="inline-block text-2xl text-[#00324d]" />
+                      </button>
+
+                    </div>
+                  </div>
                 </div>
-                <p>{name}</p>
-              </li>
-            ))} 
-          </ul>
+              ))
+            ) : (
+              <p>No hay equipos de trabajo disponibles, Pulsa el botón + para crear un nuevo team.</p>
+            )}
+          </div>
+          <ModalAddInformation isOpen={openAddInfoModal} onClose={handleCloseAddInfoModal} />
+          <ModalComponent isOpen={openAgregarInfo} onClose={handleCloseAgregarInfo} />
+          <ModalEliminarTeam isOpen={confirmModalOpen} onClose={() => setConfirmModalOpen(false)} onConfirm={handleConfirmDelete}/> 
         </div>
       </div>
-
+      <ToastContainer />
     </div>
-    </div>
-    </div>
-    </div>
-    );
+  );
 }

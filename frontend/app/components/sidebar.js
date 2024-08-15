@@ -31,7 +31,68 @@ export const Sidebar = () => {
                 <div className="flex items-center mb-10 space-x-5">
                     <Image src={logoSena} alt="Logo Sena" className="w-11
                         " />
-                    <span className="text-s">PROYECTOS FORMATIVOS (C.S.F.) </span>
+                        <span className="text-s">PROYECTOS FORMATIVOS (C.S.F.) </span>
+                    </div>
+
+                    <ul className='text-white'>
+                        
+                        
+                        <li>
+                            <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <IoPersonSharp className='text-2xl' />
+                                Fichas
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link href="/programas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <FaLaptopCode className='text-2xl' />
+                                Programas
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link href="/asistencia" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <BsPersonCheck className='text-2xl' />
+                                Asistencia
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link href="/teamScrum" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <HiUserGroup className='text-2xl' />
+                                Teams
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link href="/aprendicesView" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <PiStudentFill className='text-2xl' />
+                                Aprendices
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link href="/aprendicelist" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <FaChalkboardUser className='text-2xl' />
+                                Sustentaciones
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <TfiBlackboard className='text-2xl' />
+                                Proyectos 
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link href="/justificaciones" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <GiNotebook className='text-2xl' />
+                                Justificaciones 
+                            </Link>
+                        </li>
+                    </ul>
                 </div>
 
                 <ul className='text-white'>

@@ -1,108 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from 'react'; 
-import Link from "next/link";
 import { Header } from "../../components/header"; //importaciones del Header y el Sidebar
 import { Sidebar } from "../../components/sidebar";
-import { MdAdd } from "react-icons/md";
-import ModalNewProject from '../../components/Modals/modalNewProject';
-import { MdAddCircle } from "react-icons/md";
-import { FaTrashAlt } from "react-icons/fa";
-import ModalComponent from '../../components/Modals/modalComponent';
-import { listTeamsScrum, createTeamScrum, deleteTeamScrum } from '../../services/teamScrumService'; 
-import ModalAddInformation from '../../components/Modals/modalAddInformation';
-import ModalEliminarTeam from "../../components/Modals/modalEliminarTeam";
 import { ToastContainer, toast } from "react-toastify"; //importacion de la libreria ToastContainer para las alertas con la animacion 
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function Home() {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [openAgregarInfo, setOpenModal] = useState(false);
-  const [teams, setTeams] = useState([]); 
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [teamToDelete, setTeamToDelete] = useState(null);
-
-  useEffect(() => {
-    fetchTeams(); 
-  }, []);
-
-  const fetchTeams = () => {
-    listTeamsScrum() 
-      .then(data => {
-        setTeams(data); 
-      })
-      .catch(error => {
-        console.error('Error fetching teams:', error);
-        toast.error('Error al obtener los equipos.');
-      });
-  };
-
-  const handleCreateTeam = (team) => {
-    if (!team.nameProject) {
-      toast.error('Por favor completa correctamente todos los campos obligatorios.');
-      toast.error('Error al crear equipo.');
-      return;
-    }
-
-    createTeamScrum(team)
-      .then(() => {
-        fetchTeams(); 
-        toast.success('¡Nuevo Proyecto creado con éxito!');
-        handleCloseModal(); // Cierra el modal de nuevo proyecto después de la creación exitosa del Team
-      })
-      .catch(error => {
-        console.error('Error creating team:', error);
-        toast.error('Error al crear equipo Scrum.');
-      });
-  };
-
-  const handleDeleteTeam = (teamId) => {
-    deleteTeamScrum(teamId)
-      .then(() => {
-        setTeams(teams.filter(team => team.team_scrum_id !== teamId));
-        toast.success('Equipo eliminado exitosamente.');
-      })
-      .catch(error => {
-        console.error('Error deleting team:', error);
-        toast.error('Error al eliminar equipo.');
-      });
-  };
-
-  const handleOpenModal = () => {
-    setModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
-  };
-
-  const OpenModal = () => {
-    setOpenModal(true);
-  };
-
-  const CloseModal = () => {
-    setOpenModal(false);
-  };
-
-  const [openAddInfoModal, setOpenAddInfoModal] = useState(false);
-
-  const handleOpenAddInfoModal = () => {
-    setOpenAddInfoModal(true);
-  };
-
-  const handleCloseAddInfoModal = () => {
-    setOpenAddInfoModal(false);
-  };
-
-  const handleOpenConfirmModal = (teamId) => {
-    setTeamToDelete(teamId);
-    setConfirmModalOpen(true);
-  };
-
-  const handleConfirmDelete = () => {
-    handleDeleteTeam(teamToDelete);
-    setConfirmModalOpen(false);
-  };
+ 
 
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
