@@ -21,14 +21,14 @@ public class Trainers implements Serializable {
     @Column(name = "trainer_id", nullable = false)
     private Long trainer_id;
 
-    @Column(name = "triner_state", nullable = false)
-    private Boolean triner_state;
+    @Column(name = "trainer_state", nullable = false)
+    private Boolean trainer_state;
 
     @Column(name = "id_person", nullable = false)
     private Long id_person;
 
-    @Column(name = "document_number", nullable = false)
-    private BigInteger document_number;
+    @Column(name = "documentNumber", nullable = false)
+    private BigInteger documentNumber;
 
     @OneToMany(mappedBy = "fk_trainer_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Attendances> attendanceSet;
