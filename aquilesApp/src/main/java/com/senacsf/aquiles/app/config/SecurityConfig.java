@@ -31,7 +31,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/excel/report").permitAll()
                                 .requestMatchers("/api/projects/**").permitAll()
                                 .requestMatchers("/api/students/**").permitAll()
-                                .requestMatchers("/api/juries/**").permitAll()
+                                .requestMatchers("/api/trainers/**").permitAll()
+
 
 
                                 .anyRequest().authenticated() // Requiere autenticación para cualquier otra solicitud
