@@ -14,7 +14,7 @@ export default function ListaChequeo() {
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', 'reporte.pdf'); // El nombre del archivo descargado
+            link.setAttribute('download', 'reporte.pdf'); 
             document.body.appendChild(link);
             link.click();
             link.parentNode.removeChild(link);
@@ -84,14 +84,13 @@ export default function ListaChequeo() {
                                         <IoIosArrowDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer" />
                                     </div>
                                 </div>
-
+                                <div className="pt-1">
                                 <button className="bg-custom-blue text-white text-center font-bold py-2 px-4 rounded-lg mt-4 block ml-3 w-28 h-10">
                                     Buscar
                                 </button>
+                                </div>
                             </div>
                             
-
-
                             <div className="flex justify-end">
                                 <div className="w-52 h-28 bg-white border border-gray-200 p-4 rounded-lg shadow-md">
                                     <h2 className="text-gray-700 text-sm font-bold mb-2 text-center">Exportar lista de chequeo como:</h2>
@@ -116,61 +115,106 @@ export default function ListaChequeo() {
                     </div>
                 </div>
 
-            <div className=" w-2/3 h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ml-52 mt-10"> 
                 <div className="flex bg-white w-full h-14">
             </div>
 
-
-        
-            {/* Tabla de lista de asistencia */}
-            <div className="container mx-auto">
-            <div className="overflow-x-auto mt-4 bg-gray-100 mb-5">
-        
+            <div className="container w-2/3 ml-52">
                 <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-auto">
                 <thead className="bg-sky-950">
                   
                     <tr>
                         
-                        <th className="px-4 py-3 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Item</th>
-                        <th className="px-4 py-3 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Indicadores y/o Variables</th>
-                        <th className="px-4 py-3 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Si</th>
-                        <th className="px-4 py-3 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">No</th>
-                        <th className="px-4 py-3 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Observaciones</th>
+                        <th className="px-4 py-3 w-20 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Item</th>
+                        <th className="px-4 w-96 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white text-center">Indicadores y/o Variables</th>
+                        <th className="px-4 w-20 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Si</th>
+                        <th className="px-4 w-20 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">No</th>
+                        <th className="px-4 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Observaciones</th>
 
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-300">
+                        <tr>
+                        <td className="px-4 py-3 border-2 border-gray-300 text-sm text-center">1</td>
+                        <td className="px-2 border-2 border-gray-300 text-sm text-center">El software evidencia autenticación y manejo dinámico de roles.</td>
+                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">
+                        <ul className="list-none">
+                            <li className="flex items-center">
+                            <input type="checkbox" id="item1" className="mr-2 ml-4 transform scale-150 custom-checkbox" />
+                            </li>
+                        </ul>
+                        </td>
+                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">
+                        <ul className="list-none">
+                            <li className="flex items-center">
+                            <input type="checkbox" id="item2" className="mr-2 ml-4 transform scale-150 custom-checkboxred" />
+                            </li>
+                        </ul>
+                        </td>
+                        <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold"></span></td>
                     </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-300">
-                <tr>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">1</td>
-                        <td className="px-2 border-2 border-gray-300 text-sm">El software evidencia autenticación y manejo dinámico de roles.</td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text font-normal"></span></td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold"></span></td>
+
+                    <tr>
+                        <td className="px-4 py-3 border-2 border-gray-300 text-sm text-center">1</td>
+                        <td className="px-2 border-2 border-gray-300 text-sm text-center">El software evidencia autenticación y manejo dinámico de roles.</td>
+                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">
+                        <ul className="list-none">
+                            <li className="flex items-center">
+                            <input type="checkbox" id="item1" className="mr-2 ml-4 transform scale-150 custom-checkbox" />
+                            </li>
+                        </ul>
+                        </td>
+                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">
+                        <ul className="list-none">
+                            <li className="flex items-center">
+                            <input type="checkbox" id="item2" className="mr-2 ml-4 transform scale-150 custom-checkboxred" />
+                            </li>
+                        </ul>
+                        </td>
                         <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold"></span></td>
                     
                     </tr>
 
                     <tr>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">1</td>
-                        <td className="px-2 border-2 border-gray-300 text-sm">El software evidencia autenticación y manejo dinámico de roles.</td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text font-normal"></span></td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold"></span></td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold"></span></td>
-                    
-                    </tr>
-
-                    <tr>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">1</td>
-                        <td className="px-2 border-2 border-gray-300 text-sm">El software evidencia autenticación y manejo dinámico de roles.</td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text font-normal"></span></td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold"></span></td>
+                        <td className="px-4 py-3 border-2 border-gray-300 text-sm text-center">1</td>
+                        <td className="px-2 border-2 border-gray-300 text-sm text-center">El software evidencia autenticación y manejo dinámico de roles.</td>
+                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">
+                        <ul className="list-none">
+                            <li className="flex items-center">
+                            <input type="checkbox" id="item1" className="mr-2 ml-4 transform scale-150 custom-checkbox" />
+                            </li>
+                        </ul>
+                        </td>
+                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">
+                        <ul className="list-none">
+                            <li className="flex items-center">
+                            <input type="checkbox" id="item2" className="mr-2 ml-4 transform scale-150 custom-checkboxred" />
+                            </li>
+                        </ul>
+                        </td>
                         <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold"></span></td>
                                             
                     </tr>
                 </tbody>
                 </table>
-                </div>
             </div>
-        </div>
+
+            <div className="flex items-start pt-10 space-x-20">
+            <div className="ml-52">
+                <span className="text-custom-blue font-semibold text-xl font-inter">Instructor Técnico Anterior</span>
+                <button type="text" className="flex mt-2 border-2 border-gray-400 bg-zinc-300 shadow-xl rounded-lg text-black text-center font-inter w-52 h-8 cursor-pointer">Firma Instructor</button>
+                <div className="pb-3 border-b-2 border-black w-72 mt-2"></div>
+            </div>
+
+            <div>
+                <span className="text-custom-blue font-semibold text-xl font-inter">Instructor Técnico Nuevo</span>
+                <button type="text" className="flex mt-2 border-2 border-gray-400 bg-zinc-300 shadow-xl rounded-lg text-black text-center font-inter w-52 h-8 cursor-pointer">Firma Instructor</button>
+                <div className="pb-3 border-b-2 border-black w-72 mt-2"></div>
+            </div>
+
+            <div className="ml-4 pt-14">
+                <button type="text" className="border-custom-blue border-2 bg-custom-blue text-center font-inter text-white text-xl w-32 h-9 shadow-xl rounded-lg">Guardar</button>
+            </div>
+            </div>
     </div>
 </div>
       );
