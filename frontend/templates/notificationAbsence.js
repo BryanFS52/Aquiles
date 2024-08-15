@@ -3,10 +3,15 @@ const generateEmailContent = (studentName, date) => {
     return `
       <div class="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
         <div class="bg-[#0e314d] p-4">
-          <!-- Reemplaza esta URL por la URL pública de tu imagen -->
           <img src="cid:logoImage" alt="Logo Sena" class="w-16 h-16 mx-auto" />
         </div>
         <div class="p-6">
+        <h1 class="text-2xl text-custom-blue font-medium font-inter">
+        TDA
+        </h1>
+        <h5 class="text-custom-blue text-base font-inter">
+        Transformando el futuro con las nuevas habilidades del SENA.
+        </h5>
           <h1 class="text-xl font-bold text-[#40b003]">
             Notificación de Inasistencia a Clase y Solicitud de Justificación
           </h1>
