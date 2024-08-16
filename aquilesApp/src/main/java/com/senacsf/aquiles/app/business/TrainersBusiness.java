@@ -65,10 +65,10 @@ public class TrainersBusiness {
 
     public void create(TrainersDto trainersDto){
         try {
-            BigInteger documentNumber = trainersDto.getDocument_number();
-            Trainers existingTrainer = trainersService.findByDocument_Number(documentNumber);
+            BigInteger document_number = trainersDto.getDocument_number();
+            Trainers existingTrainer = trainersService.findByDocumentNumber(document_number);
             if ( existingTrainer != null){
-                throw  new CustomException("The trainer with document number " + documentNumber + "Already Exists");
+                throw  new CustomException("The trainer with document number " + document_number + "Already Exists");
             }
 
             Trainers trainers = modelMapper.map(trainersDto , Trainers.class);
