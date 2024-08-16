@@ -3,7 +3,7 @@
 import React from 'react';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { Header } from '@/app/components/header';
+export { Header } from '../app/components/header';  // Si el componente se llama Header y está en el archivo Header.js
 import Home from './page';
 
 const inter = Inter({ subsets: ['latin'] });
