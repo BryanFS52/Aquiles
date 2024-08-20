@@ -8,7 +8,8 @@ import { BsPersonCheck } from "react-icons/bs";
 import { IoMdLogOut } from "react-icons/io";
 import { TfiBlackboard } from "react-icons/tfi";
 import { GiNotebook } from "react-icons/gi";
-import { IoSettings } from "react-icons/io5";
+import { FaGear } from "react-icons/fa6";
+import { FaChalkboardUser } from "react-icons/fa6";
 // import { RiCheckboxBlankCircleFill } from "react-icons/ri";
 import { PiStudentFill } from "react-icons/pi";
 import { IoClose } from "react-icons/io5";
@@ -30,7 +31,7 @@ export const Sidebar = () => {
                     <div className="flex items-center mb-10 space-x-5">
                         <Image src={logoSena} alt="Logo Sena" className="w-11
                         " />
-                        <span className="text-s">PROYECTOS FORMATIVOS (C.S.F.) </span>
+                        <span className="text-xs">PROYECTOS FORMATIVOS (C.S.F.) </span>
                     </div>
 
                     <ul className='text-white'>
@@ -38,50 +39,57 @@ export const Sidebar = () => {
                         
                         <li>
                             <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <IoPersonSharp/>
+                                <IoPersonSharp className='text-2xl' />
                                 Fichas
                             </Link>
                         </li>
 
                         <li>
-                            <Link href="/inventario" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <FaLaptopCode />
+                            <Link href="/programas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <FaLaptopCode className='text-2xl' />
                                 Programas
                             </Link>
                         </li>
 
                         <li>
                             <Link href="/asistencia" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <BsPersonCheck />
+                                <BsPersonCheck className='text-2xl' />
                                 Asistencia
                             </Link>
                         </li>
 
                         <li>
-                            <Link href="#" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <HiUserGroup  />
+                            <Link href="/teamScrum" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <HiUserGroup className='text-2xl' />
                                 Teams
                             </Link>
                         </li>
 
                         <li>
-                            <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <TfiBlackboard />
-                                Proyectos
-                            </Link>
-                        </li>
-
-                        <li>
-                            <Link href="/justificaciones" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <GiNotebook/>
-                                Justificaciones
+                            <Link href="/aprendicesView" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <PiStudentFill className='text-2xl' />
+                                Aprendices
                             </Link>
                         </li>
 
                         <li>
                             <Link href="/aprendicelist" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <PiStudentFill  />
-                                Aprendices
+                                <FaChalkboardUser className='text-2xl' />
+                                Sustentaciones
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <TfiBlackboard className='text-2xl' />
+                                Proyectos 
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link href="/justificaciones" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                                <GiNotebook className='text-2xl' />
+                                Justificaciones 
                             </Link>
                         </li>
                     </ul>
@@ -92,11 +100,14 @@ export const Sidebar = () => {
                         <RiCheckboxBlankCircleFill className='absolute text-green-600 left-16 translate-y-2 text-xs'/>
                         Usuario
                     </li>  */}
-                    <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> <IoMdLogOut />
-                        Cerrar Sesión
-                    </li>
-                    <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> <IoSettings/>
+                    <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> 
+                        <FaGear className='text-2xl' />
                         Configuración 
+                    </li>
+                    
+                    <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                        <IoMdLogOut className='text-2xl' />
+                        Cerrar Sesión
                     </li>
 
                 </ul>

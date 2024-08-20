@@ -97,5 +97,3 @@ import ModalVerMas from './modalVerMas';
 
 
 export default ModalComponent;
-
-
