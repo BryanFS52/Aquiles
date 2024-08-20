@@ -18,9 +18,10 @@ public class TrainersService implements Idao<Trainers, Long> {
     TrainersRepository trainersRepository;
 
     @Transactional(readOnly = false)
-    public Trainers findByDocument_Number(BigInteger documentNUmber) {
-        return trainersRepository.findByDocumentNumber(documentNUmber); // Llama al método del repositorio para encontrar un equipo scrum por el nombre del proyecto
+    public Trainers findByDocumentNumber(BigInteger documentNumber) {
+        return trainersRepository.findByDocumentNumber(documentNumber);
     }
+
 
     @Override
     public List<Trainers> findAll() {
