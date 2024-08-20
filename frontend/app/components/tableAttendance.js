@@ -208,4 +208,3 @@ const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la ta
     </div>
   );
 };
-

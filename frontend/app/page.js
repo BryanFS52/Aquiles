@@ -75,7 +75,7 @@ export default function Login() {
               <Image src={LogoAquiles} alt="TDA Logo" className="w-28" />
               <div className="flex flex-col px-2 text-custom-blue">
                 <h1 className="text-3xl font-medium ">TDA</h1>
-                <p className="text-[11px] font-light">
+                <p className="text-[13px] font-light">
                   Transformando el futuro con las nuevas habilidades del SENA.
                 </p>
               </div>
@@ -83,9 +83,9 @@ export default function Login() {
 						<div className="text-custom-blue pt-10">
 							<h1 className="text-4xl">Inicia Sesión</h1>
 							<p className="text-base pt-5">
-								¡Bienvenido de vuelta!
+								¡Bienvenido de Vuelta!
 								<br />
-								Por favor, inicia sesión para acceder a tu cuenta.
+							 Inicia Sesión para Acceder a tu Cuenta.
 							</p>
 						</div>
 

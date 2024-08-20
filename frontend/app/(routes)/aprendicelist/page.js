@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState } from "react";
 import { Header } from "../../components/header";
@@ -32,7 +32,6 @@ export default function AprendicesList() {
             setIsModalOpen(false);
         }
     };
-
     return (
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
             <Sidebar />
@@ -88,39 +87,31 @@ export default function AprendicesList() {
                     <div className="overflow-x-auto w-full">
                         <table className="ml-16 bg-white w-96 md:w-5/6">
                                 <thead>
-                                <tr>
-                                    <th className="px-4 py-2 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">Número de Documento</th>
-                                    <th className="px-4 py-2 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">Nombres y Apellidos</th>
-                                    <th className="px-4 py-2 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">L</th>
-                                </tr>
+                                    <tr>
+                                        <th className="px-4 py-2 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">Número de Documento</th>
+                                        <th className="px-4 py-2 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">Nombres y Apellidos</th>
+                                        <th className="px-4 py-2 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">L</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">10078459687</td>
-                                    <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">Michael Felipe Laiton Chaparro</td>
-                                    <td className="px-4 py-2 border-2 border-gray-200 text-sm text-green-600 font-semibold">✓</td>
-                                    
-                                </tr>
-                                <tr>
-                                    <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">10078459687</td>
-                                    <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">Michael Felipe Laiton Chaparro</td>
-                                    <td className="px-4 py-2 border-2 border-gray-200 text-sm text-green-600 font-semibold">✓</td>
-                                </tr>
+                                    <tr>
+                                        <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">10078459687</td>
+                                        <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">Michael Felipe Laiton Chaparro</td>
+                                        <td className="px-4 py-2 border-2 border-gray-200 text-sm text-green-600 font-semibold">✓</td>
+                                        <td className="cursor-pointer" onClick={() => toggleModal({ email: 'keishlanayedcamargorojas@gmail.com',name: 'Michael Felipe Laiton Chaparro', date: '2024-08-16' })}>
+                                           
+                                        </td>
+                                    </tr>
 
-                                <tr>
-                                <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700"> 10078459687 </td>
-                                <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700"> Michael Felipe Laiton Chaparro </td>
-                                <td className="px-4 py-2 border-2 border-gray-200 text-sm text-red-600 font-semibold"> X </td>
-                                <td className="cursor-pointer" onClick={toggleModal}>
-                                  <ImMail4 className="w-6 h-6 ml-2" />
-                                </td>
-                              </tr>
-
-                                <tr>
-                                    <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">10078459687</td>
-                                    <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">Michael Felipe Laiton Chaparro</td>
-                                    <td className="px-4 py-2 border-2 border-gray-200 text-sm text-green-600 font-semibold">✓</td>
-                                </tr>
+                                    <tr>
+                                        <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">10078459687</td>
+                                        <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">Michael Felipe Laiton Chaparro</td>
+                                        <td className="px-4 py-2 border-2 border-gray-200 text-sm text-red-600 font-semibold">X</td>
+                                        <td className="cursor-pointer" onClick={() => toggleModal({ email: 'keishlanayedcamargorojas@gmail.com',name: 'Michael Felipe Laiton Chaparro', date: '2024-08-16' })}>
+                                            <ImMail4 className="w-6 h-6 ml-2" />
+                                        </td>
+                                    </tr>
+                                    {/* Agrega más filas según sea necesario */}
                                 </tbody>
                         </table>
                         <div className="flex justify-end mr-12">

@@ -37,14 +37,14 @@ export const Sidebaraprendiz = () => {
 
                     <li>
                             <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <IoPersonSharp/>
+                                <IoPersonSharp className='text-2xl' />
                                 Ficha
                             </Link>
                         </li>
 
                     <li>
                             <Link href="/asistenciaAprendiz" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <BsPersonCheck />
+                                <BsPersonCheck className='text-2xl' />
                                 Asistencia
                             </Link>
                         </li>
@@ -58,7 +58,7 @@ export const Sidebaraprendiz = () => {
 
                         <li>
                             <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <TfiBlackboard />
+                                <TfiBlackboard className='text-2xl' />
                                 Proyectos
                             </Link>
                         </li>
