@@ -68,7 +68,7 @@ export default function Attendance () {
             
             <button
               type="button"
-              className="ml-auto text-white rounded-lg text-sm bg-custom-blue hover:bg-custom-blue w-32 h-10 mt-3"
+              className="mr-1 ml-auto text-white rounded-lg text-sm bg-custom-blue hover:bg-custom-blue w-32 h-10 mt-4"
               onClick={handleOpenModal}>
               Guardar
             </button>
@@ -78,9 +78,9 @@ export default function Attendance () {
           <div className="flex flex-col w-full md:w-96 h-52 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 p-4 space-y-3">
             <PiStudentFill className="w-9 h-9 text-stone-600 mx-auto" />
             <div className="text-center">
-              <span className="text-5xl font-inter font-normal">25</span>
-              <span className="font-inter font-normal text-lg block">Aprendices Actuales</span>
-              <span className="font-inter font-normal text-green-500 block">97%</span>
+              <span className="text-[#0e324d] text-5xl font-inter font-semibold">25</span>
+              <span className="font-inter font-medium text-lg block">Aprendices Actuales</span>
+              <span className="font-inter font-medium text-green-500 block">97%</span>
             </div>
           </div>
 

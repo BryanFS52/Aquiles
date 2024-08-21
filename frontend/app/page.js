@@ -157,7 +157,7 @@ export default function Login() {
                   className='bg-custom-blue w-full p-2 text-white font-medium rounded mt-20 hover:bg-custom-blues' 
                   type='submit'
                 >
-                  Iniciar Sesion
+                  Iniciar Sesión
                 </button>
               </form>
             </div>

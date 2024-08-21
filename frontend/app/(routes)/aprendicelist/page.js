@@ -39,14 +39,14 @@ export default function AprendicesList() {
                 <Header />
 
                 <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full relative bg-neutral-100 space-y-5 ">
-                    <h1 className="font-serif text-4xl pb-3 border-b-2 border-black w-80">Lista de Asistencia</h1>
+                    <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Lista de Asistencia</h1>
                     <div className="flex px-9 space-x-24">
                         <div className="flex w-96 h-48 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ">
                             <div className="z-50 justify-end space-y-3">
                                 <PiStudentFill className="w-9 h-9 text-stone-600 ml-6" /><br />
                                 <div>
-                                    <span className="font-inter font-normal text-5xl ml-6">25</span><br /><br />
-                                    <span className="font-inter font-normal text-lg ">Aprendices de la ficha</span>
+                                    <span className="text-[#0e324d] font-inter font-semibold text-5xl ml-6">25</span><br /><br />
+                                    <span className="font-inter font-medium text-lg ">Aprendices de la ficha</span>
                                 </div>
                             </div>
                         </div>
@@ -56,22 +56,22 @@ export default function AprendicesList() {
                   <PiStudentFill className="w-9 h-9 text-stone-600 ml-6"/><br/>
 
                   <div>
-                    <span className="text-5xl font-inter font-normal ml-6">20</span><br/><br/>
-                    <span className="font-inter font-normal text-lg ">Aprendices en clase</span>
+                    <span className="text-[#0e324d] text-5xl font-inter font-semibold ml-6">20</span><br/><br/>
+                    <span className="font-inter font-medium text-lg ">Aprendices en clase</span>
                   </div>
                 </div>
               </div>
-                        
 
               <div className=" flex w-96 h-48 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ">
                   <div className="z-50 justify-end space-y-3">
                   <PiStudentFill className="w-9 h-9 text-stone-600 ml-6"/><br/>
 
                   <div>
-                    <span className="text-5xl font-inter font-normal ml-6">5</span><br/><br/>
-                    <span className="font-inter font-normal text-lg ">Aprendices que fallaron</span>
+                    <span className="text-[#0e324d] text-5xl font-inter font-semibold ml-6">5</span><br/><br/>
+                    <span className="font-inter font-medium text-lg ">Aprendices que fallaron</span>
                   </div>
                 </div>
+
               </div>
               <ModalCorreo isOpen={isModalOpen} onClose={toggleModal} />
                

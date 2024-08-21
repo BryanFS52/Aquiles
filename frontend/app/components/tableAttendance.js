@@ -42,7 +42,7 @@ const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la ta
 
     <div className=" w-11/12 h-auto  rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ml-10 mt-10"> 
         <div className="flex bg-white w-full h-14">
-            <form className="w-72 h-10">   
+            <form className="w-auto h-10">   
                 <div className="relative">
                     <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <GoSearch className="text-gray-400" />
@@ -59,17 +59,17 @@ const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la ta
                     <input type="date" className="h-7 block w-52 pl-10 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300" placeholder="Buscar por fechas" />
                 </div>
             </form>
-    <div className="ml-28 mr-7">
+    <div className=" mr-7 ml-auto flex space-x-4">
       <button type="button" className="text-white font-inter font-normal h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
           onClick={handleOpenQRModal}
           >
-          Generar QR
+          Toma de Asistencia
             <BsQrCode className="w-4 h-4 ml-3" />
       </button>
            <ModalQR isOpen={modalQROpen} onClose={handleCloseQRModal}/>
     </div>
     
-    <div className="mr-7">
+    <div className="mr-10">
       <button
         type="button"
         className="text-white font-inter font-normal h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
@@ -81,10 +81,7 @@ const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la ta
         <ModalInfoficha isOpen={modalOpen} onClose={handleCloseModal} />
     </div>
     
-         <Link href="/aprendicelist" className='text-white font-inter font-normal h-11 w-44 rounded-lg text-sm px-2 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center'>
-             Continuar Asistencia
-          <IoMdExit className="w-5 h-5 ml-2" />
-        </Link>
+      
         
     </div>
 
