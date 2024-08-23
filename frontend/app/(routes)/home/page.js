@@ -14,7 +14,7 @@ export default function Home() {
       <Sidebar />
       <div className="xl:col-span-5">
         <Header />
-      <div className='bg-orange-600' ><span>Dashboard</span></div>
+      <div className='bg-[#40b003]' ><span>Dashboard</span></div>
         
       </div>
       <ToastContainer />
