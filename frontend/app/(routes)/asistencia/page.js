@@ -11,6 +11,7 @@ import ModalAsistencia from "../../components/Modals/modalAsistencia";
 import { Header } from "../../components/header";
 import { Sidebar } from "../../components/sidebar";
 
+
 export default function Attendance () {
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -21,8 +22,6 @@ export default function Attendance () {
   const handleCloseModal = () => {
     setModalOpen(false);
   };
-
-
   
   return (
 

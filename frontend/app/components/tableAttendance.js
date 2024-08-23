@@ -1,211 +1,145 @@
 "use client"
 
-import Link from "next/link";
-import React, { useState,  } from 'react';
-import { GoSearch } from "react-icons/go";
-import { BsQrCode } from "react-icons/bs";
-import { FaEye } from "react-icons/fa";
-import { VscEye } from "react-icons/vsc";
-import { IoMdExit } from "react-icons/io";
-import ModalInfoficha from "../components/Modals/modalInfoficha";
-import ModalQR from "../components/Modals/modalQR";
+import React, { useState, useEffect } from 'react';
+import apprenticeService from "../services/ApprenticeService";
 
+const ApprenticeList = () => {
+    const [apprentices, setApprentices] = useState([]);
+    const [selectedApprentice, setSelectedApprentice] = useState(null);
+    const [newApprentice, setNewApprentice] = useState({ fullName: '', documentNumber: '', documentType: '', status: '' });
 
-export const TableAttendance = () => {
+    useEffect(() => {
+        loadApprentices();
+    }, []);
 
-const [modalOpen, setModalOpen] = useState(false); // de linea 16 a linea 21 se crea la funcion para la logica del modal de ver info de ficha
-const [modalQROpen, setModalQROpen] = useState(false); // de linea 23 a linea 30 se crea la funcion para la logica del modal de QR
-const [attendees, setAttendees] = useState([]);  //Se crea la funcion para la tabla de asistencia 
+    const loadApprentices = () => {
+        apprenticeService.getApprentices()
+            .then(response => setApprentices(response.data))
+            .catch(error => console.error('Error fetching apprentices:', error));
+    };
 
-  const toggleAttendance = (index, day, weekIndex) => {  
-    const updatedAttendees = [...attendees];
-    updatedAttendees[index].weeks[weekIndex][day] = !updatedAttendees[index].weeks[weekIndex][day];
-    setAttendees(updatedAttendees);
-  };
+    const handleSelectApprentice = (apprentice) => {
+        setSelectedApprentice(apprentice);  
+    };
 
-  const handleOpenModal = () => {
-    setModalOpen(true);
-  };
+    const handleCreateApprentice = () => {
+        apprenticeService.createApprentice(newApprentice)
+            .then(() => {
+                loadApprentices();
+                setNewApprentice({ fullName: '', documentNumber: '', documentType: '', status: '' });
+            })
+            .catch(error => console.error('Error creating apprentice:', error));
+    };
 
-  const handleCloseModal = () => {
-    setModalOpen(false);
-  };
-  const handleOpenQRModal = () => {
-    setModalQROpen(true);
-  };
+    const handleUpdateApprentice = (id) => {
+        apprenticeService.updateApprentice(id, selectedApprentice)
+            .then(() => {
+                loadApprentices();
+                setSelectedApprentice(null);
+            })
+            .catch(error => console.error('Error updating apprentice:', error));
+    };
 
-  const handleCloseQRModal = () => {
-    setModalQROpen(false);
-  };
+    const handleDeleteApprentice = (id) => {
+        apprenticeService.deleteApprentice(id)
+            .then(() => loadApprentices())
+            .catch(error => console.error('Error deleting apprentice:', error));
+    };
 
-    return(
+    return (
+        <div className="container mx-auto">
+            <h1 className="text-2xl font-bold mb-4">Apprentices</h1>
 
-    <div className=" w-11/12 h-auto  rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ml-10 mt-10"> 
-        <div className="flex bg-white w-full h-14">
-            <form className="w-72 h-10">   
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <GoSearch className="text-gray-400" />
-                    </div>
-                    <input type="search" className="h-7 block w-52 pl-10 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300" placeholder="Buscar aprendiz:" />
+            <div className="mb-4">
+                <input
+                    type="text"
+                    placeholder="Full Name"
+                    value={newApprentice.fullName}
+                    onChange={e => setNewApprentice({ ...newApprentice, fullName: e.target.value })}
+                    className="border p-2 mb-2"
+                />
+                <input
+                    type="text"
+                    placeholder="Document Number"
+                    value={newApprentice.documentNumber}
+                    onChange={e => setNewApprentice({ ...newApprentice, documentNumber: e.target.value })}
+                    className="border p-2 mb-2"
+                />
+                <input
+                    type="text"
+                    placeholder="Document Type"
+                    value={newApprentice.documentType}
+                    onChange={e => setNewApprentice({ ...newApprentice, documentType: e.target.value })}
+                    className="border p-2 mb-2"
+                />
+                <input
+                    type="text"
+                    placeholder="Status"
+                    value={newApprentice.status}
+                    onChange={e => setNewApprentice({ ...newApprentice, status: e.target.value })}
+                    className="border p-2 mb-2"
+                />
+                <button onClick={handleCreateApprentice} className="bg-blue-500 text-white p-2 rounded">Add Apprentice</button>
+            </div>
+
+            <table className="table-auto w-full">
+                <thead>
+                    <tr>
+                        <th className="px-4 py-2">Full Name</th>
+                        <th className="px-4 py-2">Document Number</th>
+                        <th className="px-4 py-2">Document Type</th>
+                        <th className="px-4 py-2">Status</th>
+                        <th className="px-4 py-2">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {apprentices.map(apprentice => (
+                        <tr key={apprentice.id}>
+                            <td className="border px-4 py-2">{apprentice.fullName}</td>
+                            <td className="border px-4 py-2">{apprentice.documentNumber}</td>
+                            <td className="border px-4 py-2">{apprentice.documentType}</td>
+                            <td className="border px-4 py-2">{apprentice.status}</td>
+                            <td className="border px-4 py-2">
+                                <button onClick={() => handleSelectApprentice(apprentice)} className="bg-yellow-500 text-white p-2 rounded">Edit</button>
+                                <button onClick={() => handleDeleteApprentice(apprentice.id)} className="bg-red-500 text-white p-2 rounded ml-2">Delete</button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+
+            {selectedApprentice && (
+                <div className="mt-4">
+                    <h2 className="text-xl font-bold mb-2">Edit Apprentice</h2>
+                    <input
+                        type="text"
+                        value={selectedApprentice.fullName}
+                        onChange={e => setSelectedApprentice({ ...selectedApprentice, fullName: e.target.value })}
+                        className="border p-2 mb-2"
+                    />
+                    <input
+                        type="text"
+                        value={selectedApprentice.documentNumber}
+                        onChange={e => setSelectedApprentice({ ...selectedApprentice, documentNumber: e.target.value })}
+                        className="border p-2 mb-2"
+                    />
+                    <input
+                        type="text"
+                        value={selectedApprentice.documentType}
+                        onChange={e => setSelectedApprentice({ ...selectedApprentice, documentType: e.target.value })}
+                        className="border p-2 mb-2"
+                    />
+                    <input
+                        type="text"
+                        value={selectedApprentice.status}
+                        onChange={e => setSelectedApprentice({ ...selectedApprentice, status: e.target.value })}
+                        className="border p-2 mb-2"
+                    />
+                    <button onClick={() => handleUpdateApprentice(selectedApprentice.id)} className="bg-green-500 text-white p-2 rounded">Update Apprentice</button>
                 </div>
-            </form>
-
-            <form className="w-72 h-10 ml-4">
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <GoSearch className="text-gray-400" />
-                    </div>
-                    <input type="date" className="h-7 block w-52 pl-10 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300" placeholder="Buscar por fechas" />
-                </div>
-            </form>
-    <div className="ml-28 mr-7">
-      <button type="button" className="text-white font-inter font-normal h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
-          onClick={handleOpenQRModal}
-          >
-          Generar QR
-            <BsQrCode className="w-4 h-4 ml-3" />
-      </button>
-           <ModalQR isOpen={modalQROpen} onClose={handleCloseQRModal}/>
-    </div>
-    
-    <div className="mr-7">
-      <button
-        type="button"
-        className="text-white font-inter font-normal h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
-        onClick={handleOpenModal}
-      >
-         Ver información de la ficha
-        <FaEye className="w-5 h-5 ml-2" />
-      </button>
-        <ModalInfoficha isOpen={modalOpen} onClose={handleCloseModal} />
-    </div>
-    
-         <Link href="/aprendicelist" className='text-white font-inter font-normal h-11 w-44 rounded-lg text-sm px-2 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center'>
-             Continuar Asistencia
-          <IoMdExit className="w-5 h-5 ml-2" />
-        </Link>
-        
-    </div>
-
-    {/* Tabla de lista de asistencia */}
-    <div className="container mx-auto">
-    <div className="overflow-x-auto mt-4 bg-gray-100 mb-5">
-
-        <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-auto">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-10 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300"></th>
-              <th className="px-28 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300"></th>
-              {[...Array(4)].map((_, weekIndex) => (
-                <th key={weekIndex} colSpan={7} className="px-2 py-3 text-center text-xs font-semibold font-inter text-black uppercase tracking-wider border-2 border-gray-300">Semana {weekIndex + 1}</th>
-              ))}
-            </tr>
-            <tr>
-                <th className="px-10 py-3 text-left text-xs text-gray-700 uppercase tracking-wider border-2 border-gray-300 font-inter font-semibold">Número de Documento</th>
-                <th className="px-6 py-3 text-xs text-center text-gray-700 uppercase tracking-wider border-2 border-gray-300 font-inter font-semibold">Nombre y Apellido</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">L</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">J</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">V</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">S</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">D</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">L</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">J</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">V</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">S</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">D</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">L</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">J</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">V</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">S</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">D</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">L</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">M</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">J</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">V</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">S</th>
-                <th className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700">D</th>
-                
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-300">
-          <tr>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm">10078459687</td>
-                <td className="px-2 border-2 border-gray-300 text-sm">Michael Felipe Laiton Chaparro</td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-blue-500 font-bold">J</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-blue-500 font-bold">J</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-blue-500 font-bold">J</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-            </tr>
-            <tr>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm">10078459687</td>
-                <td className="px-2 border-2 border-gray-300 text-sm">Michael Felipe Laiton Chaparro</td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-blue-500 font-bold">J</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-blue-500 font-bold">J</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold">X</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-green-500 font-bold">✓</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-yellow-500 font-bold">R</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-blue-500 font-bold">J</span></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                <td className="px-4 py-3 border-2 border-gray-300 text-sm bg-gray-200"></td>
-                
-            </tr>
-          </tbody>
-        </table>
+            )}
         </div>
-    </div>
-    </div>
-  );
+    );
 };
 
+export default ApprenticeList;
