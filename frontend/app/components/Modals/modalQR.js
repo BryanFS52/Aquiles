@@ -1,17 +1,29 @@
-// ModalQR.js
-
 "use client";
 import React, { useState, useEffect } from 'react';
+import qrCodeService from '../../services/QRService'; // Importa el servicio
 import { BsQrCode } from "react-icons/bs";
 import { useRouter } from 'next/navigation'; // Importa useRouter de next/navigation
 
 const ModalQR = ({ isOpen, onClose }) => {
   const [showNextModal, setShowNextModal] = useState(false);
   const [timer, setTimer] = useState(900); // Duración del QR en segundos
+  const [qrCodeImage, setQrCodeImage] = useState(null); // Para almacenar la imagen del QR
   const router = useRouter(); // Hook para redireccionar
 
   useEffect(() => {
     if (!isOpen) return;
+
+    // Generar el QR al abrir el modal
+    const fetchQRCode = async () => {
+      try {
+        const qrCode = await qrCodeService.generateQRCode('Texto de ejemplo para el QR');
+        setQrCodeImage(qrCode);
+      } catch (error) {
+        console.error("Error generating QR code:", error);
+      }
+    };
+
+    fetchQRCode();
 
     const interval = setInterval(() => {
       setTimer(prev => {
@@ -24,12 +36,11 @@ const ModalQR = ({ isOpen, onClose }) => {
       });
     }, 1000);
 
-    return () => clearInterval(interval); // Limpia el intervalo al desmontar el componente
+    return () => clearInterval(interval);
   }, [isOpen, router]);
 
   const handleNext = () => {
-    // Redirige al hacer clic en "Finalizar"
-    router.push('/aprendicelist');
+    router.push('/aprendicelist'); // Redirige al hacer clic en "Finalizar"
   };
 
   const handleClose = () => {
@@ -46,7 +57,7 @@ const ModalQR = ({ isOpen, onClose }) => {
       const secs = seconds % 60;
       return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')} Min`;
     } else {
-      return `00:${String(seconds).padStart(2, '0')} Seg`
+      return `00:${String(seconds).padStart(2, '0')} Seg`;
     }
   }
 
@@ -60,21 +71,22 @@ const ModalQR = ({ isOpen, onClose }) => {
           </div><br/><br/>
           <div className='flex justify-start'>
             <div className='w-72 h-56'>
-              <BsQrCode className='w-60 h-60 ml-6' />
+              {qrCodeImage ? (
+                <img src={qrCodeImage} alt="QR Code" className='w-70 h-70 ml-0 ' />
+              ) : (
+                <BsQrCode className='w-60 h-60 ml-6' />
+              )}
             </div>
           </div>
           <div className='flex ml-80 absolute inset-x-0 top-36'>
             <span className='text-2xl font-medium font-inter'>Duración del QR</span>
           </div>
-          
-
           <div className="flex absolute inset-x-0 top-48 ml-80">
             <input className="rounded-md border-gray-300 border-2 pl-8 w-40 h-10" />
             <span className="absolute inset-y-0 left-9 flex items-center pr-3 text-black font-inter text-xl">
-             {formatTime(timer)}
+              {formatTime(timer)}
             </span>
           </div>
-          
           <div className='flex justify-end mt-20'>
             <button
               className='hover:bg-red-600 rounded-md transition-colors bg-red-600 px-4 py-2 border text-white text-lg w-36 h-10 font-inter mr-60'

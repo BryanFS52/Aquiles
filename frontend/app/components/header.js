@@ -90,15 +90,15 @@ export const Header = () => {
   };
 
   return (
-    <header className='h-[7vh] md:h-[9vh] mx-auto flex items-center justify-end px-5 lg:py-5 lg:px-4 border bg-slate-100'>
+    <header className='h-[7vh] md:h-[9vh] mx-auto flex items-center justify-end px-5 lg:py-5 lg:px-4  border-[#ffffff] bg-[#ffffff]'>
       <div className="relative">
         <ul>
           <li
-            className='h-8 w-8 flex items-center justify-center rounded-full bg-white hover:bg-gray-800'
+            className='h-10 w-10 flex items-center justify-center rounded-full bg-white hover:bg-[#00324d] transition-colors duration-300'
             onClick={toggleMenu}
           >
-            <a href="#" className='text-gray-400 text-xl relative'>
-              <IoNotificationsOutline />
+            <a href="#" className='text-gray-400 text-2xl relative'>
+              <IoNotificationsOutline className="text-[#01b001] transition-colors duration-300"/>
               {unreadCount > 0 && (
                 <RiCheckboxBlankCircleFill className="absolute top-0 right-0 text-red-600 h-3 w-3" />
               )}
@@ -106,11 +106,11 @@ export const Header = () => {
           </li>
         </ul>
         {isOpen && (
-          <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg">
+          <div className="absolute right-0 mt-2 w-96 bg-white border border-gray-200 rounded-lg shadow-lg">
             <div className="flex justify-between items-center p-2">
-              <span className="font-bold">Notifications</span>
+              <span className="text-[#00324d] font-inter font-bold">Notifications</span>
               <button
-                className="text-[#00324d] hover:text-[#40b003] text-sm"
+                className="text-[#00324d] hover:text-[#40b003] text-sm font-inter"
                 onClick={markAllAsRead}
               >
                 Mark all as read
@@ -153,7 +153,7 @@ export const Header = () => {
         )}
       </div>
       <Link href='/perfil' className='flex items-center gap-2 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-        <div className="flex flex-col">
+        <div className="text-[#000000] font-inter font-medium flex flex-col">
           <span className="text-end">Usuario</span>
           <span className="text-xs">Aprendices</span>
         </div>
