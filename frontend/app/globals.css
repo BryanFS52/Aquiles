@@ -103,7 +103,7 @@
 }
 
 .custom-checkbox:checked::after {
-  content: "✔"; 
+  content: "✅"; 
   color: green; 
   font-size: 14px;
   position: absolute;
@@ -128,7 +128,7 @@
 }
 
 .custom-checkboxred:checked::after {
-  content: "✕"; 
+  content: "❌"; 
   color: red; 
   font-size: 14px;
   position: absolute;

@@ -1,11 +1,24 @@
 "use client"
 
-import React from "react";
+import React, { useRef } from "react";
 import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
 import { Sidebaraprendiz } from "../../components/sidebaraprendiz";
 import { IoIosArrowDown } from "react-icons/io";
 
 export default function Justificacionaaprendiz() {
+
+      // Refs para inputs de archivos
+    const fileInputRefPrev = useRef(null);
+    const fileInputRefNew = useRef(null);
+
+        // Funciones para abrir el explorador de archivos
+        const handleUploadPrev = () => {
+          fileInputRefPrev.current.click();
+      };
+      const handleUploadNew = () => {
+          fileInputRefNew.current.click();
+      };
+
     return (
       <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
         <Sidebaraprendiz />
@@ -25,7 +38,7 @@ export default function Justificacionaaprendiz() {
             <div className="flex flex-col">
               <label className="font-inter font-semibold text-[#0e324d] text-sm sm:text-base">Tipo de novedad</label>
               <div className="relative">
-                <input type="search" className="h-10 block w-80 pl-3 pr-10 text-base text-left font-serif rounded-lg bg-zinc-200 border-2 border-zinc-300 focus:outline-none focus:border-slate-300" placeholder="Novedad"/>
+                <input type="search" className="h-10 block w-80 pl-3 pr-10 text-base text-left font-inter rounded-lg bg-zinc-200 border-2 border-zinc-300 focus:outline-none focus:border-slate-300" placeholder="Novedad"/>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-24 pointer-events-none">
                   <IoIosArrowDown className="text-black" />
                 </div>
@@ -52,19 +65,39 @@ export default function Justificacionaaprendiz() {
               <input type="search" className="h-10 block w-80 pl-3 pr-10 text-sm text-left font-inter rounded-lg bg-zinc-200 border-2 border-zinc-300 focus:outline-none focus:border-slate-300" placeholder="Digite el numero de ficha"/>
             </div>
 
-            <div className="flex flex-col">
-              <label className="font-inter font-semibold text-[#0e324d] text-sm sm:text-base">Agregar Justificación</label>
-              <button className="h-10 w-96 bg-gray-200 text-gray-700 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-slate-300">
-              Selecciona un archivo
-              </button>
-            </div>
+             <div className="flex flex-col">
+            <span className="font-inter font-semibold text-[#0e324d] text-sm sm:text-base">Agregar Justificación</span>
+            <button
+              type="button"
+              onClick={handleUploadPrev}
+              className="h-10 w-96 bg-gray-200 text-gray-700 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-slate-300"
+            >
+             Selecciona un archivo
+            </button>
+            <input
+              type="file"
+              ref={fileInputRefPrev}
+              className="hidden"
+              onChange={(e) => console.log(e.target.files[0])} // Aquí puedes manejar el archivo subido
+            />
+          </div>
           </div>
 
           <div className="flex flex-col items-center">
-            <label className="font-inter font-semibold text-[#0e324d] text-sm sm:text-base">Firma del aprendiz</label>
-            <button className="h-10 w-56 bg-gray-200 text-gray-700 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-slate-300">
-            Selecciona un archivo
+            <span className="font-inter font-semibold text-[#0e324d] text-sm sm:text-base">Firma del aprendiz</span>
+            <button
+              type="button"
+              onClick={handleUploadPrev}
+              className="h-10 w-56 bg-gray-200 text-gray-700 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-slate-300"
+            >
+             Selecciona un archivo
             </button>
+            <input
+              type="file"
+              ref={fileInputRefPrev}
+              className="hidden"
+              onChange={(e) => console.log(e.target.files[0])} // Aquí puedes manejar el archivo subido
+            />
           </div>
 
           <div className="flex justify-between mt-8">
