@@ -13,6 +13,8 @@ import { Sidebar } from "../../components/sidebar";
 
 export default function Attendance () {
   const [modalOpen, setModalOpen] = useState(false);
+  const [nombreInstructor, setNombreInstructor] = useState('');
+
 
   const handleOpenModal = () => {
     setModalOpen(true);
@@ -21,6 +23,15 @@ export default function Attendance () {
   const handleCloseModal = () => {
     setModalOpen(false);
   };
+
+    const handleNombreChange = (e) => {
+        const value = e.target.value;
+        const regex = /^[a-zA-Z\s]*$/;
+        if (regex.test(value)) {
+            setNombreInstructor(value);
+        }
+    };
+
   
   return (
 
@@ -46,7 +57,7 @@ export default function Attendance () {
             <div className="flex">
               <span className="font-inter font-semibold text-[#0e324d] text-sm sm:text-base">Instructor:</span>
               <div className="font-inter font-normal text-black text-sm sm:text-base ml-auto w-2/3">
-                <input type="text" name="nameProject" placeholder="Nombre del instructor" className="w-full rounded-lg bg-white border--300 border-2 pl-3" />
+                <input type="text" name="nameProject" placeholder="Nombre del instructor" className="w-full rounded-lg bg-white border--300 border-2 pl-3" value={nombreInstructor} onChange={handleNombreChange}/>
               </div>
             </div>
 
