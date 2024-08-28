@@ -67,7 +67,7 @@ export default function Login() {
   };
 
   return (
-		<div className="w-screen h-screen flex justify-center items-center bg-white">
+		<div className="font-inter w-screen h-screen flex justify-center items-center bg-white">
       <div className="w-full h-full flex justify-between items-center">
         <div className="xl:w-1/2 h-full flex justify-center items-center sm:w-full">
           <div className="xl:w-1/2 p-5">
@@ -98,7 +98,7 @@ export default function Login() {
             <div className="mt-20">
               <form onSubmit={handleLogin}>
                 <div className="flex flex-col items-center">
-                  <div className="flex items-center w-full mt-4 rounded border-solid border-2">
+                  <div className="font-inter font-normal flex items-center w-full mt-4 rounded border-solid border-2">
                     <HiMiniIdentification className="w-5 mr-2 mx-3 h-5 text-gray-500" />
                     <select
                       name="documentType"
@@ -106,7 +106,9 @@ export default function Login() {
                       onChange={handleChange}
                       className="outline-none text-sm w-full h-9 text-custom-blue"
                     >
-                      <option value="">Tipo de documento</option>
+                      <option value="" disabled selected hidden>
+                         Tipo de documento
+                      </option>
                       <option value="CC">Cédula de Ciudadania</option>
                       <option value="TI">Tarjeta de Identidad</option>
                       <option value="CE">Cédula Extranjería</option>
@@ -116,7 +118,7 @@ export default function Login() {
                     </select>
                   </div>
 
-                  <div className="flex items-center w-full mt-4 rounded border-solid border-2 text-custom-blue">
+                  <div className="font-inter font-normal flex items-center w-full mt-4 rounded border-solid border-2 text-custom-blue">
                     <BsPersonCircle className="w-5 mr-2 mx-3 h-5 text-gray-500" />
                     <input 
                       value={formData.documentNumber} 
@@ -128,19 +130,19 @@ export default function Login() {
                     />
                   </div> 
 
-                  <div className="flex items-center w-full mt-4 rounded border-solid border-2">
+                  <div className="font-inter font-normal flex items-center w-full mt-4 rounded border-solid border-2">
                     <HiLockClosed className="w-5 mr-2 mx-3 h-5 text-gray-500" />
                     <input 
                       value={formData.password} 
                       type="password" 
                       name="password" 
                       placeholder='Contraseña' 
-                      className='outline-none text-sm w-full h-9 text-custom-blue'
+                      className='outline-none text-sm w-full h-9 text-[#0e324d]'
                       onChange={handleChange}
                     />
                   </div>
                 </div>
-                <div className="flex justify-between mt-4 items-center text-custom-blue">
+                <div className="font-inter font-normal flex justify-between mt-4 items-center text-[#0e324d]">
                   <div className="flex text-center">
                     <input type="checkbox" className='mr-2'/>
                     <label htmlFor="" className='text-xs'>Recordar</label>
@@ -154,7 +156,7 @@ export default function Login() {
                 </div>
 
                 <button 
-                  className='bg-custom-blue w-full p-2 text-white font-medium rounded mt-20 hover:bg-custom-blues' 
+                  className='font-inter font-semibold bg-[#0e324d] w-full p-2 text-white rounded mt-20 hover:bg-[#01b001] transition-colors duration-300' 
                   type='submit'
                 >
                   Iniciar Sesión
@@ -173,7 +175,7 @@ export default function Login() {
                 </div>
               </div>
               <div>
-                <div className='flex justify-center'>
+                <div className='font-inter font-normal flex justify-center'>
                   <div className='rounded-md relative' style={{ backgroundColor: 'rgba(0, 0, 0, 0.0)' }}>
                     <p className='text-xl text-left px-4 py-4'>
                       ¡Únete a la comunidad educativa del SENA y <br />
@@ -184,7 +186,7 @@ export default function Login() {
                     </p>
                   </div>
                 </div>
-                <div className='flex items-center justify-end'>
+                <div className='font-inter font-normal flex items-center justify-end'>
                   <div>
                     <span className='text-xs'>Potenciando la asistencia </span>
                   </div>

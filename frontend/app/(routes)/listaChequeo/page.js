@@ -8,7 +8,7 @@ import { IoIosArrowDown } from "react-icons/io";
 
 export default function ListaChequeo() {
     // Opciones para los select 
-    const [sedes, setSedes] = useState (["Centro de Servicios Financieros", "Salitre Sena"]);
+    const [sede, setSede] = useState (["Centro de Servicios Financieros", "Salitre Sena"]);
     const [jornada, setJornada] = useState (["Mañana", "Tarde", "Noche", "Madrugada", "Fin de Semana"]);
     const [trimestre, setTrimestre] = useState (["Trimestre 1", "Trimestre 2", "Trimestre 3", "Trimestre 4", "Trimestre 5", "Trimestre 6", "Trimestre 7"]);
     const [team, setTeam] = useState (["Team 1", "Team 2", "Team 3"]);
@@ -72,7 +72,7 @@ export default function ListaChequeo() {
                                     <span className="text-custom-blue text-base font-semibold font-inter">Sede:</span>
                                     <div className="relative inline-block ml-8">
                                         <select className="border-2 border-gray-300 rounded-lg ml-5 w-52">
-                                            {sedes.map((sede, index) => (
+                                            {sede.map((sede, index) => (
                                                 <option key={index} value={sede}>{sede}</option>
                                             ))}
                                         </select>

@@ -5,12 +5,18 @@ import { Header } from "../../components/header";
 import { Sidebaraprendiz } from "../../components/sidebaraprendiz"; // Importaciones del header y del sidebar
 import { GoSearch } from "react-icons/go";
 import { IoIosArrowDown } from "react-icons/io";
+import { useRouter } from 'next/navigation'; // Importa useRouter de next/navigation
 
 export default function AsistenciaAprendiz() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
+  };
+
+   const router = useRouter(); // Hook para redireccionar
+  const handleNext = () => {
+    router.push('/justificacionaprendiz'); // Redirige al hacer clic en "Justificar"
   };
 
   return (
@@ -48,11 +54,11 @@ export default function AsistenciaAprendiz() {
                     <div className="relative">
                       <input
                         type="search"
-                        className="font-inter font-normal h-8 block w-52 pl-10 pr-10 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300"
+                        className="font-inter font-normal h-8 block w-48 pl-2 pr-10 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300"
                         placeholder="Filtrar por"
                         onClick={toggleDropdown}
                       />
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-5">
+                      <div className="absolute inset-y-0 right-0 flex items-center ">
                         <IoIosArrowDown className="text-black mr-9 cursor-pointer" onClick={toggleDropdown} />
                       </div>
 
@@ -60,15 +66,15 @@ export default function AsistenciaAprendiz() {
                       {isDropdownOpen && (
                         <div className="absolute top-12 right-0 w-48 bg-white border border-gray-300 rounded shadow-lg z-10">
                           <ul className="text-sm">
-                            <li className="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100">
+                            <li className="font-inter flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100">
                               <span className="text-red-500 mr-2">❌</span>
                               Inasistencia
                             </li>
-                            <li className="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100">
+                            <li className="font-inter flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100">
                               <span className="text-yellow-500 mr-2">🟡</span>
                               Retardo
                             </li>
-                            <li className="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100">
+                            <li className="font-inter flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100">
                               <span className="text-blue-500 mr-2">🟦</span>
                               Justificación
                             </li>
@@ -187,10 +193,14 @@ export default function AsistenciaAprendiz() {
                       <td className="px-6 py-11 border-2 border-gray-400 relative">
                       <span className="absolute top-0 right-0 pr-2 font-inter font-semibold text-3xl">25</span>
                       </td>
+
                       <td className="px-6 py-11 border-2 border-gray-400 relative semicircle">
                       <span className="absolute top-0 right-0 pr-2 font-inter font-semibold text-3xl">26</span>
-                      <button className="absolute bottom-0 left-0 px-4 py-2 bg-custom-blue text-white text-xs w-24 ml-8 font-bold rounded">Justificar</button>
+                      <button className="absolute bottom-0 left-0 px-4 py-2 bg-custom-blue text-white text-xs w-24 ml-8 font-bold rounded"
+                      onClick={handleNext}>
+                      Justificar</button>
                       </td>
+
                       <td className="px-6 py-11 border-2 border-gray-400 relative">
                       <span className="absolute top-0 right-0 pr-2 font-inter font-semibold text-3xl">27</span>
                       </td>
