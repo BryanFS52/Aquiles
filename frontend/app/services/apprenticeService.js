@@ -1,14 +1,24 @@
 import axios from 'axios';
 
-export const createApprentice = async (apprentice) => {
+const API_URL = 'http://localhost:8081/api';
+
+export const createApprentice = async (data) => {
   try {
-    const response = await axios.post('http://localhost:8081/api/persons/create', apprentice, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    await axios.post(`${API_URL}/persons/create`, data);
+    // Agregar lógica para obtener los asistentes actualizados
+    return true;
+  } catch (error) {
+    console.error('Error creating apprentice:', error);
+    return false;
+  }
+};
+
+export const getAttendees = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/attendees`);
     return response.data;
   } catch (error) {
-    throw error;
+    console.error('Error fetching attendees:', error);
+    return [];
   }
 };
