@@ -31,8 +31,7 @@ spring:
             enable: true
 
   main:
-<<<<<<< HEAD
+
     allow-circular-references: true
-=======
-    allow-circular-references: true
->>>>>>> 8735888 (cambios en los archivos security config y EmailController)
+
+

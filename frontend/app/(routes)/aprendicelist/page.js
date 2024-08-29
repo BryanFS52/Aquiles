@@ -7,6 +7,7 @@ import { PiStudentFill } from "react-icons/pi";
 import { ImMail4 } from "react-icons/im";
 import ModalCorreo from "../../components/Modals/modalCorreo";
 import { sendEmailAbsence } from "../../services/emailService";
+import { useApprenticeContext } from "../../context/AprendizContext";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 

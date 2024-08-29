@@ -1,97 +1,109 @@
-"use client"
+"use client";
 
-import React, { useState } from "react";
-import { Sidebar } from "../../components/sidebar";
-import { Header } from "../../components/header";
-import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { createApprentice } from '../../services/apprenticeService';
 
-export default function FormularioRegistro () {
-    const [nombreAprendiz, setNombreAprendiz] = useState('');
-    const [apellidosAprendiz, setApellidosAprendiz] = useState('');
-    const [documento, setDocumento] = useState('');
+const RegisterPersonForm = () => {
+  const [nombre, setNombre] = useState('');
+  const [apellidos, setApellidos] = useState('');
+  const [documentNumber, setDocumentNumber] = useState('');
+  const [documentType, setDocumentType] = useState('CC'); // Añadido un campo para tipo de documento
 
-    const router = useRouter();
-
-    const handleNombreChange = (e) => {
-        const value = e.target.value;
-        const regex = /^[a-zA-Z\s]*$/;
-        if (regex.test(value)) {
-            setNombreAprendiz(value);
-        }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    if (!nombre || !apellidos || !documentNumber || !documentType) {
+      toast.error('Por favor, completa todos los campos.');
+      return;
+    }
+  
+    const newApprentice = { 
+      name: nombre, 
+      lastName: apellidos, // Asegúrate de que esta clave coincida con la del backend
+      documentType,
+      documentNumber
     };
+  
+    console.log('JSON to be sent:', JSON.stringify(newApprentice)); // Imprime el JSON que se va a enviar
+  
+    try {
+      await createApprentice(newApprentice);
+      toast.success('¡Persona registrada con éxito!');
+      setNombre('');
+      setApellidos('');
+      setDocumentNumber('');
+      setDocumentType('CC');
+    } catch (error) {
+      console.error('Error creating apprentice:', error);
+      toast.error('Error al registrar la persona.');
+    }
+  };
+  
 
-    const handleApellidosChange = (e) => {
-        const value = e.target.value;
-        const regex = /^[a-zA-Z\s]*$/;
-        if (regex.test(value)) {
-            setApellidosAprendiz(value);
-        }
-    };
-
-    const handleDocumentoChange = (e) => {
-        const value = e.target.value;
-        const regex = /^[0-9]*$/; 
-        if (regex.test(value)) {
-            setDocumento(value);
-        }
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (nombreAprendiz && apellidosAprendiz && documento) {
-            router.push('/asistencia');
-        } else {
-            toast.error("Por favor, completa todos los campos.");
-        }
-    };
-
-    return (
-        <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-            <Sidebar/>
-
-            <div className="xl:col-span-5">
-                <Header/>
-
-                <div className="h-[90vh] overflow-y-scroll p-6 md:p-12 w-full bg-neutral-100 space-y-5">
-                    <div className="flex flex-wrap justify-center md:justify-start gap-4 ml-16">
-                        <div className="flex flex-col w-full md:w-2/5 h-80 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 p-4 space-y-3 text-custom-blue text-xl font-medium">
-                            Agregar Aprendiz
-                            <div className="flex pt-7">
-                                <span className="font-inter font-semibold text-[#0e324d] text-sm sm:text-sm">Nombre del Aprendiz:</span>
-                                <div className="font-inter font-normal text-black sm:text-base ml-auto relative w-2/3">
-                                    <input type="text" name="nameProject" placeholder="Nombre del Aprendiz" className="w-72 rounded-lg border-gray-300 border-2 pl-3 ml-6 pr-10" value={nombreAprendiz} onChange={handleNombreChange}/>
-                                </div>
-                            </div>
-
-                            <div className="flex pt-5">
-                                <span className="font-inter font-semibold text-[#0e324d] text-sm sm:text-sm">Apellidos del Aprendiz:</span>
-                                <div className="font-inter font-normal text-black sm:text-base ml-auto relative w-2/3">
-                                    <input type="text" name="nameProject" placeholder="Apellidos del Aprendiz" className="w-72 rounded-lg border-gray-300 border-2 pl-3 ml-6 pr-10" value={apellidosAprendiz} onChange={handleApellidosChange} />
-                                </div>
-                            </div>
-
-                            <div className="flex pt-5">
-                                <span className="font-inter font-semibold text-[#0e324d] text-sm sm:text-sm">Documento:</span>
-                                <div className="font-inter font-normal text-black sm:text-base ml-auto relative w-2/3">
-                                    <input type="text" name="nameProject" placeholder="Documento" className="w-72 rounded-lg border-gray-300 border-2 pl-3 ml-6 pr-10" value={documento} onChange={handleDocumentoChange} />
-                                </div>
-                            </div>
-
-                            <div className="flex pt-5">
-                                <button
-                                    onClick={handleSubmit}
-                                    className="bg-custom-blue border-2 border-custom-blue rounded-xl text-white font-medium font-inter text-base w-44 h-8 ml-72 flex items-center justify-center cursor-pointer">
-                                    Agregar Aprendiz
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <ToastContainer />
+  return (
+    <div className="p-4 max-w-md mx-auto bg-white rounded-lg shadow-md">
+      <h2 className="text-xl font-semibold mb-4">Registrar Persona</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre</label>
+          <input
+            id="nombre"
+            type="text"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3"
+            required
+          />
         </div>
-    );
-}
+        <div>
+          <label htmlFor="apellidos" className="block text-sm font-medium text-gray-700">Apellidos</label>
+          <input
+            id="apellidos"
+            type="text"
+            value={apellidos}
+            onChange={(e) => setApellidos(e.target.value)}
+            className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="documentNumber" className="block text-sm font-medium text-gray-700">Documento</label>
+          <input
+            id="documentNumber"
+            type="text"
+            value={documentNumber}
+            onChange={(e) => setDocumentNumber(e.target.value)}
+            className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="documentType" className="block text-sm font-medium text-gray-700">Tipo de Documento</label>
+          <select
+            id="documentType"
+            value={documentType}
+            onChange={(e) => setDocumentType(e.target.value)}
+            className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3"
+            required
+          >
+            <option value="CC">Cédula de Ciudadanía</option>
+            <option value="TI">Tarjeta de Identidad</option>
+            <option value="CE">Cédula de Extranjero</option>
+            <option value="Pasaporte">Pasaporte</option>
+          </select>
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+        >
+          Registrar
+        </button>
+      </form>
+      <ToastContainer />
+    </div>
+  );
+};
+
+export default RegisterPersonForm;

@@ -15,7 +15,6 @@ export default function Attendance () {
   const [modalOpen, setModalOpen] = useState(false);
   const [nombreInstructor, setNombreInstructor] = useState('');
 
-
   const handleOpenModal = () => {
     setModalOpen(true);
   };
@@ -31,7 +30,6 @@ export default function Attendance () {
             setNombreInstructor(value);
         }
     };
-
   
   return (
 

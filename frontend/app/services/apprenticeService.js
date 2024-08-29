@@ -1,13 +1,14 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8081/api/send-notification';
-
-export const getAttendees = async () => {
+export const createApprentice = async (apprentice) => {
   try {
-    const response = await axios.get(`${API_URL}/attendees`);
+    const response = await axios.post('http://localhost:8081/api/persons/create', apprentice, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     return response.data;
   } catch (error) {
-    console.error('Error fetching attendees:', error);
     throw error;
   }
 };
