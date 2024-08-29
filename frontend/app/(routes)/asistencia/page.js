@@ -4,7 +4,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { HiLockClosed } from "react-icons/hi";
 import { PiStudentFill } from "react-icons/pi";
-import { IoMdCheckmark } from "react-icons/io";
+import { FaCheck } from "react-icons/fa";
 import { TbLetterR, TbLetterX, TbLetterJ } from "react-icons/tb";
 import { TableAttendance } from "../../components/tableAttendance";
 import ModalAsistencia from "../../components/Modals/modalAsistencia";
@@ -85,42 +85,51 @@ export default function Attendance () {
           </div>
 
           <div className="flex flex-col w-full md:w-96 h-52 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 p-4 space-y-3">
-            <span className="text-[#40b003] font-inter font-semibold text-xl sm:text-2xl text-center">Información de asistencia</span>
-            <div className="flex justify-between">
+  <span className="text-[#40b003] font-inter font-semibold text-xl sm:text-2xl text-center">Información de asistencia</span>
+  
+          {/* Sección de Asistencia e Inasistencias */}
+          <div className="flex justify-between">
+            {/* Asistencia */}
+            <div className="flex items-center space-x-4">
+              <span className="font-inter font-normal text-[#000000] sm:text-lg text-lg">Asistencia</span>
               <div className="flex items-center">
-                <span className="font-inter font-normal text-[#000000] sm:text-base text-lg">Asistencia</span>
-                <div className="relative ml-4">
-                  <input className="rounded-md border-gray-200 border-2 pl-8 w-5 h-5" />
-                  <IoMdCheckmark className="absolute top-1/2 transform -translate-y-1/2 left-2 text-green-500 w-4 h-4" />
-                </div>
-              </div>
-
-              <div className="flex items-center">
-                <span className="font-inter font-normal text-[#000000] sm:text-base text-lg">Inasistencias</span>
-                <div className="relative ml-4">
-                  <input className="rounded-md border-gray-200 border-2 pl-8 w-5 h-5" />
-                  <TbLetterX className="absolute top-1/2 transform -translate-y-1/2 left-2 text-red-500 w-4 h-4" />
-                </div>
+                <input className="rounded-md border-gray-300 border-2 w-7 h-6" />
+                <FaCheck className="ml-[-23px] text-green-500 w-5 h-5 pointer-events-none" style={{ strokeWidth: 4 }} />
               </div>
             </div>
 
-            <div className="flex justify-between">
+            {/* Inasistencias */}
+            <div className="flex items-center space-x-4">
+              <span className="font-inter font-normal text-[#000000] sm:text-lg text-lg">Inasistencias</span>
               <div className="flex items-center">
-                <span className="font-inter font-normal text-[#000000] sm:text-base text-lg">Retardo</span>
-                <div className="relative ml-4">
-                  <input className="rounded-md border-gray-200 border-2 pl-8 w-5 h-5" />
-                  <TbLetterR className="absolute top-1/2 transform -translate-y-1/2 left-2 text-yellow-500 w-4 h-4" />
-                </div>
-              </div>
-
-              <div className="flex items-center">
-                <span className="font-inter font-normal text-[#000000] sm:text-base text-lg">Justificación</span>
-                <div className="relative ml-4">
-                  <input className="rounded-md border-gray-200 border-2 pl-8 w-5 h-5" />
-                  <TbLetterJ className="absolute top-1/2 transform -translate-y-1/2 left-2 text-blue-500 w-4 h-4" />
-                </div>
+                <input className="rounded-md border-gray-300 border-2 w-7 h-6" />
+                <TbLetterX className="ml-[-23px] text-red-500 w-5 h-5 pointer-events-none" style={{ strokeWidth: 4 }} />
               </div>
             </div>
+          </div>
+
+          {/* Sección de Retardo y Justificación */}
+          <div className="flex justify-between">
+            {/* Retardo */}
+            <div className="flex items-center space-x-4">
+              <span className="font-inter font-normal text-[#000000] sm:text-lg text-lg">Retardo</span>
+              <div className="flex items-center">
+                <input className="rounded-md border-gray-300 border-2 w-7 h-6" />
+                <TbLetterR className="ml-[-23px] text-yellow-500 w-5 h-5 pointer-events-none" style={{ strokeWidth: 4 }} />
+              </div>
+            </div>
+
+            {/* Justificación */}
+            <div className="flex items-center space-x-6">
+              <span className="font-inter font-normal text-[#000000] sm:text-lg text-lg">Justificación</span>
+              <div className="flex items-center">
+                <input className="rounded-md border-gray-300 border-2 w-7 h-6" />
+                <TbLetterJ className="ml-[-24px] text-blue-500 w-5 h-5 pointer-events-none" style={{ strokeWidth: 4 }} />
+              </div>
+            </div>
+          </div>
+
+
 
            
             <ModalAsistencia isOpen={modalOpen} onClose={handleCloseModal} />
