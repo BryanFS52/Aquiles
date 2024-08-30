@@ -5,19 +5,29 @@ import { BsQrCode } from "react-icons/bs";
 import { FaEye } from "react-icons/fa";
 import ModalInfoficha from "../components/Modals/modalInfoficha";
 import ModalQR from "../components/Modals/modalQR";
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
 const TablaApprentices = () => {
   const [apprentices, setApprentices] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalQROpen, setModalQROpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedWeek, setSelectedWeek] = useState(1);
+
   useEffect(() => {
     // Llamada al servicio para obtener todos los aprendices
     const fetchApprentices = async () => {
       try {
         const apprenticesData = await getAllApprentices();
-        setApprentices(apprenticesData);
+        // Agregar estructura de semanas y días a los datos obtenidos
+        const updatedApprentices = apprenticesData.map(apprentice => ({
+          ...apprentice,
+          weeks: Array(4).fill(null).map(() => Array(7).fill('A')), // Inicializa la asistencia
+        }));
+        setApprentices(updatedApprentices);
       } catch (error) {
         console.error('Error al obtener la lista de aprendices:', error);
       }
@@ -25,6 +35,16 @@ const TablaApprentices = () => {
 
     fetchApprentices();
   }, []);
+
+  const toggleAttendance = (index, day, weekIndex) => {
+    const updatedApprentices = [...apprentices];
+    const currentStatus = updatedApprentices[index].weeks[weekIndex][day];
+    updatedApprentices[index].weeks[weekIndex][day] =
+      currentStatus === '✓' ? 'R' :
+      (currentStatus === 'R' ? 'J' :
+      (currentStatus === 'J' ? 'X' : '✓'));
+    setApprentices(updatedApprentices);
+  };
 
   const handleOpenModal = () => {
     setModalOpen(true);
@@ -46,9 +66,19 @@ const TablaApprentices = () => {
     setSearchTerm(e.target.value);
   };
 
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    const weekNumber = Math.floor(date.getDate() / 7) + 1;
+    setSelectedWeek(weekNumber);
+  };
+
   const filteredApprentices = apprentices.filter((apprentice) =>
     apprentice.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleCalendarToggle = () => {
+    setCalendarOpen(!calendarOpen);
+  };
 
   return (
     <div className="w-11/12 h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ml-10 mt-10">
@@ -68,6 +98,25 @@ const TablaApprentices = () => {
           </div>
         </form>
 
+        <div className="relative ml-6">
+          <button
+            onClick={handleCalendarToggle}
+            className="h-7 w-52 pl-2 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300 flex items-center"
+          >
+            <GoSearch className="text-gray-400" />
+            <span className="mr-2 text-gray-400">Filtrar por semana:</span>
+          </button>
+          {calendarOpen && (
+            <div className="absolute z-50 mt-2 p-2 border border-gray-300 bg-white rounded-lg shadow-lg">
+              <Calendar
+                onChange={handleDateChange}
+                value={selectedDate}
+                className="bg-gray-100"
+              />
+            </div>
+          )}
+        </div>
+        
         <div className="mr-7 ml-auto flex space-x-4">
           <button
             type="button"
@@ -93,39 +142,76 @@ const TablaApprentices = () => {
         </div>
       </div>
 
-      {/* Tabla de lista de aprendices */}
+      {/* Tabla de lista de asistencia */}
       <div className="container mx-auto">
         <div className="overflow-x-auto mt-4 bg-gray-100 mb-5">
           <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-auto">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-10 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300">
+                <th className="px-10 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300"></th>
+                <th className="px-28 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300"></th>
+                {[...Array(4)].map((_, weekIndex) => (
+                  <th
+                    key={weekIndex}
+                    colSpan={7}
+                    className="px-2 py-3 text-center text-xs font-semibold font-inter text-black uppercase tracking-wider border-2 border-gray-300"
+                  >
+                    Semana {weekIndex + 1}
+                  </th>
+                ))}
+              </tr>
+              <tr>
+                <th className="px-10 py-3 text-left text-xs text-gray-700 uppercase tracking-wider border-2 border-gray-300 font-inter font-semibold">
                   Número de Documento
                 </th>
-                <th className="px-6 py-3 text-xs text-center text-gray-700 uppercase tracking-wider border-2 border-gray-300">
+                <th className="px-6 py-3 text-xs text-center text-gray-700 uppercase tracking-wider border-2 border-gray-300 font-inter font-semibold">
                   Nombre y Apellido
                 </th>
+                {[...Array(28)].map((_, dayIndex) => (
+                  <th
+                    key={dayIndex}
+                    className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700"
+                  >
+                    {["L", "M", "M", "J", "V", "S", "D"][dayIndex % 7]}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-300">
-              {filteredApprentices.length > 0 ? (
-                filteredApprentices.map((apprentice) => (
-                  <tr key={apprentice.documentNumber}>
-                    <td className="px-4 py-3 border-2 border-gray-300 text-sm">
-                      {apprentice.documentNumber}
-                    </td>
-                    <td className="px-2 border-2 border-gray-300 text-sm">
-                      {apprentice.name} {apprentice.lastName || ''}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="2" className="text-center py-4">
-                    No hay aprendices registrados.
+              {filteredApprentices.map((apprentice, index) => (
+                <tr key={apprentice.documentNumber}>
+                  <td className="px-4 py-3 border-2 border-gray-300 text-sm">
+                    {apprentice.documentNumber}
                   </td>
+                  <td className="px-4 py-3 border-2 border-gray-300 text-sm">
+                    {apprentice.name}
+                  </td>
+                  {[...Array(4)].map((_, weekIndex) => (
+                    <React.Fragment key={weekIndex}>
+                      {[...Array(7)].map((_, dayIndex) => (
+                        <td
+                          key={dayIndex}
+                          onClick={() => toggleAttendance(index, dayIndex, weekIndex)}
+                          className={`px-2 py-2 text-center cursor-pointer ${
+                            apprentice.weeks[weekIndex][dayIndex] === 'R'
+                              ? 'bg-yellow-300 text-yellow-800 font-bold'
+                              : apprentice.weeks[weekIndex][dayIndex] === 'J'
+                              ? 'bg-blue-300 text-blue-800 font-bold'
+                              : apprentice.weeks[weekIndex][dayIndex] === 'X'
+                              ? 'bg-red-300 text-red-800 font-bold'
+                              : apprentice.weeks[weekIndex][dayIndex] === '✓'
+                              ? 'bg-green-100 text-green-800 font-bold text-xl' 
+                              : 'bg-gray-200 text-gray-600'
+
+                          } border-2 border-gray-300`}
+                        >
+                          {apprentice.weeks[weekIndex][dayIndex]}
+                        </td>
+                      ))}
+                    </React.Fragment>
+                  ))}
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
         </div>
