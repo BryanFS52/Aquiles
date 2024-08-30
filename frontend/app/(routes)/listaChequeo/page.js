@@ -1,12 +1,22 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef } from "react";
 import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
 import { downloadReportPDF } from "../../services/PDFService";
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "../../components/sidebar";
 import { IoIosArrowDown } from "react-icons/io";
 
 export default function ListaChequeo() {
+    // Opciones para los select 
+    const [sede, setSede] = useState (["Centro de Servicios Financieros", "Salitre Sena"]);
+    const [jornada, setJornada] = useState (["Mañana", "Tarde", "Noche", "Madrugada", "Fin de Semana"]);
+    const [trimestre, setTrimestre] = useState (["Trimestre 1", "Trimestre 2", "Trimestre 3", "Trimestre 4", "Trimestre 5", "Trimestre 6", "Trimestre 7"]);
+    const [team, setTeam] = useState (["Team 1", "Team 2", "Team 3"]);
+    const [pilar, setPilar] = useState (["Componente Técnico", "Componente Humanístico", "Componente Comunicación", "Componente Emprendimiento", "Componente Inglés"]);
+
+     // Refs para inputs de archivos
+  const fileInputRefPrev = useRef(null);
+  const fileInputRefNew = useRef(null);
 
     const handleDownloadPDF = async () => {
         try {
@@ -28,13 +38,25 @@ export default function ListaChequeo() {
         updatedAttendees[index].weeks[weekIndex][day] = !updatedAttendees[index].weeks[weekIndex][day];
         setAttendees(updatedAttendees);
     };
+
+        // Funciones para abrir el explorador de archivos
+    const handleUploadPrev = () => {
+        fileInputRefPrev.current.click();
+    };
+    const handleUploadNew = () => {
+        fileInputRefNew.current.click();
+    };
+
+
     
     return (
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
             <Sidebar />
             <div className="xl:col-span-5">
                 <Header />
-                <div className="text-custom-blue font-bold text-2xl ml-10 py-6 border-b-2 border-gray-400 w-full sm:w-3/5 lg:w-2/5 mb-5 lg:mb-8">Lista de Chequeo Cierre de Trimestre 3-2024</div>
+                <div className="text-custom-blue font-bold text-2xl ml-10 py-6 border-b-2 border-gray-400 w-full sm:w-3/5 lg:w-2/5 mb-5 lg:mb-8">
+                    Lista de Chequeo Cierre de Trimestre 3-2024
+                </div>
                 <div className="w-2/3 h-60 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ml-52 mt-10">
                     <div className="flex flex-col space-x-8">
                         <div className="flex space-x-8">
@@ -42,52 +64,70 @@ export default function ListaChequeo() {
                                 <div>
                                     <span className="text-custom-blue text-base font-semibold font-inter">Ficha:</span>
                                     <div className="relative inline-block ml-8">
-                                        <input type="text" className="border-2 border-gray-300 rounded-lg ml-5"/>
+                                        <input type="text" className="border-2 border-gray-300 rounded-lg ml-5 w-52"/>
                                     </div>
                                 </div>
+
                                 <div>
                                     <span className="text-custom-blue text-base font-semibold font-inter">Sede:</span>
                                     <div className="relative inline-block ml-8">
-                                        <input type="text" className="border-2 border-gray-300 rounded-lg ml-6"/>
-                                        <IoIosArrowDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer" />
+                                        <select className="border-2 border-gray-300 rounded-lg ml-5 w-52">
+                                            {sede.map((sede, index) => (
+                                                <option key={index} value={sede}>{sede}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
+
                                 <div>
                                     <span className="text-custom-blue text-base font-semibold font-inter">Jornada:</span>
                                     <div className="relative inline-block ml-8">
-                                        <input type="text" className="border-2 border-gray-300 rounded-lg"/>
-                                        <IoIosArrowDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer" />
+                                        <select className="border-2 border-gray-300 rounded-lg w-52">
+                                            {jornada.map((jornada, index) => (
+                                                <option key={index} value={jornada}>{jornada}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
+
                             </div>
                             <div className="flex flex-col items-start space-y-4">
                                 <div className="flex space-x-8"> 
                                     <div>
                                         <span className="text-custom-blue text-base font-semibold font-inter">Trimestre:</span>
                                         <div className="relative inline-block ml-3">
-                                            <input type="text" className="border-2 border-gray-300 rounded-lg ml-5"/>
-                                            <IoIosArrowDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer" />
+                                            <select className="border-2 border-gray-300 rounded-lg ml-5 w-52">
+                                                {trimestre.map((trimestre, index) => (
+                                                    <option key={index} value={trimestre}>{trimestre}</option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                                 <div>
                                     <span className="text-custom-blue text-base font-semibold font-inter">Team:</span>
                                     <div className="relative inline-block ml-10">
-                                        <input type="text" className="border-2 border-gray-300 rounded-lg ml-6"/>
-                                        <IoIosArrowDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer" />
+                                        <select className="border-2 border-gray-300 rounded-lg ml-5 w-52">
+                                            {team.map((team, index) => (
+                                                <option key={index} value={team}>{team}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
                                 <div>
-                                    <span className="text-custom-blue text-base font-semibold font-inter">Pilar :</span>
+                                    <span className="text-custom-blue text-base font-semibold font-inter">Pilar:</span>
                                     <div className="relative inline-block ml-16">
-                                        <input type="text" className="border-2 border-gray-300 rounded-lg"/>
-                                        <IoIosArrowDown className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer" />
+                                        <select className="border-2 border-gray-300 rounded-lg w-52">
+                                            {pilar.map((pilar, index) => (
+                                                <option key={index} value={pilar}>{pilar}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
                                 <div className="pt-1">
-                                <button className="bg-custom-blue text-white text-center font-bold py-2 px-4 rounded-lg mt-4 block ml-3 w-28 h-10">
-                                    Buscar
-                                </button>
+                                    <button className="bg-custom-blue text-white text-center font-bold py-2 px-4 rounded-lg mt-4 block ml-3 w-28 h-10">
+                                        Buscar
+                                    </button>
                                 </div>
                             </div>
                             
@@ -105,8 +145,8 @@ export default function ListaChequeo() {
                                     <div className="w-44 h-20 bg-white border border-gray-200 p-4 rounded-lg shadow-md mr-10">
                                         <h2 className="text-gray-700 text-sm font-bold mb-2">Indicaciones de uso:</h2>
                                         <div className="flex space-x-7">
-                                            <span className="ml-3">Si ✔️</span>
-                                            <span className="">No ❌</span>
+                                            <span className="ml-3">Si ✅</span>
+                                            <span className="ml-3">No ❌</span>
                                         </div>
                                     </div>  
                                 </div>
@@ -199,25 +239,49 @@ export default function ListaChequeo() {
             </div>
 
             <div className="flex items-start pt-10 space-x-20">
-            <div className="ml-52">
-                <span className="text-custom-blue font-semibold text-xl font-inter">Instructor Técnico Anterior</span>
-                <button type="text" className="flex mt-2 border-2 border-gray-400 bg-zinc-300 shadow-xl rounded-lg text-black text-center font-inter w-52 h-8 cursor-pointer">Firma Instructor</button>
-                <div className="pb-3 border-b-2 border-black w-72 mt-2"></div>
-            </div>
+          <div className="ml-52">
+            <span className="text-custom-blue font-semibold text-xl font-inter">Instructor Técnico Anterior</span>
+            <button
+              type="button"
+              onClick={handleUploadPrev}
+              className="flex mt-2 border-2 border-gray-400 bg-zinc-300 shadow-xl rounded-lg text-black text-center font-inter w-52 h-8 cursor-pointer"
+            >
+              Firma Instructor
+            </button>
+            <input
+              type="file"
+              ref={fileInputRefPrev}
+              className="hidden"
+              onChange={(e) => console.log(e.target.files[0])} // Aquí puedes manejar el archivo subido
+            />
+            <div className="pb-3 border-b-2 border-black w-72 mt-2"></div>
+          </div>
 
-            <div>
-                <span className="text-custom-blue font-semibold text-xl font-inter">Instructor Técnico Nuevo</span>
-                <button type="text" className="flex mt-2 border-2 border-gray-400 bg-zinc-300 shadow-xl rounded-lg text-black text-center font-inter w-52 h-8 cursor-pointer">Firma Instructor</button>
-                <div className="pb-3 border-b-2 border-black w-72 mt-2"></div>
-            </div>
+          <div>
+            <span className="text-custom-blue font-semibold text-xl font-inter">Instructor Técnico Nuevo</span>
+            <button
+              type="button"
+              onClick={handleUploadNew}
+              className="flex mt-2 border-2 border-gray-400 bg-zinc-300 shadow-xl rounded-lg text-black text-center font-inter w-52 h-8 cursor-pointer"
+            >
+              Firma Instructor
+            </button>
+            <input
+              type="file"
+              ref={fileInputRefNew}
+              className="hidden"
+              onChange={(e) => console.log(e.target.files[0])} // Aquí puedes manejar el archivo subido
+            />
+            <div className="pb-3 border-b-2 border-black w-72 mt-2"></div>
+          </div>
 
-            <div className="ml-4 pt-14">
-                <button type="text" className="border-custom-blue border-2 bg-custom-blue text-center font-inter text-white text-xl w-32 h-9 shadow-xl rounded-lg">Guardar</button>
-            </div>
-            </div>
+          <div className="ml-4 pt-14">
+            <button type="button" className="border-custom-blue border-2 bg-custom-blue text-center font-inter text-white text-xl w-32 h-9 shadow-xl rounded-lg">
+              Guardar
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
-      );
-    };
-    
-    
+  );
+}

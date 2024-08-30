@@ -37,35 +37,28 @@ export const Sidebaraprendiz = () => {
 
                     <li>
                             <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <IoPersonSharp/>
+                                <IoPersonSharp className='text-2xl' />
                                 Ficha
                             </Link>
                         </li>
 
                     <li>
                             <Link href="/asistenciaAprendiz" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <BsPersonCheck />
+                                <BsPersonCheck className='text-2xl' />
                                 Asistencia
                             </Link>
                         </li>
 
                         <li>
                             <Link href="/teamScrumAprendiz" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <HiUserGroup  />
+                                <HiUserGroup className='text-2xl' />
                                 Team
-                            </Link>
-                        </li>
-
-                        <li>
-                            <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <TfiBlackboard />
-                                Proyectos
                             </Link>
                         </li>
                         
                         <li>
                             <Link href="/aprendicesView" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <PiStudentFill  />
+                                <PiStudentFill className='text-2xl' />
                                 Aprendices
                             </Link>
                         </li>

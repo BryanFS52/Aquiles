@@ -25,7 +25,7 @@ export const Sidebar = () => {
     };
 
     return (
-        <div className={`xl:h-[100vh] overflow-y-scroll fixed xl:static bg-custom-blue w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto border-r border-gray-300 h-full -left-full top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
+        <div className={`xl:h-[100vh] overflow-y-scroll fixed xl:static bg-custom-blue w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto border-r-0 border-gray-300 h-full -left-full top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
             <div>
                 {/*LOGO*/}
                 <div className="flex items-center mb-10 space-x-5">
@@ -38,7 +38,7 @@ export const Sidebar = () => {
 
 
                     <li>
-                        <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                        <Link href="/fichas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                             <IoPersonSharp className='text-2xl' />
                             Fichas
                         </Link>
@@ -66,13 +66,6 @@ export const Sidebar = () => {
                     </li>
 
                     <li>
-                        <Link href="/aprendicelist" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                            <PiStudentFill className='text-2xl' />
-                            Aprendices
-                        </Link>
-                    </li>
-
-                    <li>
                         <Link href="/listaChequeo" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                             <FaChalkboardUser className='text-2xl' />
                             Sustentaciones
@@ -80,9 +73,9 @@ export const Sidebar = () => {
                     </li>
 
                     <li>
-                        <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                            <TfiBlackboard className='text-2xl' />
-                            Proyectos
+                        <Link href="/aprendicelist" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <PiStudentFill className='text-2xl' />
+                            Aprendices
                         </Link>
                     </li>
 

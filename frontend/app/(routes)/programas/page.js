@@ -19,7 +19,7 @@ export default function Programas() {
         <Header />
 
         <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full">
-          <h1 className="text-4xl pb-3 border-b-2 border-gray-400 w-1/2 mb-12 font-serif"> Estos son los Programas</h1>
+          <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Programas</h1>
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 ml-8 py-7 ">
             <div className=" flex w-96 h-52 rounded-lg overflow-hidden shadow-lg bg-zinc-200 relative mb-4 p-4 ">
               <div className=" z-50 justify-end p-4  space-y-4">
