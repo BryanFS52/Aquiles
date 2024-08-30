@@ -140,8 +140,10 @@ export default function Attendance() {
                   <div className="flex items-center space-x-4">
                     <span className="font-inter text-lg">Asistencia</span>
                     <div className="flex items-center">
-                      <input className="rounded-md border-gray-300 border-2 w-7 h-6" />
-                      <FaCheck className="ml-[-23px] text-green-500 w-5 h-5 pointer-events-none" />
+                      <input className="rounded-md border-gray-300 border-2 w-7 h-6" 
+                      readOnly
+                      />
+                      <FaCheck className="ml-[-23px] text-green-500 w-5 h-5 pointer-events-none" strokeWidth={4} />
                     </div>
                   </div>
 
@@ -149,8 +151,10 @@ export default function Attendance() {
                   <div className="flex items-center space-x-4">
                     <span className="font-inter text-lg">Inasistencias</span>
                     <div className="flex items-center">
-                      <input className="rounded-md border-gray-300 border-2 w-7 h-6" />
-                      <TbLetterX className="ml-[-23px] text-red-500 w-5 h-5 pointer-events-none" />
+                      <input className="rounded-md border-gray-300 border-2 w-7 h-6" 
+                      readOnly
+                      />
+                      <TbLetterX className="ml-[-23px] text-red-500 w-5 h-5 pointer-events-none" strokeWidth={4} />
                     </div>
                   </div>
                 </div>
@@ -161,8 +165,10 @@ export default function Attendance() {
                   <div className="flex items-center space-x-4">
                     <span className="font-inter text-lg">Retardo</span>
                     <div className="flex items-center">
-                      <input className="rounded-md border-gray-300 border-2 w-7 h-6" />
-                      <TbLetterR className="ml-[-23px] text-yellow-500 w-5 h-5 pointer-events-none" />
+                      <input className="rounded-md border-gray-300 border-2 w-7 h-6" 
+                      readOnly
+                      />
+                      <TbLetterR className="ml-[-23px] text-yellow-500 w-5 h-5 pointer-events-none" strokeWidth={4} />
                     </div>
                   </div>
 
@@ -170,8 +176,10 @@ export default function Attendance() {
                   <div className="flex items-center space-x-6">
                     <span className="font-inter text-lg">Justificación</span>
                     <div className="flex items-center">
-                      <input className="rounded-md border-gray-300 border-2 w-7 h-6" />
-                      <TbLetterJ className="ml-[-24px] text-blue-500 w-5 h-5 pointer-events-none" />
+                      <input className="rounded-md border-gray-300 border-2 w-7 h-6" 
+                      readOnly
+                      />
+                      <TbLetterJ className="ml-[-24px] text-blue-500 w-5 h-5 pointer-events-none" strokeWidth={4} />
                     </div>
                   </div>
                 </div>
