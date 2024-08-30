@@ -35,9 +35,9 @@ export default function Attendance () {
   return (
 
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-              <Sidebar/>
-            <div className="xl:col-span-5">
-                <Header />
+      <Sidebar/>
+    <div className="xl:col-span-5">
+      <Header />
     
     <div>
       <div className="h-[90vh] overflow-y-scroll p-6 md:p-12 w-full bg-neutral-100 space-y-5">
@@ -74,10 +74,7 @@ export default function Attendance () {
               </div>
             </div>
             
-            <button
-              type="button"
-              className="mr-1 ml-auto text-white rounded-lg text-sm bg-custom-blue hover:bg-custom-blue w-32 h-10 mt-4"
-              onClick={handleOpenModal}>
+            <button type="button"className="mr-1 ml-auto text-white rounded-lg text-sm bg-custom-blue hover:bg-custom-blue w-32 h-10 mt-4" onClick={handleOpenModal}>
               Guardar
             </button>
 
@@ -129,7 +126,6 @@ export default function Attendance () {
                 </div>
               </div>
             </div>
-
            
             <ModalAsistencia isOpen={modalOpen} onClose={handleCloseModal} />
           </div>

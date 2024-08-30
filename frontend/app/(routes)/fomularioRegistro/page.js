@@ -59,42 +59,18 @@ const RegisterPersonForm = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombres del Aprendiz</label>
-                <input 
-                  id="nombre" 
-                  type="text" 
-                  value={nombre} 
-                  onChange={(e) => setNombre(e.target.value)} 
-                  className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" 
-                  required 
-                />
+                <input id="nombre" type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" required />
               </div>
               <div>
                 <label htmlFor="apellidos" className="block text-sm font-medium text-gray-700">Apellidos del Aprendiz:</label>
-                <input 
-                  id="apellidos" 
-                  type="text" 
-                  value={apellidos} 
-                  onChange={(e) => setApellidos(e.target.value)} 
-                  className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" 
-                  required 
-                />
+                <input id="apellidos" type="text" value={apellidos} onChange={(e) => setApellidos(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" required />
               </div>
               <div>
                 <label htmlFor="documentNumber" className="block text-sm font-medium text-gray-700">Documento</label>
-                <input 
-                  id="documentNumber" 
-                  type="text" 
-                  value={documentNumber} 
-                  onChange={(e) => setDocumentNumber(e.target.value)} 
-                  className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" 
-                  required 
-                />
+                <input id="documentNumber" type="text" value={documentNumber} onChange={(e) => setDocumentNumber(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" required />
               </div>
 
-              <button 
-                type="submit" 
-                className="w-full bg-custom-blue text-white py-2 px-4 rounded-lg"
-              >
+              <button type="submit" className="w-full bg-custom-blue text-white py-2 px-4 rounded-lg">
                 Agregar Aprendiz
               </button>
             </form>
@@ -105,5 +81,4 @@ const RegisterPersonForm = () => {
     </div>
   );
 };
-
 export default RegisterPersonForm;
