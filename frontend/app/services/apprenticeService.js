@@ -5,7 +5,6 @@ const API_URL = 'http://localhost:8081/api';
 export const createApprentice = async (data) => {
   try {
     await axios.post(`${API_URL}/persons/create`, data);
-    // Agregar lógica para obtener los asistentes actualizados
     return true;
   } catch (error) {
     console.error('Error creating apprentice:', error);

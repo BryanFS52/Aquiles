@@ -6,10 +6,11 @@ import { HiLockClosed } from "react-icons/hi";
 import { PiStudentFill } from "react-icons/pi";
 import { IoMdCheckmark } from "react-icons/io";
 import { TbLetterR, TbLetterX, TbLetterJ } from "react-icons/tb";
-import { TableAttendance } from "../../components/tableAttendance";
+import TableAttendance from "../../components/tableAttendance";
 import ModalAsistencia from "../../components/Modals/modalAsistencia";
 import { Header } from "../../components/header";
 import { Sidebar } from "../../components/sidebar";
+
 
 export default function Attendance () {
   const [modalOpen, setModalOpen] = useState(false);
