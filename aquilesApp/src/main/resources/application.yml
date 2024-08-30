@@ -31,4 +31,7 @@ spring:
             enable: true
 
   main:
+
     allow-circular-references: true
+
+

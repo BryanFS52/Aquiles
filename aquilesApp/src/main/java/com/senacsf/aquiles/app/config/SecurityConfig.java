@@ -18,13 +18,18 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF para desarrollo
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .anyRequest().permitAll() // Permitir todas las solicitudes sin autenticación
+                                .requestMatchers("/api/send-notification").permitAll() // Permitir acceso sin autenticación a este endpoint
+                                .requestMatchers("/api/teams-scrum/all").permitAll()
+                                .requestMatchers("/api/teams-scrum/create").permitAll()
+                                .requestMatchers("/api/teams-scrum/update").permitAll()
+                                .requestMatchers("/api/teams-scrum/delete/{id}").permitAll()
+                                .anyRequest().authenticated() // Requerir autenticación para cualquier otra solicitud
                 );
         return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Proporciona una implementación de codificación de contraseñas basada en BCrypt
+        return new BCryptPasswordEncoder(); // Codificación de contraseñas con BCrypt
     }
 }

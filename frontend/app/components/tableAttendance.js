@@ -1,46 +1,58 @@
-"use client";
-
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { getAllApprentices } from "../services/apprenticeService";
 import { GoSearch } from "react-icons/go";
 import { BsQrCode } from "react-icons/bs";
 import { FaEye } from "react-icons/fa";
 import ModalInfoficha from "../components/Modals/modalInfoficha";
 import ModalQR from "../components/Modals/modalQR";
-import Calendar from 'react-calendar'; // Importar Calendar
-import 'react-calendar/dist/Calendar.css'; // Importar CSS
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
-export const TableAttendance = () => {
+const TablaApprentices = () => {
+  const [apprentices, setApprentices] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalQROpen, setModalQROpen] = useState(false);
-  const [calendarOpen, setCalendarOpen] = useState(false); // Estado para manejar el calendario emergente
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [attendees, setAttendees] = useState([
-    { id: "10078459687", name: "Michael Felipe Laiton Chaparro", weeks: Array(4).fill(null).map(() => Array(7).fill('A')) },
-    { id: "10078459688", name: "Juan Pérez Gonzalez", weeks: Array(4).fill(null).map(() => Array(7).fill('A')) },
-    { id: "10078459689", name: "Jhon Mario Lozano Zapata", weeks: Array(4).fill(null).map(() => Array(7).fill('A')) },
-    
-    // Más asistentes aquí
-  ]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedWeek, setSelectedWeek] = useState(1);
 
+  useEffect(() => {
+    // Llamada al servicio para obtener todos los aprendices
+    const fetchApprentices = async () => {
+      try {
+        const apprenticesData = await getAllApprentices();
+        // Agregar estructura de semanas y días a los datos obtenidos
+        const updatedApprentices = apprenticesData.map(apprentice => ({
+          ...apprentice,
+          weeks: Array(4).fill(null).map(() => Array(7).fill('A')), // Inicializa la asistencia
+        }));
+        setApprentices(updatedApprentices);
+      } catch (error) {
+        console.error('Error al obtener la lista de aprendices:', error);
+      }
+    };
+
+    fetchApprentices();
+  }, []);
+
   const toggleAttendance = (index, day, weekIndex) => {
-    const updatedAttendees = [...attendees];
-    const currentStatus = updatedAttendees[index].weeks[weekIndex][day];
-    updatedAttendees[index].weeks[weekIndex][day] =
-      currentStatus === 'A' ? 'R' :
+    const updatedApprentices = [...apprentices];
+    const currentStatus = updatedApprentices[index].weeks[weekIndex][day];
+    updatedApprentices[index].weeks[weekIndex][day] =
+      currentStatus === '✓' ? 'R' :
       (currentStatus === 'R' ? 'J' :
-      (currentStatus === 'J' ? 'X' : 'A'));
-    setAttendees(updatedAttendees);
+      (currentStatus === 'J' ? 'X' : '✓'));
+    setApprentices(updatedApprentices);
   };
 
-  /*  const handleOpenModal = () => {
+  const handleOpenModal = () => {
     setModalOpen(true);
-  }; */
+  };
 
-  /* const handleCloseModal = () => {
+  const handleCloseModal = () => {
     setModalOpen(false);
-  }; */
+  };
 
   const handleOpenQRModal = () => {
     setModalQROpen(true);
@@ -60,8 +72,8 @@ export const TableAttendance = () => {
     setSelectedWeek(weekNumber);
   };
 
-  const filteredAttendees = attendees.filter((attendee) =>
-    attendee.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredApprentices = apprentices.filter((apprentice) =>
+    apprentice.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleCalendarToggle = () => {
@@ -116,6 +128,18 @@ export const TableAttendance = () => {
           </button>
           <ModalQR isOpen={modalQROpen} onClose={handleCloseQRModal} />
         </div>
+
+        <div className="mr-10">
+          <button
+            type="button"
+            className="text-white font-inter font-normal h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
+            onClick={handleOpenModal}
+          >
+            Ver información de la ficha
+            <FaEye className="w-5 h-5 ml-2" />
+          </button>
+          <ModalInfoficha isOpen={modalOpen} onClose={handleCloseModal} />
+        </div>
       </div>
 
       {/* Tabla de lista de asistencia */}
@@ -154,45 +178,38 @@ export const TableAttendance = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-300">
-              {filteredAttendees.map((attendee, index) => (
-                <tr key={attendee.id}>
+              {filteredApprentices.map((apprentice, index) => (
+                <tr key={apprentice.documentNumber}>
                   <td className="px-4 py-3 border-2 border-gray-300 text-sm">
-                    {attendee.id}
+                    {apprentice.documentNumber}
                   </td>
-                  <td className="px-2 border-2 border-gray-300 text-sm">
-                    {attendee.name}
+                  <td className="px-4 py-3 border-2 border-gray-300 text-sm">
+                    {apprentice.name}
                   </td>
-                  {attendee.weeks.map((week, weekIndex) =>
-                    week.map((status, dayIndex) => (
-                      <td
-                        key={`${weekIndex}-${dayIndex}`}
-                        className={`px-4 py-3 border-2 border-gray-300 text-sm ${
-                          status === 'R'
-                            ? 'bg-yellow-300 text-yellow-800'
-                            : status === 'J'
-                            ? 'bg-blue-300 text-blue-800'
-                            : status === 'X'
-                            ? 'bg-red-300 text-red-800'
-                            : 'bg-green-100 text-green-800'
-                        }`}
-                        onClick={() => toggleAttendance(index, dayIndex, weekIndex)}
-                      >
-                        <span
-                          className={
-                            status === 'R'
-                              ? "font-bold"
-                              : status === 'J'
-                              ? "font-bold"
-                              : status === 'X'
-                              ? "font-bold"
-                              : "font-bold"
-                          }
+                  {[...Array(4)].map((_, weekIndex) => (
+                    <React.Fragment key={weekIndex}>
+                      {[...Array(7)].map((_, dayIndex) => (
+                        <td
+                          key={dayIndex}
+                          onClick={() => toggleAttendance(index, dayIndex, weekIndex)}
+                          className={`px-2 py-2 text-center cursor-pointer ${
+                            apprentice.weeks[weekIndex][dayIndex] === 'R'
+                              ? 'bg-yellow-300 text-yellow-800 font-bold'
+                              : apprentice.weeks[weekIndex][dayIndex] === 'J'
+                              ? 'bg-blue-300 text-blue-800 font-bold'
+                              : apprentice.weeks[weekIndex][dayIndex] === 'X'
+                              ? 'bg-red-300 text-red-800 font-bold'
+                              : apprentice.weeks[weekIndex][dayIndex] === '✓'
+                              ? 'bg-green-100 text-green-800 font-bold text-xl' 
+                              : 'bg-gray-200 text-gray-600'
+
+                          } border-2 border-gray-300`}
                         >
-                          {status === 'R' ? "R" : status === 'J' ? "J" : status === 'X' ? "X" : "✓"}
-                        </span>
-                      </td>
-                    ))
-                  )}
+                          {apprentice.weeks[weekIndex][dayIndex]}
+                        </td>
+                      ))}
+                    </React.Fragment>
+                  ))}
                 </tr>
               ))}
             </tbody>
@@ -202,3 +219,5 @@ export const TableAttendance = () => {
     </div>
   );
 };
+
+export default TablaApprentices;

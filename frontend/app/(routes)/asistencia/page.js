@@ -6,14 +6,16 @@ import { HiLockClosed } from "react-icons/hi";
 import { PiStudentFill } from "react-icons/pi";
 import { FaCheck, FaEye } from "react-icons/fa";
 import { TbLetterR, TbLetterX, TbLetterJ } from "react-icons/tb";
-import { TableAttendance } from "../../components/tableAttendance";
+import TableAttendance from "../../components/tableAttendance";
 import ModalAsistencia from "../../components/Modals/modalAsistencia";
 import ModalInfoficha from "../../components/Modals/modalInfoficha";
 import { Header } from "../../components/header";
 import { Sidebar } from "../../components/sidebar";
 
-export default function Attendance() {
+
+export default function Attendance () {
   const [modalOpen, setModalOpen] = useState(false);
+  const [nombreInstructor, setNombreInstructor] = useState('');
 
   const handleOpenModal = () => {
     setModalOpen(true);
@@ -23,6 +25,14 @@ export default function Attendance() {
     setModalOpen(false);
   };
 
+    const handleNombreChange = (e) => {
+        const value = e.target.value;
+        const regex = /^[a-zA-Z\s]*$/;
+        if (regex.test(value)) {
+            setNombreInstructor(value);
+        }
+    };
+  
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebar />
