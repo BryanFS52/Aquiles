@@ -1,11 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import React, { useState } from 'react';
 import { GoSearch } from "react-icons/go";
 import { BsQrCode } from "react-icons/bs";
 import { FaEye } from "react-icons/fa";
-import { IoMdExit } from "react-icons/io";
 import ModalInfoficha from "../components/Modals/modalInfoficha";
 import ModalQR from "../components/Modals/modalQR";
 import Calendar from 'react-calendar'; // Importar Calendar
@@ -20,6 +18,7 @@ export const TableAttendance = () => {
     { id: "10078459687", name: "Michael Felipe Laiton Chaparro", weeks: Array(4).fill(null).map(() => Array(7).fill('A')) },
     { id: "10078459688", name: "Juan Pérez Gonzalez", weeks: Array(4).fill(null).map(() => Array(7).fill('A')) },
     { id: "10078459689", name: "Jhon Mario Lozano Zapata", weeks: Array(4).fill(null).map(() => Array(7).fill('A')) },
+    
     // Más asistentes aquí
   ]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,13 +34,13 @@ export const TableAttendance = () => {
     setAttendees(updatedAttendees);
   };
 
-  const handleOpenModal = () => {
+  /*  const handleOpenModal = () => {
     setModalOpen(true);
-  };
+  }; */
 
-  const handleCloseModal = () => {
+  /* const handleCloseModal = () => {
     setModalOpen(false);
-  };
+  }; */
 
   const handleOpenQRModal = () => {
     setModalQROpen(true);
@@ -116,18 +115,6 @@ export const TableAttendance = () => {
             <BsQrCode className="w-4 h-4 ml-3" />
           </button>
           <ModalQR isOpen={modalQROpen} onClose={handleCloseQRModal} />
-        </div>
-
-        <div className="mr-10">
-          <button
-            type="button"
-            className="text-white font-inter font-normal h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
-            onClick={handleOpenModal}
-          >
-            Ver información de la ficha
-            <FaEye className="w-5 h-5 ml-2" />
-          </button>
-          <ModalInfoficha isOpen={modalOpen} onClose={handleCloseModal} />
         </div>
       </div>
 

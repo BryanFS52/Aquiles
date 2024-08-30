@@ -90,7 +90,7 @@ export const Header = () => {
   };
 
   return (
-    <header className='h-[7vh] md:h-[9vh] mx-auto flex items-center justify-end px-5 lg:py-5 lg:px-4  border-[#ffffff] bg-slate-100'>
+    <header className='h-[7vh] md:h-[9vh] mx-auto flex items-center justify-end px-5 lg:py-5 lg:px-4  border-[#ffffff] bg-slate-200'>
       <div className="relative">
         <ul>
           <li
