@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class AttendancesBusiness {
@@ -63,4 +65,18 @@ public class AttendancesBusiness {
         }
     }
 
+    public Map<String, Long> getAttendanceSummary(Long trainer_id) {
+        try {
+            long presentCount = attendancesService.countPresentByTrainerId(trainer_id);
+            long absentCount = attendancesService.countAbsentByTrainerId(trainer_id);
+
+            Map<String, Long> summary = new HashMap<>();
+            summary.put("present", presentCount);
+            summary.put("absent", absentCount);
+
+            return summary;
+        } catch (Exception e) {
+            throw new CustomException("Error getting attendance summary");
+        }
+    }
 }

@@ -21,8 +21,8 @@ public class Trainers implements Serializable {
     @Column(name = "trainer_id", nullable = false)
     private Long trainer_id;
 
-    @Column(name = "triner_state", nullable = false)
-    private Boolean triner_state;
+    @Column(name = "trainer_state", nullable = false)
+    private Boolean trainer_state;
 
     @Column(name = "id_person", nullable = false)
     private Long id_person;
