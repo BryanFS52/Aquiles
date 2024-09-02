@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/attendances")
@@ -65,5 +66,10 @@ public class AttendancesController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-//probando commit para merge
+    //probando commit para merge
+    @GetMapping("/summary/{trainerId}")
+    public ResponseEntity<Map<String, Long>> getAttendanceSummary(@PathVariable Long trainer_id) {
+        Map<String, Long> summary = attendancesBusiness.getAttendanceSummary(trainer_id);
+        return ResponseEntity.ok(summary);
+    }
 }

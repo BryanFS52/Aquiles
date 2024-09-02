@@ -15,22 +15,38 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF para desarrollo
+                .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF solo para desarrollo
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/send-notification").permitAll() // Permitir acceso sin autenticación a este endpoint
-                                .requestMatchers("/api/teams-scrum/all").permitAll()
-                                .requestMatchers("/api/teams-scrum/create").permitAll()
-                                .requestMatchers("/api/teams-scrum/update").permitAll()
-                                .requestMatchers("/api/teams-scrum/delete/{id}").permitAll()
-                                .requestMatchers("/api/attendances/generateQRCode").permitAll() // Qr con Endpoint para la Asistencia
-                                .anyRequest().authenticated() // Requerir autenticación para cualquier otra solicitud
+                                // Permitir acceso sin autenticación a los endpoints específicos
+                                .requestMatchers("/api/teams-scrum/**").permitAll()
+                                .requestMatchers("/api/send-notification").permitAll()
+                                .requestMatchers("/api/2fa/**").permitAll()
+                                .requestMatchers("/api/pdf/**").permitAll()
+                                .requestMatchers("/api/attendances/**").permitAll()
+                                .requestMatchers("/api/excel/**").permitAll()
+                                .requestMatchers("/api/projects/**").permitAll()
+                                .requestMatchers("/api/students/**").permitAll()
+                                .requestMatchers("/api/trainers/**").permitAll()
+                                // Solo instructores pueden acceder a los endpoints de asistencia
+                                .requestMatchers("/attendance/**").hasRole("Trainer")
+                                // Cualquier otra solicitud requiere autenticación
+                                .anyRequest().authenticated()
+                )
+                .formLogin(form ->
+                        form
+                                .loginPage("/login") // Personaliza la página de inicio de sesión
+                                .permitAll()
+                )
+                .logout(logout ->
+                        logout.permitAll()
                 );
+
         return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Codificación de contraseñas con BCrypt
+        return new BCryptPasswordEncoder(); // Codificador de contraseñas BCrypt
     }
 }

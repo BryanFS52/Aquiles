@@ -10,7 +10,7 @@ import java.math.BigInteger;
 @AllArgsConstructor
 public class TrainersDto {
     private Long trainer_id;
-    private Boolean triner_state;
+    private Boolean trainer_state;
     private Long id_person;
     private BigInteger document_number;
 }
