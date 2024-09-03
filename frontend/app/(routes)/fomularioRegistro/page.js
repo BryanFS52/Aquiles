@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import { useRouter } from 'next/navigation'; // Importamos useRouter para redirección
+import { useRouter } from 'next/navigation'; 
 import { Header } from '../../components/header';
 import { Sidebar } from '../../components/sidebar';
 import { createApprentice } from '../../services/apprenticeService';
@@ -14,12 +14,24 @@ const RegisterPersonForm = () => {
   const [documentNumber, setDocumentNumber] = useState('');
   const router = useRouter(); 
 
+  const handleDocumentNumberChange = (e) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value) && value.length <= 10) {
+      setDocumentNumber(value);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!nombre || !apellidos || !documentNumber) {
       toast.error('Por favor, completa todos los campos.');
       return; 
+    }
+
+    if (documentNumber.length !== 10) {
+      toast.error('El número de documento debe tener 10 dígitos.');
+      return;
     }
 
     const newApprentice = { 
@@ -67,7 +79,7 @@ const RegisterPersonForm = () => {
               </div>
               <div>
                 <label htmlFor="documentNumber" className="block text-sm font-medium text-gray-700">Documento</label>
-                <input id="documentNumber" type="text" value={documentNumber} onChange={(e) => setDocumentNumber(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" required />
+                <input id="documentNumber" type="text" value={documentNumber} onChange={handleDocumentNumberChange} className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" required />
               </div>
 
               <button type="submit" className="w-full bg-custom-blue text-white py-2 px-4 rounded-lg">
@@ -81,4 +93,5 @@ const RegisterPersonForm = () => {
     </div>
   );
 };
+
 export default RegisterPersonForm;

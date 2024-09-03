@@ -18,14 +18,12 @@ const TablaApprentices = () => {
   const [selectedWeek, setSelectedWeek] = useState(1);
 
   useEffect(() => {
-    // Llamada al servicio para obtener todos los aprendices
     const fetchApprentices = async () => {
       try {
         const apprenticesData = await getAllApprentices();
-        // Agregar estructura de semanas y días a los datos obtenidos
         const updatedApprentices = apprenticesData.map(apprentice => ({
           ...apprentice,
-          weeks: Array(4).fill(null).map(() => Array(7).fill('A')), // Inicializa la asistencia
+          weeks: Array(4).fill(null).map(() => Array(7).fill('A')), 
         }));
         setApprentices(updatedApprentices);
       } catch (error) {
@@ -44,14 +42,6 @@ const TablaApprentices = () => {
       (currentStatus === 'R' ? 'J' :
       (currentStatus === 'J' ? 'X' : '✓'));
     setApprentices(updatedApprentices);
-  };
-
-  const handleOpenModal = () => {
-    setModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
   };
 
   const handleOpenQRModal = () => {
@@ -88,61 +78,31 @@ const TablaApprentices = () => {
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <GoSearch className="text-gray-400" />
             </div>
-            <input
-              type="search"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="h-7 block w-52 pl-10 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300"
-              placeholder="Buscar aprendiz:"
-            />
+            <input type="search" value={searchTerm} onChange={handleSearchChange} className="h-7 block w-52 pl-10 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300" placeholder="Buscar aprendiz:"/>
           </div>
         </form>
 
         <div className="relative ml-6">
-          <button
-            onClick={handleCalendarToggle}
-            className="h-7 w-52 pl-2 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300 flex items-center"
-          >
+          <button onClick={handleCalendarToggle} className="h-7 w-52 pl-2 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300 flex items-center">
             <GoSearch className="text-gray-400" />
             <span className="mr-2 text-gray-400">Filtrar por semana:</span>
           </button>
           {calendarOpen && (
             <div className="absolute z-50 mt-2 p-2 border border-gray-300 bg-white rounded-lg shadow-lg">
-              <Calendar
-                onChange={handleDateChange}
-                value={selectedDate}
-                className="bg-gray-100"
-              />
+              <Calendar onChange={handleDateChange} value={selectedDate} className="bg-gray-100"/>
             </div>
           )}
         </div>
         
         <div className="mr-7 ml-auto flex space-x-4">
-          <button
-            type="button"
-            className="text-white font-inter font-normal h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
-            onClick={handleOpenQRModal}
-          >
+          <button type="button" className="text-white font-inter font-normal h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0" onClick={handleOpenQRModal}>
             Toma de Asistencia
             <BsQrCode className="w-4 h-4 ml-3" />
           </button>
           <ModalQR isOpen={modalQROpen} onClose={handleCloseQRModal} />
         </div>
-
-        <div className="mr-10">
-          <button
-            type="button"
-            className="text-white font-inter font-normal h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0"
-            onClick={handleOpenModal}
-          >
-            Ver información de la ficha
-            <FaEye className="w-5 h-5 ml-2" />
-          </button>
-          <ModalInfoficha isOpen={modalOpen} onClose={handleCloseModal} />
-        </div>
       </div>
 
-      {/* Tabla de lista de asistencia */}
       <div className="container mx-auto">
         <div className="overflow-x-auto mt-4 bg-gray-100 mb-5">
           <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-auto">
@@ -184,14 +144,12 @@ const TablaApprentices = () => {
                     {apprentice.documentNumber}
                   </td>
                   <td className="px-4 py-3 border-2 border-gray-300 text-sm">
-                    {apprentice.name}
+                    {apprentice.name} {/*Muestra el nombre */} {apprentice.lastName} {/* Muestra el apellido aquí */}
                   </td>
                   {[...Array(4)].map((_, weekIndex) => (
                     <React.Fragment key={weekIndex}>
                       {[...Array(7)].map((_, dayIndex) => (
-                        <td
-                          key={dayIndex}
-                          onClick={() => toggleAttendance(index, dayIndex, weekIndex)}
+                        <td key={dayIndex} onClick={() => toggleAttendance(index, dayIndex, weekIndex)}
                           className={`px-2 py-2 text-center cursor-pointer ${
                             apprentice.weeks[weekIndex][dayIndex] === 'R'
                               ? 'bg-yellow-300 text-yellow-800 font-bold'
@@ -200,9 +158,8 @@ const TablaApprentices = () => {
                               : apprentice.weeks[weekIndex][dayIndex] === 'X'
                               ? 'bg-red-300 text-red-800 font-bold'
                               : apprentice.weeks[weekIndex][dayIndex] === '✓'
-                              ? 'bg-green-100 text-green-800 font-bold text-xl' 
+                              ? 'bg-green-100 text-green-800 font-bold text-xl'
                               : 'bg-gray-200 text-gray-600'
-
                           } border-2 border-gray-300`}
                         >
                           {apprentice.weeks[weekIndex][dayIndex]}
@@ -213,6 +170,7 @@ const TablaApprentices = () => {
                 </tr>
               ))}
             </tbody>
+
           </table>
         </div>
       </div>
