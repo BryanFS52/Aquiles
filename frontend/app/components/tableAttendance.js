@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { getAllApprentices } from "../services/apprenticeService";
 import { GoSearch } from "react-icons/go";
 import { BsQrCode } from "react-icons/bs";
-import { FaEye } from "react-icons/fa";
-import ModalInfoficha from "../components/Modals/modalInfoficha";
-import ModalQR from "../components/Modals/modalQR";
+import { IoIosArrowBack } from "react-icons/io";
+import { IoIosArrowForward } from "react-icons/io";import ModalQR from "../components/Modals/modalQR";
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 
@@ -71,21 +70,21 @@ const TablaApprentices = () => {
   };
 
   return (
-    <div className="w-11/12 h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ml-10 mt-10">
+    <div className="w-[98%] h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 mr-6 mt-10">
       <div className="flex bg-white w-full h-14 items-center">
         <form className="w-auto h-7">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <GoSearch className="text-gray-400" />
             </div>
-            <input type="search" value={searchTerm} onChange={handleSearchChange} className="h-7 block w-52 pl-10 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300" placeholder="Buscar aprendiz:"/>
+            <input type="search" value={searchTerm} onChange={handleSearchChange} className="h-7 block w-52 pl-10 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300" placeholder="Buscar"/>
           </div>
         </form>
 
         <div className="relative ml-6">
           <button onClick={handleCalendarToggle} className="h-7 w-52 pl-2 pr-4 text-sm rounded-lg dark:bg-white border-2 border-slate-300 dark:placeholder-gray-400 dark:text-black focus:outline-none focus:border-slate-300 flex items-center">
             <GoSearch className="text-gray-400" />
-            <span className="mr-2 text-gray-400">Filtrar por semana:</span>
+            <span className="mr-2 text-gray-400">Filtrar por fecha</span>
           </button>
           {calendarOpen && (
             <div className="absolute z-50 mt-2 p-2 border border-gray-300 bg-white rounded-lg shadow-lg">
@@ -96,7 +95,7 @@ const TablaApprentices = () => {
         
         <div className="mr-7 ml-auto flex space-x-4">
           <button type="button" className="text-white font-inter font-normal h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0" onClick={handleOpenQRModal}>
-            Toma de Asistencia
+            Generar QR
             <BsQrCode className="w-4 h-4 ml-3" />
           </button>
           <ModalQR isOpen={modalQROpen} onClose={handleCloseQRModal} />
@@ -170,8 +169,33 @@ const TablaApprentices = () => {
                 </tr>
               ))}
             </tbody>
-
           </table>
+          <div className="flex items-center space-x-4 pt-3">
+          <button>
+            <IoIosArrowBack className="text-gray-700 w-6 h-6"/>
+          </button>
+          <ul className="flex space-x-2">
+            <li>
+              <a href="#" className="flex items-center px-3 h-7 text-white bg-custom-blue hover:bg-green-600 hover:text-white rounded-md">1</a>
+            </li>
+            <li>
+              <a href="#" className="flex items-center px-3 h-7 text-white bg-custom-blue hover:bg-green-600 hover:text-white rounded-md">2</a>
+            </li>
+            <li>
+              <a href="#" className="flex items-center px-3 h-7 text-white bg-custom-blue hover:bg-green-600 hover:text-white rounded-md">3</a>
+            </li>
+            <li>
+              <a href="#" className="flex items-center px-3 h-7 text-white bg-custom-blue hover:bg-green-600 hover:text-white rounded-md">4</a>
+            </li>
+            <li>
+              <a href="#" className="flex items-center px-3 h-7 text-white bg-custom-blue hover:bg-green-600 hover:text-white rounded-md">5</a>
+            </li>
+          </ul>
+          <button>
+            <IoIosArrowForward className="text-gray-700 w-6 h-6"/>
+          </button>
+</div>
+
         </div>
       </div>
     </div>
