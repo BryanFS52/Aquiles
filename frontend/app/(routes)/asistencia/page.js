@@ -7,7 +7,6 @@ import { PiStudentFill } from "react-icons/pi";
 import { FaCheck, FaEye } from "react-icons/fa";
 import { TbLetterR, TbLetterX, TbLetterJ } from "react-icons/tb";
 import TableAttendance from "../../components/tableAttendance";
-import ModalAsistencia from "../../components/Modals/modalAsistencia";
 import ModalInfoficha from "../../components/Modals/modalInfoficha";
 import { Header } from "../../components/header";
 import { Sidebar } from "../../components/sidebar";
@@ -44,115 +43,68 @@ export default function Attendance () {
             <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">
               Lista de Asistencia
             </h1>
-
             <div className="flex flex-wrap justify-center gap-4">
-              {/* Card de información */}
-              <div className="flex flex-col w-full md:w-[45%] lg:w-[30%] h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 p-4 space-y-3">
-                <div className="flex items-center">
-                  <span className="font-inter font-semibold text-[#0e324d] text-sm sm:text-base">
-                    Institución:
-                  </span>
-                  <div className="font-inter font-normal text-black sm:text-base ml-auto relative w-2/3">
-                    <input type="text" name="nameProject" placeholder="Centro al que pertenece" className="w-full bg-neutral-300 rounded-lg border-gray-400 border-2 pl-3 pr-10"/>
-                    <HiLockClosed className="absolute top-0 right-2 h-full flex items-center" />
-                  </div>
-                </div>
-
-                <div className="flex items-center">
-                  <span className="font-inter font-semibold text-[#0e324d] text-sm sm:text-base">
-                    Instructor:
-                  </span>
-                  <div className="font-inter font-normal text-black sm:text-base ml-auto w-2/3">
-                    <input type="text" name="nameProject" placeholder="Nombre del instructor" className="w-full rounded-lg bg-white border-2 border-gray-300 pl-3"/>
-                  </div>
-                </div>
-
-                <div className="flex items-center">
-                  <span className="font-inter font-semibold text-[#0e324d] text-sm sm:text-base">
-                    Fecha:
-                  </span>
-                  <div className="font-inter font-normal text-black sm:text-base ml-auto w-2/3">
-                    <input type="date" name="nameProject" className="w-full text-gray-400 bg-white rounded-lg border-2 border-gray-300 pl-3"/>
-                  </div>
-                </div>
-
-                <div className="flex items-center">
-                  <span className="font-inter font-semibold text-[#0e324d] text-sm sm:text-base">
-                    Componente:
-                  </span>
-                  <div className="font-inter font-normal text-black sm:text-base ml-auto w-2/3">
-                    <input type="text" name="nameProject" placeholder="Asignar componente" className="w-full bg-white rounded-lg border-2 border-gray-300 pl-3"/>
-                  </div>
-                </div>
-
-                <button type="button" className="ml-auto text-white rounded-lg text-sm bg-custom-blue hover:bg-custom-blue w-32 h-10 mt-4">
-                  Guardar
-                </button>
+            <div className="flex flex-col h-36 w-[30%] rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 p-4">
+            <div className="flex flex-row items-center space-x-4">
+              <div className="flex flex-col items-center ml-5 mr-4">
+                <PiStudentFill className="w-12 h-12 text-stone-600" />
+                <span className="font-inter font-medium text-green-500 mt-1">97%</span>
               </div>
 
-              <div className="flex flex-col w-full md:w-[45%] lg:w-[24%] h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 p-4 space-y-3">
-                <PiStudentFill className="w-9 h-9 text-stone-600 mx-auto" />
-                <div className="text-center">
-                  <span className="text-[#0e324d] text-5xl font-inter font-semibold">
-                    25
-                  </span>
-                  <span className="font-inter font-medium text-lg block">
-                    Aprendices Actuales
-                  </span>
-                  <span className="font-inter font-medium text-green-500 block">
-                    97%
-                  </span>
-                </div>
-                <button type="button" className="text-white font-inter h-11 w-full rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 flex items-center justify-center" onClick={handleOpenModal}>
-                  Ver información de la ficha
-                  <FaEye className="w-5 h-5 ml-2" />
-                </button>
-                <ModalInfoficha isOpen={modalOpen} onClose={handleCloseModal} />
-              </div>
-
-              <div className="flex flex-col w-full md:w-[45%] lg:w-[26%] h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 p-4 space-y-3">
-                <span className="text-[#40b003] font-inter font-semibold text-xl sm:text-2xl text-center">
-                  Información de asistencia
-                </span>
-
-                <div className="flex justify-between">
-                  <div className="flex items-center space-x-4">
-                    <span className="font-inter text-lg">Asistencia</span>
-                    <div className="flex items-center">
-                      <input className="rounded-md border-gray-300 border-2 w-7 h-6" readOnly />
-                      <FaCheck className="ml-[-23px] text-green-500 w-5 h-5 pointer-events-none" strokeWidth={4} />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-4">
-                    <span className="font-inter text-lg">Inasistencias</span>
-                    <div className="flex items-center">
-                      <input className="rounded-md border-gray-300 border-2 w-7 h-6" readOnly /> 
-                      <TbLetterX className="ml-[-23px] text-red-500 w-5 h-5 pointer-events-none" strokeWidth={4} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-between">
-                  <div className="flex items-center space-x-4">
-                  <span className="font-inter text-lg">Retardo</span>
-                  <div className="flex items-center">
-                    <input  className="rounded-md border-gray-300 border-2 w-7 h-6" readOnly/>
-                    <TbLetterR className="ml-[-23px] text-yellow-500 w-5 h-5 pointer-events-none" strokeWidth={4} />
-                  </div>
-                </div>
-
-                  <div className="flex items-center space-x-6">
-                    <span className="font-inter text-lg">Justificación</span>
-                    <div className="flex items-center">
-                      <input className="rounded-md border-gray-300 border-2 w-7 h-6" readOnly />
-                      <TbLetterJ className="ml-[-24px] text-blue-500 w-5 h-5 pointer-events-none" strokeWidth={4} />
-                    </div>
-                  </div>
-                </div>
+              <div className="flex flex-row items-start space-x-2"> 
+                <span className="text-[#0e324d] text-5xl font-inter font-medium">25</span>
+                <span className="font-inter font-medium text-base mt-3">Aprendices Actuales</span>
               </div>
             </div>
 
+            <div className="w-full">
+              <button type="button" className="text-white font-inter h-9 w-56 ml-24 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 flex items-center justify-center" onClick={handleOpenModal} >
+                Ver información de la ficha
+                <FaEye className="w-5 h-5 ml-2" />
+              </button>
+            </div>
+
+            <ModalInfoficha isOpen={modalOpen} onClose={handleCloseModal} />
+          </div>
+              <div className="flex flex-col w-56 h-44 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 p-4 space-y-3">
+                <span className="text-[#40b003] font-inter font-semibold text-xl sm:text-xl text-center">Uso de Asistencia</span>
+
+                <div className="flex flex-col space-y-1"> 
+                <div className="flex items-center space-x-4">
+                  <span className="font-inter text-base w-28">Asistencia</span>
+                  <div className="flex items-center">
+                    <input className="rounded-md border-gray-300 border-2 w-7 h-6" readOnly />
+                    <FaCheck className="ml-[-23px] text-green-500 w-4 h-4 pointer-events-none" strokeWidth={4} />
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <span className="font-inter text-base w-28">Retardo</span>
+                  <div className="flex items-center">
+                    <input className="rounded-md border-gray-300 border-2 w-7 h-6" readOnly />
+                    <TbLetterR className="ml-[-23px] text-yellow-500 w-4 h-4 pointer-events-none" strokeWidth={4} />
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <span className="font-inter text-base w-28">Inasistencias</span>
+                  <div className="flex items-center">
+                    <input className="rounded-md border-gray-300 border-2 w-7 h-6" readOnly /> 
+                    <TbLetterX className="ml-[-23px] text-red-500 w-4 h-4 pointer-events-none" strokeWidth={4} />
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <span className="font-inter text-base w-28">Justificación</span>
+                  <div className="flex items-center">
+                    <input className="rounded-md border-gray-300 border-2 w-7 h-6" readOnly />
+                    <TbLetterJ className="ml-[-24px] text-blue-500 w-4 h-4 pointer-events-none" strokeWidth={4} />
+                  </div>
+                </div>
+                </div>
+              </div>
+            </div>
+            
             <div className="mt-6">
               <TableAttendance />
             </div>
