@@ -18,8 +18,7 @@ export default function AprendicesList() {
     const [students, setStudents] = useState([
         { documentNumber: '10078459687', fullName: 'Michael Felipe Laiton Chaparro', isPresent: true, email: 'keishlanayedcamargorojas@gmail.com', date: '2024-08-16' },
         { documentNumber: '10078459688', fullName: 'Ana María Pérez', isPresent: false, email: 'anamaria@gmail.com', date: '2024-08-16' },
-        { documentNumber: '10078459688', fullName: 'Beatris orozco', isPresent: false, email: 'anamaria@gmail.com', date: '2024-08-16' },
-        // Agrega más aprendices según sea necesario
+      
     ]);
 
     const toggleModal = (student) => {
@@ -111,12 +110,18 @@ export default function AprendicesList() {
                                             <td className={`px-4 py-2 border-2 border-gray-200 text-sm ${student.isPresent ? 'text-green-600' : 'text-red-600'} font-semibold`}>
                                                 {student.isPresent ? '✓' : 'X'}
                                             </td>
-                                            <td className="cursor-pointer" onClick={() => toggleModal({ email: student.email, studentName: student.fullName, date: student.date })}>
-                                                <ImMail4 className="w-6 h-6 ml-2" />
+                                            <td className="cursor-pointer">
+                                                {student.isPresent ? null : (
+                                                    <ImMail4
+                                                        className="w-6 h-6 ml-2"
+                                                        onClick={() => toggleModal({ email: student.email, studentName: student.fullName, date: student.date })}
+                                                    />
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
+
                             </table>
                             <div className="flex justify-end mr-12">
                                 <button type="button" className="text-white font-inter font-normal h-11 w-44 rounded-lg text-sm px-5 my-6 ml-80 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center">
