@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { getAllApprentices } from "../services/apprenticeService";
 import { GoSearch } from "react-icons/go";
 import { BsQrCode } from "react-icons/bs";
-import { IoIosArrowBack } from "react-icons/io";
-import { IoIosArrowForward } from "react-icons/io";import ModalQR from "../components/Modals/modalQR";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import ModalQR from "../components/Modals/modalQR";
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 
@@ -22,7 +22,11 @@ const TablaApprentices = () => {
         const apprenticesData = await getAllApprentices();
         const updatedApprentices = apprenticesData.map(apprentice => ({
           ...apprentice,
-          weeks: Array(4).fill(null).map(() => Array(7).fill('A')), 
+          weeks: Array(4).fill(null).map(() => 
+            Array(7).fill(null).map((_, dayIndex) => 
+              (dayIndex === 5 || dayIndex === 6) ? '' : 'A'  // Cambia 'A' por vacío para sábados y domingos
+            )
+          ),
         }));
         setApprentices(updatedApprentices);
       } catch (error) {
@@ -102,101 +106,99 @@ const TablaApprentices = () => {
         </div>
       </div>
 
-      <div className="container mx-auto">
-        <div className="overflow-x-auto mt-4 bg-gray-100 mb-5">
-          <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-auto">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-10 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300"></th>
-                <th className="px-28 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300"></th>
-                {[...Array(4)].map((_, weekIndex) => (
-                  <th
-                    key={weekIndex}
-                    colSpan={7}
-                    className="px-2 py-3 text-center text-xs font-semibold font-inter text-black uppercase tracking-wider border-2 border-gray-300"
-                  >
-                    Semana {weekIndex + 1}
-                  </th>
-                ))}
-              </tr>
-              <tr>
-                <th className="px-10 py-3 text-left text-xs text-gray-700 uppercase tracking-wider border-2 border-gray-300 font-inter font-semibold">
-                  Número de Documento
+      <div className="overflow-x-auto mt-4 bg-gray-100 mb-5">
+        <table className="min-w-full table-fixed border border-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-2 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300"></th>
+              <th className="px-2 py-3 text-left text-xs font-medium text-black uppercase tracking-wider border-2 border-gray-300"></th>
+              {[...Array(4)].map((_, weekIndex) => (
+                <th
+                  key={weekIndex}
+                  colSpan={7}
+                  className="px-2 py-3 text-center text-xs font-semibold font-inter text-black uppercase tracking-wider border-2 border-gray-300"
+                >
+                  Semana {weekIndex + 1}
                 </th>
-                <th className="px-6 py-3 text-xs text-center text-gray-700 uppercase tracking-wider border-2 border-gray-300 font-inter font-semibold">
-                  Nombre y Apellido
-                </th>
-                {[...Array(28)].map((_, dayIndex) => (
-                  <th
-                    key={dayIndex}
-                    className="px-4 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700"
-                  >
-                    {["L", "M", "M", "J", "V", "S", "D"][dayIndex % 7]}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-300">
-              {filteredApprentices.map((apprentice, index) => (
-                <tr key={apprentice.documentNumber}>
-                  <td className="px-4 py-3 border-2 border-gray-300 text-sm">
-                    {apprentice.documentNumber}
-                  </td>
-                  <td className="px-4 py-3 border-2 border-gray-300 text-sm">
-                    {apprentice.name} {/*Muestra el nombre */} {apprentice.lastName} {/* Muestra el apellido aquí */}
-                  </td>
-                  {[...Array(4)].map((_, weekIndex) => (
-                    <React.Fragment key={weekIndex}>
-                      {[...Array(7)].map((_, dayIndex) => (
-                        <td key={dayIndex} onClick={() => toggleAttendance(index, dayIndex, weekIndex)}
-                          className={`px-2 py-2 text-center cursor-pointer ${
-                            apprentice.weeks[weekIndex][dayIndex] === 'R'
-                              ? 'bg-yellow-300 text-yellow-800 font-bold'
-                              : apprentice.weeks[weekIndex][dayIndex] === 'J'
-                              ? 'bg-blue-300 text-blue-800 font-bold'
-                              : apprentice.weeks[weekIndex][dayIndex] === 'X'
-                              ? 'bg-red-300 text-red-800 font-bold'
-                              : apprentice.weeks[weekIndex][dayIndex] === '✓'
-                              ? 'bg-green-100 text-green-800 font-bold text-xl'
-                              : 'bg-gray-200 text-gray-600'
-                          } border-2 border-gray-300`}
-                        >
-                          {apprentice.weeks[weekIndex][dayIndex]}
-                        </td>
-                      ))}
-                    </React.Fragment>
-                  ))}
-                </tr>
               ))}
-            </tbody>
-          </table>
+            </tr>
+            <tr>
+              <th className="px-2 py-3 text-left text-xs text-gray-700 uppercase tracking-wider border-2 border-gray-300 font-inter font-semibold">
+                Número de Documento
+              </th>
+              <th className="px-2 py-3 text-xs text-center text-gray-700 uppercase tracking-wider border-2 border-gray-300 font-inter font-semibold">
+                Nombre y Apellido
+              </th>
+              {[...Array(28)].map((_, dayIndex) => {
+                const dayOfWeek = dayIndex % 7;
+                return (
+                  <th
+                  key={dayIndex}
+                  className={`px-2 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700 ${
+                    dayIndex === 5 || dayIndex === 6 ? 'text-gray-700' : ''
+                  }`}
+                >
+                  {["L", "M", "M", "J", "V", "S", "D"][dayIndex % 7]}
+                </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-300">
+            {filteredApprentices.map((apprentice, index) => (
+              <tr key={apprentice.documentNumber}>
+                <td className="px-2 py-2 border-2 border-gray-300 text-sm">
+                  {apprentice.documentNumber}
+                </td>
+                <td className="px-2 py-2 border-2 border-gray-300 text-sm">
+                  {apprentice.name} {apprentice.lastName}
+                </td>
+                {[...Array(4)].map((_, weekIndex) => (
+                  <React.Fragment key={weekIndex}>
+                    {[...Array(7)].map((_, dayIndex) => {
+                      const isWeekend = dayIndex === 5 || dayIndex === 6;
+                      const cellValue = apprentice.weeks[weekIndex][dayIndex];
+                      return (
+                        <td 
+                        key={dayIndex} 
+                        onClick={() => toggleAttendance(index, dayIndex, weekIndex)}
+                        className={`px-2 py-2 text-center cursor-pointer border-2 border-gray-300
+                          ${isWeekend ? 'bg-gray-200 text-white' : ''} 
+                          ${cellValue === 'R' ? 'bg-yellow-300 text-yellow-800 font-bold'
+                            : cellValue === 'J' ? 'bg-blue-300 text-blue-800 font-bold'
+                            : cellValue === 'X' ? 'bg-red-300 text-red-800 font-bold'
+                            : cellValue === '✓' ? 'bg-green-300 text-green-800 font-bold'
+                            : 'text-black'}
+                        `}
+                      >
+                        {isWeekend ? '' : cellValue}
+                      </td>
+                      );
+                    })}
+                  </React.Fragment>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-          <div className="flex items-center space-x-4 pt-3 mb-6">
-          <button >
-            <IoIosArrowBack className="text-gray-700 w-6 h-6"/>
-          </button>
-          <ul className="flex space-x-2">
-            <li>
-              <a href="#" className="flex items-center px-3 h-7 text-white bg-custom-blue hover:bg-green-600 hover:text-white rounded-md">1</a>
+      <div className="flex items-center space-x-4 pt-3 mb-1">
+        <button className="p-2 rounded-lg text-gray-500">
+          <IoIosArrowBack className="text-gray-700 w-6 h-6" />
+        </button>
+        <ul className="flex space-x-2">
+          {[1, 2, 3, 4, 5].map(page => (
+            <li key={page}>
+              <a href="#" className="flex items-center px-3 h-7 text-white bg-custom-blue hover:bg-green-600 hover:text-white rounded-md">
+                {page}
+              </a>
             </li>
-            <li>
-              <a href="#" className="flex items-center px-3 h-7 text-white bg-custom-blue hover:bg-green-600 hover:text-white rounded-md">2</a>
-            </li>
-            <li>
-              <a href="#" className="flex items-center px-3 h-7 text-white bg-custom-blue hover:bg-green-600 hover:text-white rounded-md">3</a>
-            </li>
-            <li>
-              <a href="#" className="flex items-center px-3 h-7 text-white bg-custom-blue hover:bg-green-600 hover:text-white rounded-md">4</a>
-            </li>
-            <li>
-              <a href="#" className="flex items-center px-3 h-7 text-white bg-custom-blue hover:bg-green-600 hover:text-white rounded-md">5</a>
-            </li>
-          </ul>
-          <button>
-            <IoIosArrowForward className="text-gray-700 w-6 h-6"/>
-          </button>
-          </div>      
-        </div>
+          ))}
+        </ul>
+        <button className="p-2 rounded-lg text-gray-500">
+          <IoIosArrowForward className="text-gray-700 w-6 h-6" />
+        </button>
       </div>
     </div>
   );
