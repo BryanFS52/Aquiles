@@ -1,18 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from 'react'; 
-import Link from "next/link";
-import { Header } from "../../components/header"; //importaciones del Header y el Sidebar
+import { Header } from "../../components/header"; 
 import { Sidebar } from "../../components/sidebar";
 import { MdAdd } from "react-icons/md";
 import ModalNewProject from '../../components/Modals/modalNewProject';
-import { MdAddCircle } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
 import ModalComponent from '../../components/Modals/modalComponent';
 import { listTeamsScrum, createTeamScrum, deleteTeamScrum } from '../../services/teamScrumService'; 
 import ModalAddInformation from '../../components/Modals/modalAddInformation';
 import ModalEliminarTeam from "../../components/Modals/modalEliminarTeam";
-import { ToastContainer, toast } from "react-toastify"; //importacion de la libreria ToastContainer para las alertas con la animacion 
+import { ToastContainer, toast } from "react-toastify"; 
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function Home() {
@@ -48,7 +46,7 @@ export default function Home() {
       .then(() => {
         fetchTeams(); 
         toast.success('¡Nuevo Proyecto creado con éxito!');
-        handleCloseModal(); // Cierra el modal de nuevo proyecto después de la creación exitosa del Team
+        handleCloseModal(); 
       })
       .catch(error => {
         console.error('Error creating team:', error);
@@ -111,14 +109,15 @@ export default function Home() {
         <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full relative">
           <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Teams Scrums</h1>
           <br />
-          <li className="h-9 w-14 flex items-center justify-center border-y-gray-950 rounded-lg bg-[#00324d] hover:bg-[#40b003] ml-auto">
-            <a href="#" onClick={handleOpenModal}>
-              <MdAdd className="w-8 h-8 text-white"/>
-            </a>
-          </li>
 
-          {/* Modal para nuevo proyecto */}
-          <ModalNewProject isOpen={modalOpen} onClose={handleCloseModal} onCreate={handleCreateTeam} />
+          {teams.length === 0 && (
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-gray-600">No hay equipos de trabajo disponibles. Pulsa el botón + para crear un nuevo team.</p>
+              <button onClick={handleOpenModal} className="flex items-center justify-center bg-[#00324d] hover:bg-[#40b003] text-white px-4 py-2 rounded-lg">
+                <MdAdd className="mr-2" /> Añadir Team
+              </button>
+            </div>
+          )}
 
           <div className="grid grid-cols-3 gap-4 mt-8">
             {teams.length > 0 ? (
@@ -152,10 +151,10 @@ export default function Home() {
                   </div>
                 </div>
               ))
-            ) : (
-              <p>No hay equipos de trabajo disponibles, Pulsa el botón + para crear un nuevo team.</p>
-            )}
+            ) : null}
           </div>
+
+          <ModalNewProject isOpen={modalOpen} onClose={handleCloseModal} onCreate={handleCreateTeam} />
           <ModalAddInformation isOpen={openAddInfoModal} onClose={handleCloseAddInfoModal} />
           <ModalComponent isOpen={openAgregarInfo} onClose={handleCloseAgregarInfo} />
           <ModalEliminarTeam isOpen={confirmModalOpen} onClose={() => setConfirmModalOpen(false)} onConfirm={handleConfirmDelete}/> 
