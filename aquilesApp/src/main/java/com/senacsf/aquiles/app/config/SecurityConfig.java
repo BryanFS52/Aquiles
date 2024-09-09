@@ -23,6 +23,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/teams-scrum/create").permitAll()
                                 .requestMatchers("/api/teams-scrum/update").permitAll()
                                 .requestMatchers("/api/teams-scrum/delete/{id}").permitAll()
+                                .requestMatchers("/api/attendances/generateQRCode").permitAll()
                                 .anyRequest().authenticated() // Requerir autenticación para cualquier otra solicitud
                 );
         return http.build();

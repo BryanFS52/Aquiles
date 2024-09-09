@@ -21,11 +21,11 @@ public class QrCodeGenerator {
 
     public byte[] generateQRCodeImage(String text) throws WriterException, IOException {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 350, 350);
-        BufferedImage qrImage = new BufferedImage(350, 350, BufferedImage.TYPE_INT_RGB);
+        BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 330, 330);
+        BufferedImage qrImage = new BufferedImage(330, 330, BufferedImage.TYPE_INT_RGB);
 
-        for (int x = 0; x < 350; x++) {
-            for (int y = 0; y < 350; y++) {
+        for (int x = 0; x < 330; x++) {
+            for (int y = 0; y < 330; y++) {
                 qrImage.setRGB(x, y, bitMatrix.get(x, y) ? 0x00000 : 0xFFFFFF);
             }
         }
