@@ -33,8 +33,4 @@ public class EmailService {
     public void sendEmail(String email, String code) {
 
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 8735888 (cambios en los archivos security config y EmailController)
