@@ -5,6 +5,7 @@ import { Header } from "../../components/header";
 import { Sidebar } from "../../components/sidebar";
 import { BiX, BiCheck } from "react-icons/bi";
 import CheckListTable from "../../components/CheckListTable";
+import {downloadReportPDF} from "../../services/PDFService";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { useMemo } from 'react';
