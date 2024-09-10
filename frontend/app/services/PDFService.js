@@ -14,5 +14,3 @@ export const downloadReportPDF = async () => {
         throw error;
     }
 };
-
-// Otros métodos relacionados con los reportes pueden ir aquí

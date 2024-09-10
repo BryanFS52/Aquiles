@@ -6,8 +6,6 @@ import { Sidebar } from "../../components/sidebar";
 import { BiX, BiCheck } from "react-icons/bi";
 import CheckListTable from "../../components/CheckListTable";
 import {downloadReportPDF} from "../../services/PDFService";
-import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
 import { useMemo } from 'react';
 
 export default function ListaChequeo() {
@@ -46,16 +44,6 @@ export default function ListaChequeo() {
 
     const handleUploadPrev = useCallback(() => fileInputRefPrev.current.click(), []);
     const handleUploadNew = useCallback(() => fileInputRefNew.current.click(), []);
-
-    const handleGuardar = useCallback(() => {
-        setGuardarPresionado(true);
-
-        if (!ficha || !sedeSeleccionada || !jornadaSeleccionada || !trimestreSeleccionado || !teamSeleccionado || !pilarSeleccionado) {
-            toast.error("Todos los campos son obligatorios", { position: "top-right" });
-        } else {
-            toast.success("Datos guardados correctamente", { position: "top-right" });
-        }
-    }, [ficha, sedeSeleccionada, jornadaSeleccionada, trimestreSeleccionado, teamSeleccionado, pilarSeleccionado]);
 
     return (
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
@@ -134,11 +122,7 @@ export default function ListaChequeo() {
                                         </select>
                                     </div>
                                 </div>
-                                <div className="pt-1">
-                                    <button onClick={handleGuardar} className="bg-custom-blue text-white text-center font-bold py-2 px-4 rounded-lg mt-4 block ml-3 w-28 h-10">
-                                        Guardar
-                                    </button>
-                                </div>
+                                
                             </div>
                             <div className="flex justify-end">
                                 <div className="w-52 h-28 bg-white border border-gray-200 p-4 rounded-lg shadow-md">
@@ -189,7 +173,6 @@ export default function ListaChequeo() {
                         </button>
                     </div>
                 </div>
-                <ToastContainer />
             </div>
         </div>
     );
