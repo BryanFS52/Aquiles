@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import { useRouter } from 'next/navigation'; // Importamos useRouter para redirección
+import { useRouter } from 'next/navigation';
 import { Header } from '../../components/header';
 import { Sidebar } from '../../components/sidebar';
 import { createApprentice } from '../../services/apprenticeService';
@@ -12,35 +12,50 @@ const RegisterPersonForm = () => {
   const [nombre, setNombre] = useState('');
   const [apellidos, setApellidos] = useState('');
   const [documentNumber, setDocumentNumber] = useState('');
+  const [documentType, setDocumentType] = useState('');
+  const [program, setProgram] = useState('');
+  const [email, setEmail] = useState('');
+  const [teamNumber, setTeamNumber] = useState('');
+  const [profilePicture, setProfilePicture] = useState(null);
   const router = useRouter(); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!nombre || !apellidos || !documentNumber) {
+  
+    if (!nombre || !apellidos || !documentNumber || !documentType || !program || !email || !teamNumber) {
       toast.error('Por favor, completa todos los campos.');
-      return; 
+      return;
     }
-
-    const newApprentice = { 
-      name: nombre, 
-      lastName: apellidos, 
-      documentNumber
-    };
-
-    console.log('JSON to be sent:', JSON.stringify(newApprentice));
-
+  
+    const formData = new FormData();
+    formData.append('name', nombre);
+    formData.append('lastName', apellidos);
+    formData.append('documentNumber', documentNumber);
+    formData.append('documentType', documentType);
+    formData.append('program', program);
+    formData.append('email', email);
+    formData.append('teamNumber', teamNumber);
+    if (profilePicture) {
+      formData.append('profilePicture', profilePicture);
+    }
+  
     try {
-      await createApprentice(newApprentice);
+      await createApprentice(formData);
       toast.success('¡Persona registrada con éxito!');
-
+  
       setTimeout(() => {
         router.push('/asistencia');
-      }, 2000); 
-
+      }, 2000);
+  
+      // Reset form fields
       setNombre('');
       setApellidos('');
       setDocumentNumber('');
+      setDocumentType('');
+      setProgram('');
+      setEmail('');
+      setTeamNumber('');
+      setProfilePicture(null);
     } catch (error) {
       console.error('Error creating apprentice:', error);
       toast.error('Error al registrar la persona.');
@@ -66,8 +81,28 @@ const RegisterPersonForm = () => {
                 <input id="apellidos" type="text" value={apellidos} onChange={(e) => setApellidos(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" required />
               </div>
               <div>
-                <label htmlFor="documentNumber" className="block text-sm font-medium text-gray-700">Documento</label>
+                <label htmlFor="documentNumber" className="block text-sm font-medium text-gray-700">Número de Documento</label>
                 <input id="documentNumber" type="text" value={documentNumber} onChange={(e) => setDocumentNumber(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" required />
+              </div>
+              <div>
+                <label htmlFor="documentType" className="block text-sm font-medium text-gray-700">Tipo de Documento</label>
+                <input id="documentType" type="text" value={documentType} onChange={(e) => setDocumentType(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" required />
+              </div>
+              <div>
+                <label htmlFor="program" className="block text-sm font-medium text-gray-700">Programa</label>
+                <input id="program" type="text" value={program} onChange={(e) => setProgram(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" required />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Correo Institucional</label>
+                <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" required />
+              </div>
+              <div>
+                <label htmlFor="teamNumber" className="block text-sm font-medium text-gray-700">Número del Team</label>
+                <input id="teamNumber" type="text" value={teamNumber} onChange={(e) => setTeamNumber(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" required />
+              </div>
+              <div>
+                <label htmlFor="profilePicture" className="block text-sm font-medium text-gray-700">Foto de Perfil</label>
+                <input id="profilePicture" type="file" onChange={handleFileChange} className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" />
               </div>
 
               <button type="submit" className="w-full bg-custom-blue text-white py-2 px-4 rounded-lg">
@@ -81,4 +116,5 @@ const RegisterPersonForm = () => {
     </div>
   );
 };
+
 export default RegisterPersonForm;

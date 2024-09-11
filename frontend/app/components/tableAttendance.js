@@ -99,7 +99,7 @@ const TablaApprentices = () => {
         
         <div className="mr-7 ml-auto flex space-x-4">
           <button type="button" className="text-white font-inter font-normal h-11 w-54 rounded-lg text-sm px-3 bg-custom-blue hover:bg-[#01b001] transition-colors duration-300 dark:focus:ring-custom-blue flex items-center mb-2 lg:mb-0" onClick={handleOpenQRModal}>
-            Generar QR
+            Toma de Asistencia
             <BsQrCode className="w-4 h-4 ml-3" />
           </button>
           <ModalQR isOpen={modalQROpen} onClose={handleCloseQRModal} />
