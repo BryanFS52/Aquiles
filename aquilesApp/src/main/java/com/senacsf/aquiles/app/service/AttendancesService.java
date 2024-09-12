@@ -5,7 +5,10 @@ import com.senacsf.aquiles.app.repository.AttendancesRepository;
 import com.senacsf.aquiles.app.service.dao.Idao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -45,4 +48,11 @@ public class AttendancesService implements Idao<Attendances, Long> {
         this.attendancesRepository.delete(entity);
     }
 
+    public long countPresentByTrainerId(Long trainerId) {
+        return attendancesRepository.countPresentByTrainerId(trainerId);
+    }
+
+    public long countAbsentByTrainerId(Long trainer_id) {
+        return attendancesRepository.countAbsentByTrainerId(trainer_id);
+    }
 }

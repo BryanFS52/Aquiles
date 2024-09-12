@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Header } from "../../components/header"; 
 import { Sidebar } from "../../components/sidebar";
 import { MdAdd } from "react-icons/md";
+import { MdAddCircle } from "react-icons/md";
 import ModalNewProject from '../../components/Modals/modalNewProject';
 import { FaTrashAlt } from "react-icons/fa";
 import ModalComponent from '../../components/Modals/modalComponent';

@@ -45,6 +45,8 @@ export default function ListaChequeo() {
     const handleUploadPrev = useCallback(() => fileInputRefPrev.current.click(), []);
     const handleUploadNew = useCallback(() => fileInputRefNew.current.click(), []);
 
+
+    
     return (
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
             <Sidebar />
@@ -103,8 +105,12 @@ export default function ListaChequeo() {
                                 <div className="w-52 h-28 bg-white border border-gray-200 p-4 rounded-lg shadow-md">
                                     <h2 className="text-gray-700 text-sm font-bold mb-2 text-center">Exportar lista de chequeo como:</h2>
                                     <div className="flex space-x-2 mb-4">
-                                        <button type="button" onClick={handleDownloadPDF} className="w-full bg-custom-blue font-bold py-2 px-4 rounded text-white focus:outline-none focus:shadow-outline">PDF</button>
-                                        <button className="w-full bg-custom-blue font-bold py-2 px-4 rounded text-white focus:outline-none focus:shadow-outline">Excel</button>
+                                        <button type="button" onClick={handleDownloadPDF} className="w-full bg-custom-blue font-bold py-2 px-4 rounded text-white focus:outline-none focus:shadow-outline">
+                                            PDF
+                                        </button>
+                                        <button className="w-full bg-custom-blue font-bold py-2 px-4 rounded text-white focus:outline-none focus:shadow-outline">
+                                            Excel
+                                        </button>
                                     </div>
                                     <div className="w-44 h-20 bg-white border border-gray-200 p-4 rounded-lg shadow-md mr-10">
                                         <h2 className="text-gray-700 text-sm font-bold mb-2">Indicaciones de uso:</h2>
