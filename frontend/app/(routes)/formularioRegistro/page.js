@@ -100,10 +100,7 @@ const RegisterPersonForm = () => {
                 <label htmlFor="teamNumber" className="block text-sm font-medium text-gray-700">Número del Team</label>
                 <input id="teamNumber" type="text" value={teamNumber} onChange={(e) => setTeamNumber(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" required />
               </div>
-              <div>
-                <label htmlFor="profilePicture" className="block text-sm font-medium text-gray-700">Foto de Perfil</label>
-                <input id="profilePicture" type="file" onChange={handleFileChange} className="mt-1 block w-full border border-gray-300 rounded-lg py-2 px-3" />
-              </div>
+              
 
               <button type="submit" className="w-full bg-custom-blue text-white py-2 px-4 rounded-lg">
                 Agregar Aprendiz
