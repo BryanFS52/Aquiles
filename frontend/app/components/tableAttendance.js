@@ -24,7 +24,7 @@ const TablaApprentices = () => {
           ...apprentice,
           weeks: Array(4).fill(null).map(() => 
             Array(7).fill(null).map((_, dayIndex) => 
-              (dayIndex === 5 || dayIndex === 6) ? '' : 'A'  // Cambia 'A' por vacío para sábados y domingos
+              (dayIndex === 5 || dayIndex === 6) ? '' : 'A'
             )
           ),
         }));
