@@ -1,14 +1,15 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import qrCodeService from '../../services/QRService'; // Importa el servicio
+import qrCodeService from '../../services/QRService'; 
 import { BsQrCode } from "react-icons/bs";
 import { useRouter } from 'next/navigation'; // Importa useRouter de next/navigation
 
 const ModalQR = ({ isOpen, onClose }) => {
   const [showNextModal, setShowNextModal] = useState(false);
   const [timer, setTimer] = useState(900); // Duración del QR en segundos
-  const [qrCodeImage, setQrCodeImage] = useState(null); // Para almacenar la imagen del QR
-  const router = useRouter(); // Hook para redireccionar
+  const [qrCodeImage, setQrCodeImage] = useState(null); 
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false); 
+  const router = useRouter(); 
 
   useEffect(() => {
     if (!isOpen) return;
@@ -24,12 +25,11 @@ const ModalQR = ({ isOpen, onClose }) => {
     };
 
     fetchQRCode();
-
     const interval = setInterval(() => {
       setTimer(prev => {
         if (prev <= 1) {
           clearInterval(interval);
-          router.push('/aprendicelist'); // Redirige cuando el tiempo se acaba
+          router.push('/aprendicelist'); 
           return 0;
         }
         return prev - 1;
@@ -40,12 +40,20 @@ const ModalQR = ({ isOpen, onClose }) => {
   }, [isOpen, router]);
 
   const handleNext = () => {
-    router.push('/aprendicelist'); // Redirige al hacer clic en "Finalizar"
+    setIsConfirmationModalOpen(true); 
+  };
+
+  const handleConfirmFinish = () => {
+    setIsConfirmationModalOpen(false);
+    router.push('/aprendicelist'); 
+  };
+
+  const handleCloseConfirmation = () => {
+    setIsConfirmationModalOpen(false);
   };
 
   const handleClose = () => {
     onClose();
-    // También reinicia el temporizador aquí si deseas que se reinicie al cerrar el modal
     setTimer(900);
   }
 
@@ -88,21 +96,28 @@ const ModalQR = ({ isOpen, onClose }) => {
             </span>
           </div>
           <div className='flex justify-end mt-20'>
-            <button
-              className='hover:bg-red-600 rounded-md transition-colors bg-red-600 px-4 py-2 border text-white text-lg w-36 h-10 font-inter mr-60'
-              onClick={handleClose}>
+            <button className='hover:bg-red-600 rounded-md transition-colors bg-red-600 px-4 py-2 border text-white text-lg w-36 h-10 font-inter mr-60'onClick={handleClose}>
               Cancelar QR
             </button>
-            <button
-              className='hover:bg-custom-blue rounded-md transition-colors bg-custom-blue px-4 py-2 border text-white text-lg w-36 h-10 font-inter'
-              onClick={handleNext}>
+            <button className='hover:bg-custom-blue rounded-md transition-colors bg-custom-blue px-4 py-2 border text-white text-lg w-36 h-10 font-inter'onClick={handleNext}>
               Finalizar Asistencia
             </button>
           </div>
         </div>
       </div>
+
+      {isConfirmationModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-custom-blue bg-opacity-50">
+          <div className="bg-white p-6 w-1/3 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold mb-4 text-center">¿Está seguro de finalizar la toma de asistencia?</h2>
+            <div className="flex justify-center space-x-8">
+              <button onClick={handleConfirmFinish} className="bg-green-600 text-white px-4 py-2 rounded-md">Sí</button>
+              <button onClick={handleCloseConfirmation}className="bg-red-600 text-white px-4 py-2 rounded-md">No</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
 export default ModalQR;

@@ -111,14 +111,17 @@ export default function Home() {
           <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Teams Scrums</h1>
           <br />
 
-          {teams.length === 0 && (
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-gray-600">No hay equipos de trabajo disponibles. Pulsa el botón + para crear un nuevo team.</p>
-              <button onClick={handleOpenModal} className="flex items-center justify-center bg-[#00324d] hover:bg-[#40b003] text-white px-4 py-2 rounded-lg">
-                <MdAdd className="mr-2" /> Añadir Team
-              </button>
-            </div>
+        
+          <div className="flex items-center justify-between mb-6">
+          {teams.length === 0 ? (
+            <p className="text-gray-600">No hay equipos de trabajo disponibles. Pulsa el botón + para crear un nuevo team.</p>
+          ) : (
+            <p className="text-gray-600">Teams disponibles. Puedes seguir creando nuevos teams.</p>
           )}
+          <button onClick={handleOpenModal} className="flex items-center justify-center bg-[#00324d] hover:bg-[#40b003] text-white px-4 py-2 rounded-lg">
+            <MdAdd className="mr-2" /> Añadir Team
+          </button>
+        </div>
 
           <div className="grid grid-cols-3 gap-4 mt-8">
             {teams.length > 0 ? (

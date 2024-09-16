@@ -62,29 +62,19 @@ export default function ListaChequeo() {
                                 <div>
                                     <span className="text-custom-blue text-base font-semibold font-inter">Ficha:</span>
                                     <div className="relative inline-block ml-8">
-                                        <input type="text" className={`border-2 ${guardarPresionado && !ficha ? "border-red-500" : "border-gray-300"} rounded-lg ml-4 w-52`} value={ficha} onChange={(e) => setFicha(e.target.value)} />
+                                        <input className={`border-2 ${guardarPresionado && !ficha ? "border-red-500" : "border-gray-300"} rounded-lg ml-4 w-52`} disabled/>
                                     </div>
                                 </div>
                                 <div>
                                     <span className="text-custom-blue text-base font-semibold font-inter">Sede:</span>
                                     <div className="relative inline-block ml-8">
-                                        <select className={`border-2 ${guardarPresionado && !sedeSeleccionada ? "border-red-500" : "border-gray-300"} rounded-lg ml-5 w-52`} value={sedeSeleccionada} onChange={(e) => setSedeSeleccionada(e.target.value)}>
-                                            <option value=""> </option>
-                                            {sedeOptions.map((sede, index) => (
-                                                <option key={index} value={sede}>{sede}</option>
-                                            ))}
-                                        </select>
+                                        <input className={`border-2 ${guardarPresionado && !sedeSeleccionada ? "border-red-500" : "border-gray-300"} rounded-lg ml-5 w-52`} disabled/>
                                     </div>
                                 </div>
                                 <div>
                                     <span className="text-custom-blue text-base font-semibold font-inter">Jornada:</span>
-                                    <div className="relative inline-block ml-8">
-                                        <select className={`border-2 ${guardarPresionado && !jornadaSeleccionada ? "border-red-500" : "border-gray-300"} rounded-lg w-52`} value={jornadaSeleccionada} onChange={(e) => setJornadaSeleccionada(e.target.value)}>
-                                            <option value=""> </option>
-                                            {jornadaOptions.map((jornada, index) => (
-                                                <option key={index} value={jornada}>{jornada}</option>
-                                            ))}
-                                        </select>
+                                    <div className="relative inline-block ml-7">
+                                        <input className={`border-2 ${guardarPresionado && !jornadaSeleccionada ? "border-red-500" : "border-gray-300"} rounded-lg w-52`} disabled/>
                                     </div>
                                 </div>
                             </div>
@@ -93,35 +83,20 @@ export default function ListaChequeo() {
                                     <div>
                                         <span className="text-custom-blue text-base font-semibold font-inter">Trimestre:</span>
                                         <div className="relative inline-block ml-3">
-                                            <select className={`border-2 ${guardarPresionado && !trimestreSeleccionado ? "border-red-500" : "border-gray-300"} rounded-lg ml-5 w-52`} value={trimestreSeleccionado} onChange={(e) => setTrimestreSeleccionado(e.target.value)}>
-                                                <option value=""> </option>
-                                                {trimestreOptions.map((trimestre, index) => (
-                                                    <option key={index} value={trimestre}>{trimestre}</option>
-                                                ))}
-                                            </select>
+                                            <input className={`border-2 ${guardarPresionado && !trimestreSeleccionado ? "border-red-500" : "border-gray-300"} rounded-lg ml-5 w-52`} disabled/>
                                         </div>
                                     </div>
                                 </div>
                                 <div>
                                     <span className="text-custom-blue text-base font-semibold font-inter">Team:</span>
                                     <div className="relative inline-block ml-10">
-                                        <select className={`border-2 ${guardarPresionado && !teamSeleccionado ? "border-red-500" : "border-gray-300"} rounded-lg ml-6 w-52`} value={teamSeleccionado} onChange={(e) => setTeamSeleccionado(e.target.value)}>
-                                            <option value=""> </option>
-                                            {teamOptions.map((team, index) => (
-                                                <option key={index} value={team}>{team}</option>
-                                            ))}
-                                        </select>
+                                        <input className={`border-2 ${guardarPresionado && !teamSeleccionado ? "border-red-500" : "border-gray-300"} rounded-lg ml-6 w-52`} disabled/>
                                     </div>
                                 </div>
                                 <div>
-                                    <span className="text-custom-blue text-base font-semibold font-inter">Pilar:</span>
-                                    <div className="relative inline-block ml-16">
-                                        <select className={`border-2 ${guardarPresionado && !pilarSeleccionado ? "border-red-500" : "border-gray-300"} rounded-lg ml-1 w-52`} value={pilarSeleccionado} onChange={(e) => setPilarSeleccionado(e.target.value)}>
-                                            <option value=""> </option>
-                                            {pilarOptions.map((pilar, index) => (
-                                                <option key={index} value={pilar}>{pilar}</option>
-                                            ))}
-                                        </select>
+                                    <span className="text-custom-blue text-base font-semibold font-inter">Indicador:</span>
+                                    <div className="relative inline-block ml-8">
+                                        <input className={`border-2 ${guardarPresionado && !pilarSeleccionado ? "border-red-500" : "border-gray-300"} rounded-lg ml-1 w-52`} disabled/>
                                     </div>
                                 </div>
                                 

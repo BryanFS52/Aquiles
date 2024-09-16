@@ -15,6 +15,8 @@ const TablaApprentices = () => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedWeek, setSelectedWeek] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const apprenticesPerPage = 7;
 
   useEffect(() => {
     const fetchApprentices = async () => {
@@ -24,7 +26,7 @@ const TablaApprentices = () => {
           ...apprentice,
           weeks: Array(4).fill(null).map(() => 
             Array(7).fill(null).map((_, dayIndex) => 
-              (dayIndex === 5 || dayIndex === 6) ? '' : 'A'  // Cambia 'A' por vacío para sábados y domingos
+              (dayIndex === 5 || dayIndex === 6) ? '' : 'A'
             )
           ),
         }));
@@ -37,14 +39,17 @@ const TablaApprentices = () => {
     fetchApprentices();
   }, []);
 
-  const toggleAttendance = (index, day, weekIndex) => {
+    const toggleAttendance = (index, day, weekIndex) => {
     const updatedApprentices = [...apprentices];
-    const currentStatus = updatedApprentices[index].weeks[weekIndex][day];
-    updatedApprentices[index].weeks[weekIndex][day] =
-      currentStatus === '✓' ? 'R' :
-      (currentStatus === 'R' ? 'J' :
-      (currentStatus === 'J' ? 'X' : '✓'));
-    setApprentices(updatedApprentices);
+    const isWeekend = day === 5 || day === 6;
+    if (!isWeekend) {
+      const currentStatus = updatedApprentices[index].weeks[weekIndex][day];
+      updatedApprentices[index].weeks[weekIndex][day] =
+        currentStatus === '✓' ? 'R' :
+        (currentStatus === 'R' ? 'J' :
+        (currentStatus === 'J' ? 'X' : '✓'));
+      setApprentices(updatedApprentices);
+    }
   };
 
   const handleOpenQRModal = () => {
@@ -73,8 +78,20 @@ const TablaApprentices = () => {
     setCalendarOpen(!calendarOpen);
   };
 
+  const indexOfLastApprentice = currentPage * apprenticesPerPage;
+  const indexOfFirstApprentice = indexOfLastApprentice - apprenticesPerPage;
+  const currentApprentices = filteredApprentices.slice(indexOfFirstApprentice, indexOfLastApprentice);
+
+  const totalPages = Math.ceil(filteredApprentices.length / apprenticesPerPage);
+
+  const handlePageChange = (page) => {
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
   return (
-    <div className="w-[98%] h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 mr-6 mt-10">
+    <div className="w-[98%] h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 mr-6 mt-7">
       <div className="flex bg-white w-full h-14 items-center">
         <form className="w-auto h-7">
           <div className="relative">
@@ -116,8 +133,7 @@ const TablaApprentices = () => {
                 <th
                   key={weekIndex}
                   colSpan={7}
-                  className="px-2 py-3 text-center text-xs font-semibold font-inter text-black uppercase tracking-wider border-2 border-gray-300"
-                >
+                  className="px-2 py-3 text-center text-xs font-semibold font-inter text-black uppercase tracking-wider border-2 border-gray-300">
                   Semana {weekIndex + 1}
                 </th>
               ))}
@@ -145,7 +161,7 @@ const TablaApprentices = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-300">
-            {filteredApprentices.map((apprentice, index) => (
+            {currentApprentices.map((apprentice, index) => (
               <tr key={apprentice.documentNumber}>
                 <td className="px-2 py-2 border-2 border-gray-300 text-sm">
                   {apprentice.documentNumber}
@@ -162,17 +178,22 @@ const TablaApprentices = () => {
                         <td 
                         key={dayIndex} 
                         onClick={() => toggleAttendance(index, dayIndex, weekIndex)}
-                        className={`px-2 py-2 text-center cursor-pointer border-2 border-gray-300
-                          ${isWeekend ? 'bg-gray-200 text-white' : ''} 
-                          ${cellValue === 'R' ? 'bg-yellow-300 text-yellow-800 font-bold'
-                            : cellValue === 'J' ? 'bg-blue-300 text-blue-800 font-bold'
-                            : cellValue === 'X' ? 'bg-red-300 text-red-800 font-bold'
-                            : cellValue === '✓' ? 'bg-green-300 text-green-800 font-bold'
-                            : 'text-black'}
-                        `}
-                      >
-                        {isWeekend ? '' : cellValue}
-                      </td>
+                        className={`px-2 py-2 border-2 border-gray-300 text-center cursor-pointer ${
+                          isWeekend ? 'bg-gray-200' : ''
+                        }`}
+                        >
+                          <span
+                            className={`${
+                              cellValue === '✓' ? 'text-green-500 font-bold' :
+                              (cellValue === 'R' ? 'text-yellow-500 font-bold' :
+                              (cellValue === 'X' ? 'text-red-500 font-bold' :
+                              (cellValue === 'J' ? 'text-blue-500 font-bold' : 
+                              'text-black')))
+                            }`}
+                          >
+                            {cellValue}
+                          </span>
+                        </td>
                       );
                     })}
                   </React.Fragment>
@@ -183,21 +204,21 @@ const TablaApprentices = () => {
         </table>
       </div>
 
-      <div className="flex items-center space-x-4 pt-3 mb-1">
-        <button className="p-2 rounded-lg text-gray-500">
-          <IoIosArrowBack className="text-gray-700 w-6 h-6" />
+      <div className="flex justify-center items-center space-x-4">
+        <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="px-4 py-2 font-medium text-gray-500 text-2xl cursor-pointer">
+          <IoIosArrowBack />
         </button>
-        <ul className="flex space-x-2">
-          {[1, 2, 3, 4, 5].map(page => (
-            <li key={page}>
-              <a href="#" className="flex items-center px-3 h-7 text-white bg-custom-blue hover:bg-green-600 hover:text-white rounded-md">
-                {page}
-              </a>
-            </li>
-          ))}
-        </ul>
-        <button className="p-2 rounded-lg text-gray-500">
-          <IoIosArrowForward className="text-gray-700 w-6 h-6" />
+        {[...Array(totalPages)].map((_, pageIndex) => (
+          <button key={pageIndex + 1} onClick={() => handlePageChange(pageIndex + 1)} className={`px-4 py-2 text-sm font-medium rounded-lg ${
+              currentPage === pageIndex + 1
+                ? 'bg-custom-blue text-white hover:bg-[#01b001] transition-colors duration-300'
+                : 'bg-custom-blue text-white hover:bg-[#01b001] transition-colors duration-300'
+            }`}>
+            {pageIndex + 1}
+          </button>
+        ))}
+        <button onClick={() => handlePageChange(currentPage + 1)}disabled={currentPage === totalPages} className="px-4 py-2 font-medium text-gray-500 text-2xl cursor-pointer">
+          <IoIosArrowForward />
         </button>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import logoSena from "../public/img/Logo-sena-green.png";
+import logoSena from "../../public/img/Logo-sena-green.png";
 import Image from 'next/image';
 
 const Notification = ({ studentName, date }) => {
