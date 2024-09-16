@@ -1,113 +1,119 @@
-"use client"
+// ListaApprentices.js
+"use client";
 
-import React from 'react';
-import { Header } from "../../components/header"; 
+import React, { useState, useEffect } from 'react';
+import { Header } from "../../components/header";
 import { Sidebar } from "../../components/sidebar";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { getAllApprentices } from "../../services/apprenticeService";
+import { useApprentices } from '../../context/ApprenticeContext'; // Importar el contexto
+import { Sidebaraprendiz } from '@/components/sidebaraprendiz';
 
-export function Aprendicesview() {
-    const renderEstado = (estado) => {
-        let bgColor = "";
-      
-        if (estado === "Activo") {
-          bgColor = "bg-green-100 text-green-600";
-        } else if (estado === "Inactivo") {
-          bgColor = "bg-red-100 text-red-600";
-        } else if (estado === "Pendiente") {
-          bgColor = "bg-yellow-100 text-yellow-600";
-        }
-      
-        return (
-            <td className={"w-48 h-12 text-center py-3 border-2 border-gray-300 text-sm"}>
-                <span className={`text-black rectangular-effect ${bgColor}`}>{estado}</span>
-            </td>
-          
-        );
+const ListaApprentices = () => {
+  const { apprentices, setApprentices } = useApprentices();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const fetchApprentices = async () => {
+      try {
+        const apprenticesData = await getAllApprentices();
+        setApprentices(apprenticesData);
+      } catch (error) {
+        console.error('Error al obtener los aprendices:', error);
+      }
     };
-      
-    return (
-        <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-            <Sidebar />
-            <div className="xl:col-span-5">
-                <Header />
-    
-                <div className="w-72 pt-4">
-                    <h2 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Aprendices</h2>
-                </div>
-    
-                <div className="flex justify-center pt-4">
-                    <div className="bg-white shadow-md rounded-lg p-6 border-2 border-gray-200 w-full max-w-6xl overflow-x-auto max-h-[35rem]">
-                        <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-auto">
-                            <thead className="bg-custom-blue text-white">
-                                <tr>
-                                    <th className="p-3 text-xs font-medium text-center uppercase tracking-wider">ID</th>
-                                    <th className="p-3 text-xs font-medium text-center uppercase tracking-wider">TD</th>
-                                    <th className="p-3 text-xs font-medium text-center uppercase tracking-wider">Número de identificación</th>
-                                    <th className="p-3 text-xs font-medium text-center uppercase tracking-wider">Nombres</th>
-                                    <th className="p-3 text-xs font-medium text-center uppercase tracking-wider">Apellido</th>
-                                    <th className="p-3 text-xs font-medium text-center uppercase tracking-wider">Team Scrum</th>
-                                    <th className="p-3 text-xs font-medium text-center uppercase tracking-wider">Novedad</th>
-                                    <th className="p-3 text-xs font-medium text-center uppercase tracking-wider">Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-300">
-                                <tr>
-                                    <td className="py-3 text-center border-2 border-gray-300 text-sm">1</td>
-                                    <td className="py-3 text-center border-2 border-gray-300 text-sm">cc</td>
-                                    <td className="py-3 text-center border-2 border-gray-300 text-sm"><span className="text-black">236587</span></td>
-                                    <td className="py-3 text-center border-2 border-gray-300 text-sm"><span className="text-black">Angel</span></td>
-                                    <td className="py-3 text-center border-2 border-gray-300 text-sm"><span className="text-black">Orozco</span></td>
-                                    <td className="py-3 text-center border-2 border-gray-300 text-sm"><span className="text-black">3</span></td>
-                                    <td className="py-3 text-center border-2 border-gray-300 text-sm"><span className="text-black">Falta</span></td>
-                                    {renderEstado("Activo")}
-                                </tr>
-                                <tr>
-                                    <td className="py-3 px-10 text-center border-2 border-gray-300 text-sm">2</td>
-                                    <td className="py-3 px-10 text-center border-2 border-gray-300 text-sm">cc</td>
-                                    <td className="py-3 px-10 text-center border-2 border-gray-300 text-sm"><span className="text-black">234467</span></td>
-                                    <td className="py-3 px-10 text-center border-2 border-gray-300 text-sm"><span className="text-black">Miguel</span></td>
-                                    <td className="py-3 px-10 text-center border-2 border-gray-300 text-sm"><span className="text-black">Clavijo</span></td>
-                                    <td className="py-3 px-10 text-center border-2 border-gray-300 text-sm"><span className="text-black">1</span></td>
-                                    <td className="py-3 px-10 text-center border-2 border-gray-300 text-sm"><span className="text-black">Falta</span></td>
-                                    {renderEstado("Inactivo")}
-                                </tr>
-                                <tr>
-                                    <td className="py-3 px-10 text-center border-2 border-gray-300 text-sm">3</td>
-                                    <td className="py-3 px-10 text-center border-2 border-gray-300 text-sm">cc</td>
-                                    <td className="py-3 px-10 text-center border-2 border-gray-300 text-sm"><span className="text-black">224567</span></td>
-                                    <td className="py-3 px-10 text-center border-2 border-gray-300 text-sm"><span className="text-black">Fernando</span></td>
-                                    <td className="py-3 px-10 text-center border-2 border-gray-300 text-sm"><span className="text-black">Yepes</span></td>
-                                    <td className="py-3 px-10 text-center border-2 border-gray-300 text-sm"><span className="text-black">2</span></td>
-                                    <td className="py-3 px-10 text-center border-2 border-gray-300 text-sm"><span className="text-black">Falta</span></td>
-                                    {renderEstado("Pendiente")}
-                                </tr>
-                                
-                            </tbody>
-                        </table>
-    
-                        <div className="flex justify-end  space-x-2 mt-4">
-                            <button className="text-black px-2 py-1 rounded">
-                                <IoIosArrowBack className="w-6 h-6" />
-                            </button>
-                            
-                                {[1, 2, 3, 4, 5].map((num) => (
-                            <button
-                                key={num}
-                                type="number"
-                                className="bg-custom-blue text-white px-2 py-1 rounded w-8 h-8 flex items-center justify-center text-sm">
-                                {num}
-                            </button>
-                            ))}
-                            <button className="text-black px-2 py-1 rounded">
-                                <IoIosArrowForward className="w-6 h-6" />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-    
-}
 
-export default Aprendicesview;
+    fetchApprentices();
+  }, [setApprentices]);
+
+  const filteredApprentices = apprentices.filter(apprentice => 
+    apprentice.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    apprentice.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    apprentice.documentNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    apprentice.program.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    apprentice.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    apprentice.teamNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    apprentice.documentType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (apprentice.profilePicture ? apprentice.profilePicture.toLowerCase().includes(searchTerm.toLowerCase()) : false)
+  );
+
+  return (
+    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
+      <Sidebaraprendiz />
+      <div className="xl:col-span-5">
+        <Header />
+        <div className="text-custom-blue font-bold text-4xl ml-10 py-6 border-b-2 border-gray-400 w-full sm:w-3/5 lg:w-2/5 mb-5 lg:mb-8">
+          Aprendices de la Ficha
+        </div>
+
+        <div className="flex justify-center mr-auto mb-6">
+          <input
+            type="text"
+            placeholder="Buscar por nombre, apellido o número de identificación..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-2 py-2 border border-gray-300 rounded-lg w-full max-w-xl"
+          />
+        </div>
+
+        <div className="flex justify-center">
+          <div className="w-full max-w-6xl">
+            <div className="bg-white shadow-md rounded-lg p-6 border-2 border-gray-200 overflow-x-auto max-h-[35rem]">
+              <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-auto">
+                <thead className="bg-sky-950">
+                  <tr>
+                    <th className="px-4 py-3 w-28 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">
+                      Foto
+                    </th>
+                    <th className="px-4 w-48 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">
+                      Nombres
+                    </th>
+                    <th className="px-4 w-48 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">
+                      Apellidos
+                    </th>
+                    <th className="px-4 w-48 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white text-center">
+                      Programa
+                    </th>
+                    <th className="px-4 w-48 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">
+                      Correo Institucional
+                    </th>
+                    <th className="px-4 w-48 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">
+                      Número del Team
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-300">
+                  {filteredApprentices.map((apprentice) => (
+                    <tr key={apprentice.documentNumber}>
+                      <td className="px-4 py-3 border-2 border-gray-300 text-sm text-center">
+                      {apprentice.profilePicture ? (
+                        <img src={apprentice.profilePicture} alt="Profile" className="w-16 h-16 object-cover" />
+                        ) : 'N/A'}
+                      </td>
+                      <td className="px-2 border-2 border-gray-300 text-sm text-center">
+                        {apprentice.name}
+                      </td>
+                      <td className="px-2 border-2 border-gray-300 text-sm text-center">
+                        {apprentice.lastName}
+                      </td>
+                      <td className="px-2 border-2 border-gray-300 text-sm text-center">
+                        {apprentice.program} 
+                      </td>
+                      <td className="px-2 border-2 border-gray-300 text-sm text-center">
+                        {apprentice.email || 'N/A'}
+                      </td>
+                      <td className="px-2 border-2 border-gray-300 text-sm text-center">
+                        {apprentice.teamNumber}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ListaApprentices;

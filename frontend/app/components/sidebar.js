@@ -31,7 +31,7 @@ export const Sidebar = () => {
                 <div className="flex items-center mb-10 space-x-5">
                     <Image src={logoSena} alt="Logo Sena" className="w-11
                         " />
-                    <span className="text-s">PROYECTOS FORMATIVOS (C.S.F.) </span>
+                    <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) INSTRUCTOR </span>
                 </div>
 
                 <ul className='text-white'>

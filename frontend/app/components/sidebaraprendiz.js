@@ -9,6 +9,8 @@ import { IoMdLogOut } from "react-icons/io";
 import { TfiBlackboard } from "react-icons/tfi";
 import { IoSettings } from "react-icons/io5";
 import { FaGear } from "react-icons/fa6";
+import { GiNotebook } from "react-icons/gi";
+import { FaChalkboardUser } from "react-icons/fa6";
 // import { RiCheckboxBlankCircleFill } from "react-icons/ri";
 import { PiStudentFill } from "react-icons/pi";
 import { IoClose } from "react-icons/io5";
@@ -30,7 +32,7 @@ export const Sidebaraprendiz = () => {
                     <div className="flex items-center mb-10 space-x-5">
                         <Image src={logoSena} alt="Logo Sena" className="w-11
                         " />
-                        <span className="text-xs">PROYECTOS FORMATIVOS (C.S.F.) </span>
+                        <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) APRENDIZ </span>
                     </div>
 
                     <ul className='text-white'>
@@ -57,11 +59,26 @@ export const Sidebaraprendiz = () => {
                         </li>
                         
                         <li>
+                        <Link href="/listaChequeo" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <FaChalkboardUser className='text-2xl' />
+                            Sustentaciones
+                        </Link>
+                        </li>
+
+                        <li>
                             <Link href="/aprendicesView" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <PiStudentFill className='text-2xl' />
                                 Aprendices
                             </Link>
                         </li>
+
+                        <li>
+                        <Link href="/justificacionesAprendiz" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <GiNotebook className='text-2xl' />
+                            Justificaciones
+                        </Link>
+                        </li>
+
                     </ul>
                 </div>
                 <ul>
