@@ -49,14 +49,10 @@ public class AttendancesController {
     @GetMapping("/generateQRCode")
     public ResponseEntity<byte[]> generateQRCode() {
         try {
-            LocalDateTime date = LocalDateTime.now();
-            String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            String frontendUrl = "https://4bc6-152-200-176-22.ngrok-free.app/qrformulariomovil"; // Cambia esto por la URL real de tu frontend
 
-            // Aquí solo estamos incluyendo la fecha y hora en el texto del QR
-            String qrText = formattedDate;
-
-            // Generar el código QR sin logo
-            byte[] qrCode = qrCodeGenerator.generateQRCodeImage(qrText);
+            // Generar el código QR con la URL del frontend
+            byte[] qrCode = qrCodeGenerator.generateQRCodeImage(frontendUrl);
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "image/png");
@@ -65,5 +61,6 @@ public class AttendancesController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
 //probando commit para merge
 }
