@@ -14,13 +14,10 @@ export default function AprendicesList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState(null);
 
-    // Estado para los aprendices
     const [students, setStudents] = useState([
         { documentNumber: '10078459687', fullName: 'Michael Felipe Laiton Chaparro', isPresent: true, email: 'keishlanayedcamargorojas@gmail.com', date: '2024-08-16' },
         { documentNumber: '10078459688', fullName: 'Ana María Pérez', isPresent: false, email: 'anamaria@gmail.com', date: '2024-08-16' },
-      
     ]);
-
     const toggleModal = (student) => {
         setSelectedStudent(student);
         setIsModalOpen(!isModalOpen);
@@ -42,7 +39,6 @@ export default function AprendicesList() {
         }
     };
 
-    // Calcula los números de los aprendices
     const totalStudents = students.length;
     const presentStudents = students.filter(student => student.isPresent).length;
     const absentStudents = students.filter(student => !student.isPresent).length;
@@ -52,10 +48,10 @@ export default function AprendicesList() {
             <Sidebar />
             <div className="xl:col-span-5">
                 <Header />
-                <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full relative bg-neutral-100 space-y-5 ">
+                <div className="h-[90vh] overflow-y-scroll p-12 bg-neutral-100 space-y-5">
                     <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Lista de Asistencia</h1>
-                    <div className="flex px-9 space-x-24">
-                        <div className="flex w-96 h-48 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ">
+                    <div className="flex flex-col sm:flex-row sm:space-x-6 space-y-4 sm:space-y-0 items-center justify-center">
+                        <div className="flex w-full sm:w-1/3 lg:w-1/4 h-48 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 p-4">
                             <div className="z-50 justify-end space-y-3">
                                 <PiStudentFill className="w-9 h-9 text-stone-600 ml-6" /><br />
                                 <div>
@@ -65,7 +61,7 @@ export default function AprendicesList() {
                             </div>
                         </div>
 
-                        <div className="flex w-96 h-48 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ">
+                        <div className="flex w-full sm:w-1/3 lg:w-1/4 h-48 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 p-4">
                             <div className="z-50 justify-end space-y-3">
                                 <PiStudentFill className="w-9 h-9 text-stone-600 ml-6" /><br />
                                 <div>
@@ -75,7 +71,7 @@ export default function AprendicesList() {
                             </div>
                         </div>
 
-                        <div className="flex w-96 h-48 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ">
+                        <div className="flex w-full sm:w-1/3 lg:w-1/4 h-48 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 p-4">
                             <div className="z-50 justify-end space-y-3">
                                 <PiStudentFill className="w-9 h-9 text-stone-600 ml-6" /><br />
                                 <div>
@@ -84,17 +80,12 @@ export default function AprendicesList() {
                                 </div>
                             </div>
                         </div>
-
-                        <ModalCorreo isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSendEmail={handleSendEmail} />
                     </div>
-
-                    <div className="flex w-1/2 h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative ml-80 p-4 ">
-                        <div className="z-50 justify-end space-y-3">
-                        </div>
-
-                        {/* Tabla con los datos */}
+                    <ModalCorreo isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSendEmail={handleSendEmail} />
+                    <div className="flex w-full md:w-1/2 h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mt-8 p-4 mx-auto">
+                        <div className="z-50 justify-end space-y-3"></div>
                         <div className="overflow-x-auto w-full">
-                            <table className="ml-16 bg-white w-96 md:w-5/6">
+                            <table className="w-full text-center">
                                 <thead>
                                     <tr>
                                         <th className="px-4 py-2 border-2 border-gray-200 bg-gray-100 text-sm font-semibold text-gray-700">Número de Documento</th>
@@ -105,13 +96,17 @@ export default function AprendicesList() {
                                 <tbody>
                                     {students.map((student, index) => (
                                         <tr key={index}>
-                                            <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">{student.documentNumber}</td>
-                                            <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">{student.fullName}</td>
+                                            <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">
+                                                {student.documentNumber}
+                                            </td>
+                                            <td className="px-4 py-2 border-2 border-gray-200 text-sm text-gray-700">
+                                                {student.fullName}
+                                            </td>
                                             <td className={`px-4 py-2 border-2 border-gray-200 text-sm ${student.isPresent ? 'text-green-600' : 'text-red-600'} font-semibold`}>
                                                 {student.isPresent ? '✓' : 'X'}
                                             </td>
                                             <td className="cursor-pointer">
-                                                {student.isPresent ? null : (
+                                                {!student.isPresent && (
                                                     <ImMail4
                                                         className="w-6 h-6 ml-2"
                                                         onClick={() => toggleModal({ email: student.email, studentName: student.fullName, date: student.date })}
@@ -121,15 +116,16 @@ export default function AprendicesList() {
                                         </tr>
                                     ))}
                                 </tbody>
-
                             </table>
-                            <div className="flex justify-end mr-12">
-                                <button type="button" className="text-white font-inter font-normal h-11 w-44 rounded-lg text-sm px-5 my-6 ml-80 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center">
+
+                            <div className="flex justify-end mt-6">
+                                <button type="button" className="text-white font-inter font-normal h-11 w-44 rounded-lg text-sm px-5 bg-custom-blue dark:hover:bg-custom-blue flex items-center">
                                     Guardar Asistencia
                                 </button>
                             </div>
                         </div>
                     </div>
+
                 </div>
                 <ToastContainer />
             </div>

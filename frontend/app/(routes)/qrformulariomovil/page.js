@@ -11,5 +11,4 @@ const QrFormularioMovil = () => {
         </div>
     )
 };
-
 export default QrFormularioMovil;
