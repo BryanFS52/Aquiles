@@ -1,14 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Header } from "../components/header";
 import { SlBookOpen } from "react-icons/sl";
 import { CgFileDocument } from "react-icons/cg";
 import { BsFillFilePersonFill } from "react-icons/bs";
 import { IoPersonCircleOutline } from "react-icons/io5";
 
-const FormularioQr = () => {
+const FormularioQr = ({ updateAttendance }) => {
+    const [documentNumber, setDocumentNumber] = useState("");
+
+    const handleSubmit = () => {
+        updateAttendance(documentNumber);
+        setDocumentNumber(""); // Limpiar el campo después de enviar
+    };
+
     return (
         <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4">
-            
             <div className="w-full max-w-md mb-4">
                 <Header />
             </div>
@@ -30,28 +36,34 @@ const FormularioQr = () => {
                 </div>
 
                 <div className="relative w-full mb-4">
-                    <input type="text" className="flex h-14 w-full rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 pl-12"  placeholder='Ficha (Default)' />
+                    <input type="text" className="flex h-14 w-full rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 pl-12" placeholder='Ficha (Default)' />
                     <div className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400">
                         <CgFileDocument />
                     </div>
                 </div>
 
                 <div className="relative w-full mb-4">
-                    <input  type="text" className="flex h-14 w-full rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 pl-12" placeholder='Tipo de Documento' />
+                    <input type="text" className="flex h-14 w-full rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 pl-12" placeholder='Tipo de Documento' />
                     <div className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400">
                         <BsFillFilePersonFill />
                     </div>
                 </div>
 
                 <div className="relative w-full mb-6">
-                    <input type="text" className="flex h-14 w-full rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 pl-12" placeholder='Numero de Documento' />
+                    <input
+                        type="text"
+                        value={documentNumber}
+                        onChange={(e) => setDocumentNumber(e.target.value)}
+                        className="flex h-14 w-full rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 pl-12"
+                        placeholder='Numero de Documento'
+                    />
                     <div className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400">
                         <IoPersonCircleOutline />
                     </div>
                 </div>
 
                 <div className="text-center">
-                    <button className='font-inter bg-custom-blue border-2 border-custom-blue text-white rounded-lg w-full h-10 cursor-pointer'>
+                    <button onClick={handleSubmit} className='font-inter bg-custom-blue border-2 border-custom-blue text-white rounded-lg w-full h-10 cursor-pointer'>
                         Enviar Asistencia
                     </button>
                 </div>

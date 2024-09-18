@@ -14,9 +14,9 @@ export default function AsistenciaAprendiz() {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-   const router = useRouter(); // Hook para redireccionar
-  const handleNext = () => {
-    router.push('/justificacionaprendiz'); // Redirige al hacer clic en "Justificar"
+   const router = useRouter(); 
+  const handleNext = () => {  
+    router.push('/justificacionaprendiz'); 
   };
 
   return (
@@ -62,7 +62,6 @@ export default function AsistenciaAprendiz() {
                         <IoIosArrowDown className="text-black mr-9 cursor-pointer" onClick={toggleDropdown} />
                       </div>
 
-                      {/* Dropdown */}
                       {isDropdownOpen && (
                         <div className="absolute top-12 right-0 w-48 bg-white border border-gray-300 rounded shadow-lg z-10">
                           <ul className="text-sm">
@@ -88,13 +87,13 @@ export default function AsistenciaAprendiz() {
                   <table className="w-full text-sm text-left text-black dark:text-black border-2 border-gray-400 ml-0">
                   <thead className="text-base font-serif dark:bg-[#265067] dark:text-white text-center">
                   <tr>
-                      <th className="font-inter font-semibold px-7 py-3 border-2 border-gray-400"> Domingo</th>
-                      <th className="font-inter font-semibold px-10 py-3 border-2 border-gray-400"> Lunes</th>
-                      <th className="font-inter font-semibold px-9 py-3 border-2 border-gray-400"> Martes</th>
-                      <th className="font-inter font-semibold px-6 py-3 border-2 border-gray-400"> Miercoles</th>
-                      <th className="font-inter font-semibold px-9 py-3 border-2 border-gray-400"> Jueves</th>
-                      <th className="font-inter font-semibold px-8 py-3 border-2 border-gray-400"> Viernes</th>
-                      <th className="font-inter font-semibold px-8 py-3 border-2 border-gray-400"> Sabado</th>
+                      <th className="font-inter font-semibold px-7 py-3 border-2 border-gray-400 text-white"> Domingo</th>
+                      <th className="font-inter font-semibold px-10 py-3 border-2 border-gray-400 text-white"> Lunes</th>
+                      <th className="font-inter font-semibold px-9 py-3 border-2 border-gray-400 text-white"> Martes</th>
+                      <th className="font-inter font-semibold px-6 py-3 border-2 border-gray-400 text-white"> Miercoles</th>
+                      <th className="font-inter font-semibold px-9 py-3 border-2 border-gray-400 text-white"> Jueves</th>
+                      <th className="font-inter font-semibold px-8 py-3 border-2 border-gray-400 text-white"> Viernes</th>
+                      <th className="font-inter font-semibold px-8 py-3 border-2 border-gray-400 text-white"> Sabado</th>
                   </tr>
       
                   </thead>
