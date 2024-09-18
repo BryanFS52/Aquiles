@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Header } from "../../components/header";
 import { Sidebar } from "../../components/sidebar";
 import { PiStudentFill } from "react-icons/pi";
@@ -9,17 +9,29 @@ import ModalCorreo from "../../components/Modals/modalCorreo";
 import { sendEmailAbsence } from "../../services/emailService";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { getAllApprentices } from "../../services/apprenticeService"; // Importa el servicio
 
 export default function AprendicesList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState(null);
+    const [students, setStudents] = useState([]);
 
-    // Estado para los aprendices
-    const [students, setStudents] = useState([
-        { documentNumber: '10078459687', fullName: 'Michael Felipe Laiton Chaparro', isPresent: true, email: 'keishlanayedcamargorojas@gmail.com', date: '2024-08-16' },
-        { documentNumber: '10078459688', fullName: 'Ana María Pérez', isPresent: false, email: 'anamaria@gmail.com', date: '2024-08-16' },
-      
-    ]);
+    // Hook para cargar los aprendices cuando el componente se monta
+    useEffect(() => {
+        const fetchApprentices = async () => {
+            const apprenticesData = await getAllApprentices();
+            const formattedData = apprenticesData.map(apprentice => ({
+                documentNumber: apprentice.documentNumber,
+                fullName: `${apprentice.name} ${apprentice.lastName}`,
+                isPresent: true, // Este valor puede cambiar según tu lógica de asistencia
+                email: apprentice.email,
+                date: new Date().toISOString().split("T")[0], // Agregar fecha actual como ejemplo
+            }));
+            setStudents(formattedData);
+        };
+
+        fetchApprentices();
+    }, []);
 
     const toggleModal = (student) => {
         setSelectedStudent(student);
@@ -40,21 +52,37 @@ export default function AprendicesList() {
         } finally {
             setIsModalOpen(false);
         }
-    };
+    };   
 
-    // Calcula los números de los aprendices
     const totalStudents = students.length;
     const presentStudents = students.filter(student => student.isPresent).length;
     const absentStudents = students.filter(student => !student.isPresent).length;
+
+    const handleSaveAttendance = async () => {
+        try {
+            const attendanceData = students.map(student => ({
+                documentNumber: student.documentNumber,
+                isPresent: student.isPresent,
+                date: student.date,  // O la fecha que corresponda
+            }));
+            
+            await updateAttendance(attendanceData);
+            toast.success('Asistencia guardada correctamente');
+        } catch (error) {
+            console.error('Error al guardar la asistencia:', error);
+            toast.error('Hubo un error al guardar la asistencia');
+        }
+    };
 
     return (
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
             <Sidebar />
             <div className="xl:col-span-5">
                 <Header />
-                <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full relative bg-neutral-100 space-y-5 ">
+                <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full relative bg-neutral-100 space-y-5">
                     <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Lista de Asistencia</h1>
                     <div className="flex px-9 space-x-24">
+                        {/* Card de Aprendices */}
                         <div className="flex w-96 h-48 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ">
                             <div className="z-50 justify-end space-y-3">
                                 <PiStudentFill className="w-9 h-9 text-stone-600 ml-6" /><br />
@@ -65,6 +93,7 @@ export default function AprendicesList() {
                             </div>
                         </div>
 
+                        {/* Card de Presentes */}
                         <div className="flex w-96 h-48 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ">
                             <div className="z-50 justify-end space-y-3">
                                 <PiStudentFill className="w-9 h-9 text-stone-600 ml-6" /><br />
@@ -75,6 +104,7 @@ export default function AprendicesList() {
                             </div>
                         </div>
 
+                        {/* Card de Ausentes */}
                         <div className="flex w-96 h-48 rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 ">
                             <div className="z-50 justify-end space-y-3">
                                 <PiStudentFill className="w-9 h-9 text-stone-600 ml-6" /><br />
@@ -88,11 +118,8 @@ export default function AprendicesList() {
                         <ModalCorreo isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSendEmail={handleSendEmail} />
                     </div>
 
+                    {/* Tabla de aprendices */}
                     <div className="flex w-1/2 h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative ml-80 p-4 ">
-                        <div className="z-50 justify-end space-y-3">
-                        </div>
-
-                        {/* Tabla con los datos */}
                         <div className="overflow-x-auto w-full">
                             <table className="ml-16 bg-white w-96 md:w-5/6">
                                 <thead>
@@ -121,12 +148,16 @@ export default function AprendicesList() {
                                         </tr>
                                     ))}
                                 </tbody>
-
                             </table>
                             <div className="flex justify-end mr-12">
-                                <button type="button" className="text-white font-inter font-normal h-11 w-44 rounded-lg text-sm px-5 my-6 ml-80 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center">
-                                    Guardar Asistencia
-                                </button>
+                                <button type="button"
+                                className="text-white font-inter font-normal h-11 w-44 rounded-lg text-sm px-5 my-6 ml-80 bg-custom-blue dark:hover:bg-custom-blue dark:focus:ring-custom-blue flex items-center"
+                                onClick={handleSaveAttendance}
+                             >
+                                Guardar Asistencia
+                            </button>
+
+
                             </div>
                         </div>
                     </div>
