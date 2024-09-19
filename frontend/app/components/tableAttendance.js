@@ -42,10 +42,9 @@ const TablaApprentices = () => {
     const updateAttendance = (documentNumber) => {
         const updatedApprentices = apprentices.map(apprentice => {
             if (apprentice.documentNumber === documentNumber) {
-                const currentDay = new Date().getDay(); // 0 (Domingo) a 6 (Sábado)
-                const currentWeek = 0; // Cambia esto según la semana actual si es necesario
+                const currentDay = new Date().getDay(); 
+                const currentWeek = 0; 
 
-                // Cambiar la asistencia de 'A' a '✓'
                 apprentice.weeks[currentWeek][currentDay] = '✓';
             }
             return apprentice;
@@ -191,7 +190,7 @@ const TablaApprentices = () => {
                 </button>
             </div>
 
-            <FormularioQr updateAttendance={updateAttendance} />
+            {/* <FormularioQr updateAttendance={updateAttendance} /> */}
         </div>
     );
 };
