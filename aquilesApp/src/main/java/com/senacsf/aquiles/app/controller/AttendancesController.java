@@ -50,14 +50,8 @@ public class AttendancesController {
     @GetMapping("/generateQRCode")
     public ResponseEntity<byte[]> generateQRCode() {
         try {
-            LocalDateTime date = LocalDateTime.now();
-            String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-            // Aquí solo estamos incluyendo la fecha y hora en el texto del QR
-            String qrText = formattedDate;
-
-            // Generar el código QR sin logo
-            byte[] qrCode = qrCodeGenerator.generateQRCodeImage(qrText);
+            String frontendUrl = "https://8f45-152-200-176-22.ngrok-free.app/qrformulariomovil";
+            byte[] qrCode = qrCodeGenerator.generateQRCodeImage(frontendUrl);
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "image/png");
@@ -66,7 +60,7 @@ public class AttendancesController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    //probando commit para merge
+
     @GetMapping("/summary/{trainerId}")
     public ResponseEntity<Map<String, Long>> getAttendanceSummary(@PathVariable Long trainer_id) {
         Map<String, Long> summary = attendancesBusiness.getAttendanceSummary(trainer_id);

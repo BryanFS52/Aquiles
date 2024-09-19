@@ -13,7 +13,6 @@ export const createApprentice = async (data) => {
   }
 };
 
-// Función para obtener todos los aprendices con datos completos
 export const getAllApprentices = async () => {
   try {
     const response = await axios.get(`${API_URL}/persons/all`);
@@ -25,7 +24,7 @@ export const getAllApprentices = async () => {
       program: person.program || 'N/A',
       email: person.email || 'N/A',
       teamNumber: person.teamNumber || 'N/A',
-      profilePicture: person.profilePicture || 'N/A' // Asegúrate de que este campo esté disponible
+      profilePicture: person.profilePicture || 'N/A'
     }));
     return filteredData;
   } catch (error) {

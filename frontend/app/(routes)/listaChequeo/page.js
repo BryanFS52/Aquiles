@@ -21,7 +21,6 @@ export default function ListaChequeo() {
     const [trimestreSeleccionado, setTrimestreSeleccionado] = useState("");
     const [teamSeleccionado, setTeamSeleccionado] = useState("");
     const [pilarSeleccionado, setPilarSeleccionado] = useState("");
-
     const [guardarPresionado, setGuardarPresionado] = useState(false);
 
     const fileInputRefPrev = useRef(null);
@@ -44,8 +43,6 @@ export default function ListaChequeo() {
 
     const handleUploadPrev = useCallback(() => fileInputRefPrev.current.click(), []);
     const handleUploadNew = useCallback(() => fileInputRefNew.current.click(), []);
-
-
     
     return (
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">

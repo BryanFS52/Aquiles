@@ -12,7 +12,7 @@ import { TbLetterR, TbLetterX, TbLetterJ } from "react-icons/tb";
 export default function Attendance () {
   
   return (
-    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
+    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">        
       <Sidebar />
       <div className="xl:col-span-5">
         <Header />
@@ -22,77 +22,79 @@ export default function Attendance () {
           Lista de Asistencia
         </h1>
         
-        <div className="flex space-x-4">
-          <div className="flex h-16 w-[30%] rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 mb-2 ml-10">
-            <div className="flex items-center">
-              <span className="font-inter font-medium text-xl text-green-500">Desarollo de Aplicaciones Web II</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col h-16 w-3/5 rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 mb-2">
-          <div className="flex justify-center space-x-4">
-            <div className="flex h-12 w-60 rounded-lg shadow-lg border-2 bg-neutral-200 border-green-500 mt-[-10px]">
-              <div className="flex items-center">
-                <BsPersonCircle className="w-7 h-7 text-gray-500 ml-2" /></div>
-              <h1 className="text-custom-blue font-semibold text-lg font-inter ml-3 pt-2">25</h1>
-              <span className="font-inter text-sm ml-5 pt-3">Aprendices Activos</span>
-            </div>
-
-            <div className="flex h-12 w-60 rounded-lg shadow-lg border-2 bg-neutral-200 border-green-500 mt-[-10px]">
-              <div className="flex items-center">
-                <BsPersonCircle className="w-7 h-7 text-gray-500 ml-1" /></div>
-              <h1 className="text-custom-blue font-semibold text-lg font-inter ml-3 pt-2">4</h1>
-              <span className="font-inter text-sm ml-5 pt-3">Aprendices en Deserción</span>
-            </div>
-
-            <div className="flex h-12 w-60 rounded-lg shadow-lg border-2 bg-neutral-200 border-green-500 mt-[-10px]">
-              <div className="flex items-center">
-                <BsPersonCircle className="w-7 h-7 text-gray-500 ml-2" /></div>
-              <h1 className="text-custom-blue font-semibold text-lg font-inter ml-3 pt-2">3</h1>
-              <span className="font-inter text-sm ml-5 pt-3">Aprendices Retirados</span>
-            </div>
+        <div className="flex flex-col space-y-4 md:flex-row md:space-x-10 md:space-y-0">
+        <div className="flex h-auto md:h-16 w-full md:w-[30%] rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4">
+          <div className="flex items-center justify-center md:justify-start">
+            <span className="font-inter font-medium text-xl text-green-500"> Desarrollo de Aplicaciones Web II</span>
           </div>
         </div>
-        </div>
 
-      <div className="mt-6">
-        <TableAttendance />
-      </div>
-            <div className="flex justify-end mb-2 mr-6">
-            <div className="flex space-x-6">
-              <div className="flex h-14 w-40 rounded-lg shadow-lg bg-white border-2 border-gray-300 text-custom-blue font-inter font-semibold text-2xl justify-center p-3"> 255873</div>
-              <div className="flex h-14 flex-grow min-w-[400px] rounded-lg shadow-lg bg-white border-2 border-gray-300 text-custom-blue font-inter font-semibold text-xl justify-between p-4 space-x-6">
-                <div className="flex items-center space-x-4">
-                  <span className="font-inter text-base font-normal text-black">Asistencia</span>
-                  <div className="relative flex items-center">
-                    <input className="rounded-md border-gray-300 border-2 w-6 h-6 pr-6" readOnly />
-                    <FaCheck className="absolute right-2 text-green-500 w-4 h-4" strokeWidth={4} />
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <span className="font-inter text-base font-normal text-black">Retardo</span>
-                  <div className="relative flex items-center">
-                    <input className="rounded-md border-gray-300 border-2 w-6 h-6 pr-6" readOnly />
-                    <TbLetterR className="absolute right-2 text-yellow-500 w-4 h-4" strokeWidth={4} />
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <span className="font-inter text-base font-normal text-black">Inasistencia</span>
-                  <div className="relative flex items-center">
-                    <input className="rounded-md border-gray-300 border-2 w-6 h-6 pr-6" readOnly />
-                    <TbLetterX className="absolute right-2 text-red-500 w-4 h-4" strokeWidth={4} />
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <span className="font-inter text-base font-normal text-black">Justificación</span>
-                  <div className="relative flex items-center">
-                    <input className="rounded-md border-gray-300 border-2 w-6 h-6 pr-6" readOnly />
-                    <TbLetterJ className="absolute right-2 text-blue-500 w-4 h-4" strokeWidth={4} />
-                  </div>
-                </div>
+        <div className="flex h-auto md:h-16 w-full md:w-[63%] rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4">
+          <div className="flex flex-col items-center justify-center space-y-2 w-full md:flex-row md:justify-start md:space-y-0 md:space-x-14">
+            <div className="flex h-auto md:h-10 w-full md:w-60 rounded-lg shadow-lg border-2 bg-neutral-200 border-green-500 p-2">
+              <div className="flex items-center justify-center md:justify-start w-full">
+                <BsPersonCircle className="w-7 h-7 text-gray-500" />
+                <h1 className="text-custom-blue font-semibold text-lg font-inter ml-3">25</h1>
+                <span className="font-inter text-sm ml-5">Aprendices Activos</span>
+              </div>
+            </div>
+
+            <div className="flex h-auto md:h-10 w-full md:w-60 rounded-lg shadow-lg border-2 bg-neutral-200 border-green-500 p-2">
+              <div className="flex items-center justify-center md:justify-start w-full">
+                <BsPersonCircle className="w-7 h-7 text-gray-500" />
+                <h1 className="text-custom-blue font-semibold text-lg font-inter ml-3">4</h1>
+                <span className="font-inter text-sm ml-5">Aprendices en Deserción</span>
+              </div>
+            </div>
+
+            <div className="flex h-auto md:h-10 w-full md:w-60 rounded-lg shadow-lg border-2 bg-neutral-200 border-green-500 p-2">
+              <div className="flex items-center justify-center md:justify-start w-full">
+                <BsPersonCircle className="w-7 h-7 text-gray-500" />
+                <h1 className="text-custom-blue font-semibold text-lg font-inter ml-3">3</h1>
+                <span className="font-inter text-sm ml-5">Aprendices Retirados</span>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div className="mt-6">
+        <TableAttendance />
+      </div>
+      <div className="flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0 justify-center items-center w-full md:w-[60%]">
+      <div className="flex h-14 w-full md:w-40 rounded-lg shadow-lg bg-white border-2 border-gray-300 text-custom-blue font-inter font-semibold text-2xl justify-center p-3">
+        255873
+      </div>
+      <div className="flex flex-col md:flex-row md:space-x-6 w-full max-w-4xl rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 space-y-4 md:space-y-0">
+        <div className="flex items-center space-x-4 flex-1">
+          <span className="font-inter text-base font-normal text-black">Asistencia</span>
+          <div className="relative flex items-center">
+            <input className="rounded-md border-gray-300 border-2 w-6 h-6" readOnly />
+            <FaCheck className="absolute left-1 text-green-500 w-4 h-4" strokeWidth={4} />
+          </div>
+        </div>
+        <div className="flex items-center space-x-4 flex-1">
+          <span className="font-inter text-base font-normal text-black">Retardo</span>
+          <div className="relative flex items-center">
+            <input className="rounded-md border-gray-300 border-2 w-6 h-6" readOnly />
+            <TbLetterR className="absolute left-1 text-yellow-500 w-4 h-4" strokeWidth={4} />
+          </div>
+        </div>
+        <div className="flex items-center space-x-4 flex-1">
+          <span className="font-inter text-base font-normal text-black">Inasistencia</span>
+          <div className="relative flex items-center">
+            <input className="rounded-md border-gray-300 border-2 w-6 h-6" readOnly />
+            <TbLetterX className="absolute left-1 text-red-500 w-4 h-4" strokeWidth={4} />
+          </div>
+        </div>
+        <div className="flex items-center space-x-4 flex-1">
+          <span className="font-inter text-base font-normal text-black">Justificación</span>
+          <div className="relative flex items-center">
+            <input className="rounded-md border-gray-300 border-2 w-6 h-6" readOnly />
+            <TbLetterJ className="absolute left-1 text-blue-500 w-4 h-4" strokeWidth={4} />
+          </div>
+        </div>
+      </div>
+    </div>
           </div>
       </div>
     </div>
