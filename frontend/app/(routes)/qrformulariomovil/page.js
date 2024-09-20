@@ -1,23 +1,8 @@
-// "use client"
-
-// import React from "react";
-// import FormularioQr from "../../components/formularioQr";
-
-// const QrFormularioMovil = () => {
-//     return (
-//         <div>
-//             <FormularioQr />
-
-//         </div>
-//     )
-// };
-// export default QrFormularioMovil;
-
 "use client";
 
 import React, { useState, useEffect } from "react";
 import FormularioQr from "../../components/formularioQr";
-import { getAllApprentices } from "../../services/apprenticeService"; // Asegúrate de que la ruta sea correcta
+import { getAllApprentices } from "../../services/apprenticeService";
 
 const QrFormularioMovil = () => {
     const [apprentices, setApprentices] = useState([]);
@@ -56,7 +41,6 @@ const QrFormularioMovil = () => {
         });
 
         setApprentices(updatedApprentices);
-        setAttendanceData(documentNumber); // Guardar el número de documento en el estado
     };
 
     return (
@@ -65,12 +49,10 @@ const QrFormularioMovil = () => {
                 <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">
                     Escanear QR
                 </h1>
-                {/* Pasamos la función updateAttendance como prop */}
                 <FormularioQr updateAttendance={updateAttendance} />
             </div>
             {attendanceData && (
                 <div className="mt-4 text-center">
-                    {/* Mostrar un mensaje de éxito o cualquier lógica */}
                     <p className="text-lg text-green-600">
                         Asistencia registrada para el documento: {attendanceData}
                     </p>

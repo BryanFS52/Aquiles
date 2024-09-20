@@ -7,10 +7,9 @@ const qrCodeService = {
     try {
       const response = await axios.get(QR_CODE_API_URL, {
         params: { text },
-        responseType: 'arraybuffer', // Importante para manejar la imagen binaria
+        responseType: 'arraybuffer',
       });
 
-      // Convertir la respuesta a una imagen en base64
       const qrCodeImage = `data:image/png;base64,${btoa(
         String.fromCharCode(...new Uint8Array(response.data))
       )}`;
@@ -18,7 +17,7 @@ const qrCodeService = {
       return qrCodeImage;
     } catch (error) {
       console.error('Error generating QR code:', error);
-      throw error; // Lanza el error para que pueda ser manejado en el componente
+      throw error; 
     }
   },
 };
