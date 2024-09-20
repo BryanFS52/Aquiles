@@ -1,4 +1,4 @@
-// "use client"
+np// "use client"
 
 // import React from "react";
 // import FormularioQr from "../../components/formularioQr";
