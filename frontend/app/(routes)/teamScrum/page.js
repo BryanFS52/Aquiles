@@ -139,15 +139,17 @@ export default function Home() {
                     <div className="text-[#0e324d] font-inter font-semibold text-lg sm:text-xl mb-2">Team Número</div>
                     <p className="text-black-700 text-base mb-4">{team.team_scrum_id}</p>
                     
-                    <div className="text-[#000000] font-inter font-medium text-xl flex items-center justify-between">
-                      <span>Agregar Información</span>
-                      <div className="flex items-center">
-                        <button onClick={handleOpenAddInfoModal} className="ml-2">
-                          <MdAddCircle className="text-2xl text-[#00324d]" />
-                        </button>
-                        <button onClick={() => handleOpenConfirmModal(team.team_scrum_id)} className="ml-4">
-                          <FaTrashAlt className="text-2xl text-[#00324d]" />
-                        </button>
+                        <div className="text-[#000000] font-inter font-medium text-xl flex items-center justify-between">
+                          <div className="font-inter flex items-center gap-2"> {/* Agregar un gap entre el texto y el botón */}
+                            <span>Agregar Información</span>
+                            <button onClick={handleOpenAddInfoModal}>
+                              <MdAddCircle className="text-3xl text-[#00324d]" />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button onClick={() => handleOpenConfirmModal(team.team_scrum_id)}>
+                              <FaTrashAlt className="text-2xl text-[#00324d]" />
+                            </button>
                       </div>
                     </div>
                   </div>
