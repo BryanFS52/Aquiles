@@ -4,13 +4,33 @@ import { SlBookOpen } from "react-icons/sl";
 import { CgFileDocument } from "react-icons/cg";
 import { BsFillFilePersonFill } from "react-icons/bs";
 import { IoPersonCircleOutline } from "react-icons/io5";
+import { updateAttendance, createAttendance } from "../services/attendances"; 
 
-const FormularioQr = ({ updateAttendance }) => {
+const FormularioQr = () => {
     const [documentNumber, setDocumentNumber] = useState("");
+    const [isUpdating, setIsUpdating] = useState(false); // Estado para saber si estamos actualizando
 
-    const handleSubmit = () => {
-        updateAttendance(documentNumber);
-        setDocumentNumber(""); // Limpiar el campo después de enviar
+    const handleSubmit = async () => {
+        try {
+            const attendanceData = {
+                documentNumber: documentNumber,
+                attendance_state: 'PRESENTE', 
+                attendance_date: new Date(),
+            };
+
+            if (isUpdating) {
+                await updateAttendance(attendanceData); // Llama a updateAttendance si está en modo actualización
+                alert('Asistencia actualizada con éxito');
+            } else {
+                await createAttendance(attendanceData); // Llama a createAttendance si está en modo creación
+                alert('Asistencia registrada con éxito');
+            }
+
+            setDocumentNumber(""); 
+        } catch (error) {
+            console.error('Error al enviar asistencia:', error);
+            alert('Error al registrar asistencia');
+        }
     };
 
     return (
@@ -64,7 +84,7 @@ const FormularioQr = ({ updateAttendance }) => {
 
                 <div className="text-center">
                     <button onClick={handleSubmit} className='font-inter bg-custom-blue border-2 border-custom-blue text-white rounded-lg w-full h-10 cursor-pointer'>
-                        Enviar Asistencia
+                        {isUpdating ? 'Actualizar Asistencia' : 'Enviar Asistencia'}
                     </button>
                 </div>
             </div>

@@ -2,7 +2,6 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:8081/api';
 
-// Función para crear un nuevo aprendiz
 export const createApprentice = async (data) => {
   try {
     await axios.post(`${API_URL}/persons/create`, data);
@@ -32,3 +31,4 @@ export const getAllApprentices = async () => {
     return [];
   }
 };
+
