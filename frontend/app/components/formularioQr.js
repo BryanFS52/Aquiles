@@ -8,7 +8,7 @@ import { updateAttendance, createAttendance } from "../services/attendances";
 
 const FormularioQr = () => {
     const [documentNumber, setDocumentNumber] = useState("");
-    const [isUpdating, setIsUpdating] = useState(false); // Estado para saber si estamos actualizando
+    const [isUpdating, setIsUpdating] = useState(false); 
 
     const handleSubmit = async () => {
         try {
@@ -19,10 +19,10 @@ const FormularioQr = () => {
             };
 
             if (isUpdating) {
-                await updateAttendance(attendanceData); // Llama a updateAttendance si está en modo actualización
+                await updateAttendance(attendanceData); 
                 alert('Asistencia actualizada con éxito');
             } else {
-                await createAttendance(attendanceData); // Llama a createAttendance si está en modo creación
+                await createAttendance(attendanceData); 
                 alert('Asistencia registrada con éxito');
             }
 
