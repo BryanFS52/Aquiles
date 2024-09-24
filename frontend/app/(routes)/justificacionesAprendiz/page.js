@@ -6,6 +6,7 @@ import { Sidebaraprendiz } from "../../components/sidebaraprendiz";
 import { IoIosArrowDown } from "react-icons/io";
 import { ToastContainer, toast } from "react-toastify"; // Importa ToastContainer y toast
 import "react-toastify/dist/ReactToastify.css"; // Importa el estilo para las notificaciones
+import { BsPersonCircle } from "react-icons/bs";
 
 export default function Justificacionaaprendiz() {
 
@@ -114,12 +115,48 @@ export default function Justificacionaaprendiz() {
       <div className="xl:col-span-5">
         <Header />
 
-        <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full">
-          <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">
-            Cargar Justificación
-          </h1>
+        <div className="h-[90vh] p-4 md:p-8 lg:p-12 w-full bg-neutral-100 space-y-5">
+        <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-4 font-inter font-semibold">
+          Cargar Justificación
+        </h1>
 
-          <div className="flex items-center justify-center bg-gray-100 py-12 w-3/4 ml-40">
+      
+
+        <div className="flex h-auto md:h-16 w-full md:w-[50%] rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4">
+          <div className="flex flex-col items-center justify-center space-y-2 w-full md:flex-row md:justify-start md:space-y-0 md:space-x-14">
+            <div className="flex h-auto md:h-10 w-full md:w-60 rounded-lg shadow-lg border-2 bg-neutral-200 border-green-500 p-2">
+              <div className="flex items-center justify-center md:justify-start w-full">
+                <BsPersonCircle className="w-7 h-7 text-gray-500" />
+                <h1 className="text-custom-blue font-semibold text-lg font-inter ml-3">10</h1>
+                <span className="font-inter text-sm ml-5">Justificaciones Aceptadas</span>
+              </div>
+            </div>
+
+            <div className="flex h-auto md:h-10 w-full md:w-60 rounded-lg shadow-lg border-2 bg-neutral-200 border-green-500 p-2">
+              <div className="flex items-center justify-center md:justify-start w-full">
+                <BsPersonCircle className="w-7 h-7 text-gray-500" />
+                <h1 className="text-custom-blue font-semibold text-lg font-inter ml-3">4</h1>
+                <span className="font-inter text-sm ml-5">Justificaciones Pendientes</span>
+              </div>
+            </div>
+
+            <div className="flex h-auto md:h-10 w-full md:w-60 rounded-lg shadow-lg border-2 bg-neutral-200 border-green-500 p-2">
+              <div className="flex items-center justify-center md:justify-start w-full">
+                <BsPersonCircle className="w-7 h-7 text-gray-500" />
+                <h1 className="text-custom-blue font-semibold text-lg font-inter ml-3">3</h1>
+                <span className="font-inter text-sm ml-5">Justificaciones Rechazadas </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+        <div className="flex h-auto md:h-5/6 w-full md:w-[50%] rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4">
+          <div className="flex flex-col items-center justify-center space-y-2 w-full md:flex-row md:justify-start md:space-y-0 md:space-x-14">
+        
+          </div>
+        </div>
+        
+        <div className="flex items-center justify-center bg-gray-100 py-12 w-3/4 ml-40">
             <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full">
               <h2 className="text-[#0e324d] font-inter font-semibold text-xl sm:text-3xl text-center mb-10">
                 Justifica Aquí tu Inasistencia

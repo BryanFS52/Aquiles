@@ -54,7 +54,7 @@ public class AttendancesController {
     @GetMapping("/generateQRCode")
     public ResponseEntity<byte[]> generateQRCode() {
         try {
-            String frontendUrl = "https://4bc6-152-200-176-22.ngrok-free.app/qrformulariomovil";
+            String frontendUrl = "https://6608-152-200-176-22.ngrok-free.app/qrformulariomovil";
             byte[] qrCode = qrCodeGenerator.generateQRCodeImage(frontendUrl);
 
             HttpHeaders headers = new HttpHeaders();
