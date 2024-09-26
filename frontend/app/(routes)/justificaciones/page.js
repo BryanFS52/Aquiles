@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
-import { Sidebar } from "../../components/sidebar";
+import { Sidebar } from "../../components/Sidebar";
 import { GoSearch } from "react-icons/go";
 import { GrAttachment } from "react-icons/gr";
 import Image from "next/image";

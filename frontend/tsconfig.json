@@ -38,7 +38,7 @@
     "app/components/estadistica.js",
     "app/components/header.js",
     "app/components/product.js",
-    "app/components/sidebar.js",
+    "app/components/Sidebar.js",
     "app/page.js",
     "app/layout.js",
     ".next/types/*/.ts",

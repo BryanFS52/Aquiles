@@ -1,21 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from 'react'; 
-import { Header } from "../../components/header"; //importaciones del Header y el Sidebar
-import { Sidebar } from "../../components/sidebar";
-import { ToastContainer, toast } from "react-toastify"; //importacion de la libreria ToastContainer para las alertas con la animacion 
+import React from 'react'; 
+import { Header } from "../../components/header"; // Importaciones del Header
+import AppSidebar from "../../components/AppSidebar"; // Cambiar a AppSidebar
+import { ToastContainer } from "react-toastify"; // Importación de la librería ToastContainer para las alertas con la animación 
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function Home() {
- 
-
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-      <Sidebar />
+      <AppSidebar /> {/* Usar AppSidebar en lugar de Sidebar */}
       <div className="xl:col-span-5">
         <Header />
-      <div className='bg-[#40b003]' ><span>Dashboard</span></div>
-        
+        <div className='bg-[#40b003]'>
+          <span>Dashboard</span>
+        </div>
       </div>
       <ToastContainer />
     </div>

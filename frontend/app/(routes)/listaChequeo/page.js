@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState, useRef } from "react";
 import { Header } from "../../components/header";
-import { Sidebar } from "../../components/sidebar";
+import { Sidebar } from "../../components/Sidebar";
 import { BiX, BiCheck } from "react-icons/bi";
 import CheckListTable from "../../components/CheckListTable";
 import {downloadReportPDF} from "../../services/PDFService";

@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { BsPersonCircle } from "react-icons/bs";
 import TableAttendance from "../../components/tableAttendance";
 import { Header } from "../../components/header";
-import { Sidebar } from "../../components/sidebar";
+import { Sidebar } from "../../components/Sidebar";
 import { FaCheck, FaEye } from "react-icons/fa";
 import { TbLetterR, TbLetterX, TbLetterJ } from "react-icons/tb";
 

@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { Header } from "../../components/header";
-import { Sidebaraprendiz } from "../../components/sidebaraprendiz";
+import { Sidebaraprendiz } from "../../components/SidebarAprendiz";
 import { IoIosArrowDown } from "react-icons/io";
 import { ToastContainer, toast } from "react-toastify"; // Importa ToastContainer y toast
 import "react-toastify/dist/ReactToastify.css"; // Importa el estilo para las notificaciones

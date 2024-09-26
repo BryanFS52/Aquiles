@@ -4,7 +4,7 @@ import React, {useState} from "react";
 import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
 import { downloadReportPDF } from "../../services/PDFService";
 import { IoIosArrowDown } from "react-icons/io";
-import { Sidebaraprendiz } from "../../components/sidebaraprendiz";
+import { Sidebaraprendiz } from "../../components/SidebarAprendiz";
 import ChecklistAprendices from "../../components/ChecklistAprendices";
 
 export default function ListaChequeo() {

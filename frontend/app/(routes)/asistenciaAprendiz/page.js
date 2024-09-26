@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Header } from "../../components/header";
-import { Sidebaraprendiz } from "../../components/sidebaraprendiz"; // Importaciones del header y del sidebar
+import { Sidebaraprendiz } from "../../components/SidebarAprendiz"; // Importaciones del header y del sidebar
 import { GoSearch } from "react-icons/go";
 import { IoIosArrowDown } from "react-icons/io";
 import { useRouter } from 'next/navigation'; // Importa useRouter de next/navigation

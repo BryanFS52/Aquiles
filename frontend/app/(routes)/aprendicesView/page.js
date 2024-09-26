@@ -3,10 +3,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Header } from "../../components/header";
-import { Sidebar } from "../../components/sidebar";
+
 import { getAllApprentices } from "../../services/apprenticeService";
 import { useApprentices } from '../../context/ApprenticeContext'; // Importar el contexto
-import { Sidebaraprendiz } from '@/components/sidebaraprendiz';
+import { Sidebaraprendiz } from '../../components/SidebarAprendiz';
 
 const ListaApprentices = () => {
   const { apprentices, setApprentices } = useApprentices();

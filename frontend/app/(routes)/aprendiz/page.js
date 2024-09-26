@@ -1,6 +1,6 @@
 import React from "react";
 import { Header } from "../../components/header";
-import { Sidebaraprendiz } from "../../components/sidebaraprendiz";
+import { Sidebaraprendiz } from "../../components/SidebarAprendiz";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { LiaLanguageSolid } from "react-icons/lia";
 import { FaComputer } from "react-icons/fa6";

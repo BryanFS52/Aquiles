@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Header } from "../../components/header";
-import { Sidebar } from "../../components/sidebar";
+import { Sidebar } from "../../components/Sidebar";
 import { getAllApprentices } from "../../services/apprenticeService";
 import { useApprentices } from '../../context/ApprenticeContext';
 

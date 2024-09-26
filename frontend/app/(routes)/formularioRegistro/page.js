@@ -5,7 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { useRouter } from 'next/navigation'; 
 import { Header } from '../../components/header';
-import { Sidebar } from '../../components/sidebar';
+import { Sidebar } from '../../components/Sidebar';
 import { createApprentice } from '../../services/apprenticeService';
 
 const RegisterPersonForm = () => {

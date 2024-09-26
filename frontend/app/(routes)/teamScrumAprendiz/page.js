@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
-import { Sidebaraprendiz } from "../../components/sidebaraprendiz";
+import { Sidebaraprendiz } from "../../components/SidebarAprendiz";
 import Image from 'next/image';
 import aquiles from "../../../public/img/aquiles.jpg";
 import { IoPersonCircleSharp } from "react-icons/io5";

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'; 
 import { Header } from "../../components/header"; 
-import { Sidebar } from "../../components/sidebar";
+import { Sidebar } from "../../components/Sidebar";
 import { MdAdd } from "react-icons/md";
 import { MdAddCircle } from "react-icons/md";
 import ModalNewProject from '../../components/Modals/modalNewProject';

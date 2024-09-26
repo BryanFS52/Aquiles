@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Header } from "../../components/header"; 
-import { Sidebar } from "../../components/sidebar";
+import { Sidebar } from "../../components/Sidebar";
 import { TbArrowBigRight } from "react-icons/tb";
 import { MdAdd } from "react-icons/md";
 import { ToastContainer, toast } from "react-toastify"; 

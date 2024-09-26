@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Header } from "../../components/header";
-import { Sidebar } from "../../components/sidebar";
+import { Sidebar } from "../../components/Sidebar";
 import { PiStudentFill } from "react-icons/pi";
 import { ImMail4 } from "react-icons/im";
 import ModalCorreo from "../../components/Modals/modalCorreo";
