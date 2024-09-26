@@ -15,9 +15,10 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/attendances")
+    @RequestMapping("/api/attendances")
 public class AttendancesController {
 
     @Autowired
@@ -49,7 +50,7 @@ public class AttendancesController {
     @GetMapping("/generateQRCode")
     public ResponseEntity<byte[]> generateQRCode() {
         try {
-            String frontendUrl = "https://4bc6-152-200-176-22.ngrok-free.app/qrformulariomovil";
+            String frontendUrl = "https://8a4c-152-200-176-22.ngrok-free.app/qrformulariomovil";
             byte[] qrCode = qrCodeGenerator.generateQRCodeImage(frontendUrl);
 
             HttpHeaders headers = new HttpHeaders();
@@ -60,4 +61,9 @@ public class AttendancesController {
         }
     }
 
+    @GetMapping("/summary/{trainerId}")
+    public ResponseEntity<Map<String, Long>> getAttendanceSummary(@PathVariable Long trainer_id) {
+        Map<String, Long> summary = attendancesBusiness.getAttendanceSummary(trainer_id);
+        return ResponseEntity.ok(summary);
+    }
 }

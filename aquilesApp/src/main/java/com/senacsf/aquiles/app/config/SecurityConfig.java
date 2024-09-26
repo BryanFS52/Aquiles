@@ -29,7 +29,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/students/**").permitAll()
                                 .requestMatchers("/api/trainers/**").permitAll()
                                 // Solo instructores pueden acceder a los endpoints de asistencia
-                                .requestMatchers("/attendance/**").hasRole("Trainer")
+                                .requestMatchers("/api/attendances/**").permitAll()//.hasRole("Trainer")
+                                .requestMatchers("/api/stateattendance/**").permitAll()
                                 // Cualquier otra solicitud requiere autenticación
                                 .anyRequest().authenticated()
                 )
