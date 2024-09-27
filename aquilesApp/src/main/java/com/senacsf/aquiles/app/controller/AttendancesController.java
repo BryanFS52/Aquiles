@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/attendances")
+    @RequestMapping("/api/attendances")
 public class AttendancesController {
 
     @Autowired
@@ -50,7 +50,7 @@ public class AttendancesController {
     @GetMapping("/generateQRCode")
     public ResponseEntity<byte[]> generateQRCode() {
         try {
-            String frontendUrl = "https://4bc6-152-200-176-22.ngrok-free.app/qrformulariomovil";
+            String frontendUrl = "https://8a4c-152-200-176-22.ngrok-free.app/qrformulariomovil";
             byte[] qrCode = qrCodeGenerator.generateQRCodeImage(frontendUrl);
 
             HttpHeaders headers = new HttpHeaders();
@@ -69,5 +69,13 @@ public class AttendancesController {
     }
 =======
 
+<<<<<<< HEAD
 >>>>>>> 0840835b7f0aedd7c7b1ce3d75191bbbc9288449
+=======
+    @GetMapping("/summary/{trainerId}")
+    public ResponseEntity<Map<String, Long>> getAttendanceSummary(@PathVariable Long trainer_id) {
+        Map<String, Long> summary = attendancesBusiness.getAttendanceSummary(trainer_id);
+        return ResponseEntity.ok(summary);
+    }
+>>>>>>> e2c8202cace7315c5acf8af74d850be7f3781cb9
 }
