@@ -6,21 +6,12 @@ import { getAllApprentices } from "../../services/apprenticeService";
 
 const QrFormularioMovil = () => {
     const [apprentices, setApprentices] = useState([]);
-    const [attendanceData, setAttendanceData] = useState(null);
 
     useEffect(() => {
         const fetchApprentices = async () => {
             try {
                 const apprenticesData = await getAllApprentices();
-                const updatedApprentices = apprenticesData.map(apprentice => ({
-                    ...apprentice,
-                    weeks: Array(4).fill(null).map(() => 
-                        Array(7).fill(null).map((_, dayIndex) => 
-                            (dayIndex === 5 || dayIndex === 6) ? '' : 'A'
-                        )
-                    ),
-                }));
-                setApprentices(updatedApprentices);
+                setApprentices(apprenticesData);
             } catch (error) {
                 console.error('Error al obtener la lista de aprendices:', error);
             }
@@ -29,38 +20,16 @@ const QrFormularioMovil = () => {
         fetchApprentices();
     }, []);
 
-    const updateAttendance = (documentNumber) => {
-        const updatedApprentices = apprentices.map(apprentice => {
-            if (apprentice.documentNumber === documentNumber) {
-                const currentDay = new Date().getDay(); 
-                const currentWeek = 0; 
-
-                apprentice.weeks[currentWeek][currentDay] = '✓';
-            }
-            return apprentice;
-        });
-
-        setApprentices(updatedApprentices);
-    };
-
     return (
         <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4">
             <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
                 <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">
                     Escanear QR
                 </h1>
-                <FormularioQr updateAttendance={updateAttendance} />
+                <FormularioQr />
             </div>
-            {attendanceData && (
-                <div className="mt-4 text-center">
-                    <p className="text-lg text-green-600">
-                        Asistencia registrada para el documento: {attendanceData}
-                    </p>
-                </div>
-            )}
         </div>
     );
 };
 
 export default QrFormularioMovil;
-
