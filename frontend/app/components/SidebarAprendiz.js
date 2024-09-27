@@ -38,7 +38,7 @@ export const Sidebaraprendiz = () => {
                     <ul className='text-white'>
 
                     <li>
-                            <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <Link href="/FichaAprendiz" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <IoPersonSharp className='text-2xl' />
                                 Ficha
                             </Link>
@@ -63,13 +63,6 @@ export const Sidebaraprendiz = () => {
                             <FaChalkboardUser className='text-2xl' />
                             Sustentaciones
                         </Link>
-                        </li>
-
-                        <li>
-                            <Link href="/aprendicesView" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <PiStudentFill className='text-2xl' />
-                                Aprendices
-                            </Link>
                         </li>
 
                         <li>
