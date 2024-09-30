@@ -5,31 +5,29 @@ import { updateAttendanceState } from "../services/attendances";
 
 const FormularioQr = () => {
     const [documentNumber, setDocumentNumber] = useState("");
-    const [attendanceId] = useState(1); // Asumimos que el id de asistencia es siempre 1 al enviar
-    const [stateAttendanceId, setStateAttendanceId] = useState(1); // Cambia a 1 por defecto
+    const [attendanceId] = useState(1); 
+    const [stateAttendanceId, setStateAttendanceId] = useState(1); 
     const [loading, setLoading] = useState(false); 
-    const [attendanceUpdated, setAttendanceUpdated] = useState(false); // Estado para controlar la visualización del chulito
+    const [attendanceUpdated, setAttendanceUpdated] = useState(false); 
 
     const handleSubmit = async () => {
         setLoading(true);
         try {
-            const currentDate = new Date().toISOString(); // Obtener la fecha actual en formato ISO
+            const currentDate = new Date().toISOString(); 
             const attendanceData = {
-                attendance_id: attendanceId, // Asegúrate de que attendanceId tenga el valor correcto
+                attendance_id: attendanceId, 
                 attendance_date: currentDate,
                 documentNumber: documentNumber,
                 fk_stateAttendance: {
-                    stateAttendanceId: 2 // Cambia a 2 al registrar la asistencia
+                    stateAttendanceId: 2
                 }
             };
     
-            // Aquí se actualiza el estado en la tabla stateAttendance
             await updateAttendanceState(attendanceData); 
     
             alert('Asistencia actualizada con éxito');
-            setAttendanceUpdated(true); // Cambia el estado para mostrar el chulito
+            setAttendanceUpdated(true); 
     
-            // Limpiar el campo de entrada
             setDocumentNumber(""); 
         } catch (error) {
             console.error('Error al enviar asistencia:', error);

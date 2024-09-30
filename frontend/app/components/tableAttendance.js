@@ -4,7 +4,6 @@ import { GoSearch } from "react-icons/go";
 import { BsQrCode } from "react-icons/bs";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import ModalQR from "../components/Modals/modalQR";
-import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import FormularioQr from "../components/formularioQr"; 
 
@@ -17,21 +16,14 @@ const TablaApprentices = () => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentPage, setCurrentPage] = useState(1);
     const [apprenticesPerPage] = useState(7);
+    const [alertVisible, setAlertVisible] = useState(false); 
 
     useEffect(() => {
         const fetchApprentices = async () => {
             try {
-                const apprenticesData = await getAllApprentices();
-                const updatedApprentices = apprenticesData.map(apprentice => ({
-                    ...apprentice,
-                    weeks: Array(4).fill(null).map(() => 
-                        Array(7).fill(null).map((_, dayIndex) => 
-                            (dayIndex === 5 || dayIndex === 6) ? '' : 'A'
-                        )
-                    ),
-                }));
-                setApprentices(updatedApprentices);
-            } catch (error) {
+                const apprenticesData = await getAllApprentices(); 
+                setApprentices(apprenticesData);
+            }catch (error) {
                 console.error('Error al obtener la lista de aprendices:', error);
             }
         };
@@ -39,30 +31,21 @@ const TablaApprentices = () => {
         fetchApprentices();
     }, []);
 
-    const updateAttendance = (documentNumber) => {
-        const updatedApprentices = apprentices.map(apprentice => {
-            if (apprentice.documentNumber === documentNumber && apprentice.state === 2) { // Verifica el estado
-                const currentDay = new Date().getDay(); 
-                const currentWeek = 0; 
-
-                apprentice.weeks[currentWeek][currentDay] = '✓'; // Pone el chulito
-            }
-            return apprentice;
-        });
-
-        setApprentices(updatedApprentices);
-    };
-
-    const handleOpenQRModal = () => {
-        setModalQROpen(true);
-    };
-
-    const handleCloseQRModal = () => {
-        setModalQROpen(false);
-    };
-
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
+    };
+
+    const handleAttendanceClick = () => {
+            setAlertVisible(true); // Muestra la alerta
+    };
+
+    const handleYesClick = () => {
+        setModalQROpen(true); // Abre el modal QR si se selecciona "Sí"
+        setAlertVisible(false); 
+    };
+
+    const handleNoClick = () => {
+        setAlertVisible(false); // Cerrar la alerta si se selecciona "No"
     };
 
     const filteredApprentices = apprentices.filter((apprentice) =>
@@ -72,9 +55,7 @@ const TablaApprentices = () => {
     const indexOfLastApprentice = currentPage * apprenticesPerPage;
     const indexOfFirstApprentice = indexOfLastApprentice - apprenticesPerPage;
     const currentApprentices = filteredApprentices.slice(indexOfFirstApprentice, indexOfLastApprentice);
-
     const totalPages = Math.ceil(filteredApprentices.length / apprenticesPerPage);
-
     const handlePageChange = (page) => {
         if (page > 0 && page <= totalPages) {
             setCurrentPage(page);
@@ -95,11 +76,22 @@ const TablaApprentices = () => {
                     </form>
 
                     <div className="relative w-full md:w-auto">
-                        <button onClick={handleOpenQRModal} className="flex items-center h-10 w-full md:w-auto pl-3 pr-4 text-sm rounded-lg border-2 border-slate-300 bg-custom-blue text-white hover:bg-[#01b001] transition-colors duration-300 focus:outline-none">
+                        <button onClick={handleAttendanceClick} className="flex items-center h-10 w-full md:w-auto pl-3 pr-4 text-sm rounded-lg border-2 border-slate-300 bg-custom-blue text-white hover:bg-[#01b001] transition-colors duration-300 focus:outline-none">
                             Toma de Asistencia
                             <BsQrCode className="w-4 h-4 ml-2" />
                         </button>
-                        <ModalQR isOpen={modalQROpen} onClose={handleCloseQRModal} />
+                        {alertVisible && (
+                            <div className="absolute z-10 left-0 top-10 mt-4 bg-white border-2 border-gray-400 shadow-lg h-20 rounded-lg flex items-center justify-between p-4 w-[300px]">
+                                <div className="flex flex-col">
+                                    <span className="font-inter text-center text-base font-semibold">Se va a generar el QR, ¿desea continuar?</span>
+                                </div>
+                                <div className="flex space-x-2">
+                                    <button onClick={handleNoClick} className="bg-red-600 border-2 border-red-700 rounded-2xl w-16 h-8 text-white font-medium text-xl">No</button>
+                                    <button onClick={handleYesClick} className="bg-green-600 border-2 border-green-700 rounded-2xl w-16 h-8 text-white font-medium text-xl">Sí </button>
+                                </div>
+                            </div>
+                        )}
+                        <ModalQR isOpen={modalQROpen} onClose={() => setModalQROpen(false)} />
                     </div>
                 </div>
             </div>
@@ -147,45 +139,52 @@ const TablaApprentices = () => {
                                     {apprentice.name} {apprentice.lastName}
                                 </td>
                                 {[...Array(4)].map((_, weekIndex) => (
-                                    <React.Fragment key={weekIndex}>
-                                        {[...Array(7)].map((_, dayIndex) => {
-                                            const isWeekend = dayIndex === 5 || dayIndex === 6;
-                                            const cellValue = apprentice.weeks[weekIndex][dayIndex];
-                                            return (
-                                                <td 
-                                                    key={dayIndex} 
-                                                    className={`px-2 py-2 border-2 border-gray-300 text-center ${isWeekend ? 'bg-gray-200' : ''}`}
-                                                >
-                                                    <span className={`${
-                                                        cellValue === '✓' ? 'text-green-500 font-bold' :
-                                                        (cellValue === 'R' ? 'text-yellow-500 font-bold' :
-                                                        (cellValue === 'X' ? 'text-red-500 font-bold' :
-                                                        (cellValue === 'J' ? 'text-blue-500 font-bold' : 
-                                                        'text-black')))
-                                                    }`}>
-                                                        {cellValue}
-                                                    </span>
-                                                </td>
-                                            );
-                                        })}
-                                    </React.Fragment>
-                                ))}
+                                <React.Fragment key={weekIndex}>
+                                    {[...Array(7)].map((_, dayIndex) => {
+                                        const isWeekend = dayIndex === 5 || dayIndex === 6;
+                                        const cellValue = apprentice.weeks && apprentice.weeks[weekIndex] ? apprentice.weeks[weekIndex][dayIndex] : '';
+
+                                        return (
+                                            <td 
+                                                key={dayIndex} 
+                                                className={`px-2 py-2 border-2 border-gray-300 text-center ${isWeekend ? 'bg-gray-200' : ''}`}
+                                            >
+                                                <span className={`${
+                                                    cellValue === '✓' ? 'text-green-500 font-bold' :
+                                                    (cellValue === 'R' ? 'text-yellow-500 font-bold' :
+                                                    (cellValue === 'X' ? 'text-red-500 font-bold' :
+                                                    (cellValue === 'J' ? 'text-blue-500 font-bold' : 
+                                                    'text-black')))
+                                                }`}>
+                                                    {cellValue}
+                                                </span>
+                                            </td>
+                                        );
+                                    })}
+                                </React.Fragment>
+                            ))}
+
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
 
-            <div className="flex justify-between mt-4">
-                <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="bg-custom-blue text-white px-4 py-2 rounded-md">
+            <div className="flex justify-center items-center space-x-4">
+                <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="px-4 py-2 font-medium text-gray-500 text-2xl cursor-pointer">
                     <IoIosArrowBack />
                 </button>
-                <span className="self-center">{currentPage} / {totalPages}</span>
-                <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="bg-custom-blue text-white px-4 py-2 rounded-md">
+                {[...Array(totalPages)].map((_, pageIndex) => (
+                    <button key={pageIndex + 1} onClick={() => handlePageChange(pageIndex + 1)} className={`px-4 py-2 text-sm font-medium rounded-lg ${currentPage === pageIndex + 1 ? 'bg-custom-blue text-white hover:bg-[#01b001] transition-colors duration-300' : 'bg-custom-blue text-white hover:bg-[#01b001] transition-colors duration-300'}`}>
+                        {pageIndex + 1}
+                    </button>
+                ))}
+                <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="px-4 py-2 font-medium text-gray-500 text-2xl cursor-pointer">
                     <IoIosArrowForward />
                 </button>
             </div>
         </div>
+        
     );
 };
 
