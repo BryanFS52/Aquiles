@@ -1,4 +1,3 @@
-// En AppSidebar.js
 import React, { useEffect, useState } from 'react';
 import { getRoles } from '../services/RoleService'; // Importa el servicio que creaste
 import { Sidebar } from '../components/Sidebar'; 
@@ -11,8 +10,8 @@ const AppSidebar = () => {
     useEffect(() => {
         // Obtener roles desde Mockoon (Olimpo simulado)
         const fetchRoles = async () => {
-            const roles = await getRoles();
-            setRoles(roles);
+            const fetchedRoles = await getRoles();
+            setRoles(fetchedRoles);
             setLoading(false);
         };
 
@@ -25,9 +24,11 @@ const AppSidebar = () => {
         }
 
         // Lógica basada en los roles obtenidos
-        if (roles.includes('instructor')) {
+        const roleNames = roles.map(role => role.name); // Extraer los nombres de los roles
+
+        if (roleNames.includes('instructor')) {
             return <Sidebar />;
-        } else if (roles.includes('aprendiz')) {
+        } else if (roleNames.includes('aprendiz')) {
             return <SidebarAprendiz />;
         } else {
             return <div>Rol no reconocido</div>;

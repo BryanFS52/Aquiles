@@ -10,6 +10,7 @@ import logoSena from "../public/img/LogoSena.png";
 import LogoAquiles from "../public/img/LogoAquiles.png";
 import ModalOlvidoContraseña from "../app/components/Modals/modalOlvidoContraseña";
 import { useRouter } from 'next/navigation';
+import axios from 'axios'; // Asegúrate de importar axios
 
 export default function Login() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -18,7 +19,7 @@ export default function Login() {
     documentNumber: '',
     password: ''
   });
-  const [error, setError] = useState(null); // Añadido estado para errores
+  const [error, setError] = useState(null);
   const router = useRouter();
 
   const handleOpenModal = () => {
@@ -36,38 +37,36 @@ export default function Login() {
     });
   };
 
-  const getCsrfToken = async () => {
-    try {
-      const response = await axios.get('/api/csrf-token');
-      return response.data.csrfToken; // Ajusta esto según la estructura de tu respuesta
-    } catch (error) {
-      console.error('Error al obtener el token CSRF:', error.message);
-      return null;
-    }
-  };
-
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
-      const csrfToken = await getCsrfToken();
-
-      const response = await axios.post('/api/auth/login', formData, {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': csrfToken
-        }
+      const response = await axios.post('/api/auth/login', {
+          documentType: formData.documentType,
+          documentNumber: formData.documentNumber,
+          password: formData.password
+      }, {
+          headers: {
+              'Content-Type': 'application/json'
+          }
       });
-      console.log('Respuesta del servidor:', response.data);
-      router.push('/home');
+
+      // Verifica que la respuesta contenga datos antes de intentar acceder a ellos
+      if (response.data && response.data.data) {
+          const { redirectUrl, rol } = response.data.data;
+          localStorage.setItem('userRole', rol);
+          window.location.href = redirectUrl; // Redirige a la URL proporcionada
+      } else {
+          throw new Error("No se recibió la URL de redirección");
+      }
+
     } catch (error) {
       console.error('Error al iniciar sesión:', error.message);
-      setError('Error al iniciar sesión: ' + error.message); // Utilizar setError aquí
+      setError('Error al iniciar sesión: ' + (error.response ? error.response.data.message : error.message));
     }
   };
 
   return (
-		<div className="font-inter w-screen h-screen flex justify-center items-center bg-white">
+    <div className="font-inter w-screen h-screen flex justify-center items-center bg-white">
       <div className="w-full h-full flex justify-between items-center">
         <div className="xl:w-1/2 h-full flex justify-center items-center sm:w-full">
           <div className="xl:w-1/2 p-5">
@@ -80,14 +79,14 @@ export default function Login() {
                 </p>
               </div>
             </div>
-						<div className="text-custom-blue pt-10">
-							<h1 className="text-4xl">Inicia Sesión</h1>
-							<p className="text-base pt-5">
-								¡Bienvenido de Vuelta!
-								<br />
-							 Inicia Sesión para Acceder a tu Cuenta.
-							</p>
-						</div>
+            <div className="text-custom-blue pt-10">
+              <h1 className="text-4xl">Inicia Sesión</h1>
+              <p className="text-base pt-5">
+                ¡Bienvenido de Vuelta!
+                <br />
+                Inicia Sesión para Acceder a tu Cuenta.
+              </p>
+            </div>
 
             {error && (
               <div className="text-red-500 mt-4">
@@ -105,9 +104,10 @@ export default function Login() {
                       value={formData.documentType}
                       onChange={handleChange}
                       className="outline-none text-sm w-full h-9 text-custom-blue"
+                      required // Asegura que se seleccione un tipo de documento
                     >
-                      <option value="" disabled selected hidden>
-                         Tipo de documento
+                      <option value="" disabled hidden>
+                        Tipo de documento
                       </option>
                       <option value="CC">Cédula de Ciudadania</option>
                       <option value="TI">Tarjeta de Identidad</option>
@@ -127,6 +127,7 @@ export default function Login() {
                       placeholder='Documento' 
                       className='outline-none text-sm w-full h-9 text-custom-blue'
                       onChange={handleChange}
+                      required // Asegura que el número de documento sea obligatorio
                     />
                   </div> 
 
@@ -139,6 +140,7 @@ export default function Login() {
                       placeholder='Contraseña' 
                       className='outline-none text-sm w-full h-9 text-[#0e324d]'
                       onChange={handleChange}
+                      required // Asegura que la contraseña sea obligatoria
                     />
                   </div>
                 </div>
@@ -177,7 +179,7 @@ export default function Login() {
               <div>
                 <div className='font-inter font-normal flex justify-center'>
                   <div className='rounded-md relative' style={{ backgroundColor: 'rgba(0, 0, 0, 0.0)' }}>
-                    <p className='text-xl text-left px-4 py-4'>
+                  <p className='text-xl text-left px-4 py-4'>
                       ¡Únete a la comunidad educativa del SENA y <br />
                       potencia tu futuro! Regístrate ahora para <br />
                       acceder a una amplia gama de programas de <br />
@@ -190,11 +192,11 @@ export default function Login() {
                   <div>
                     <span className='text-xs'>Potenciando la asistencia </span>
                   </div>
-                </div>
               </div>
-            </div>     
-          </div>   
-        </div>  
+            </div>
+          </div>
+        </div>
+      </div>
       </div>
     </div>
   );

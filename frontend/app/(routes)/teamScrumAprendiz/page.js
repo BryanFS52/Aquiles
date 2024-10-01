@@ -6,19 +6,45 @@ import { Sidebaraprendiz } from "../../components/SidebarAprendiz";
 import Image from 'next/image';
 import aquiles from "../../../public/img/aquiles.jpg"; // imagen de aquiles
 import { IoPersonCircleSharp } from "react-icons/io5";
-import { IoCameraSharp } from 'react-icons/io5';
+import { IoCameraSharp, IoCalendar } from 'react-icons/io5';
 import Slider from 'react-slick'; // Importa el componente Slider
+import { FaArrowLeft, FaArrowRight, FaHashtag } from 'react-icons/fa'; // Importa íconos de flechas
 
-export default function TeamScrum() {
-    const settings = {
-        dots: true,
-        infinite: false,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        adaptiveHeight: true,
+
+    const CustomNextArrow = ({ onClick }) => {
+        return (
+            <div
+                className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-[#0e324d] hover:bg-[#40b003] transition-colors duration-300    text-white p-2 rounded-full cursor-pointer z-10"
+                onClick={onClick}
+            >
+                <FaArrowRight className="text-xl" />
+            </div>
+        );
+    };
+    
+    const CustomPrevArrow = ({ onClick }) => {
+        return (
+            <div
+                className="absolute top-1/2 left-1 transform -translate-y-1/2 bg-[#0e324d] hover:bg-[#40b003] transition-colors duration-300 text-white p-2 rounded-full cursor-pointer z-10"
+                onClick={onClick}
+            >
+                <FaArrowLeft className="text-xl" />
+            </div>
+        );
     };
 
+    export default function TeamScrum() {
+        const settings = {
+            dots: true,
+            infinite: true,
+            speed: 500,
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            adaptiveHeight: true,
+            nextArrow: <CustomNextArrow />,  // Flecha derecha personalizada
+            prevArrow: <CustomPrevArrow />,  // Flecha izquierda personalizada
+        };
+    
     return (
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
             <Sidebaraprendiz />
@@ -52,24 +78,34 @@ export default function TeamScrum() {
                             </div>
                         </div>
 
-                        {/* Información del equipo */}
-                        <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-                            <h2 className="text-xl font-bold text-[#0e324d] mb-4">Detalles del Equipo</h2>
-                            <div className="space-y-4">
-                                <div className="flex items-center">
-                                    <span className="text-[#0e324d] font-semibold mr-2">Número del Team:</span>
-                                    <p className="text-gray-700">Team 6</p>
-                                </div>
-                                <div className="flex items-center">
-                                    <span className="text-[#0e324d] font-semibold mr-2">Ficha:</span>
-                                    <p className="text-gray-700">2723687</p>
-                                </div>
-                                <div className="flex items-center">
-                                    <span className="text-[#0e324d] font-semibold mr-2">Trimestre:</span>
-                                    <p className="text-gray-700">Trimestre 5</p>
-                                </div>
+                                        {/* Información del equipo */}
+                    <div className="bg-gradient-to-br from-white to-neutral-100 p-6 rounded-xl shadow-xl border border-gray-200">
+                        <h2 className="text-2xl font-inter font-extrabold text-[#0e324d] mb-6 tracking-tight">Detalles del Equipo</h2>
+                        <div className="space-y-4 text-lg">
+                            <div className="flex items-center space-x-3">
+                                    <FaHashtag className="inline-block text-[#40b003] text-2xl" />
+                                    <span className="flex text-[#0e324d] font-inter font-semibold">
+                                    Número del Team:
+                                </span>
+                                <p className="text-gray-800 font-inter font-normal">Team 6</p>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                    <IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" />
+                                    <span className="flex text-[#0e324d] font-inter font-semibold">
+                                    Ficha:
+                                </span>
+                                <p className="text-gray-800 font-inter font-normal">2723687</p>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                                    <IoCalendar className="inline-block text-[#40b003] text-2xl " />
+                                    <span className="flex text-[#0e324d] font-inter font-semibold ">
+                                    Trimestre:
+                                </span>
+                                <p className="text-gray-800 font-inter font-normal">Trimestre 5</p>
                             </div>
                         </div>
+                    </div>
+
                     </div>
 
                     {/* Sección principal de aprendices y proyecto */}
