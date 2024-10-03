@@ -3,18 +3,19 @@ import React, { useState, useEffect } from 'react';
 import qrCodeService from '../../services/QRService'; 
 import { BsQrCode } from "react-icons/bs";
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
 const ModalQR = ({ isOpen, onClose }) => {
-  const [showNextModal, setShowNextModal] = useState(false);
   const [timer, setTimer] = useState(900); // Duración del QR en segundos
   const [qrCodeImage, setQrCodeImage] = useState(null); 
-  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false); 
   const router = useRouter(); 
+
+  // Ejemplo de correo del aprendiz (deberías obtenerlo dinámicamente)
+  const apprenticeEmail = "keishlanayedcamargorojas@gmail.com"; 
 
   useEffect(() => {
     if (!isOpen) return;
 
-    // Generar el QR al abrir el modal
     const fetchQRCode = async () => {
       try {
         const qrCode = await qrCodeService.generateQRCode('Texto de ejemplo para el QR');
@@ -39,35 +40,111 @@ const ModalQR = ({ isOpen, onClose }) => {
     return () => clearInterval(interval);
   }, [isOpen, router]);
 
-  const handleNext = () => {
-    setIsConfirmationModalOpen(true); 
-  };
-
-  const handleConfirmFinish = () => {
-    setIsConfirmationModalOpen(false);
-    router.push('/aprendicelist'); 
-  };
-
-  const handleCloseConfirmation = () => {
-    setIsConfirmationModalOpen(false);
-  };
-
   const handleClose = () => {
     onClose();
     setTimer(900);
+    setQrCodeImage(null); // Limpiar el QR al cerrar
+  };
+
+  const sendAttendanceEmail = async () => {
+    const emailData = {
+      email: apprenticeEmail,
+      subject: "Notificación de Asistencia",
+      htmlContent: `
+        <html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Redirección Email</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #5cbd63; /* Custom blue */
+            color: #ffffff;
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            padding: 20px;
+            color: #4b5563; /* Gray-700 */
+        }
+        .steps {
+            list-style-type: decimal;
+            padding-left: 20px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="URL_DE_LOGO_SENA" alt="Logo del SENA" style="width: 50px; height: 50px;">
+            <h2>qrformulario móvil</h2>
+        </div>
+        <div class="content">
+            <p>Hola, [nombre del aprendiz]:</p>
+            <p>Parece que vas a confirmar tu asistencia nuevamente.<br>Para hacerlo, hemos generado un código QR único que te permitirá verificar tu asistencia en nuestra plataforma.</p>
+
+            <p><strong>Sigue estos pasos para completar el proceso:</strong></p>
+            <ol class="steps">
+                <li><strong>Si estás en tu computadora:</strong> usa la cámara de tu teléfono para escanear el código QR adjunto.</li>
+                <li>
+                    <img src="URL_DE_CODIGO_QR" alt="Código QR" style="display: block; margin: 0 auto; width: 100px; height: 100px;">
+                </li>
+                <li><strong>Si has recibido un enlace:</strong> haz clic en el enlace incluido para abrir el formulario en tu navegador y sigue las instrucciones para confirmar tu asistencia.</li>
+            </ol>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button style="background-color: #5cbd63; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                    Enlace incluido
+                </button>
+            </div>
+
+            <p>Si no solicitaste este código o no estás confirmando tu asistencia, por favor responde a este mensaje o contáctanos directamente. Estaremos encantados de ayudarte a resolver cualquier problema.</p>
+        </div>
+        <div class="footer">
+            <p>Atentamente, SENA Equipo de Asistencia</p>
+        </div>
+    </div>
+</body>
+</html>`
+    };
+
+    try {
+      const response = await axios.post('http://localhost:8080/api/email/send-notification-attendance', emailData);
+      console.log(response.data.message); // Manejar la respuesta como sea necesario
+      alert("Correo enviado con éxito!");
+    } catch (error) {
+      console.error("Error al enviar correo:", error);
+      alert("Error al enviar el correo.");
+    }
+  };
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
   if (!isOpen) return null;
-
-  const formatTime = (seconds) => {
-    if (seconds >= 60) {
-      const minutes = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-    } else {
-      return `00:${String(seconds).padStart(2, '0')}`;
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
@@ -78,7 +155,8 @@ const ModalQR = ({ isOpen, onClose }) => {
             <h1 className="font-inter text-xl sm:text-2xl md:text-3xl border-b-2 border-black">
               Código QR Para la Toma de Asistencia
             </h1>
-          </div><br/><br/>
+          </div>
+          <br/><br/>
           <div className='flex justify-center'>
             <div className='w-56 h-56 sm:w-72 sm:h-72'>
               {qrCodeImage ? (
@@ -99,27 +177,21 @@ const ModalQR = ({ isOpen, onClose }) => {
             />
           </div>
           <div className='flex justify-between mt-8'>
-            <button className='hover:bg-red-600 rounded-md transition-colors bg-red-600 px-4 py-2 border text-white text-lg font-inter' onClick={handleClose}>
+            <button 
+              className='hover:bg-red-600 rounded-md transition-colors bg-red-600 px-4 py-2 border text-white text-lg font-inter' 
+              onClick={handleClose}
+            >
               Cancelar QR
             </button>
-            <button className='hover:bg-custom-blue rounded-md transition-colors bg-custom-blue px-4 py-2 border text-white text-lg font-inter' onClick={handleNext}>
-              Finalizar Asistencia
+            <button 
+              className='hover:bg-custom-blue rounded-md transition-colors bg-custom-blue px-3 py-2 border text-white text-base font-inter' 
+              onClick={sendAttendanceEmail}
+            >
+              Enviar Correo Electrónico
             </button>
           </div>
         </div>
       </div>
-
-      {isConfirmationModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-custom-blue bg-opacity-50">
-          <div className="bg-white p-4 sm:p-6 w-4/5 sm:w-1/2 md:w-1/3 rounded-lg shadow-lg">
-            <h2 className="text-lg sm:text-xl font-bold mb-4 text-center">¿Está seguro de finalizar la toma de asistencia?</h2>
-            <div className="flex justify-center space-x-4">
-              <button onClick={handleConfirmFinish} className="bg-green-600 text-white px-4 py-2 rounded-md">Sí</button>
-              <button onClick={handleCloseConfirmation} className="bg-red-600 text-white px-4 py-2 rounded-md">No</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

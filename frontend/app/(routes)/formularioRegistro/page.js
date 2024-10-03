@@ -50,10 +50,14 @@ const RegisterPersonForm = () => {
       return;
     }
 
+    // Definir el valor del correo electrónico
+    const email = `${nombre.toLowerCase()}.${apellidos.toLowerCase()}@ejemplo.com`; // Aquí puedes personalizar el correo
+
     const newApprentice = { 
       name: nombre, 
       lastName: apellidos, 
-      documentNumber
+      documentNumber,
+      email // Se añade el campo de email al objeto JSON
     };
 
     console.log('JSON to be sent:', JSON.stringify(newApprentice));
