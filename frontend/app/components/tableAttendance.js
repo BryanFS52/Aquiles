@@ -23,7 +23,7 @@ const TablaApprentices = () => {
             try {
                 const apprenticesData = await getAllApprentices(); 
                 setApprentices(apprenticesData);
-            }catch (error) {
+            } catch (error) {
                 console.error('Error al obtener la lista de aprendices:', error);
             }
         };
@@ -36,7 +36,7 @@ const TablaApprentices = () => {
     };
 
     const handleAttendanceClick = () => {
-            setAlertVisible(true); // Muestra la alerta
+        setAlertVisible(true); // Muestra la alerta
     };
 
     const handleYesClick = () => {
@@ -56,6 +56,7 @@ const TablaApprentices = () => {
     const indexOfFirstApprentice = indexOfLastApprentice - apprenticesPerPage;
     const currentApprentices = filteredApprentices.slice(indexOfFirstApprentice, indexOfLastApprentice);
     const totalPages = Math.ceil(filteredApprentices.length / apprenticesPerPage);
+    
     const handlePageChange = (page) => {
         if (page > 0 && page <= totalPages) {
             setCurrentPage(page);
@@ -91,7 +92,7 @@ const TablaApprentices = () => {
                                 </div>
                             </div>
                         )}
-                        <ModalQR isOpen={modalQROpen} onClose={() => setModalQROpen(false)} />
+                        <ModalQR isOpen={modalQROpen} onClose={() => setModalQROpen(false)} apprentices={currentApprentices} />
                     </div>
                 </div>
             </div>
@@ -130,7 +131,7 @@ const TablaApprentices = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-300">
-                        {currentApprentices.map((apprentice, index) => (
+                        {currentApprentices.map((apprentice) => (
                             <tr key={apprentice.documentNumber}>
                                 <td className="px-2 py-2 border-2 border-gray-300 text-sm">
                                     {apprentice.documentNumber}
@@ -139,52 +140,51 @@ const TablaApprentices = () => {
                                     {apprentice.name} {apprentice.lastName}
                                 </td>
                                 {[...Array(4)].map((_, weekIndex) => (
-                                <React.Fragment key={weekIndex}>
-                                    {[...Array(7)].map((_, dayIndex) => {
-                                        const isWeekend = dayIndex === 5 || dayIndex === 6;
-                                        const cellValue = apprentice.weeks && apprentice.weeks[weekIndex] ? apprentice.weeks[weekIndex][dayIndex] : '';
+                                    <React.Fragment key={weekIndex}>
+                                        {[...Array(7)].map((_, dayIndex) => {
+                                            const isWeekend = dayIndex === 5 || dayIndex === 6;
+                                            const cellValue = apprentice.weeks && apprentice.weeks[weekIndex] ? apprentice.weeks[weekIndex][dayIndex] : '';
 
-                                        return (
-                                            <td 
-                                                key={dayIndex} 
-                                                className={`px-2 py-2 border-2 border-gray-300 text-center ${isWeekend ? 'bg-gray-200' : ''}`}
-                                            >
-                                                <span className={`${
-                                                    cellValue === '✓' ? 'text-green-500 font-bold' :
-                                                    (cellValue === 'R' ? 'text-yellow-500 font-bold' :
-                                                    (cellValue === 'X' ? 'text-red-500 font-bold' :
-                                                    (cellValue === 'J' ? 'text-blue-500 font-bold' : 
-                                                    'text-black')))
-                                                }`}>
-                                                    {cellValue}
-                                                </span>
-                                            </td>
-                                        );
-                                    })}
-                                </React.Fragment>
-                            ))}
-
+                                            return (
+                                                <td 
+                                                    key={dayIndex} 
+                                                    className={`px-2 py-2 border-2 border-gray-300 text-center ${isWeekend ? 'bg-gray-200' : ''}`}
+                                                >
+                                                    <span className={`${
+                                                        cellValue === '✓' ? 'text-green-500 font-bold' :
+                                                        (cellValue === 'R' ? 'text-yellow-500 font-bold' :
+                                                        (cellValue === 'X' ? 'text-red-500 font-bold' :
+                                                        (cellValue === 'J' ? 'text-blue-500 font-bold' : 
+                                                        'text-black')))
+                                                    }`}>
+                                                        {cellValue}
+                                                    </span>
+                                                </td>
+                                            );
+                                        })}
+                                    </React.Fragment>
+                                ))}
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
-
-            <div className="flex justify-center items-center space-x-4">
-                <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="px-4 py-2 font-medium text-gray-500 text-2xl cursor-pointer">
-                    <IoIosArrowBack />
+            <div className="flex justify-between items-center mt-4">
+                <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`bg-gray-200 px-4 py-2 rounded-lg ${currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''}`}>
+                    <IoIosArrowBack className="text-lg" />
                 </button>
-                {[...Array(totalPages)].map((_, pageIndex) => (
-                    <button key={pageIndex + 1} onClick={() => handlePageChange(pageIndex + 1)} className={`px-4 py-2 text-sm font-medium rounded-lg ${currentPage === pageIndex + 1 ? 'bg-custom-blue text-white hover:bg-[#01b001] transition-colors duration-300' : 'bg-custom-blue text-white hover:bg-[#01b001] transition-colors duration-300'}`}>
-                        {pageIndex + 1}
-                    </button>
-                ))}
-                <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="px-4 py-2 font-medium text-gray-500 text-2xl cursor-pointer">
-                    <IoIosArrowForward />
+                <span className="text-sm">Página {currentPage} de {totalPages}</span>
+                <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`bg-gray-200 px-4 py-2 rounded-lg ${currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''}`}>
+                    <IoIosArrowForward className="text-lg" />
                 </button>
             </div>
         </div>
-        
     );
 };
 

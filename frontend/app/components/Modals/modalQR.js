@@ -10,7 +10,6 @@ const ModalQR = ({ isOpen, onClose }) => {
   const [qrCodeImage, setQrCodeImage] = useState(null); 
   const router = useRouter(); 
 
-  // Ejemplo de correo del aprendiz (deberías obtenerlo dinámicamente)
   const apprenticeEmail = "keishlanayedcamargorojas@gmail.com"; 
 
   useEffect(() => {
@@ -72,7 +71,7 @@ const ModalQR = ({ isOpen, onClose }) => {
             padding: 20px;
         }
         .header {
-            background-color: #5cbd63; /* Custom blue */
+            background-color: #00314D; /* Custom blue */
             color: #ffffff;
             text-align: center;
             padding: 10px 0;
@@ -113,7 +112,7 @@ const ModalQR = ({ isOpen, onClose }) => {
             </ol>
 
             <div style="text-align: center; margin-top: 20px;">
-                <button style="background-color: #5cbd63; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                <button style="background-color: #00314D; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
                     Enlace incluido
                 </button>
             </div>
