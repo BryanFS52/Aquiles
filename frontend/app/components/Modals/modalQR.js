@@ -56,7 +56,7 @@ const ModalQR = ({ isOpen, onClose }) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario Redirección Email</title>
     <style>
-        body {
+         body {
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
             margin: 0;
@@ -73,13 +73,16 @@ const ModalQR = ({ isOpen, onClose }) => {
         .header {
             background-color: #00314D; /* Custom blue */
             color: #ffffff;
-            text-align: center;
-            padding: 10px 0;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 20px; 
+            padding: 10px 30px; 
             border-radius: 8px 8px 0 0;
         }
         .content {
             padding: 20px;
-            color: #4b5563; /* Gray-700 */
+            color: #4b5563;
         }
         .steps {
             list-style-type: decimal;
@@ -95,8 +98,8 @@ const ModalQR = ({ isOpen, onClose }) => {
 <body>
     <div class="container">
         <div class="header">
-            <img src="URL_DE_LOGO_SENA" alt="Logo del SENA" style="width: 50px; height: 50px;">
-            <h2>qrformulario móvil</h2>
+            <img src="cid:logoImage" alt="Logo del SENA" style="width: 50px; height: 50px;">
+            <h2 style="color: #1fd137; margin: 0; margin-left: 30px;">qrformulario móvil</h2> <!-- Ajuste de margen -->
         </div>
         <div class="content">
             <p>Hola, [nombre del aprendiz]:</p>
@@ -106,7 +109,7 @@ const ModalQR = ({ isOpen, onClose }) => {
             <ol class="steps">
                 <li><strong>Si estás en tu computadora:</strong> usa la cámara de tu teléfono para escanear el código QR adjunto.</li>
                 <li>
-                    <img src="URL_DE_CODIGO_QR" alt="Código QR" style="display: block; margin: 0 auto; width: 100px; height: 100px;">
+                    <img src="cid:qrCodeImage" alt="Código QR" style="display: block; margin: 0 auto; width: 100px; height: 100px;"> <!-- Uso de CID -->
                 </li>
                 <li><strong>Si has recibido un enlace:</strong> haz clic en el enlace incluido para abrir el formulario en tu navegador y sigue las instrucciones para confirmar tu asistencia.</li>
             </ol>
@@ -124,7 +127,8 @@ const ModalQR = ({ isOpen, onClose }) => {
         </div>
     </div>
 </body>
-</html>`
+</html>
+`
     };
 
     try {
