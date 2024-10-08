@@ -10,7 +10,7 @@ const ModalQR = ({ isOpen, onClose }) => {
   const [qrCodeImage, setQrCodeImage] = useState(null); 
   const router = useRouter(); 
 
-  const apprenticeEmail = "keishlanayedcamargorojas@gmail.com"; 
+  const apprenticeEmail = "jhorsreflex@gmail.com"; 
 
   useEffect(() => {
     if (!isOpen) return;
