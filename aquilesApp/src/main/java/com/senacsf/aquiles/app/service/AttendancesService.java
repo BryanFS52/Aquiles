@@ -55,4 +55,7 @@ public class AttendancesService implements Idao<Attendances, Long> {
     public long countAbsentByTrainerId(Long trainer_id) {
         return attendancesRepository.countAbsentByTrainerId(trainer_id);
     }
+
 }
+
+

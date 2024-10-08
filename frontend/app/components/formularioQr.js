@@ -1,38 +1,42 @@
 import React, { useState } from 'react';
-import { Header } from "../components/header";
-import { SlBookOpen } from "react-icons/sl";
-import { CgFileDocument } from "react-icons/cg";
-import { BsFillFilePersonFill } from "react-icons/bs";
-import { IoPersonCircleOutline } from "react-icons/io5";
-import { updateAttendance, createAttendance } from "../services/attendances"; 
+import { Header } from "../components/header"; 
+import { IoPersonCircleOutline } from "react-icons/io5"; 
+import { updateAttendanceState } from "../services/attendances"; 
 
 const FormularioQr = () => {
     const [documentNumber, setDocumentNumber] = useState("");
-    const [isUpdating, setIsUpdating] = useState(false); // Estado para saber si estamos actualizando
+    const [attendanceId] = useState(1); 
+    const [stateAttendanceId, setStateAttendanceId] = useState(1); 
+    const [loading, setLoading] = useState(false); 
+    const [attendanceUpdated, setAttendanceUpdated] = useState(false); 
 
     const handleSubmit = async () => {
+        setLoading(true);
         try {
+            const currentDate = new Date().toISOString(); 
             const attendanceData = {
+                attendance_id: attendanceId, 
+                attendance_date: currentDate,
                 documentNumber: documentNumber,
-                attendance_state: 'PRESENTE', 
-                attendance_date: new Date(),
+                fk_stateAttendance: {
+                    stateAttendanceId: 2
+                }
             };
-
-            if (isUpdating) {
-                await updateAttendance(attendanceData); // Llama a updateAttendance si está en modo actualización
-                alert('Asistencia actualizada con éxito');
-            } else {
-                await createAttendance(attendanceData); // Llama a createAttendance si está en modo creación
-                alert('Asistencia registrada con éxito');
-            }
-
+    
+            await updateAttendanceState(attendanceData); 
+    
+            alert('Asistencia actualizada con éxito');
+            setAttendanceUpdated(true); 
+    
             setDocumentNumber(""); 
         } catch (error) {
             console.error('Error al enviar asistencia:', error);
             alert('Error al registrar asistencia');
+        } finally {
+            setLoading(false);
         }
     };
-
+    
     return (
         <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4">
             <div className="w-full max-w-md mb-4">
@@ -49,33 +53,12 @@ const FormularioQr = () => {
                 </div>
                 
                 <div className="relative w-full mb-4">
-                    <input type="text" className="flex h-14 w-full rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 pl-12" placeholder='Componente (Default)' />
-                    <div className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400">
-                        <SlBookOpen />
-                    </div>
-                </div>
-
-                <div className="relative w-full mb-4">
-                    <input type="text" className="flex h-14 w-full rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 pl-12" placeholder='Ficha (Default)' />
-                    <div className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400">
-                        <CgFileDocument />
-                    </div>
-                </div>
-
-                <div className="relative w-full mb-4">
-                    <input type="text" className="flex h-14 w-full rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 pl-12" placeholder='Tipo de Documento' />
-                    <div className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400">
-                        <BsFillFilePersonFill />
-                    </div>
-                </div>
-
-                <div className="relative w-full mb-6">
-                    <input
-                        type="text"
+                    <input 
+                        type="text" 
                         value={documentNumber}
                         onChange={(e) => setDocumentNumber(e.target.value)}
-                        className="flex h-14 w-full rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 pl-12"
-                        placeholder='Numero de Documento'
+                        className="flex h-14 w-full rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 pl-12" 
+                        placeholder='Número de Documento'
                     />
                     <div className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400">
                         <IoPersonCircleOutline />
@@ -83,10 +66,15 @@ const FormularioQr = () => {
                 </div>
 
                 <div className="text-center">
-                    <button onClick={handleSubmit} className='font-inter bg-custom-blue border-2 border-custom-blue text-white rounded-lg w-full h-10 cursor-pointer'>
-                        {isUpdating ? 'Actualizar Asistencia' : 'Enviar Asistencia'}
+                    <button onClick={handleSubmit} className='font-inter bg-custom-blue border-2 border-custom-blue text-white rounded-lg w-full h-10 cursor-pointer' disabled={loading}>
+                        {loading ? 'Cargando...' : 'Actualizar Asistencia'}
                     </button>
                 </div>
+                {attendanceUpdated && (
+                    <div className="mt-4 text-center text-green-600">
+                        <span className="text-2xl">✓</span> {/* Chulito visible al actualizar la asistencia */}
+                    </div>
+                )}
             </div>
         </div>
     );

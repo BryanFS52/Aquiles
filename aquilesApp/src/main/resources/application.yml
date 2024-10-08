@@ -10,8 +10,13 @@ spring:
 
   jpa:
     hibernate:
+<<<<<<< HEAD
       ddl-auto: create-drop
       #ddl-auto: update
+=======
+      #ddl-auto: create-drop
+      ddl-auto: update
+>>>>>>> e2c8202cace7315c5acf8af74d850be7f3781cb9
 
     properties:
       hibernate:
