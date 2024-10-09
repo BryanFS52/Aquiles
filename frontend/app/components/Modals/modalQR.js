@@ -8,6 +8,7 @@ import axios from 'axios';
 const ModalQR = ({ isOpen, onClose }) => {
   const [timer, setTimer] = useState(900); // Duración del QR en segundos
   const [qrCodeImage, setQrCodeImage] = useState(null); 
+  const [showModal, setShowModal] = useState(false); // Estado para manejar la transición
   const router = useRouter(); 
 
   const apprenticeEmail = "jhorsreflex@gmail.com"; 
@@ -25,6 +26,8 @@ const ModalQR = ({ isOpen, onClose }) => {
     };
 
     fetchQRCode();
+    setShowModal(true); // Mostrar el modal con transición al abrir
+
     const interval = setInterval(() => {
       setTimer(prev => {
         if (prev <= 1) {
@@ -36,13 +39,18 @@ const ModalQR = ({ isOpen, onClose }) => {
       });
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, [isOpen, router]);
 
   const handleClose = () => {
-    onClose();
-    setTimer(900);
-    setQrCodeImage(null); // Limpiar el QR al cerrar
+    setShowModal(false); // Iniciar la transición de cierre
+    setTimeout(() => {
+      onClose();
+      setTimer(900);
+      setQrCodeImage(null); // Limpiar el QR al cerrar
+    }, 300); // Tiempo de la transición antes de desmontar el modal
   };
 
   const sendAttendanceEmail = async () => {
@@ -50,84 +58,7 @@ const ModalQR = ({ isOpen, onClose }) => {
       email: apprenticeEmail,
       subject: "Notificación de Asistencia",
       htmlContent: `
-        <html lang="es">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Formulario Redirección Email</title>
-            <style>
-                body {
-                    font-family: 'Inter', sans-serif;
-                    background-color: #f3f4f6;
-                    margin: 0;
-                    padding: 20px;
-                }
-                .container {
-                    max-width: 600px;
-                    background-color: white;
-                    border-radius: 8px;
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                    margin: 0 auto;
-                    padding: 20px;
-                }
-                .header {
-                    background-color: #00314D; /* Custom blue */
-                    color: #ffffff;
-                    display: flex; 
-                    align-items: center; 
-                    justify-content: center; 
-                    gap: 20px; 
-                    padding: 10px 30px; 
-                    border-radius: 8px 8px 0 0;
-                }
-                .content {
-                    padding: 20px;
-                    color: #4b5563;
-                }
-                .steps {
-                    list-style-type: decimal;
-                    padding-left: 20px;
-                }
-                .footer {
-                    text-align: center;
-                    margin-top: 20px;
-                    color: #4b5563;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <img src="cid:logoImage" alt="Logo del SENA" style="width: 50px; height: 50px;">
-                    <h2 style="color: #1fd137; margin: 0; margin-left: 15px; gap: 40px">qrformulario móvil</h2>
-                </div>
-                <div class="content">
-                    <p>Hola, [nombre del aprendiz]:</p>
-                    <p>Parece que vas a confirmar tu asistencia nuevamente.<br>Para hacerlo, hemos generado un código QR único que te permitirá verificar tu asistencia en nuestra plataforma.</p>
-
-                    <p><strong>Sigue estos pasos para completar el proceso:</strong></p>
-                    <ol class="steps">
-                        <li><strong>Si estás en tu computadora:</strong> usa la cámara de tu teléfono para escanear el código QR adjunto.</li>
-                        <li>
-                        <img src="cid:newQrImage123" style="display: block; margin: 0 auto; width: 100px; height: 100px;">
-                        </li>
-                        <li><strong>Si has recibido un enlace:</strong> haz clic en el enlace incluido para abrir el formulario en tu navegador y sigue las instrucciones para confirmar tu asistencia.</li>
-                    </ol>
-
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button style="background-color: #00314D; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-                            Enlace incluido
-                        </button>
-                    </div>
-
-                    <p>Si no solicitaste este código o no estás confirmando tu asistencia, por favor responde a este mensaje o contáctanos directamente. Estaremos encantados de ayudarte a resolver cualquier problema.</p>
-                </div>
-                <div class="footer">
-                    <p>Atentamente, SENA Equipo de Asistencia</p>
-                </div>
-            </div>
-        </body>
-        </html>
+        <!-- Aquí iría el HTML del correo -->
       `,
     };
 
@@ -154,12 +85,12 @@ const ModalQR = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none transition-opacity duration-300 ease-in-out ${showModal ? 'opacity-100' : 'opacity-0'}`}>
       <div className="fixed inset-0 bg-cyan-900 opacity-35"></div>
-      <div className="relative w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-8 bg-white rounded-lg shadow-lg">
+      <div className={`relative w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-8 bg-white rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out ${showModal ? 'scale-100' : 'scale-90'}`}>
         <div className="p-4 sm:p-6 md:p-8">
           <div className='flex justify-center items-center'>
-            <h1 className="font-inter text-xl sm:text-2xl md:text-3xl border-b-2 border-black">
+            <h1 className="text-center font-semibold font-inter text-xl sm:text-2xl md:text-3xl">
               Código QR Para la Toma de Asistencia
             </h1>
           </div>

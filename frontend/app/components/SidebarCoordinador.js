@@ -17,7 +17,7 @@ import { IoPersonSharp } from "react-icons/io5";
 import Image from 'next/image';
 import logoSena from "../../public/img/Logo-sena-green.png";
 
-export const Sidebar = () => {
+export const Sidebarcoordinador = () => {
     const [showMenu, setShowMenu] = useState(false);
 
     const toggleMenu = () => {
@@ -31,60 +31,40 @@ export const Sidebar = () => {
                 <div className="flex items-center mb-10 space-x-5">
                     <Image src={logoSena} alt="Logo Sena" className="w-11
                         " />
-                    <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) INSTRUCTOR </span>
+                    <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) COORDINADOR </span>
                 </div>
 
                 <ul className='text-white'>
 
 
                     <li>
-                        <Link href="/" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                        <Link href="/FichasCoordinador" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                             <IoPersonSharp className='text-2xl' />
                             Fichas
                         </Link>
                     </li>
 
                     <li>
-                        <Link href="/programas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                        <Link href="/" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                             <FaLaptopCode className='text-2xl' />
-                            Programas
+                            Instructores
                         </Link>
                     </li>
 
                     <li>
-                        <Link href="/asistencia" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                        <Link href="/" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                             <BsPersonCheck className='text-2xl' />
-                            Asistencia
+                            Listas de Chequeo
                         </Link>
                     </li>
 
                     <li>
-                        <Link href="/teamScrum" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                            <HiUserGroup className='text-2xl' />
-                            Teams
+                        <Link href="/" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <BsPersonCheck className='text-2xl' />
+                            Jurados 
                         </Link>
                     </li>
 
-                    <li>
-                        <Link href="/listaChequeo" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                            <FaChalkboardUser className='text-2xl' />
-                            Sustentaciones
-                        </Link>
-                    </li>
-
-                    <li>
-                        <Link href="/Aprendices" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                            <PiStudentFill className='text-2xl' />
-                            Aprendices
-                        </Link>
-                    </li>
-
-                    <li>
-                        <Link href="/justificaciones" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                            <GiNotebook className='text-2xl' />
-                            Justificaciones
-                        </Link>
-                    </li>
                 </ul>
             </div>
 

@@ -1,7 +1,9 @@
 package com.senacsf.aquiles.app.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.zxing.WriterException;
 import com.senacsf.aquiles.app.business.AttendancesBusiness;
 import com.senacsf.aquiles.app.dto.AttenancesDto;
+import com.senacsf.aquiles.app.utilities.CustomException;
 import com.senacsf.aquiles.app.utilities.QrCodeGenerator;
 
 @RestController
@@ -64,22 +67,20 @@ public class AttendancesController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-<<<<<<< HEAD
+
     //probando commit para merge
     @GetMapping("/summary/{trainerId}")
     public ResponseEntity<Map<String, Long>> getAttendanceSummary(@PathVariable Long trainer_id) {
         Map<String, Long> summary = attendancesBusiness.getAttendanceSummary(trainer_id);
         return ResponseEntity.ok(summary);
     }
-=======
 
-<<<<<<< HEAD
->>>>>>> 0840835b7f0aedd7c7b1ce3d75191bbbc9288449
-=======
-    @GetMapping("/summary/{trainerId}")
-    public ResponseEntity<Map<String, Long>> getAttendanceSummary(@PathVariable Long trainer_id) {
-        Map<String, Long> summary = attendancesBusiness.getAttendanceSummary(trainer_id);
-        return ResponseEntity.ok(summary);
+    private ResponseEntity<Map<String, Object>> handleException(CustomException e) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "error");
+        response.put("message", e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); // Devuelve 400 Bad Request
     }
->>>>>>> e2c8202cace7315c5acf8af74d850be7f3781cb9
+
+
 }

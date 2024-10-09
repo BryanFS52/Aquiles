@@ -4,6 +4,7 @@ import { GoSearch } from "react-icons/go";
 import { BsQrCode } from "react-icons/bs";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import ModalQR from "../components/Modals/modalQR";
+import { motion } from 'framer-motion'; // Importar framer-motion
 import 'react-calendar/dist/Calendar.css';
 import FormularioQr from "../components/formularioQr"; 
 
@@ -77,20 +78,47 @@ const TablaApprentices = () => {
                     </form>
 
                     <div className="relative w-full md:w-auto">
-                        <button onClick={handleAttendanceClick} className="flex items-center h-10 w-full md:w-auto pl-3 pr-4 text-sm rounded-lg border-2 border-slate-300 bg-custom-blue text-white hover:bg-[#01b001] transition-colors duration-300 focus:outline-none">
+                        <button onClick={handleAttendanceClick} className="flex items-center h-10 w-full md:w-auto pl-3 pr-4 text-sm rounded-lg border-2 border-custom-blue hover:border-[#01b001] bg-custom-blue text-white hover:bg-[#01b001] transition-colors duration-300 focus:outline-none">
                             Toma de Asistencia
                             <BsQrCode className="w-4 h-4 ml-2" />
                         </button>
                         {alertVisible && (
-                            <div className="absolute z-10 left-0 top-10 mt-4 bg-white border-2 border-gray-400 shadow-lg h-20 rounded-lg flex items-center justify-between p-4 w-[300px]">
-                                <div className="flex flex-col">
-                                    <span className="font-inter text-center text-base font-semibold">Se va a generar el QR, ¿desea continuar?</span>
-                                </div>
-                                <div className="flex space-x-2">
-                                    <button onClick={handleNoClick} className="bg-red-600 border-2 border-red-700 rounded-2xl w-16 h-8 text-white font-medium text-xl">No</button>
-                                    <button onClick={handleYesClick} className="bg-green-600 border-2 border-green-700 rounded-2xl w-16 h-8 text-white font-medium text-xl">Sí </button>
-                                </div>
+                            <motion.div 
+                            
+                            initial={{ opacity: 0, y: -10 }} 
+                            animate={{ opacity: 1, y: 0 }} 
+                            exit={{ opacity: 0, y: -10 }} 
+                            className="absolute z-10 left-0 top-10 mt-4 bg-white border-2 border-gray-400 shadow-lg h-20 rounded-lg flex items-center justify-between p-4 w-[300px]"
+                        >
+                            <div className="flex flex-col">
+                                <span className="font-inter text-center text-base font-semibold">Se va a generar el QR, ¿desea continuar?</span>
                             </div>
+                            <div className="flex space-x-2">
+                                <motion.button 
+                                    onClick={handleNoClick}
+                                    initial={{ opacity: 0, y: -10 }} 
+                                    animate={{ opacity: 1, y: 0 }} 
+                                    exit={{ opacity: 0, y: -10 }} 
+                                    whileHover={{ scale: 1.1 }} // Efecto de escala al pasar el ratón
+                                    transition={{ duration: 0.2 }} // Duración de la transición
+                                    className="bg-red-600 border-2 border-red-700 rounded-2xl w-16 h-8 text-white font-medium text-xl"
+                                >
+                                    No
+                                </motion.button>
+                                <motion.button 
+                                    onClick={handleYesClick}
+                                    initial={{ opacity: 0, y: -10 }} 
+                                    animate={{ opacity: 1, y: 0 }} 
+                                    exit={{ opacity: 0, y: -10 }} 
+                                    whileHover={{ scale: 1.1 }} // Efecto de escala al pasar el ratón
+                                    transition={{ duration: 0.2 }} // Duración de la transición
+                                    className="bg-green-600 border-2 border-green-700 rounded-2xl w-16 h-8 text-white font-medium text-xl"
+                                >
+                                    Sí
+                                </motion.button>
+                            </div>
+                        </motion.div>
+                        
                         )}
                         <ModalQR isOpen={modalQROpen} onClose={() => setModalQROpen(false)} apprentices={currentApprentices} />
                     </div>
