@@ -109,7 +109,7 @@ const ModalQR = ({ isOpen, onClose }) => {
                     <ol class="steps">
                         <li><strong>Si estás en tu computadora:</strong> usa la cámara de tu teléfono para escanear el código QR adjunto.</li>
                         <li>
-                        <img src="cid:newQrImage123" style="display: block; margin: 0 auto; width: 100px; height: 100px;">
+                        <img src="cid:newQrImage123" style="background: #ff5733; display: block; margin: 0 auto; width: 100px; height: 100px;">
                         </li>
                         <li><strong>Si has recibido un enlace:</strong> haz clic en el enlace incluido para abrir el formulario en tu navegador y sigue las instrucciones para confirmar tu asistencia.</li>
                     </ol>
