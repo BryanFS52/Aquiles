@@ -37,4 +37,4 @@ const sendEmail = async (email, subject, studentName, date) => {
 };
 
 // Llamar a sendEmail con los datos correspondientes
-sendEmail('keishlanayedcamargorojas@gmail.com', 'Notificación de Inasistencia a Clase', 'Nombre del Estudiante', '2024-08-16');
+sendEmail('correo@gmail.com', 'Notificación de Inasistencia a Clase', 'Nombre del Estudiante', '2024-08-16');
