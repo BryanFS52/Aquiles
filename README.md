@@ -117,7 +117,7 @@ El sistema está compuesto por un frontend desarrollado con **Next.js**, **React
 Aquiles utiliza **Mockoon** para simular el consumo de roles desde el proyecto **Olimpo**. Puedes configurar Mockoon con el siguiente endpoint para simular los roles:
 
  ```json
-
+{
   "endpoint": "/api/roles",
   "method": "GET",
   "status": 200,
