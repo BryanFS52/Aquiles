@@ -25,7 +25,7 @@ public class ChecklistSubstantiationList implements Serializable {
     @Column(name = "item", nullable = false, length = 255)
     private String item;
 
-    @Column(name = "observations", nullable = false, length = 255)
+    @Column(name = "observations", length = 255)
     private String observations;
 
     @Column(name = "rating", nullable = false)
@@ -38,6 +38,11 @@ public class ChecklistSubstantiationList implements Serializable {
     @JoinColumn(name = "fk_project_id", nullable = false)
     private Project project;
 
-    @ManyToMany(mappedBy = "list_checklistSubstantiationLists", cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "checklist_juries",
+            joinColumns = @JoinColumn(name = "check_list_id"),
+            inverseJoinColumns = @JoinColumn(name = "jury_id")
+    )
     private List<Juries> juries;
 }

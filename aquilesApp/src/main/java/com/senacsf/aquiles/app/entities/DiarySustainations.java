@@ -13,8 +13,8 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "diary_sustainations")
-public class DiarySustainations implements Serializable {
+@Table(name = "diary_susta  inations")
+    public class DiarySustainations implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "diary_id", nullable = false)
