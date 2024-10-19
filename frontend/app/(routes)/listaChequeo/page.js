@@ -1,53 +1,48 @@
-"use client";
+"use client"
 
-import React, { useState, useRef } from "react";
-import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
-import { downloadReportPDF } from "../../services/PDFService";
-import { Sidebar } from "../../components/sidebar";
-import { IoIosArrowDown } from "react-icons/io";
+import React, { useCallback, useState, useRef } from "react";
+import { Header } from "../../components/header";
+import { Sidebar } from "../../components/Sidebar";
+import { BiX, BiCheck } from "react-icons/bi";
+import CheckListTable from "../../components/CheckListTable";
+import {downloadReportPDF} from "../../services/PDFService";
+import { useMemo } from 'react';
 
 export default function ListaChequeo() {
-    // Opciones para los select 
-    const [sede, setSede] = useState (["Centro de Servicios Financieros", "Salitre Sena"]);
-    const [jornada, setJornada] = useState (["Mañana", "Tarde", "Noche", "Madrugada", "Fin de Semana"]);
-    const [trimestre, setTrimestre] = useState (["Trimestre 1", "Trimestre 2", "Trimestre 3", "Trimestre 4", "Trimestre 5", "Trimestre 6", "Trimestre 7"]);
-    const [team, setTeam] = useState (["Team 1", "Team 2", "Team 3"]);
-    const [pilar, setPilar] = useState (["Componente Técnico", "Componente Humanístico", "Componente Comunicación", "Componente Emprendimiento", "Componente Inglés"]);
+    const sedeOptions = useMemo(() => ["Centro de Servicios Financieros", "Salitre Sena"], []);
+    const jornadaOptions = useMemo(() => ["Mañana", "Tarde", "Noche", "Madrugada", "Fin de Semana"], []);
+    const trimestreOptions = useMemo(() => ["Trimestre 1", "Trimestre 2", "Trimestre 3", "Trimestre 4", "Trimestre 5", "Trimestre 6", "Trimestre 7"], []);
+    const teamOptions = useMemo(() => ["Team 1", "Team 2", "Team 3"], []);
+    const pilarOptions = useMemo(() => ["Componente Técnico", "Componente Humanístico", "Componente Comunicación", "Componente Emprendimiento", "Componente Inglés"], []);
+    
+    const [ficha, setFicha] = useState("");
+    const [sedeSeleccionada, setSedeSeleccionada] = useState("");
+    const [jornadaSeleccionada, setJornadaSeleccionada] = useState("");
+    const [trimestreSeleccionado, setTrimestreSeleccionado] = useState("");
+    const [teamSeleccionado, setTeamSeleccionado] = useState("");
+    const [pilarSeleccionado, setPilarSeleccionado] = useState("");
+    const [guardarPresionado, setGuardarPresionado] = useState(false);
 
-     // Refs para inputs de archivos
-  const fileInputRefPrev = useRef(null);
-  const fileInputRefNew = useRef(null);
+    const fileInputRefPrev = useRef(null);
+    const fileInputRefNew = useRef(null);
 
-    const handleDownloadPDF = async () => {
+    const handleDownloadPDF = useCallback(async () => {
         try {
             const blob = await downloadReportPDF();
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', 'reporte.pdf'); 
+            link.setAttribute('download', 'reporte.pdf');
             document.body.appendChild(link);
             link.click();
             link.parentNode.removeChild(link);
         } catch (err) {
             console.error('Error al descargar el reporte PDF', err);
         }
-    };
+    }, []);
 
-    const toggleAttendance = (index, day, weekIndex) => {  
-        const updatedAttendees = [...attendees];
-        updatedAttendees[index].weeks[weekIndex][day] = !updatedAttendees[index].weeks[weekIndex][day];
-        setAttendees(updatedAttendees);
-    };
-
-        // Funciones para abrir el explorador de archivos
-    const handleUploadPrev = () => {
-        fileInputRefPrev.current.click();
-    };
-    const handleUploadNew = () => {
-        fileInputRefNew.current.click();
-    };
-
-
+    const handleUploadPrev = useCallback(() => fileInputRefPrev.current.click(), []);
+    const handleUploadNew = useCallback(() => fileInputRefNew.current.click(), []);
     
     return (
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
@@ -64,73 +59,45 @@ export default function ListaChequeo() {
                                 <div>
                                     <span className="text-custom-blue text-base font-semibold font-inter">Ficha:</span>
                                     <div className="relative inline-block ml-8">
-                                        <input type="text" className="border-2 border-gray-300 rounded-lg ml-5 w-52"/>
+                                        <input className={`border-2 ${guardarPresionado && !ficha ? "border-red-500" : "border-gray-300"} rounded-lg ml-4 w-52`} disabled/>
                                     </div>
                                 </div>
-
                                 <div>
                                     <span className="text-custom-blue text-base font-semibold font-inter">Sede:</span>
                                     <div className="relative inline-block ml-8">
-                                        <select className="border-2 border-gray-300 rounded-lg ml-5 w-52">
-                                            {sede.map((sede, index) => (
-                                                <option key={index} value={sede}>{sede}</option>
-                                            ))}
-                                        </select>
+                                        <input className={`border-2 ${guardarPresionado && !sedeSeleccionada ? "border-red-500" : "border-gray-300"} rounded-lg ml-5 w-52`} disabled/>
                                     </div>
                                 </div>
-
                                 <div>
                                     <span className="text-custom-blue text-base font-semibold font-inter">Jornada:</span>
-                                    <div className="relative inline-block ml-8">
-                                        <select className="border-2 border-gray-300 rounded-lg w-52">
-                                            {jornada.map((jornada, index) => (
-                                                <option key={index} value={jornada}>{jornada}</option>
-                                            ))}
-                                        </select>
+                                    <div className="relative inline-block ml-7">
+                                        <input className={`border-2 ${guardarPresionado && !jornadaSeleccionada ? "border-red-500" : "border-gray-300"} rounded-lg w-52`} disabled/>
                                     </div>
                                 </div>
-
                             </div>
                             <div className="flex flex-col items-start space-y-4">
-                                <div className="flex space-x-8"> 
+                                <div className="flex space-x-8">
                                     <div>
                                         <span className="text-custom-blue text-base font-semibold font-inter">Trimestre:</span>
                                         <div className="relative inline-block ml-3">
-                                            <select className="border-2 border-gray-300 rounded-lg ml-5 w-52">
-                                                {trimestre.map((trimestre, index) => (
-                                                    <option key={index} value={trimestre}>{trimestre}</option>
-                                                ))}
-                                            </select>
+                                            <input className={`border-2 ${guardarPresionado && !trimestreSeleccionado ? "border-red-500" : "border-gray-300"} rounded-lg ml-5 w-52`} disabled/>
                                         </div>
                                     </div>
                                 </div>
                                 <div>
                                     <span className="text-custom-blue text-base font-semibold font-inter">Team:</span>
                                     <div className="relative inline-block ml-10">
-                                        <select className="border-2 border-gray-300 rounded-lg ml-5 w-52">
-                                            {team.map((team, index) => (
-                                                <option key={index} value={team}>{team}</option>
-                                            ))}
-                                        </select>
+                                        <input className={`border-2 ${guardarPresionado && !teamSeleccionado ? "border-red-500" : "border-gray-300"} rounded-lg ml-6 w-52`} disabled/>
                                     </div>
                                 </div>
                                 <div>
-                                    <span className="text-custom-blue text-base font-semibold font-inter">Pilar:</span>
-                                    <div className="relative inline-block ml-16">
-                                        <select className="border-2 border-gray-300 rounded-lg w-52">
-                                            {pilar.map((pilar, index) => (
-                                                <option key={index} value={pilar}>{pilar}</option>
-                                            ))}
-                                        </select>
+                                    <span className="text-custom-blue text-base font-semibold font-inter">Indicador:</span>
+                                    <div className="relative inline-block ml-8">
+                                        <input className={`border-2 ${guardarPresionado && !pilarSeleccionado ? "border-red-500" : "border-gray-300"} rounded-lg ml-1 w-52`} disabled/>
                                     </div>
                                 </div>
-                                <div className="pt-1">
-                                    <button className="bg-custom-blue text-white text-center font-bold py-2 px-4 rounded-lg mt-4 block ml-3 w-28 h-10">
-                                        Buscar
-                                    </button>
-                                </div>
+                                
                             </div>
-                            
                             <div className="flex justify-end">
                                 <div className="w-52 h-28 bg-white border border-gray-200 p-4 rounded-lg shadow-md">
                                     <h2 className="text-gray-700 text-sm font-bold mb-2 text-center">Exportar lista de chequeo como:</h2>
@@ -144,144 +111,47 @@ export default function ListaChequeo() {
                                     </div>
                                     <div className="w-44 h-20 bg-white border border-gray-200 p-4 rounded-lg shadow-md mr-10">
                                         <h2 className="text-gray-700 text-sm font-bold mb-2">Indicaciones de uso:</h2>
-                                        <div className="flex space-x-7">
-                                            <span className="ml-3">Si ✅</span>
-                                            <span className="ml-3">No ❌</span>
+                                        <div className="flex space-x-7 items-center">
+                                            <div className="flex items-center space-x-1">
+                                                <span className="ml-2">Si</span>
+                                                <BiCheck className="text-green-500 text-3xl" />
+                                            </div>
+                                            <div className="flex items-center space-x-1">
+                                                <span className="ml-2">No</span>
+                                                <BiX className="text-red-600 text-3xl" />
+                                            </div>
                                         </div>
-                                    </div>  
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div className="flex bg-white w-full h-14">
+                <CheckListTable />
+                <div className="flex items-start pt-10 space-x-20">
+                    <div className="ml-52">
+                        <span className="text-custom-blue font-semibold text-xl font-inter">Instructor Técnico Anterior</span>
+                        <button type="button" onClick={handleUploadPrev} className="flex mt-2 border-2 border-gray-400 bg-zinc-300 shadow-xl rounded-lg text-black text-center font-inter w-52 h-8 cursor-pointer">
+                            Firma Instructor
+                        </button>
+                        <input type="file" ref={fileInputRefPrev} className="hidden" onChange={(e) => console.log(e.target.files[0])} />
+                        <div className="pb-3 border-b-2 border-black w-72 mt-2"></div>
+                    </div>
+                    <div>
+                        <span className="text-custom-blue font-semibold text-xl font-inter">Instructor Técnico Nuevo</span>
+                        <button type="button" onClick={handleUploadNew} className="flex mt-2 border-2 border-gray-400 bg-zinc-300 shadow-xl rounded-lg text-black text-center font-inter w-52 h-8 cursor-pointer">
+                            Firma Instructor
+                        </button>
+                        <input type="file" ref={fileInputRefNew} className="hidden" onChange={(e) => console.log(e.target.files[0])} />
+                        <div className="pb-3 border-b-2 border-black w-72 mt-2"></div>
+                    </div>
+                    <div className="ml-4 pt-14">
+                        <button type="button" className="border-custom-blue border-2 bg-custom-blue text-center font-inter text-white text-xl w-32 h-9 shadow-xl rounded-lg">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
             </div>
-
-            <div className="container w-2/3 ml-52">
-                <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-auto">
-                <thead className="bg-sky-950">
-                  
-                    <tr>
-                        
-                        <th className="px-4 py-3 w-20 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Item</th>
-                        <th className="px-4 w-96 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white text-center">Indicadores y/o Variables</th>
-                        <th className="px-4 w-20 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Si</th>
-                        <th className="px-4 w-20 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">No</th>
-                        <th className="px-4 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Observaciones</th>
-
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-300">
-                        <tr>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm text-center">1</td>
-                        <td className="px-2 border-2 border-gray-300 text-sm text-center">El software evidencia autenticación y manejo dinámico de roles.</td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">
-                        <ul className="list-none">
-                            <li className="flex items-center">
-                            <input type="checkbox" id="item1" className="mr-2 ml-4 transform scale-150 custom-checkbox" />
-                            </li>
-                        </ul>
-                        </td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">
-                        <ul className="list-none">
-                            <li className="flex items-center">
-                            <input type="checkbox" id="item2" className="mr-2 ml-4 transform scale-150 custom-checkboxred" />
-                            </li>
-                        </ul>
-                        </td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold"></span></td>
-                    </tr>
-
-                    <tr>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm text-center">1</td>
-                        <td className="px-2 border-2 border-gray-300 text-sm text-center">El software evidencia autenticación y manejo dinámico de roles.</td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">
-                        <ul className="list-none">
-                            <li className="flex items-center">
-                            <input type="checkbox" id="item1" className="mr-2 ml-4 transform scale-150 custom-checkbox" />
-                            </li>
-                        </ul>
-                        </td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">
-                        <ul className="list-none">
-                            <li className="flex items-center">
-                            <input type="checkbox" id="item2" className="mr-2 ml-4 transform scale-150 custom-checkboxred" />
-                            </li>
-                        </ul>
-                        </td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold"></span></td>
-                    
-                    </tr>
-
-                    <tr>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm text-center">1</td>
-                        <td className="px-2 border-2 border-gray-300 text-sm text-center">El software evidencia autenticación y manejo dinámico de roles.</td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">
-                        <ul className="list-none">
-                            <li className="flex items-center">
-                            <input type="checkbox" id="item1" className="mr-2 ml-4 transform scale-150 custom-checkbox" />
-                            </li>
-                        </ul>
-                        </td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm">
-                        <ul className="list-none">
-                            <li className="flex items-center">
-                            <input type="checkbox" id="item2" className="mr-2 ml-4 transform scale-150 custom-checkboxred" />
-                            </li>
-                        </ul>
-                        </td>
-                        <td className="px-4 py-3 border-2 border-gray-300 text-sm"><span className="text-red-500 font-bold"></span></td>
-                                            
-                    </tr>
-                </tbody>
-                </table>
-            </div>
-
-            <div className="flex items-start pt-10 space-x-20">
-          <div className="ml-52">
-            <span className="text-custom-blue font-semibold text-xl font-inter">Instructor Técnico Anterior</span>
-            <button
-              type="button"
-              onClick={handleUploadPrev}
-              className="flex mt-2 border-2 border-gray-400 bg-zinc-300 shadow-xl rounded-lg text-black text-center font-inter w-52 h-8 cursor-pointer"
-            >
-              Firma Instructor
-            </button>
-            <input
-              type="file"
-              ref={fileInputRefPrev}
-              className="hidden"
-              onChange={(e) => console.log(e.target.files[0])} // Aquí puedes manejar el archivo subido
-            />
-            <div className="pb-3 border-b-2 border-black w-72 mt-2"></div>
-          </div>
-
-          <div>
-            <span className="text-custom-blue font-semibold text-xl font-inter">Instructor Técnico Nuevo</span>
-            <button
-              type="button"
-              onClick={handleUploadNew}
-              className="flex mt-2 border-2 border-gray-400 bg-zinc-300 shadow-xl rounded-lg text-black text-center font-inter w-52 h-8 cursor-pointer"
-            >
-              Firma Instructor
-            </button>
-            <input
-              type="file"
-              ref={fileInputRefNew}
-              className="hidden"
-              onChange={(e) => console.log(e.target.files[0])} // Aquí puedes manejar el archivo subido
-            />
-            <div className="pb-3 border-b-2 border-black w-72 mt-2"></div>
-          </div>
-
-          <div className="ml-4 pt-14">
-            <button type="button" className="border-custom-blue border-2 bg-custom-blue text-center font-inter text-white text-xl w-32 h-9 shadow-xl rounded-lg">
-              Guardar
-            </button>
-          </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

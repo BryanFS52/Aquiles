@@ -15,44 +15,40 @@ import com.senacsf.aquiles.app.service.dao.Idao;
 public class TrainersService implements Idao<Trainers, Long> {
 
     @Autowired
-    TrainersRepository trainersRepository;
+    private TrainersRepository trainersRepository;
 
     @Transactional(readOnly = false)
     public Trainers findByDocumentNumber(BigInteger documentNumber) {
-        return trainersRepository.findByDocumentNumber(documentNumber);     // Llama al método del repositorio para encontrar un equipo scrum por el nombre del proyecto
+        return trainersRepository.findByDocumentNumber(documentNumber); // Llama al método del repositorio para encontrar un entrenador por el número de documento
     }
-
-
 
     @Override
     public List<Trainers> findAll() {
-        return List.of();
+        return trainersRepository.findAll(); // Obtiene todos los entrenadores desde el repositorio
     }
 
     @Override
-    public Trainers getById(Long aLong) {
-        return null;
+    public Trainers getById(Long id) {
+        return trainersRepository.findById(id).orElse(null); // Devuelve el entrenador o null si no existe
     }
 
     @Override
     public void update(Trainers entity) {
-        this.trainersRepository.save(entity);
+        trainersRepository.save(entity); // Actualiza el entrenador
     }
 
     @Override
     public Trainers save(Trainers entity) {
-        return this.trainersRepository.save(entity);
-
+        return trainersRepository.save(entity); // Guarda la entidad y devuelve el entrenador guardado
     }
 
     @Override
     public void create(Trainers entity) {
-        this.trainersRepository.save(entity);
-
+        trainersRepository.save(entity); // Crea un nuevo entrenador
     }
 
     @Override
     public void delete(Trainers entity) {
-        this.trainersRepository.delete(entity);
+        trainersRepository.delete(entity); // Elimina el entrenador
     }
 }

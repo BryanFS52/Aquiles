@@ -1,10 +1,14 @@
+/* Agrega los estilos de slick-carousel */
+@import "~slick-carousel/slick/slick.css";
+@import "~slick-carousel/slick/slick-theme.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 ::-webkit-scrollbar {
   width: 1px;
-  height: 9px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -13,14 +17,14 @@
 
 ::-webkit-scrollbar-thumb {
   background: #00324D;
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #01b001;
 }
 
-::-webkit-scrollbar{
+::-webkit-scrollbar {
   width: 0;
 }
 
@@ -29,30 +33,30 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 45px; 
-  height: 45px; 
-  background-color: #f44336; 
+  width: 45px;
+  height: 45px;
+  background-color: #f44336;
   border-bottom-right-radius: 100px;
 }
 
 .custom-checkbox {
-  appearance: none; 
+  appearance: none;
   width: 16px;
   height: 16px;
-  border: 2px solid #ccc; 
+  border: 2px solid #ccc;
   position: relative;
   cursor: pointer;
   background-color: #ffffff;
 }
 
 .custom-checkbox:checked {
-  background-color: #ffffff; 
-  border-color: green; 
+  background-color: #ffffff;
+  border-color: green;
 }
 
 .custom-checkbox:checked::after {
-  content: "✔"; 
-  color: green; 
+  content: "✔";
+  color: green;
   font-size: 14px;
   position: absolute;
   top: 50%;
@@ -61,50 +65,48 @@
 }
 
 .custom-checkboxred {
-  appearance: none; 
+  appearance: none;
   width: 16px;
   height: 16px;
-  border: 2px solid #ccc; 
+  border: 2px solid #ccc;
   position: relative;
   cursor: pointer;
   background-color: #ffffff;
 }
 
 .custom-checkboxred:checked {
-  background-color: #ffffff; 
-  border-color: red; 
+  background-color: #ffffff;
+  border-color: red;
 }
 
 .custom-checkboxred:checked::after {
-  content: "✕"; 
-  color: red; 
+  content: "✕";
+  color: red;
   font-size: 14px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
-
-
 
 .custom-checkbox {
-  appearance: none; 
+  appearance: none;
   width: 16px;
   height: 16px;
-  border: 2px solid #ccc; 
+  border: 2px solid #ccc;
   position: relative;
   cursor: pointer;
   background-color: #ffffff;
 }
 
 .custom-checkbox:checked {
-  background-color: #ffffff; 
-  border-color: green; 
+  background-color: #ffffff;
+  border-color: green;
 }
 
 .custom-checkbox:checked::after {
-  content: "✅"; 
-  color: green; 
+  content: "✅";
+  color: green;
   font-size: 14px;
   position: absolute;
   top: 50%;
@@ -113,26 +115,38 @@
 }
 
 .custom-checkboxred {
-  appearance: none; 
+  appearance: none;
   width: 16px;
   height: 16px;
-  border: 2px solid #ccc; 
+  border: 2px solid #ccc;
   position: relative;
   cursor: pointer;
   background-color: #ffffff;
 }
 
 .custom-checkboxred:checked {
-  background-color: #ffffff; 
-  border-color: red; 
+  background-color: #ffffff;
+  border-color: red;
 }
 
 .custom-checkboxred:checked::after {
-  content: "❌"; 
-  color: red; 
+  content: "❌";
+  color: red;
   font-size: 14px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+.animate-shake {
+  animation: shake 0.3s ease-in-out;
 }

@@ -1,25 +1,58 @@
 package com.senacsf.aquiles.app.controller;
 
-import com.google.zxing.WriterException;
-import com.senacsf.aquiles.app.business.AttendancesBusiness;
-import com.senacsf.aquiles.app.dto.AttenancesDto;
-import com.senacsf.aquiles.app.utilities.QrCodeGenerator;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
+import com.google.zxing.WriterException;
+import com.senacsf.aquiles.app.business.AttendancesBusiness;
+import com.senacsf.aquiles.app.dto.AttenancesDto;
+import com.senacsf.aquiles.app.utilities.CustomException;
+import com.senacsf.aquiles.app.utilities.QrCodeGenerator;
 
 @RestController
-@RequestMapping("/api/attendances")
-public class AttendancesController {
+    @RequestMapping("/api/attendances")
+public class
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AttendancesController {
 
     @Autowired
     private AttendancesBusiness attendancesBusiness;
@@ -50,14 +83,8 @@ public class AttendancesController {
     @GetMapping("/generateQRCode")
     public ResponseEntity<byte[]> generateQRCode() {
         try {
-            LocalDateTime date = LocalDateTime.now();
-            String formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-            // Aquí solo estamos incluyendo la fecha y hora en el texto del QR
-            String qrText = formattedDate;
-
-            // Generar el código QR sin logo
-            byte[] qrCode = qrCodeGenerator.generateQRCodeImage(qrText);
+            String frontendUrl = " https://05f6-152-200-176-22.ngrok-free.app/qrformulariomovil";
+            byte[] qrCode = qrCodeGenerator.generateQRCodeImage(frontendUrl);
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "image/png");
@@ -66,10 +93,20 @@ public class AttendancesController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
     //probando commit para merge
     @GetMapping("/summary/{trainerId}")
     public ResponseEntity<Map<String, Long>> getAttendanceSummary(@PathVariable Long trainer_id) {
         Map<String, Long> summary = attendancesBusiness.getAttendanceSummary(trainer_id);
         return ResponseEntity.ok(summary);
     }
+
+    private ResponseEntity<Map<String, Object>> handleException(CustomException e) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "error");
+        response.put("message", e.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST); // Devuelve 400 Bad Request
+    }
+
+
 }

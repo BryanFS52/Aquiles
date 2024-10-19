@@ -31,14 +31,14 @@ export const Sidebar = () => {
                 <div className="flex items-center mb-10 space-x-5">
                     <Image src={logoSena} alt="Logo Sena" className="w-11
                         " />
-                    <span className="text-s">PROYECTOS FORMATIVOS (C.S.F.) </span>
+                    <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) INSTRUCTOR </span>
                 </div>
 
                 <ul className='text-white'>
 
 
                     <li>
-                        <Link href="/fichas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                        <Link href="/" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                             <IoPersonSharp className='text-2xl' />
                             Fichas
                         </Link>
@@ -73,7 +73,7 @@ export const Sidebar = () => {
                     </li>
 
                     <li>
-                        <Link href="/aprendicelist" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                        <Link href="/Aprendices" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                             <PiStudentFill className='text-2xl' />
                             Aprendices
                         </Link>

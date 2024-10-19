@@ -3,7 +3,6 @@ import axios from 'axios';
 const API_BASE_URL = "http://localhost:8080/api";
 
 export const sendEmailAbsence = async (email, studentName, date) => {
-    // Agregar console.log para verificar los datos antes de enviarlos
     console.log('Datos que se enviarán:', {
         email,
         studentName,
@@ -11,7 +10,6 @@ export const sendEmailAbsence = async (email, studentName, date) => {
     });
 
     try {
-        // Construcción del asunto y contenido del correo
         const subject = "Notificación de Inasistencia";
         const htmlContent = `
             <div style="max-width: 800px; margin: auto; background-color: #ffffff; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;">
@@ -60,7 +58,6 @@ export const sendEmailAbsence = async (email, studentName, date) => {
             </div>
         `;
 
-        // Agregar console.log para verificar el contenido del correo
         console.log('Contenido del correo:', {
             subject,
             htmlContent

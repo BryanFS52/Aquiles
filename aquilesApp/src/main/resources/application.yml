@@ -10,8 +10,10 @@ spring:
 
   jpa:
     hibernate:
+
       #ddl-auto: create-drop
       ddl-auto: update
+      #ddl-auto: drop
 
     properties:
       hibernate:
@@ -31,7 +33,4 @@ spring:
             enable: true
 
   main:
-
     allow-circular-references: true
-
-

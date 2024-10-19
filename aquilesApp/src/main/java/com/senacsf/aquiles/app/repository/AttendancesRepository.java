@@ -9,10 +9,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AttendancesRepository extends JpaRepository<Attendances, Long> {
     // Consulta JPQL ajustada para contar asistentes presentes por entrenador
-    @Query("SELECT COUNT(a) FROM Attendances a WHERE a.fk_trainer_id.trainer_id = :trainerId AND a.attendance_state = com.senacsf.aquiles.app.entities.Attendances$Enum_attendance_state.PRESENTE")
+
+    @Query("SELECT COUNT(a) FROM Attendances a WHERE a.fk_trainer_id.trainer_id = :trainerId AND a.fk_stateAttendance.status = 'PRESENTE'")
     long countPresentByTrainerId(@Param("trainerId") Long trainerId);
 
-    // Consulta JPQL ajustada para contar asistentes ausentes por entrenador
-    @Query("SELECT COUNT(a) FROM Attendances a WHERE a.fk_trainer_id.trainer_id = :trainerId AND a.attendance_state = com.senacsf.aquiles.app.entities.Attendances$Enum_attendance_state.FALLA")
+    @Query("SELECT COUNT(a) FROM Attendances a WHERE a.fk_trainer_id.trainer_id = :trainerId AND a.fk_stateAttendance.status = 'FALLA'")
     long countAbsentByTrainerId(@Param("trainerId") Long trainerId);
 }

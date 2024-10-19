@@ -1,9 +1,8 @@
-    package com.senacsf.aquiles.app.controller;
+package com.senacsf.aquiles.app.controller;
 
-
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -21,11 +20,10 @@ public class PdfController {
     @Autowired
     private PdfService pdfService;
 
-
     @GetMapping("/report")
     public ResponseEntity<ByteArrayResource> generateReport() {
         try {
-            ByteArrayOutputStream outputStream = pdfService .createPdf();
+            ByteArrayOutputStream outputStream = pdfService.createPdf();
             ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
 
             return ResponseEntity.ok()

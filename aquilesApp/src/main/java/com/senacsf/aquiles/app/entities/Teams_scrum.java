@@ -1,13 +1,24 @@
 package com.senacsf.aquiles.app.entities; // Declara el paquete al que pertenece esta clase
 
-import jakarta.persistence.*; // Importa las anotaciones de JPA
+import java.io.Serializable; // Importa las anotaciones de JPA
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity; // Importa la interfaz Serializable para la serialización de objetos
+import jakarta.persistence.FetchType; // Importa la clase List de java.util para manejar colecciones
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-
-import java.io.Serializable; // Importa la interfaz Serializable para la serialización de objetos
-import java.util.List; // Importa la clase List de java.util para manejar colecciones
-import java.util.Set; // Importa la clase Set de java.util para manejar colecciones sin duplicados
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "teams_scrum")
