@@ -3,20 +3,19 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from "../../components/header";
 import { Sidebar } from '../../components/Sidebar';
-import { FaUsers } from "react-icons/fa"; // Icono para los aprendices
-import { getInstructorFichas } from '../../services/FichasInstructorService'; // Servicio para obtener las fichas del instructor
+import { FaUsers } from "react-icons/fa"; 
+import { getInstructorFichas } from '../../services/FichasInstructorService'; 
 import { IoPeople } from "react-icons/io5";
 
 const FichasInstructor = () => {
-  const [fichas, setFichas] = useState([]); // Estado para las fichas
-  const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
+  const [fichas, setFichas] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    // Llamada al servicio para obtener las fichas del instructor
     const fetchFichas = async () => {
       try {
-        const response = await getInstructorFichas(); // Llama a tu endpoint que trae las fichas del instructor
-        setFichas(response.data); // Actualiza el estado con las fichas recibidas
+        const response = await getInstructorFichas(); // Obtén fichas donde el instructor está asignado como instructor técnico
+        setFichas(response.data);
       } catch (error) {
         console.error("Error fetching fichas:", error);
       }
@@ -25,7 +24,6 @@ const FichasInstructor = () => {
     fetchFichas();
   }, []);
 
-  // Filtrar las fichas según el término de búsqueda
   const filteredFichas = fichas.filter(ficha =>
     ficha.numeroFicha.toString().includes(searchTerm) ||
     ficha.programa.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -43,16 +41,14 @@ const FichasInstructor = () => {
             Fichas del Instructor
           </h1>
 
-          {/* Input para buscar fichas */}
           <input
             type="text"
             placeholder="Buscar por número de ficha, programa o jornada..."
             className="p-2 w-full sm:w-1/2 border border-gray-300 rounded-md mb-4"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)} // Manejo del cambio en el input
+            onChange={(e) => setSearchTerm(e.target.value)} 
           />
 
-          {/* Grid para mostrar las fichas */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredFichas.map((ficha) => (
               <div
@@ -72,17 +68,15 @@ const FichasInstructor = () => {
                 <div className="flex flex-col space-y-2 text-center md:text-left mx-auto md:mx-8">
                   <div>
                     <p className="text-[#0e324d] text-lg font-bold md:text-base lg:text-base">Número de la Ficha</p>
-                    <p className="text-xl md:text-lg lg:text-sm">{ficha.numeroFicha}</p>
+                    <p className="text-lg text-gray-700">{ficha.numeroFicha}</p>
                   </div>
-
                   <div>
-                    <p className="text-[#0e324d] text-sm font-bold md:text-base lg:text-base">Jornada</p>
-                    <p className="text-md md:text-lg lg:text-sm">{ficha.jornada}</p>
+                    <p className="text-[#0e324d] text-lg font-bold md:text-base lg:text-base">Jornada</p>
+                    <p className="text-lg text-gray-700">{ficha.jornada}</p>
                   </div>
-
                   <div>
-                    <p className="text-[#0e324d] text-sm font-bold md:text-base lg:text-base">Programa</p>
-                    <p className="text-md md:text-lg lg:text-sm">{ficha.programa}</p>
+                    <p className="text-[#0e324d] text-lg font-bold md:text-base lg:text-base">Programa</p>
+                    <p className="text-lg text-gray-700">{ficha.programa}</p>
                   </div>
                 </div>
               </div>

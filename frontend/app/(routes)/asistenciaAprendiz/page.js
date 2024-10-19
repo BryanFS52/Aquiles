@@ -16,7 +16,7 @@ export default function AsistenciaAprendiz() {
 
    const router = useRouter(); 
   const handleNext = () => {  
-    router.push('/justificacionaprendiz'); 
+    router.push('/justificacionesAprendiz'); 
   };
 
   return (

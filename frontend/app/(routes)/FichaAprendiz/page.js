@@ -10,7 +10,7 @@ const ApprenticeView = () => {
   const [apprenticeData, setApprenticeData] = useState({
     ficha: "123456",
     jornada: "Mañana",
-    programa: "Desarrollo Web",
+    programa: "Analisís y Desarrollo de Software",
     compañeros: [
       { name: "Juan", lastName: "Pérez", documentNumber: "001", email: "juan.perez@example.com", profilePicture: null },
       { name: "Ana", lastName: "García", documentNumber: "002", email: "ana.garcia@example.com", profilePicture: null },

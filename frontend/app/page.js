@@ -72,14 +72,14 @@ export default function Login() {
           <div className="xl:w-1/2 p-5">
             <div className="flex items-center mb-8">
               <Image src={LogoAquiles} alt="TDA Logo" className="w-28" />
-              <div className="flex flex-col px-2 text-custom-blue">
-                <h1 className="text-3xl font-medium ">TDA</h1>
+              <div className="font-inter flex flex-col px-2 text-custom-blue">
+                <h1 className="text-4xl font-medium ">Aquiles</h1>
                 <p className="text-[13px] font-light">
-                  Transformando el futuro con las nuevas habilidades del SENA.
+                Sistema de Gestión de Asistencia y Seguimiento para Proyectos de Aprendices
                 </p>
               </div>
             </div>
-            <div className="text-custom-blue pt-10">
+            <div className="font-inter text-custom-blue pt-10">
               <h1 className="text-4xl">Inicia Sesión</h1>
               <p className="text-base pt-5">
                 ¡Bienvenido de Vuelta!
@@ -146,10 +146,8 @@ export default function Login() {
                 </div>
                 <div className="font-inter font-normal flex justify-between mt-4 items-center text-[#0e324d]">
                   <div className="flex text-center">
-                    <input type="checkbox" className='mr-2'/>
-                    <label htmlFor="" className='text-xs'>Recordar</label>
                   </div>
-                  <div className="text-xs">
+                  <div className="text-sm">
                     <Link href="">
                       <p className='hover:text-custom-blues' onClick={handleOpenModal}>¿Olvidó su contraseña?</p>
                     </Link>

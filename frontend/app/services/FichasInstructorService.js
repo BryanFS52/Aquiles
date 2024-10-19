@@ -1,14 +1,12 @@
 import axios from 'axios';
 
-// Función para obtener las fichas del instructor
+// Función para obtener la lista de entrenadores
 export const getInstructorFichas = async () => {
   try {
-    // Realiza la solicitud GET al endpoint que devuelve las fichas del instructor
-    const response = await axios.get('/api/instructor/sheets'); // Asegúrate de que este endpoint exista y devuelva los datos correctos
-    return response; // Devuelve la respuesta completa
+    const response = await axios.get('/api/trainers/all');
+    return response.data; // Devuelve solo los datos de la respuesta
   } catch (error) {
-    // Maneja errores de la solicitud
-    console.error('Error fetching fichas:', error);
+    console.error('Error fetching trainers:', error);
     throw error; // Lanza el error para manejarlo en el componente
   }
 };

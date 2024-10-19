@@ -58,7 +58,84 @@ const ModalQR = ({ isOpen, onClose }) => {
       email: apprenticeEmail,
       subject: "Notificación de Asistencia",
       htmlContent: `
-        <!-- Aquí iría el HTML del correo -->
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Formulario Redirección Email</title>
+            <style>
+                body {
+                    font-family: 'Inter', sans-serif;
+                    background-color: #f3f4f6;
+                    margin: 0;
+                    padding: 20px;
+                }
+                .container {
+                    max-width: 600px;
+                    background-color: white;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+                .header {
+                    background-color: #00314D; /* Custom blue */
+                    color: #ffffff;
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    gap: 20px; 
+                    padding: 10px 30px; 
+                    border-radius: 8px 8px 0 0;
+                }
+                .content {
+                    padding: 20px;
+                    color: #4b5563;
+                }
+                .steps {
+                    list-style-type: decimal;
+                    padding-left: 20px;
+                }
+                .footer {
+                    text-align: center;
+                    margin-top: 20px;
+                    color: #4b5563;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <img src="cid:logoImage" alt="Logo del SENA" style="width: 50px; height: 50px;">
+                    <h2 style="color: #1fd137; margin: 0; margin-left: 15px; gap: 40px">qrformulario móvil</h2>
+                </div>
+                <div class="content">
+                    <p>Hola, [nombre del aprendiz]:</p>
+                    <p>Parece que vas a confirmar tu asistencia nuevamente.<br>Para hacerlo, hemos generado un código QR único que te permitirá verificar tu asistencia en nuestra plataforma.</p>
+
+                    <p><strong>Sigue estos pasos para completar el proceso:</strong></p>
+                    <ol class="steps">
+                        <li><strong>Si estás en tu computadora:</strong> usa la cámara de tu teléfono para escanear el código QR adjunto.</li>
+                        <li>
+                        <img src="cid:newQrImage123" style="display: block; margin: 0 auto; width: 100px; height: 100px;">
+                        </li>
+                        <li><strong>Si has recibido un enlace:</strong> haz clic en el enlace incluido para abrir el formulario en tu navegador y sigue las instrucciones para confirmar tu asistencia.</li>
+                    </ol>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button style="background-color: #00314D; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+                            Enlace incluido
+                        </button>
+                    </div>
+
+                    <p>Si no solicitaste este código o no estás confirmando tu asistencia, por favor responde a este mensaje o contáctanos directamente. Estaremos encantados de ayudarte a resolver cualquier problema.</p>
+                </div>
+                <div class="footer">
+                    <p>Atentamente, SENA Equipo de Asistencia</p>
+                </div>
+            </div>
+        </body>
+        </html>
       `,
     };
 
