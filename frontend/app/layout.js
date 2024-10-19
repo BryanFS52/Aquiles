@@ -1,10 +1,8 @@
-// Ejemplo corregido con algunas importaciones ajustadas
-
+// layout.js
 import React from 'react';
 import { Inter } from 'next/font/google';
 import './globals.css';
-export { Header } from '../app/components/header';  // Si el componente se llama Header y está en el archivo Header.js
-import Home from './page';
+import { ApprenticeProvider } from '../app/context/ApprenticeContext'; // Ajusta la ruta si es necesario
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,7 +15,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`bg-white text-black font-sans ${inter.className}`}>
-        {children}
+        <ApprenticeProvider>
+          {children}
+        </ApprenticeProvider>
       </body>
     </html>
   );

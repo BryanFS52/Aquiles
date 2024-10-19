@@ -43,9 +43,6 @@ dependencies {
     implementation 'org.apache.pdfbox:pdfbox:2.0.28' // Usa la versión más reciente
 }
 
-
-
-
 tasks.named('test') {
     useJUnitPlatform()
 }

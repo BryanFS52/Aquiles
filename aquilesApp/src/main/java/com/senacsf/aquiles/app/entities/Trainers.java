@@ -27,7 +27,7 @@ public class Trainers implements Serializable {
     @Column(name = "id_person", nullable = false)
     private Long id_person;
 
-    @Column(name = "document_number", nullable = false)
+    @Column(name = "documentNumber", nullable = false)
     private BigInteger documentNumber;
 
     @OneToMany(mappedBy = "fk_trainer_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

@@ -9,6 +9,8 @@ import { IoMdLogOut } from "react-icons/io";
 import { TfiBlackboard } from "react-icons/tfi";
 import { IoSettings } from "react-icons/io5";
 import { FaGear } from "react-icons/fa6";
+import { GiNotebook } from "react-icons/gi";
+import { FaChalkboardUser } from "react-icons/fa6";
 // import { RiCheckboxBlankCircleFill } from "react-icons/ri";
 import { PiStudentFill } from "react-icons/pi";
 import { IoClose } from "react-icons/io5";
@@ -30,13 +32,13 @@ export const Sidebaraprendiz = () => {
                     <div className="flex items-center mb-10 space-x-5">
                         <Image src={logoSena} alt="Logo Sena" className="w-11
                         " />
-                        <span className="text-xs">PROYECTOS FORMATIVOS (C.S.F.) </span>
+                        <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) APRENDIZ </span>
                     </div>
 
                     <ul className='text-white'>
 
                     <li>
-                            <Link href="/fichasasignadas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <Link href="/FichaAprendiz" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                                 <IoPersonSharp className='text-2xl' />
                                 Ficha
                             </Link>
@@ -55,28 +57,24 @@ export const Sidebaraprendiz = () => {
                                 Team
                             </Link>
                         </li>
-
-                        <li>
-                            <Link href="/home" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <TfiBlackboard className='text-2xl' />
-                                Proyectos
-                            </Link>
-                        </li>
                         
                         <li>
-                            <Link href="/aprendicesView" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                <PiStudentFill className='text-2xl' />
-                                Aprendices
-                            </Link>
+                        <Link href="/listaChequeoAprendiz" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <FaChalkboardUser className='text-2xl' />
+                            Sustentaciones
+                        </Link>
                         </li>
+
+                        <li>
+                        <Link href="/justificacionesAprendiz" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                            <GiNotebook className='text-2xl' />
+                            Justificaciones
+                        </Link>
+                        </li>
+
                     </ul>
                 </div>
                 <ul>
-                    {/* <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> <img src="https://img.freepik.com/foto-gratis/joven-bella-mujer-pie-sobre-pared-blanca_114579-90514.jpg" className='w-6 h-6 object-cover rounded-full' />
-                        <RiCheckboxBlankCircleFill className='absolute text-green-600 left-16 translate-y-2 text-xs'/>
-                        Usuario
-                    </li>  */}
-                  
                     <li className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'> 
                         <FaGear className='text-2xl' />
                         Configuración 

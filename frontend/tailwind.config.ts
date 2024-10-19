@@ -10,6 +10,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         'kiwi-marumaru': ['Kiwi Maru', 'serif'],
+        'inter': ['Inter', 'sans-serif'],
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

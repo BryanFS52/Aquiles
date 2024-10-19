@@ -1,10 +1,10 @@
 package com.senacsf.aquiles.app.repository;
 
-import com.senacsf.aquiles.app.entities.Students;
-import com.senacsf.aquiles.app.entities.Teams_scrum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import com.senacsf.aquiles.app.entities.Students;
 
 @Repository
 public interface StudentsRepository extends JpaRepository<Students, Long> {
