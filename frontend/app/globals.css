@@ -6,6 +6,15 @@
 @tailwind components;
 @tailwind utilities;
 
+
+.arrow-button {
+  @apply p-2 bg-gray-200 rounded hover:bg-gray-300 transition-colors;
+}
+
+.current-trimester, .current-week {
+  @apply font-bold text-lg;
+}
+
 ::-webkit-scrollbar {
   width: 1px;
   height: 10px;
@@ -150,3 +159,4 @@
 .animate-shake {
   animation: shake 0.3s ease-in-out;
 }
+

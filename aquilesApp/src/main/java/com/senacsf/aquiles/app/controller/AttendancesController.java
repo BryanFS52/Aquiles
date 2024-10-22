@@ -28,30 +28,6 @@ import com.senacsf.aquiles.app.utilities.QrCodeGenerator;
     @RequestMapping("/api/attendances")
 public class
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 AttendancesController {
 
     @Autowired
@@ -83,7 +59,7 @@ AttendancesController {
     @GetMapping("/generateQRCode")
     public ResponseEntity<byte[]> generateQRCode() {
         try {
-            String frontendUrl = " https://05f6-152-200-176-22.ngrok-free.app/qrformulariomovil";
+            String frontendUrl = "https://bc53-152-200-176-22.ngrok-free.app/FormularioQRAsistencia";
             byte[] qrCode = qrCodeGenerator.generateQRCodeImage(frontendUrl);
 
             HttpHeaders headers = new HttpHeaders();

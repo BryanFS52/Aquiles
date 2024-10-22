@@ -39,8 +39,8 @@ export const Sidebarcoordinador = () => {
 
                     <li>
                         <Link href="/FichasCoordinador" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                            <IoPersonSharp className='text-2xl' />
-                            Fichas
+                            <IoPersonSharp className='text-4xl' />
+                            Fichas y Asignación de Instructores
                         </Link>
                     </li>
 
