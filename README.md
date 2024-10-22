@@ -22,9 +22,8 @@ El sistema está compuesto por un frontend desarrollado con **Next.js**, **React
 ### Backend
 - **Java 17+**
 - **Spring Boot**
-- **JavaMailSender** (para envío de notificaciones por correo)
 - **Base de datos relacional** (ej. MySQL, PostgreSQL)
-- **Maven** para la gestión de dependencias
+- **Gradle** para la gestión de dependencias
 
 ### Frontend
 - **Node.js 18+**
@@ -52,7 +51,7 @@ El sistema está compuesto por un frontend desarrollado con **Next.js**, **React
 
 2. Ejecutar la aplicación: 
     ```bash
-    mvn spring-boot:run
+    gradle spring-boot:run
     ```
 
 ### Frontend (Next.js)
