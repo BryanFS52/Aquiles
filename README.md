@@ -51,7 +51,7 @@ El sistema está compuesto por un frontend desarrollado con **Next.js**, **React
 
 2. Ejecutar la aplicación: 
     ```bash
-    gradle spring-boot:run
+    ./gradlew bootRun
     ```
 
 ### Frontend (Next.js)
