@@ -5,23 +5,44 @@ import { Header } from "../../components/header";
 import { Sidebar } from '../../components/Sidebar';
 import { IoPeople } from "react-icons/io5";
 import { getFichaFromOlimpo } from '../../services/FichasService'; // Nuevo servicio
+import ApprenticeModal from '../../components/Modals/ApprenticeModal'; // Importa el modal
 
 const FichasInstructor = () => {
   const [ficha, setFicha] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedApprentice, setSelectedApprentice] = useState(null);
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const fetchFicha = async () => {
+    try {
+      const data = await getFichaFromOlimpo(); // Obtén la ficha simulada desde Mockoon
+      setFicha({
+        ...data,
+        numberStudents: data.students.length // Actualiza el número de estudiantes con la longitud del array
+      });
+    } catch (error) {
+      console.error("Error fetching ficha:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchFicha = async () => {
-      try {
-        const data = await getFichaFromOlimpo(); // Obtén la ficha simulada desde Mockoon
-        setFicha(data);
-      } catch (error) {
-        console.error("Error fetching ficha:", error);
-      }
-    };
+    fetchFicha(); // Llama la función al iniciar
 
-    fetchFicha();
+    const intervalId = setInterval(() => {
+      fetchFicha(); // Actualiza la ficha cada 10 segundos (10000 ms)
+    }, 10000);
+
+    return () => clearInterval(intervalId); // Limpia el intervalo al desmontar el componente
   }, []);
+
+  const openModal = (apprentice) => {
+    setSelectedApprentice(apprentice);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedApprentice(null);
+    setModalOpen(false);
+  };
 
   // Si la ficha no ha cargado aún, mostramos un mensaje de carga
   if (!ficha) {
@@ -36,12 +57,15 @@ const FichasInstructor = () => {
 
         <div className="h-[90vh] p-4 md:p-8 lg:p-4 w-full bg-neutral-100 space-y-4">
           <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-4 font-inter font-semibold">
-            Ficha desde Olimpo
+            Fichas desde Olimpo
           </h1>
 
           <div className="flex items-center border border-gray-300 shadow-md rounded-lg p-4 bg-white">
             <div>
-              <div className="flex-shrink-0 bg-[#0e324d] rounded-2xl h-20 w-20 flex items-center justify-center mx-auto border-[#01b001] border-4">
+              <div 
+                className="flex-shrink-0 bg-[#0e324d] rounded-2xl h-20 w-20 flex items-center justify-center mx-auto border-[#01b001] border-4 cursor-pointer"
+                onClick={() => openModal(null)} // Abre el modal al hacer clic en el ícono
+              >
                 <IoPeople className="text-5xl text-white" />
               </div>
               <div className='text-center'>
@@ -65,6 +89,15 @@ const FichasInstructor = () => {
               </div>
             </div>
           </div>
+
+          {/* Modal para mostrar información del aprendiz */}
+          <ApprenticeModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            apprentice={selectedApprentice}
+            students={ficha.students} // Asegúrate de que esto esté definido
+          />
+
         </div>
       </div>
     </div>
