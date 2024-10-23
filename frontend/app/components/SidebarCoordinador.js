@@ -16,6 +16,7 @@ import { IoClose } from "react-icons/io5";
 import { IoPersonSharp } from "react-icons/io5";
 import Image from 'next/image';
 import logoSena from "../../public/img/Logo-sena-green.png";
+import logoAquiles from "../../public/img/logoAquiles.png"
 
 export const Sidebarcoordinador = () => {
     const [showMenu, setShowMenu] = useState(false);
@@ -29,7 +30,7 @@ export const Sidebarcoordinador = () => {
             <div>
                 {/*LOGO*/}
                 <div className="flex items-center mb-10 space-x-5">
-                    <Image src={logoSena} alt="Logo Sena" className="w-11
+                    <Image src={logoAquiles} alt="Logo Aquiles" className="w-14
                         " />
                     <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) COORDINADOR </span>
                 </div>
@@ -40,7 +41,7 @@ export const Sidebarcoordinador = () => {
                     <li>
                         <Link href="/FichasCoordinador" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                             <IoPersonSharp className='text-4xl' />
-                            Fichas y Asignación de Instructores
+                             Asignación de Instructores a Fichas
                         </Link>
                     </li>
 

@@ -17,6 +17,7 @@ import { IoClose } from "react-icons/io5";
 import { IoPersonSharp } from "react-icons/io5";
 import Image from 'next/image';
 import logoSena from "../../public/img/Logo-sena-green.png";
+import logoAquiles from "../../public/img/logoAquiles.png"
 
 export const Sidebaraprendiz = () => {
     const [showMenu, setShowMenu] = useState(false);
@@ -30,7 +31,7 @@ export const Sidebaraprendiz = () => {
                 <div>
                     {/*LOGO*/}
                     <div className="flex items-center mb-10 space-x-5">
-                        <Image src={logoSena} alt="Logo Sena" className="w-11
+                        <Image src={logoAquiles} alt="Logo Aquiles" className="w-14
                         " />
                         <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) APRENDIZ </span>
                     </div>
