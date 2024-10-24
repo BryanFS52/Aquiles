@@ -161,9 +161,19 @@ const ModalQR = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
+  // Manejador para cerrar el modal al hacer clic fuera del modal
+  const handleClickOutside = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
+    
     <div className={`fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none transition-opacity duration-300 ease-in-out ${showModal ? 'opacity-100' : 'opacity-0'}`}>
-      <div className="fixed inset-0 bg-cyan-900 opacity-35"></div>
+      <div className="fixed inset-0 flex items-center bg-black bg-opacity-25" 
+       onClick={handleClickOutside}  // De tectar clics fuera del modal
+      ></div>
       <div className={`relative w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-8 bg-white rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out ${showModal ? 'scale-100' : 'scale-90'}`}>
         <div className="p-4 sm:p-6 md:p-8">
           <div className='flex justify-center items-center'>

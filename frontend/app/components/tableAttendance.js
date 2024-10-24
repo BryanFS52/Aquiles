@@ -100,7 +100,7 @@ const TablaApprentices = ({ onStatusChange }) => {
                 <div className="relative w-full md:w-auto">
                     <button
                         onClick={handleAttendanceClick}
-                        className="flex items-center h-10 w-full md:w-auto pl-3 pr-4 text-sm rounded-lg border-2 border-custom-blue hover:border-[#01b001] bg-custom-blue text-white hover:bg-[#01b001] transition-colors duration-300 focus:outline-none">
+                        className="flex items-center h-10 w-full md:w-auto pl-3 pr-4 text-sm rounded-lg border-2 border-[#0e324b] hover:border-[#01b001] bg-[#0e324b] text-white hover:bg-[#01b001] transition-colors duration-300 focus:outline-none">
                         Toma de Asistencia
                         <BsQrCode className="w-4 h-4 ml-2" />
                     </button>
