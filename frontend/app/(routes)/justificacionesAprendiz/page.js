@@ -199,7 +199,7 @@ export default function Component() {
                     </p>
                     <button
                       onClick={handleJustifyClick}
-                      className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                      className="px-4 py-2 rounded bg-[#0e324d] text-white hover:bg-[#01b001] transition-colors duration-300"
                     >
                       Justificar
                     </button>
@@ -286,7 +286,7 @@ export default function Component() {
                           <button
                             type="button"
                             onClick={handleUploadPrev}
-                            className="bg-blue-600 text-white h-10 rounded-lg"
+                            className="bg-[#0e324d] hover:bg-[#01b001] transition-colors duration-300 text-white h-10 rounded-lg"
                           >
                             {formData.justificacionFile ? formData.justificacionFile.name : "Subir Archivo"}
                           </button>
@@ -304,7 +304,7 @@ export default function Component() {
                           <button
                             type="button"
                             onClick={handleUploadNew}
-                            className="bg-blue-600 text-white h-10 rounded-lg"
+                            className="bg-[#0e324d] hover:bg-[#01b001] transition-colors duration-300 text-white h-10 rounded-lg"
                           >
                             {formData.firmaFile ? formData.firmaFile.name : "Subir Archivo"}
                           </button>
@@ -320,7 +320,7 @@ export default function Component() {
                         <button type="button" onClick={handleCancel} className="px-4 py-2 rounded bg-gray-500 text-white hover:bg-gray-600">
                           Cancelar
                         </button>
-                        <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">
+                        <button type="submit" className="px-4 py-2 rounded bg-[#0e324d] text-white hover:bg-[#01b001] transition-colors duration-300">
                           Guardar Justificación
                         </button>
                       </div>

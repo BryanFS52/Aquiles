@@ -11,8 +11,8 @@ spring:
   jpa:
     hibernate:
 
-      #ddl-auto: create-drop
-      ddl-auto: update
+      ddl-auto: create-drop
+      #ddl-auto: update
       #ddl-auto: drop
 
     properties:
