@@ -26,6 +26,6 @@ public class Excuses implements Serializable {
     @Column(name = "excuse_document", nullable = false, length = 100)
     private String excuse_document;
 
-    @OneToMany(mappedBy = "fk_idExcuse", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<Attendances> attendanceSet;
+    // @OneToMany(mappedBy = "fk_idExcuse", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    // private Set<Attendances> attendanceSet;
 }
