@@ -10,7 +10,6 @@ import { BiX, BiCheck } from "react-icons/bi";
 
 export default function ListaChequeo() {
     
-
     return (
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
             <Sidebaraprendiz />
