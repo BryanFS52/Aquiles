@@ -2,7 +2,7 @@
 
   import React, { useRef, useState } from "react";
   import { motion, AnimatePresence } from "framer-motion";
-  import { Header } from "../../components/header";
+  import { HeaderAprendiz } from "../../components/HeaderAprendiz";
   import { Sidebaraprendiz } from "../../components/SidebarAprendiz";
   import { ToastContainer, toast } from "react-toastify";
   import "react-toastify/dist/ReactToastify.css";
@@ -100,7 +100,7 @@
       <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
         <Sidebaraprendiz />
         <div className="xl:col-span-5">
-          <Header />
+          <HeaderAprendiz />
           <div className="h-[90vh] p-4 md:p-8 lg:p-12 w-full bg-neutral-100 space-y-5">
             <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-4 font-inter font-semibold">
               Justificación para el Aprendiz

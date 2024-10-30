@@ -107,8 +107,8 @@ export default function Home() {
       <div className="xl:col-span-5">
         <Header />
 
-        <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full relative">
-          <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Teams Scrums</h1>
+        <div className="container mx-auto p-6 space-y-6">
+        <h1 className="text-3xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">Team Scrums</h1>
           
           <div className="flex items-center justify-between mb-6">
             {teams.length === 0 ? (

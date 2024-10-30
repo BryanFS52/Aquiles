@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 import React from "react";
-import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
+import { Header } from "../../components/header"; 
 import { Sidebar } from "../../components/Sidebar";
 import { GoSearch } from "react-icons/go";
 import { GrAttachment } from "react-icons/gr";
@@ -12,71 +12,78 @@ import { IoIosArrowBack } from "react-icons/io";
 
 export default function Options() {
   return (
-    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
+    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6 bg-gray-100">
       <Sidebar />
       <div className="xl:col-span-5">
         <Header />
 
-        <div className="h-[90vh] overflow-y-scroll p-4 md:p-6 lg:p-8 xl:p-10 mx-auto max-w-screen-lg">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 mb-8 lg:mb-10 font-serif">
-            Justificaciones Ficha 2630197
+        <div className="container mx-auto p-6 space-y-8">
+          <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
+            Justificaciones de Aprendices
           </h1>
-          
+
           <div className="relative mb-6 max-w-md">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <GoSearch className="text-gray-400" />
             </div>
             <input
               type="search"
-              className="block w-full pl-10 pr-4 text-sm rounded-lg border-2 border-slate-300 focus:outline-none focus:border-slate-300"
+              className="block w-full pl-10 pr-4 py-2 text-sm rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#01b001] transition-all duration-300"
               placeholder="Buscar aprendiz."
             />
           </div>
 
           {/* Tabla */}
-          <div className="relative overflow-x-auto">
-            <table className="w-full text-sm text-left text-black">
-              <thead className="text-xs uppercase bg-gray-50 dark:bg-custom-blue dark:text-white border-2 border-gray-500">
+          <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <table className="w-full text-sm text-left text-gray-700 bg-white rounded-lg">
+              <thead className="text-xs uppercase bg-gray-50 text-gray-600">
                 <tr>
-                  <th className="px-3 py-2">Foto</th>
-                  <th className="px-3 py-2">Documento</th>
-                  <th className="px-3 py-2">Aprendiz</th>
-                  <th className="px-3 py-2">Fecha de Justificación</th>
-                  <th className="px-3 py-2">Archivo Adjunto</th>
+                  <th className="px-4 py-3">Pograma</th>
+                  <th className="px-4 py-3">Ficha</th>
+                  <th className="px-4 py-3">Foto</th>
+                  <th className="px-4 py-3">Documento</th>
+                  <th className="px-4 py-3">Aprendiz</th>
+                  <th className="px-4 py-3">Fecha de Justificación</th>
+                  <th className="px-4 py-3">Archivo Adjunto</th>
+                  <th className="px-4 py-3">Estado</th>
+                  
                 </tr>
               </thead>
               <tbody>
-                <tr className="bg-white border-2 border-gray-400">
-                  <td className="px-3 py-2">
-                    <Image src={persona} alt="" className="w-10 h-9" />
+                <tr className="border-b hover:bg-gray-50 transition-colors duration-200">
+                <td className="px-4 py-3">Analisis y Desarollo de Software</td>
+                <td className="px-4 py-3">25785784</td>
+                  <td className="px-4 py-3">
+                    <Image src={persona} alt="Persona" className="w-10 h-9 rounded-full" />
                   </td>
-                  <td className="px-3 py-2">10158962</td>
-                  <td className="px-3 py-2">Juliana Valeria Lilian Tibocha Gutierrez</td>
-                  <td className="px-3 py-2">12/02/2024</td>
-                  <td className="px-3 py-2">
-                    <GrAttachment className="w-5 h-5" />
+                  <td className="px-4 py-3">1015896552</td>
+                  <td className="px-4 py-3">Juliana Valeria Lilian Tibocha Gutierrez</td>
+                  <td className="px-4 py-3">12/02/2024</td>
+                  <td className="px-4 py-3">
+                    <GrAttachment className="w-5 h-5 text-[#01b001] hover:text-[#00324d] transition-colors duration-300" />
                   </td>
+                  <td className="px-4 py-3">Activo</td>
                 </tr>
                 {/* Repetir las filas según sea necesario */}
               </tbody>
             </table>
           </div>
 
-          <div className="flex flex-col items-center pt-4 lg:pt-6">
+          <div className="flex flex-col items-center pt-4 lg:pt-6 space-x-4">
             <div className="flex space-x-3 lg:space-x-4">
               <button
                 type="button"
-                className="text-custom-blue font-medium flex items-center font-serif text-md lg:text-lg"
+                className="flex items-center text-[#00324d] font-medium text-md lg:text-lg hover:text-[#01b001] transition-colors duration-300"
               >
-                <IoIosArrowBack className="text-custom-blue w-4 h-4 lg:w-5 lg:h-5" />
+                <IoIosArrowBack className="w-4 h-4 lg:w-5 lg:h-5" />
                 Anterior
               </button>
               <button
                 type="button"
-                className="text-custom-blue font-medium flex items-center font-serif text-md lg:text-lg"
+                className="flex items-center text-[#00324d] font-medium text-md lg:text-lg hover:text-[#01b001] transition-colors duration-300"
               >
                 Siguiente
-                <IoIosArrowForward className="text-custom-blue w-4 h-4 lg:w-5 lg:h-5" />
+                <IoIosArrowForward className="w-4 h-4 lg:w-5 lg:h-5" />
               </button>
             </div>
           </div>

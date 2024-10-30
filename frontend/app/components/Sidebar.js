@@ -26,7 +26,7 @@ export const Sidebar = () => {
     };
 
     return (
-        <div className={`xl:h-[100vh] overflow-y-scroll fixed xl:static bg-custom-blue w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto border-r-0 border-gray-300 h-full -left-full top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
+        <div className={`xl:h-[100vh] overflow-y-scroll fixed xl:static bg-[#0e324b] w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto border-r-0 border-gray-300 h-full -left-full top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
             <div>
                 {/*LOGO*/}
                 <div className="flex items-center mb-10 space-x-5">
@@ -46,7 +46,7 @@ export const Sidebar = () => {
                     </li>
 
                     <li>
-                        <Link href="/programas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                        <Link href="/Programas" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                             <FaLaptopCode className='text-2xl' />
                             Programas
                         </Link>

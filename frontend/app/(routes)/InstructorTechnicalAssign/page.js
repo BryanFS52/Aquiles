@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Header } from "../../components/header";
+import { HeaderCoordinador } from "../../components/HeaderCoordinador";
 import { Sidebarcoordinador } from '../../components/SidebarCoordinador';
 import { FaUsers } from "react-icons/fa"; 
 import { getAllSheets, assignInstructor } from '../../services/FichasCoordinadorService'; 
@@ -44,7 +44,7 @@ const FichasCoordinator = () => {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebarcoordinador />
       <div className="xl:col-span-5">
-        <Header />
+        <HeaderCoordinador />
         <div className="h-[90vh] p-4 md:p-8 lg:p-4 w-full bg-neutral-100 space-y-4">
           <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-4 font-inter font-semibold">
             Fichas y Asignación de Instructores

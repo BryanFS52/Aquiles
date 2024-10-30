@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { getRoles } from '../services/RoleService'; // Importa el servicio que creaste
-import { Sidebar } from '../components/Sidebar'; 
-import { SidebarAprendiz } from '../components/SidebarAprendiz';
+import { Sidebar } from './Sidebar'; 
+import { SidebarAprendiz } from './SidebarAprendiz';
 
-const AppSidebar = () => {
+const SidebarRole = () => {
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -42,4 +42,4 @@ const AppSidebar = () => {
     );
 };
 
-export default AppSidebar; // Asegúrate de que se exporte por defecto
+export default SidebarRole; // Asegúrate de que se exporte por defecto
