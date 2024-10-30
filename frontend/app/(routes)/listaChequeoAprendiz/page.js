@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { HeaderAprendiz } from "../../components/HeaderAprendiz";
 import { Sidebaraprendiz } from "../../components/SidebarAprendiz";
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGreaterThan } from '@fortawesome/free-solid-svg-icons';
+import { faLessThan } from '@fortawesome/free-solid-svg-icons';
 import { Check, FileDown, X } from "lucide-react";
 
 const checklistData = {
@@ -159,23 +161,23 @@ export default function Component() {
           </div>
 
           {/* Paginación */}
-          <div className="flex justify-between items-center mt-4">
+          <div className="flex justify-center items-center mt-4">
             <button
-              className={`px-4 py-2 border rounded-md ${currentPage === 1 ? 'disabled:opacity-50' : ''}`}
+              className={`px-4 py-2 ${currentPage === 1 ? 'disabled:opacity-50' : ''}`}
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
             >
-              Anterior
+              <FontAwesomeIcon icon={faLessThan} size="sm" className="text-slate-700" style={{ transform: 'scaleX(0.8)'}}/>
             </button>
             <div className="text-lg">
               Página {currentPage} de {totalPages}
             </div>
             <button
-              className={`px-4 py-2 border rounded-md ${currentPage === totalPages ? 'disabled:opacity-50' : ''}`}
+              className={`px-4 py-2 ${currentPage === totalPages ? 'disabled:opacity-50' : ''}`}
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
             >
-              Siguiente
+              <FontAwesomeIcon icon={faGreaterThan} size="sm" className="text-slate-700" style={{ transform: 'scaleX(0.8)'}}/>
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 ">
