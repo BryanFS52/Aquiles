@@ -27,16 +27,15 @@ export const Sidebaraprendiz = () => {
     };
 
     return (
-            <div className={`xl:h-[100vh] overflow-y-scroll fixed xl:static bg-custom-blue w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto border-r border-gray-300 h-full -left-full top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
-                <div>
-                    {/*LOGO*/}
-                    <div className="flex items-center mb-10 space-x-5">
-                        <Image src={logoAquiles} alt="Logo Aquiles" className="w-14
-                        " />
-                        <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) APRENDIZ </span>
-                    </div>
+        <div className={`xl:h-[100vh] overflow-y-auto fixed xl:static bg-[#00324d] w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto border-r border-gray-300 h-full top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
+        <div>
+            {/*LOGO*/}
+            <div className="flex items-center mb-10 space-x-5">
+                <Image src={logoAquiles} alt="Logo Aquiles" className="w-14" />
+                <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) APRENDIZ </span>
+            </div>
 
-                    <ul className='text-white'>
+            <ul className='text-white'>
 
                     <li>
                             <Link href="/FichaAprendiz" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>

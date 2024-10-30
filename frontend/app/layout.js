@@ -2,7 +2,6 @@
 import React from 'react';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { ApprenticeProvider } from '../app/context/ApprenticeContext'; // Ajusta la ruta si es necesario
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -15,9 +14,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`bg-white text-black font-sans ${inter.className}`}>
-        <ApprenticeProvider>
-          {children}
-        </ApprenticeProvider>
+        {children}
       </body>
     </html>
   );

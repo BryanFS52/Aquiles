@@ -2,7 +2,7 @@
 
 import { Clipboard, UserPlus, Users } from "lucide-react";
 import React, { useState } from "react";
-import { Header } from "../../components/header";
+import { HeaderCoordinador } from "../../components/HeaderCoordinador";
 import { Sidebaraprendiz } from "../../components/SidebarAprendiz";
 import {  FaRegClock, FaGraduationCap, FaCalendarDay, FaRegListAlt } from "react-icons/fa"; // Iconos
 import { Sidebarcoordinador } from '../../components/SidebarCoordinador';
@@ -63,7 +63,7 @@ export default function Component({
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebarcoordinador />
       <div className="xl:col-span-5">
-        <Header />
+        <HeaderCoordinador />
 
          <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full relative">
           <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-3xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Asignación de Instructores a Múltiples Fichas</h1>

@@ -55,9 +55,9 @@ const FichasInstructor = () => {
       <div className="xl:col-span-5">
         <Header />
 
-        <div className="h-[90vh] p-4 md:p-8 lg:p-4 w-full bg-neutral-100 space-y-4">
-          <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-4 font-inter font-semibold">
-            Fichas desde Olimpo
+        <div className="container mx-auto p-6 space-y-8">
+          <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
+            Fichas del Instructor
           </h1>
 
           <div className="flex items-center border border-gray-300 shadow-md rounded-lg p-4 bg-white">

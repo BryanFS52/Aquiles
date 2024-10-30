@@ -29,8 +29,8 @@ public class Attendances implements Serializable {
 
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_idExcuse", referencedColumnName = "excuse_id")
-    private Excuses fk_idExcuse;
+    @JoinColumn(name = "fk_idJustification", referencedColumnName = "justification_id")
+    private Justification fk_idJustification;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_trainer_id", referencedColumnName = "trainer_id")

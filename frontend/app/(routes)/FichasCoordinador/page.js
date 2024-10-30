@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Header } from "../../components/header";
+import { HeaderCoordinador } from "../../components/HeaderCoordinador";
 import { Sidebarcoordinador } from '../../components/SidebarCoordinador';
 
 // Definición del componente Card
@@ -69,10 +69,10 @@ const FichasCoordinator = () => {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebarcoordinador />
       <div className="xl:col-span-5">
-        <Header />
-        <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full relative">
-          <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-4 font-inter font-semibold">
-            Fichas y Asignación de Instructores
+        <HeaderCoordinador />
+        <div className="container mx-auto p-6 space-y-8">
+          <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
+            Asignación de Instructores a Fichas
           </h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <Card className="w-[300px]">

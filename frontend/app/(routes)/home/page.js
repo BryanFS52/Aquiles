@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'; 
 import { Header } from "../../components/header"; 
-import AppSidebar from "../../components/AppSidebar"; 
+import SidebarRole from "../../components/SidebarRole"; 
 import { ToastContainer } from "react-toastify"; 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -22,7 +22,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-      <AppSidebar /> {/* Sidebar dinámico basado en los roles */}
+      <SidebarRole /> {/* Sidebar dinámico basado en los roles */}
       <div className="xl:col-span-5">
         <Header />
         <div className='bg-[#40b003]'>

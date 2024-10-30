@@ -28,12 +28,12 @@ public class ExcusesController {
     }
 
     @PostMapping("/create")
-    public void createExcuses(@RequestBody ExcusesDto excusesDto) {
+    public void createExcuse(@RequestBody ExcusesDto excusesDto) {
         excusesBusiness.create(excusesDto);
     }
 
     @PutMapping("/update")
-    public void updateExxcuse(@RequestBody ExcusesDto excusesDto) {
+    public void updateExcuse(@RequestBody ExcusesDto excusesDto) {
         excusesBusiness.update(excusesDto);
     }
 

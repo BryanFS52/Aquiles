@@ -6,7 +6,7 @@ import { IoNotificationsOutline } from "react-icons/io5";
 import { RiCheckboxBlankCircleFill } from "react-icons/ri";
 import { Notifications } from "./notifications";
 
-export const Header = () => {
+export const HeaderCoordinador = () => {
   const [isOpen, setIsOpen] = useState(false);
   const unreadCount = Notifications.unreadCount;
 
@@ -35,7 +35,7 @@ export const Header = () => {
       <Link href='/perfil' className='group flex items-center font-semibold text-white gap-3 py-3 px-4 bg-[#00324d] hover:bg-[#01b001] rounded-lg transition-all duration-300 shadow-md'>
         <div className="flex flex-col text-end">
           <span className="text-lg">Usuario</span>
-          <span className="text-sm text-[#01b001] group-hover:text-[#00324d] transition-colors duration-300">Instructor</span>
+          <span className="text-sm text-[#01b001] group-hover:text-[#00324d] transition-colors duration-300">Coordinador</span>
         </div>
         <img
           src="https://img.freepik.com/foto-gratis/joven-bella-mujer-pie-sobre-pared-blanca_114579-90514.jpg"
