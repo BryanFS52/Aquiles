@@ -41,19 +41,19 @@ export const Sidebarcoordinador = () => {
                     <li>
                         <Link href="/FichasCoordinador" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                             <IoPersonSharp className='text-4xl' />
-                             Asignación de Instructores a Fichas
+                            Asignación de Instructores a Fichas
                         </Link>
                     </li>
 
                     <li>
-                        <Link href="/" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                        <Link href="/InstructoresCoordinador" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                             <FaLaptopCode className='text-2xl' />
                             Instructores
                         </Link>
                     </li>
 
                     <li>
-                        <Link href="/" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
+                        <Link href="/ListaChequeoCoordinador" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                             <BsPersonCheck className='text-2xl' />
                             Listas de Chequeo
                         </Link>
@@ -62,7 +62,7 @@ export const Sidebarcoordinador = () => {
                     <li>
                         <Link href="/" className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
                             <BsPersonCheck className='text-2xl' />
-                            Jurados 
+                            Jurados
                         </Link>
                     </li>
 
