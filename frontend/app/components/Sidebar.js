@@ -5,12 +5,12 @@ import { FiAlignRight } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import logoAquiles from "../../public/img/logoAquiles.png";
+import LogoAquilesWhite from "../../public/img/LogoAquilesWhite.png";
 
 // Importación dinámica de íconos para mejorar la carga inicial
-const IconFichas = dynamic(() => import('react-icons/io5').then((mod) => mod.IoPersonSharp), { ssr: false });
+const IconFichas = dynamic(() => import('react-icons/fa').then((mod) => mod.FaRegListAlt), { ssr: false });
 const IconProgramas = dynamic(() => import('react-icons/fa').then((mod) => mod.FaLaptopCode), { ssr: false });
-const IconAsistencia = dynamic(() => import('react-icons/bs').then((mod) => mod.BsPersonCheck), { ssr: false });
+const IconAsistencia = dynamic(() => import('react-icons/bs').then((mod) => mod.BsPersonFillCheck), { ssr: false });
 const IconTeams = dynamic(() => import('react-icons/hi2').then((mod) => mod.HiUserGroup), { ssr: false });
 const IconSustentaciones = dynamic(() => import('react-icons/fa6').then((mod) => mod.FaChalkboardUser), { ssr: false });
 const IconAprendices = dynamic(() => import('react-icons/pi').then((mod) => mod.PiStudentFill), { ssr: false });
@@ -31,7 +31,7 @@ export const Sidebar = () => {
         { href: "/Programas", label: "Programas", icon: <IconProgramas className='text-2xl' /> },
         { href: "/asistencia", label: "Asistencia", icon: <IconAsistencia className='text-2xl' /> },
         { href: "/teamScrum", label: "Teams", icon: <IconTeams className='text-2xl' /> },
-        { href: "/listaChequeo", label: "Sustentaciones", icon: <IconSustentaciones className='text-2xl' /> },
+        { href: "/ListaChequeoInstructor", label: "Sustentaciones", icon: <IconSustentaciones className='text-2xl' /> },
         { href: "/Aprendices", label: "Aprendices", icon: <IconAprendices className='text-2xl' /> },
         { href: "/justificaciones", label: "Justificaciones", icon: <IconJustificaciones className='text-2xl' /> },
     ], []);
@@ -40,8 +40,8 @@ export const Sidebar = () => {
         <div className={`xl:h-[100vh] overflow-y-scroll fixed xl:static bg-[#0e324b] w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto border-r-0 border-gray-300 h-full -left-full top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
             <div>
                 {/* LOGO */}
-                <div className="flex items-center mb-10 space-x-5">
-                    <Image src={logoAquiles} alt="Logo Aquiles" className="w-14" loading="lazy" />
+                <div className="flex items-center mb-10 space-x-0">
+                    <Image src={LogoAquilesWhite} alt="Logo Aquiles" className="w-24" />
                     <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) INSTRUCTOR</span>
                 </div>
 
