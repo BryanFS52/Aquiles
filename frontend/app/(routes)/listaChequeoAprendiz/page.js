@@ -44,7 +44,7 @@ export default function Component() {
   const [items, setItems] = useState(checklistData[selectedTrimester][selectedComponent]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
-
+  
   useEffect(() => {
     setItems(checklistData[selectedTrimester][selectedComponent]);
     setCurrentPage(1);

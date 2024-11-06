@@ -1,202 +1,159 @@
-"use client";
+'use client'
 
-import { HeaderAprendiz } from "../../components/HeaderAprendiz";
-import { Sidebaraprendiz } from "../../components/SidebarAprendiz";
-import Image from 'next/image';
-import aquiles from "../../../public/img/aquiles.jpg"; // imagen de aquiles
-import { IoPersonCircleSharp } from "react-icons/io5";
-import { IoDocumentTextSharp } from "react-icons/io5";
-import { FaIdCard } from 'react-icons/fa';
+import { useState } from 'react'
+import Image from 'next/image'
+import { Sidebarcoordinador } from '@/components/SidebarCoordinador'
+import { HeaderCoordinador } from '@/components/HeaderCoordinador'
 
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import { HeaderCoordinador } from "../../components/HeaderCoordinador";
-import { Sidebarcoordinador } from '../../components/SidebarCoordinador';
+const Modal = ({ isOpen, onClose, children }) => {
+    if (!isOpen) return null
 
-// Definición del componente Card
-const Card = ({ children, className }) => {
     return (
-        <div className={`bg-white shadow-xl rounded-lg p-8 w-full md:w-auto lg:w-auto ${className}`}>
-            {children}
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+                {children}
+                <button
+                    onClick={onClose}
+                    className="mt-4 px-4 py-2 bg-[#00324d] text-white rounded hover:bg-[#40b003] transition-colors duration-300"
+                >
+                    Cerrar
+                </button>
+            </div>
         </div>
-    );
-};
+    )
+}
 
-// Definición del componente CardHeader
-const CardHeader = ({ children }) => {
+const InstructorCard = ({ instructor }) => {
+    const [showMore, setShowMore] = useState(false)
+    const [showModal, setShowModal] = useState(false)
+
     return (
-        <div className="mb-4 border-b pb-2">
-            {children}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+            <div className="p-4 flex-grow">
+                <div className="flex items-start">
+                    <Image
+                        src={instructor.image}
+                        alt={instructor.name}
+                        width={80}
+                        height={80}
+                        className="rounded-full mr-4"
+                    />
+                    <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-[#00324d]">{instructor.name}</h3>
+                        <p className="text-sm text-gray-600">{instructor.specialty}</p>
+                        <p className="text-sm text-gray-600">{`Fichas asignadas: ${instructor.assignedGroups}`}</p>
+                        <button
+                            onClick={() => setShowModal(true)}
+                            className="text-sm text-green-600"
+                            aria-label="Ver fichas asignadas"
+                        >Ver fichas</button>
+                    </div>
+                </div>
+                {showMore && (
+                    <div className="mt-4 pt-2 border-t border-gray-200">
+                        <p className="text-sm text-gray-700"><span className="font-semibold">Tiempo de contrato:</span> {instructor.contractTime}</p>
+                        <p className="text-sm text-gray-700"><span className="font-semibold">Centros y sedes:</span> {instructor.centers}</p>
+                        <p className="text-sm text-gray-700"><span className="font-semibold">Modalidad:</span> {instructor.modalidad}</p>
+                    </div>
+                )}
+            </div>
+            <button
+                onClick={() => setShowMore(!showMore)}
+                className="w-full py-2 text-[#00324d] hover:text-[#40b003] transition-colors duration-300 bg-gray-100 hover:bg-gray-200 mt-auto"
+            >
+                {showMore ? 'Menos información' : 'Más información'}
+            </button>
+            <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+                <h4 className="text-lg font-semibold mb-2">Fichas asignadas</h4>
+                <ul className="list-disc pl-5">
+                {/* {instructor.assignedGroups.map((ficha, index) => (
+            <li key={index} className="text-sm text-gray-700">{ficha}</li>
+          ))} */}
+                    <li>{instructor.ficha}</li>
+                </ul>
+            </Modal>
         </div>
-    );
-};
+    )
+}
 
-// Definición del componente CardTitle
-const CardTitle = ({ children }) => {
-    return (
-        <h2 className="text-xl font-semibold">
-            {children}
-        </h2>
-    );
-};
-
-// Definición del componente CardContent
-const CardContent = ({ children }) => {
-    return (
-        <div className="text-gray-700">
-            {children}
-        </div>
-    );
-};
-
-// Definición del componente Button
-const Button = ({ children, onClick, className }) => {
-    return (
-        <button
-            onClick={onClick}
-            className={`px-4 py-2 bg-[#00324d] text-white rounded hover:bg-[#40b003] transition-all duration-300 ${className}`}
-        >
-            {children}
-        </button>
-    );
-};
-
-const InstructoresCoordinador = () => {
-    const router = useRouter();
-
-    // Funciones para redirigir a las rutas correspondientes
-    const handleInstructorAsignacion = () => {
-        router.push('/InstructorTechnicalAssign'); // Ruta para la asignación de instructor técnico
-    };
-
-    const handleMultipleAsignacion = () => {
-        router.push('/InstructorAssignMultipleSheets'); // Ruta para la asignación a múltiples fichas
-    };
+export default function InstructoresCoordinador() {
+    const instructors = [
+        {
+            name: 'Lucía Maria Pérez Gonzales',
+            image: '/img/aquiles.jpg',
+            specialty: 'Desarrollo Web',
+            assignedGroups: 3,
+            contractTime: '1 año',
+            centers: 'Centro de Tecnología, Sede Principal',
+            modalidad: 'Presencial',
+            ficha: '2892271'
+        },
+        {
+            name: 'Carlos Rodríguez',
+            image: '/img/aquiles.jpg',
+            specialty: 'Inteligencia Artificial',
+            assignedGroups: 2,
+            contractTime: '2 años',
+            centers: 'Centro de Innovación, Sede Secundaria',
+            modalidad: 'Presencial',
+            ficha: '2892275'
+        },
+        {
+            name: 'Juan Pérez',
+            image: '/img/aquiles.jpg',
+            specialty: 'Desarrollo Móvil',
+            assignedGroups: 3,
+            contractTime: '3 años',
+            centers: 'Centro de Servicios Financieros, Sede Este',
+            modalidad: 'Presencial',
+            ficha: '2892289'
+        },
+        {
+            name: 'Lucía Maria Pérez Gonzales',
+            image: '/img/aquiles.jpg',
+            specialty: 'Desarrollo Web',
+            assignedGroups: 3,
+            contractTime: '1 año',
+            centers: 'Centro de Tecnología, Sede Principal',
+            modalidad: 'Presencial',
+            ficha: '2892257'
+        },
+        {
+            name: 'Ana Martínez',
+            image: '/img/aquiles.jpg',
+            specialty: 'Diseño UX/UI',
+            assignedGroups: 4,
+            contractTime: '1.5 años',
+            centers: 'Centro de Servicios Financieros, Sede Principal',
+            modalidad: 'Virtual',
+            ficha: '2892212'
+        },
+        {
+            name: 'Juan Pérez',
+            image: '/img/aquiles.jpg',
+            specialty: 'Desarrollo Móvil',
+            assignedGroups: 3,
+            contractTime: '3 años',
+            centers: 'Centro de Servicios Financieros, Sede Este',
+            modalidad: 'Presencial',
+            ficha: '2892270'
+        }
+    ]
 
     return (
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
             <Sidebarcoordinador />
             <div className="xl:col-span-5">
                 <HeaderCoordinador />
-                <div className="container mx-auto p-6 space-y-8">
-                    <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
-                        Instructores
-                    </h1>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-                        
-                        <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg border border-gray-200">
-                            <div className="relative mb-4">
-                                <Image src={aquiles} alt="Instructor" width={120} height={120} className="rounded-full" />
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-                                <div className="space-y-2 text-lg">
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Tiempo de contrato:</span>
-                                        <p className="text-gray-800 font-inter font-normal">Lucía Maria Pérez Gonzales</p>
-                                    </div>
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Centros y sedes:</span>
-                                        <p className="text-gray-800 font-inter font-normal">Lucía Maria Pérez Gonzales</p>
-                                    </div>
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Fichas asignadas:</span>
-                                        <p className="text-gray-800 font-inter font-normal">3</p>
-                                    </div>
-                                </div>
-                                <div className="space-y-2 text-lg">
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Tiempo de contrato:</span>
-                                        <p className="text-gray-800 font-inter font-normal">Lucía Maria Pérez Gonzales</p>
-                                    </div>
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Centros y sedes:</span>
-                                        <p className="text-gray-800 font-inter font-normal">Lucía Maria Pérez Gonzales</p>
-                                    </div>
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Fichas asignadas:</span>
-                                        <p className="text-gray-800 font-inter font-normal">3</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        
-                        <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg border border-gray-200">
-                            <div className="relative mb-4">
-                                <Image src={aquiles} alt="Instructor" width={120} height={120} className="rounded-full" />
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-                                <div className="space-y-2 text-lg">
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Tiempo de contrato:</span>
-                                        <p className="text-gray-800 font-inter font-normal">Lucía Maria Pérez Gonzales</p>
-                                    </div>
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Centros y sedes:</span>
-                                        <p className="text-gray-800 font-inter font-normal">Lucía Maria Pérez Gonzales</p>
-                                    </div>
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Fichas asignadas:</span>
-                                        <p className="text-gray-800 font-inter font-normal">3</p>
-                                    </div>
-                                </div>
-                                <div className="space-y-2 text-lg">
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Tiempo de contrato:</span>
-                                        <p className="text-gray-800 font-inter font-normal">Lucía Maria Pérez Gonzales</p>
-                                    </div>
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Centros y sedes:</span>
-                                        <p className="text-gray-800 font-inter font-normal">Lucía Maria Pérez Gonzales</p>
-                                    </div>
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Fichas asignadas:</span>
-                                        <p className="text-gray-800 font-inter font-normal">3</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg border border-gray-200">
-                            <div className="relative mb-4">
-                                <Image src={aquiles} alt="Instructor" width={120} height={120} className="rounded-full" />
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-                                <div className="space-y-2 text-lg">
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Tiempo de contrato:</span>
-                                        <p className="text-gray-800 font-inter font-normal">Lucía Maria Pérez Gonzales</p>
-                                    </div>
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Centros y sedes:</span>
-                                        <p className="text-gray-800 font-inter font-normal">Lucía Maria Pérez Gonzales</p>
-                                    </div>
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Fichas asignadas:</span>
-                                        <p className="text-gray-800 font-inter font-normal">3</p>
-                                    </div>
-                                </div>
-                                <div className="space-y-2 text-lg">
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Tiempo de contrato:</span>
-                                        <p className="text-gray-800 font-inter font-normal">Lucía Maria Pérez Gonzales</p>
-                                    </div>
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Centros y sedes:</span>
-                                        <p className="text-gray-800 font-inter font-normal">Lucía Maria Pérez Gonzales</p>
-                                    </div>
-                                    <div className="space-x-2">
-                                        <span className="flex text-[#0e324d] font-inter font-semibold"><IoPersonCircleSharp className="inline-block text-[#40b003] text-2xl" /> &nbsp;Fichas asignadas:</span>
-                                        <p className="text-gray-800 font-inter font-normal">3</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <main className="container mx-auto p-6">
+                    <h1 className="text-3xl font-bold text-[#00324d] mb-6">Instructores</h1>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {instructors.map((instructor, index) => (
+                            <InstructorCard key={index} instructor={instructor} />
+                        ))}
                     </div>
-                </div>
+                </main>
             </div>
         </div>
-    );
-};
-
-export default InstructoresCoordinador;
+    )
+}
