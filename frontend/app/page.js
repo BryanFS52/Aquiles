@@ -8,6 +8,7 @@ import { HiMiniIdentification } from "react-icons/hi2";
 import Image from "next/image";
 import logoSena from "../public/img/LogoSena.png";
 import LogoAquiles from "../public/img/LogoAquiles.png";
+import LogoAquilesDarkBlue from "../public/img/LogoAquilesDarkBlue.png";
 import ModalOlvidoContraseña from "../app/components/Modals/modalOlvidoContraseña";
 import { useRouter } from 'next/navigation';
 import axios from 'axios'; // Asegúrate de importar axios
@@ -70,8 +71,8 @@ export default function Login() {
       <div className="w-full h-full flex justify-between items-center">
         <div className="xl:w-1/2 h-full flex justify-center items-center sm:w-full">
           <div className="xl:w-1/2 p-5">
-            <div className="flex items-center mb-8">
-              <Image src={LogoAquiles} alt="TDA Logo" className="w-28" />
+            <div className="flex items-center mb-3 space-x-2">
+              <Image src={LogoAquilesDarkBlue} alt="Logo Aquiles" className="w-36" />
               <div className="font-inter flex flex-col px-2 text-custom-blue">
                 <h1 className="text-4xl font-medium ">Aquiles</h1>
                 <p className="text-[13px] font-light">
