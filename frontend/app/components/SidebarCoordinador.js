@@ -11,6 +11,7 @@ import LogoAquilesWhite from "../../public/img/LogoAquilesWhite.png";
 // Importación dinámica de íconos para mejorar la carga inicial
 
 const IconFichas = dynamic(() => import('react-icons/fa').then((mod) => mod.FaRegListAlt), { ssr: false });
+const IconProfesor = dynamic(() => import('react-icons/fa').then((mod) => mod.FaChalkboardTeacher), { ssr: false });
 const IconProgramas = dynamic(() => import('react-icons/fa').then((mod) => mod.FaLaptopCode), { ssr: false });
 const IconAsistencia = dynamic(() => import('react-icons/bs').then((mod) => mod.BsPersonFillCheck), { ssr: false });
 const IconTeams = dynamic(() => import('react-icons/hi2').then((mod) => mod.HiUserGroup), { ssr: false });
@@ -28,6 +29,7 @@ export const Sidebarcoordinador = () => {
     // Lista de enlaces de menú
     const menuItems = useMemo(() => [
         { href: "/FichasCoordinador", label: "Fichas", icon: <IconFichas className='text-2xl' /> },
+        { href: "/InstructoresCoordinador", label: "Instructores", icon: <IconProfesor className='text-2xl'/> },
         { href: "/", label: "Programas", icon: <IconProgramas className='text-2xl' /> },
         { href: "/", label: "Asistencia", icon: <IconAsistencia className='text-2xl' /> },
         { href: "/", label: "Teams", icon: <IconTeams className='text-2xl' /> },
@@ -39,7 +41,7 @@ export const Sidebarcoordinador = () => {
             {/* LOGO */}
             <div className="flex items-center mb-10 space-x-0">
                 <Image src={LogoAquilesWhite} alt="Logo Aquiles" className="w-24" />
-                <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) INSTRUCTOR</span>
+                <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) COORDINADOR</span>
             </div>
 
             <ul className='text-white'>

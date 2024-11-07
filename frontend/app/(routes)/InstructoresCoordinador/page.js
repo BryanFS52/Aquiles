@@ -4,6 +4,9 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Sidebarcoordinador } from '@/components/SidebarCoordinador'
 import { HeaderCoordinador } from '@/components/HeaderCoordinador'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faUserGroup } from '@fortawesome/free-solid-svg-icons'
+
 
 const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null
@@ -65,11 +68,10 @@ const InstructorCard = ({ instructor }) => {
             </button>
             <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
                 <h4 className="text-lg font-semibold mb-2">Fichas asignadas</h4>
-                <ul className="list-disc pl-5">
-                {/* {instructor.assignedGroups.map((ficha, index) => (
-            <li key={index} className="text-sm text-gray-700">{ficha}</li>
-          ))} */}
-                    <li>{instructor.ficha}</li>
+                <ul className="list-none pl-5">
+                    {instructor.fichas.map((ficha, index) => (
+                        <li key={index} className="text-sm text-gray-700"><FontAwesomeIcon icon={faUserGroup} /> {ficha.ficha}</li>
+                    ))}
                 </ul>
             </Modal>
         </div>
@@ -86,7 +88,12 @@ export default function InstructoresCoordinador() {
             contractTime: '1 año',
             centers: 'Centro de Tecnología, Sede Principal',
             modalidad: 'Presencial',
-            ficha: '2892271'
+            fichas: [
+                { ficha: "2892271" },
+                { ficha: "2892272" },
+                { ficha: "2892273" },
+                { ficha: "2892274" }
+            ]
         },
         {
             name: 'Carlos Rodríguez',
@@ -96,7 +103,10 @@ export default function InstructoresCoordinador() {
             contractTime: '2 años',
             centers: 'Centro de Innovación, Sede Secundaria',
             modalidad: 'Presencial',
-            ficha: '2892275'
+            fichas: [
+                { ficha: "2892273" },
+                { ficha: "2892275" }
+            ]
         },
         {
             name: 'Juan Pérez',
@@ -106,17 +116,7 @@ export default function InstructoresCoordinador() {
             contractTime: '3 años',
             centers: 'Centro de Servicios Financieros, Sede Este',
             modalidad: 'Presencial',
-            ficha: '2892289'
-        },
-        {
-            name: 'Lucía Maria Pérez Gonzales',
-            image: '/img/aquiles.jpg',
-            specialty: 'Desarrollo Web',
-            assignedGroups: 3,
-            contractTime: '1 año',
-            centers: 'Centro de Tecnología, Sede Principal',
-            modalidad: 'Presencial',
-            ficha: '2892257'
+            fichas: [{ ficha: "2892289" }]
         },
         {
             name: 'Ana Martínez',
@@ -126,7 +126,11 @@ export default function InstructoresCoordinador() {
             contractTime: '1.5 años',
             centers: 'Centro de Servicios Financieros, Sede Principal',
             modalidad: 'Virtual',
-            ficha: '2892212'
+            fichas: [
+                { ficha: "2892212" },
+                { ficha: "2892274" },
+                { ficha: "2891274" }
+            ]
         },
         {
             name: 'Juan Pérez',
@@ -136,7 +140,7 @@ export default function InstructoresCoordinador() {
             contractTime: '3 años',
             centers: 'Centro de Servicios Financieros, Sede Este',
             modalidad: 'Presencial',
-            ficha: '2892270'
+            fichas: [{ ficha: "2892270" }]
         }
     ]
 
