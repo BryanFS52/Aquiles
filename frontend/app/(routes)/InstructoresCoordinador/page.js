@@ -7,7 +7,6 @@ import { HeaderCoordinador } from '@/components/HeaderCoordinador'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUserGroup } from '@fortawesome/free-solid-svg-icons'
 
-
 const Modal = ({ isOpen, onClose, children }) => {
     if (!isOpen) return null
 
@@ -27,8 +26,8 @@ const Modal = ({ isOpen, onClose, children }) => {
 }
 
 const InstructorCard = ({ instructor }) => {
-    const [showMore, setShowMore] = useState(false)
     const [showModal, setShowModal] = useState(false)
+    const [showModalFichas, setShowModalFichas] = useState(false)
 
     return (
         <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col h-full">
@@ -43,30 +42,33 @@ const InstructorCard = ({ instructor }) => {
                     />
                     <div className="flex-1">
                         <h3 className="text-lg font-semibold text-[#00324d]">{instructor.name}</h3>
-                        <p className="text-sm text-gray-600">{instructor.specialty}</p>
-                        <p className="text-sm text-gray-600">{`Fichas asignadas: ${instructor.assignedGroups}`}</p>
-                        <button
-                            onClick={() => setShowModal(true)}
-                            className="text-sm text-green-600"
-                            aria-label="Ver fichas asignadas"
-                        >Ver fichas</button>
+                        <p className="text-sm text-green-600">{instructor.specialty}</p>
+                        <p className="text-sm text-gray-600">{instructor.centers}</p>
+                        
                     </div>
                 </div>
-                {showMore && (
-                    <div className="mt-4 pt-2 border-t border-gray-200">
-                        <p className="text-sm text-gray-700"><span className="font-semibold">Tiempo de contrato:</span> {instructor.contractTime}</p>
-                        <p className="text-sm text-gray-700"><span className="font-semibold">Centros y sedes:</span> {instructor.centers}</p>
-                        <p className="text-sm text-gray-700"><span className="font-semibold">Modalidad:</span> {instructor.modalidad}</p>
-                    </div>
-                )}
             </div>
-            <button
-                onClick={() => setShowMore(!showMore)}
-                className="w-full py-2 text-[#00324d] hover:text-[#40b003] transition-colors duration-300 bg-gray-100 hover:bg-gray-200 mt-auto"
-            >
-                {showMore ? 'Menos información' : 'Más información'}
-            </button>
+            <div className="grid-cols-2">
+                <button
+                    onClick={() => setShowModal(true)}
+                    className="w-1/2 py-2 text-[#00324d] hover:text-[#40b003] transition-colors duration-300 bg-gray-100 hover:bg-gray-200 mt-auto"
+                >
+                    Más información
+                </button>
+                <button
+                    onClick={() => setShowModalFichas(true)}
+                    className="w-1/2 py-2 text-[#00324d] hover:text-[#228B22] transition-colors duration-300 bg-green-300 hover:bg-green-200 mt-auto"
+                >
+                    Fichas asignadas
+                </button>
+            </div>
+            
             <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+                <p className="text-sm"><span className="text-lg font-semibold">Tiempo de contrato:</span> {instructor.contractTime}</p>
+                <p className="text-sm"><span className="text-lg font-semibold">Modalidad:</span> {instructor.modalidad}</p>
+            </Modal>
+
+            <Modal isOpen={showModalFichas} onClose={() => setShowModalFichas(false)}>
                 <h4 className="text-lg font-semibold mb-2">Fichas asignadas</h4>
                 <ul className="list-none pl-5">
                     {instructor.fichas.map((ficha, index) => (
@@ -84,7 +86,6 @@ export default function InstructoresCoordinador() {
             name: 'Lucía Maria Pérez Gonzales',
             image: '/img/aquiles.jpg',
             specialty: 'Desarrollo Web',
-            assignedGroups: 3,
             contractTime: '1 año',
             centers: 'Centro de Tecnología, Sede Principal',
             modalidad: 'Presencial',

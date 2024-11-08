@@ -5,6 +5,9 @@ import { Header } from "../../components/header"
 import { Sidebar } from "../../components/Sidebar"
 import { toast } from "react-toastify"
 import { Check, FileDown, Save, Upload, X } from "lucide-react"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGreaterThan } from '@fortawesome/free-solid-svg-icons';
+import { faLessThan } from '@fortawesome/free-solid-svg-icons';
 
 // Asumimos que `checklistData` y `teams` están definidos en otro lugar
 // y son importados aquí
@@ -635,21 +638,24 @@ export default function InstructorChecklistView() {
             </table>
           </div>
 
-          <div className="flex justify-between items-center mt-4">
+          {/* Paginación */}
+          <div className="flex justify-center items-center mt-4">
             <button
+              className={`px-4 py-2 ${currentPage === 1 ? 'disabled:opacity-50' : ''}`}
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="bg-gray-300 rounded px-4 py-2"
             >
-              Anterior
+              <FontAwesomeIcon icon={faLessThan} size="sm" className="text-slate-700" style={{ transform: 'scaleX(0.8)'}}/>
             </button>
-            <div className="text-sm">Página {currentPage} de {totalPages}</div>
+            <div className="text-lg">
+              Página {currentPage} de {totalPages}
+            </div>
             <button
+              className={`px-4 py-2 ${currentPage === totalPages ? 'disabled:opacity-50' : ''}`}
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="bg-gray-300 rounded px-4 py-2"
             >
-              Siguiente
+              <FontAwesomeIcon icon={faGreaterThan} size="sm" className="text-slate-700" style={{ transform: 'scaleX(0.8)'}}/>
             </button>
           </div>
 
