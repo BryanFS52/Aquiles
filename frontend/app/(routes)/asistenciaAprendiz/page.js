@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Header } from "../../components/header";
-import { Sidebaraprendiz } from "../../components/sidebaraprendiz"; // Importaciones del header y del sidebar
+import { HeaderAprendiz } from "../../components/HeaderAprendiz";
+import { Sidebaraprendiz } from "../../components/SidebarAprendiz"; // Importaciones del header y del sidebar
 import { GoSearch } from "react-icons/go";
 import { IoIosArrowDown } from "react-icons/io";
 import { useRouter } from 'next/navigation'; // Importa useRouter de next/navigation
@@ -16,14 +16,14 @@ export default function AsistenciaAprendiz() {
 
    const router = useRouter(); 
   const handleNext = () => {  
-    router.push('/justificacionaprendiz'); 
+    router.push('/justificacionesAprendiz'); 
   };
 
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebaraprendiz />
       <div className="xl:col-span-5">
-        <Header />
+        <HeaderAprendiz />
 
         <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full">
           <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">

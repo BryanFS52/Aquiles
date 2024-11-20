@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'; 
 import { Header } from "../../components/header"; 
-import { Sidebar } from "../../components/sidebar";
+import { Sidebar } from "../../components/Sidebar";
 import { MdAdd } from "react-icons/md";
 import { MdAddCircle } from "react-icons/md";
 import ModalNewProject from '../../components/Modals/modalNewProject';
@@ -107,8 +107,8 @@ export default function Home() {
       <div className="xl:col-span-5">
         <Header />
 
-        <div className="h-[90vh] overflow-y-scroll p-12 inline-block w-full relative">
-          <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Teams Scrums</h1>
+        <div className="container mx-auto p-6 space-y-6">
+        <h1 className="text-3xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">Team Scrums</h1>
           
           <div className="flex items-center justify-between mb-6">
             {teams.length === 0 ? (
@@ -140,12 +140,14 @@ export default function Home() {
                     <p className="text-black-700 text-base mb-4">{team.team_scrum_id}</p>
                     
                     <div className="text-[#000000] font-inter font-medium text-xl flex items-center justify-between">
-                      <span>Agregar Información</span>
-                      <div className="flex items-center">
-                        <button onClick={handleOpenAddInfoModal} className="ml-2">
-                          <MdAddCircle className="text-2xl text-[#00324d]" />
+                      <div className="font-inter flex items-center gap-2">
+                        <span>Agregar Información</span>
+                        <button onClick={handleOpenAddInfoModal}>
+                          <MdAddCircle className="text-3xl text-[#00324d]" />
                         </button>
-                        <button onClick={() => handleOpenConfirmModal(team.team_scrum_id)} className="ml-4">
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => handleOpenConfirmModal(team.team_scrum_id)}>
                           <FaTrashAlt className="text-2xl text-[#00324d]" />
                         </button>
                       </div>

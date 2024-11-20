@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Header } from "../../components/header"; 
-import { Sidebar } from "../../components/sidebar";
+import { Sidebarcoordinador } from "../../components/SidebarCoordinador";
 import { TbArrowBigRight } from "react-icons/tb";
 import { MdAdd } from "react-icons/md";
 import { ToastContainer, toast } from "react-toastify"; 
@@ -50,7 +50,7 @@ export default function Options() {
 
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-      <Sidebar />
+      <Sidebarcoordinador />
       <div className="xl:col-span-5">
         <Header />
 

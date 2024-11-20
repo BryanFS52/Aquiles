@@ -8,9 +8,10 @@ import axios from 'axios';
 const ModalQR = ({ isOpen, onClose }) => {
   const [timer, setTimer] = useState(900); // Duración del QR en segundos
   const [qrCodeImage, setQrCodeImage] = useState(null); 
+  const [showModal, setShowModal] = useState(false); // Estado para manejar la transición
   const router = useRouter(); 
 
-  const apprenticeEmail = "keishlanayedcamargorojas@gmail.com"; 
+  const apprenticeEmail = "jhorsreflex@gmail.com"; 
 
   useEffect(() => {
     if (!isOpen) return;
@@ -25,6 +26,8 @@ const ModalQR = ({ isOpen, onClose }) => {
     };
 
     fetchQRCode();
+    setShowModal(true); // Mostrar el modal con transición al abrir
+
     const interval = setInterval(() => {
       setTimer(prev => {
         if (prev <= 1) {
@@ -36,13 +39,18 @@ const ModalQR = ({ isOpen, onClose }) => {
       });
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, [isOpen, router]);
 
   const handleClose = () => {
-    onClose();
-    setTimer(900);
-    setQrCodeImage(null); // Limpiar el QR al cerrar
+    setShowModal(false); // Iniciar la transición de cierre
+    setTimeout(() => {
+      onClose();
+      setTimer(900);
+      setQrCodeImage(null); // Limpiar el QR al cerrar
+    }, 300); // Tiempo de la transición antes de desmontar el modal
   };
 
   const sendAttendanceEmail = async () => {
@@ -153,13 +161,23 @@ const ModalQR = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
+  // Manejador para cerrar el modal al hacer clic fuera del modal
+  const handleClickOutside = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
-      <div className="fixed inset-0 bg-cyan-900 opacity-35"></div>
-      <div className="relative w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-8 bg-white rounded-lg shadow-lg">
+    
+    <div className={`fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none transition-opacity duration-300 ease-in-out ${showModal ? 'opacity-100' : 'opacity-0'}`}>
+      <div className="fixed inset-0 flex items-center bg-black bg-opacity-25" 
+       onClick={handleClickOutside}  // De tectar clics fuera del modal
+      ></div>
+      <div className={`relative w-full max-w-md sm:max-w-lg md:max-w-xl mx-auto my-8 bg-white rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out ${showModal ? 'scale-100' : 'scale-90'}`}>
         <div className="p-4 sm:p-6 md:p-8">
           <div className='flex justify-center items-center'>
-            <h1 className="font-inter text-xl sm:text-2xl md:text-3xl border-b-2 border-black">
+            <h1 className="text-center font-semibold font-inter text-xl sm:text-2xl md:text-3xl">
               Código QR Para la Toma de Asistencia
             </h1>
           </div>

@@ -15,33 +15,35 @@ export const Header = () => {
   };
 
   return (
-    <header className='h-[7vh] md:h-[9vh] mx-auto flex items-center justify-end px-5 lg:py-5 lg:px-4 border-[#ffffff] bg-slate-200'>
-      <div className="relative">
+    <header className='h-[7vh] md:h-[9vh] mx-auto flex items-center justify-end px-5 lg:py-5 lg:px-4 border-[#ffffff] bg-slate-200 shadow-none'>
+      <div className="relative mr-6">
         <ul>
           <li
-            className='h-10 w-10 flex items-center justify-center rounded-full bg-white hover:bg-[#00324d] transition-colors duration-300'
+            className='h-10 w-10 flex items-center justify-center rounded-full bg-white hover:bg-[#00324d] transition-all duration-300 shadow-md'
             onClick={toggleMenu}
-          >
+            >
             <a href="#" className='text-gray-400 text-2xl relative'>
               <IoNotificationsOutline className="text-[#01b001] transition-colors duration-300"/>
               {unreadCount > 0 && (
-                <RiCheckboxBlankCircleFill className="absolute top-0 right-0 text-red-600 h-3 w-3" />
+                <RiCheckboxBlankCircleFill className="absolute top-1 right-1 text-red-600 h-3 w-3" />
               )}
             </a>
           </li>
         </ul>
         {isOpen && <Notifications />}
       </div>
-      <Link href='/perfil' className='flex items-center gap-2 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-        <div className="text-[#000000] font-inter font-medium flex flex-col">
-          <span className="text-end">Usuario</span>
-          <span className="text-xs">Aprendices</span>
+      <Link href='/perfil' className='group flex items-center font-semibold text-white gap-3 py-3 px-4 bg-[#00324d] hover:bg-[#01b001] rounded-lg transition-all duration-300 shadow-md'>
+        <div className="flex flex-col text-end">
+          <span className="text-lg">Usuario</span>
+          <span className="text-sm text-[#01b001] group-hover:text-[#00324d] transition-colors duration-300">Instructor</span>
         </div>
         <img
           src="https://img.freepik.com/foto-gratis/joven-bella-mujer-pie-sobre-pared-blanca_114579-90514.jpg"
-          className='w-10 h-10 object-cover rounded-full'
+          className='w-11 h-11 object-cover rounded-full border-2 border-white shadow-sm'
         />
       </Link>
+
+
     </header>
   );
 };

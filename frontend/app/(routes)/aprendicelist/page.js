@@ -1,23 +1,34 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Header } from "../../components/header";
-import { Sidebar } from "../../components/sidebar";
+import { Sidebar } from "../../components/Sidebar";
 import { PiStudentFill } from "react-icons/pi";
 import { ImMail4 } from "react-icons/im";
 import ModalCorreo from "../../components/Modals/modalCorreo";
 import { sendEmailAbsence } from "../../services/emailService";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { getAllApprentices } from "../../services/apprenticeService"; // Importa el servicio
 
 export default function AprendicesList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState(null);
+    const [students, setStudents] = useState([]); // Inicializa la lista de estudiantes
 
-    const [students, setStudents] = useState([
-        { documentNumber: '10078459687', fullName: 'Michael Felipe Laiton Chaparro', isPresent: true, email: 'keishlanayedcamargorojas@gmail.com', date: '2024-08-16' },
-        { documentNumber: '10078459688', fullName: 'Ana María Pérez', isPresent: false, email: 'anamaria@gmail.com', date: '2024-08-16' },
-    ]);
+    useEffect(() => {
+        const fetchStudents = async () => {
+            try {
+                const studentsData = await getAllApprentices(); // Obtén la lista de aprendices del servicio
+                setStudents(studentsData);
+            } catch (error) {
+                console.error('Error al obtener la lista de aprendices:', error);
+            }
+        };
+
+        fetchStudents();
+    }, []);
+
     const toggleModal = (student) => {
         setSelectedStudent(student);
         setIsModalOpen(!isModalOpen);
@@ -37,11 +48,28 @@ export default function AprendicesList() {
         } finally {
             setIsModalOpen(false);
         }
-    };
+    };   
 
     const totalStudents = students.length;
     const presentStudents = students.filter(student => student.isPresent).length;
     const absentStudents = students.filter(student => !student.isPresent).length;
+
+    const handleSaveAttendance = async () => {
+        try {
+            const attendanceData = students.map(student => ({
+                documentNumber: student.documentNumber,
+                isPresent: student.isPresent,
+                date: student.date,
+            }));
+            
+            // Llama a la función para guardar la asistencia aquí (actualizarAttendance debe estar definida en otro lugar)
+            await updateAttendance(attendanceData);
+            toast.success('Asistencia guardada correctamente');
+        } catch (error) {
+            console.error('Error al guardar la asistencia:', error);
+            toast.error('Hubo un error al guardar la asistencia');
+        }
+    };
 
     return (
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
@@ -119,7 +147,7 @@ export default function AprendicesList() {
                             </table>
 
                             <div className="flex justify-end mt-6">
-                                <button type="button" className="text-white font-inter font-normal h-11 w-44 rounded-lg text-sm px-5 bg-custom-blue dark:hover:bg-custom-blue flex items-center">
+                                <button type="button" onClick={handleSaveAttendance} className="text-white font-inter font-normal h-11 w-44 rounded-lg text-sm px-5 bg-custom-blue dark:hover:bg-custom-blue flex items-center">
                                     Guardar Asistencia
                                 </button>
                             </div>

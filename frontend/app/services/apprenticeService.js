@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:8081/api';
 
+// Crear aprendiz
 export const createApprentice = async (data) => {
   try {
     await axios.post(`${API_URL}/persons/create`, data);
@@ -12,6 +13,7 @@ export const createApprentice = async (data) => {
   }
 };
 
+// Obtener todos los aprendices
 export const getAllApprentices = async () => {
   try {
     const response = await axios.get(`${API_URL}/persons/all`);
@@ -32,3 +34,27 @@ export const getAllApprentices = async () => {
   }
 };
 
+// Obtener asistencia de un aprendiz
+export const getApprenticeAttendance = async (documentNumber) => {
+  try {
+    const response = await axios.get(`${API_URL}/attendance/${documentNumber}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener la asistencia del aprendiz:', error);
+    return null;
+  }
+};
+
+// Actualizar asistencia de un aprendiz
+export const updateApprenticeAttendance = async (documentNumber, attendanceData) => {
+  try {
+    const response = await axios.post(`${API_URL}/attendance/update`, {
+      documentNumber,
+      attendanceData,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error al actualizar la asistencia del aprendiz:', error);
+    return null;
+  }
+};
