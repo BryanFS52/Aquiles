@@ -14,13 +14,20 @@ import { getAllApprentices } from "../../services/apprenticeService"; // Importa
 export default function AprendicesList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState(null);
+    const [students, setStudents] = useState([]); // Inicializa la lista de estudiantes
 
-    // Estado para los aprendices
-    const [students, setStudents] = useState([
-        { documentNumber: '10078459687', fullName: 'Michael Felipe Laiton Chaparro', isPresent: true, email: 'keishlanayedcamargorojas@gmail.com', date: '2024-08-16' },
-        { documentNumber: '10078459688', fullName: 'Ana María Pérez', isPresent: false, email: 'anamaria@gmail.com', date: '2024-08-16' },
-      
-    ]);
+    useEffect(() => {
+        const fetchStudents = async () => {
+            try {
+                const studentsData = await getAllApprentices(); // Obtén la lista de aprendices del servicio
+                setStudents(studentsData);
+            } catch (error) {
+                console.error('Error al obtener la lista de aprendices:', error);
+            }
+        };
+
+        fetchStudents();
+    }, []);
 
     const toggleModal = (student) => {
         setSelectedStudent(student);
@@ -52,9 +59,10 @@ export default function AprendicesList() {
             const attendanceData = students.map(student => ({
                 documentNumber: student.documentNumber,
                 isPresent: student.isPresent,
-                date: student.date,  // O la fecha que corresponda
+                date: student.date,
             }));
             
+            // Llama a la función para guardar la asistencia aquí (actualizarAttendance debe estar definida en otro lugar)
             await updateAttendance(attendanceData);
             toast.success('Asistencia guardada correctamente');
         } catch (error) {
@@ -139,7 +147,7 @@ export default function AprendicesList() {
                             </table>
 
                             <div className="flex justify-end mt-6">
-                                <button type="button" className="text-white font-inter font-normal h-11 w-44 rounded-lg text-sm px-5 bg-custom-blue dark:hover:bg-custom-blue flex items-center">
+                                <button type="button" onClick={handleSaveAttendance} className="text-white font-inter font-normal h-11 w-44 rounded-lg text-sm px-5 bg-custom-blue dark:hover:bg-custom-blue flex items-center">
                                     Guardar Asistencia
                                 </button>
                             </div>

@@ -1,84 +1,226 @@
-"use client"
+"use client";
 
-import React from "react";
-import { Header } from "../../components/header"; //importaciones del header y del sidebar para hacer el llamado
+import React, { useState, useMemo } from "react";
+import { Header } from "../../components/header";
 import { Sidebar } from "../../components/Sidebar";
 import { GoSearch } from "react-icons/go";
 import { GrAttachment } from "react-icons/gr";
 import Image from "next/image";
 import persona from "../../../public/img/persona.jpg";
-import { IoIosArrowForward } from "react-icons/io";
-import { IoIosArrowBack } from "react-icons/io";
+import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
-export default function Options() {
+export default function JustificacionesInstructor() {
+  const [selectedFiltro, setSelectedFiltro] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
+  // Datos de ejemplo
+  const fichas = [
+    { id: "25785784", nombre: "Análisis y Desarrollo de Software" },
+    { id: "25724865", nombre: "Desarrollo de Software" },
+    // Agrega más fichas según sea necesario
+  ];
+
+  const justificaciones = [
+    {
+      id: 1,
+      programa: "Análisis y Desarrollo de Software",
+      ficha: "25785784",
+      documento: "1015896552",
+      aprendiz: "Luisa Fernanda Gómez",
+      fecha: "12/02/2024",
+      estado: "Activo",
+    },
+    {
+      id: 2,
+      programa: "Análisis y Desarrollo de Software",
+      ficha: "25724865",
+      documento: "1015896553",
+      aprendiz: "Jorge Mario Pineda García",
+      fecha: "12/03/2024",
+      estado: "Activo",
+    },
+    // Add more justificaciones to test pagination
+    {
+      id: 3,
+      programa: "Desarrollo de Software",
+      ficha: "25724865",
+      documento: "1015896554",
+      aprendiz: "Ana María López",
+      fecha: "13/03/2024",
+      estado: "Activo",
+    },
+    {
+      id: 4,
+      programa: "Análisis y Desarrollo de Software",
+      ficha: "25785784",
+      documento: "1015896555",
+      aprendiz: "Carlos Andrés Rodríguez",
+      fecha: "14/03/2024",
+      estado: "Activo",
+    },
+    {
+      id: 5,
+      programa: "Desarrollo de Software",
+      ficha: "25724865",
+      documento: "1015896556",
+      aprendiz: "María José Hernández",
+      fecha: "15/03/2024",
+      estado: "Activo",
+    },
+    {
+      id: 6,
+      programa: "Análisis y Desarrollo de Software",
+      ficha: "25785784",
+      documento: "1015896557",
+      aprendiz: "Juan Pablo Martínez",
+      fecha: "16/03/2024",
+      estado: "Activo",
+    },
+    {
+      id: 7,
+      programa: "Desarrollo de Software",
+      ficha: "25724865",
+      documento: "1015896558",
+      aprendiz: "Laura Sofía Pérez",
+      fecha: "17/03/2024",
+      estado: "Activo",
+    },
+  ];
+
+  const filteredJustificaciones = useMemo(() => {
+    return justificaciones.filter((j) => {
+      if (!selectedFiltro || !searchTerm) return true;
+
+      switch (selectedFiltro) {
+        case "programa":
+          return j.programa.toLowerCase().includes(searchTerm.toLowerCase());
+        case "ficha":
+          return j.ficha.includes(searchTerm);
+        case "documento":
+          return j.documento.includes(searchTerm);
+        case "aprendiz":
+          return j.aprendiz.toLowerCase().includes(searchTerm.toLowerCase());
+        case "fecha":
+          return j.fecha.includes(searchTerm);
+        default:
+          return true;
+      }
+    });
+  }, [selectedFiltro, searchTerm]);
+
+  const totalPages = Math.ceil(filteredJustificaciones.length / itemsPerPage);
+
+  const paginatedJustificaciones = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredJustificaciones.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredJustificaciones, currentPage]);
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
   return (
-    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
+    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6 bg-gray-100">
       <Sidebar />
       <div className="xl:col-span-5">
         <Header />
 
-        <div className="h-[90vh] overflow-y-scroll p-4 md:p-6 lg:p-8 xl:p-10 mx-auto max-w-screen-lg">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 mb-8 lg:mb-10 font-serif">
-            Justificaciones Ficha 2630197
+        <div className="container mx-auto p-6 space-y-8">
+          <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
+            Justificaciones de Aprendices
           </h1>
-          
-          <div className="relative mb-6 max-w-md">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <GoSearch className="text-gray-400" />
+
+          <div className="flex flex-col md:flex-row gap-4 items-center">
+            <div className="w-full md:w-1/3">
+              <select
+                onChange={(e) => setSelectedFiltro(e.target.value)}
+                value={selectedFiltro}
+                className="w-full p-2 border border-gray-300 rounded"
+              >
+                <option value="">Filtrar por...</option>
+                <option value="programa">Programa</option>
+                <option value="ficha">Ficha</option>
+                <option value="documento">Documento</option>
+                <option value="aprendiz">Aprendiz</option>
+                <option value="fecha">Fecha de Justificación</option>
+              </select>
             </div>
-            <input
-              type="search"
-              className="block w-full pl-10 pr-4 text-sm rounded-lg border-2 border-slate-300 focus:outline-none focus:border-slate-300"
-              placeholder="Buscar aprendiz."
-            />
+
+            <div className="relative w-full md:w-2/3">
+              <input
+                type="search"
+                placeholder={`Buscar por ${selectedFiltro || "..."}`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 p-2 border border-gray-300 rounded"
+                disabled={!selectedFiltro}
+              />
+              <GoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            </div>
           </div>
 
           {/* Tabla */}
-          <div className="relative overflow-x-auto">
-            <table className="w-full text-sm text-left text-black">
-              <thead className="text-xs uppercase bg-gray-50 dark:bg-custom-blue dark:text-white border-2 border-gray-500">
+          <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <table className="w-full text-sm text-left text-gray-700 bg-white rounded-lg">
+              <thead className="text-xs uppercase bg-gray-50 text-gray-600">
                 <tr>
-                  <th className="px-3 py-2">Foto</th>
-                  <th className="px-3 py-2">Documento</th>
-                  <th className="px-3 py-2">Aprendiz</th>
-                  <th className="px-3 py-2">Fecha de Justificación</th>
-                  <th className="px-3 py-2">Archivo Adjunto</th>
+                  <th className="px-4 py-3">Programa</th>
+                  <th className="px-4 py-3">Ficha</th>
+                  <th className="px-4 py-3">Foto</th>
+                  <th className="px-4 py-3">Documento</th>
+                  <th className="px-4 py-3">Aprendiz</th>
+                  <th className="px-4 py-3">Fecha de Justificación</th>
+                  <th className="px-4 py-3">Archivo Adjunto</th>
+                  <th className="px-4 py-3">Estado</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="bg-white border-2 border-gray-400">
-                  <td className="px-3 py-2">
-                    <Image src={persona} alt="" className="w-10 h-9" />
-                  </td>
-                  <td className="px-3 py-2">10158962</td>
-                  <td className="px-3 py-2">Juliana Valeria Lilian Tibocha Gutierrez</td>
-                  <td className="px-3 py-2">12/02/2024</td>
-                  <td className="px-3 py-2">
-                    <GrAttachment className="w-5 h-5" />
-                  </td>
-                </tr>
-                {/* Repetir las filas según sea necesario */}
+                {paginatedJustificaciones.map((justificacion) => (
+                  <tr key={justificacion.id} className="border-b hover:bg-gray-50 transition-colors duration-200">
+                    <td className="px-4 py-3">{justificacion.programa}</td>
+                    <td className="px-4 py-3">{justificacion.ficha}</td>
+                    <td className="px-4 py-3">
+                      <Image src={persona} alt="Persona" className="w-10 h-9 rounded-full" />
+                    </td>
+                    <td className="px-4 py-3">{justificacion.documento}</td>
+                    <td className="px-4 py-3">{justificacion.aprendiz}</td>
+                    <td className="px-4 py-3">{justificacion.fecha}</td>
+                    <td className="px-4 py-3">
+                      <GrAttachment className="w-5 h-5 text-[#01b001] hover:text-[#00324d] transition-colors duration-300" />
+                    </td>
+                    <td className="px-4 py-3">{justificacion.estado}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
 
-          <div className="flex flex-col items-center pt-4 lg:pt-6">
-            <div className="flex space-x-3 lg:space-x-4">
-              <button
-                type="button"
-                className="text-custom-blue font-medium flex items-center font-serif text-md lg:text-lg"
-              >
-                <IoIosArrowBack className="text-custom-blue w-4 h-4 lg:w-5 lg:h-5" />
-                Anterior
-              </button>
-              <button
-                type="button"
-                className="text-custom-blue font-medium flex items-center font-serif text-md lg:text-lg"
-              >
-                Siguiente
-                <IoIosArrowForward className="text-custom-blue w-4 h-4 lg:w-5 lg:h-5" />
-              </button>
-            </div>
+          <div className="flex justify-between items-center pt-4 lg:pt-6">
+            <button
+              className="flex items-center p-2 border border-gray-300 rounded"
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+            >
+              <IoIosArrowBack className="mr-2" />
+              Anterior
+            </button>
+            <span>
+              Página {currentPage} de {totalPages}
+            </span>
+            <button
+              className="flex items-center p-2 border border-gray-300 rounded"
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+            >
+              Siguiente
+              <IoIosArrowForward className="ml-2" />
+            </button>
           </div>
         </div>
       </div>

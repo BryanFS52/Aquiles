@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Header } from "../../components/header";
+import { HeaderAprendiz } from "../../components/HeaderAprendiz";
 import { Sidebaraprendiz } from '../../components/SidebarAprendiz';
 import { FaUsers, FaRegClock, FaGraduationCap, FaRegListAlt } from "react-icons/fa"; // Iconos
 
@@ -24,12 +24,12 @@ const ApprenticeView = () => {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">        
       <Sidebaraprendiz />
       <div className="xl:col-span-5">
-        <Header />
+        <HeaderAprendiz />
 
-        <div className="h-[90vh] p-4 md:p-8 lg:p-4 w-full bg-neutral-100 space-y-4">
-        <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-4 font-inter font-semibold">
+        <div className="container mx-auto p-6 space-y-8">
+          <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
           Ficha y Aprendices
-        </h1>
+          </h1>
 
         <div className="flex flex-col items-center justify-center space-y-4 w-full md:flex-row md:flex-wrap md:justify-center md:space-y-0 md:space-x-8">
           

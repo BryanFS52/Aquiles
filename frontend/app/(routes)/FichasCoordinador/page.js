@@ -1,107 +1,102 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { Header } from "../../components/header";
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import { HeaderCoordinador } from "../../components/HeaderCoordinador";
 import { Sidebarcoordinador } from '../../components/SidebarCoordinador';
-import { FaUsers } from "react-icons/fa"; 
-import { getAllSheets, assignInstructor } from '../../services/FichasCoordinadorService'; 
+
+// Definición del componente Card
+const Card = ({ children, className }) => {
+  return (
+    <div className={`bg-white shadow-xl rounded-lg p-8 w-full md:w-auto lg:w-auto ${className}`}>
+    {children}
+  </div>
+  );
+};
+
+// Definición del componente CardHeader
+const CardHeader = ({ children }) => {
+  return (
+    <div className="mb-4 border-b pb-2">
+      {children}
+    </div>
+  );
+};
+
+// Definición del componente CardTitle
+const CardTitle = ({ children }) => {
+  return (
+    <h2 className="text-xl font-semibold">
+      {children}
+    </h2>
+  );
+};
+
+// Definición del componente CardContent
+const CardContent = ({ children }) => {
+  return (
+    <div className="text-gray-700">
+      {children}
+    </div>
+  );
+};
+
+// Definición del componente Button
+const Button = ({ children, onClick, className }) => {
+  return (
+    <button 
+      onClick={onClick} 
+      className={`px-4 py-2 bg-[#00324d] text-white rounded hover:bg-[#40b003] transition-all duration-300 ${className}`}
+    >
+      {children}
+    </button>
+  );
+};
 
 const FichasCoordinator = () => {
-  const [sheets, setSheets] = useState([]);
-  const [selectedInstructor, setSelectedInstructor] = useState({});
-  const [instructors, setInstructors] = useState([]);
+  const router = useRouter();
 
-  useEffect(() => {
-    const fetchSheets = async () => {
-      try {
-        const response = await getAllSheets();
-        setSheets(response.data); 
-      } catch (error) {
-        console.error("Error fetching sheets:", error);
-      }
-    };
+  // Funciones para redirigir a las rutas correspondientes
+  const handleInstructorAsignacion = () => {
+    router.push('/InstructorTechnicalAssign'); // Ruta para la asignación de instructor técnico
+  };
 
-    const fetchInstructors = async () => {
-      const response = await fetch('/api/instructors');
-      const data = await response.json();
-      setInstructors(data);
-    };
-
-    fetchSheets();
-    fetchInstructors();
-  }, []);
-
-  const handleAssignInstructor = async (sheetId, instructorId) => {
-    try {
-      await assignInstructor(sheetId, instructorId);
-      alert("Instructor asignado exitosamente");
-    } catch (error) {
-      console.error("Error asignando instructor:", error);
-    }
+  const handleMultipleAsignacion = () => {
+    router.push('/InstructorAssignMultipleSheets'); // Ruta para la asignación a múltiples fichas
   };
 
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebarcoordinador />
       <div className="xl:col-span-5">
-        <Header />
-        <div className="h-[90vh] p-4 md:p-8 lg:p-4 w-full bg-neutral-100 space-y-4">
-          <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-4 font-inter font-semibold">
-            Fichas y Asignación de Instructores
+        <HeaderCoordinador />
+        <div className="container mx-auto p-6 space-y-8">
+          <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
+            Asignación de Instructores a Fichas
           </h1>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {sheets.map((sheet) => (
-              <div key={sheet.idStudentSheet} className="flex flex-col border border-gray-300 shadow-md rounded-lg p-4 bg-white">
-                <div className="flex-shrink-0 bg-[#0e324d] rounded-2xl h-20 w-20 flex items-center justify-center mx-auto border-[#01b001] border-4">
-                  <FaUsers className="text-3xl text-white" />
-                </div>
-                <div className="text-center">
-                  <p className="text-xl font-bold mt-2 mx-auto">Aprendices</p>
-                  <p className="text-2xl font-bold mt-2 mx-auto">{sheet.token_number}</p>
-                </div>
-                <div className="flex flex-col ml-12 mx-auto">
-                  <p className="text-lg font-bold">Número de la Ficha</p>
-                  <p className="text-xl">{sheet.idStudentSheet}</p>
-                  <p className="text-sm font-bold">Jornada</p>
-                  <p className="text-md">{sheet.jornada}</p>
-                  <p className="text-sm font-bold">Programa</p>
-                  <p className="text-md">{sheet.program}</p>
-                  <p className="text-sm font-bold">Instructor Técnico</p>
-                  <p className="text-md">{sheet.instructorTecnico || "No asignado"}</p>
-                </div>
-                <div className="mt-4">
-                  <label htmlFor={`instructor-${sheet.idStudentSheet}`} className="block text-sm font-bold">
-                    Asignar Instructor:
-                  </label>
-                  <select
-                    id={`instructor-${sheet.idStudentSheet}`}
-                    className="w-full p-2 border border-gray-300 rounded-md"
-                    value={selectedInstructor[sheet.idStudentSheet] || ""}
-                    onChange={(e) =>
-                      setSelectedInstructor((prev) => ({
-                        ...prev,
-                        [sheet.idStudentSheet]: e.target.value,
-                      }))
-                    }
-                  >
-                    <option value="">Seleccionar Instructor</option>
-                    {instructors.map((instructor) => (
-                      <option key={instructor.id} value={instructor.id}>{instructor.name}</option>
-                    ))}
-                  </select>
-                  <button
-                    className="mt-2 p-2 bg-[#01b001] text-white rounded-md"
-                    onClick={() => handleAssignInstructor(sheet.idStudentSheet, selectedInstructor[sheet.idStudentSheet])}
-                  >
-                    Asignar
-                  </button>
-                </div>
-              </div>
-            ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Card className="w-[300px]">
+                <CardHeader>
+                  <CardTitle>Asignación de Instructor Técnico</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>Asigne un instructor técnico a una ficha específica.</p>
+                  <Button onClick={handleInstructorAsignacion} className="mt-4 w-full">Asignar</Button>
+                </CardContent>
+              </Card>
+              <Card className="w-[300px]">
+                <CardHeader>
+                  <CardTitle>Asignación de Instructor a Múltiples Fichas</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>Asigne un instructor a varias fichas simultáneamente.</p>
+                  <Button onClick={handleMultipleAsignacion} className="mt-4 w-full">Asignar</Button>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

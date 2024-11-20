@@ -1,120 +1,211 @@
-// ListaApprentices.js
-"use client";
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { Header } from "../../components/header";
-import { Sidebar } from "../../components/Sidebar";
-import { getAllApprentices } from "../../services/apprenticeService";
-import { useApprentices } from '../../context/ApprenticeContext';
+import React, { useState, useEffect } from 'react'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import { HeaderCoordinador } from "../../components/HeaderCoordinador"
+import { Sidebarcoordinador } from '../../components/SidebarCoordinador'
 
-const ListaApprentices = () => {
-  const { apprentices, setApprentices } = useApprentices();
-  const [searchTerm, setSearchTerm] = useState('');
+function ListaApprentices() {
+  const [apprentices, setApprentices] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [newApprentice, setNewApprentice] = useState({
+    name: '',
+    lastName: '',
+    documentType: '',
+    documentNumber: '',
+    program: '',
+    email: '',
+    teamNumber: '',
+  })
 
   useEffect(() => {
     const fetchApprentices = async () => {
       try {
-        const apprenticesData = await getAllApprentices();
-        setApprentices(apprenticesData);
+        const response = await fetch('http://localhost:8080/api/students')
+        const data = await response.json()
+        setApprentices(data)
       } catch (error) {
-        console.error('Error al obtener los aprendices:', error);
+        console.error('Error al obtener los aprendices:', error)
+        toast.error("No se pudieron cargar los aprendices. Por favor, intente de nuevo más tarde.")
       }
-    };
+    }
 
-    fetchApprentices();
-  }, [setApprentices]);
+    fetchApprentices()
+  }, [])
 
   const filteredApprentices = apprentices.filter(apprentice => 
-    apprentice.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apprentice.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apprentice.documentNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apprentice.program.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apprentice.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apprentice.teamNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    apprentice.documentType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (apprentice.profilePicture ? apprentice.profilePicture.toLowerCase().includes(searchTerm.toLowerCase()) : false)
-  );
+    Object.values(apprentice).some(value => 
+      value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  )
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setNewApprentice(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      const response = await fetch('http://localhost:8080/api/students', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newApprentice),
+      })
+      const createdApprentice = await response.json()
+      setApprentices(prev => [...prev, createdApprentice])
+      setNewApprentice({
+        name: '',
+        lastName: '',
+        documentType: '',
+        documentNumber: '',
+        program: '',
+        email: '',
+        teamNumber: '',
+      })
+      toast.success("Aprendiz creado correctamente.")
+    } catch (error) {
+      console.error('Error al crear el aprendiz:', error)
+      toast.error("No se pudo crear el aprendiz. Por favor, intente de nuevo.")
+    }
+  }
 
   return (
-    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-      <Sidebar />
-      <div className="xl:col-span-5 w-full">
-        <Header />
-        <div className="text-custom-blue font-bold text-2xl sm:text-3xl lg:text-4xl ml-4 sm:ml-10 py-4 sm:py-6 border-b-2 border-gray-400 w-full sm:w-3/5 lg:w-2/5 mb-5 lg:mb-8">
-          Aprendices
-        </div>
+    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6 bg-gray-50">
+      <Sidebarcoordinador />
+      <div className="xl:col-span-5">
+        <HeaderCoordinador />
 
-        <div className="flex justify-center mr-auto mb-6 px-4 sm:px-10">
-          <input
-            type="text"
-            placeholder="Buscar"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-2 py-2 border border-gray-300 rounded-lg w-full max-w-xl"
-          />
-        </div>
 
-        <div className="flex justify-center px-4">
-          <div className="w-full max-w-6xl">
-            <div className="bg-white shadow-md rounded-lg p-4 sm:p-6 border-2 border-gray-200 overflow-x-auto max-h-[35rem]">
-              <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-auto">
-                <thead className="bg-sky-950">
+        <div className="container mx-auto p-6 space-y-6">
+        <h1 className="text-3xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">Gestión de Aprendices</h1>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Crear Nuevo Aprendiz */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Crear Nuevo Aprendiz</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700" htmlFor="name">Nombres</label>
+                  <input 
+                    className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    id="name" 
+                    name="name" 
+                    value={newApprentice.name} 
+                    onChange={handleInputChange} 
+                    required 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700" htmlFor="lastName">Apellidos</label>
+                  <input 
+                    className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    id="lastName" 
+                    name="lastName" 
+                    value={newApprentice.lastName} 
+                    onChange={handleInputChange} 
+                    required 
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700" htmlFor="documentType">Tipo de Documento</label>
+                  <select 
+                    className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    name="documentType" 
+                    onChange={handleInputChange} 
+                    required
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="CC">Cédula de Ciudadanía</option>
+                    <option value="TI">Tarjeta de Identidad</option>
+                    <option value="CE">Cédula de Extranjería</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700" htmlFor="documentNumber">Número de Documento</label>
+                  <input 
+                    className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    id="documentNumber" 
+                    name="documentNumber" 
+                    value={newApprentice.documentNumber} 
+                    onChange={handleInputChange} 
+                    required 
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700" htmlFor="program">Programa</label>
+                <input 
+                  className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  id="program" 
+                  name="program" 
+                  value={newApprentice.program} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700" htmlFor="email">Correo Institucional</label>
+                <input 
+                  className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  id="email" 
+                  name="email" 
+                  type="email" 
+                  value={newApprentice.email} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700" htmlFor="teamNumber">Número del Team</label>
+                <input 
+                  className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  id="teamNumber" 
+                  name="teamNumber" 
+                  value={newApprentice.teamNumber} 
+                  onChange={handleInputChange} 
+                  required 
+                />
+              </div>
+              <button type="submit" className="bg-blue-500 text-white px-6 py-3 rounded-lg mt-4 hover:bg-blue-600">Crear Aprendiz</button>
+            </form>
+          </div>
+
+          {/* Lista de Aprendices */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Lista de Aprendices</h2>
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Buscar aprendices"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="border rounded-lg overflow-hidden shadow-md">
+              <table className="w-full">
+                <thead className="bg-gray-100">
                   <tr>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 w-16 sm:w-20 border-2 border-gray-300 bg-sky-950 text-xs sm:text-sm font-semibold text-white">
-                      Foto
-                    </th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 w-16 sm:w-20 border-2 border-gray-300 bg-sky-950 text-xs sm:text-sm font-semibold text-white">
-                      Tipo de Documento
-                    </th>
-                    <th className="px-2 sm:px-4 w-48 sm:w-96 border-2 border-gray-300 bg-sky-950 text-xs sm:text-sm font-semibold text-white text-center">
-                      Número de Identificación
-                    </th>
-                    <th className="px-2 sm:px-4 w-48 sm:w-96 border-2 border-gray-300 bg-sky-950 text-xs sm:text-sm font-semibold text-white text-center">
-                      Programa
-                    </th>
-                    <th className="px-2 sm:px-4 w-24 sm:w-20 border-2 border-gray-300 bg-sky-950 text-xs sm:text-sm font-semibold text-white">
-                      Nombres
-                    </th>
-                    <th className="px-2 sm:px-4 w-24 sm:w-20 border-2 border-gray-300 bg-sky-950 text-xs sm:text-sm font-semibold text-white">
-                      Apellidos
-                    </th>
-                    <th className="px-2 sm:px-4 border-2 border-gray-300 bg-sky-950 text-xs sm:text-sm font-semibold text-white">
-                      Correo Institucional
-                    </th>
-                    <th className="px-2 sm:px-4 border-2 border-gray-300 bg-sky-950 text-xs sm:text-sm font-semibold text-white">
-                      Número del Team
-                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Documento</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Programa</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Team</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-300">
+                <tbody className="bg-white divide-y divide-gray-200">
                   {filteredApprentices.map((apprentice) => (
                     <tr key={apprentice.documentNumber}>
-                      <td className="px-2 sm:px-4 py-2 border-2 border-gray-300 text-xs sm:text-sm text-center">
-                        {apprentice.profilePicture ? (
-                          <img src={apprentice.profilePicture} alt="Profile" className="w-10 h-10 sm:w-16 sm:h-16 object-cover rounded-full" />
-                        ) : 'N/A'}
-                      </td>
-                      <td className="px-2 sm:px-4 py-2 border-2 border-gray-300 text-xs sm:text-sm text-center">
-                        {apprentice.documentType}
-                      </td>
-                      <td className="px-2 border-2 border-gray-300 text-xs sm:text-sm text-center">
-                        {apprentice.documentNumber}
-                      </td>
-                      <td className="px-2 border-2 border-gray-300 text-xs sm:text-sm text-center">
-                        {apprentice.program}
-                      </td>
-                      <td className="px-2 border-2 border-gray-300 text-xs sm:text-sm text-center">
-                        {apprentice.name}
-                      </td>
-                      <td className="px-2 border-2 border-gray-300 text-xs sm:text-sm text-center">
-                        {apprentice.lastName}
-                      </td>
-                      <td className="px-2 border-2 border-gray-300 text-xs sm:text-sm text-center">
-                        {apprentice.email || 'N/A'}
-                      </td>
-                      <td className="px-2 border-2 border-gray-300 text-xs sm:text-sm text-center">
-                        {apprentice.teamNumber}
-                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{apprentice.name} {apprentice.lastName}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{apprentice.documentNumber}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{apprentice.program}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{apprentice.teamNumber}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -122,9 +213,12 @@ const ListaApprentices = () => {
             </div>
           </div>
         </div>
+        </div>
+
+        <ToastContainer />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ListaApprentices;
+export default ListaApprentices
