@@ -20,6 +20,7 @@ export default function Login() {
     password: ''
   });
   const [error, setError] = useState(null);
+  const [validationError, setValidationError] = useState('');
   const router = useRouter();
 
   const handleOpenModal = () => {
@@ -39,7 +40,18 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    
+    // Validar campos del formulario
+    if (!formData.documentType || !formData.documentNumber || !formData.password) {
+      setValidationError('¡Acceso denegado! Verifica que los campos no estén vacios o incorrectos.');
+      return;
+    }
+
     try {
+      // Limpiar errores previos
+      setValidationError('');
+      setError(null);
+
       const response = await axios.post('/api/auth/login', {
         documentType: formData.documentType,
         documentNumber: formData.documentNumber,
@@ -59,7 +71,6 @@ export default function Login() {
       }
 
     } catch (error) {
-      console.error('Error al iniciar sesión:', error.message);
       setError('Error al iniciar sesión: ' + (error.response ? error.response.data.message : error.message));
     }
   };
@@ -67,24 +78,30 @@ export default function Login() {
   return (
     <div className="font-inter min-h-screen flex flex-col md:flex-row bg-white">
       <div className="w-full md:w-1/2 p-6 md:p-6 flex flex-col justify-center">
-        <div className="max-w-md mx-auto w-full">
-          <div className="flex items-center mb-6 space-x-2">
-            <Image src={LogoAquilesDarkBlue} alt="Logo Aquiles" className="w-24 md:w-36" />
+        <div className="max-w-md mx-auto w-2/3">
+          <div className="flex items-center mb-6">
+            <Image src={LogoAquilesDarkBlue} alt="Logo Aquiles" className="w-24 md:w-28 lg:w-36" />
             <div className="font-inter flex flex-col text-custom-blue">
-              <h1 className="text-2xl md:text-4xl font-medium">Aquiles</h1>
-              <p className="text-xs md:text-sm font-light">
+              <h1 className="text-2xl xl:text-4xl font-medium">Aquiles</h1>
+              <p className="text-xs xl:text-sm font-light">
                 Sistema de Gestión de Asistencia y Seguimiento para Proyectos de Aprendices
               </p>
             </div>
           </div>
-          <div className="font-inter text-custom-blue pt-6 md:pt-0">
-            <h1 className="text-3xl md:text-4xl">Inicia Sesión</h1>
-            <p className="text-sm md:text-base pt-3 md:pt-5">
-              ¡Bienvenido de Vuelta!
+          <div className="font-inter text-custom-blue pt-4 md:pt-0">
+            <h1 className="text-2xl xl:text-4xl">Inicia Sesión</h1>
+            <p className="text-sm lg:text-base pt-0 md:pt-5">
+              ¡Bienvenido!
               <br />
-              Inicia Sesión para Acceder a tu Cuenta.
+              Accede a tu cuenta.
             </p>
           </div>
+
+          {validationError && (
+            <div className="bg-red-500 text-white p-4 rounded-md mt-4 mb-4">
+              <p>{validationError}</p>
+            </div>
+          )}
 
           {error && (
             <div className="text-red-500 mt-4 text-sm">
@@ -92,7 +109,7 @@ export default function Login() {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="mt-8 md:mt-6">
+          <form onSubmit={handleLogin} className="mt-6">
             <div className="space-y-4">
               <div className="font-inter font-normal flex items-center w-full rounded border-solid border-2">
                 <HiMiniIdentification className="w-5 mr-2 mx-3 h-5 text-gray-500" />
@@ -101,7 +118,6 @@ export default function Login() {
                   value={formData.documentType}
                   onChange={handleChange}
                   className="outline-none text-sm w-full h-9 text-custom-blue"
-                  required
                 >
                   <option value="" disabled hidden>
                     Tipo de documento
@@ -124,7 +140,6 @@ export default function Login() {
                   placeholder='Documento' 
                   className='outline-none text-sm w-full h-9 text-custom-blue'
                   onChange={handleChange}
-                  required
                 />
               </div> 
 
@@ -137,11 +152,10 @@ export default function Login() {
                   placeholder='Contraseña' 
                   className='outline-none text-sm w-full h-9 text-[#0e324d]'
                   onChange={handleChange}
-                  required
                 />
               </div>
             </div>
-            <div className="font-inter font-normal flex justify-end mt-4 text-[#0e324d]">
+            <div className="font-inter font-normal flex justify-end mt-2 text-[#0e324d]">
               <div className="text-sm">
                 <Link href="">
                   <p className='hover:text-custom-blues' onClick={handleOpenModal}>¿Olvidó su contraseña?</p>
@@ -151,7 +165,7 @@ export default function Login() {
             </div>
 
             <button 
-              className='font-inter font-semibold bg-[#0e324d] w-full p-2 text-white rounded mt-8 md:mt-6 hover:bg-[#01b001] transition-colors duration-300' 
+              className='font-inter font-semibold bg-[#0e324d] w-full p-2 text-white rounded mt-4 md:mt-6 hover:bg-[#01b001] transition-colors duration-300' 
               type='submit'
             >
               Iniciar Sesión
@@ -162,7 +176,7 @@ export default function Login() {
       <div className="hidden md:block w-2/3 bg-cover bg-center" style={{ backgroundImage: "url('/img/fondo-login.png')"}}>
         <div className="relative w-full h-full">
           <div className="absolute inset-0 bg-black opacity-20"></div>
-          <div className="relative z-10 h-full flex flex-col justify-between p-10 text-center text-white">
+          <div className="relative z-10 h-full flex flex-col justify-between p-2 text-center text-white">
             <div className='flex justify-end'> 
               <div className="w-36">
                 <Image src={logoSena} alt="" className="" />
@@ -170,8 +184,8 @@ export default function Login() {
             </div>
             <div>
               <div className='font-inter font-normal flex justify-center'>
-                <div className='rounded-md relative' style={{ backgroundColor: 'rgba(0, 0, 0, 0.0)' }}>
-                  <p className='text-xl text-left px-4 py-0'>
+                <div className='rounded-md relative w-3/5' style={{ backgroundColor: 'rgba(0, 0, 0, 0.0)' }}>
+                  <p className='text-xs lg:text-sm text-justify'>
                     ¡Únete a la comunidad educativa del SENA y 
                     potencia tu futuro! Regístrate ahora para 
                     acceder a una amplia gama de programas de 
@@ -190,5 +204,5 @@ export default function Login() {
         </div>
       </div>
     </div>
-  );
+  )
 }
