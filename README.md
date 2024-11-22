@@ -63,11 +63,11 @@ El sistema está compuesto por un frontend desarrollado con **Next.js**, **React
 
 2. Instalar las dependencias:
     ```bash
-    npm install
+     npm install --legacy-peer-deps
     ```
 3. Instalar las dependencias:
     ```bash
-    npm install --legacy-peer-deps
+    npm install
     ```
 
 4. Configurar las variables de entorno en el archivo `.env.local` para conectar con el backend:
