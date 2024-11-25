@@ -1,0 +1,53 @@
+server:
+  port: 8080  # Cambia 8081 por el puerto que prefieras
+
+spring:
+  application:
+    name: DBAquilesRest
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/DBAquilesRest
+    username: postgres
+    password: "jhors345"
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+
+      ddl-auto: create-drop
+      #ddl-auto: update
+      #ddl-auto: drop
+
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: fosnotreply@gmail.com
+    password: blquyaiclscdoufe
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+
+  scheduling:
+    enabled: true
+
+  firebase:
+    config:
+      file: config/firebase-config.json
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
