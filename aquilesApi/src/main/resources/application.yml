@@ -8,14 +8,14 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/DBAquilesRest
     username: postgres
-    password: "jhors345"
+    password: "Nathaly1510*"
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
 
-      ddl-auto: create-drop
-      #ddl-auto: update
+      #ddl-auto: create-drop
+      ddl-auto: update
       #ddl-auto: drop
 
     properties:
