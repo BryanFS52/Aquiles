@@ -76,21 +76,21 @@ export default function Login() {
   };
 
   return (
-    <div className="font-inter min-h-screen flex flex-col md:flex-row bg-white">
-      <div className="w-full md:w-1/2 p-6 md:p-6 flex flex-col justify-center">
+    <div className="font-inter min-h-screen flex flex-col lg:flex-row bg-white ">
+      <div className="lg:w-1/2 p-6 md:p-6 flex flex-col justify-center h-screen items-center ">
         <div className="max-w-md mx-auto w-2/3">
           <div className="flex items-center mb-6">
-            <Image src={LogoAquilesDarkBlue} alt="Logo Aquiles" className="w-24 md:w-28 lg:w-36" />
+            <Image src={LogoAquilesDarkBlue} alt="Logo Aquiles" className="w-24 sm:w-32 md:w-36 lg:w-32 xl:w-36 ml-[-10px]" />
             <div className="font-inter flex flex-col text-custom-blue">
-              <h1 className="text-2xl xl:text-4xl font-medium">Aquiles</h1>
-              <p className="text-xs xl:text-sm font-light">
+              <h1 className="text-2xl sm:text-3xl lg:text-2xl xl:text-4xl md:text-4xl font-medium">Aquiles</h1>
+              <p className="text-xs lg:text-xs xl:text-sm md:text-sm sm:text-sm font-light">
                 Sistema de Gestión de Asistencia y Seguimiento para Proyectos de Aprendices
               </p>
             </div>
           </div>
           <div className="font-inter text-custom-blue pt-4 md:pt-0">
-            <h1 className="text-2xl xl:text-4xl">Inicia Sesión</h1>
-            <p className="text-sm lg:text-base pt-0 md:pt-5">
+            <h1 className="text-2xl lg:text-2xl xl:text-4xl md:text-4xl sm:text-3xl">Inicia Sesión</h1>
+            <p className="text-sm md:text-base pt-0 sm:pt-5">
               ¡Bienvenido!
               <br />
               Accede a tu cuenta.
@@ -173,10 +173,10 @@ export default function Login() {
           </form>
         </div>
       </div>
-      <div className="hidden md:block w-2/3 bg-cover bg-center" style={{ backgroundImage: "url('/img/fondo-login.png')"}}>
+      <div className="hidden lg:block xl:w-11/12 bg-cover bg-center" style={{ backgroundImage: "url('/img/fondo-login.png')"}}>
         <div className="relative w-full h-full">
           <div className="absolute inset-0 bg-black opacity-20"></div>
-          <div className="relative z-10 h-full flex flex-col justify-between p-2 text-center text-white">
+          <div className="relative z-10 h-full flex flex-col justify-between p-6 text-center text-white">
             <div className='flex justify-end'> 
               <div className="w-36">
                 <Image src={logoSena} alt="" className="" />
@@ -185,7 +185,7 @@ export default function Login() {
             <div>
               <div className='font-inter font-normal flex justify-center'>
                 <div className='rounded-md relative w-3/5' style={{ backgroundColor: 'rgba(0, 0, 0, 0.0)' }}>
-                  <p className='text-xs lg:text-sm text-justify'>
+                  <p className='lg:text-sm 2xl:text-base text-justify'>
                     ¡Únete a la comunidad educativa del SENA y 
                     potencia tu futuro! Regístrate ahora para 
                     acceder a una amplia gama de programas de 
