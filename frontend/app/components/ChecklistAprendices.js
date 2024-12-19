@@ -12,8 +12,8 @@ const ChecklistAprendices = () => {
                         <th className="px-4 py-3 w-20 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Trimestre</th>
                         <th className="px-4 w-20 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white text-center">Team</th>
                         <th className="px-4 w-52 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Item</th>
-                        <th className="px-4 w-10 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">SI</th>
-                        <th className="px-4 w-10 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">NO</th>
+                        <th className="px-4 w-10 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Si</th>
+                        <th className="px-4 w-10 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">No</th>
                         <th className="px-4 w-52 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Observaciones</th>
                     </tr>
                         </thead>

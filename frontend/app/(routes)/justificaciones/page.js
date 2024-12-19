@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { Header } from "../../components/header";
+import React from "react";
+import { Header } from "../../components/header"; 
 import { Sidebar } from "../../components/Sidebar";
 import { GoSearch } from "react-icons/go";
 import { GrAttachment } from "react-icons/gr";
@@ -136,33 +136,15 @@ export default function JustificacionesInstructor() {
             Justificaciones de Aprendices
           </h1>
 
-          <div className="flex flex-col md:flex-row gap-4 items-center">
-            <div className="w-full md:w-1/3">
-              <select
-                onChange={(e) => setSelectedFiltro(e.target.value)}
-                value={selectedFiltro}
-                className="w-full p-2 border border-gray-300 rounded"
-              >
-                <option value="">Filtrar por...</option>
-                <option value="programa">Programa</option>
-                <option value="ficha">Ficha</option>
-                <option value="documento">Documento</option>
-                <option value="aprendiz">Aprendiz</option>
-                <option value="fecha">Fecha de Justificación</option>
-              </select>
+          <div className="relative mb-6 max-w-md">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <GoSearch className="text-gray-400" />
             </div>
-
-            <div className="relative w-full md:w-2/3">
-              <input
-                type="search"
-                placeholder={`Buscar por ${selectedFiltro || "..."}`}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 p-2 border border-gray-300 rounded"
-                disabled={!selectedFiltro}
-              />
-              <GoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            </div>
+            <input
+              type="search"
+              className="block w-full pl-10 pr-4 py-2 text-sm rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#01b001] transition-all duration-300"
+              placeholder="Buscar aprendiz."
+            />
           </div>
 
           {/* Tabla */}
@@ -170,7 +152,7 @@ export default function JustificacionesInstructor() {
             <table className="w-full text-sm text-left text-gray-700 bg-white rounded-lg">
               <thead className="text-xs uppercase bg-gray-50 text-gray-600">
                 <tr>
-                  <th className="px-4 py-3">Programa</th>
+                  <th className="px-4 py-3">Pograma</th>
                   <th className="px-4 py-3">Ficha</th>
                   <th className="px-4 py-3">Foto</th>
                   <th className="px-4 py-3">Documento</th>
@@ -178,49 +160,46 @@ export default function JustificacionesInstructor() {
                   <th className="px-4 py-3">Fecha de Justificación</th>
                   <th className="px-4 py-3">Archivo Adjunto</th>
                   <th className="px-4 py-3">Estado</th>
+                  
                 </tr>
               </thead>
               <tbody>
-                {paginatedJustificaciones.map((justificacion) => (
-                  <tr key={justificacion.id} className="border-b hover:bg-gray-50 transition-colors duration-200">
-                    <td className="px-4 py-3">{justificacion.programa}</td>
-                    <td className="px-4 py-3">{justificacion.ficha}</td>
-                    <td className="px-4 py-3">
-                      <Image src={persona} alt="Persona" className="w-10 h-9 rounded-full" />
-                    </td>
-                    <td className="px-4 py-3">{justificacion.documento}</td>
-                    <td className="px-4 py-3">{justificacion.aprendiz}</td>
-                    <td className="px-4 py-3">{justificacion.fecha}</td>
-                    <td className="px-4 py-3">
-                      <GrAttachment className="w-5 h-5 text-[#01b001] hover:text-[#00324d] transition-colors duration-300" />
-                    </td>
-                    <td className="px-4 py-3">{justificacion.estado}</td>
-                  </tr>
-                ))}
+                <tr className="border-b hover:bg-gray-50 transition-colors duration-200">
+                <td className="px-4 py-3">Analisis y Desarollo de Software</td>
+                <td className="px-4 py-3">25785784</td>
+                  <td className="px-4 py-3">
+                    <Image src={persona} alt="Persona" className="w-10 h-9 rounded-full" />
+                  </td>
+                  <td className="px-4 py-3">1015896552</td>
+                  <td className="px-4 py-3">Juliana Valeria Lilian Tibocha Gutierrez</td>
+                  <td className="px-4 py-3">12/02/2024</td>
+                  <td className="px-4 py-3">
+                    <GrAttachment className="w-5 h-5 text-[#01b001] hover:text-[#00324d] transition-colors duration-300" />
+                  </td>
+                  <td className="px-4 py-3">Activo</td>
+                </tr>
+                {/* Repetir las filas según sea necesario */}
               </tbody>
             </table>
           </div>
 
-          <div className="flex justify-between items-center pt-4 lg:pt-6">
-            <button
-              className="flex items-center p-2 border border-gray-300 rounded"
-              onClick={handlePreviousPage}
-              disabled={currentPage === 1}
-            >
-              <IoIosArrowBack className="mr-2" />
-              Anterior
-            </button>
-            <span>
-              Página {currentPage} de {totalPages}
-            </span>
-            <button
-              className="flex items-center p-2 border border-gray-300 rounded"
-              onClick={handleNextPage}
-              disabled={currentPage === totalPages}
-            >
-              Siguiente
-              <IoIosArrowForward className="ml-2" />
-            </button>
+          <div className="flex flex-col items-center pt-4 lg:pt-6 space-x-4">
+            <div className="flex space-x-3 lg:space-x-4">
+              <button
+                type="button"
+                className="flex items-center text-[#00324d] font-medium text-md lg:text-lg hover:text-[#01b001] transition-colors duration-300"
+              >
+                <IoIosArrowBack className="w-4 h-4 lg:w-5 lg:h-5" />
+                Anterior
+              </button>
+              <button
+                type="button"
+                className="flex items-center text-[#00324d] font-medium text-md lg:text-lg hover:text-[#01b001] transition-colors duration-300"
+              >
+                Siguiente
+                <IoIosArrowForward className="w-4 h-4 lg:w-5 lg:h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

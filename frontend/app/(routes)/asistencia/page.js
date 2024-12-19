@@ -73,7 +73,7 @@ export default function Attendance() {
                     </div>
 
                     <div className="mt-6">
-                        <TableAttendance apprentices={students} onStatusChange={handleStatusChange} /> {/* Pasa la lista aquí */}
+                        <TableAttendance onStatusChange={handleStatusChange} /> {/* Pasa la función aquí */}
                     </div>
 
                     <div className="flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0 justify-center items-center w-full md:w-[60%]">
