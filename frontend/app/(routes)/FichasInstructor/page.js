@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Header } from "../../components/header";
 import { Sidebar } from '../../components/Sidebar';
 import { IoPeople } from "react-icons/io5";
-import { getFichaFromOlimpo } from '../../services/FichasService'; // Nuevo servicio
 import ApprenticeModal from '../../components/Modals/ApprenticeModal'; // Importa el modal
 
 const FichasInstructor = () => {
@@ -12,13 +11,26 @@ const FichasInstructor = () => {
   const [selectedApprentice, setSelectedApprentice] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const fetchFicha = async () => {
+  // Datos locales simulados
+  const fichaMock = {
+    number: "123456",
+    quarter: { name: "Mañana" },
+    program: { name: "Análisis y Desarrollo de Software" },
+    students: [
+      { id: 1, name: "Juan Pérez", attendance: "Presente" },
+      { id: 2, name: "María López", attendance: "Ausente" },
+      { id: 3, name: "Carlos Sánchez", attendance: "Presente" }
+    ]
+  };
+
+  const fetchFicha = () => {
     try {
-      const data = await getFichaFromOlimpo(); // Obtén la ficha simulada desde Mockoon
-      setFicha({
-        ...data,
-        numberStudents: data.students.length // Actualiza el número de estudiantes con la longitud del array
-      });
+      // Simula la carga de datos locales
+      const data = {
+        ...fichaMock,
+        numberStudents: fichaMock.students.length // Calcula el número de estudiantes
+      };
+      setFicha(data);
     } catch (error) {
       console.error("Error fetching ficha:", error);
     }

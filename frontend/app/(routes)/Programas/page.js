@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { Header } from "../../components/header"; // importaciones del header y del sidebar para hacer el llamado
 import { Sidebar } from "../../components/Sidebar";
-import ProgramsService from '../../services/ProgramsService'; // Importa el servicio
 
 // Importa correctamente los íconos
 import { FaComputer, FaPeopleRoof } from 'react-icons/fa6';  // Fa6 (FontAwesome icons)
@@ -17,22 +16,26 @@ import { LiaLanguageSolid } from 'react-icons/lia';  // Lia (Line Awesome Icons)
 
 const ITEMS_PER_PAGE = 6; // Número de programas por página
 
+const localPrograms = [
+  { id: 1, name: "Análisis y Desarrollo de Software", description: "Programa para el desarrollo de soluciones informáticas.", icon: "FaComputer" },
+  { id: 2, name: "Gestión Empresarial", description: "Preparación para la gestión eficiente de empresas.", icon: "AiOutlineStock" },
+  { id: 3, name: "Gestión Bancaria y Financiera", description: "Formación en operaciones bancarias y financieras.", icon: "GiTakeMyMoney" },
+  { id: 4, name: "Marketing Digital", description: "Estrategias modernas para el marketing en línea.", icon: "BsPersonRolodex" },
+  { id: 5, name: "Contabilidad Financiera", description: "Fundamentos de contabilidad y gestión financiera.", icon: "SlCalculator" },
+  { id: 6, name: "Gestión de Recursos Humanos", description: "Técnicas para la gestión efectiva del talento humano.", icon: "FaPeopleRoof" },
+  { id: 7, name: "Administración Pública", description: "Preparación para roles administrativos en el sector público.", icon: "GrUserSettings" },
+  { id: 8, name: "Idiomas Extranjeros", description: "Aprendizaje de lenguas extranjeras y cultura.", icon: "LiaLanguageSolid" },
+  { id: 9, name: "Logística Empresarial", description: "Gestión de operaciones logísticas y cadena de suministro.", icon: "FaPeopleCarry" },
+];
+
 export default function Programas() {
   const [programs, setPrograms] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
 
   useEffect(() => {
-    const fetchPrograms = async () => {
-      try {
-        const data = await ProgramsService.getAllPrograms();
-        setPrograms(data.programs);
-      } catch (error) {
-        console.error("Error fetching programs:", error);
-      }
-    };
-
-    fetchPrograms();
+    // Simula la obtención de datos locales
+    setPrograms(localPrograms);
   }, []);
 
   const filteredPrograms = programs.filter(program => 
