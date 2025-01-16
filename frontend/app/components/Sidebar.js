@@ -13,7 +13,7 @@ const IconProgramas = dynamic(() => import('react-icons/fa').then((mod) => mod.F
 const IconAsistencia = dynamic(() => import('react-icons/bs').then((mod) => mod.BsPersonFillCheck), { ssr: false });
 const IconTeams = dynamic(() => import('react-icons/hi2').then((mod) => mod.HiUserGroup), { ssr: false });
 const IconSustentaciones = dynamic(() => import('react-icons/fa6').then((mod) => mod.FaChalkboardUser), { ssr: false });
-const IconAprendices = dynamic(() => import('react-icons/pi').then((mod) => mod.PiStudentFill), { ssr: false });
+
 const IconJustificaciones = dynamic(() => import('react-icons/gi').then((mod) => mod.GiNotebook), { ssr: false });
 const IconConfiguracion = dynamic(() => import('react-icons/fa6').then((mod) => mod.FaGear), { ssr: false });
 const IconCerrarSesion = dynamic(() => import('react-icons/io').then((mod) => mod.IoMdLogOut), { ssr: false });
@@ -32,12 +32,11 @@ export const Sidebar = () => {
         { href: "/asistencia", label: "Asistencia", icon: <IconAsistencia className='text-2xl' /> },
         { href: "/teamScrum", label: "Teams", icon: <IconTeams className='text-2xl' /> },
         { href: "/ListaChequeoInstructor", label: "Sustentaciones", icon: <IconSustentaciones className='text-2xl' /> },
-        { href: "/Aprendices", label: "Aprendices", icon: <IconAprendices className='text-2xl' /> },
         { href: "/justificaciones", label: "Justificaciones", icon: <IconJustificaciones className='text-2xl' /> },
     ], []);
 
     return (
-        <div className={`xl:h-[100vh] overflow-y-scroll fixed xl:static bg-[#0e324b] w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto border-r-0 border-gray-300 h-full -left-full top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
+        <div className={`xl:h-[100vh] overflow-y-scroll fixed xl:static bg-[#0e324b] w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto border-r-0 border-gray-300 h-screen -left-full top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
             <div>
                 {/* LOGO */}
                 <div className="flex items-center mb-10 space-x-0">

@@ -14,7 +14,9 @@ const IconFichas = dynamic(() => import('react-icons/fa').then((mod) => mod.FaRe
 const IconProfesor = dynamic(() => import('react-icons/fa').then((mod) => mod.FaChalkboardTeacher), { ssr: false });
 const IconProgramas = dynamic(() => import('react-icons/fa').then((mod) => mod.FaLaptopCode), { ssr: false });
 const IconAsistencia = dynamic(() => import('react-icons/bs').then((mod) => mod.BsPersonFillCheck), { ssr: false });
-const IconTeams = dynamic(() => import('react-icons/hi2').then((mod) => mod.HiUserGroup), { ssr: false });
+const IconSustentaciones = dynamic(() => import('react-icons/fa6').then((mod) => mod.FaChalkboardUser), { ssr: false });
+const IconJustificaciones = dynamic(() => import('react-icons/gi').then((mod) => mod.GiNotebook), { ssr: false });
+const IconAprendices = dynamic(() => import('react-icons/pi').then((mod) => mod.PiStudentFill), { ssr: false });
 const IconConfiguracion = dynamic(() => import('react-icons/fa6').then((mod) => mod.FaGear), { ssr: false });
 const IconCerrarSesion = dynamic(() => import('react-icons/io').then((mod) => mod.IoMdLogOut), { ssr: false });
 
@@ -30,9 +32,11 @@ export const Sidebarcoordinador = () => {
     const menuItems = useMemo(() => [
         { href: "/FichasCoordinador", label: "Fichas", icon: <IconFichas className='text-2xl' /> },
         { href: "/InstructoresCoordinador", label: "Instructores", icon: <IconProfesor className='text-2xl'/> },
-        { href: "/", label: "Programas", icon: <IconProgramas className='text-2xl' /> },
-        { href: "/", label: "Asistencia", icon: <IconAsistencia className='text-2xl' /> },
-        { href: "/", label: "Teams", icon: <IconTeams className='text-2xl' /> },
+        { href: "/ProgramasCoordinador", label: "Programas", icon: <IconProgramas className='text-2xl' /> },
+        /*{ href: "/", label: "Asistencia", icon: <IconAsistencia className='text-2xl' /> },*/
+        { href: "/ListaChequeoCoordinador", label: "Sustentaciones", icon: <IconSustentaciones className='text-2xl' /> },
+        { href: "/justificacionesCoordinador", label: "Justificaciones", icon: <IconJustificaciones className='text-2xl' /> },
+        { href: "/Aprendices", label: "Aprendices", icon: <IconAprendices className='text-2xl' /> },
     ], []);
 
     return (
