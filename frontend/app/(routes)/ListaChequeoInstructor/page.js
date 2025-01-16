@@ -506,7 +506,7 @@ export default function InstructorChecklistView() {
   }
 
   return (
-    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
+    <div className="max-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebar />
       <div className="xl:col-span-5">
         <Header />
@@ -687,6 +687,7 @@ export default function InstructorChecklistView() {
             </div>
           </div>
         </div>
+        
       </div>
     </div>
   )

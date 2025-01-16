@@ -1,8 +1,8 @@
 "use client"; // Esto hace que el componente sea un Client Component
 
 import React, { useEffect, useState } from 'react';
-import { Header } from "../../components/header"; // importaciones del header y del sidebar para hacer el llamado
-import { Sidebar } from "../../components/Sidebar";
+import { HeaderCoordinador } from "../../components/HeaderCoordinador";
+import { Sidebarcoordinador } from '../../components/SidebarCoordinador';
 
 // Importa correctamente los íconos
 import { FaComputer, FaPeopleRoof } from 'react-icons/fa6';  // Fa6 (FontAwesome icons)
@@ -63,10 +63,11 @@ export default function Programas() {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-      <Sidebar />
+    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6 bg-gray-100">
+      <Sidebarcoordinador />
       <div className="xl:col-span-5">
-        <Header />
+        <HeaderCoordinador />
+
         <div className="h-auto p-12 inline-block w-full">
           <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">
             Programas

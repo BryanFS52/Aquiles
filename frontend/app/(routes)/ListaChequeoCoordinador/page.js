@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState, useEffect } from "react"
-import { Header } from "../../components/header"
-import { Sidebarcoordinador } from "../../components/SidebarCoordinador"
+import { HeaderCoordinador } from "../../components/HeaderCoordinador";
+import { Sidebarcoordinador } from '../../components/SidebarCoordinador';
 import { MdAdd } from "react-icons/md"
 import { FaTrashAlt } from "react-icons/fa"
 import { listChecklists, createChecklist, deleteChecklist } from "../../services/checkListService"
@@ -76,7 +76,7 @@ export default function CoordinadorChecklistView() {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebarcoordinador />
       <div className="xl:col-span-5">
-        <Header />
+        <HeaderCoordinador  />
         <div className="container mx-auto p-6 space-y-6">
           <h1 className="text-3xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
             Listas de Chequeo Trimestrales

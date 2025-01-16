@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Header } from "../../components/header"; 
+import { HeaderCoordinador } from "../../components/HeaderCoordinador";
 import { Sidebarcoordinador } from "../../components/SidebarCoordinador";
 import { GoSearch } from "react-icons/go";
 import { GrAttachment } from "react-icons/gr";
@@ -15,7 +15,7 @@ export default function Options() {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6 bg-gray-100">
       <Sidebarcoordinador />
       <div className="xl:col-span-5">
-        <Header />
+        <HeaderCoordinador/>
 
         <div className="container mx-auto p-6 space-y-8">
           <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
