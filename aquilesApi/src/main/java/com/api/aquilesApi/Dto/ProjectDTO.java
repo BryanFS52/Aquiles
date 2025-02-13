@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectDTO {
+public class ProjectDto {
     // Propiedades para almacenar los datos de la entidad Project
     private Long projectId; // ID del proyecto
     private String description; // Descripción del proyecto

@@ -1,10 +1,10 @@
 package com.api.aquilesApi.Business;
 
-import com.api.aquilesApi.Dto.ProjectDTO;
-import com.api.aquilesApi.Entity.Project;
-import com.api.aquilesApi.Entity.TeamScrum;
+import com.api.aquilesApi.Dto.ProjectDto;
+import com.api.aquilesApi.Entity.ProjectEntity;
+import com.api.aquilesApi.Entity.Teams_ScrumEntity;
 import com.api.aquilesApi.Service.ProjectService;
-import com.api.aquilesApi.Service.TeamScrumService;
+import com.api.aquilesApi.Service.Team_ScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
 import org.json.JSONObject;
@@ -27,7 +27,7 @@ public class ProjectBusiness {
     private ProjectService projectService;
 
     @Autowired
-    private TeamScrumService teamScrumService;
+    private Team_ScrumService teamScrumService;
 
     @Autowired
     private Util util;
@@ -35,7 +35,7 @@ public class ProjectBusiness {
     private final ModelMapper modelMapper = new ModelMapper();
 
     // Validación Objeto
-    private ProjectDTO validationObject(Map<String, Object> json, ProjectDTO projectDto) {
+    private ProjectDto validationObject(Map<String, Object> json, ProjectDto projectDto) {
         JSONObject dataObject = util.getData(json);
 
         if (!dataObject.has("projectId") || dataObject.isNull("projectId")) {
@@ -56,15 +56,15 @@ public class ProjectBusiness {
     }
 
     // Find All
-    public Page<ProjectDTO> findAll(int page, int size) {
+    public Page<ProjectDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<Project> projectEntityPage = projectService.findAll(pageRequest);
+            Page<ProjectEntity> projectEntityPage = projectService.findAll(pageRequest);
 
-            List<ProjectDTO> projectDtoList = projectEntityPage.getContent()
+            List<ProjectDto> projectDtoList = projectEntityPage.getContent()
                     .stream()
                     .map(entity -> {
-                        ProjectDTO dto = new ProjectDTO();
+                        ProjectDto dto = new ProjectDto();
                         dto.setProjectId(entity.getProjectId());
                         dto.setDescription(entity.getDescription());
                         dto.setProblem(entity.getProblem());
@@ -89,12 +89,12 @@ public class ProjectBusiness {
     }
 
     // Find By ID
-    public ProjectDTO findById(Long id) {
+    public ProjectDto findById(Long id) {
         try {
-            Project project = projectService.getById(id);
+            ProjectEntity project = projectService.getById(id);
 
             // Crear el DTO manualmente y mapear los campos esenciales
-            ProjectDTO projectDto = new ProjectDTO();
+            ProjectDto projectDto = new ProjectDto();
             projectDto.setProjectId(project.getProjectId());
             projectDto.setDescription(project.getDescription());
             projectDto.setProblem(project.getProblem());
@@ -119,11 +119,11 @@ public class ProjectBusiness {
     // add
     public void add(Map<String, Object> json) {
         try {
-            ProjectDTO projectDto = new ProjectDTO();
+            ProjectDto projectDto = new ProjectDto();
             projectDto = validationObject(json, projectDto);
 
-            Project projectEntity = modelMapper.map(projectDto, Project.class);
-            TeamScrum teamScrum = teamScrumService.getById(projectDto.getFk_team_scrum_id());
+            ProjectEntity projectEntity = modelMapper.map(projectDto, ProjectEntity.class);
+            Teams_ScrumEntity teamScrum = teamScrumService.getById(projectDto.getFk_team_scrum_id());
             projectEntity.setFk_team_scrum_id(teamScrum);
 
             projectService.create(projectEntity);
@@ -138,8 +138,8 @@ public class ProjectBusiness {
     // Update
     public void update(Long projectId, Map<String, Object> json){
         try {
-            ProjectDTO projectDto = modelMapper.map(projectService.getById(projectId), ProjectDTO.class);
-            Project projectEntity = modelMapper.map(this.validationObject(json, projectDto), Project.class);
+            ProjectDto projectDto = modelMapper.map(projectService.getById(projectId), ProjectDto.class);
+            ProjectEntity projectEntity = modelMapper.map(this.validationObject(json, projectDto), ProjectEntity.class);
             projectService.save(projectEntity);
         } catch (CustomException e){
             throw e;
@@ -151,7 +151,7 @@ public class ProjectBusiness {
     // Delete
     public void delete(Long projectId){
         try {
-            Project project = projectService.getById(projectId);
+            ProjectEntity project = projectService.getById(projectId);
             projectService.delete(project);
         } catch (CustomException e){
             throw e;

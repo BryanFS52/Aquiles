@@ -21,7 +21,7 @@ public class Follow_upsEntity implements Serializable {
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_idStudent", referencedColumnName = "student_id")
-    private Student fk_idStudent;
+    private StudentsEntity fk_idStudent;
 
 
     // Relación con State_Follow_Up

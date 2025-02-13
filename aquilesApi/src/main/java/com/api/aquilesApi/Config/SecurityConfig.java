@@ -3,8 +3,8 @@ package com.api.aquilesApi.Config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
@@ -13,7 +13,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF solo para desarrollo (no recomendado en producción)
+                .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF solo para desarrollo
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 // Permitir acceso sin autenticación a los endpoints específicos
@@ -21,14 +21,18 @@ public class SecurityConfig {
                                 .requestMatchers("/api/send-notification").permitAll()
                                 .requestMatchers("/api/2fa/**").permitAll()
                                 .requestMatchers("/api/pdf/**").permitAll()
+                                .requestMatchers("/api/attendances/**").permitAll()
                                 .requestMatchers("/api/excel/**").permitAll()
                                 .requestMatchers("/api/projects/**").permitAll()
-                                .requestMatchers("/api/students/**").permitAll()  // Permitir acceso sin autenticación a /api/students/**
+                                .requestMatchers("/api/students/**").permitAll()
                                 .requestMatchers("/api/trainers/**").permitAll()
                                 .requestMatchers("/api/stateAttendance/**").permitAll()
-                                .anyRequest().authenticated() // Requiere autenticación para cualquier otra solicitud
+                                // Cualquier otra solicitud requiere autenticación
+                                .anyRequest().permitAll() // Permitir todas las demás solicitudes sin autenticación
                 );
 
         return http.build();
     }
 }
+
+

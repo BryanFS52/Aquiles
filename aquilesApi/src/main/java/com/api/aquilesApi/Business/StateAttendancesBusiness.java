@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.StateAttendanceDto;
-import com.api.aquilesApi.Entity.StateAttendance;
+import com.api.aquilesApi.Entity.StateAttendanceEntity;
 import com.api.aquilesApi.Service.StateAttendanceService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
@@ -50,7 +50,7 @@ public class StateAttendancesBusiness {
     public Page<StateAttendanceDto> findAll(int page , int size){
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<StateAttendance> stateAttendanceEntityPage = this.stateAttendanceService.findAll(pageRequest);
+            Page<StateAttendanceEntity> stateAttendanceEntityPage = this.stateAttendanceService.findAll(pageRequest);
 
             // Convertir las entidades a DTOs
             List<StateAttendanceDto> stateAttendanceDtoList = stateAttendanceEntityPage.getContent()
@@ -68,7 +68,7 @@ public class StateAttendancesBusiness {
     // Metodo Para Obtener Los Estados Por Id
     public StateAttendanceDto findById(Long id){
         try {
-            StateAttendance stateAttendance = this.stateAttendanceService.getById(id);
+            StateAttendanceEntity stateAttendance = this.stateAttendanceService.getById(id);
             return modelMapper.map(stateAttendance , StateAttendanceDto.class);
         } catch (CustomException e){
             throw e;
@@ -81,7 +81,7 @@ public class StateAttendancesBusiness {
     public void add(Map<String , Object> json){
         try {
             StateAttendanceDto stateAttendanceDto = new StateAttendanceDto();
-            var stateAttendance = modelMapper.map(this.validationObject(json , stateAttendanceDto) , StateAttendance.class);
+            var stateAttendance = modelMapper.map(this.validationObject(json , stateAttendanceDto) , StateAttendanceEntity.class);
             this.stateAttendanceService.create(stateAttendance);
         } catch (CustomException e){
             throw e;
@@ -112,7 +112,7 @@ public class StateAttendancesBusiness {
             stateAttendanceDto.setStatus((String) json.get("status"));
 
             // Mapear el DTO de vuelta a la entidad
-            var stateAttendanceEntity = modelMapper.map(stateAttendanceDto, StateAttendance.class);
+            var stateAttendanceEntity = modelMapper.map(stateAttendanceDto, StateAttendanceEntity.class);
 
             // Guardar la entidad actualizada
             stateAttendanceService.save(stateAttendanceEntity);
@@ -126,7 +126,7 @@ public class StateAttendancesBusiness {
     //  Metodo Para Eliminar Un Estado De Asistencia
     public void delete (Long stateAttendanceId){
         try {
-            StateAttendance stateAttendance = stateAttendanceService.getById(stateAttendanceId);
+            StateAttendanceEntity stateAttendance = stateAttendanceService.getById(stateAttendanceId);
             stateAttendanceService.delete(stateAttendance);
         } catch (CustomException e){
             throw e;

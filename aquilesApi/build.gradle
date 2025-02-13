@@ -47,9 +47,6 @@ dependencies {
 	implementation 'org.apache.pdfbox:pdfbox:2.0.28' // Usa la versión más reciente
 	// JSON
 	implementation group: 'org.json', name: 'json', version: '20240303'
-	//Validación como @NotNull, @Size, etc. que se utilizan en los DTOs para asegurar que los datos sean válidos.
-	implementation 'jakarta.validation:jakarta.validation-api:3.0.0'  // O la versión que estés utilizando
-
 }
 
 tasks.named('test') {

@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Controller;
 
-import com.api.aquilesApi.Business.ProjectBusiness;
-import com.api.aquilesApi.Dto.ProjectDto;
+import com.api.aquilesApi.Business.Teams_ScrumBusiness;
+import com.api.aquilesApi.Dto.Teams_ScrumDto;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,28 +13,28 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/project")
-public class ProjectController {
+@RequestMapping("/api/teamScrum")
+public class Teams_ScrumController {
 
     @Autowired
-    private ProjectBusiness projectBusiness;
+    private Teams_ScrumBusiness teamsScrumBusiness;
 
-    //End-Point Para Traer Todos Los Proyectos
+    //End-Point Para Traer Todos Los Teams Scrum
     @GetMapping("/all")
-    public ResponseEntity<Map<String , Object>> findAll (@RequestParam(defaultValue = "0") int page,
-                                                         @RequestParam(defaultValue = "10") int size){
+    public ResponseEntity<Map<String , Object>> findAll(@RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "10") int size){
         try {
-            Page<ProjectDto> projectDtoPage = projectBusiness.findAll(page , size);
-            if(!projectDtoPage.isEmpty()){
+            Page<Teams_ScrumDto> teamsScrumDtoPage = teamsScrumBusiness.findAll(page, size);
+            if (!teamsScrumDtoPage.isEmpty()){
                 return new ResponseEntity<>(ResponseHttpApi.responseHttpFindAll(
-                        projectDtoPage.getContent(),
+                        teamsScrumDtoPage.getContent(),
                         ResponseHttpApi.CODE_OK,
                         "Successfully Completed",
-                        projectDtoPage.getSize(),
-                        projectDtoPage.getTotalPages(),
-                        (int) projectDtoPage.getTotalElements()),
+                        teamsScrumDtoPage.getSize(),
+                        teamsScrumDtoPage.getTotalPages(),
+                        (int) teamsScrumDtoPage.getTotalElements()),
                         HttpStatus.OK);
-            }else {
+            } else {
                 return new ResponseEntity<>(ResponseHttpApi.responseHttpFindAll(
                         null,
                         ResponseHttpApi.NO_CONTENT,
@@ -44,21 +44,20 @@ public class ProjectController {
                         0),
                         HttpStatus.NO_CONTENT);
             }
-        }  catch (Exception e){
+        } catch (Exception e){
             return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error retrieving Project: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
+                    "Error retrieving Teams Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-
-    //End-Point Para Traer Por Id
+    //End-Point Para Traer Un Team Scrum Por Id
     @GetMapping("/find/{id}")
     public ResponseEntity<Map<String , Object>> findById(@PathVariable Long id){
         try {
-            ProjectDto projectDto = this.projectBusiness.findById(id);
+            Teams_ScrumDto teamsScrumDto = this.teamsScrumBusiness.findById(id);
             return new ResponseEntity<>(ResponseHttpApi.responseHttpFindId(
-                    projectDto,
+                    teamsScrumDto,
                     ResponseHttpApi.CODE_OK,
                     "Successfully Completed"),
                     HttpStatus.OK);
@@ -68,21 +67,20 @@ public class ProjectController {
                     HttpStatus.BAD_REQUEST);
         } catch (Exception e){
             return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error getting Project By Id: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
+                    "Error getting Team Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
 
-
-    //End-Point Para Crear Un Nuevo Proyecto
+    //End-Point Para Crear Un Nuevo Team Scrum
     @PostMapping("/create")
     public ResponseEntity<Map<String , Object>> add(@RequestBody Map<String , Object> json){
         try {
-            projectBusiness.add(json);
+            teamsScrumBusiness.add(json);
             return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
                     ResponseHttpApi.CODE_OK,
-                    "Project added successfully"),
+                    "Team Scrum added successfully"),
                     HttpStatus.CREATED);
         } catch (CustomException e){
             return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
@@ -90,38 +88,37 @@ public class ProjectController {
                     HttpStatus.BAD_REQUEST);
         } catch (Exception e){
             return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error adding Project: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
+                    "Error adding Team Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    //End-Point Para Actualizar Un Proyecto
-    @PutMapping("/update")
+    //End-Point Para Editar-Actualizar un Team Scrum
+    @PutMapping("/update/{id}")
     public ResponseEntity<Map<String , Object>> update(@PathVariable Long id , @RequestBody Map<String , Object> json){
         try {
-            projectBusiness.update(id , json);
+            teamsScrumBusiness.update(id, json);
             return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
-                    ResponseHttpApi.CODE_OK, "Project updated successfully"), HttpStatus.OK);
-        }catch (CustomException e){
+                    ResponseHttpApi.CODE_OK, "Team Scrum updated successfully"), HttpStatus.OK);
+        } catch (CustomException e){
             return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
                     e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
                     HttpStatus.BAD_REQUEST);
         } catch (Exception e){
             return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error updating Project: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
+                    "Error updating Team Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-
-    //End-Point Para Eliminar Un Project
-    @DeleteMapping("/delete")
-    public ResponseEntity<Map<String , Object>> delete (@PathVariable Long id){
+    //End-Point Para Eliminar Un Team Scrum
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Map<String , Object>> delete(@PathVariable Long id) {
         {
             try {
-                projectBusiness.delete(id);
+                teamsScrumBusiness.delete(id);
                 return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
-                        ResponseHttpApi.CODE_OK, "Project deleted successfully"),
+                        ResponseHttpApi.CODE_OK, "Attendance deleted successfully"),
                         HttpStatus.OK);
             } catch (CustomException e) {
                 return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
@@ -129,10 +126,9 @@ public class ProjectController {
                         HttpStatus.BAD_REQUEST);
             } catch (Exception e) {
                 return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                        "Error deleting Project: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
+                        "Error deleting attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
     }
-
 }
