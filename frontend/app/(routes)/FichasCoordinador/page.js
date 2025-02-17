@@ -66,8 +66,8 @@ const FichasCoordinator = () => {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-      <Sidebarcoordinador />
+      <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
+        <Sidebarcoordinador />
       <div className="xl:col-span-5">
         <HeaderCoordinador />
         <div className="container mx-auto p-6 space-y-8">

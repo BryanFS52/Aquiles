@@ -40,7 +40,9 @@ export const Sidebarcoordinador = () => {
     ], []);
 
     return (
-        <div className={`xl:h-[100vh] overflow-y-scroll fixed xl:static bg-[#0e324b] w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto border-r-0 border-gray-300 h-full -left-full top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
+        <div className='grid grid-flow-row'>
+        <div className='flex relative'>
+        <div className="sticky top-0 h-screen overflow-y-auto bg-[#0e324b] md:w-[40%] lg:w-[30%] xl:w-auto border-r border-gray-300 p-8 z-50 flex flex-col justify-between transition-all text-white">
         <div>
             {/* LOGO */}
             <div className="flex items-center mb-10 space-x-0">
@@ -74,6 +76,8 @@ export const Sidebarcoordinador = () => {
         <button onClick={toggleMenu} className='text-white bg-custom-blue fixed bottom-4 right-4 p-2 text-lg rounded-full lg:hidden'>
             {showMenu ? <IoClose /> : <FiAlignRight />}
         </button>
+    </div>
+    </div>
     </div>
 );
 };

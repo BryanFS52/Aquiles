@@ -24,8 +24,10 @@ export const Sidebaraprendiz = () => {
     };
 
     return (
-        <div className={`xl:h-[100vh] overflow-y-auto fixed xl:static bg-[#00324d] w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto border-r border-gray-300 h-full top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
-            <div>
+        <div className='grid grid-flow-row'>
+        <div className='flex relative'>
+        <div className="sticky top-0 h-screen overflow-y-auto bg-[#0e324b] md:w-[40%] lg:w-[30%] xl:w-auto border-r border-gray-300 p-8 z-50 flex flex-col justify-between transition-all text-white">
+        <div>
                 {/* LOGO */}
                 <div className="flex items-center mb-10 space-x-0">
                     <Image src={LogoAquilesWhite} alt="Logo Aquiles" className="w-24" />
@@ -80,5 +82,7 @@ export const Sidebaraprendiz = () => {
                 {showMenu ? <IoClose /> : <FiAlignRight />}
             </button>
         </div>
+        </div>
+    </div>
     );
 };
