@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import React, { useState, useMemo } from 'react';
 import { FiAlignRight } from "react-icons/fi";
+import { IoClose } from "react-icons/io5";
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import logoAquiles from "../../public/img/logoAquiles.png";
@@ -18,16 +19,14 @@ const IconCerrarSesion = dynamic(() => import('react-icons/io').then((mod) => mo
 
 export const Sidebaraprendiz = () => {
     const [showMenu, setShowMenu] = useState(false);
-
+ 
     const toggleMenu = () => {
         setShowMenu(!showMenu);
     };
 
     return (
-        <div className='grid grid-flow-row'>
-        <div className='flex relative'>
-        <div className="sticky top-0 h-screen overflow-y-auto bg-[#0e324b] md:w-[40%] lg:w-[30%] xl:w-auto border-r border-gray-300 p-8 z-50 flex flex-col justify-between transition-all text-white">
-        <div>
+        <div className={`xl:h-[100vh] overflow-y-auto fixed xl:static bg-[#00324d] w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto border-r border-gray-300 h-full top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
+            <div>
                 {/* LOGO */}
                 <div className="flex items-center mb-10 space-x-0">
                     <Image src={LogoAquilesWhite} alt="Logo Aquiles" className="w-24" />
@@ -77,12 +76,11 @@ export const Sidebaraprendiz = () => {
                     Cerrar Sesión
                 </li>
             </ul>
+
             {/* Botón para togglear el menú */}
             <button onClick={toggleMenu} className='text-white bg-custom-blue fixed bottom-4 right-4 p-2 text-lg rounded-full lg:hidden'>
                 {showMenu ? <IoClose /> : <FiAlignRight />}
             </button>
         </div>
-        </div>
-    </div>
     );
 };
