@@ -19,7 +19,7 @@ const IconCerrarSesion = dynamic(() => import('react-icons/io').then((mod) => mo
 
 export const Sidebaraprendiz = () => {
     const [showMenu, setShowMenu] = useState(false);
- 
+
     const toggleMenu = () => {
         setShowMenu(!showMenu);
     };
