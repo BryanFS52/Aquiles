@@ -160,3 +160,28 @@
   animation: shake 0.3s ease-in-out;
 }
 
+/* Estilos generales */
+body {
+  @apply bg-white text-black transition-colors duration-300;
+}
+
+/* Modo oscuro */
+.dark body {
+  @apply bg-gray-900 text-white;
+}
+
+.dark .sidebar {
+  background-color: #1e293b; /* Azul oscuro más neutro */
+  color: white;
+}
+
+.dark .sidebar a {
+  color: white;
+}
+
+.dark .sidebar a:hover {
+  background-color: #374151; /* Un gris más suave */
+}
+
+
+
