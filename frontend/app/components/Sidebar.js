@@ -5,8 +5,6 @@ import { FiAlignRight } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import LogoAquilesWhite from "../../public/img/LogoAquilesWhite.png";
-import logoAquiles from "../../public/img/logoAquiles.png";
 import ButtonTheme from "./ButtonTheme"
 
 // Importación dinámica de íconos para mejorar la carga inicial
@@ -35,33 +33,39 @@ export const Sidebar = () => {
     ], []);
 
     return (
-        <div className={`xl:h-[100vh] overflow-y-auto fixed xl:static bg-[#39A900] dark:bg-[#0e324b] w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto border-r border-gray-300 h-full top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
-            <div>
-                {/* LOGO */}
-                <div className="flex items-center mb-10 space-x-0">
-                    <Image src={LogoAquilesWhite} alt="Logo Aquiles" className="w-24" />
-                    <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) INSTRUCTOR</span>
+        <div className="grid grid-flow-row">
+            <div className="flex relative">
+            <div className={` min-h-screen h-full overflow-y-auto fixed xl:static bg-[#39A900] dark:bg-[#0e324b] w-4/5 md:w-2/5 lg:w-1/3 xl:w-auto border-r border-gray-300 xl:border-r-0 top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
+
+                    <div>
+                        {/* LOGO */}
+                        <div className="flex items-center mb-10">
+                            <Image src="/img/LogoAquilesWhite.png" alt="Logo Aquiles" width={96} height={96} />
+                            <span className="text-xs font-inter">PROYECTOS FORMATIVOS (C.S.F.) INSTRUCTOR</span>
+                        </div>
+
+                        <ul className="text-white">
+                            {menuItems.map((item, index) => (
+                                <li key={index}>
+                                    <Link href={item.href} className="flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors">
+                                        {item.icon}
+                                        {item.label}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <ul>
+                        <ButtonTheme />
+                    </ul>
+                    
+                    {/* Botón para togglear el menú */}
+                    <button onClick={toggleMenu} className='text-white bg-custom-blue fixed bottom-4 right-4 p-2 text-lg rounded-full lg:hidden'>
+                        {showMenu ? <IoClose /> : <FiAlignRight />}
+                    </button>
                 </div>
-
-                <ul className='text-white'>
-                    {menuItems.map((item, index) => (
-                        <li key={index}>
-                            <Link href={item.href} className='flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors'>
-                                {item.icon}
-                                {item.label}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
             </div>
-
-            <ul>
-                <ButtonTheme />
-            </ul>
-
-            <button onClick={toggleMenu} className='text-white bg-custom-blue fixed bottom-4 right-4 p-2 text-lg rounded-full lg:hidden'>
-                {showMenu ? <IoClose /> : <FiAlignRight />}
-            </button>
         </div>
     );
 };
