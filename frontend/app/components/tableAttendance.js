@@ -4,6 +4,7 @@ import { GoSearch } from "react-icons/go";
 import { BsQrCode } from "react-icons/bs";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import ModalQR from "../components/Modals/modalQR";
+import { motion } from "framer-motion";
 import 'react-calendar/dist/Calendar.css';
 import FormularioQr from "../components/formularioQr";
 
@@ -105,7 +106,7 @@ const TablaApprentices = ({ onStatusChange }) => {
                     </button>
     
                     {/* Alerta de Confirmación */}
-                    {/*{alertVisible && (
+                    {alertVisible && (
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -140,7 +141,7 @@ const TablaApprentices = ({ onStatusChange }) => {
                                 </motion.button>
                             </div>
                         </motion.div>
-                    )}*/}
+                    )}
                     {/* Modal QR */}
                     <ModalQR isOpen={modalQROpen} onClose={() => setModalQROpen(false)} apprentices={currentApprentices} />
                 </div>
