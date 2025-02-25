@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Header } from "../components/header"; 
 import { IoPersonCircleOutline } from "react-icons/io5"; 
-import { updateAttendanceState } from "../services/attendances"; 
+import { updateAttendanceState } from "../services/attendances";
+import Webcam from "react-webcam";
+import jsQR from "jsqr";
 
 const FormularioQr = () => {
     const [documentNumber, setDocumentNumber] = useState("");
     const [attendanceId] = useState(1); 
-    const [stateAttendanceId, setStateAttendanceId] = useState(1); 
     const [loading, setLoading] = useState(false); 
-    const [attendanceUpdated, setAttendanceUpdated] = useState(false); 
+    const [attendanceUpdated, setAttendanceUpdated] = useState(false);
+    const [qrResult, setQrResult] = useState("");
+    const webcamRef = useRef(null);
 
     const handleSubmit = async () => {
         setLoading(true);
@@ -17,16 +20,14 @@ const FormularioQr = () => {
             const attendanceData = {
                 attendance_id: attendanceId, 
                 attendance_date: currentDate,
-                documentNumber: documentNumber,
-                fk_stateAttendance: {
-                    stateAttendanceId: 2
-                }
+                documentNumber: qrResult || documentNumber,
+                fk_stateAttendance: { stateAttendanceId: 2 }
             };
     
             await updateAttendanceState(attendanceData); 
     
             alert('Asistencia actualizada con éxito');
-            setAttendanceUpdated(true); 
+            setAttendanceUpdated(true);
     
             setDocumentNumber(""); 
         } catch (error) {
@@ -36,6 +37,34 @@ const FormularioQr = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (webcamRef.current) {
+                const imageSrc = webcamRef.current.getScreenshot();
+                if (imageSrc) {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    const img = new Image();
+                    img.src = imageSrc;
+    
+                    img.onload = () => {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0, img.width, img.height);
+                        const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                        const code = jsQR(imageData.data, img.width, img.height);
+    
+                        if (code) {
+                            setQrResult(code.data);
+                        }
+                    };
+                }
+            }
+        }, 1000);
+    
+        return () => clearInterval(interval);
+    }, []);
     
     return (
         <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 p-4">
@@ -49,13 +78,15 @@ const FormularioQr = () => {
 
             <div className="flex flex-col h-auto w-full max-w-md rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4">
                 <div className="flex justify-center mb-4">
-                    <span className="text-center text-base font-medium">Disfruta tu clase</span>
+                    <span className="text-center text-base font-medium">Escanea tu código QR o ingresa manualmente</span>
                 </div>
+                
+                <Webcam ref={webcamRef} screenshotFormat="image/png" className="mb-4 w-full rounded-lg border-2" />
                 
                 <div className="relative w-full mb-4">
                     <input 
                         type="text" 
-                        value={documentNumber}
+                        value={qrResult || documentNumber}
                         onChange={(e) => setDocumentNumber(e.target.value)}
                         className="flex h-14 w-full rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 pl-12" 
                         placeholder='Número de Documento'
@@ -72,7 +103,7 @@ const FormularioQr = () => {
                 </div>
                 {attendanceUpdated && (
                     <div className="mt-4 text-center text-green-600">
-                        <span className="text-2xl">✓</span> {/* Chulito visible al actualizar la asistencia */}
+                        <span className="text-2xl">✓</span>
                     </div>
                 )}
             </div>
