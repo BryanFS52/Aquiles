@@ -91,12 +91,13 @@ export default function Programas() {
                 <div key={program.id} className="flex w-96 h-52 rounded-lg overflow-hidden shadow-lg bg-zinc-200 relative mb-4 p-4">
                   <div className="z-50 justify-end p-4 space-y-4">
                     <div className="space-y-2">
-                      <span className="text-[#40b003] font-inter font-semibold text-xl">{program.name}</span>
+                      <span className="text-lightGreen dark:text-darkBlue font-inter font-semibold text-xl">{program.name}</span>
                       <p className="font-inter font-normal text-black text-sm sm:text-sm pr-5">{program.description}</p>
                     </div>
                   </div>
                   <Icon className="z-50 text-5xl text-white ml-auto w-40" />
-                  <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-[#0e324d] border-l-[190px] border-l-transparent -z-1"></div>
+                  <div className="border-l-[190px] absolute top-0 right-0 w-0 h-0 border-t-[130px] border-l-transparent dark:border-t-darkBlue border-t-lightGreen -z-1"></div>
+
                 </div>
               );
             })}
