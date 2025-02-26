@@ -20,9 +20,12 @@ const config: Config = {
       },
       // Agregar color personalizado
       colors: {
-        'custom-blue': '#00324D',
-        'custom-blues': '#39A900',
-        'sena-red': '#dc2626'
+        'darkBlue': '#00304D',
+        'lightGray': '#E4E4E5',
+        'darkGray': '#1e293b',
+        'darkGreen': '#007832',
+        'lightGreen': '#39A900',
+        'letters': '#ffffff'
       },
       keyframes: {
         showContent: {

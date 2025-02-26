@@ -35,7 +35,7 @@ export const Sidebar = () => {
     return (
         <div className="grid grid-flow-row">
             <div className="flex relative">
-            <div className={` min-h-screen h-full overflow-y-auto fixed xl:static bg-[#39A900] dark:bg-[#0e324b] w-4/5 md:w-2/5 lg:w-1/3 xl:w-auto border-r border-gray-300 xl:border-r-0 top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
+            <div className={` min-h-screen h-full overflow-y-auto fixed xl:static bg-lightGreen dark:bg-darkBlue w-4/5 md:w-2/5 lg:w-1/3 xl:w-auto border-r border-gray-300 xl:border-r-0 top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
 
                     <div>
                         {/* LOGO */}
@@ -47,7 +47,7 @@ export const Sidebar = () => {
                         <ul className="text-white">
                             {menuItems.map((item, index) => (
                                 <li key={index}>
-                                    <Link href={item.href} className="flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors">
+                                    <Link href={item.href} className="flex items-center gap-4 py-3 px-4 hover:bg-[#007832] dark:hover:bg-darkGray rounded-xl transition-colors">
                                         {item.icon}
                                         {item.label}
                                     </Link>

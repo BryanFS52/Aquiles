@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { FaSun, FaMoon } from "react-icons/fa";
 
 // Componente que maneja el modo oscuro
 const ButtonTheme = () => {
@@ -33,10 +34,31 @@ const ButtonTheme = () => {
     }, [theme]);
 
     return (
-        <div className="flex items-center gap-4 py-3 px-4 hover:bg-gray-500 rounded-xl transition-colors">
-            <button onClick={changeTheme} className="bg-gray-700 text-white px-4 py-2 rounded-lg">
-                {theme === "light" ? "Modo Oscuro 🌙" : "Modo Claro ☀️"}
-            </button>
+        <div className="mt-auto w-full flex items-center justify-center mb-4 space-x-4">
+            {/* Ícono de Sol */}
+            <FaSun className="w-10 h-10 text-yellow-400" />
+
+            {/* Switch */}
+            <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                    type="checkbox"
+                    checked={theme === "dark"}
+                    onChange={changeTheme}
+                    className="sr-only peer"
+                />
+                <div className="w-20 h-9 bg-lightGray peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-white rounded-full peer transition-all">
+                    {/* Círculo deslizante */}
+                    <span
+                        className={`absolute top-1 left-1 w-7 h-7 bg-white rounded-full shadow-md transform transition-transform flex items-center justify-center ${
+                            theme === "dark" ? "translate-x-11" : "translate-x-0"
+                        }`}
+                    >
+                    </span>
+                </div>
+            </label>
+
+            {/* Ícono de Luna */}
+            <FaMoon className={`w-10 h-10  text-white`} />
         </div>
     );
 };

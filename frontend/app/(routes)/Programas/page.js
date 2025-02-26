@@ -68,7 +68,7 @@ export default function Programas() {
       <div className="xl:col-span-5">
         <Header />
         <div className="h-auto p-12 inline-block w-full">
-          <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">
+          <h1 className="text-white text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">
             Programas
           </h1>
 
