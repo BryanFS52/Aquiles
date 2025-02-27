@@ -67,8 +67,9 @@ export default function Programas() {
       <Sidebar />
       <div className="xl:col-span-5">
         <Header />
-        <div className="h-auto p-12 inline-block w-full">
-          <h1 className="text-white text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">
+        <div className="h-auto p-8 md:p-16 lg:p-24 inline-block w-full">
+
+          <h1 className="text-lightGreen dark:text-darkBlue text-5xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 dark:border-darkGray w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">
             Programas
           </h1>
 
@@ -76,11 +77,11 @@ export default function Programas() {
           <input 
             type="text" 
             placeholder="Buscar programa..." 
-            className="mb-4 w-full p-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#40b003] focus:border-transparent"
+            className="mb-4 w-80 md:w-96 lg:w-1/2 p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-lightGreen dark:ring-darkBlue focus:border-transparent"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-  
+
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 ml-8 py-7">
             {displayedPrograms.map((program) => {
               const Icon = iconMap[program.icon];
