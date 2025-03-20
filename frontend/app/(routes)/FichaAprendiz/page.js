@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { HeaderAprendiz } from "../../components/HeaderAprendiz";
-import { Sidebaraprendiz } from '../../components/SidebarAprendiz';
+import { Sidebar } from '../../components/Sidebar';
+import  InfoBox from "../../components/infoBox";
 import { FaUsers, FaRegClock, FaGraduationCap, FaRegListAlt } from "react-icons/fa"; // Iconos
 
 const ApprenticeView = () => {
@@ -22,68 +23,25 @@ const ApprenticeView = () => {
 
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">        
-      <Sidebaraprendiz />
+      <Sidebar />
       <div className="xl:col-span-5">
         <HeaderAprendiz />
 
         <div className="container mx-auto p-6 space-y-8">
-          <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
-          Ficha y Aprendices
+          <h1 className="text-4xl font-bold text-lightGreen dark:text-darkBlue ">
+            Ficha y Aprendices
           </h1>
 
-        <div className="flex flex-col items-center justify-center space-y-4 w-full md:flex-row md:flex-wrap md:justify-center md:space-y-0 md:space-x-8">
-          
-        {/* Ficha */}
-          <div className="flex h-auto md:h-24 w-full md:w-52 rounded-lg shadow-lg border-2 bg-white border-green-500 p-2">
-            <div className="flex items-center justify-center md:justify-start w-full">
-              <div className="bg-[#0e324d] rounded-2xl p-3">
-                <FaRegListAlt className="text-4xl text-white stroke-current stroke-[1px]" />
-              </div>
-              <div className="flex flex-col justify-center ml-6">
-                <h1 className="text-custom-blue font-semibold text-xl font-inter">Ficha</h1>
-                <p className="text-black font-inter font-medium text-lg">{ficha}</p>
-              </div>
-            </div>
-          </div>
+        <div className="flex flex-col items-center justify-center space-y-5 w-full md:flex-row md:flex-wrap md:justify-center md:space-y-0 md:space-x-8">
 
-        {/* Compañeros */}
-          <div className="flex h-auto md:h-24 w-full md:w-52 rounded-lg shadow-lg border-2 bg-white border-green-500 p-2">
-            <div className="flex items-center justify-center md:justify-start w-full">
-              <div className="bg-[#0e324d] rounded-2xl p-3">
-                <FaUsers className="text-4xl text-white stroke-current stroke-[1px]" />
-              </div>
-              <div className="flex flex-col justify-center ml-6">
-                <h1 className="text-custom-blue font-semibold text-2xl font-inter">{compañeros.length}</h1>
-                <p className="text-black font-inter font-medium text-lg">Compañeros</p>
-              </div>
-            </div>
-          </div>
-
-        {/* Jornada */}
-          <div className="flex h-auto md:h-24 w-full md:w-52 rounded-lg shadow-lg border-2 bg-white border-green-500 p-2">
-            <div className="flex items-center justify-center md:justify-start w-full">
-              <div className="bg-[#0e324d] rounded-2xl p-3">
-                <FaRegClock className="text-4xl text-white stroke-current stroke-[1px]" />
-              </div>
-              <div className="flex flex-col justify-center ml-6">
-                <h1 className="text-custom-blue font-semibold text-xl font-inter">Jornada</h1>
-                <p className="text-black font-inter font-medium text-lg">{jornada}</p>
-              </div>
-            </div>
-          </div>
-
-        {/* Programa */}
-          <div className="flex h-auto md:h-24 w-full md:w-80 rounded-lg shadow-lg border-2 bg-white border-green-500 p-2">
-            <div className="flex items-center justify-center md:justify-start w-full">
-              <div className="bg-[#0e324d] rounded-2xl p-3">
-                <FaGraduationCap className="text-4xl text-white stroke-current stroke-[1px]" />
-              </div>
-              <div className="flex flex-col justify-center ml-6">
-                <h1 className="text-custom-blue font-semibold text-xl font-inter">Programa</h1>
-                <p className="text-black font-inter font-medium text-lg">{programa}</p>
-              </div>
-            </div>
-          </div>
+          {/* Ficha */}
+          <InfoBox title="Ficha" textInfo={ficha} icon={FaRegListAlt} />
+          {/* Compañeros */}
+          <InfoBox title="Compañeros" textInfo={compañeros.length} icon={FaUsers} /> 
+          {/* Jornada */}
+          <InfoBox title="Jornada" textInfo={jornada} icon={FaRegClock} /> 
+          {/* Programa */}
+          <InfoBox title="Programa" textInfo={programa} icon={FaGraduationCap} />  
 
         </div>
 

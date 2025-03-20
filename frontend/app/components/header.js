@@ -15,15 +15,15 @@ export const Header = () => {
   };
 
   return (
-    <header className='h-[7vh] md:h-[9vh] mx-auto flex items-center justify-end px-5 lg:py-5 lg:px-4 border-[#ffffff] bg-slate-200 shadow-none'>
+    <header className='h-[7vh] md:h-[9vh] mx-auto flex items-center justify-end px-5 lg:py-5 lg:px-4 bg-lightGreen dark:bg-darkBlue shadow-none'>
       <div className="relative mr-6">
         <ul>
           <li
-            className='h-10 w-10 flex items-center justify-center rounded-full bg-white hover:bg-[#00324d] transition-all duration-300 shadow-md'
+            className='h-10 w-10 flex items-center justify-center rounded-full bg-white hover:bg-darkGreen dark:hover:bg-shadowBlue transition-all duration-300 shadow-md'
             onClick={toggleMenu}
             >
             <a href="#" className='text-gray-400 text-2xl relative'>
-              <IoNotificationsOutline className="text-[#01b001] transition-colors duration-300"/>
+              <IoNotificationsOutline className="text-lightGreen dark:text- transition-colors duration-300"/>
               {unreadCount > 0 && (
                 <RiCheckboxBlankCircleFill className="absolute top-1 right-1 text-red-600 h-3 w-3" />
               )}
