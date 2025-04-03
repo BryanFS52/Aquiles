@@ -20,10 +20,11 @@ const config: Config = {
       },
       colors: {
         'darkBlue': '#00304D',
-        'shadowBlue': '#1e293b',
+        'shadowBlue': '#1e213d', 
         'lightGray': '#E4E4E5',
-        'darkGreen': '#007832',
+        'darkGray': '#5e5c5c',
         'lightGreen': '#39A900',
+        'darkGreen': '#007832',
         'white': '#ffffff'
       },
       keyframes: {

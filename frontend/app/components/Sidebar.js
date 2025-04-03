@@ -1,4 +1,5 @@
 'use client';
+
 import Link from 'next/link';
 import React, { useState, useMemo, useEffect } from 'react';
 import { FiAlignRight } from "react-icons/fi";
@@ -47,7 +48,7 @@ export const Sidebar = () => {
                         <ul className="text-white">
                             {menuItems.map((item, index) => (
                                 <li key={index}>
-                                    <Link href={item.href} className="flex items-center gap-4 py-3 px-4 hover:bg-[#007832] dark:hover:bg-darkGray rounded-xl transition-colors">
+                                    <Link href={item.href} className="flex items-center gap-4 py-3 px-4 hover:bg-darkGreen dark:hover:bg-shadowBlue rounded-xl transition-colors">
                                         {item.icon}
                                         {item.label}
                                     </Link>

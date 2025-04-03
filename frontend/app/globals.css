@@ -167,7 +167,7 @@ body {
 
 /* Modo oscuro */
 .dark body {
-  @apply bg-[#B0B0B0];
+  @apply bg-[#102A38];
 }
 
 
