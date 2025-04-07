@@ -70,11 +70,11 @@ const FichasInstructor = () => {
         <Headerf role="Instructor" />
 
         <div className="container mx-auto p-6 space-y-8">
-          <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
+          <h1 className="text-4xl font-bold text-[#ffffff] transition-colors duration-300">
             Fichas del Instructor
           </h1>
 
-          <div className="flex items-center border border-gray-300 shadow-md rounded-lg p-4 bg-white">
+          <div className="flex items-center border border-gray-300 shadow-black shadow-xl rounded-lg p-4 bg-white dark:bg-lightGray">
             <div>
               <div 
                 className="flex-shrink-0 bg-[#0e324d] rounded-2xl h-20 w-20 flex items-center justify-center mx-auto border-[#01b001] border-4 cursor-pointer"
