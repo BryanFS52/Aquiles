@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Headerf } from "../../components/headerf";
+import { Header } from "../../components/header";
 import { Sidebar } from '../../components/Sidebar';
 import { IoPeople } from "react-icons/io5";
 import  InfoBox from "../../components/infoBox";
@@ -67,7 +67,7 @@ const FichasInstructor = () => {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebar />
       <div className="xl:col-span-5">
-        <Headerf role="Instructor" />
+        <Header role="Instructor" />
 
         <div className="container mx-auto p-6 space-y-8">
           <h1 className="text-4xl font-bold text-[#ffffff] transition-colors duration-300">
