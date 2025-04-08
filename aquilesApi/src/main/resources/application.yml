@@ -1,5 +1,5 @@
 server:
-  port: 8083  # Cambia 8081 por el puerto que prefieras
+  port: 8081  # Cambia 8081 por el puerto que prefieras
 spring:
   application:
     name: DBAquiles
@@ -23,8 +23,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: fosnotreply@gmail.com
-    password: blquyaiclscdoufe
+    username: appaquiles@gmail.com
+    password: cjoudiukabtkazxp
     properties:
       mail:
         smtp:
