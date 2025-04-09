@@ -28,7 +28,7 @@ public class JuriesEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "fk_jury_id", nullable = false)
     )
 
-    private List<ChecklistSubstantiationListEntity> list_checklistSubstantiationLists;
+    private List<ChecklistEntity> list_checklistSubstantiationLists;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "juries_diary_sustainations", joinColumns = @JoinColumn(name = "fk_diary_id", nullable = false),

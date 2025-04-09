@@ -25,14 +25,18 @@ const TablaApprentices = ({ onStatusChange }) => {
             try {
                 const apprenticesData = await getAllApprentices(); 
                 setApprentices(apprenticesData);
-                onStatusChange(apprenticesData); // Llama a la función para actualizar el estado en el componente padre
             } catch (error) {
                 console.error('Error al obtener la lista de aprendices:', error);
             }
         };
 
         fetchApprentices();
-    }, [onStatusChange]);
+    }, []); // Removida la dependencia onStatusChange
+
+    // Efecto separado para notificar cambios al componente padre
+    useEffect(() => {
+        onStatusChange(apprentices);
+    }, [apprentices, onStatusChange]);
 
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);

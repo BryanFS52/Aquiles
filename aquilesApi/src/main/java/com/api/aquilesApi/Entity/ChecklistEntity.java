@@ -12,27 +12,29 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "checklist_substantiation_list")
-public class ChecklistSubstantiationListEntity implements Serializable {
+@Table(name = "checklist")
+public class ChecklistEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "trimester", nullable = false)
-    private Long trimester;
+    // Columns
+    @Column(name = "state", nullable = false)
+    private Boolean state;
 
-    @Column(name = "item", nullable = false, length = 255)
-    private String item;
+    @Column(name = "remarks", nullable = false, length = 255)
+    private String remarks;
 
-    @Column(name = "observations", nullable = false, length = 255)
-    private String observations;
+    @Column(name = "instructor_signature", nullable = false, length = 255)
+    private String instructorSignature;
 
-    @Column(name = "rating", nullable = false)
-    private boolean rating;
+    @Column(name = "evaluation_criteria", nullable = false)
+    private boolean evaluationCriteria;
 
-    @Column(name = "team_scrum_id", nullable = false)
-    private Long teamScrumId;
+    @Column(name = "checklist_history", nullable = false)
+    private String checklistHistory;
 
+    // Relations
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_project_id", nullable = false)
     private ProjectEntity project;

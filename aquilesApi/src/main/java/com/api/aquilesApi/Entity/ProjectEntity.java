@@ -38,5 +38,5 @@ public class ProjectEntity implements Serializable {
     private String justification;
 
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<ChecklistSubstantiationListEntity> checklistSubstantiationList;
+    private Set<ChecklistEntity> checklistSubstantiationList;
 }

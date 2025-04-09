@@ -1,6 +1,6 @@
 package com.api.aquilesApi.Service;
 
-import com.api.aquilesApi.Entity.ChecklistSubstantiationListEntity;
+import com.api.aquilesApi.Entity.ChecklistEntity;
 import com.api.aquilesApi.Entity.DiarySustainationsEntity;
 import com.api.aquilesApi.Repository.DiarySustainationsRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
