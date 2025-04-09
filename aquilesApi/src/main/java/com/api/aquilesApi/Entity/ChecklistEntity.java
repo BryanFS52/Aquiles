@@ -16,8 +16,7 @@ import java.util.List;
 public class ChecklistSubstantiationListEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "check_list_id", nullable = false)
-    private Long checkListId;
+    private Long id;
 
     @Column(name = "trimester", nullable = false)
     private Long trimester;
