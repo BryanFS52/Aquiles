@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState, useMemo } from "react"
-import { Header } from "../../components/header"
-import { Sidebar } from "../../components/Sidebar"
+import { Header } from "@components/header"
+import { Sidebar } from "@components/Sidebar"
 import { toast } from "react-toastify"
 import { Check, FileDown, Save, Upload, X } from "lucide-react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

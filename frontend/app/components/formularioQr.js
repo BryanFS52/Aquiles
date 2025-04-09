@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Header } from "../components/header"; 
+import { Header } from "@components/header"; 
 import { IoPersonCircleOutline } from "react-icons/io5"; 
-import { updateAttendanceState } from "../services/attendances";
+import { updateAttendanceState } from "@services/attendances";
 import Webcam from "react-webcam";
 import jsQR from "jsqr";
 

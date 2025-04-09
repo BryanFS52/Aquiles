@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { getAllApprentices } from "../services/apprenticeService";
+import { getAllApprentices } from "@services/apprenticeService";
 import { GoSearch } from "react-icons/go";
 import { BsQrCode } from "react-icons/bs";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-import ModalQR from "../components/Modals/modalQR";
+import ModalQR from "@components/Modals/modalQR";
 import { motion } from "framer-motion";
 import 'react-calendar/dist/Calendar.css';
-import FormularioQr from "../components/formularioQr";
+import FormularioQr from "@components/formularioQr";
 
 const TablaApprentices = ({ onStatusChange }) => {
     const [apprentices, setApprentices] = useState([]); 

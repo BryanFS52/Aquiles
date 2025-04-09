@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from 'react'; 
-import { Header } from "../../components/header"; 
-import SidebarRole from "../../components/SidebarRole"; 
+import { Header } from "@components/header"; 
+import SidebarRole from "@components/SidebarRole"; 
 import { ToastContainer } from "react-toastify"; 
 import 'react-toastify/dist/ReactToastify.css';
 

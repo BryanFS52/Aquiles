@@ -12,5 +12,4 @@ export const updateAttendance = async ({ documentNumber, attendanceData }) => {
     } catch (error) {
         throw new Error('Error al actualizar la asistencia: ' + error.message);
     }
-  },
 };

@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Header } from "../../components/header";
-import { Sidebarcoordinador } from '../../components/SidebarCoordinador';
+import { Header } from "@components/header";
+import { Sidebarcoordinador } from "@components/SidebarCoordinador";
 
 // Definición del componente Card
 const Card = ({ children, className }) => {

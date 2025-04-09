@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from 'react';
-import logoSenaFormulario from "../../../public/img/Logo-sena-green.png";
-import logo from "../../../public/img/aquiles.jpg";
+import logoSenaFormulario from "@public/img/Logo-sena-green.png";
+import logo from "@public/img/aquiles.jpg";
 import Image from 'next/image';
 
 const formularioRedireccionEmail = () => {

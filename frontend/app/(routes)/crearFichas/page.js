@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Header } from "../../components/header"; 
-import { Sidebarcoordinador } from "../../components/SidebarCoordinador";
+import { Header } from "@components/header"; 
+import { Sidebarcoordinador } from "@components/SidebarCoordinador";
 import { TbArrowBigRight } from "react-icons/tb";
 import { MdAdd } from "react-icons/md";
 import { ToastContainer, toast } from "react-toastify"; 
 import 'react-toastify/dist/ReactToastify.css';
-import ModalFichas from "../../components/Modals/modalFichas"; 
+import ModalFichas from "@components/Modals/modalFichas"; 
 import axios from 'axios'; 
 
 export default function Options() {

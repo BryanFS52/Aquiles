@@ -2,8 +2,8 @@
 
 import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { HeaderAprendiz } from "../../components/HeaderAprendiz";
-import { Sidebaraprendiz } from "../../components/SidebarAprendiz";
+import { HeaderAprendiz } from "@components/HeaderAprendiz";
+import { Sidebaraprendiz } from "@components/SidebarAprendiz";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BsPersonCircle } from "react-icons/bs";

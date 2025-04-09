@@ -16,6 +16,8 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "target": "ES2017",
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
@@ -24,25 +26,37 @@
     "paths": {
       "@/*": [
         "./app/*"
-      ]
-    },
-    "target": "ES2017"
+      ],
+      "@components/*": [
+        "./app/components/*"
+      ],
+      "@routes/*": [
+        "./app/(routes)/*"
+      ],
+      "@styles/*": [
+        "./app/styles/*"
+      ],
+      "@lib/*": [
+        "./app/lib/*"
+      ],
+      "@utils/*": [
+        "./app/utils/*"
+      ],
+      "@hooks/*": [
+        "./app/hooks/*"
+      ],
+      "@public/*": [
+        "./public/*"
+      ],
+      "@services/*": [
+        "./app/services/*"
+      ] 
+    }
   },
   "include": [
     "next-env.d.ts",
-    "*/.ts",
-    "*/.tsx",
-    ".next/types/*/.ts",
-    "app/(routes)/home/page.js",
-    "app/(routes)/inventario/page.js",
-    "app/(routes)/roles/page.js",
-    "app/components/estadistica.js",
-    "app/components/header.js",
-    "app/components/product.js",
-    "app/components/Sidebar.js",
-    "app/page.js",
-    "app/layout.js",
-    ".next/types/*/.ts",
+    "**/*.ts",
+    "**/*.tsx",
     ".next/types/**/*.ts"
   ],
   "exclude": [

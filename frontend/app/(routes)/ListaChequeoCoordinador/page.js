@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useState, useEffect } from "react"
-import { HeaderCoordinador } from "../../components/HeaderCoordinador";
-import { Sidebarcoordinador } from '../../components/SidebarCoordinador';
+import { HeaderCoordinador } from "@components/HeaderCoordinador";
+import { Sidebarcoordinador } from "@components/SidebarCoordinador";
 import { MdAdd } from "react-icons/md"
 import { FaTrashAlt } from "react-icons/fa"
-import { listChecklists, createChecklist, deleteChecklist } from "../../services/checkListService"
+import { listChecklists, createChecklist, deleteChecklist } from "@services/checkListService"
 import { ToastContainer, toast } from "react-toastify"
-import ModalNewChecklist from "../../components/Modals/ModalNewChecklist"
+import ModalNewChecklist from "@components/Modals/ModalNewChecklist"
 import "react-toastify/dist/ReactToastify.css"
 
 export default function CoordinadorChecklistView() {

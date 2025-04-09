@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { getRoles } from '../services/RoleService'; // Importa el servicio que creaste
-import { Sidebar } from './Sidebar'; 
-import { SidebarAprendiz } from './SidebarAprendiz';
+import { getRoles } from '@services/RoleService'; // Importa el servicio que creaste
+import { Sidebar } from '@components/Sidebar'; 
+import { SidebarAprendiz } from '@components/SidebarAprendiz';
 
 const SidebarRole = () => {
     const [roles, setRoles] = useState([]);

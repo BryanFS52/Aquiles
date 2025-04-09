@@ -5,8 +5,8 @@ import { FiAlignRight } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import logoAquiles from "../../public/img/logoAquiles.png";
-import LogoAquilesWhite from "../../public/img/LogoAquilesWhite.png";
+import logoAquiles from "@public/img/logoAquiles.png";
+import LogoAquilesWhite from "@public/img/LogoAquilesWhite.png";
 
 // Importación dinámica de íconos para mejorar la carga inicial
 const IconFicha = dynamic(() => import('react-icons/fa').then((mod) => mod.FaRegListAlt), { ssr: false });

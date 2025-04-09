@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { HeaderAprendiz } from "../../components/HeaderAprendiz";
-import { Sidebaraprendiz } from "../../components/SidebarAprendiz";
+import { HeaderAprendiz } from "@components/HeaderAprendiz";
+import { Sidebaraprendiz } from "@components/SidebarAprendiz";
 import { Check, FileDown, X } from "lucide-react";
 
 const checklistData = {

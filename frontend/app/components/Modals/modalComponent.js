@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import ModalDescripcion from '../Modals/modalDescripcion';
-import ModalProblematicas from './modalProblematicas';
-import ModalObjetivos from './modalObjetivos';
-import ModalJustificacion from './modalJustificacion';
-import ModalVerMas from './modalVerMas';
+import ModalDescripcion from '@components/Modals/modalDescripcion';
+import ModalProblematicas from '@components/Modals/modalProblematicas';
+import ModalObjetivos from '@components/Modals/modalObjetivos';
+import ModalJustificacion from '@components/Modals/modalJustificacion';
+import ModalVerMas from '@components/Modals/modalVerMas';
 
 
   const ModalComponent = ({ isOpen, onClose, modalContent }) => {

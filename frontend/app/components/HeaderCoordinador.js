@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { RiCheckboxBlankCircleFill } from "react-icons/ri";
-import { Notifications } from "./notifications";
+import { Notifications } from "@components/notifications";
 
 export const HeaderCoordinador = () => {
   const [isOpen, setIsOpen] = useState(false);

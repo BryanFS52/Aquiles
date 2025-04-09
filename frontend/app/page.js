@@ -6,9 +6,9 @@ import { HiLockClosed } from "react-icons/hi";
 import { BsPersonCircle } from "react-icons/bs";
 import { HiMiniIdentification } from "react-icons/hi2";
 import Image from "next/image";
-import logoSena from "../public/img/LogoSena.png";
-import LogoAquilesDarkBlue from "../public/img/LogoAquilesDarkBlue.png";
-import ModalOlvidoContraseña from "../app/components/Modals/modalOlvidoContraseña";
+import logoSena from '@public/img/LogoSena.png'
+import LogoAquilesDarkBlue from '@public/img/LogoAquilesDarkBlue.png'
+import ModalOlvidoContraseña from '@components/Modals/modalOlvidoContraseña'
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 

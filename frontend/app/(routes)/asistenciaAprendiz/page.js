@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { HeaderAprendiz } from "../../components/HeaderAprendiz";
-import { Sidebaraprendiz } from "../../components/SidebarAprendiz"; // Importaciones del header y del sidebar
+import { HeaderAprendiz } from "@components/HeaderAprendiz";
+import { Sidebaraprendiz } from "@components/SidebarAprendiz"; // Importaciones del header y del sidebar
 import { GoSearch } from "react-icons/go";
 import { IoIosArrowDown } from "react-icons/io";
 import { useRouter } from 'next/navigation'; // Importa useRouter de next/navigation

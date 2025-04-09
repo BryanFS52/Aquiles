@@ -2,10 +2,10 @@
 
 import { Clipboard, UserPlus, Users } from "lucide-react";
 import React, { useState } from "react";
-import { HeaderCoordinador } from "../../components/HeaderCoordinador";
-import { Sidebaraprendiz } from "../../components/SidebarAprendiz";
+import { HeaderCoordinador } from "@components/HeaderCoordinador";
+import { Sidebaraprendiz } from "@components/SidebarAprendiz";
 import {  FaRegClock, FaGraduationCap, FaCalendarDay, FaRegListAlt } from "react-icons/fa"; // Iconos
-import { Sidebarcoordinador } from '../../components/SidebarCoordinador';
+import { Sidebarcoordinador } from "@components/SidebarCoordinador";
 
 // Implementación de los componentes personalizados
 

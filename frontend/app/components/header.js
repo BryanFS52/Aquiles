@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import Link from "next/link";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { RiCheckboxBlankCircleFill } from "react-icons/ri";
-import { Notifications } from "./notifications";
+import { Notifications } from "@components/notifications";
 
 export const Header = ({ role }) => {
   const [isOpen, setIsOpen] = useState(false);

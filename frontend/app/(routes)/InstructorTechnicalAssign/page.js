@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { HeaderCoordinador } from "../../components/HeaderCoordinador";
-import { Sidebarcoordinador } from '../../components/SidebarCoordinador';
+import { HeaderCoordinador } from "@components/HeaderCoordinador";
+import { Sidebarcoordinador } from "@components/SidebarCoordinador";
 import { FaUsers } from "react-icons/fa"; 
-import { getAllSheets, assignInstructor } from '../../services/FichasCoordinadorService'; 
+import { getAllSheets, assignInstructor } from "@services/FichasCoordinadorService"; 
 
 const FichasCoordinator = () => {
   const [sheets, setSheets] = useState([]);

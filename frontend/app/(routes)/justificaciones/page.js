@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Header } from "../../components/header";
-import { Sidebar } from "../../components/Sidebar";
+import { Header } from "@components/header";
+import { Sidebar } from "@components/Sidebar";
 import { GoSearch } from "react-icons/go";
 import { GrAttachment } from "react-icons/gr";
 import Image from "next/image";
-import persona from "../../../public/img/persona.jpg";
+import persona from "@public/img/persona.jpg";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 
 export default function JustificacionesInstructor() {

@@ -3,12 +3,12 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { BsPersonCircle } from "react-icons/bs";
-import TableAttendance from "../../components/tableAttendance";
-import { Header } from "../../components/header";
-import { Sidebar } from "../../components/Sidebar";
+import TableAttendance from "@components/tableAttendance";
+import { Header } from "@components/header";
+import { Sidebar } from "@components/Sidebar";
 import { FaCheck, FaEye } from "react-icons/fa";
 import { TbLetterR, TbLetterX, TbLetterJ } from "react-icons/tb";
-import { getAllApprentices } from "../../services/apprenticeService"; // Importa el servicio
+import { getAllApprentices } from "@services/apprenticeService"; // Importa el servicio
 
 export default function Attendance() {
     const [students, setStudents] = useState([]); // Estado para almacenar los aprendices

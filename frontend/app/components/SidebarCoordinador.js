@@ -6,7 +6,7 @@ import { FiAlignRight } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import LogoAquilesWhite from "../../public/img/LogoAquilesWhite.png";
+import LogoAquilesWhite from "@public/img/LogoAquilesWhite.png";
 
 // Importación dinámica de íconos para mejorar la carga inicial
 

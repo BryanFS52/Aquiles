@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from 'react'; 
-import { Header } from "../../components/header"; 
-import { Sidebar } from "../../components/Sidebar";
+import { Header } from "@components/header"; 
+import { Sidebar } from "@components/Sidebar";
 import { MdAdd } from "react-icons/md";
 import { MdAddCircle } from "react-icons/md";
-import ModalNewProject from '../../components/Modals/modalNewProject';
+import ModalNewProject from "@components/Modals/modalNewProject";
 import { FaTrashAlt } from "react-icons/fa";
-import ModalComponent from '../../components/Modals/modalComponent';
-import { listTeamsScrum, createTeamScrum, deleteTeamScrum } from '../../services/teamScrumService'; 
-import ModalAddInformation from '../../components/Modals/modalAddInformation';
-import ModalEliminarTeam from "../../components/Modals/modalEliminarTeam";
+import ModalComponent from "@components/Modals/modalComponent";
+import { listTeamsScrum, createTeamScrum, deleteTeamScrum } from "@services/teamScrumService"; 
+import ModalAddInformation from "@components/Modals/modalAddInformation";
+import ModalEliminarTeam from "@components/Modals/modalEliminarTeam";
 import { ToastContainer, toast } from "react-toastify"; 
 import 'react-toastify/dist/ReactToastify.css';
 

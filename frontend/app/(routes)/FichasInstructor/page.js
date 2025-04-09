@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Header } from "../../components/header";
-import { Sidebar } from '../../components/Sidebar';
+import { Header } from "@components/header";
+import { Sidebar } from "@components/Sidebar";
 import { IoPeople } from "react-icons/io5";
-import  InfoBox from "../../components/infoBox";
+import  InfoBox from "@components/infoBox";
 import { FaUsers, FaRegClock, FaGraduationCap, FaRegListAlt } from "react-icons/fa"; // Iconos
-import ApprenticeModal from '../../components/Modals/ApprenticeModal'; // Importa el modal
+import ApprenticeModal from "@components/Modals/ApprenticeModal"; // Importa el modal
 
 const FichasInstructor = () => {
   const [ficha, setFicha] = useState(null);

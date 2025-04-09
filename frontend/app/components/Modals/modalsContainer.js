@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ModalComponent from './modalComponent'; // Ajusta la ruta según tu estructura de archivos
+import ModalComponent from '@components/Modals/modalComponent'; // Ajusta la ruta según tu estructura de archivos
 
 
 const ModalsContainer = () => {

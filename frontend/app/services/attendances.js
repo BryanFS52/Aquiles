@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api/attendances'; 
+const API_URL = 'http://localhost:8081/api/attendances'; 
 
 export const updateAttendanceState = async (attendanceData) => {
     try {

@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { HeaderAprendiz } from "../../components/HeaderAprendiz"; 
-import { Sidebaraprendiz } from "../../components/SidebarAprendiz";
+import { HeaderAprendiz } from "@components/HeaderAprendiz"; 
+import { Sidebaraprendiz } from "@components/SidebarAprendiz";
 import Image from 'next/image';
-import aquiles from "../../../public/img/aquiles.jpg"; // imagen de aquiles
+import aquiles from "@public/img/aquiles.jpg"; // imagen de aquiles
 import { IoPersonCircleSharp } from "react-icons/io5";
 import { IoCameraSharp, IoCalendar } from 'react-icons/io5';
 import Slider from 'react-slick'; // Importa el componente Slider

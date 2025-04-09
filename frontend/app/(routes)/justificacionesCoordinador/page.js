@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import { HeaderCoordinador } from "../../components/HeaderCoordinador";
-import { Sidebarcoordinador } from "../../components/SidebarCoordinador";
+import { HeaderCoordinador } from "@components/HeaderCoordinador";
+import { Sidebarcoordinador } from "@components/SidebarCoordinador";
 import { GoSearch } from "react-icons/go";
 import { GrAttachment } from "react-icons/gr";
 import Image from "next/image";
-import persona from "../../../public/img/persona.jpg";
+import persona from "@public/img/persona.jpg";
 import { IoIosArrowForward } from "react-icons/io";
 import { IoIosArrowBack } from "react-icons/io";
 

@@ -5,7 +5,7 @@ import { HiLockClosed } from "react-icons/hi";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
-import logoSena from "../../../public/img/LogoSena.png";
+import logoSena from "@public/img/LogoSena.png";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");

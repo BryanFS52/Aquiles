@@ -1,7 +1,7 @@
 "use client"
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import AbsenceEmailNotification from "../../components/absenceEmailNotification";
+import AbsenceEmailNotification from "@components/absenceEmailNotification";
 
 export default function handler(req, res) {
   const { studentName, date } = req.query;

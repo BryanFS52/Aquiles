@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'react-toastify'
-import { createChecklist } from '../../services/checkListService'
+import { createChecklist } from '@services/checkListService'
 
 export default function CrearListaChequeo() {
   const [isOpen, setIsOpen] = useState(false)

@@ -1,8 +1,8 @@
 "use client"; // Esto hace que el componente sea un Client Component
 
 import React, { useEffect, useState } from 'react';
-import { Header } from "../../components/header"; // importaciones del header y del sidebar para hacer el llamado
-import { Sidebar } from "../../components/Sidebar";
+import { Header } from "@components/header"; // importaciones del header y del sidebar para hacer el llamado
+import { Sidebar } from "@components/Sidebar";
 
 // Importa correctamente los íconos
 import { FaComputer, FaPeopleRoof } from 'react-icons/fa6';  // Fa6 (FontAwesome icons)
