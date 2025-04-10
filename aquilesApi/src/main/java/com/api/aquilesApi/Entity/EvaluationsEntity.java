@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 
 import java.io.Serializable;
 
-public class Evaluations implements Serializable {
+public class EvaluationsEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
