@@ -32,7 +32,7 @@ const ModalQR = ({ isOpen, onClose }) => {
       setTimer(prev => {
         if (prev <= 1) {
           clearInterval(interval);
-          router.push('/aprendicelist'); 
+          router.push('/AprendicesList'); 
           return 0;
         }
         return prev - 1;

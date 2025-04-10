@@ -1,31 +1,35 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.antlr.v4.runtime.misc.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.List;
 
-@Entity
-@Table(name = "teams_scrum")
-@Getter
-@Setter
 @NoArgsConstructor
 @ToString(exclude = {"studentList", "projectList"})
+@Getter
+@Setter
+@Entity
+@Table(name = "teams")
 public class Teams_ScrumEntity implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Id // Indica que esta propiedad es la clave primaria
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Generación automática de valores para la clave primaria
-    @Column(name = "team_scrum_id", nullable = false) // Mapea esta propiedad a una columna en la tabla con restricción de no nulo
-    private Long teamScrumId; // Propiedad que representa el ID del equipo scrum
+    @Column(name = "name", nullable = false, length = 100)
+    private String name;
 
-    @Column(name = "name_project", nullable = false, length = 100) // Mapea esta propiedad a una columna en la tabla con restricciones de no nulo y longitud máxima de 100 caracteres
-    private String nameProject; // Propiedad que representa el nombre del proyecto
+    @Column(name = "members", nullable = false, length = 200)
+    private  String members;
 
+    // Relations
     @OneToMany(mappedBy = "fk_team_scrum_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL) // Mapea esta propiedad a una relación uno a muchos con la entidad Students
-    private List<StudentsEntity> studentList; // Lista de estudiantes asociados a este equipo scrum
+    private List<StudentsEntity> studentList;
 
     @OneToMany(mappedBy = "fk_team_scrum_id", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<ProjectEntity> projectList; // Lista de proyectos asociados a este equipo scrum
+    private List<ProjectEntity> projectList;
 }
