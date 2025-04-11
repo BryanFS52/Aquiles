@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "http://localhost:8081/api";
 
 export const sendEmailAbsence = async (email, studentName, date) => {
     console.log('Datos que se enviarán:', {
@@ -17,7 +17,7 @@ export const sendEmailAbsence = async (email, studentName, date) => {
                 <img src="cid:logoImage" alt="Logo Sena" style="width: 64px; height: 64px; display: block; margin: auto;" />
             </div>
             <div style="padding: 24px;">
-                <h1 style="font-size: 1.5rem; color: #0e314d; font-family: 'Inter', sans-serif;">TDA</h1>
+                <h1 style="font-size: 1.5rem; color: #0e314d; font-family: 'Inter', sans-serif;">SENA</h1>
                 <h5 style="color: #0e314d; font-size: 1rem; font-family: 'Inter', sans-serif;">
                 Transformando el futuro con las nuevas habilidades del SENA.
                 </h5>
