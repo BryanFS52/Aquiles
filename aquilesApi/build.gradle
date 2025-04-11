@@ -48,7 +48,7 @@ dependencies {
 	// JSON
 	implementation group: 'org.json', name: 'json', version: '20240303'
 	//GraphQL
-	implementation 'org.springframework.boot:spring-boot-starter-graphql:3.4.4'
+	//	implementation 'org.springframework.boot:spring-boot-starter-graphql:3.4.4'
 }
 
 tasks.named('test') {

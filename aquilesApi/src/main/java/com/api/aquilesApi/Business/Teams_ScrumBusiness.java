@@ -72,9 +72,10 @@ public class Teams_ScrumBusiness {
     public Teams_ScrumDto findById(Long id) {
         try {
             Teams_ScrumEntity teamsScrum = teamScrumService.getById(id);
-            // Configurar el mapeo manualmente si es necesario
+
+            // Configurar el mapeo manualmente si los nombres no coinciden
             modelMapper.typeMap(Teams_ScrumEntity.class, Teams_ScrumDto.class)
-                    .addMapping(Teams_ScrumEntity::getTeamScrumId, Teams_ScrumDto::setTeamScrumId);
+                    .addMapping(Teams_ScrumEntity::getId, Teams_ScrumDto::setTeamScrumId);
 
             return modelMapper.map(teamsScrum, Teams_ScrumDto.class);
         } catch (CustomException e) {
@@ -83,6 +84,7 @@ public class Teams_ScrumBusiness {
             throw new CustomException("Error Getting Team Scrum By Id: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
 
     // Add
     public void add(Map<String, Object> json) {

@@ -40,6 +40,7 @@ public class StudentsEntity implements Serializable {
     private Set<Follow_upsEntity> follow_upSet;
     //
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_team_scrum_id", referencedColumnName = "team_scrum_id")
+    @JoinColumn(name = "fk_team_scrum_id")
     private Teams_ScrumEntity fk_team_scrum_id;
+
 }
