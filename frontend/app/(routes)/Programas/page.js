@@ -66,7 +66,7 @@ export default function Programas() {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebar />
       <div className="xl:col-span-5">
-        <Header />
+      <Header role="Instructor" />
         <div className="h-auto p-8 md:p-16 lg:p-16 inline-block w-full">
 
           <h1 className="text-lightGreen dark:text-darkBlue text-5xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 dark:border-darkGray w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">

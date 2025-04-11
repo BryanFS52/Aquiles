@@ -20,10 +20,6 @@ public class Team_ScrumService implements Idao<Teams_ScrumEntity , Long> {
     private Team_ScrumRepository teamsScrumRepository;
 
     // Método para encontrar un equipo scrum por el nombre del proyecto
-    @Transactional(readOnly = false)
-    public Teams_ScrumEntity findByName_project(String name_project) {
-        return teamsScrumRepository.findByNameProject(name_project); // Llama al método del repositorio para encontrar un equipo scrum por el nombre del proyecto
-    }
 
     @Override
     public Page<Teams_ScrumEntity> findAll(PageRequest pageRequest) {

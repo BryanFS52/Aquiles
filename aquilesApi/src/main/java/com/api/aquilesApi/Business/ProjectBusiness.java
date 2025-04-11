@@ -65,18 +65,12 @@ public class ProjectBusiness {
                     .stream()
                     .map(entity -> {
                         ProjectDto dto = new ProjectDto();
-                        dto.setProjectId(entity.getProjectId());
                         dto.setDescription(entity.getDescription());
                         dto.setProblem(entity.getProblem());
                         dto.setObjectives(entity.getObjectives());
                         dto.setJustification(entity.getJustification());
 
                         // Asignar manualmente el teamScrumId
-                        if (entity.getFk_team_scrum_id() != null) {
-                            dto.setFk_team_scrum_id(entity.getFk_team_scrum_id().getTeamScrumId());
-                        } else {
-                            dto.setFk_team_scrum_id(null);
-                        }
 
                         return dto;
                     })
@@ -95,18 +89,12 @@ public class ProjectBusiness {
 
             // Crear el DTO manualmente y mapear los campos esenciales
             ProjectDto projectDto = new ProjectDto();
-            projectDto.setProjectId(project.getProjectId());
             projectDto.setDescription(project.getDescription());
             projectDto.setProblem(project.getProblem());
             projectDto.setObjectives(project.getObjectives());
             projectDto.setJustification(project.getJustification());
 
             // Asignar manualmente el teamScrumId
-            if (project.getFk_team_scrum_id() != null) {
-                projectDto.setFk_team_scrum_id(project.getFk_team_scrum_id().getTeamScrumId());
-            } else {
-                projectDto.setFk_team_scrum_id(null);
-            }
 
             return projectDto;
         } catch (CustomException e) {

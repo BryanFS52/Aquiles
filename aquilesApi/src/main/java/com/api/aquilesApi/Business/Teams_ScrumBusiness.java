@@ -67,14 +67,14 @@ public class Teams_ScrumBusiness {
             throw new CustomException("Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
     // Find By Id
     public Teams_ScrumDto findById(Long id) {
         try {
             Teams_ScrumEntity teamsScrum = teamScrumService.getById(id);
             // Configurar el mapeo manualmente si es necesario
             modelMapper.typeMap(Teams_ScrumEntity.class, Teams_ScrumDto.class)
-                    .addMapping(Teams_ScrumEntity::getTeamScrumId, Teams_ScrumDto::setTeamScrumId);
+                    .addMapping(Teams_ScrumEntity::getId, Teams_ScrumDto::setTeamScrumId)
+                    .addMapping(Teams_ScrumEntity::getName, Teams_ScrumDto::setNameProject);
 
             return modelMapper.map(teamsScrum, Teams_ScrumDto.class);
         } catch (CustomException e) {

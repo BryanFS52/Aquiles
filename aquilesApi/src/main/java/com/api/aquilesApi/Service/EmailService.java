@@ -23,7 +23,7 @@ public class EmailService {
         helper.setTo(to); // Establece el destinatario
         helper.setSubject(subject); // Establece el asunto
         helper.setText(htmlContent, true); // Establece el contenido HTML
-        FileSystemResource res = new FileSystemResource(new File("/home/fabrica/aquilesApp/frontend/public/img/Logo-sena-green.png"));
+        FileSystemResource res = new FileSystemResource(new File("/home/fabrica/frontend/public/img/Logo-sena-green.png"));
         helper.addInline("logoImage", res);
 
         // Enviar el correo
