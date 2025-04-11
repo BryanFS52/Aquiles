@@ -5,9 +5,9 @@ spring:
     name: DBAquiles
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/Aquiles
+    url: jdbc:postgresql://localhost:5432/DB_Aquiles
     username: postgres
-    password: "Azkoien1033702995@"
+    password: "fabrica2024*"
     driver-class-name: org.postgresql.Driver
 
   jpa:
