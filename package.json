@@ -2,14 +2,15 @@
     "name": "aquiles-monorepo",
     "private": true,
     "workspaces": [
-        "frontend"
+      "frontend"
     ],
     "scripts": {
-        "start:frontend": "npm --workspace frontend run dev",
-        "start:aquilesApi": "cd aquilesApi && node -e \"require('child_process').spawnSync(process.platform === 'win32' ? 'gradlew.bat' : './gradlew', ['bootRun'], { stdio: 'inherit' })\"",
-         "dev": "concurrently --names \"FRONTEND,BACKEND\" --prefix-colors \"green,blue\" \"npm run start:frontend\" \"npm run start:aquilesApi\""
+      "start:frontend": "npm --workspace frontend run dev",
+      "start:aquilesApi": "cd aquilesApi && (if exist gradlew.bat (gradlew.bat bootRun) else (./gradlew bootRun))",
+      "dev": "concurrently --names \"FRONTEND,BACKEND\" --prefix-colors \"green,blue\" \"npm run start:frontend\" \"npm run start:aquilesApi\""
     },
     "devDependencies": {
-        "concurrently": "^8.2.0"
+      "concurrently": "^8.2.0"
     }
-}
+  }
+  

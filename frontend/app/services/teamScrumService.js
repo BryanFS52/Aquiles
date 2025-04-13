@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const endpoint = 'http://localhost:8080/api/teams-scrum';
+const endpoint = 'http://localhost:8081/api/teams-scrum';
 
 export const listTeamsScrum = () => {
     return axios.get(`${endpoint}/all`).then(response => response.data);

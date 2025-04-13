@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8080/api/excuses'; // Cambia la URL según sea necesario
+const BASE_URL = 'http://localhost:8081/api/excuses'; // Cambia la URL según sea necesario
 
 export const getAllExcuses = async () => {
     const response = await axios.get(`${BASE_URL}/all`);

@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api//api/justification'; // Cambia la URL por la de tu backend
+const API_URL = 'http://localhost:8081/api//api/justification'; // Cambia la URL por la de tu backend
 
 export const submitJustification = async (formData) => {
   try {

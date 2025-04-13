@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api/students'; // Asegúrate de que el puerto sea correcto
+const API_URL = 'http://localhost:8081/api/students'; // Asegúrate de que el puerto sea correcto
 
 // Crear un nuevo aprendiz
 export const createStudent = async (studentData) => {
