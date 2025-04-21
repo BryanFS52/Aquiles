@@ -1,0 +1,24 @@
+type Attendance {
+    attendanceId: ID!
+    attendanceDate: String
+    stateAttendance: StateAttendance
+}
+type StateAttendance {
+    id: ID!
+    name: String
+}
+type Query {
+    allAttendances(page: Int = 0, size: Int = 10): [Attendance]
+    attendanceById(id: ID!): Attendance
+}
+
+input AttendanceInput {
+    attendanceDate: String
+    stateAttendanceId: ID!
+}
+
+type Mutation {
+    createAttendance(input: AttendanceInput): String
+    updateAttendance(id: ID!, input: AttendanceInput): String
+    deleteAttendance(id: ID!): String
+}

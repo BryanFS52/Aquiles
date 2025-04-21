@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.security.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor
 @Entity
@@ -27,6 +28,6 @@ public class DiarySustainationsEntity implements Serializable {
     @Column(name = "place", length = 255)
     private String place;
 
-    @ManyToMany(mappedBy = "list_DiarySustainations", cascade = CascadeType.PERSIST)
-    private List<JuriesEntity> juries;
+    @ManyToMany(mappedBy = "diarySustainations")
+    private Set<JuriesEntity> juries;
 }

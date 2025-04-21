@@ -26,22 +26,26 @@ public class AttendancesEntity implements Serializable {
     @Timestamp
     @Column(name = "attendance_date", nullable = false)
     private Date attendanceDate;
-    //
+
+    // Relations
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_idExcuse", referencedColumnName = "excuse_id")
-    private ExcusesEntity excuse;  // Esta es la propiedad a la que mappedBy debe referirse
-    //
+    private ExcusesEntity excuse;
+
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_trainer_id", referencedColumnName = "trainer_id")
     private TrainersEntity trainer;
-    //
+
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_idStudent", referencedColumnName = "student_id")
     private StudentsEntity student;
-    //
+
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_stateAttendance_id", referencedColumnName = "stateAttendance_id")
-    private StateAttendanceEntity stateAttendance; // Cambiar a este nombre
+    private StateAttendanceEntity stateAttendance;
 
+    // 3.Relation (M-M) con notifications
+    @ManyToMany(mappedBy = "attendances")
+    private Set<NotificationsEntity> notifications;
 }

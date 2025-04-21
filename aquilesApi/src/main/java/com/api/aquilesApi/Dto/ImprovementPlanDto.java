@@ -1,0 +1,37 @@
+package com.api.aquilesApi.Dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.Date;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ImprovementPlanDto implements Serializable {
+    private Long id;
+
+    @NotBlank(message = "La ciudad es obligatoria")
+    @Size(max = 55, message = "La ciudad no puede exceder los 55 caracteres")
+    private String city;
+
+    @NotNull(message = "La fecha es obligatoria")
+    private Date date;
+
+    @NotBlank(message = "El motivo es obligatorio")
+    @Size(max = 255, message = "El motivo no puede exceder los 255 caracteres")
+    private String reason;
+
+    @NotNull(message = "El número es obligatorio")
+    private Integer number;
+
+    @NotNull(message = "El estado es obligatorio")
+    private Boolean state;
+
+    // Relations
+}

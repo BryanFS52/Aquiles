@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api/email/send-notification-attendance';
+const API_URL = 'http://localhost:8081/api/email/send-notification-attendance';
 
 export const sendEmailAbsence = async (email) => {
     try {

@@ -25,4 +25,7 @@ public class NotificationsTypeEntity implements Serializable {
     private String description;
 
     // Relations
+    // 1.Relation (1-1) con notifications
+    @OneToOne(mappedBy = "type")
+    private NotificationsEntity notification;
 }

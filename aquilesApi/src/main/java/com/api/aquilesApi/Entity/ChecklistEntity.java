@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor
 @Entity
@@ -35,10 +36,38 @@ public class ChecklistEntity implements Serializable {
     private String checklistHistory;
 
     // Relations
+    // (Error)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_project_id", nullable = false)
-    private ProjectEntity project;
+    @JoinColumn(name = "project_id", nullable = false)
+    private ProjectEntity associatedProject;
 
-    @ManyToMany(mappedBy = "list_checklistSubstantiationLists", cascade = CascadeType.PERSIST)
-    private List<JuriesEntity> juries;
+    // 1.Relation (M-M) con juries
+    @ManyToMany
+    @JoinTable(
+            name = "checklist_jury",
+            joinColumns = @JoinColumn(name = "checklist_id"),
+            inverseJoinColumns = @JoinColumn(name = "jury_id")
+    )
+    private Set<JuriesEntity> juries;
+
+    // 2.Relation (1-M) con item
+    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemEntity> items;
+
+    // 3.Relation (1-1) con evaluations
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "evaluation_id", referencedColumnName = "id")
+    private EvaluationsEntity evaluation;
+
+    // 4.Relation (1-M) con Team
+    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamsScrumEntity> teams;
+
+    // 5.Relation (1-M) con studySheet (Model)
+    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StudySheetEntity> studySheets;
+
+    // 5.Relation (1-M) con learningOutocome (Model)
+    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LearningOutcomeEntity> learningOutcomes;
 }

@@ -19,6 +19,7 @@ public class ProjectEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Columns
     @Column(name = "problem", nullable = false, length = 255)
     private String problem;
 
@@ -31,12 +32,13 @@ public class ProjectEntity implements Serializable {
     @Column(name = "justification", nullable = false, length = 255)
     private String justification;
 
+    @Column(name = "members", nullable = false)
+    private String members;
+
     //Relations
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_team_scrum_id", nullable = false)
-    private Teams_ScrumEntity fk_team_scrum_id;
+    private TeamsScrumEntity fk_team_scrum_id;
 
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<ChecklistEntity> checklistSubstantiationList;
 }

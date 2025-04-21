@@ -29,10 +29,10 @@ public class TrainersEntity implements Serializable {
     @Column(name = "documentNumber", nullable = false)
     private BigInteger documentNumber;
 
-    // Esta es la relación correcta
+    // Relations
     @OneToMany(mappedBy = "trainer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<AttendancesEntity> attendanceSet;
 
-    @OneToMany(mappedBy = "trainer", fetch = FetchType.LAZY, cascade = CascadeType.ALL) // Cambia esto si es necesario
+    @OneToMany(mappedBy = "trainer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<JuriesEntity> jurieSet;
 }

@@ -23,11 +23,6 @@ public class FinalReportEntity implements Serializable {
     @Column(name = "file_number",nullable = false, length = 55)
     private String fileNumber;
 
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "creation_date", updatable = false)
-    private Date createdAt;
-
     @Column(name = "objetives", nullable = false, length = 255)
     private String objectives;
 
@@ -47,4 +42,14 @@ public class FinalReportEntity implements Serializable {
 
     @Column(name = "state", nullable = false)
     private Boolean state;
+
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "creation_date", updatable = false)
+    private Date createdAt;
+
+    // Relations
+    // 1.Relation (1-1) con notifications
+    @OneToOne(mappedBy = "finalReport")
+    private NotificationsEntity notification;
 }

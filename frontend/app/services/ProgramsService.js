@@ -3,7 +3,7 @@ import axios from 'axios';
 const ProgramsService = {
   getProgramById: async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8084/api/programs/${id}`);
+      const response = await axios.get(`http://localhost:8081/api/programs/${id}`);
       return response.data;
     } catch (error) {
       console.error("Error fetching program:", error);
@@ -13,7 +13,7 @@ const ProgramsService = {
 
   getAllPrograms: async () => {
     try {
-      const response = await axios.get('http://localhost:8084/api/programs/all');
+      const response = await axios.get('http://localhost:8081/api/programs/all');
       return response.data;
     } catch (error) {
       console.error("Error fetching programs:", error);

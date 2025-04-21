@@ -22,7 +22,7 @@ function ListaApprentices() {
   useEffect(() => {
     const fetchApprentices = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/students')
+        const response = await fetch('http://localhost:8081/api/students')
         const data = await response.json()
         setApprentices(data)
       } catch (error) {
@@ -48,7 +48,7 @@ function ListaApprentices() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const response = await fetch('http://localhost:8080/api/students', {
+      const response = await fetch('http://localhost:8081/api/students', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -6,25 +6,27 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "item_type")
-public class ItemTypeEntity implements Serializable {
+@Table(name = "justification_types")
+public class JustificationTypeEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // Columns
-    @Column(name = "name", nullable = false, length = 20)
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "description", nullable = false)
+    private String description;
+
     // Relations
-    // 1. Relation (1-M) con item
-    @OneToMany(mappedBy = "itemType", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ItemEntity> items;
+    // 1. Relation (1-M) con justification
+    @OneToMany(mappedBy = "type")
+    private Set<JustificationEntity> justificationSet;
 }

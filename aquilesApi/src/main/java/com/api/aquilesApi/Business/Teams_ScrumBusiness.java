@@ -1,8 +1,7 @@
 package com.api.aquilesApi.Business;
 
-import com.api.aquilesApi.Dto.AttendancesDto;
 import com.api.aquilesApi.Dto.Teams_ScrumDto;
-import com.api.aquilesApi.Entity.Teams_ScrumEntity;
+import com.api.aquilesApi.Entity.TeamsScrumEntity;
 import com.api.aquilesApi.Service.Team_ScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
@@ -55,7 +54,7 @@ public class Teams_ScrumBusiness {
     public Page<Teams_ScrumDto> findAll(int page , int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<Teams_ScrumEntity> teamsScrumEntityPage = teamScrumService.findAll(pageRequest);
+            Page<TeamsScrumEntity> teamsScrumEntityPage = teamScrumService.findAll(pageRequest);
 
             List<Teams_ScrumDto> teamsScrumDtoList = teamsScrumEntityPage.getContent()
                     .stream()
@@ -70,11 +69,11 @@ public class Teams_ScrumBusiness {
     // Find By Id
     public Teams_ScrumDto findById(Long id) {
         try {
-            Teams_ScrumEntity teamsScrum = teamScrumService.getById(id);
-            // Configurar el mapeo manualmente si es necesario
-            modelMapper.typeMap(Teams_ScrumEntity.class, Teams_ScrumDto.class)
-                    .addMapping(Teams_ScrumEntity::getId, Teams_ScrumDto::setTeamScrumId)
-                    .addMapping(Teams_ScrumEntity::getName, Teams_ScrumDto::setNameProject);
+            TeamsScrumEntity teamsScrum = teamScrumService.getById(id);
+
+            // Configurar el mapeo manualmente si los nombres no coinciden
+            modelMapper.typeMap(TeamsScrumEntity.class, Teams_ScrumDto.class)
+                    .addMapping(TeamsScrumEntity::getId, Teams_ScrumDto::setTeamScrumId);
 
             return modelMapper.map(teamsScrum, Teams_ScrumDto.class);
         } catch (CustomException e) {
@@ -83,6 +82,7 @@ public class Teams_ScrumBusiness {
             throw new CustomException("Error Getting Team Scrum By Id: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
 
     // Add
     public void add(Map<String, Object> json) {
@@ -94,7 +94,7 @@ public class Teams_ScrumBusiness {
             teamsScrumDto = validationObject(json, teamsScrumDto);
 
             // Convertir el DTO a entidad
-            Teams_ScrumEntity teamsScrumEntity = modelMapper.map(teamsScrumDto, Teams_ScrumEntity.class);
+            TeamsScrumEntity teamsScrumEntity = modelMapper.map(teamsScrumDto, TeamsScrumEntity.class);
 
             // Guardar la entidad
             teamScrumService.create(teamsScrumEntity);
@@ -110,7 +110,7 @@ public class Teams_ScrumBusiness {
     public void update(Long teamScrumId , Map<String , Object> json){
         try {
             var teamScrumDto = modelMapper.map(teamScrumService.getById(teamScrumId) , Teams_ScrumDto.class);
-            var teamScrum = modelMapper.map(this.validationObject(json , teamScrumDto) , Teams_ScrumEntity.class);
+            var teamScrum = modelMapper.map(this.validationObject(json , teamScrumDto) , TeamsScrumEntity.class);
             teamScrumService.save(teamScrum);
         } catch (CustomException e){
             throw e;
@@ -122,7 +122,7 @@ public class Teams_ScrumBusiness {
     // Delete
     public void delete(Long teamScrumId){
         try {
-            Teams_ScrumEntity teamsScrum = teamScrumService.getById(teamScrumId);
+            TeamsScrumEntity teamsScrum = teamScrumService.getById(teamScrumId);
             teamScrumService.delete(teamsScrum);
         } catch (CustomException e){
             throw e;
