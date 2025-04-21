@@ -9,7 +9,6 @@ const CheckListTable = () => {
         <thead className="bg-sky-950">
           
             <tr>
-                
                 <th className="px-4 py-3 w-20 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Item</th>
                 <th className="px-4 w-96 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white text-center">Indicadores</th>
                 <th className="px-4 w-20 border-2 border-gray-300 bg-sky-950 text-sm font-semibold text-white">Si</th>

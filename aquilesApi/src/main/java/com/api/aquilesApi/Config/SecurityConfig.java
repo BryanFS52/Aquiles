@@ -32,16 +32,16 @@ public class SecurityConfig {
                                 .requestMatchers("/api/students/**").permitAll()
                                 .requestMatchers("/api/trainers/**").permitAll()
                                 .requestMatchers("/api/stateAttendance/**").permitAll()
+                                .requestMatchers("/graphql").permitAll() // Asegúrate de que la ruta de GraphQL esté correctamente configurada
                                 .anyRequest().permitAll()
                 );
-
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // URL de tu frontend
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

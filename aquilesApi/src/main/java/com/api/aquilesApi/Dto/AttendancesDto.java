@@ -15,5 +15,5 @@ import java.util.Date;
 public class AttendancesDto implements Serializable {
     private Long attendanceId;
     private Date attendanceDate;
-    private StateAttendanceEntity stateAttendance; // Cambiar a este nombre
+    private StateAttendanceEntity stateAttendance;
 }

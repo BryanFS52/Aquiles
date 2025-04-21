@@ -30,4 +30,9 @@ public class ApprenticeRegulationsEntity implements Serializable {
     @Column(name = "paragraph", nullable = false, length = 80)
     private String paragraph;
 
+    // Relations
+    // 1. Relation (1-1) con notifications
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "notification_id", referencedColumnName = "id")
+    private NotificationsEntity notification;
 }

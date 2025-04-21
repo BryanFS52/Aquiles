@@ -8,6 +8,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor
 @Entity
@@ -24,19 +25,19 @@ public class JuriesEntity implements Serializable {
 
     // Relations
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_trainer_id", referencedColumnName = "trainer_id") // Esta columna debe referirse a la clave primaria de TrainersEntity
+    @JoinColumn(name = "fk_trainer_id", referencedColumnName = "trainer_id")
     private TrainersEntity trainer;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "juries_checklist_substantiation_list", joinColumns = @JoinColumn(name = "fk_check_list_id", nullable = false),
-            inverseJoinColumns = @JoinColumn(name = "fk_jury_id", nullable = false)
-    )
-    private List<ChecklistEntity> list_checklistSubstantiationLists;
+    // 1.Relation (M-M) con Checklist
+    @ManyToMany(mappedBy = "juries")
+    private Set<ChecklistEntity> checklists;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "juries_diary_sustainations", joinColumns = @JoinColumn(name = "fk_diary_id", nullable = false),
-            inverseJoinColumns = @JoinColumn(name = "fk_jury_id", nullable = false)
+    @ManyToMany
+    @JoinTable(
+            name = "jury_diary_sustaination",
+            joinColumns = @JoinColumn(name = "jury_id"),
+            inverseJoinColumns = @JoinColumn(name = "diary_sustaination_id")
     )
+    private Set<DiarySustainationsEntity> diarySustainations;
 
-    private List<DiarySustainationsEntity> list_DiarySustainations;
 }

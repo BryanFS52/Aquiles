@@ -15,11 +15,12 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "teams")
-public class Teams_ScrumEntity implements Serializable {
+public class TeamsScrumEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Columns
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
@@ -27,6 +28,11 @@ public class Teams_ScrumEntity implements Serializable {
     private  String members;
 
     // Relations
+    // 1.Relation (M-1) con Checklist
+    @ManyToOne
+    @JoinColumn(name = "checklist_id", nullable = false)
+    private ChecklistEntity checklist;
+
     @OneToMany(mappedBy = "fk_team_scrum_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL) // Mapea esta propiedad a una relación uno a muchos con la entidad Students
     private List<StudentsEntity> studentList;
 

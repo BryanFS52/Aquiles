@@ -2,7 +2,7 @@ package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.ProjectDto;
 import com.api.aquilesApi.Entity.ProjectEntity;
-import com.api.aquilesApi.Entity.Teams_ScrumEntity;
+import com.api.aquilesApi.Entity.TeamsScrumEntity;
 import com.api.aquilesApi.Service.ProjectService;
 import com.api.aquilesApi.Service.Team_ScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -107,7 +107,7 @@ public class ProjectBusiness {
             projectDto = validationObject(json, projectDto);
 
             ProjectEntity projectEntity = modelMapper.map(projectDto, ProjectEntity.class);
-            Teams_ScrumEntity teamScrum = teamScrumService.getById(projectDto.getFk_team_scrum_id());
+            TeamsScrumEntity teamScrum = teamScrumService.getById(projectDto.getFk_team_scrum_id());
             projectEntity.setFk_team_scrum_id(teamScrum);
 
             projectService.create(projectEntity);

@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "item")
+@Table(name = "items")
 public class ItemEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +25,14 @@ public class ItemEntity implements Serializable {
     private String indicator;
 
     //Relations
+    // 1. Relation (M-1) con itemType
+    @ManyToOne
+    @JoinColumn(name = "item_type_id", nullable = false)
+    private ItemTypeEntity itemType;
 
+    // 2. Relation (M-1) con checklist
+    @ManyToOne
+    @JoinColumn(name = "checklist_id", nullable = false)
+    private ChecklistEntity checklist;
 
 }

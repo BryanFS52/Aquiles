@@ -16,7 +16,7 @@ public class EvaluationsEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //Columns
+    // Columns
     @Column(name = "observations")
     private String observations;
 
@@ -27,5 +27,4 @@ public class EvaluationsEntity implements Serializable {
     private String valueJudgment;
 
     // Relations
-
 }
