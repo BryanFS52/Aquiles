@@ -66,7 +66,6 @@ public class TeamsScrumBusiness {
             throw new CustomException("Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
     // Find By Id
     public TeamsScrumDto findById(Long id) {
         try {

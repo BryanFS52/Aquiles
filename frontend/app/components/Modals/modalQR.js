@@ -209,7 +209,7 @@ const ModalQR = ({ isOpen, onClose }) => {
               Cancelar QR
             </button>
             <button 
-              className='hover:bg-custom-blue rounded-md transition-colors bg-custom-blue px-3 py-2 border text-white text-base font-inter' 
+              className= 'bg-lightGreen rounded-md transition-colors bg-custom-blue px-3 py-2 border text-white text-base font-inter' 
               onClick={sendAttendanceEmail}
             >
               Enviar Correo Electrónico
