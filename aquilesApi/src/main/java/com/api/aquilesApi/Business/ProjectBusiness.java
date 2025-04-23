@@ -4,7 +4,7 @@ import com.api.aquilesApi.Dto.ProjectDto;
 import com.api.aquilesApi.Entity.ProjectEntity;
 import com.api.aquilesApi.Entity.TeamsScrumEntity;
 import com.api.aquilesApi.Service.ProjectService;
-import com.api.aquilesApi.Service.Team_ScrumService;
+import com.api.aquilesApi.Service.TeamScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
 import org.json.JSONObject;
@@ -27,7 +27,7 @@ public class ProjectBusiness {
     private ProjectService projectService;
 
     @Autowired
-    private Team_ScrumService teamScrumService;
+    private TeamScrumService teamScrumService;
 
     @Autowired
     private Util util;

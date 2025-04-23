@@ -3,12 +3,11 @@ package com.api.aquilesApi.Service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-
-import java.io.File;
+import org.springframework.util.StringUtils;
 
 @Service
 public class EmailService {
@@ -17,21 +16,36 @@ public class EmailService {
     private JavaMailSender emailSender;
 
     public void sendHtmlEmail(String to, String subject, String htmlContent) throws MessagingException {
-        // Crear el mensaje de correo
-        MimeMessage message = emailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setTo(to); // Establece el destinatario
-        helper.setSubject(subject); // Establece el asunto
-        helper.setText(htmlContent, true); // Establece el contenido HTML
-        FileSystemResource res = new FileSystemResource(new File("C:\\Users\\Gabri\\aquilesApp\\frontend\\public\\img\\Logo-sena-green.png"));
-        helper.addInline("logoImage", res);
+        if (!StringUtils.hasText(to) || !StringUtils.hasText(subject) || !StringUtils.hasText(htmlContent)) {
+            throw new IllegalArgumentException("Los campos email, asunto y contenido son obligatorios");
+        }
 
-        // Enviar el correo
-        emailSender.send(message);
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(htmlContent, true);
+
+            // Intentar cargar el logo desde los recursos
+            try {
+                ClassPathResource logoResource = new ClassPathResource("static/img/Logo-sena-green.png");
+                if (logoResource.exists()) {
+                    helper.addInline("logoImage", logoResource);
+                }
+            } catch (Exception e) {
+                // Si no se puede cargar el logo, continuar sin él
+                System.out.println("No se pudo cargar el logo: " + e.getMessage());
+            }
+
+            emailSender.send(message);
+        } catch (MessagingException e) {
+            System.err.println("Error al enviar el correo: " + e.getMessage());
+            throw e;
+        }
     }
 
     public void sendEmail(String email, String code) {
-
+        // Implementación pendiente
     }
-
 }

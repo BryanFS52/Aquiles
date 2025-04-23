@@ -11,7 +11,7 @@ const ModalQR = ({ isOpen, onClose }) => {
   const [showModal, setShowModal] = useState(false); // Estado para manejar la transición
   const router = useRouter(); 
 
-  const apprenticeEmail = "jhorsreflex@gmail.com"; 
+  const apprenticeEmail = "launathalypastrana@gmail.com"; 
 
   useEffect(() => {
     if (!isOpen) return;
@@ -140,7 +140,7 @@ const ModalQR = ({ isOpen, onClose }) => {
     };
 
     try {
-      const response = await axios.post('http://localhost:8080/api/email/send-notification-attendance', emailData, {
+      const response = await axios.post('http://localhost:8081/api/send-notification', emailData, {
         headers: {
           'Content-Type': 'application/json',
         },

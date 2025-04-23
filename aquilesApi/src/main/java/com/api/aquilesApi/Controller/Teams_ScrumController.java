@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Controller;
 
-import com.api.aquilesApi.Business.Teams_ScrumBusiness;
-import com.api.aquilesApi.Dto.Teams_ScrumDto;
+import com.api.aquilesApi.Business.TeamsScrumBusiness;
+import com.api.aquilesApi.Dto.TeamsScrumDto;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +17,14 @@ import java.util.Map;
 public class Teams_ScrumController {
 
     @Autowired
-    private Teams_ScrumBusiness teamsScrumBusiness;
+    private TeamsScrumBusiness teamsScrumBusiness;
 
     //End-Point Para Traer Todos Los Teams Scrum
     @GetMapping("/all")
     public ResponseEntity<Map<String , Object>> findAll(@RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "10") int size){
         try {
-            Page<Teams_ScrumDto> teamsScrumDtoPage = teamsScrumBusiness.findAll(page, size);
+            Page<TeamsScrumDto> teamsScrumDtoPage = teamsScrumBusiness.findAll(page, size);
             if (!teamsScrumDtoPage.isEmpty()){
                 return new ResponseEntity<>(ResponseHttpApi.responseHttpFindAll(
                         teamsScrumDtoPage.getContent(),
@@ -55,7 +55,7 @@ public class Teams_ScrumController {
     @GetMapping("/find/{id}")
     public ResponseEntity<Map<String , Object>> findById(@PathVariable Long id){
         try {
-            Teams_ScrumDto teamsScrumDto = this.teamsScrumBusiness.findById(id);
+            TeamsScrumDto teamsScrumDto = this.teamsScrumBusiness.findById(id);
             return new ResponseEntity<>(ResponseHttpApi.responseHttpFindId(
                     teamsScrumDto,
                     ResponseHttpApi.CODE_OK,

@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
-public class Team_ScrumService implements Idao<TeamsScrumEntity, Long> {
+public class TeamScrumService implements Idao<TeamsScrumEntity, Long> {
     @Autowired // Inyecta automáticamente el repositorio Teams_scrumRepository
     private TeamScrumRepository teamsScrumRepository;
 

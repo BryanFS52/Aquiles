@@ -60,7 +60,6 @@ public class AttendancesService implements Idao<AttendancesEntity , Long> {
         return attendancesRepository.countAbsentByTrainerId(trainerId, absentStateId);
     }
 
-
     public boolean existsByAttendanceDateAndStateAttendance(Date attendanceDate, StateAttendanceEntity stateAttendance) {
         return attendancesRepository.existsByAttendanceDateAndStateAttendance(attendanceDate , stateAttendance);
     }

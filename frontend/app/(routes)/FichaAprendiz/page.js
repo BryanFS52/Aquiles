@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { HeaderAprendiz } from "@components/HeaderAprendiz";
-import { Sidebar } from "@components/Sidebar";
-import  InfoBox from "@components/infoBox";
+import { Sidebaraprendiz } from "@components/SidebarAprendiz";
+import InfoBox from "@components/infoBox";
 import { FaUsers, FaRegClock, FaGraduationCap, FaRegListAlt } from "react-icons/fa"; // Iconos
 
 const ApprenticeView = () => {
@@ -23,7 +23,7 @@ const ApprenticeView = () => {
 
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">        
-      <Sidebar />
+      <Sidebaraprendiz />
       <div className="xl:col-span-5">
         <HeaderAprendiz />
 
@@ -58,11 +58,9 @@ const ApprenticeView = () => {
             ))}
           </div>
         </div>
-
       </div>
       </div>
     </div>
   );
 };
-
 export default ApprenticeView;

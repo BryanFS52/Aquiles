@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS})
 public class EmailController {
     @Autowired
     private EmailService emailService;
@@ -23,4 +24,8 @@ public class EmailController {
         }
     }
 
+    @RequestMapping(value = "/send-notification", method = RequestMethod.OPTIONS)
+    public void handleOptions() {
+        // Este método maneja las peticiones OPTIONS
+    }
 }

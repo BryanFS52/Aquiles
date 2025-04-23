@@ -1,8 +1,8 @@
 package com.api.aquilesApi.Business;
 
-import com.api.aquilesApi.Dto.Teams_ScrumDto;
+import com.api.aquilesApi.Dto.TeamsScrumDto;
 import com.api.aquilesApi.Entity.TeamsScrumEntity;
-import com.api.aquilesApi.Service.Team_ScrumService;
+import com.api.aquilesApi.Service.TeamScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
 import org.json.JSONObject;
@@ -19,10 +19,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
-public class Teams_ScrumBusiness {
+public class TeamsScrumBusiness {
 
     @Autowired
-    private Team_ScrumService teamScrumService;
+    private TeamScrumService teamScrumService;
 
     @Autowired
     private Util util;
@@ -30,7 +30,7 @@ public class Teams_ScrumBusiness {
     private final ModelMapper modelMapper = new ModelMapper();
 
     // Validación Objeto
-    private Teams_ScrumDto validationObject(Map<String, Object> json, Teams_ScrumDto teamsScrumDto) {
+    private TeamsScrumDto validationObject(Map<String, Object> json, TeamsScrumDto teamsScrumDto) {
         // Extrae datos del objeto JSON
         JSONObject dataObject = util.getData(json);
 
@@ -51,14 +51,14 @@ public class Teams_ScrumBusiness {
     }
 
     // Find All
-    public Page<Teams_ScrumDto> findAll(int page , int size) {
+    public Page<TeamsScrumDto> findAll(int page , int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
             Page<TeamsScrumEntity> teamsScrumEntityPage = teamScrumService.findAll(pageRequest);
 
-            List<Teams_ScrumDto> teamsScrumDtoList = teamsScrumEntityPage.getContent()
+            List<TeamsScrumDto> teamsScrumDtoList = teamsScrumEntityPage.getContent()
                     .stream()
-                    .map(entity -> modelMapper.map(entity, Teams_ScrumDto.class))
+                    .map(entity -> modelMapper.map(entity, TeamsScrumDto.class))
                     .collect(Collectors.toList());
 
             return new PageImpl<>(teamsScrumDtoList , pageRequest , teamsScrumEntityPage.getTotalElements());
@@ -68,15 +68,15 @@ public class Teams_ScrumBusiness {
     }
 
     // Find By Id
-    public Teams_ScrumDto findById(Long id) {
+    public TeamsScrumDto findById(Long id) {
         try {
             TeamsScrumEntity teamsScrum = teamScrumService.getById(id);
 
             // Configurar el mapeo manualmente si los nombres no coinciden
-            modelMapper.typeMap(TeamsScrumEntity.class, Teams_ScrumDto.class)
-                    .addMapping(TeamsScrumEntity::getId, Teams_ScrumDto::setTeamScrumId);
+            modelMapper.typeMap(TeamsScrumEntity.class, TeamsScrumDto.class)
+                    .addMapping(TeamsScrumEntity::getId, TeamsScrumDto::setTeamScrumId);
 
-            return modelMapper.map(teamsScrum, Teams_ScrumDto.class);
+            return modelMapper.map(teamsScrum, TeamsScrumDto.class);
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada
         } catch (Exception e) {
@@ -89,7 +89,7 @@ public class Teams_ScrumBusiness {
     public void add(Map<String, Object> json) {
         try {
             // Crear un nuevo DTO
-            Teams_ScrumDto teamsScrumDto = new Teams_ScrumDto();
+            TeamsScrumDto teamsScrumDto = new TeamsScrumDto();
 
             // Validar y asignar datos del JSON al DTO
             teamsScrumDto = validationObject(json, teamsScrumDto);
@@ -110,7 +110,7 @@ public class Teams_ScrumBusiness {
 
     public void update(Long teamScrumId , Map<String , Object> json){
         try {
-            var teamScrumDto = modelMapper.map(teamScrumService.getById(teamScrumId) , Teams_ScrumDto.class);
+            var teamScrumDto = modelMapper.map(teamScrumService.getById(teamScrumId) , TeamsScrumDto.class);
             var teamScrum = modelMapper.map(this.validationObject(json , teamScrumDto) , TeamsScrumEntity.class);
             teamScrumService.save(teamScrum);
         } catch (CustomException e){

@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -39,5 +38,4 @@ public class JuriesEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "diary_sustaination_id")
     )
     private Set<DiarySustainationsEntity> diarySustainations;
-
 }
