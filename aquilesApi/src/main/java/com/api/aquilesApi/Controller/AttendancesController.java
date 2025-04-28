@@ -7,6 +7,7 @@ import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.api.aquilesApi.Utilities.QrCodeGenerator;
 import com.google.zxing.WriterException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,16 +16,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
-@RequestMapping(path = "/api/attendances" , method =
-        {
-                RequestMethod.DELETE,
-                RequestMethod.GET,
-                RequestMethod.POST,
-                RequestMethod.PUT
-        })
-
+@CrossOrigin(origins = "https://6c12-179-1-218-161.ngrok-free.app")
+@RequestMapping(path = "/api/attendances", method = {
+        RequestMethod.DELETE,
+        RequestMethod.GET,
+        RequestMethod.POST,
+        RequestMethod.PUT
+})
 public class AttendancesController {
     @Autowired
     private AttendancesBusiness attendancesBusiness;
@@ -128,11 +129,19 @@ public class AttendancesController {
     }
 
     // Generate Qr
+    @Value("${frontend.url}")
+    private String frontendUrl;
     @GetMapping("/generateQRCode")
     public ResponseEntity<byte[]> generateQRCode() {
         try {
-            String frontendUrl = "https://8a4c-152-200-176-22.ngrok-free.app/qrformulariomovil";
-            byte[] qrCode = qrCodeGenerator.generateQRCodeImage(frontendUrl);
+            // Generar un UUID como identificador único de la sesión de asistencia
+            String sessionId = UUID.randomUUID().toString();
+
+            // Construir la URL con ese sessionId para que el frontend lo reciba
+            String qrUrl = frontendUrl + "/FormularioQRAsistencia?session=" + sessionId;
+
+            // Generar el código QR con esa URL
+            byte[] qrCode = qrCodeGenerator.generateQRCodeImage(qrUrl);
 
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "image/png");
@@ -142,4 +151,3 @@ public class AttendancesController {
         }
     }
 }
-

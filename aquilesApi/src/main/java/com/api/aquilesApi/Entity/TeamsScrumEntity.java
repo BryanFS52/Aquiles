@@ -33,7 +33,7 @@ public class TeamsScrumEntity implements Serializable {
     @JoinColumn(name = "checklist_id", nullable = false)
     private ChecklistEntity checklist;
 
-    @OneToMany(mappedBy = "fk_team_scrum_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL) // Mapea esta propiedad a una relación uno a muchos con la entidad Students
+    @OneToMany(mappedBy = "fk_team_scrum_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<StudentsEntity> studentList;
 
     @OneToMany(mappedBy = "fk_team_scrum_id", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -41,6 +41,6 @@ public class TeamsScrumEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "team_scrum_id")
-    private Teams_ScrumEntity teamScrum;
+    private TeamsScrumEntity teamScrum;
 
 }

@@ -1,16 +1,13 @@
 {
-    "name": "aquiles-monorepo",
-    "private": true,
-    "workspaces": [
-      "frontend"
-    ],
-    "scripts": {
+  "name": "aquiles-monorepo",
+  "private": true,
+  "workspaces": ["frontend"],
+  "scripts": {
     "start:frontend": "npm --workspace frontend run dev",
-    "start:aquilesApi": "cd aquilesApi && [ -f gradlew.bat ] && ./gradlew.bat bootRun || ./gradlew bootRun",
+    "start:aquilesApi": "cd aquilesApi && ./gradlew bootRun",
     "dev": "concurrently --names \"FRONTEND,BACKEND\" --prefix-colors \"green,blue\" \"npm run start:frontend\" \"npm run start:aquilesApi\""
-    },
-    "devDependencies": {
-      "concurrently": "^8.2.0"
-    }
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
   }
-  
+}

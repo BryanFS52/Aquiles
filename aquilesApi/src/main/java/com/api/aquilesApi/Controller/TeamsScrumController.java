@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/teamScrum")
-public class Teams_ScrumController {
+public class TeamsScrumController {
 
     @Autowired
     private TeamsScrumBusiness teamsScrumBusiness;
