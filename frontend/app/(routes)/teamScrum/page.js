@@ -46,7 +46,7 @@ export default function Home() {
     createTeamScrum(team)
       .then(() => {
         fetchTeams(); 
-        toast.success('¡Nuevo Proyecto creado con éxito!');
+        toast.success('¡Nuevo Team creado con éxito!');
         handleCloseModal(); 
       })
       .catch(error => {

@@ -73,7 +73,6 @@ public class AttendancesBusiness {
     }
 
     // Find All
-
     public Page<AttendancesDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);

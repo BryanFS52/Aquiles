@@ -31,17 +31,23 @@ public class TeamsScrumBusiness {
 
     // Validación Objeto
     private TeamsScrumDto validationObject(Map<String, Object> json, TeamsScrumDto teamsScrumDto) {
-        // Extrae datos del objeto JSON
         JSONObject dataObject = util.getData(json);
 
-        // Asigna el valor del JSON al DTO
-        teamsScrumDto.setTeamScrumId(dataObject.getLong("teamScrumId"));
-        teamsScrumDto.setNameProject(dataObject.getString("nameProject"));
+        // Solo si viene el teamScrumId lo asignamos y validamos
+        if (dataObject.has("teamScrumId")) {
+            teamsScrumDto.setTeamScrumId(dataObject.getLong("teamScrumId"));
 
-        // Aquí puedes agregar validaciones adicionales, por ejemplo:
-        if (teamsScrumDto.getTeamScrumId() == null || teamsScrumDto.getTeamScrumId() <= 0) {
-            throw new CustomException("Invalid Team Scrum ID", HttpStatus.BAD_REQUEST);
+            if (teamsScrumDto.getTeamScrumId() == null || teamsScrumDto.getTeamScrumId() <= 0) {
+                throw new CustomException("Invalid Team Scrum ID", HttpStatus.BAD_REQUEST);
+            }
         }
+
+        // nameProject es obligatorio siempre
+        if (!dataObject.has("nameProject")) {
+            throw new CustomException("Project name is required", HttpStatus.BAD_REQUEST);
+        }
+
+        teamsScrumDto.setNameProject(dataObject.getString("nameProject"));
 
         if (teamsScrumDto.getNameProject() == null || teamsScrumDto.getNameProject().isEmpty()) {
             throw new CustomException("Project name cannot be empty", HttpStatus.BAD_REQUEST);
@@ -49,6 +55,7 @@ public class TeamsScrumBusiness {
 
         return teamsScrumDto;
     }
+
 
     // Find All
     public Page<TeamsScrumDto> findAll(int page , int size) {

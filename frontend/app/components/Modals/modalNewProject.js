@@ -76,7 +76,7 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
                 Cancelar
               </button>
               <button
-                className={`text-sm hover:bg-[#01b001] transition-colors duration-300 focus:outline-none rounded-md bg-custom-blue px-8 py-4 border text-white
+                className={`text-sm bg-lightGreen transition-colors duration-300 focus:outline-none rounded-md bg-custom-blue px-8 py-4 border text-white
                   ${modalTransition ? "scale-100 opacity-100" : "scale-75 opacity-0"}
                 `}
                 onClick={handleCreateTeam}

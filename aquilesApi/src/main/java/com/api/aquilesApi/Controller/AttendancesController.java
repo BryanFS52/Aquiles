@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@CrossOrigin(origins = "https://6c12-179-1-218-161.ngrok-free.app")
+@CrossOrigin(origins = "https://18e5-179-1-218-161.ngrok-free.app")
 @RequestMapping(path = "/api/attendances", method = {
         RequestMethod.DELETE,
         RequestMethod.GET,
@@ -40,7 +40,7 @@ public class AttendancesController {
             Page<AttendancesDto> attendancesDtoPage = attendancesBusiness.findAll(page, size);
             Map<String, Object> response = ResponseHttpApi.responseHttpFindAll(
                     attendancesDtoPage.getContent(),
-                    ResponseHttpApi.CODE_OK,
+                        ResponseHttpApi.CODE_OK,
                     "Successfully Completed",
                     attendancesDtoPage.getSize(),
                     attendancesDtoPage.getTotalPages(),

@@ -1,15 +1,13 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.List;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString(exclude = {"studentList", "projectList"})
 @Getter
 @Setter
@@ -42,5 +40,4 @@ public class TeamsScrumEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "team_scrum_id")
     private TeamsScrumEntity teamScrum;
-
 }
