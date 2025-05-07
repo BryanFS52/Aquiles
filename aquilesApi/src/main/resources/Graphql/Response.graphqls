@@ -1,0 +1,10 @@
+type Response {
+    id : ID
+    message : String
+    code : String
+}
+
+type Query {
+}
+type Mutation {
+}

@@ -2,12 +2,10 @@ package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.AttendancesDto;
 import com.api.aquilesApi.Entity.AttendancesEntity;
-import com.api.aquilesApi.Entity.StateAttendanceEntity;
 import com.api.aquilesApi.Service.AttendancesService;
 import com.api.aquilesApi.Service.StateAttendanceService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
-import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -36,7 +34,8 @@ public class AttendancesBusiness {
     private final ModelMapper modelMapper = new ModelMapper();
 
     // Validación Objeto
-    private AttendancesDto validationObject(Map<String, Object> json, AttendancesDto attendancesDTO) {
+    private void validationObject(Map<String, Object> json, AttendancesDto attendancesDTO) {
+        /*
         // Extrae datos del objeto JSON
         JSONObject dataObject = util.getData(json);
 
@@ -61,8 +60,9 @@ public class AttendancesBusiness {
         }
 
         return attendancesDTO;
-    }
 
+         */
+    }
     private Date convertToDate(String dateString) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         try {
@@ -103,37 +103,20 @@ public class AttendancesBusiness {
     }
 
     // Add
-    public void add(Map<String, Object> json) {
+    public AttendancesDto add(AttendancesDto attendancesDto) {
         try {
-            AttendancesDto attendancesDto = new AttendancesDto();
-            attendancesDto.setAttendanceId(((Number) json.get("attendanceId")).longValue());
-            attendancesDto.setAttendanceDate(convertToDate((String) json.get("attendanceDate")));
-
-            Long stateAttendanceId = ((Number) json.get("fk_stateAttendance_id")).longValue();
-            StateAttendanceEntity stateAttendanceEntity = stateAttendanceService.getById(stateAttendanceId);
-
-            if (stateAttendanceEntity == null) {
-                throw new CustomException("State Attendance not found for id: " + stateAttendanceId, HttpStatus.BAD_REQUEST);
-            }
-
-            // Asigna el estado de asistencia
-            attendancesDto.setStateAttendance(stateAttendanceEntity); // Aquí asignas el objeto StateAttendanceEntity
-
-            // Convierte el DTO a entidad y guarda
-            var attendance = modelMapper.map(attendancesDto, AttendancesEntity.class);
-            this.attendancesService.create(attendance);
-        } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
-        } catch (Exception e) {
-            throw new CustomException("Error Creating Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            AttendancesEntity attendancesEntity = modelMapper.map(attendancesDto, AttendancesEntity.class);
+            return modelMapper.map(attendancesService.save(attendancesEntity), AttendancesDto.class);
+        }catch ( Exception e){
+            throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);
         }
     }
 
     // update
-    public void update(Long attendanceId, Map<String, Object> json) {
+    public void update(Long attendanceId, AttendancesDto attendancesDto) {
         try {
-            var attendanceDto = modelMapper.map(attendancesService.getById(attendanceId), AttendancesDto.class);
-            var attendance = modelMapper.map(this.validationObject(json, attendanceDto), AttendancesEntity.class);
+            attendancesDto.setAttendanceId(attendanceId);
+            AttendancesEntity attendance = modelMapper.map( attendancesDto, AttendancesEntity.class);
             attendancesService.save(attendance);
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada

@@ -1,17 +1,6 @@
 package com.api.aquilesApi.Controller;
 
-import com.api.aquilesApi.Business.StateAttendancesBusiness;
-import com.api.aquilesApi.Dto.StateAttendanceDto;
-import com.api.aquilesApi.Utilities.CustomException;
-import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
-
+/*
 @RestController
 @RequestMapping("api/stateAttendance")
 public class StateAttendanceController {
@@ -146,5 +135,5 @@ public class StateAttendanceController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }
+ */

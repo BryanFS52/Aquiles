@@ -2,30 +2,23 @@ package com.api.aquilesApi.Controller;
 
 import com.api.aquilesApi.Business.AttendancesBusiness;
 import com.api.aquilesApi.Dto.AttendancesDto;
-import com.api.aquilesApi.Utilities.CustomException;
+import com.api.aquilesApi.Dto.QRCodePayload;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.api.aquilesApi.Utilities.QrCodeGenerator;
-import com.google.zxing.WriterException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpHeaders;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
 
-import java.io.IOException;
+import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
 
-@RestController
-@CrossOrigin(origins = "https://18e5-179-1-218-161.ngrok-free.app")
-@RequestMapping(path = "/api/attendances", method = {
-        RequestMethod.DELETE,
-        RequestMethod.GET,
-        RequestMethod.POST,
-        RequestMethod.PUT
-})
+@Controller
 public class AttendancesController {
     @Autowired
     private AttendancesBusiness attendancesBusiness;
@@ -33,121 +26,103 @@ public class AttendancesController {
     @Autowired
     private QrCodeGenerator qrCodeGenerator;
 
-    @GetMapping("/all")
-    public ResponseEntity<Map<String, Object>> findAll(@RequestParam(defaultValue = "0") int page,
-                                                       @RequestParam(defaultValue = "10") int size) {
+    @QueryMapping
+    public Map<String, Object> allAttendances(@Argument int page, @Argument int size) {
         try {
             Page<AttendancesDto> attendancesDtoPage = attendancesBusiness.findAll(page, size);
-            Map<String, Object> response = ResponseHttpApi.responseHttpFindAll(
-                    attendancesDtoPage.getContent(),
-                        ResponseHttpApi.CODE_OK,
-                    "Successfully Completed",
-                    attendancesDtoPage.getSize(),
-                    attendancesDtoPage.getTotalPages(),
-                    (int) attendancesDtoPage.getTotalElements());
 
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return ResponseHttpApi.responseHttpFindAll(
+                    attendancesDtoPage.getContent(),
+                    ResponseHttpApi.CODE_OK,
+                    "Query ok",
+                    attendancesDtoPage.getTotalPages(),
+                    page,
+                    (int) attendancesDtoPage.getTotalElements()
+            );
         } catch (Exception e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping("/find/{id}")
-    public ResponseEntity<Map<String, Object>> findById(@PathVariable Long id) {
+    @QueryMapping
+    public Map<String, Object> attendanceById(@Argument Long id) {
         try {
-            AttendancesDto attendancesDto = this.attendancesBusiness.findById(id);
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpFindId(
+            AttendancesDto attendancesDto = attendancesBusiness.findById(id);
+            return ResponseHttpApi.responseHttpFindId(
                     attendancesDto,
                     ResponseHttpApi.CODE_OK,
-                    "Successfully Completed"),
-                    HttpStatus.OK);
-        } catch (CustomException e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                    HttpStatus.BAD_REQUEST);
+                    "query by id ok"
+            );
         } catch (Exception e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error getting attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<Map<String, Object>> add(@RequestBody Map<String, Object> json) {
+    @MutationMapping
+    public Map<String, Object> addAttendance(@Argument("input") AttendancesDto attendancesDto) {
         try {
-            attendancesBusiness.add(json);
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
+             AttendancesDto attendancesDto1 = attendancesBusiness.add(attendancesDto);
+            return ResponseHttpApi.responseHttpAction(
+                    attendancesDto1.getAttendanceId(),
                     ResponseHttpApi.CODE_OK,
-                    "Attendance added successfully"),
-                    HttpStatus.CREATED);
-        } catch (CustomException e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                    HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error adding attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+                    "add ok"
+            );
+        }catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error adding attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Map<String, Object>> update(@PathVariable Long id, @RequestBody Map<String, Object> json) {
+    @MutationMapping
+    public Map<String, Object> updateAttendance(@Argument Long id, @Argument ("input")AttendancesDto attendancesDto) {
         try {
-            attendancesBusiness.update(id, json);
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
-                    ResponseHttpApi.CODE_OK, "Attendance updated successfully"), HttpStatus.OK);
-        } catch (CustomException e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                    HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error updating attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+             attendancesBusiness.update(id, attendancesDto );
+            return ResponseHttpApi.responseHttpAction(
+                    id,
+                    ResponseHttpApi.CODE_OK,
+                    "update ok"
+            );
+        }
+        catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error updating attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Map<String, Object>> delete(@PathVariable Long id) {
+    @MutationMapping
+    public Map<String, Object> deleteAttendance(@Argument Long id) {
         try {
             attendancesBusiness.delete(id);
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
-                    ResponseHttpApi.CODE_OK, "Attendance deleted successfully"),
-                    HttpStatus.OK);
-        } catch (CustomException e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                    HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error deleting attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseHttpApi.responseHttpAction(
+                   id,
+                   ResponseHttpApi.CODE_OK,
+                    "delete ok"
+            );
+        }
+        catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error deleting attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 
     // Generate Qr
     @Value("${frontend.url}")
     private String frontendUrl;
-    @GetMapping("/generateQRCode")
-    public ResponseEntity<byte[]> generateQRCode() {
-        try {
-            // Generar un UUID como identificador único de la sesión de asistencia
-            String sessionId = UUID.randomUUID().toString();
+    @MutationMapping
+    public QRCodePayload generateQRCode() throws Exception {
+        String sessionId = UUID.randomUUID().toString();
+        String qrUrl = frontendUrl + "/FormularioQRAsistencia?session=" + sessionId;
 
-            // Construir la URL con ese sessionId para que el frontend lo reciba
-            String qrUrl = frontendUrl + "/FormularioQRAsistencia?session=" + sessionId;
+        byte[] qrCode = qrCodeGenerator.generateQRCodeImage(qrUrl);
+        String qrCodeBase64 = Base64.getEncoder().encodeToString(qrCode);
 
-            // Generar el código QR con esa URL
-            byte[] qrCode = qrCodeGenerator.generateQRCodeImage(qrUrl);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Content-Type", "image/png");
-            return new ResponseEntity<>(qrCode, headers, HttpStatus.OK);
-        } catch (WriterException | IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+        return new QRCodePayload(sessionId, qrCodeBase64, qrUrl);
     }
+
 }

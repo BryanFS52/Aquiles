@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -24,7 +23,7 @@ public class AttendancesEntity implements Serializable {
 
     @Timestamp
     @Column(name = "attendance_date", nullable = false)
-    private Date attendanceDate;
+    private String attendanceDate;
 
     // Relations
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -7,8 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-
 @Repository
 public interface AttendancesRepository extends JpaRepository<AttendancesEntity, Long> {
 
@@ -19,6 +17,6 @@ public interface AttendancesRepository extends JpaRepository<AttendancesEntity, 
     long countAbsentByTrainerId(@Param("trainerId") Long trainerId, @Param("absentStateId") Long absentStateId);
 
 
-    boolean existsByAttendanceDateAndStateAttendance(Date attendanceDate, StateAttendanceEntity stateAttendance);
+    boolean existsByAttendanceDateAndStateAttendance(String attendanceDate, StateAttendanceEntity stateAttendance);
 
 }

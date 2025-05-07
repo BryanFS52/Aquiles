@@ -11,8 +11,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-
 @Service
 public class AttendancesService implements Idao<AttendancesEntity , Long> {
 
@@ -60,7 +58,7 @@ public class AttendancesService implements Idao<AttendancesEntity , Long> {
         return attendancesRepository.countAbsentByTrainerId(trainerId, absentStateId);
     }
 
-    public boolean existsByAttendanceDateAndStateAttendance(Date attendanceDate, StateAttendanceEntity stateAttendance) {
+    public boolean existsByAttendanceDateAndStateAttendance(String attendanceDate, StateAttendanceEntity stateAttendance) {
         return attendancesRepository.existsByAttendanceDateAndStateAttendance(attendanceDate , stateAttendance);
     }
 }

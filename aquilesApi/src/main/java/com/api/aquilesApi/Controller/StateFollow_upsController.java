@@ -1,17 +1,6 @@
 package com.api.aquilesApi.Controller;
 
-import com.api.aquilesApi.Business.StateFollow_upsBusiness;
-import com.api.aquilesApi.Dto.StateFollow_upsDto;
-import com.api.aquilesApi.Utilities.CustomException;
-import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
-
+/*
 @RestController
 @RequestMapping("api/stateFollowUp")
 public class StateFollow_upsController {
@@ -138,3 +127,4 @@ public class StateFollow_upsController {
             }
         }
 }
+ */
