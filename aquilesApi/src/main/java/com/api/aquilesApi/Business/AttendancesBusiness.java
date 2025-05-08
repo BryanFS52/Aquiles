@@ -112,7 +112,7 @@ public class AttendancesBusiness {
         }
     }
 
-    // update
+    // Update
     public void update(Long attendanceId, AttendancesDto attendancesDto) {
         try {
             attendancesDto.setAttendanceId(attendanceId);
@@ -125,7 +125,7 @@ public class AttendancesBusiness {
         }
     }
 
-    // delete
+    // Delete
     public void delete(Long attendanceId) {
         try {
             AttendancesEntity attendances = attendancesService.getById(attendanceId);

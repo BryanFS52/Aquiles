@@ -114,34 +114,21 @@ public class TrainersBusiness {
     }
 
     // Add
-    public void add (Map<String , Object> json){
+    public TrainersDto add (TrainersDto trainersDto){
         try {
-            TrainersDto trainersDto = new TrainersDto();
-
-            // Validar Y Asignar Datos Del JSON al DTO
-            trainersDto = validationObject(json , trainersDto);
-
-            // Convertir El Dto A Entidad
-            TrainersEntity trainersEntity = modelMapper.map(trainersDto , TrainersEntity.class);
-
-            // Guardar La Entidad
-            trainersService.create(trainersEntity);
-
-        } catch (CustomException e){
-            throw e;
+            TrainersEntity trainerEntity = modelMapper.map(trainersDto , TrainersEntity.class);
+            return modelMapper.map(trainersService.save(trainerEntity) , TrainersDto.class);
         } catch (Exception e){
             throw new CustomException("Error Creating Trainer: " + e.getMessage() , HttpStatus.BAD_REQUEST);
         }
     }
 
     // Update
-    public void update(Long trainerId , Map<String , Object> json){
+    public void update(Long trainerId , TrainersDto trainersDto){
         try {
-            var trainerDto = modelMapper.map(trainersService.getById(trainerId) , TrainersDto.class);
-            var trainer = modelMapper.map(this.validationObject(json , trainerDto) , TrainersEntity.class);
-            trainersService.save(trainer);
-        } catch (CustomException e){
-            throw e;
+            trainersDto.setTrainerId(trainerId);
+            TrainersEntity trainerEntity = modelMapper.map(trainersDto , TrainersEntity.class);
+            trainersService.save(trainerEntity);
         } catch (Exception e){
             throw new CustomException("Error Updating Trainer: " + e.getMessage() , HttpStatus.BAD_REQUEST);
         }

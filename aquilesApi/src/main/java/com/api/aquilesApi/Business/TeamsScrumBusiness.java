@@ -92,35 +92,21 @@ public class TeamsScrumBusiness {
 
 
     // Add
-    public void add(Map<String, Object> json) {
+    public TeamsScrumDto add(TeamsScrumDto teamsScrumDto) {
         try {
-            // Crear un nuevo DTO
-            TeamsScrumDto teamsScrumDto = new TeamsScrumDto();
-
-            // Validar y asignar datos del JSON al DTO
-            teamsScrumDto = validationObject(json, teamsScrumDto);
-
-            // Convertir el DTO a entidad
             TeamsScrumEntity teamsScrumEntity = modelMapper.map(teamsScrumDto, TeamsScrumEntity.class);
-
-            // Guardar la entidad
-            teamScrumService.create(teamsScrumEntity);
-        } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
+            return modelMapper.map(teamScrumService.save(teamsScrumEntity), TeamsScrumDto.class);
         } catch (Exception e) {
-            throw new CustomException("Error Creating Team Scrum: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     // Update
-
-    public void update(Long teamScrumId , Map<String , Object> json){
+    public void update(Long teamScrumId , TeamsScrumDto teamsScrumDto){
         try {
-            var teamScrumDto = modelMapper.map(teamScrumService.getById(teamScrumId) , TeamsScrumDto.class);
-            var teamScrum = modelMapper.map(this.validationObject(json , teamScrumDto) , TeamsScrumEntity.class);
-            teamScrumService.save(teamScrum);
-        } catch (CustomException e){
-            throw e;
+            teamsScrumDto.setTeamScrumId(teamScrumId);
+            TeamsScrumEntity teamsScrumEntity = modelMapper.map(teamsScrumDto, TeamsScrumEntity.class);
+            teamScrumService.save(teamsScrumEntity);
         } catch (Exception e){
             throw new CustomException("Error Updating Team Scrum: " + e.getMessage() , HttpStatus.BAD_REQUEST);
         }

@@ -5,7 +5,6 @@ import com.api.aquilesApi.Dto.AttendancesDto;
 import com.api.aquilesApi.Dto.QRCodePayload;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.api.aquilesApi.Utilities.QrCodeGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -20,12 +19,15 @@ import java.util.UUID;
 
 @Controller
 public class AttendancesController {
-    @Autowired
-    private AttendancesBusiness attendancesBusiness;
+    private final AttendancesBusiness attendancesBusiness;
+    private final QrCodeGenerator qrCodeGenerator;
 
-    @Autowired
-    private QrCodeGenerator qrCodeGenerator;
+    public AttendancesController(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator) {
+        this.attendancesBusiness = attendancesBusiness;
+        this.qrCodeGenerator = qrCodeGenerator;
+    };
 
+    // End-Point Para Traer Todos Los Attendances (GraphQL)
     @QueryMapping
     public Map<String, Object> allAttendances(@Argument int page, @Argument int size) {
         try {
@@ -43,8 +45,9 @@ public class AttendancesController {
             return ResponseHttpApi.responseHttpError(
                     "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    };
 
+    // End-Point Para Traer Un Attendance Por Id (GraphQL)
     @QueryMapping
     public Map<String, Object> attendanceById(@Argument Long id) {
         try {
@@ -52,15 +55,16 @@ public class AttendancesController {
             return ResponseHttpApi.responseHttpFindId(
                     attendancesDto,
                     ResponseHttpApi.CODE_OK,
-                    "query by id ok"
+                    "Query by id ok"
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
-    }
+    };
 
+    // End-Point Para Crear Un Nuevo Attendance (GraphQL)
     @MutationMapping
     public Map<String, Object> addAttendance(@Argument("input") AttendancesDto attendancesDto) {
         try {
@@ -68,15 +72,16 @@ public class AttendancesController {
             return ResponseHttpApi.responseHttpAction(
                     attendancesDto1.getAttendanceId(),
                     ResponseHttpApi.CODE_OK,
-                    "add ok"
+                    "Add ok"
             );
         }catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error adding attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
-    }
+    };
 
+    // End-point para actualizar Attendance (GraphQL)
     @MutationMapping
     public Map<String, Object> updateAttendance(@Argument Long id, @Argument ("input")AttendancesDto attendancesDto) {
         try {
@@ -84,7 +89,7 @@ public class AttendancesController {
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
-                    "update ok"
+                    "Update ok"
             );
         }
         catch (Exception e) {
@@ -92,8 +97,9 @@ public class AttendancesController {
                     "Error updating attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
-    }
+    };
 
+    // End-point para eliminar Attendance (GraphQL)
     @MutationMapping
     public Map<String, Object> deleteAttendance(@Argument Long id) {
         try {
@@ -101,7 +107,7 @@ public class AttendancesController {
             return ResponseHttpApi.responseHttpAction(
                    id,
                    ResponseHttpApi.CODE_OK,
-                    "delete ok"
+                    "Delete ok"
             );
         }
         catch (Exception e) {
@@ -109,9 +115,9 @@ public class AttendancesController {
                     "Error deleting attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
-    }
+    };
 
-    // Generate Qr
+    // End-Point Para Generar QR (GraphQL)
     @Value("${frontend.url}")
     private String frontendUrl;
     @MutationMapping
@@ -123,6 +129,5 @@ public class AttendancesController {
         String qrCodeBase64 = Base64.getEncoder().encodeToString(qrCode);
 
         return new QRCodePayload(sessionId, qrCodeBase64, qrUrl);
-    }
-
+    };
 }

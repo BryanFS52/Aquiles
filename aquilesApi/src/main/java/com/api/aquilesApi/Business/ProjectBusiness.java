@@ -100,17 +100,13 @@ public class ProjectBusiness {
         }
     }
 
-    // add
-    public void add(Map<String, Object> json) {
+    // Add
+    public ProjectDto add(ProjectDto projectDto) {
         try {
-            ProjectDto projectDto = new ProjectDto();
-            projectDto = validationObject(json, projectDto);
-
             ProjectEntity projectEntity = modelMapper.map(projectDto, ProjectEntity.class);
             TeamsScrumEntity teamScrum = teamScrumService.getById(projectDto.getFk_team_scrum_id());
             projectEntity.setFk_team_scrum_id(teamScrum);
-
-            projectService.create(projectEntity);
+            return modelMapper.map(projectService.save(projectEntity), ProjectDto.class);
 
         } catch (CustomException e) {
             throw e;
@@ -120,10 +116,10 @@ public class ProjectBusiness {
     }
 
     // Update
-    public void update(Long projectId, Map<String, Object> json){
+    public void update(Long projectId, ProjectDto projectDto) {
         try {
-            ProjectDto projectDto = modelMapper.map(projectService.getById(projectId), ProjectDto.class);
-            ProjectEntity projectEntity = modelMapper.map(this.validationObject(json, projectDto), ProjectEntity.class);
+            projectDto.setProjectId(projectId);
+            ProjectEntity projectEntity = modelMapper.map(projectDto, ProjectEntity.class);
             projectService.save(projectEntity);
         } catch (CustomException e){
             throw e;

@@ -2,7 +2,6 @@ package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.DiarySustainationsDto;
 import com.api.aquilesApi.Entity.DiarySustainationsEntity;
-import com.api.aquilesApi.Entity.JuriesEntity;
 import com.api.aquilesApi.Service.DiarySustainationsService;
 import com.api.aquilesApi.Service.JuriesService;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -16,13 +15,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component

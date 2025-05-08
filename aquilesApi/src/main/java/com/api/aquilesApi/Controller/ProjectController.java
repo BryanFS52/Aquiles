@@ -1,127 +1,119 @@
 package com.api.aquilesApi.Controller;
 
-/*
-@RestController
-@RequestMapping("api/project")
+import com.api.aquilesApi.Business.ProjectBusiness;
+import com.api.aquilesApi.Dto.ProjectDto;
+import com.api.aquilesApi.Utilities.CustomException;
+import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
+import org.springframework.data.domain.Page;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import java.util.Map;
+
+@Controller
 public class ProjectController {
 
-    @Autowired
-    private ProjectBusiness projectBusiness;
+    private final ProjectBusiness projectBusiness;
+    public ProjectController(ProjectBusiness projectBusiness) {
+        this.projectBusiness = projectBusiness;
+    }
 
-    //End-Point Para Traer Todos Los Proyectos
-    @GetMapping("/all")
-    public ResponseEntity<Map<String , Object>> findAll (@RequestParam(defaultValue = "0") int page,
-                                                         @RequestParam(defaultValue = "10") int size){
+    //End-Point Para Traer Todos Los Proyectos (GraphQL)
+    @QueryMapping
+    public Map<String , Object> findAll (@Argument int page, @Argument int size){
         try {
             Page<ProjectDto> projectDtoPage = projectBusiness.findAll(page , size);
             if(!projectDtoPage.isEmpty()){
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpFindAll(
+                return ResponseHttpApi.responseHttpFindAll(
                         projectDtoPage.getContent(),
                         ResponseHttpApi.CODE_OK,
                         "Successfully Completed",
                         projectDtoPage.getSize(),
                         projectDtoPage.getTotalPages(),
-                        (int) projectDtoPage.getTotalElements()),
-                        HttpStatus.OK);
+                        (int) projectDtoPage.getTotalElements());
             }else {
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpFindAll(
+                return ResponseHttpApi.responseHttpFindAll(
                         null,
                         ResponseHttpApi.NO_CONTENT,
                         "No attendances found",
                         0,
                         0,
-                        0),
-                        HttpStatus.NO_CONTENT);
+                        0);
             }
         }  catch (Exception e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error retrieving Project: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving Project: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
 
-    //End-Point Para Traer Por Id
-    @GetMapping("/find/{id}")
-    public ResponseEntity<Map<String , Object>> findById(@PathVariable Long id){
+    //End-Point Para Traer Poroyecto por Id (GraphQL)
+    @QueryMapping
+    public Map<String , Object> findById(@Argument Long id){
         try {
             ProjectDto projectDto = this.projectBusiness.findById(id);
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpFindId(
+            return ResponseHttpApi.responseHttpFindId(
                     projectDto,
                     ResponseHttpApi.CODE_OK,
-                    "Successfully Completed"),
-                    HttpStatus.OK);
+                    "Successfully Completed");
         } catch (CustomException e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                    HttpStatus.BAD_REQUEST);
+            return ResponseHttpApi.responseHttpError(
+                    e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error getting Project By Id: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseHttpApi.responseHttpError(
+                    "Error getting Project By Id: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-
-
-    //End-Point Para Crear Un Nuevo Proyecto
-    @PostMapping("/create")
-    public ResponseEntity<Map<String , Object>> add(@RequestBody Map<String , Object> json){
+    //End-Point Para Crear Un Nuevo Proyecto (GraphQL)
+    @MutationMapping
+    public Map<String , Object> add(@Argument ProjectDto projectDto){
         try {
-            projectBusiness.add(json);
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
+            ProjectDto projectDto1 = projectBusiness.add(projectDto);
+            return ResponseHttpApi.responseHttpAction(
+                    projectDto1.getProjectId(),
                     ResponseHttpApi.CODE_OK,
-                    "Project added successfully"),
-                    HttpStatus.CREATED);
-        } catch (CustomException e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                    HttpStatus.BAD_REQUEST);
+                    "Project added successfully");
         } catch (Exception e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error adding Project: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseHttpApi.responseHttpError(
+                    "Error adding Project: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    //End-Point Para Actualizar Un Proyecto
-    @PutMapping("/update")
-    public ResponseEntity<Map<String , Object>> update(@PathVariable Long id , @RequestBody Map<String , Object> json){
+    //End-Point Para Actualizar Un Proyecto (GraphQL)
+    @MutationMapping
+    public Map<String , Object> update(@Argument Long id , @Argument ("input") ProjectDto projectDto){
         try {
-            projectBusiness.update(id , json);
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
-                    ResponseHttpApi.CODE_OK, "Project updated successfully"), HttpStatus.OK);
-        }catch (CustomException e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                    HttpStatus.BAD_REQUEST);
+            projectBusiness.update(id , projectDto);
+            return ResponseHttpApi.responseHttpAction(
+                    id,
+                    ResponseHttpApi.CODE_OK,
+                    "Update successfully"
+            );
         } catch (Exception e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error updating Project: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseHttpApi.responseHttpError(
+                    "Error updating Project: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    };
 
 
-    //End-Point Para Eliminar Un Project
-    @DeleteMapping("/delete")
-    public ResponseEntity<Map<String , Object>> delete (@PathVariable Long id){
+    //End-Point Para Eliminar Un Project (GraphQL)
+    @MutationMapping
+    public Map<String , Object> delete (@Argument Long id){
         {
             try {
                 projectBusiness.delete(id);
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
-                        ResponseHttpApi.CODE_OK, "Project deleted successfully"),
-                        HttpStatus.OK);
-            } catch (CustomException e) {
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                        e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                        HttpStatus.BAD_REQUEST);
+                return ResponseHttpApi.responseHttpAction(
+                        id,
+                        ResponseHttpApi.CODE_OK,
+                        "Delete successfully"
+                );
             } catch (Exception e) {
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                        "Error deleting Project: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
+                return ResponseHttpApi.responseHttpError(
+                        "Error deleting Project: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
     }
 }
- */

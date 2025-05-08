@@ -1,20 +1,21 @@
 package com.api.aquilesApi.Controller;
 
 /*
-@RestController
-@RequestMapping("api/followUp")
+@Controller
 public class Follow_upsController {
-    @Autowired
-    private Follow_upsBusiness followUpsBusiness;
+    private final Follow_upsBusiness followUpsBusiness;
+
+    public Follow_upsController(Follow_upsBusiness followUpsBusiness) {
+        this.followUpsBusiness = followUpsBusiness;
+    }
 
     //End-Point Para Traer Todos Los Follow Ups
-    @GetMapping("/all")
-    public ResponseEntity<Map<String , Object>> findAll(@RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "10") int size){
+    @QueryMapping
+    public Map<String , Object> findAll(@Argument int page, @Argument int size){
         try {
             Page<Follow_upsDto> followUpsDtoPage = followUpsBusiness.findAll(page, size);
             if (!followUpsDtoPage.isEmpty()){
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpFindAll(
+                return ResponseHttpApi.responseHttpFindAll(
                         followUpsDtoPage.getContent(),
                         ResponseHttpApi.CODE_OK,
                         "Successfully Completed",
@@ -22,8 +23,9 @@ public class Follow_upsController {
                         followUpsDtoPage.getTotalPages(),
                         (int) followUpsDtoPage.getTotalElements()),
                         HttpStatus.OK);
+                );
             } else {
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpFindAll(
+                return ResponseHttpApi.responseHttpFindAll(
                         null,
                         ResponseHttpApi.NO_CONTENT,
                         "No Follow Up found",
@@ -31,6 +33,7 @@ public class Follow_upsController {
                         0,
                         0),
                         HttpStatus.NO_CONTENT);
+                );
             }
         } catch (Exception e){
             return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
@@ -119,5 +122,3 @@ public class Follow_upsController {
     }
 }
  */
-
-

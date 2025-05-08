@@ -1,123 +1,121 @@
 package com.api.aquilesApi.Controller;
 
-/*
-@RestController
-@RequestMapping("api/trainers")
+import com.api.aquilesApi.Business.TrainersBusiness;
+import com.api.aquilesApi.Dto.TrainersDto;
+import com.api.aquilesApi.Utilities.CustomException;
+import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
+import org.springframework.data.domain.Page;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+
+import java.util.Map;
+
+@Controller
 public class TrainersController {
-    @Autowired
-    private TrainersBusiness trainersBusiness;
+
+    private final TrainersBusiness trainersBusiness;
+    public TrainersController(TrainersBusiness trainersBusiness) {
+        this.trainersBusiness = trainersBusiness;
+    }
 
     //End-Point Para Traer Todos Los Trainers
-    @GetMapping("/all")
-    public ResponseEntity<Map<String , Object>> findAll(@RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "10") int size){
+    @QueryMapping
+    public Map<String , Object> findAll(@Argument int page, @Argument int size){
         try {
             Page<TrainersDto> trainersDtoPage = trainersBusiness.findAll(page, size);
             if (!trainersDtoPage.isEmpty()){
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpFindAll(
+                return ResponseHttpApi.responseHttpFindAll(
                         trainersDtoPage.getContent(),
                         ResponseHttpApi.CODE_OK,
                         "Successfully Completed",
                         trainersDtoPage.getSize(),
                         trainersDtoPage.getTotalPages(),
-                        (int) trainersDtoPage.getTotalElements()),
-                        HttpStatus.OK);
+                        (int) trainersDtoPage.getTotalElements());
             } else {
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpFindAll(
+                return ResponseHttpApi.responseHttpFindAll(
                         null,
                         ResponseHttpApi.NO_CONTENT,
                         "No Trainers found",
                         0,
                         0,
-                        0),
-                        HttpStatus.NO_CONTENT);
+                        0);
             }
         } catch (Exception e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error retrieving Trainers: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving Trainers: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    };
 
-    // End-Point Para Traer Un Trainer Por Id
-    @GetMapping("/find/{id}")
-    public ResponseEntity<Map<String , Object>> findById(@PathVariable Long id){
+    // End-Point Para Traer Un Trainer Por Id (GraphQL)
+    @QueryMapping
+    public Map<String , Object> findById(@Argument Long id){
         try {
             TrainersDto trainersDto  = this.trainersBusiness.findById(id);
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpFindId(
+            return ResponseHttpApi.responseHttpFindId(
                     trainersDto,
                     ResponseHttpApi.CODE_OK,
-                    "Successfully Completed"),
-                    HttpStatus.OK);
+                    "Successfully Completed");
         } catch (CustomException e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                    HttpStatus.BAD_REQUEST);
+            return ResponseHttpApi.responseHttpError(
+                    e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error getting Trainer: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseHttpApi.responseHttpError(
+                    "Error getting Trainer: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    };
 
 
-    //End-Point Para Crear Un Nuevo Trainer
-    @PostMapping("/create")
-    public ResponseEntity<Map<String , Object>> add (@RequestBody Map<String , Object> json){
+    //End-Point Para Crear Un Nuevo Trainer (GraphQL)
+    @MutationMapping
+    public Map<String , Object> add (@Argument TrainersDto trainerDto){
         try {
-            trainersBusiness.add(json);
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
+             TrainersDto trainerDto1 = trainersBusiness.add(trainerDto);
+            return  ResponseHttpApi.responseHttpAction(
+                    trainerDto1.getTrainerId(),
                     ResponseHttpApi.CODE_OK,
-                    "Trainer added successfully"),
-                    HttpStatus.CREATED);
-        }catch (CustomException e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                    HttpStatus.BAD_REQUEST);
+                    "Trainer added successfully");
         } catch (Exception e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error adding Trainer: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseHttpApi.responseHttpError(
+                    "Error adding Trainer: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    };
 
 
-    //End-Point Para Actualizar Un Trainer
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Map<String , Object>> update (@PathVariable Long id , @RequestBody Map<String , Object> json){
+    //End-Point Para Actualizar Un Trainer (GraphQL)
+    @MutationMapping
+    public Map<String , Object> update (@Argument Long id , @Argument TrainersDto trainerDto){
         try {
-            trainersBusiness.update(id , json);
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
-                    ResponseHttpApi.CODE_OK, "Trainer updated successfully"), HttpStatus.OK);
+            trainersBusiness.update(id , trainerDto);
+            return  ResponseHttpApi.responseHttpAction(
+                    id,
+                    ResponseHttpApi.CODE_OK,
+                    "Update ok"
+            );
         } catch (CustomException e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                    HttpStatus.BAD_REQUEST);
+            return ResponseHttpApi.responseHttpError(
+                    e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error updating Trainer: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseHttpApi.responseHttpError(
+                    "Error updating Trainer: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-    }
+    };
 
     //End-Point Para Eliminar un Trainer
-    @DeleteMapping("/delete")
-    public ResponseEntity<Map<String , Object>> delete (@PathVariable Long id){
+    @MutationMapping
+    public Map<String , Object> deleteTrainer (@Argument Long id){
             try {
                 trainersBusiness.delete(id);
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
-                        ResponseHttpApi.CODE_OK, "Attendance deleted successfully"),
-                        HttpStatus.OK);
-            } catch (CustomException e) {
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                        e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                        HttpStatus.BAD_REQUEST);
+                return  ResponseHttpApi.responseHttpAction(
+                        id,
+                        ResponseHttpApi.CODE_OK,
+                        "Delete ok"
+                );
             } catch (Exception e) {
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                        "Error deleting attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
+                return ResponseHttpApi.responseHttpError(
+                        "Error deleting attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-    }
+    };
 }
- */

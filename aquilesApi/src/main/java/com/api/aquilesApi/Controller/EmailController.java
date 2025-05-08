@@ -3,15 +3,18 @@ package com.api.aquilesApi.Controller;
 import com.api.aquilesApi.Service.EmailService;
 import com.api.aquilesApi.Utilities.EmailRequest;
 import jakarta.mail.MessagingException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS})
 public class EmailController {
-    @Autowired
-    private EmailService emailService;
+
+    private final EmailService emailService;
+
+    public EmailController(EmailService emailService) {
+        this.emailService = emailService;
+    }
 
     @PostMapping("/send-notification")
     public String sendNotification(@RequestBody EmailRequest emailRequest) {
