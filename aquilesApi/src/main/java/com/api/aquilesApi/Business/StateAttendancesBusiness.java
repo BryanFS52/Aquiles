@@ -78,46 +78,21 @@ public class StateAttendancesBusiness {
     }
 
     // Metodo Para Crear-Add Nuevo Estado
-    public void add(Map<String , Object> json){
+    public StateAttendanceDto add(StateAttendanceDto stateAttendanceDto){
         try {
-            StateAttendanceDto stateAttendanceDto = new StateAttendanceDto();
-            var stateAttendance = modelMapper.map(this.validationObject(json , stateAttendanceDto) , StateAttendanceEntity.class);
-            this.stateAttendanceService.create(stateAttendance);
-        } catch (CustomException e){
-            throw e;
+            StateAttendanceEntity stateAttendanceEntity = modelMapper.map(stateAttendanceDto, StateAttendanceEntity.class);
+            return modelMapper.map(this.stateAttendanceService.save(stateAttendanceEntity) , StateAttendanceDto.class);
         } catch (Exception e){
             throw new CustomException("Error Creating State: " + e.getMessage() , HttpStatus.BAD_REQUEST);
         }
     }
 
     // Metodo Para Editar - Actualizar Un Estado de Asistencia
-    public void update(Long stateAttendanceId, Map<String, Object> json) {
+    public void update(Long stateAttendanceId, StateAttendanceDto stateAttendanceDto) {
         try {
-            // Verificar si el estado de asistencia existe
-            var existingStateAttendance = stateAttendanceService.getById(stateAttendanceId);
-
-            if (existingStateAttendance == null) {
-                throw new CustomException("State Attendance not found", HttpStatus.NOT_FOUND);
-            }
-
-            // Extraer el estado del JSON
-            if (!json.containsKey("status")) {
-                throw new CustomException("Missing required field: status", HttpStatus.BAD_REQUEST);
-            }
-
-            // Mapear los datos a DTO y luego a la entidad
-            var stateAttendanceDto = modelMapper.map(existingStateAttendance, StateAttendanceDto.class);
-
-            // Actualizar el DTO con nuevos valores
-            stateAttendanceDto.setStatus((String) json.get("status"));
-
-            // Mapear el DTO de vuelta a la entidad
-            var stateAttendanceEntity = modelMapper.map(stateAttendanceDto, StateAttendanceEntity.class);
-
-            // Guardar la entidad actualizada
-            stateAttendanceService.save(stateAttendanceEntity);
-        } catch (CustomException e) {
-            throw e; // Propagar excepciones personalizadas
+           stateAttendanceDto.setStateAttendanceId(stateAttendanceId);
+           StateAttendanceEntity stateAttendanceEntity = modelMapper.map(stateAttendanceDto, StateAttendanceEntity.class);
+           this.stateAttendanceService.save(stateAttendanceEntity);
         } catch (Exception e) {
             throw new CustomException("Error Updating State Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }

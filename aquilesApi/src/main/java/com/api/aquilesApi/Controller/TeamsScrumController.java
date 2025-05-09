@@ -11,7 +11,6 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
 
@@ -26,7 +25,7 @@ public class TeamsScrumController {
 
     // FindAll TeamsScrums (GraphQL)
     @QueryMapping
-    public Map<String , Object> allTeamsScrums(@RequestParam int page, @RequestParam int size){
+    public Map<String , Object> allTeamsScrums(@Argument int page, @Argument int size){
         try {
             Page<TeamsScrumDto> teamsScrumDtoPage = teamsScrumBusiness.findAll(page, size);
             if (!teamsScrumDtoPage.isEmpty()){
@@ -87,7 +86,7 @@ public class TeamsScrumController {
 
     // Update TeamScrum (GraphQL)
     @MutationMapping
-    public Map<String , Object>updateTeamScrum(@Argument Long id , @Argument TeamsScrumDto teamsScrumDto){
+    public Map<String , Object>updateTeamScrum(@Argument Long id , @Argument ("input")TeamsScrumDto teamsScrumDto){
         try {
             teamsScrumBusiness.update(id, teamsScrumDto);
             return ResponseHttpApi.responseHttpAction(

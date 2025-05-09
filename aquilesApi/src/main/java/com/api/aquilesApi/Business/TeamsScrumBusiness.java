@@ -5,6 +5,7 @@ import com.api.aquilesApi.Entity.TeamsScrumEntity;
 import com.api.aquilesApi.Service.TeamScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
+import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,41 +20,20 @@ import java.util.stream.Collectors;
 @Component
 public class TeamsScrumBusiness {
 
-    @Autowired
-    private TeamScrumService teamScrumService;
-
-    @Autowired
-    private Util util;
+    private final TeamScrumService teamScrumService;
+    private final Util util;
 
     private final ModelMapper modelMapper = new ModelMapper();
-    /*
-    // Validación Objeto
-    private TeamsScrumDto validationObject(Map<String, Object> json, TeamsScrumDto teamsScrumDto) {
-        JSONObject dataObject = util.getData(json);
 
-        // Solo si viene el teamScrumId lo asignamos y validamos
-        if (dataObject.has("teamScrumId")) {
-            teamsScrumDto.setTeamScrumId(dataObject.getLong("teamScrumId"));
-
-            if (teamsScrumDto.getTeamScrumId() == null || teamsScrumDto.getTeamScrumId() <= 0) {
-                throw new CustomException("Invalid Team Scrum ID", HttpStatus.BAD_REQUEST);
-            }
-        }
-
-        // nameProject es obligatorio siempre
-        if (!dataObject.has("nameProject")) {
-            throw new CustomException("Project name is required", HttpStatus.BAD_REQUEST);
-        }
-
-        teamsScrumDto.setNameProject(dataObject.getString("nameProject"));
-
-        if (teamsScrumDto.getNameProject() == null || teamsScrumDto.getNameProject().isEmpty()) {
-            throw new CustomException("Project name cannot be empty", HttpStatus.BAD_REQUEST);
-        }
-
-        return teamsScrumDto;
+    public TeamsScrumBusiness(TeamScrumService teamScrumService, Util util) {
+        this.teamScrumService = teamScrumService;
+        this.util = util;
     }
-     */
+
+    // Validación Objeto
+    private TeamsScrumDto validationObject(TeamsScrumDto teamsScrumDto) {
+
+    }
 
 
     // Find All

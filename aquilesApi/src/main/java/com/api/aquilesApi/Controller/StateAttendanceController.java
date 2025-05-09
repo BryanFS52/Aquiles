@@ -1,139 +1,116 @@
 package com.api.aquilesApi.Controller;
 
-/*
-@RestController
-@RequestMapping("api/stateAttendance")
+
+import com.api.aquilesApi.Business.StateAttendancesBusiness;
+import com.api.aquilesApi.Dto.StateAttendanceDto;
+import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
+import org.springframework.data.domain.Page;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+
+import java.util.Map;
+
+@Controller
 public class StateAttendanceController {
-    @Autowired
-    private StateAttendancesBusiness stateAttendancesBusiness;
+    private final StateAttendancesBusiness stateAttendancesBusiness;
 
-    //End-Point Para Traer
+    public StateAttendanceController(StateAttendancesBusiness stateAttendancesBusiness) {
+        this.stateAttendancesBusiness = stateAttendancesBusiness;
+    }
 
-    @GetMapping("/all")
-    public ResponseEntity<Map<String , Object>> findAll (@RequestParam(defaultValue = "0") int page,
-                                                         @RequestParam(defaultValue = "10") int size) {
+    @QueryMapping
+    public Map<String , Object> findAll (@Argument int page, @Argument int size) {
         try {
             Page<StateAttendanceDto> stateAttendanceDtoPage  = stateAttendancesBusiness.findAll(page, size);
             if (!stateAttendanceDtoPage.isEmpty()){
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpFindAll(
+                return  ResponseHttpApi.responseHttpFindAll(
                         stateAttendanceDtoPage.getContent(),
                         ResponseHttpApi.CODE_OK,
                         "Successfully Completed",
                         stateAttendanceDtoPage.getSize(),
                         stateAttendanceDtoPage.getTotalPages(),
-                        (int) stateAttendanceDtoPage.getTotalElements()),
-                        HttpStatus.OK);
+                        (int) stateAttendanceDtoPage.getTotalElements());
             } else {
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpFindAll(
+                return  ResponseHttpApi.responseHttpFindAll(
                         null,
                         ResponseHttpApi.NO_CONTENT,
                         "State Attendance not found",
                         0,
                         0,
-                        0),
-                        HttpStatus.NO_CONTENT);
+                        0);
             }
         } catch (Exception e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error getting State Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return  ResponseHttpApi.responseHttpError(
+                    "Error getting State Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     //End-Point Para Traer Un Estado Por Id
-    @GetMapping("/find/{id}")
-    public ResponseEntity<Map<String , Object>> findById(@PathVariable Long id){
+    @QueryMapping
+    public Map<String , Object> findById(@Argument Long id){
         try {
             StateAttendanceDto stateAttendanceDto = this.stateAttendancesBusiness.findById(id);
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpFindId(
+            return  ResponseHttpApi.responseHttpFindId(
                     stateAttendanceDto,
                     ResponseHttpApi.CODE_OK,
-                    "Successfully Completed"),
-                    HttpStatus.OK);
-        } catch (CustomException e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                    HttpStatus.BAD_REQUEST);
+                    "Successfully Completed");
         } catch (Exception e){
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error getting State Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return  ResponseHttpApi.responseHttpError(
+                    "Error getting State Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     // Metodo Para Crear-Add Un Estado De Asistencia
-    @PostMapping("/create")
-    public ResponseEntity<Map<String , Object>> add (@RequestBody Map<String , Object> json){
+    @MutationMapping
+    public Map<String , Object> add (@Argument("input")StateAttendanceDto stateAttendanceDto){
         try {
-            stateAttendancesBusiness.add(json);
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
+            StateAttendanceDto stateAttendanceDto1 = stateAttendancesBusiness.add(stateAttendanceDto);
+            return  ResponseHttpApi.responseHttpAction(
+                    stateAttendanceDto1.getStateAttendanceId(),
                     ResponseHttpApi.CODE_OK,
-                    "Add State Attendance  successfully"),
-                    HttpStatus.CREATED);
-        } catch (CustomException e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                    HttpStatus.BAD_REQUEST);
+                    "Add ok"
+            );
         }    catch (Exception e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error adding  State Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return  ResponseHttpApi.responseHttpError(
+                    "Error adding  State Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
 
     // Metodo Para Actualizar Un Estado De Asistencia
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Map<String, Object>> update(@PathVariable Long id, @RequestBody Map<String, Object> json) {
+    @MutationMapping
+    public Map<String, Object> update(@Argument Long id, @Argument StateAttendanceDto stateAttendanceDto) {
         try {
-            // Verificar si el estado de asistencia existe
-            StateAttendanceDto existingState = stateAttendancesBusiness.findById(id);
-            if (existingState == null) {
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                        "State Attendance with ID " + id + " not found.", HttpStatus.NOT_FOUND, "Not Found"),
-                        HttpStatus.NOT_FOUND);
-            }
-
-            // Validar el contenido del JSON (ajusta según tus necesidades)
-            if (!json.containsKey("status")) {
-                return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                        "Missing required field: status", HttpStatus.BAD_REQUEST, "Bad Request"),
-                        HttpStatus.BAD_REQUEST);
-            }
-
-            // Actualizar el estado de asistencia
-            stateAttendancesBusiness.update(id, json);
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
-                    ResponseHttpApi.CODE_OK, "State Attendance updated successfully"), HttpStatus.OK);
-        } catch (CustomException e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                    HttpStatus.BAD_REQUEST);
+            stateAttendancesBusiness.update(id, stateAttendanceDto);
+            return ResponseHttpApi.responseHttpAction(
+                    id,
+                    ResponseHttpApi.CODE_OK,
+                    "Update ok"
+            );
         } catch (Exception e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error State Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return  ResponseHttpApi.responseHttpError(
+                    "Error State Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
 
     // Metodo Para Eliminar Un Estado Asistencia
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Map<String, Object>> delete(@PathVariable Long id) {
+    @MutationMapping
+    public Map<String, Object> delete(@Argument Long id) {
         try {
             stateAttendancesBusiness.delete(id);
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpAction(
-                    ResponseHttpApi.CODE_OK, "State Attendance deleted successfully"),
-                    HttpStatus.OK);
-        } catch (CustomException e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST, "Bad Request"),
-                    HttpStatus.BAD_REQUEST);
+            return  ResponseHttpApi.responseHttpAction(
+                    id,
+                    ResponseHttpApi.CODE_OK,
+                    "Delete ok"
+            );
         } catch (Exception e) {
-            return new ResponseEntity<>(ResponseHttpApi.responseHttpError(
-                    "Error State Attendance : " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            return  ResponseHttpApi.responseHttpError(
+                    "Error State Attendance : " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 }
- */
