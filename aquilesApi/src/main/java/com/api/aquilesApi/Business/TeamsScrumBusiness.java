@@ -5,7 +5,6 @@ import com.api.aquilesApi.Entity.TeamsScrumEntity;
 import com.api.aquilesApi.Service.TeamScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
-import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -28,7 +26,7 @@ public class TeamsScrumBusiness {
     private Util util;
 
     private final ModelMapper modelMapper = new ModelMapper();
-
+    /*
     // Validación Objeto
     private TeamsScrumDto validationObject(Map<String, Object> json, TeamsScrumDto teamsScrumDto) {
         JSONObject dataObject = util.getData(json);
@@ -55,6 +53,7 @@ public class TeamsScrumBusiness {
 
         return teamsScrumDto;
     }
+     */
 
 
     // Find All

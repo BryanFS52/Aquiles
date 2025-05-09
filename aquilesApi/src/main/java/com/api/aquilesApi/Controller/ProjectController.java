@@ -22,7 +22,7 @@ public class ProjectController {
 
     // FindAll Projects (GraphQL)
     @QueryMapping
-    public Map<String , Object> findAllProjects(@Argument int page, @Argument int size){
+    public Map<String , Object> allProjects(@Argument int page, @Argument int size){
         try {
             Page<ProjectDto> projectDtoPage = projectBusiness.findAll(page , size);
             if(!projectDtoPage.isEmpty()){
@@ -50,7 +50,7 @@ public class ProjectController {
 
     // FindById Projects (GraphQL)
     @QueryMapping
-    public Map<String , Object> findByIdProject(@Argument Long id){
+    public Map<String , Object> projectById(@Argument Long id){
         try {
             ProjectDto projectDto = this.projectBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(

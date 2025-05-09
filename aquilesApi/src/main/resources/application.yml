@@ -1,20 +1,19 @@
 server:
   port: 8081  # Cambia 8081 por el puerto que prefieras
+
 spring:
   application:
-    name: DBAquiles
+    name: aquilesApi
 
   datasource:
     url: jdbc:postgresql://localhost:5432/DB_Aquiles
     username: postgres
-    password: "Azkoien1033702995@"
+    password: "fabrica2024*"
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      #ddl-auto: create-drop
       ddl-auto: update
-
     show-sql: true
     properties:
       hibernate:
@@ -47,3 +46,17 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+
+  graphql:
+    path: /graphql
+    graphiql:
+      enabled: true
+      path: /graphiql
+    cors:
+      allowed-origin-patterns: "*"
+      allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+      allow-credentials: true
+      max-age: 3600
+
+frontend:
+  url: https://cb4b-179-1-218-161.ngrok-free.app

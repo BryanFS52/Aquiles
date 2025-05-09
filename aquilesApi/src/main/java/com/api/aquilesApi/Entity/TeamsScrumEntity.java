@@ -28,7 +28,7 @@ public class TeamsScrumEntity implements Serializable {
     // Relations
     // 1.Relation (M-1) con Checklist
     @ManyToOne
-    @JoinColumn(name = "checklist_id", nullable = false)
+    @JoinColumn(name = "checklist_id", nullable = true)
     private ChecklistEntity checklist;
 
     @OneToMany(mappedBy = "fk_team_scrum_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -38,6 +38,6 @@ public class TeamsScrumEntity implements Serializable {
     private List<ProjectEntity> projectList;
 
     @ManyToOne
-    @JoinColumn(name = "team_scrum_id")
+    @JoinColumn(name = "team_scrum_id", nullable = true)
     private TeamsScrumEntity teamScrum;
 }

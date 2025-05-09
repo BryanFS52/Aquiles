@@ -26,7 +26,7 @@ public class TeamsScrumController {
 
     // FindAll TeamsScrums (GraphQL)
     @QueryMapping
-    public Map<String , Object> findAllTeamScrums(@RequestParam int page, @RequestParam int size){
+    public Map<String , Object> allTeamsScrums(@RequestParam int page, @RequestParam int size){
         try {
             Page<TeamsScrumDto> teamsScrumDtoPage = teamsScrumBusiness.findAll(page, size);
             if (!teamsScrumDtoPage.isEmpty()){
@@ -54,7 +54,7 @@ public class TeamsScrumController {
 
     // FindById TeamScrum (GraphQL)
     @QueryMapping
-    public Map<String , Object> findByIdTeamScrum(@Argument Long id){
+    public Map<String , Object> teamScrumById(@Argument Long id){
         try {
             TeamsScrumDto teamsScrumDto = this.teamsScrumBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
@@ -87,7 +87,7 @@ public class TeamsScrumController {
 
     // Update TeamScrum (GraphQL)
     @MutationMapping
-    public Map<String , Object> updateTeamScrum(@Argument Long id , @Argument TeamsScrumDto teamsScrumDto){
+    public Map<String , Object>updateTeamScrum(@Argument Long id , @Argument TeamsScrumDto teamsScrumDto){
         try {
             teamsScrumBusiness.update(id, teamsScrumDto);
             return ResponseHttpApi.responseHttpAction(
@@ -99,7 +99,7 @@ public class TeamsScrumController {
             return ResponseHttpApi.responseHttpError(
                     "Error updating Team Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    };
+    }
 
     // Delete TeamScrum (GraphQL)
     @MutationMapping

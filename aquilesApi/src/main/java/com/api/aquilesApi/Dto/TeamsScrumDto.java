@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeamsScrumDto {
+    private Long id;
+    private String name;
+    private String members;
+    private Long checklistId;
     private Long teamScrumId;
-    private String nameProject;
 }

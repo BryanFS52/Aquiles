@@ -1,11 +1,10 @@
 type Project {
-    projectId: ID!
+    projectId: ID
     description: String
     problem: String
     objectives: String
     justification: String
     members: String
-    fk_team_scrum_id: ID
 }
 
 type ProjectPage {
@@ -31,7 +30,6 @@ input ProjectInput {
     objectives: String
     justification: String
     members: String
-    fk_team_scrum_id: ID!
 }
 
 extend type Query {
