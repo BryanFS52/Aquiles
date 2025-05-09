@@ -104,12 +104,7 @@ public class ProjectBusiness {
     public ProjectDto add(ProjectDto projectDto) {
         try {
             ProjectEntity projectEntity = modelMapper.map(projectDto, ProjectEntity.class);
-            TeamsScrumEntity teamScrum = teamScrumService.getById(projectDto.getFk_team_scrum_id());
-            projectEntity.setFk_team_scrum_id(teamScrum);
             return modelMapper.map(projectService.save(projectEntity), ProjectDto.class);
-
-        } catch (CustomException e) {
-            throw e;
         } catch (Exception e) {
             throw new CustomException("Error Creating Project: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }

@@ -24,9 +24,9 @@ public class TeamsScrumController {
         this.teamsScrumBusiness = teamsScrumBusiness;
     };
 
-    //End-Point Para Traer Todos Los Teams Scrum
+    // FindAll TeamsScrums (GraphQL)
     @QueryMapping
-    public Map<String , Object> findAll(@RequestParam int page, @RequestParam int size){
+    public Map<String , Object> findAllTeamScrums(@RequestParam int page, @RequestParam int size){
         try {
             Page<TeamsScrumDto> teamsScrumDtoPage = teamsScrumBusiness.findAll(page, size);
             if (!teamsScrumDtoPage.isEmpty()){
@@ -50,11 +50,11 @@ public class TeamsScrumController {
             return ResponseHttpApi.responseHttpError(
                     "Error retrieving Teams Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    };
+    }
 
-    //End-Point Para Traer Un Team Scrum Por Id
+    // FindById TeamScrum (GraphQL)
     @QueryMapping
-    public Map<String , Object> findById(@Argument Long id){
+    public Map<String , Object> findByIdTeamScrum(@Argument Long id){
         try {
             TeamsScrumDto teamsScrumDto = this.teamsScrumBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
@@ -65,12 +65,11 @@ public class TeamsScrumController {
             return ResponseHttpApi.responseHttpError(
                     "Error getting Team Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    };
+    }
 
-
-    //End-Point Para Crear Un Nuevo Team Scrum
+    // Add a new teamScrum (GraphQL)
     @MutationMapping
-    public Map<String , Object> add(@Argument ("input") TeamsScrumDto teamsScrumDto){
+    public Map<String , Object>addTeamScrum(@Argument("input")TeamsScrumDto teamsScrumDto){
         try {
             TeamsScrumDto teamsScrumDto1 = teamsScrumBusiness.add(teamsScrumDto);
             return ResponseHttpApi.responseHttpAction(
@@ -84,11 +83,11 @@ public class TeamsScrumController {
             return ResponseHttpApi.responseHttpError(
                     "Error adding Team Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    };
+    }
 
-    //End-Point Para Actualizar un Team Scrum (GraphQL)
+    // Update TeamScrum (GraphQL)
     @MutationMapping
-    public Map<String , Object> update(@Argument Long id , @Argument TeamsScrumDto teamsScrumDto){
+    public Map<String , Object> updateTeamScrum(@Argument Long id , @Argument TeamsScrumDto teamsScrumDto){
         try {
             teamsScrumBusiness.update(id, teamsScrumDto);
             return ResponseHttpApi.responseHttpAction(
@@ -102,9 +101,9 @@ public class TeamsScrumController {
         }
     };
 
-    //End-Point Para Eliminar Un Team Scrum (GraphQL)
+    // Delete TeamScrum (GraphQL)
     @MutationMapping
-    public Map<String , Object> delete(@Argument Long id) {
+    public Map<String , Object> deleteTeamScrum(@Argument Long id) {
         {
             try {
                 teamsScrumBusiness.delete(id);
@@ -121,5 +120,5 @@ public class TeamsScrumController {
                         "Error deleting attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-    };
+    }
 }

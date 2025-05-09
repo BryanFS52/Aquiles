@@ -20,9 +20,9 @@ public class ProjectController {
         this.projectBusiness = projectBusiness;
     }
 
-    //End-Point Para Traer Todos Los Proyectos (GraphQL)
+    // FindAll Projects (GraphQL)
     @QueryMapping
-    public Map<String , Object> findAll (@Argument int page, @Argument int size){
+    public Map<String , Object> findAllProjects(@Argument int page, @Argument int size){
         try {
             Page<ProjectDto> projectDtoPage = projectBusiness.findAll(page , size);
             if(!projectDtoPage.isEmpty()){
@@ -48,10 +48,9 @@ public class ProjectController {
         }
     }
 
-
-    //End-Point Para Traer Poroyecto por Id (GraphQL)
+    // FindById Projects (GraphQL)
     @QueryMapping
-    public Map<String , Object> findById(@Argument Long id){
+    public Map<String , Object> findByIdProject(@Argument Long id){
         try {
             ProjectDto projectDto = this.projectBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
@@ -67,9 +66,9 @@ public class ProjectController {
         }
     }
 
-    //End-Point Para Crear Un Nuevo Proyecto (GraphQL)
+    // Add a New Project (GraphQL)
     @MutationMapping
-    public Map<String , Object> add(@Argument ProjectDto projectDto){
+    public Map<String , Object> addProject(@Argument("input") ProjectDto projectDto){
         try {
             ProjectDto projectDto1 = projectBusiness.add(projectDto);
             return ResponseHttpApi.responseHttpAction(
@@ -82,9 +81,9 @@ public class ProjectController {
         }
     }
 
-    //End-Point Para Actualizar Un Proyecto (GraphQL)
+    // Update Project (GraphQL)
     @MutationMapping
-    public Map<String , Object> update(@Argument Long id , @Argument ("input") ProjectDto projectDto){
+    public Map<String , Object> updateProject(@Argument Long id , @Argument ("input") ProjectDto projectDto){
         try {
             projectBusiness.update(id , projectDto);
             return ResponseHttpApi.responseHttpAction(
@@ -96,12 +95,11 @@ public class ProjectController {
             return ResponseHttpApi.responseHttpError(
                     "Error updating Project: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    };
+    }
 
-
-    //End-Point Para Eliminar Un Project (GraphQL)
+    // Delete Project (GraphQL)
     @MutationMapping
-    public Map<String , Object> delete (@Argument Long id){
+    public Map<String , Object> deleteProject(@Argument Long id){
         {
             try {
                 projectBusiness.delete(id);

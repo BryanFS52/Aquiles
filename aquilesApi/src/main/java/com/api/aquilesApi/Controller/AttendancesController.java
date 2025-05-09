@@ -25,14 +25,13 @@ public class AttendancesController {
     public AttendancesController(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator) {
         this.attendancesBusiness = attendancesBusiness;
         this.qrCodeGenerator = qrCodeGenerator;
-    };
+    }
 
-    // End-Point Para Traer Todos Los Attendances (GraphQL)
+    // FindAll Attendances (GraphQL)
     @QueryMapping
     public Map<String, Object> allAttendances(@Argument int page, @Argument int size) {
         try {
             Page<AttendancesDto> attendancesDtoPage = attendancesBusiness.findAll(page, size);
-
             return ResponseHttpApi.responseHttpFindAll(
                     attendancesDtoPage.getContent(),
                     ResponseHttpApi.CODE_OK,
@@ -45,9 +44,9 @@ public class AttendancesController {
             return ResponseHttpApi.responseHttpError(
                     "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    };
+    }
 
-    // End-Point Para Traer Un Attendance Por Id (GraphQL)
+    // FindById Attendance (GraphQL)
     @QueryMapping
     public Map<String, Object> attendanceById(@Argument Long id) {
         try {
@@ -62,13 +61,13 @@ public class AttendancesController {
                     "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
-    };
+    }
 
-    // End-Point Para Crear Un Nuevo Attendance (GraphQL)
+    // Add a new Attendance (GraphQL)
     @MutationMapping
     public Map<String, Object> addAttendance(@Argument("input") AttendancesDto attendancesDto) {
         try {
-             AttendancesDto attendancesDto1 = attendancesBusiness.add(attendancesDto);
+            AttendancesDto attendancesDto1 = attendancesBusiness.add(attendancesDto);
             return ResponseHttpApi.responseHttpAction(
                     attendancesDto1.getAttendanceId(),
                     ResponseHttpApi.CODE_OK,
@@ -79,9 +78,9 @@ public class AttendancesController {
                     "Error adding attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
-    };
+    }
 
-    // End-point para actualizar Attendance (GraphQL)
+    // Update Attendance (GraphQL)
     @MutationMapping
     public Map<String, Object> updateAttendance(@Argument Long id, @Argument ("input")AttendancesDto attendancesDto) {
         try {
@@ -97,9 +96,9 @@ public class AttendancesController {
                     "Error updating attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
-    };
+    }
 
-    // End-point para eliminar Attendance (GraphQL)
+    // Delete Attendance (GraphQL)
     @MutationMapping
     public Map<String, Object> deleteAttendance(@Argument Long id) {
         try {
@@ -115,9 +114,9 @@ public class AttendancesController {
                     "Error deleting attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
-    };
+    }
 
-    // End-Point Para Generar QR (GraphQL)
+    // Generate QR (GraphQL)
     @Value("${frontend.url}")
     private String frontendUrl;
     @MutationMapping
@@ -129,5 +128,5 @@ public class AttendancesController {
         String qrCodeBase64 = Base64.getEncoder().encodeToString(qrCode);
 
         return new QRCodePayload(sessionId, qrCodeBase64, qrUrl);
-    };
+    }
 }

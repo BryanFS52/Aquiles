@@ -17,13 +17,14 @@ import java.util.Map;
 public class TrainersController {
 
     private final TrainersBusiness trainersBusiness;
+
     public TrainersController(TrainersBusiness trainersBusiness) {
         this.trainersBusiness = trainersBusiness;
     }
 
-    //End-Point Para Traer Todos Los Trainers
+    // FindAll Trainers (GraphQL)
     @QueryMapping
-    public Map<String , Object> findAll(@Argument int page, @Argument int size){
+    public Map<String , Object> findAllTrainers(@Argument int page, @Argument int size){
         try {
             Page<TrainersDto> trainersDtoPage = trainersBusiness.findAll(page, size);
             if (!trainersDtoPage.isEmpty()){
@@ -47,11 +48,11 @@ public class TrainersController {
             return ResponseHttpApi.responseHttpError(
                     "Error retrieving Trainers: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    };
+    }
 
-    // End-Point Para Traer Un Trainer Por Id (GraphQL)
+    // FindById Trainer (GraphQL)
     @QueryMapping
-    public Map<String , Object> findById(@Argument Long id){
+    public Map<String , Object> findByIdTrainer(@Argument Long id){
         try {
             TrainersDto trainersDto  = this.trainersBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
@@ -65,12 +66,11 @@ public class TrainersController {
             return ResponseHttpApi.responseHttpError(
                     "Error getting Trainer: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    };
+    }
 
-
-    //End-Point Para Crear Un Nuevo Trainer (GraphQL)
+    // Add a new Trainer (GraphQL)
     @MutationMapping
-    public Map<String , Object> add (@Argument TrainersDto trainerDto){
+    public Map<String , Object> addTrainer(@Argument TrainersDto trainerDto){
         try {
              TrainersDto trainerDto1 = trainersBusiness.add(trainerDto);
             return  ResponseHttpApi.responseHttpAction(
@@ -83,10 +83,9 @@ public class TrainersController {
         }
     };
 
-
-    //End-Point Para Actualizar Un Trainer (GraphQL)
+    // Update Trainer (GraphQL)
     @MutationMapping
-    public Map<String , Object> update (@Argument Long id , @Argument TrainersDto trainerDto){
+    public Map<String , Object> updateTrainer(@Argument Long id , @Argument TrainersDto trainerDto){
         try {
             trainersBusiness.update(id , trainerDto);
             return  ResponseHttpApi.responseHttpAction(
@@ -101,11 +100,11 @@ public class TrainersController {
             return ResponseHttpApi.responseHttpError(
                     "Error updating Trainer: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    };
+    }
 
-    //End-Point Para Eliminar un Trainer
+    // Delete Trainer (GraphQL)
     @MutationMapping
-    public Map<String , Object> deleteTrainer (@Argument Long id){
+    public Map<String , Object> deleteTrainer(@Argument Long id){
             try {
                 trainersBusiness.delete(id);
                 return  ResponseHttpApi.responseHttpAction(
@@ -117,5 +116,5 @@ public class TrainersController {
                 return ResponseHttpApi.responseHttpError(
                         "Error deleting attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-    };
+    }
 }

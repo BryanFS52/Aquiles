@@ -61,7 +61,7 @@ public class Follow_upsBusiness {
 
         // Retorna el DTO validado
         return followUpsDto;
-    }
+    };
 
     // Obtener todos los Follow Ups
     public Page<Follow_upsDto> findAll(int page, int size) {
@@ -77,7 +77,7 @@ public class Follow_upsBusiness {
         } catch (Exception e) {
             throw new CustomException("Error al recuperar los Follow Ups: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
+    };
 
     // Obtener Follow Up por ID
     public Follow_upsDto findById(Long id) {
@@ -89,34 +89,28 @@ public class Follow_upsBusiness {
         } catch (Exception e) {
             throw new CustomException("Error al obtener el Follow Up por ID: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-    }
+    };
 
     // Agregar un nuevo Follow Up
-    public void add(Map<String, Object> json) {
+    public Follow_upsDto add(Follow_upsDto followUpsDto) {
         try {
-            Follow_upsDto followUpsDto = new Follow_upsDto();
-            followUpsDto = validationObject(json, followUpsDto);
             Follow_upsEntity followUpsEntity = modelMapper.map(followUpsDto, Follow_upsEntity.class);
-            followUpsService.create(followUpsEntity);
-        } catch (CustomException e) {
-            throw e;
+            return modelMapper.map(followUpsService.save(followUpsEntity), Follow_upsDto.class);
         } catch (Exception e) {
             throw new CustomException("Error al crear el Follow Up: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-    }
+    };
 
-    // Actualizar Follow Up
-    public void update(Long followUpId, Map<String, Object> json) {
+    // Update
+    public void update(Long followUpId, Follow_upsDto followUpsDto) {
         try {
-            Follow_upsDto followUpDto = modelMapper.map(followUpsService.getById(followUpId), Follow_upsDto.class);
-            Follow_upsEntity followUp = modelMapper.map(this.validationObject(json, followUpDto), Follow_upsEntity.class);
-            followUpsService.update(followUp);
-        } catch (CustomException e) {
-            throw e;
+            followUpsDto.setFollowUpId(followUpId);
+            Follow_upsEntity followUpsEntity = modelMapper.map(followUpsDto, Follow_upsEntity.class);
+            followUpsService.save(followUpsEntity);
         } catch (Exception e) {
             throw new CustomException("Error al actualizar el Follow Up: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-    }
+    };
 
     // Eliminar Follow Up
     public void delete(Long followUpId) {
@@ -128,8 +122,5 @@ public class Follow_upsBusiness {
         } catch (Exception e) {
             throw new CustomException("Error al eliminar el Follow Up: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-    }
-
+    };
 }
-
-

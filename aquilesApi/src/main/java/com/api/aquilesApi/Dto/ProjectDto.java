@@ -14,4 +14,5 @@ public class ProjectDto {
     private String objectives;
     private String justification;
     private Long fk_team_scrum_id;
+    private String members;
 }

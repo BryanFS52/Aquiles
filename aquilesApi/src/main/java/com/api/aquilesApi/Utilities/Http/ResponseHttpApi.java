@@ -12,7 +12,7 @@ public class ResponseHttpApi {
     public static final String CODE_BAD = "400";
     public static final String NO_CONTENT = "204";
 
-    //findAll
+    //FindAll
     public static Map<String, Object> responseHttpFindAll(Object data, String code, String msm, int size, int page, int items) {
         Map<String, Object> response = new HashMap<>();
         response.put("date", new Date());

@@ -32,7 +32,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/students/**").permitAll()
                                 .requestMatchers("/api/trainers/**").permitAll()
                                 .requestMatchers("/api/stateAttendance/**").permitAll()
-                                .requestMatchers("/graphql").permitAll() // Asegúrate de que la ruta de GraphQL esté correctamente configurada
+                                .requestMatchers("/graphql").permitAll()
+                                .requestMatchers("/subscriptions", "/graphql/ws").permitAll()
                                 .anyRequest().permitAll()
                 );
         return http.build();

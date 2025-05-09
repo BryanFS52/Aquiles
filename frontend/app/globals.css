@@ -11,7 +11,8 @@
   @apply p-2 bg-gray-200 rounded hover:bg-gray-300 transition-colors;
 }
 
-.current-trimester, .current-week {
+.current-trimester,
+.current-week {
   @apply font-bold text-lg;
 }
 
@@ -149,11 +150,25 @@
 }
 
 @keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  50% { transform: translateX(5px); }
-  75% { transform: translateX(-5px); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-5px);
+  }
+
+  50% {
+    transform: translateX(5px);
+  }
+
+  75% {
+    transform: translateX(-5px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .animate-shake {
@@ -169,5 +184,3 @@ body {
 .dark body {
   @apply bg-darkBackground;
 }
-
-

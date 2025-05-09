@@ -38,7 +38,7 @@ public class ProjectEntity implements Serializable {
     //Relations
     @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "fk_team_scrum_id", nullable = false)
+    @JoinColumn(name = "fk_team_scrum_id", nullable = true)
     private TeamsScrumEntity fk_team_scrum_id;
 
 }

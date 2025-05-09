@@ -118,8 +118,6 @@ public class AttendancesBusiness {
             attendancesDto.setAttendanceId(attendanceId);
             AttendancesEntity attendance = modelMapper.map( attendancesDto, AttendancesEntity.class);
             attendancesService.save(attendance);
-        } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
         } catch (Exception e) {
             throw new CustomException("Error Updating Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }

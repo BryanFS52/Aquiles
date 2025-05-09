@@ -1,0 +1,38 @@
+type Excuse {
+    excuseId: ID!
+    excuseDescription: String
+    excuseDocument: String
+}
+
+type ExcusePage {
+    code: String
+    data: [Excuse]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type ExcusePageId {
+    data: Excuse
+    date: String
+    code: String
+    message: String
+}
+
+input ExcuseInput {
+    excuseDescription: String
+    excuseDocument: String
+}
+
+extend type Query {
+    allExcuses(page: Int, size: Int): ExcusePage
+    excuseById(id: ID!): ExcusePageId
+}
+
+extend type Mutation {
+    addExcuse(input: ExcuseInput): Response
+    updateExcuse(id: ID!, input: ExcuseInput): Response
+    deleteExcuse(id: ID!): Response
+}

@@ -20,8 +20,12 @@ import java.util.Map;
 
 @Component
 public class ExcusesBusiness {
-    @Autowired
-    private ExcusesService excusesService;
+
+    private final ExcusesService excusesService;
+
+    public ExcusesBusiness(ExcusesService excusesService) {
+        this.excusesService = excusesService;
+    }
 
     @Autowired
     private Util util;
@@ -63,7 +67,7 @@ public class ExcusesBusiness {
     }
 
     // Find All
-    public Page<ExcusesDto> findAll(int page , int size){
+    public Page<ExcusesDto> findAll(int page, int size){
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
             Page<ExcusesEntity> excusesEntityPage = excusesService.findAll(pageRequest);
@@ -90,39 +94,21 @@ public class ExcusesBusiness {
     }
 
     // Add
-    public void add(Map<String, Object> json) {
+    public ExcusesDto add( ExcusesDto excusesDto ) {
         try {
-            // Crea un nuevo objeto ExcusesDto
-            ExcusesDto excusesDto = new ExcusesDto();
-
-            // Válida y asigna los valores del JSON al DTO
-            excusesDto = validationObject(json, excusesDto);
-
-            // Mapea el DTO a la entidad
             ExcusesEntity excusesEntity = modelMapper.map(excusesDto, ExcusesEntity.class);
-
-            // Guarda la entidad en la base de datos
-            excusesService.save(excusesEntity);
-        } catch (CustomException e) {
-            // Lanza la excepción personalizada si ocurre
-            throw e;
-        } catch (DataAccessException e) {
-            // Manejo específico para errores de acceso a datos
-            throw new CustomException("Error saving Excuses due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return modelMapper.map(excusesService.save(excusesEntity), ExcusesDto.class);
         } catch (Exception e) {
-            // Manejo genérico para cualquier otra excepción
-            throw new CustomException("An unexpected error occurred while adding the excuse.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     // Update
-    public void update(Long excuseId , Map<String , Object> json){
+    public void update(Long excuseId, ExcusesDto excusesDto){
         try {
-            var excusesDTO = modelMapper.map(excusesService.getById(excuseId), ExcusesDto.class);
-            var excuse = modelMapper.map(this.validationObject(json, excusesDTO), ExcusesEntity.class);
-            excusesService.save(excuse);
-        }  catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
+            excusesDto.setExcuseId(excuseId);
+            ExcusesEntity excuses = modelMapper.map(excusesDto, ExcusesEntity.class);
+            excusesService.save(excuses);
         } catch (Exception e) {
             throw new CustomException("Error Updating Excuse: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
