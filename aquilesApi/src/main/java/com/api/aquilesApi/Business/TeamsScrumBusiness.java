@@ -5,9 +5,7 @@ import com.api.aquilesApi.Entity.TeamsScrumEntity;
 import com.api.aquilesApi.Service.TeamScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
-import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -31,9 +29,11 @@ public class TeamsScrumBusiness {
     }
 
     // Validación Objeto
+    /*
     private TeamsScrumDto validationObject(TeamsScrumDto teamsScrumDto) {
 
     }
+     */
 
 
     // Find All

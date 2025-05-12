@@ -1,9 +1,9 @@
-type QRCodePayload {
-  sessionId: String
-  qrCodeBase64: String
-  qrUrl: String
-}
+  type QRCodePayload {
+    sessionId: String
+    qrCodeBase64: String
+    qrUrl: String
+  }
 
-extend type Mutation {
-  generateQRCode: QRCodePayload
-}
+  extend type Mutation {
+    generateQRCode: QRCodePayload
+  }

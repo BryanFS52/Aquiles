@@ -22,7 +22,7 @@ public class Follow_upsController {
 
     // FindAll FollowUps (GraphQL)
     @QueryMapping
-    public Map<String , Object> findAllFollowUps(@Argument int page, @Argument int size){
+    public Map<String , Object> allFollowUps(@Argument int page, @Argument int size){
         try {
             Page<Follow_upsDto> followUpsDtoPage = followUpsBusiness.findAll(page, size);
                 return ResponseHttpApi.responseHttpFindAll(
@@ -41,7 +41,7 @@ public class Follow_upsController {
 
     // FindById (GraphQL)
     @QueryMapping
-    public Map<String , Object> findById(@Argument Long id){
+    public Map<String , Object> followUpById(@Argument Long id){
         try {
             Follow_upsDto followUpsDto = this.followUpsBusiness.findById(id);
             return  ResponseHttpApi.responseHttpFindId(
@@ -74,7 +74,7 @@ public class Follow_upsController {
 
     // Update FollowUp (GraphQL)
     @MutationMapping
-    public Map<String ,Object> updateFollowUp(@Argument Long id, @Argument Follow_upsDto followUpsDto){
+    public Map<String ,Object> updateFollowUp(@Argument Long id, @Argument("input")Follow_upsDto followUpsDto){
         try {
             followUpsBusiness.update(id, followUpsDto);
             return ResponseHttpApi.responseHttpAction(

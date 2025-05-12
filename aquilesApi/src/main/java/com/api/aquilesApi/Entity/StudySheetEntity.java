@@ -12,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Entity
 public class StudySheetEntity implements Serializable {
-//    (Model)
+    //    (Model)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
