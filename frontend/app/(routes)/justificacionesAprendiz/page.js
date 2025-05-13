@@ -7,6 +7,7 @@ import { Sidebaraprendiz } from "@components/SidebarAprendiz";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BsPersonCircle } from "react-icons/bs";
+import justificationService from "@services/justificationService";
 import {
   FaCalendarDay,
   FaRegClock,
@@ -34,9 +35,9 @@ export default function Component() {
   const initialFormData = {
     numeroDocumento: "",
     nombreAprendiz: "",
-    tipoNovedad: "",
     justificacionFile: null,
     firmaFile: null,
+    firmaBase64: "", // Aquí almacenaremos la firma en base64
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -66,21 +67,56 @@ export default function Component() {
   };
 
   const handleFileChange = (e, fileType) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [fileType]: e.target.files[0],
-    }));
+    const file = e.target.files[0];
+    if (fileType === "justificacionFile") {
+      setFormData((prevData) => ({
+        ...prevData,
+        [fileType]: file,
+      }));
+    } else if (fileType === "firmaFile") {
+      // Convertir la firma a base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prevData) => ({
+          ...prevData,
+          [fileType]: file,
+          firmaBase64: reader.result.split(",")[1], // Tomamos solo la parte base64
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    if (Object.values(formData).some((value) => !value)) {
-      toast.error("Por favor, complete todos los campos.");
+
+    // Validación de campos vacíos
+
+
+    // Validación de tipo de novedad
+
+
+    // Validación de tamaño de archivo (justificaciónFile)
+    if (formData.justificacionFile && formData.justificacionFile.size > 5 * 1024 * 1024) {
+      toast.error("El archivo de justificación no puede ser mayor de 5 MB.");
       return;
     }
-    console.log("Datos del formulario:", formData);
-    toast.success("Datos guardados correctamente.");
-    setShowForm(false);
+
+    // Si todo está bien, intentamos enviar el formulario
+    try {
+      console.log("Enviando justificación:", formData);
+      const result = await justificationService.submitJustification(formData);
+
+      if (result) {
+        toast.success("Justificación enviada con éxito.");
+        setShowForm(false);
+      } else {
+        toast.error("Hubo un error al enviar la justificación.");
+      }
+    } catch (error) {
+      console.error("Error al enviar la justificación:", error);
+      toast.error("Hubo un error al enviar la justificación.");
+    }
   };
 
   const handleCancel = () => {
@@ -188,6 +224,23 @@ export default function Component() {
                         type="file"
                         ref={fileInputRefPrev}
                         onChange={(e) => handleFileChange(e, "justificacionFile")}
+                        className="hidden"
+                      />
+                    </div>
+
+                    <div className="flex flex-col mt-4">
+                      <label>Firma (Archivo)</label>
+                      <button
+                        type="button"
+                        onClick={handleUploadNew}
+                        className="bg-[#0e324d] text-white h-10 rounded-lg"
+                      >
+                        {formData.firmaFile?.name || "Subir Firma"}
+                      </button>
+                      <input
+                        type="file"
+                        ref={fileInputRefNew}
+                        onChange={(e) => handleFileChange(e, "firmaFile")}
                         className="hidden"
                       />
                     </div>

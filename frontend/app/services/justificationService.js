@@ -1,18 +1,33 @@
 // src/services/justificationService.js
+import { client } from '../lib/apollo-client';
+import { ADD_JUSTIFICATION } from '../graphql/JustificationsGraph';
 
-import axios from 'axios';
+const justificationService = {
+  submitJustification: async (formData) => {
+    try {
+      const { numeroDocumento, nombreAprendiz, tipoNovedad, justificacionFile, firmaFile } = formData;
+      console.log("Submitting justification:", formData);
+      const { data } = await client.mutate({
+        mutation: ADD_JUSTIFICATION,
+        variables: {
+          numeroDocumento,
+          nombreAprendiz,
+          tipoNovedad,
+          justificacionFile,
+          firmaFile,
+        },
+      });
 
-const API_URL = 'http://localhost:8081/api//api/justification'; // Cambia la URL por la de tu backend
+      if (!data?.addJustification?.code) {
+        throw new Error("Error adding justification");
+      }
 
-export const submitJustification = async (formData) => {
-  try {
-    const response = await axios.post(API_URL, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data', // Si estás enviando archivos
-      },
-    });
-    return response.data; // Aquí puedes manejar la respuesta del backend
-  } catch (error) {
-    throw error.response.data; // Manejo de errores
-  }
+      return data.addJustification; // Devuelve la respuesta de la mutación
+    } catch (error) {
+      console.error("Error adding justification:", error);
+      throw error;
+    }
+  },
 };
+
+export default justificationService;
