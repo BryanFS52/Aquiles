@@ -9,7 +9,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
+@Component
 public class JustificationBusiness {
     private final JustificationService justificationService;
 
@@ -25,7 +27,7 @@ public class JustificationBusiness {
             PageRequest pageRequest = PageRequest.of(page, size);
             Page<JustificationEntity> justificationEntityPage = justificationService.findAll(pageRequest);
 
-            System.out.println("Total Attendances: " + justificationEntityPage.getTotalElements());
+            System.out.println("Total Justifications: " + justificationEntityPage.getTotalElements());
 
             return justificationEntityPage.map(entity -> modelMapper.map(entity, JustificationDto.class));
         } catch (DataAccessException e) {

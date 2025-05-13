@@ -1,23 +1,28 @@
-import axios from 'axios';
-
-const QR_CODE_API_URL = 'http://localhost:8081/api/attendances/generateQRCode';
+// qrCodeService.js
+import client from '../lib/apollo-client';
+import { GENERATE_QR_CODE } from '../graphql/GenerateQrGraph';
 
 const qrCodeService = {
-  generateQRCode: async (text) => {
+  generateQRCode: async () => {
     try {
-      const response = await axios.get(QR_CODE_API_URL, {
-        params: { text },
-        responseType: 'arraybuffer',
+      const { data } = await client.mutate({
+        mutation: GENERATE_QR_CODE,
       });
 
-      const qrCodeImage = `data:image/png;base64,${btoa(
-        String.fromCharCode(...new Uint8Array(response.data))
-      )}`;
+      if (!data?.generateQRCode?.qrCodeBase64) {
+        throw new Error("No QR code returned from server");
+      }
 
-      return qrCodeImage;
+      const qrCodeImage = `data:image/png;base64,${data.generateQRCode.qrCodeBase64}`;
+
+      return {
+        qrCodeImage,
+        sessionId: data.generateQRCode.sessionId,
+        qrUrl: data.generateQRCode.qrUrl,
+      };
     } catch (error) {
-      console.error('Error generating QR code:', error);
-      throw error; 
+      console.error("Error generating QR code:", error);
+      throw error;
     }
   },
 };

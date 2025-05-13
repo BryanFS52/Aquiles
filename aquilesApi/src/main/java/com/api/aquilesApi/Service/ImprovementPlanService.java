@@ -7,7 +7,9 @@ import com.api.aquilesApi.Utilities.CustomException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ImprovementPlanService implements Idao<ImprovementPlanEntity, Long> {
     private final ImprovementPlanRepository improvementPlanRepository;
 
@@ -25,7 +27,6 @@ public class ImprovementPlanService implements Idao<ImprovementPlanEntity, Long>
         return improvementPlanRepository.findById(id).orElseThrow(() ->
                 new CustomException("Attendance Type with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
-
 
     @Override
     public void update(ImprovementPlanEntity entity) {

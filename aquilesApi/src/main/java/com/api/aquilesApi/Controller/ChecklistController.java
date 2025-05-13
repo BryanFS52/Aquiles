@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Controller;
 
-import com.api.aquilesApi.Business.JustificationBusiness;
-import com.api.aquilesApi.Dto.JustificationDto;
+import com.api.aquilesApi.Business.ChecklistBusiness;
+import com.api.aquilesApi.Dto.ChecklistDto;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import org.springframework.data.domain.Page;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -9,30 +9,28 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-
 import java.util.Map;
 
 @Controller
-public class JustificationController {
-    private final JustificationBusiness justificationBusiness;
+public class ChecklistController {
+    private final ChecklistBusiness checklistBusiness;
 
-    public JustificationController(JustificationBusiness justificationBusiness) {
-        this.justificationBusiness = justificationBusiness;
+    public ChecklistController(ChecklistBusiness checklistBusiness) {
+        this.checklistBusiness = checklistBusiness;
     }
 
-
-    // FindAll Justifications (GraphQL)
+    // FindAll Checklist (GraphQL)
     @QueryMapping
-    public Map<String, Object> allJustifications(@Argument int page, @Argument int size) {
+    public Map<String, Object> allChecklist(@Argument int page, @Argument int size) {
         try {
-            Page<JustificationDto> justificationDtoPage = justificationBusiness.findAll(page, size);
+            Page<ChecklistDto> checklistDtoPage = checklistBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
-                    justificationDtoPage.getContent(),
+                    checklistDtoPage.getContent(),
                     ResponseHttpApi.CODE_OK,
                     "Query ok",
-                    justificationDtoPage.getTotalPages(),
+                    checklistDtoPage.getTotalPages(),
                     page,
-                    (int) justificationDtoPage.getTotalElements()
+                    (int) checklistDtoPage.getTotalElements()
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
@@ -40,13 +38,13 @@ public class JustificationController {
         }
     }
 
-    // FindById Justification (GraphQL)
+    // FindById Checklist (GraphQL)
     @QueryMapping
-    public Map<String, Object> justificationById(@Argument Long id) {
+    public Map<String, Object> checklistById(@Argument Long id) {
         try {
-            JustificationDto justificationDto = justificationBusiness.findById(id);
+            ChecklistDto checklistDto = checklistBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
-                    justificationDto,
+                    checklistDto,
                     ResponseHttpApi.CODE_OK,
                     "Query by id ok"
             );
@@ -57,28 +55,28 @@ public class JustificationController {
         }
     }
 
-    // Add a new Justification (GraphQL)
+    // Add a new Checklist (GraphQL)
     @MutationMapping
-    public Map<String, Object> addJustification(@Argument("input") JustificationDto justificationDto) {
+    public Map<String, Object> addChecklist(@Argument("input") ChecklistDto checklistDto) {
         try {
-            JustificationDto justificationDto1 = justificationBusiness.add(justificationDto);
+            ChecklistDto checklistDto1 = checklistBusiness.add(checklistDto);
             return ResponseHttpApi.responseHttpAction(
-                    justificationDto1.getId(),
+                    checklistDto1.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
             );
         }catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error adding Justification: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error adding Checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
 
-    // Update Justification (GraphQL)
+    // Update Checklist (GraphQL)
     @MutationMapping
-    public Map<String, Object> updateJustification(@Argument Long id, @Argument ("input")JustificationDto justificationDto) {
+    public Map<String, Object> updateChecklist(@Argument Long id, @Argument ("input")ChecklistDto checklistDto) {
         try {
-            justificationBusiness.update(id, justificationDto );
+            checklistBusiness.update(id, checklistDto );
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
@@ -87,16 +85,16 @@ public class JustificationController {
         }
         catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error updating Justification: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error updating Checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
 
-    // Delete Justification (GraphQL)
+    // Delete Checklist (GraphQL)
     @MutationMapping
-    public Map<String, Object> deleteJustification(@Argument Long id) {
+    public Map<String, Object> deleteChecklist(@Argument Long id) {
         try {
-            justificationBusiness.delete(id);
+            checklistBusiness.delete(id);
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
@@ -105,7 +103,7 @@ public class JustificationController {
         }
         catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error deleting Justification: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error deleting Checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }

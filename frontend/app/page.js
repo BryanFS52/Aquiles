@@ -1,7 +1,7 @@
 "use client";
 
 import { ApolloProvider } from '@apollo/client';
-import client from '../apolloClient';
+import client from './lib/apollo-client';
 import React, { useState } from 'react';
 import Link from "next/link";
 import { HiLockClosed } from "react-icons/hi";

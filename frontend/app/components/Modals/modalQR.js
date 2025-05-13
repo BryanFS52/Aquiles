@@ -9,6 +9,8 @@ const ModalQR = ({ isOpen, onClose }) => {
   const [timer, setTimer] = useState(900);
   const [qrCodeImage, setQrCodeImage] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [sessionId, setSessionId] = useState(null); // Mover los estados aquí
+  const [qrUrl, setQrUrl] = useState(null); // Mover los estados aquí
   const router = useRouter();
 
   const apprenticeEmail = "caceresgabriel305@gmail.com";
@@ -18,10 +20,11 @@ const ModalQR = ({ isOpen, onClose }) => {
 
     const fetchQRCode = async () => {
       try {
-        const qrCode = await qrCodeService.generateQRCode(
-          "Texto de ejemplo para el QR"
-        );
-        setQrCodeImage(qrCode);
+        const { qrCodeImage, sessionId, qrUrl } = await qrCodeService.generateQRCode();
+
+        setQrCodeImage(qrCodeImage);
+        setSessionId(sessionId);
+        setQrUrl(qrUrl);
       } catch (error) {
         console.error("Error generating QR code:", error);
       }
@@ -179,7 +182,6 @@ const ModalQR = ({ isOpen, onClose }) => {
     }
   };
 
-
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -232,25 +234,21 @@ const ModalQR = ({ isOpen, onClose }) => {
               Duración del QR
             </span>
           </div>
-          <div className="flex justify-center mt-4 relative">
-            <input
-              className="rounded-md border-gray-300 border-2 text-center text-2xl w-36 sm:w-40 h-12"
-              value={formatTime(timer)}
-              readOnly
-            />
+          <div className="flex justify-center mt-2">
+            <span className="text-xl sm:text-2xl font-medium font-inter">{formatTime(timer)}</span>
           </div>
-          <div className="flex justify-between mt-8">
+          <div className="mt-8 flex justify-center gap-4">
             <button
-              className="hover:bg-red-600 rounded-md transition-colors bg-red-600 px-4 py-2 border text-white text-lg font-inter"
+              className="bg-red-500 text-white font-semibold px-4 py-2 rounded-md hover:bg-red-600"
               onClick={handleClose}
             >
-              Cancelar QR
+              Cerrar
             </button>
             <button
-              className="bg-lightGreen rounded-md transition-colors bg-custom-blue px-3 py-2 border text-white text-base font-inter"
+              className="bg-blue-500 text-white font-semibold px-4 py-2 rounded-md hover:bg-blue-600"
               onClick={sendAttendanceEmail}
             >
-              Enviar Correo Electrónico
+              Enviar Correo
             </button>
           </div>
         </div>

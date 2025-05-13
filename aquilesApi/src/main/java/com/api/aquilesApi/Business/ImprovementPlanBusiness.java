@@ -9,7 +9,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ImprovementPlanBusiness {
     private final ImprovementPlanService improvementPlanService;
     private final ModelMapper modelMapper = new ModelMapper();

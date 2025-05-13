@@ -7,7 +7,9 @@ import com.api.aquilesApi.Utilities.CustomException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
+@Service
 public class JustificationService implements Idao<JustificationEntity, Long> {
 
     private final JustificationRepository justificationRepository;

@@ -8,9 +8,11 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
 
 import java.util.Map;
 
+@Controller
 public class ImprovementPlanController {
     private final ImprovementPlanBusiness improvementPlanBusiness;
 
@@ -18,7 +20,7 @@ public class ImprovementPlanController {
         this.improvementPlanBusiness = improvementPlanBusiness;
     }
 
-    // FindAll Attendances (GraphQL)
+    // FindAll ImprovementPlan (GraphQL)
     @QueryMapping
     public Map<String, Object> allImprovementPlans(@Argument int page, @Argument int size) {
         try {
@@ -37,7 +39,7 @@ public class ImprovementPlanController {
         }
     }
 
-    // FindById Attendance (GraphQL)
+    // FindById ImprovementPlan (GraphQL)
     @QueryMapping
     public Map<String, Object> improvementPlanById(@Argument Long id) {
         try {
@@ -54,7 +56,7 @@ public class ImprovementPlanController {
         }
     }
 
-    // Add a new Attendance (GraphQL)
+    // Add a new ImprovementPlan (GraphQL)
     @MutationMapping
     public Map<String, Object> addImprovementPlan(@Argument("input") ImprovementPlanDto improvementplanDto) {
         try {
@@ -66,12 +68,12 @@ public class ImprovementPlanController {
             );
         }catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error adding attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error adding ImprovementPlan: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
 
-    // Update Attendance (GraphQL)
+    // Update ImprovementPlan (GraphQL)
     @MutationMapping
     public Map<String, Object> updateImprovementPlan(@Argument Long id, @Argument ("input")ImprovementPlanDto improvementplanDto) {
         try {
@@ -84,12 +86,12 @@ public class ImprovementPlanController {
         }
         catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error updating attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error updating ImprovementPlan: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
 
-    // Delete Attendance (GraphQL)
+    // Delete ImprovementPlan (GraphQL)
     @MutationMapping
     public Map<String, Object> deleteImprovementPlan(@Argument Long id) {
         try {
@@ -102,7 +104,7 @@ public class ImprovementPlanController {
         }
         catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error deleting attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error deleting ImprovementPlan: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
