@@ -1,5 +1,5 @@
 package com.api.aquilesApi.Controller;
-
+/*
 import com.api.aquilesApi.Business.ChecklistBusiness;
 import com.api.aquilesApi.Dto.ChecklistDto;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
@@ -21,7 +21,7 @@ public class ChecklistController {
 
     // FindAll Checklist (GraphQL)
     @QueryMapping
-    public Map<String, Object> allChecklist(@Argument int page, @Argument int size) {
+    public Map<String, Object> allChecklists(@Argument int page, @Argument int size) {
         try {
             Page<ChecklistDto> checklistDtoPage = checklistBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
@@ -108,3 +108,4 @@ public class ChecklistController {
         }
     }
 }
+ */

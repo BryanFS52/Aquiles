@@ -1,0 +1,55 @@
+type Juries {
+    id: ID
+    name: String
+    signature: String
+    document: String
+}
+
+type Checklist {
+    id: ID!
+    state: Boolean
+    remarks: String
+    instructorSignature: String
+    evaluationCriteria: Boolean
+    checklistHistory: String
+    associatedProject: Project
+    associatedJuries: [Juries]
+}
+
+type ChecklistPage {
+    code: String
+    data: [Checklist]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type ChecklistPageId {
+    data: Checklist
+    date: String
+    code: String
+    message: String
+}
+
+input ChecklistInput {
+    state: Boolean!
+    remarks: String!
+    instructorSignature: String!
+    evaluationCriteria: Boolean!
+    checklistHistory: String!
+    associatedProjectId: ID!
+    associatedJuriesIds: [ID!]!
+}
+
+extend type Query {
+    allChecklists(page: Int, size: Int): ChecklistPage
+    checklistById(id: ID!): ChecklistPageId
+}
+
+extend type Mutation {
+    addChecklist(input: ChecklistInput): Response
+    updateChecklist(id: ID!, input: ChecklistInput): Response
+    deleteChecklist(id: ID!): Response
+}

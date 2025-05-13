@@ -53,7 +53,13 @@ public class FinalReportBusiness {
     // Add
     public FinalReportDto add(FinalReportDto finalreportDto) {
         try {
+            System.out.println("FinalReportDto: " + finalreportDto);
+
+                byte[] signatureBytes = java.util.Base64.getDecoder().decode(finalreportDto.getSignature());
+
             FinalReportEntity finalReportEntity = modelMapper.map(finalreportDto, FinalReportEntity.class);
+            finalReportEntity.setFirma(signatureBytes);
+
             return modelMapper.map(finalReportService.save(finalReportEntity), FinalReportDto.class);
         }catch ( Exception e){
             throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);

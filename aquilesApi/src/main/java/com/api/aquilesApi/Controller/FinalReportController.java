@@ -22,7 +22,7 @@ public class FinalReportController {
 
     // FindAll finalReports (GraphQL)
     @QueryMapping
-    public Map<String, Object> allFinalReport(@Argument int page, @Argument int size) {
+    public Map<String, Object> allFinalReports(@Argument int page, @Argument int size) {
         try {
             Page<FinalReportDto> finalreportDtoPage = finalReportBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
@@ -60,18 +60,33 @@ public class FinalReportController {
     @MutationMapping
     public Map<String, Object> addFinalReport(@Argument("input") FinalReportDto finalreportDto) {
         try {
+            System.out.println(finalreportDto);
+            // Convertir la firma base64 a byte[]
+            if (finalreportDto.getSignature() != null && !finalreportDto.getSignature().isEmpty()) {
+                // Decodificar la firma desde base64
+                byte[] signatureBytes = java.util.Base64.getDecoder().decode(finalreportDto.getSignature());
+                finalreportDto.setSignature(new String(signatureBytes));
+            } else {
+                throw new IllegalArgumentException("Signature is required");
+            }
+
+            // Llamar al servicio para agregar el reporte final
             FinalReportDto finalreportDto1 = finalReportBusiness.add(finalreportDto);
+
+            // Respuesta exitosa
             return ResponseHttpApi.responseHttpAction(
                     finalreportDto1.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
             );
-        }catch (Exception e) {
+        } catch (Exception e) {
+            // Manejo de errores
             return ResponseHttpApi.responseHttpError(
                     "Error adding finalReport: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
+
 
     // Update finalReport (GraphQL)
     @MutationMapping

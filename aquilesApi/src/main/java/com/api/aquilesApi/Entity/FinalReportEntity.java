@@ -37,7 +37,7 @@ public class FinalReportEntity implements Serializable {
     private byte[] annexes;
 
     @Lob
-    @Column(name = "signature", nullable = false, length = 255)
+    @Column(name = "signature", nullable = false)
     private byte[] firma;
 
     @Column(name = "state", nullable = false)

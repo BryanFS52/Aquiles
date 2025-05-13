@@ -65,9 +65,6 @@ public class ChecklistEntity implements Serializable {
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamsScrumEntity> teams;
 
-    // 5.Relation (1-M) con studySheet (Model)
-    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StudySheetEntity> studySheets;
 
     // 5.Relation (1-M) con learningOutocome (Model)
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)

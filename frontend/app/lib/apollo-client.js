@@ -7,4 +7,21 @@ const client = new ApolloClient({
     cache: new InMemoryCache(),
 });
 
-export default client;
+// New client for Cloudfare tunnel
+const clientCloudfare = new ApolloClient({
+    link: new HttpLink({
+        uri: "https://bosnia-paperback-philips-tea.trycloudflare.com/olympo/graphql",
+    }),
+    cache: new InMemoryCache(),
+    defaultOptions: {
+        watchQuery: {
+            fetchPolicy: 'no-cache',
+        },
+        query: {
+            fetchPolicy: 'no-cache',
+        },
+    },
+    connectToDevTools: true,
+});
+
+export { client, clientCloudfare };

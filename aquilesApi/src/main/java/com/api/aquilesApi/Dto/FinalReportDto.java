@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.Instant;
 
 @Data
 @NoArgsConstructor
@@ -35,12 +35,12 @@ public class FinalReportDto implements Serializable {
     private byte[] annexes;
 
     @NotNull(message = "La firma es obligatoria")
-    private byte[] signature;
+    private String signature;
 
     @NotNull(message = "El estado es obligatorio")
     private Boolean state;
 
-    private Date createdAt;
+    private Instant  createdAt;
 
     // Relations
 }

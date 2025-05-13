@@ -35,8 +35,10 @@ public class ChecklistDto implements Serializable {
 
     // Relations
     @NotNull(message = "El proyecto asociado es obligatorio")
-    private ProjectDto associatedProject;
+    private Long associatedProject;
 
     @NotNull(message = "Los jurados asociados son obligatorios")
     private List<JuriesDto> associatedJuries;
+
+    private List<Long> associatedJuriesIds;
 }

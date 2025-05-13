@@ -1,0 +1,50 @@
+type FinalReport {
+    id: ID!
+    fileNumber: String
+    objectives: String
+    disciplinaryOffenses: String
+    conclusions: String
+    annexes: String
+    signature: String
+    state: Boolean
+    createdAt: String
+}
+
+type FinalReportPage {
+    code: String
+    message: String
+    data: [FinalReport]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+}
+
+type FinalReportPageId {
+    code: String
+    message: String
+    data: FinalReport
+    date: String
+}
+
+input FinalReportInput {
+    fileNumber: String!
+    objectives: String!
+    disciplinaryOffenses: String
+    conclusions: String!
+    annexes: String
+    signature: String!
+    state: Boolean!
+    createdAt: String
+}
+
+extend type Query {
+    allFinalReports(page: Int, size: Int): FinalReportPage
+    finalReportById(id: ID!): FinalReportPageId
+}
+
+extend type Mutation {
+    addFinalReport(input: FinalReportInput): Response
+    updateFinalReport(id: ID!, input: FinalReportInput): Response
+    deleteFinalReport(id: ID!): Response
+}
