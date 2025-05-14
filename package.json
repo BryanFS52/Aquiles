@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "start:frontend": "npm --workspace frontend run dev",
-    "start:aquilesApi": "cd aquilesApi && ./gradlew bootRun",
+    "start:aquilesApi": "cd aquilesApi && cross-env ./gradlew bootRun",
     "dev": "concurrently --names \"FRONTEND,BACKEND\" --prefix-colors \"green,blue\" \"npm run start:frontend\" \"npm run start:aquilesApi\""
   },
   "devDependencies": {

@@ -1,0 +1,54 @@
+type Justification {
+    id: ID!
+    description: String
+    justificationFile: String
+    justificationDate: String
+    justificationHistory: String
+    state: Boolean
+    notificationId: ID
+    numeroDocumento: String
+    nombreAprendiz: String
+    tipoNovedad: String
+    firmaFile: String
+}
+
+type JustificationPage {
+    code: String
+    data: [Justification]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type JustificationPageId {
+    data: Justification
+    date: String
+    code: String
+    message: String
+}
+
+input JustificationInput {
+    description: String
+    justificationFile: String
+    justificationDate: String
+    justificationHistory: String
+    state: Boolean
+    notificationId: ID!
+    numeroDocumento: String
+    nombreAprendiz: String
+    tipoNovedad: String
+    firmaFile: String
+}
+
+extend type Query {
+    allJustifications(page: Int, size: Int): JustificationPage
+    justificationById(id: ID!): JustificationPageId
+}
+
+extend type Mutation {
+    addJustification(input: JustificationInput): Response
+    updateJustification(id: ID!, input: JustificationInput): Response
+    deleteJustification(id: ID!): Response
+}

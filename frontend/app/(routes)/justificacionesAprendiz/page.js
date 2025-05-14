@@ -15,7 +15,6 @@ import {
 } from "react-icons/fa";
 import { IoPeople } from "react-icons/io5";
 
-// Definición de la variable sessions
 const sessions = {
   "1": {
     componentName: "Nombre del Componente",
@@ -26,102 +25,87 @@ const sessions = {
   },
 };
 
-export default function Component() {
+export default function JustificacionAprendiz() {
   const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
+    tipoNovedad: "",
+    numeroDocumento: "",
+    nombreAprendiz: "",
+    descripcion: "",
+    justificacionFile: null,
+    justificacionFileBase64: "",
+    firmaFile: null,
+    firmaBase64: "",
+  });
 
   const fileInputRefPrev = useRef(null);
   const fileInputRefNew = useRef(null);
 
-  const initialFormData = {
-    numeroDocumento: "",
-    nombreAprendiz: "",
-    justificacionFile: null,
-    firmaFile: null,
-    firmaBase64: "", // Aquí almacenaremos la firma en base64
-  };
-
-  const [formData, setFormData] = useState(initialFormData);
-
-  const handleJustifyClick = () => setShowForm(true);
-
-  const handleUploadPrev = () => fileInputRefPrev.current.click();
-
-  const handleUploadNew = () => fileInputRefNew.current.click();
-
-  const handleNumericChange = (e) => {
+  const handleInputChange = (e, allowAlpha = false) => {
     const { name, value } = e.target;
-    const numericValue = value.replace(/[^0-9]/g, "");
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: numericValue,
-    }));
+    const cleanedValue = allowAlpha ? value.replace(/[^a-zA-Z\s]/g, "") : value.replace(/[^0-9]/g, "");
+    setFormData((prev) => ({ ...prev, [name]: cleanedValue }));
   };
 
-  const handleAlphaChange = (e) => {
+  const handleSelectChange = (e) => {
     const { name, value } = e.target;
-    const alphaValue = value.replace(/[^a-zA-Z\s]/g, "");
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: alphaValue,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e, fileType) => {
+  const handleFileChange = (e, fileKey) => {
     const file = e.target.files[0];
-    if (fileType === "justificacionFile") {
-      setFormData((prevData) => ({
-        ...prevData,
-        [fileType]: file,
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result.split(",")[1];
+      setFormData((prev) => ({
+        ...prev,
+        [fileKey]: file,
+        [`${fileKey}Base64`]: base64,
       }));
-    } else if (fileType === "firmaFile") {
-      // Convertir la firma a base64
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prevData) => ({
-          ...prevData,
-          [fileType]: file,
-          firmaBase64: reader.result.split(",")[1], // Tomamos solo la parte base64
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
-
-    // Validación de campos vacíos
-
-
-    // Validación de tipo de novedad
-
-
-    // Validación de tamaño de archivo (justificaciónFile)
     if (formData.justificacionFile && formData.justificacionFile.size > 5 * 1024 * 1024) {
       toast.error("El archivo de justificación no puede ser mayor de 5 MB.");
       return;
     }
-
-    // Si todo está bien, intentamos enviar el formulario
     try {
-      console.log("Enviando justificación:", formData);
       const result = await justificationService.submitJustification(formData);
-
       if (result) {
         toast.success("Justificación enviada con éxito.");
         setShowForm(false);
+        setFormData({
+          tipoNovedad: "",
+          numeroDocumento: "",
+          nombreAprendiz: "",
+          descripcion: "",
+          justificacionFileBase64: "",
+          firmaBase64: "",
+        });
       } else {
-        toast.error("Hubo un error al enviar la justificación.");
+        toast.error("Error al enviar la justificación.");
       }
     } catch (error) {
-      console.error("Error al enviar la justificación:", error);
-      toast.error("Hubo un error al enviar la justificación.");
+      toast.error("Error inesperado al enviar la justificación.");
+      console.error(error);
     }
   };
 
   const handleCancel = () => {
-    setFormData(initialFormData);
     setShowForm(false);
+    setFormData({
+      numeroDocumento: "",
+      nombreAprendiz: "",
+      descripcion: "",
+      tipoNovedad: "",
+      justificacionFileBase64: "",
+      firmaFile: null,
+      firmaBase64: "",
+    });
   };
 
   return (
@@ -129,8 +113,8 @@ export default function Component() {
       <Sidebaraprendiz />
       <div className="xl:col-span-5">
         <HeaderAprendiz />
-        <div className="h-[90vh] p-4 md:p-8 lg:p-12 w-full bg-neutral-100 space-y-5">
-          <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-4 font-inter font-semibold">
+        <div className="h-[90vh] p-6 bg-neutral-100 space-y-5">
+          <h1 className="text-[#0e324d] text-3xl border-b-2 border-gray-400 w-fit mb-6 font-semibold">
             Justificación para el Aprendiz
           </h1>
 
@@ -140,32 +124,32 @@ export default function Component() {
                 initial={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="w-full lg:w-1/2 bg-white p-8 rounded-lg shadow-lg"
+                className="w-full lg:w-1/2 bg-white p-8 rounded-lg shadow-md"
               >
-                <h2 className="text-[#0e324d] font-inter font-semibold text-xl sm:text-2xl mb-6">
-                  {`Componente: ${sessions["1"].componentName}`}
+                <h2 className="text-[#0e324d] text-xl font-semibold mb-4">
+                  Componente: {sessions["1"].componentName}
                 </h2>
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2 text-gray-700">
-                    <FaCalendarDay className="w-7 h-7 text-[#0e324d] mr-3" />
-                    <span>{`Fecha: ${sessions["1"].date}`}</span>
+                <div className="space-y-2 text-gray-700">
+                  <div className="flex items-center">
+                    <FaCalendarDay className="mr-3 text-[#0e324d]" />
+                    Fecha: {sessions["1"].date}
                   </div>
-                  <div className="flex items-center space-x-2 text-gray-700">
-                    <FaRegClock className="w-7 h-7 text-[#0e324d] mr-3" />
-                    <span>{`Hora: ${sessions["1"].time}`}</span>
+                  <div className="flex items-center">
+                    <FaRegClock className="mr-3 text-[#0e324d]" />
+                    Hora: {sessions["1"].time}
                   </div>
-                  <div className="flex items-center space-x-2 text-gray-700">
-                    <FaRegListAlt className="w-7 h-7 text-[#0e324d] mr-3" />
-                    <span>{`Ficha: ${sessions["1"].sheet}`}</span>
+                  <div className="flex items-center">
+                    <FaRegListAlt className="mr-3 text-[#0e324d]" />
+                    Ficha: {sessions["1"].sheet}
                   </div>
-                  <div className="flex items-center space-x-2 text-gray-700">
-                    <IoPeople className="w-7 h-7 text-[#0e324d] mr-3" />
-                    <span>{`Instructor(es): ${sessions["1"].instructors.join(", ")}`}</span>
+                  <div className="flex items-center">
+                    <IoPeople className="mr-3 text-[#0e324d]" />
+                    Instructores: {sessions["1"].instructors.join(", ")}
                   </div>
                 </div>
                 <button
-                  onClick={handleJustifyClick}
-                  className="w-full mt-6 py-2 rounded bg-[#0e324d] text-white hover:bg-[#01b001] transition-colors duration-300"
+                  onClick={() => setShowForm(true)}
+                  className="w-full mt-6 py-2 rounded bg-[#0e324d] text-white hover:bg-[#01b001] transition-colors"
                 >
                   Justificar
                 </button>
@@ -180,82 +164,112 @@ export default function Component() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 50 }}
                 transition={{ duration: 0.5 }}
-                className="w-full lg:w-1/2 bg-white p-8 rounded-lg shadow-lg"
+                className="w-full lg:w-1/2 bg-white p-8 rounded-lg shadow-md"
               >
-                <h2 className="text-[#0e324d] font-inter font-semibold text-xl sm:text-2xl mb-6">
+                <h2 className="text-[#0e324d] text-xl font-semibold mb-6">
                   Formulario de Justificación
                 </h2>
-                <form onSubmit={handleSave}>
-                  <div className="space-y-4">
-                    <div className="flex flex-col">
-                      <label>Número de Documento</label>
-                      <input
-                        type="text"
-                        name="numeroDocumento"
-                        value={formData.numeroDocumento}
-                        onChange={handleNumericChange}
-                        className="h-10 block w-full pl-3 pr-10 text-sm"
-                        placeholder="123456789"
-                      />
-                    </div>
-
-                    <div className="flex flex-col">
-                      <label>Nombre Aprendiz</label>
-                      <input
-                        type="text"
-                        name="nombreAprendiz"
-                        value={formData.nombreAprendiz}
-                        onChange={handleAlphaChange}
-                        className="h-10 block w-full pl-3 pr-10 text-sm"
-                        placeholder="Juan Pérez"
-                      />
-                    </div>
-
-                    <div className="flex flex-col">
-                      <label>Justificación (Archivo)</label>
-                      <button
-                        type="button"
-                        onClick={handleUploadPrev}
-                        className="bg-[#0e324d] text-white h-10 rounded-lg"
-                      >
-                        {formData.justificacionFile?.name || "Subir Archivo"}
-                      </button>
-                      <input
-                        type="file"
-                        ref={fileInputRefPrev}
-                        onChange={(e) => handleFileChange(e, "justificacionFile")}
-                        className="hidden"
-                      />
-                    </div>
-
-                    <div className="flex flex-col mt-4">
-                      <label>Firma (Archivo)</label>
-                      <button
-                        type="button"
-                        onClick={handleUploadNew}
-                        className="bg-[#0e324d] text-white h-10 rounded-lg"
-                      >
-                        {formData.firmaFile?.name || "Subir Firma"}
-                      </button>
-                      <input
-                        type="file"
-                        ref={fileInputRefNew}
-                        onChange={(e) => handleFileChange(e, "firmaFile")}
-                        className="hidden"
-                      />
-                    </div>
+                <form onSubmit={handleSave} className="space-y-4">
+                  <div className="flex flex-col">
+                    <label>Número de Documento</label>
+                    <input
+                      type="text"
+                      name="numeroDocumento"
+                      value={formData.numeroDocumento}
+                      onChange={(e) => handleInputChange(e)}
+                      className="h-10 border border-gray-300 rounded pl-3"
+                      placeholder="123456789"
+                    />
                   </div>
 
-                  <div className="flex justify-between mt-6">
+                  <div className="flex flex-col">
+                    <label>Nombre Aprendiz</label>
+                    <input
+                      type="text"
+                      name="nombreAprendiz"
+                      value={formData.nombreAprendiz}
+                      onChange={(e) => handleInputChange(e, true)}
+                      className="h-10 border border-gray-300 rounded pl-3"
+                      placeholder="Juan Pérez"
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label>Descripción</label>
+                    <input
+                      type="text"
+                      name="descripcion"
+                      value={formData.descripcion}
+                      onChange={(e) => handleInputChange(e, true)}
+                      className="h-10 border border-gray-300 rounded pl-3"
+                      placeholder="Motivo de la justificación"
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label>Tipo De Novedad</label>
+                    <select
+                      name="tipoNovedad"
+                      value={formData.tipoNovedad}
+                      onChange={handleSelectChange}
+                      className="h-10 border border-gray-300 rounded pl-3"
+                    >
+                      <option value="" disabled hidden>
+                        Seleccione el tipo
+                      </option>
+                      <option value="medicas">Medica</option>
+                      <option value="calamidad">Calamidad</option>
+                      <option value="otro">Otro</option>
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label>Justificación (Archivo)</label>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRefPrev.current.click()}
+                      className="bg-[#0e324d] text-white h-10 rounded mt-1"
+                    >
+                      {formData.justificacionFile?.name || "Subir Archivo"}
+                    </button>
+                    <input
+                      type="file"
+                      ref={fileInputRefPrev}
+                      onChange={(e) => handleFileChange(e, "justificacionFile")}
+                      className="hidden"
+                    />
+                  </div>
+
+                  <div className="flex flex-col">
+                    <label>Firma (Archivo)</label>
+                    <button
+                      type="button"
+                      onClick={() => fileInputRefNew.current.click()}
+                      className="bg-[#0e324d] text-white h-10 rounded mt-1"
+                    >
+                      {formData.firmaFile?.name || "Subir Firma"}
+                    </button>
+                    <input
+                      type="file"
+                      ref={fileInputRefNew}
+                      onChange={(e) => handleFileChange(e, "firmaFile")}
+                      className="hidden"
+                    />
+                  </div>
+
+                  <div className="flex justify-between">
                     <button
                       type="button"
                       onClick={handleCancel}
-                      className="px-4 py-2 bg-gray-500 text-white"
+                      className="px-4 py-2 bg-gray-500 text-white rounded"
                     >
                       Cancelar
                     </button>
-                    <button type="submit" className="px-4 py-2 bg-[#0e324d] text-white">
-                      Guardar Justificación
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-[#0e324d] text-white rounded"
+                    >
+                      Enviar Justificación
                     </button>
                   </div>
                 </form>

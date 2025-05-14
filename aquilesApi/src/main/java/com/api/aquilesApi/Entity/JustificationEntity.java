@@ -42,6 +42,6 @@ public class JustificationEntity implements Serializable {
 
     // 2.Relation (M-1) con justificationType
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "justification_type_id", nullable = false)
+    @JoinColumn(name = "justification_type_id", nullable = true)
     private JustificationTypeEntity type;
 }

@@ -13,7 +13,7 @@ public class JustificationDto {
     private Long id;
     private String description;
     private byte[] justificationFile;
-    private Date justificationDate;
+    private String justificationDate;
     private String justificationHistory;
     private Boolean state;
     // Relations
