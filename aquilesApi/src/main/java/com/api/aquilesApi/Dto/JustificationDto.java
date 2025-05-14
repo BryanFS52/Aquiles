@@ -4,19 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class JustificationDto {
     private Long id;
+    private String documentNumber;
+    private String name;
     private String description;
     private byte[] justificationFile;
     private String justificationDate;
-    private String justificationHistory;
     private Boolean state;
+    private String justificationHistory;
+
     // Relations
+    private JustificationTypeDto justificationTypeId;
     private Long notificationId;
-    private Long justificationTypeId;
 }

@@ -7,18 +7,24 @@ export const GET_ALL_JUSTIFICATIONS = gql`
       code
       message
       date
+      totalPages
+      totalItems
+      currentPage
       data {
         id
+        documentNumber
+        name
         description
+        justificationFile
         justificationDate
         justificationHistory
         state
         notificationId
-        justificationTypeId
+        justificationType {
+          id
+          name
+        }
       }
-      totalPages
-      totalItems
-      currentPage
     }
   }
 `;
@@ -31,12 +37,18 @@ export const GET_JUSTIFICATION_BY_ID = gql`
       date
       data {
         id
+        documentNumber
+        name
         description
+        justificationFile
         justificationDate
         justificationHistory
         state
         notificationId
-        justificationTypeId
+        justificationType {
+          id
+          name
+        }
       }
     }
   }

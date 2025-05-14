@@ -1,38 +1,33 @@
-import { client } from '../lib/apollo-client';
-import { ADD_JUSTIFICATION } from '../graphql/JustificationsGraph';
+import { client } from '@lib/apollo-client';
+import { ADD_JUSTIFICATION } from '@graphql/JustificationsGraph';
 
 const justificationService = {
   submitJustification: async (formData) => {
     try {
       const {
-        tipoNovedad,
+        numeroDocumento,
+        nombreAprendiz,
+        descripcion,
+        justificationTypeId,
         justificacionFile,
-        firmaFile
+        notificationId
       } = formData;
 
-      // Convierte los archivos a base64 si existen
-      let justificacionFileBase64 = null;
-      if (justificacionFile) {
-        const reader = new FileReader();
-        justificacionFileBase64 = await new Promise((resolve, reject) => {
-          reader.onloadend = () => resolve(reader.result.split(",")[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(justificacionFile);
+      // Función para convertir archivos a Base64
+      const toBase64 = (file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onerror = (error) => reject(error);
         });
-      }
 
-      let firmaFileBase64 = null;
-      if (firmaFile) {
-        const reader = new FileReader();
-        firmaFileBase64 = await new Promise((resolve, reject) => {
-          reader.onloadend = () => resolve(reader.result.split(",")[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(firmaFile);
-        });
-      }
+      const justificationFileBase64 = justificacionFile
+        ? await toBase64(justificacionFile)
+        : null;
 
-      // Si la fecha no se proporciona, usa la fecha actual (o ajusta según lo necesario)
-      const justificationDate = new Date().toISOString(); // o cualquier formato que el backend espera
+      // Fecha actual en ISO (ajústalo si el backend necesita otro formato)
+      const justificationDate = new Date().toISOString();
 
       console.log("Submitting justification:", formData);
 
@@ -40,13 +35,15 @@ const justificationService = {
         mutation: ADD_JUSTIFICATION,
         variables: {
           input: {
-            description: "",
-            justificationFile: justificacionFileBase64,
+            documentNumber: numeroDocumento,
+            name: nombreAprendiz,
+            description: descripcion,
+            justificationFile: justificationFileBase64,
+            justificationTypeId,
             justificationDate,
-            justificationHistory: "",
+            justificationHistory: "tipoNovedad",
             state: true,
-            notificationId: "",
-            firmaFile: firmaFileBase64
+            notificationId,
           }
         },
       });

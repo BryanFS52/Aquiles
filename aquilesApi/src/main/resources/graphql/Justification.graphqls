@@ -1,15 +1,14 @@
 type Justification {
     id: ID!
+    documentNumber: String
+    name: String
     description: String
     justificationFile: String
     justificationDate: String
     justificationHistory: String
     state: Boolean
     notificationId: ID
-    numeroDocumento: String
-    nombreAprendiz: String
-    tipoNovedad: String
-    firmaFile: String
+    justificationType: JustificationType
 }
 
 type JustificationPage {
@@ -30,16 +29,15 @@ type JustificationPageId {
 }
 
 input JustificationInput {
+    documentNumber: String
+    name: String
     description: String
     justificationFile: String
     justificationDate: String
     justificationHistory: String
     state: Boolean
-    notificationId: ID!
-    numeroDocumento: String
-    nombreAprendiz: String
-    tipoNovedad: String
-    firmaFile: String
+    notificationId: ID
+    justificationTypeId: JustificationTypeInput
 }
 
 extend type Query {

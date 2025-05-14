@@ -8,6 +8,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BsPersonCircle } from "react-icons/bs";
 import justificationService from "@services/justificationService";
+
 import {
   FaCalendarDay,
   FaRegClock,
@@ -28,14 +29,13 @@ const sessions = {
 export default function JustificacionAprendiz() {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    tipoNovedad: "",
+    justificationTypeId: { id: "" },
     numeroDocumento: "",
     nombreAprendiz: "",
     descripcion: "",
     justificacionFile: null,
     justificacionFileBase64: "",
-    firmaFile: null,
-    firmaBase64: "",
+    notificationId: "123456",
   });
 
   const fileInputRefPrev = useRef(null);
@@ -98,13 +98,13 @@ export default function JustificacionAprendiz() {
   const handleCancel = () => {
     setShowForm(false);
     setFormData({
+      tipoNovedad: "",
       numeroDocumento: "",
       nombreAprendiz: "",
       descripcion: "",
-      tipoNovedad: "",
+      justificacionFile: null,
       justificacionFileBase64: "",
-      firmaFile: null,
-      firmaBase64: "",
+      notificationId: "123456",
     });
   };
 
@@ -209,17 +209,21 @@ export default function JustificacionAprendiz() {
                   <div className="flex flex-col">
                     <label>Tipo De Novedad</label>
                     <select
-                      name="tipoNovedad"
-                      value={formData.tipoNovedad}
-                      onChange={handleSelectChange}
-                      className="h-10 border border-gray-300 rounded pl-3"
+                      name="justificationType"
+                      value={formData.justificationTypeId.id}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          justificationTypeId: { id: e.target.value },
+                        }))
+                      }
                     >
                       <option value="" disabled hidden>
                         Seleccione el tipo
                       </option>
-                      <option value="medicas">Medica</option>
-                      <option value="calamidad">Calamidad</option>
-                      <option value="otro">Otro</option>
+                      <option value="1">Medica</option>
+                      <option value="2">Calamidad</option>
+                      <option value="3">Otro</option>
                     </select>
                   </div>
 
@@ -236,23 +240,6 @@ export default function JustificacionAprendiz() {
                       type="file"
                       ref={fileInputRefPrev}
                       onChange={(e) => handleFileChange(e, "justificacionFile")}
-                      className="hidden"
-                    />
-                  </div>
-
-                  <div className="flex flex-col">
-                    <label>Firma (Archivo)</label>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRefNew.current.click()}
-                      className="bg-[#0e324d] text-white h-10 rounded mt-1"
-                    >
-                      {formData.firmaFile?.name || "Subir Firma"}
-                    </button>
-                    <input
-                      type="file"
-                      ref={fileInputRefNew}
-                      onChange={(e) => handleFileChange(e, "firmaFile")}
                       className="hidden"
                     />
                   </div>

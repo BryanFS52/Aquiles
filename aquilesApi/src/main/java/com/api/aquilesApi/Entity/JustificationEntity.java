@@ -19,6 +19,12 @@ public class JustificationEntity implements Serializable {
     private Long id;
 
     // Columns
+    @Column(name = "documentNumber", nullable = false)
+    private String documentNumber;
+
+    @Column(name = "name", nullable = false)
+    private String name;
+
     @Column(name = "description")
     private String description;
 
@@ -29,11 +35,11 @@ public class JustificationEntity implements Serializable {
     @Column(name = "justification_date", nullable = false)
     private Date justificationDate;
 
-    @Column(name = "justification_history", nullable = false)
-    private String justificationHistory;
-
     @Column(name = "state", nullable = false)
     private Boolean state;
+    /// TABLA INTERMEDIA OK????
+    @Column(name = "justification_history", nullable = false)
+    private String justificationHistory;
 
     // Relations
     // 1.Relation (1-1) con notifications
