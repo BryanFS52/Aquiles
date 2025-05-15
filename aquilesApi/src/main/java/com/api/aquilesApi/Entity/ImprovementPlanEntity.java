@@ -35,7 +35,7 @@ public class ImprovementPlanEntity implements Serializable {
     private Boolean state;
 
     // Relations
-    // 6.Relation (1-1) con Notifications
+    // 1.Relation (1-1) con Notifications
     @OneToOne(mappedBy = "improvementPlan")
     private NotificationsEntity notification;
 }

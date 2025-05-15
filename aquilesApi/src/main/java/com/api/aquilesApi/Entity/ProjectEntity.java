@@ -1,13 +1,11 @@
 package com.api.aquilesApi.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Set;
 
 @NoArgsConstructor
 @Getter
@@ -36,7 +34,6 @@ public class ProjectEntity implements Serializable {
     private String members;
 
     //Relations
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_team_scrum_id", nullable = true)
     private TeamsScrumEntity fk_team_scrum_id;

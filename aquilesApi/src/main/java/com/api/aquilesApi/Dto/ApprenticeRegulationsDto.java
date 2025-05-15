@@ -1,17 +1,15 @@
 package com.api.aquilesApi.Dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-
-import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApprenticeRegulationsDto implements Serializable {
+public class ApprenticeRegulationsDto {
     private Long id;
 
     @NotBlank

@@ -6,12 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EvaluationsDto implements Serializable {
+public class EvaluationsDto {
     private Long id;
 
     @NotBlank(message = "Las observaciones son obligatorias")

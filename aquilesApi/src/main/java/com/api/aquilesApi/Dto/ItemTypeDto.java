@@ -6,13 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemTypeDto implements Serializable {
-
+public class ItemTypeDto {
     private Long id;
 
     @NotBlank(message = "El nombre es obligatorio")

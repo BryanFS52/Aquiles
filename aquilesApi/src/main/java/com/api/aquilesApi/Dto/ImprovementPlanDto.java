@@ -6,13 +6,11 @@
     import lombok.AllArgsConstructor;
     import lombok.Data;
     import lombok.NoArgsConstructor;
-
-    import java.io.Serializable;
     
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public class ImprovementPlanDto implements Serializable {
+    public class ImprovementPlanDto {
         private Long id;
     
         @NotBlank(message = "La ciudad es obligatoria")

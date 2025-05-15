@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Follow_upsDto {
+
     private Long followUpId;
+
     private StateFollow_upsEntity stateFollowUps;
 }

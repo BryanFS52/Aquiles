@@ -5,13 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttendancesDto implements Serializable {
+public class AttendancesDto {
     private Long attendanceId;
+
     private String attendanceDate;
+
     private StateAttendanceEntity stateAttendance;
 }

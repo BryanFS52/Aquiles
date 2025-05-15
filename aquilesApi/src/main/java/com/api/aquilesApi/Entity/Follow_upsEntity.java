@@ -1,6 +1,5 @@
 package com.api.aquilesApi.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,8 +23,7 @@ public class Follow_upsEntity implements Serializable {
     private StudentsEntity fk_idStudent;
 
 
-    // Relación con State_Follow_Up
-    @JsonIgnore
+    // Relations
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_stateFollowUp_id", referencedColumnName = "state_Follow_up_id")
     private StateFollow_upsEntity stateFollowUps; // Cambiado a este nombre

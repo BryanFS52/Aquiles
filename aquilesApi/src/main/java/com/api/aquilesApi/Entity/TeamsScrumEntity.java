@@ -36,5 +36,4 @@ public class TeamsScrumEntity implements Serializable {
 
     @OneToMany(mappedBy = "fk_team_scrum_id", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<ProjectEntity> projectList;
-
 }

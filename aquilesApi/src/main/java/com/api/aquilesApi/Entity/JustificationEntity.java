@@ -37,6 +37,7 @@ public class JustificationEntity implements Serializable {
 
     @Column(name = "state", nullable = false)
     private Boolean state;
+
     /// TABLA INTERMEDIA OK????
     @Column(name = "justification_history", nullable = false)
     private String justificationHistory;

@@ -6,13 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChecklistDto implements Serializable {
+public class ChecklistDto {
     private Long id;
 
     @NotNull(message = "El estado es obligatorio")

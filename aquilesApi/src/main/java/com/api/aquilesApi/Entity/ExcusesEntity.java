@@ -26,7 +26,7 @@ public class ExcusesEntity implements Serializable {
     @Column(name = "excuse_document", nullable = false, length = 100)
     private String excuseDocument;
 
-    // Aquí el mappedBy debe hacer referencia a la propiedad "excuse" de AttendancesEntity
+    // Relations
     @OneToMany(mappedBy = "excuse", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<AttendancesEntity> attendanceSet;
 }

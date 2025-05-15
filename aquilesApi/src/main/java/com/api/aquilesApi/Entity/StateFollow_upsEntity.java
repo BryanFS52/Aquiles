@@ -1,6 +1,5 @@
 package com.api.aquilesApi.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +21,7 @@ public class StateFollow_upsEntity {
     @Column (name = "status")
     private String status;
 
-    @JsonIgnore
+    // Relations
     @OneToMany(mappedBy = "stateFollowUps" ,cascade = CascadeType.ALL ,  fetch = FetchType.LAZY)
     private List<Follow_upsEntity> follow_upsEntityList ;
 }

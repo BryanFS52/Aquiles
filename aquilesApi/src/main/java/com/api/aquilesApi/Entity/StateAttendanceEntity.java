@@ -1,7 +1,6 @@
 package com.api.aquilesApi.Entity;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +23,7 @@ public class StateAttendanceEntity implements Serializable {
     @Column (name = "status")
     private String status;
 
-    @JsonIgnore
+    // Relations
     @OneToMany(mappedBy = "stateAttendance" ,cascade = CascadeType.ALL ,  fetch = FetchType.LAZY)
     private List<AttendancesEntity> attendancesEntityList;
 

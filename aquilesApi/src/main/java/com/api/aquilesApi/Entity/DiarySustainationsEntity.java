@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.security.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -28,6 +26,7 @@ public class DiarySustainationsEntity implements Serializable {
     @Column(name = "place", length = 255)
     private String place;
 
+    // Relations
     @ManyToMany(mappedBy = "diarySustainations")
     private Set<JuriesEntity> juries;
 }

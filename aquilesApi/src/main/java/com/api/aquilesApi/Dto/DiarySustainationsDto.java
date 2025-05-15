@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.security.Timestamp;
 import java.time.LocalDateTime;
 
 @Data
@@ -12,6 +11,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DiarySustainationsDto {
     private Long diaryId;
+
     private LocalDateTime dateTime;
+
     private String place;
 }
