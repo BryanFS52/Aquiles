@@ -10,7 +10,7 @@ const client = new ApolloClient({
 // New client for Cloudfare tunnel
 const clientCloudfare = new ApolloClient({
     link: new HttpLink({
-        uri: "https://bosnia-paperback-philips-tea.trycloudflare.com/olympo/graphql",
+        uri: "https://antonio-expansys-aa-sacred.trycloudflare.com",
     }),
     cache: new InMemoryCache(),
     defaultOptions: {

@@ -1,18 +1,12 @@
 import { client } from '@lib/apollo-client';
-import {
-    GET_ALL_JUSTIFICATION_TYPES,
-    GET_JUSTIFICATION_TYPE_BY_ID,
-    ADD_JUSTIFICATION_TYPE,
-    UPDATE_JUSTIFICATION_TYPE,
-    DELETE_JUSTIFICATION_TYPE,
-} from '../graphql/JustificationTypeGraph';
+import JustificationGraphQL from '@graphql/JustificationTypeGraph';
 
 const justificationTypeService = {
     // Obtener todos los tipos con paginación
     getAll: async (page = 1, size = 10) => {
         try {
             const { data } = await client.query({
-                query: GET_ALL_JUSTIFICATION_TYPES,
+                query: JustificationGraphQL.GET_ALL_JUSTIFICATION_TYPES,
                 variables: { page, size },
                 fetchPolicy: 'network-only',
             });
@@ -27,7 +21,7 @@ const justificationTypeService = {
     getById: async (id) => {
         try {
             const { data } = await client.query({
-                query: GET_JUSTIFICATION_TYPE_BY_ID,
+                query: JustificationGraphQL.GET_JUSTIFICATION_TYPE_BY_ID,
                 variables: { id },
                 fetchPolicy: 'network-only',
             });
@@ -42,7 +36,7 @@ const justificationTypeService = {
     create: async (input) => {
         try {
             const { data } = await client.mutate({
-                mutation: ADD_JUSTIFICATION_TYPE,
+                mutation: JustificationGraphQL.ADD_JUSTIFICATION_TYPE,
                 variables: { input },
             });
             return data.addJustificationType;
@@ -56,7 +50,7 @@ const justificationTypeService = {
     update: async (id, input) => {
         try {
             const { data } = await client.mutate({
-                mutation: UPDATE_JUSTIFICATION_TYPE,
+                mutation: JustificationGraphQL.UPDATE_JUSTIFICATION_TYPE,
                 variables: { id, input },
             });
             return data.updateJustificationType;
@@ -70,7 +64,7 @@ const justificationTypeService = {
     remove: async (id) => {
         try {
             const { data } = await client.mutate({
-                mutation: DELETE_JUSTIFICATION_TYPE,
+                mutation: JustificationGraphQL.DELETE_JUSTIFICATION_TYPE,
                 variables: { id },
             });
             return data.deleteJustificationType;

@@ -4,19 +4,18 @@ import com.api.aquilesApi.Entity.StateFollow_upsEntity;
 import com.api.aquilesApi.Repository.StateFollow_upsRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class StateFollow_upsService implements Idao <StateFollow_upsEntity , Long> {
-    @Autowired
-    private StateFollow_upsRepository stateFollowUpsRepository;
+    private final StateFollow_upsRepository stateFollowUpsRepository;
+
+    public StateFollow_upsService(StateFollow_upsRepository stateFollowUpsRepository) {
+        this.stateFollowUpsRepository = stateFollowUpsRepository;
+    }
 
     @Override
     public Page<StateFollow_upsEntity> findAll(PageRequest pageRequest) {

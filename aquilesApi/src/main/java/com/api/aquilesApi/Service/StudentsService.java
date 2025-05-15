@@ -4,19 +4,18 @@ import com.api.aquilesApi.Entity.StudentsEntity;
 import com.api.aquilesApi.Repository.StudentsRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class StudentsService implements Idao<StudentsEntity , Long> {
-    @Autowired
-    private StudentsRepository studentsRepository;
+    private final StudentsRepository studentsRepository;
+
+    public StudentsService(StudentsRepository studentsRepository) {
+        this.studentsRepository = studentsRepository;
+    }
 
     public StudentsEntity findByDocument_Number(Long documentNumber){
         return studentsRepository.findByDocumentNumber(documentNumber);

@@ -20,6 +20,9 @@ public class JustificationTypeBusiness {
         this.justificationTypeService = justificationTypeService;
     }
 
+    // Validación Objeto
+
+
     // Find All
     public Page<JustificationTypeDto> findAll(int page, int size) {
         try {

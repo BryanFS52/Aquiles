@@ -1,15 +1,12 @@
 package com.api.aquilesApi.Business;
 
-import com.api.aquilesApi.Dto.AttendancesDto;
 import com.api.aquilesApi.Dto.ExcusesDto;
-import com.api.aquilesApi.Entity.AttendancesEntity;
 import com.api.aquilesApi.Entity.ExcusesEntity;
 import com.api.aquilesApi.Service.ExcusesService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,15 +19,13 @@ import java.util.Map;
 public class ExcusesBusiness {
 
     private final ExcusesService excusesService;
-
-    public ExcusesBusiness(ExcusesService excusesService) {
-        this.excusesService = excusesService;
-    }
-
-    @Autowired
-    private Util util;
-
+    private final Util util;
     private final ModelMapper modelMapper = new ModelMapper();
+
+    public ExcusesBusiness(ExcusesService excusesService, Util util) {
+        this.excusesService = excusesService;
+        this.util = util;
+    }
 
     // Validación de Objeto
     private ExcusesDto validationObject(Map<String, Object> json, ExcusesDto excusesDto) {

@@ -8,7 +8,6 @@ import com.api.aquilesApi.Repository.JuriesRepository;
 import com.api.aquilesApi.Repository.ProjectRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -21,14 +20,15 @@ import java.util.stream.Collectors;
 @Service
 public class ChecklistService implements Idao<ChecklistEntity, Long> {
 
-    @Autowired
-    private ChecklistRepository checklistRepository;
+    private final ChecklistRepository checklistRepository;
+    private final ProjectRepository projectRepository;  // Repositorio de ProjectEntity
+    private final JuriesRepository juriesRepository;    // Repositorio de JuriesEntity
 
-    @Autowired
-    private ProjectRepository projectRepository;  // Repositorio de ProjectEntity
-
-    @Autowired
-    private JuriesRepository juriesRepository;    // Repositorio de JuriesEntity
+    public ChecklistService(ChecklistRepository checklistRepository, ProjectRepository projectRepository, JuriesRepository juriesRepository) {
+        this.checklistRepository = checklistRepository;
+        this.projectRepository = projectRepository;
+        this.juriesRepository = juriesRepository;
+    }
 
     @Override
     public Page<ChecklistEntity> findAll(PageRequest pageRequest) {

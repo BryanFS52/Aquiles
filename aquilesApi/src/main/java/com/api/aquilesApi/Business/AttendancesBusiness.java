@@ -7,7 +7,6 @@ import com.api.aquilesApi.Service.StateAttendanceService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,16 +21,17 @@ import java.util.Map;
 @Component
 public class AttendancesBusiness {
 
-    @Autowired
-    private AttendancesService attendancesService;
-
-    @Autowired
-    private StateAttendanceService stateAttendanceService;
-
-    @Autowired
-    private Util util;
-
+    private final AttendancesService attendancesService;
+    private final StateAttendanceService stateAttendanceService;
+    private final Util util;
     private final ModelMapper modelMapper = new ModelMapper();
+
+
+    public AttendancesBusiness(AttendancesService attendancesService, StateAttendanceService stateAttendanceService, Util util) {
+        this.attendancesService = attendancesService;
+        this.stateAttendanceService = stateAttendanceService;
+        this.util = util;
+    }
 
     // Validación Objeto
     private void validationObject(Map<String, Object> json, AttendancesDto attendancesDTO) {

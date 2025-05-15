@@ -18,10 +18,6 @@ public class JuriesDto implements Serializable {
     @NotNull(message = "La fecha asignada es obligatoria")
     private Date dateAssigned;
 
-    // Relación con TrainersEntity (DTO)
-    @NotNull(message = "El entrenador es obligatorio")
-    private TrainersDto trainer;
-
     // Relación con ChecklistEntity (DTO)
     private List<ChecklistDto> listChecklistSubstantiationLists;
 

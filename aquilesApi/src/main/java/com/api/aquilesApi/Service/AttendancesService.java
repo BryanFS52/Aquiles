@@ -5,7 +5,6 @@ import com.api.aquilesApi.Entity.StateAttendanceEntity;
 import com.api.aquilesApi.Repository.AttendancesRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -14,8 +13,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class AttendancesService implements Idao<AttendancesEntity , Long> {
 
-    @Autowired
-    private AttendancesRepository attendancesRepository;
+    private final AttendancesRepository attendancesRepository;
+
+    public AttendancesService(AttendancesRepository attendancesRepository) {
+        this.attendancesRepository = attendancesRepository;
+    }
 
     @Override
     public Page<AttendancesEntity> findAll(PageRequest pageRequest) {
@@ -50,13 +52,6 @@ public class AttendancesService implements Idao<AttendancesEntity , Long> {
         this.attendancesRepository.save(entity);
     }
 
-    public long countPresentByTrainerId(Long trainerId, Long presentStateId) {
-        return attendancesRepository.countPresentByTrainerId(trainerId, presentStateId);
-    }
-
-    public long countAbsentByTrainerId(Long trainerId, Long absentStateId) {
-        return attendancesRepository.countAbsentByTrainerId(trainerId, absentStateId);
-    }
 
     public boolean existsByAttendanceDateAndStateAttendance(String attendanceDate, StateAttendanceEntity stateAttendance) {
         return attendancesRepository.existsByAttendanceDateAndStateAttendance(attendanceDate , stateAttendance);

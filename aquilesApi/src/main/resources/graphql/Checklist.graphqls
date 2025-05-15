@@ -1,3 +1,4 @@
+# Pendiente
 type Juries {
     id: ID
     name: String

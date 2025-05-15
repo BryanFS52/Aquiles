@@ -11,7 +11,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,7 +19,6 @@ public class TeamsScrumBusiness {
 
     private final TeamScrumService teamScrumService;
     private final Util util;
-
     private final ModelMapper modelMapper = new ModelMapper();
 
     public TeamsScrumBusiness(TeamScrumService teamScrumService, Util util) {
@@ -28,12 +26,7 @@ public class TeamsScrumBusiness {
         this.util = util;
     }
 
-    // Validación Objeto
-    /*
-    private TeamsScrumDto validationObject(TeamsScrumDto teamsScrumDto) {
-
-    }
-     */
+    // Validación de objecto
 
 
     // Find All
@@ -52,6 +45,7 @@ public class TeamsScrumBusiness {
             throw new CustomException("Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     // Find By Id
     public TeamsScrumDto findById(Long id) {
         try {
@@ -68,7 +62,6 @@ public class TeamsScrumBusiness {
             throw new CustomException("Error Getting Team Scrum By Id: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
 
     // Add
     public TeamsScrumDto add(TeamsScrumDto teamsScrumDto) {

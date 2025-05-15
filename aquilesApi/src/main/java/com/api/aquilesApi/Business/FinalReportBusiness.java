@@ -20,6 +20,9 @@ public class FinalReportBusiness {
         this.finalReportService = finalReportService;
     }
 
+    // Validación Objeto
+
+
     // Find All
     public Page<FinalReportDto> findAll(int page, int size) {
         try {

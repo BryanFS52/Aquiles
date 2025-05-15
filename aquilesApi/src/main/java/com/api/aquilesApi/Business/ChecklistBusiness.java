@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ChecklistBusiness {
+
     private final ChecklistService checklistService;
     private final ModelMapper modelMapper = new ModelMapper();
 
@@ -22,6 +23,7 @@ public class ChecklistBusiness {
         this.checklistService = checklistService;
     }
 
+    // Validación Objeto
 
     // Find All
     public Page<ChecklistDto> findAll(int page, int size) {

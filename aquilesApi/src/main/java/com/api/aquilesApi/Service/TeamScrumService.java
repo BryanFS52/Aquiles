@@ -4,7 +4,6 @@ import com.api.aquilesApi.Entity.TeamsScrumEntity;
 import com.api.aquilesApi.Repository.TeamScrumRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -12,9 +11,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TeamScrumService implements Idao<TeamsScrumEntity, Long> {
-    @Autowired // Inyecta automáticamente el repositorio Teams_scrumRepository
-    private TeamScrumRepository teamsScrumRepository;
+    private final TeamScrumRepository teamsScrumRepository;
 
+    public TeamScrumService(TeamScrumRepository teamsScrumRepository) {
+        this.teamsScrumRepository = teamsScrumRepository;
+    }
 
     @Override
     public Page<TeamsScrumEntity> findAll(PageRequest pageRequest) {

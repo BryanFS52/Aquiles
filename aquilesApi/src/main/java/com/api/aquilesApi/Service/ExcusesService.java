@@ -4,19 +4,18 @@ import com.api.aquilesApi.Entity.ExcusesEntity;
 import com.api.aquilesApi.Repository.ExcusesRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class ExcusesService implements Idao<ExcusesEntity , Long> {
-    @Autowired
-    private ExcusesRepository excusesRepository;
+    private final ExcusesRepository excusesRepository;
+
+    public ExcusesService(ExcusesRepository excusesRepository) {
+        this.excusesRepository = excusesRepository;
+    }
 
     @Override
     public Page<ExcusesEntity> findAll(PageRequest pageRequest) {

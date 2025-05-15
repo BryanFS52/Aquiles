@@ -20,6 +20,9 @@ public class ImprovementPlanBusiness {
         this.improvementPlanService = improvementPlanService;
     }
 
+    // Validación Objeto
+
+
     // Find All
     public Page<ImprovementPlanDto> findAll(int page, int size) {
         try {

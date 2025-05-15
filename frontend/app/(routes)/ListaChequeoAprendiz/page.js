@@ -220,7 +220,7 @@ export default function ChecklistComponent() {
             </div>
           )}
 
-          {/* Firmas - Versión más grande con texto centrado */}
+          {/* Firmas */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
             {/* Firma Instructor Técnico Anterior */}
             <div className="bg-white p-1 rounded-lg shadow-md border border-gray-300">

@@ -2,14 +2,12 @@ package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.ProjectDto;
 import com.api.aquilesApi.Entity.ProjectEntity;
-import com.api.aquilesApi.Entity.TeamsScrumEntity;
 import com.api.aquilesApi.Service.ProjectService;
 import com.api.aquilesApi.Service.TeamScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -23,16 +21,16 @@ import java.util.stream.Collectors;
 @Component
 public class ProjectBusiness {
 
-    @Autowired
-    private ProjectService projectService;
-
-    @Autowired
-    private TeamScrumService teamScrumService;
-
-    @Autowired
-    private Util util;
-
+    private final ProjectService projectService;
+    private final TeamScrumService teamScrumService;
+    private final Util util;
     private final ModelMapper modelMapper = new ModelMapper();
+
+    public ProjectBusiness(ProjectService projectService, TeamScrumService teamScrumService, Util util) {
+        this.projectService = projectService;
+        this.teamScrumService = teamScrumService;
+        this.util = util;
+    }
 
     // Validación Objeto
     private ProjectDto validationObject(Map<String, Object> json, ProjectDto projectDto) {

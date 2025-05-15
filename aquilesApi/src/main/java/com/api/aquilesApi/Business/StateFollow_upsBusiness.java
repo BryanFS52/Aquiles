@@ -7,29 +7,27 @@ import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
 public class StateFollow_upsBusiness {
-
-    @Autowired
-    private StateFollow_upsService stateFollowUpsService;
-
-    @Autowired
-    private Util util;
-
+    private final StateFollow_upsService stateFollowUpsService;
+    private final Util util;
     private final ModelMapper modelMapper = new ModelMapper();
 
-    // Validación del objeto para StateFollow_upsDto
+    public StateFollow_upsBusiness(StateFollow_upsService stateFollowUpsService, Util util) {
+        this.stateFollowUpsService = stateFollowUpsService;
+        this.util = util;
+    }
+
+    // Validación Objeto
     private StateFollow_upsDto validationObject(Map<String, Object> json, StateFollow_upsDto stateFollowUpsDto) {
         JSONObject dataObject = util.getData(json);
 

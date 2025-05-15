@@ -23,10 +23,6 @@ public class JuriesEntity implements Serializable {
     private Date dateAssigned;
 
     // Relations
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_trainer_id", referencedColumnName = "trainer_id")
-    private TrainersEntity trainer;
-
     // 1.Relation (M-M) con Checklist
     @ManyToMany(mappedBy = "juries")
     private Set<ChecklistEntity> checklists;

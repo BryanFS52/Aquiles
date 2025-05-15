@@ -211,12 +211,8 @@ export default function JustificacionAprendiz() {
                     <select
                       name="justificationType"
                       value={formData.justificationTypeId.id}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          justificationTypeId: { id: e.target.value },
-                        }))
-                      }
+                      onChange={(e) => setFormData((prev) => ({ ...prev, justificationTypeId: { id: e.target.value }, }))}
+                      className="h-10 border border-gray-300 rounded pl-3"
                     >
                       <option value="" disabled hidden>
                         Seleccione el tipo

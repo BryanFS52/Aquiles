@@ -4,19 +4,19 @@ import com.api.aquilesApi.Entity.JuriesEntity;
 import com.api.aquilesApi.Repository.JuriesRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class JuriesService implements Idao<JuriesEntity , Long> {
-    @Autowired
-    private JuriesRepository juriesRepository;
+    private final JuriesRepository juriesRepository;
+
+    public JuriesService(JuriesRepository juriesRepository) {
+        this.juriesRepository = juriesRepository;
+    }
+
     @Override
     public Page<JuriesEntity> findAll(PageRequest pageRequest) {
         return juriesRepository.findAll(pageRequest);

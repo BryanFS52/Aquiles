@@ -31,10 +31,6 @@ public class AttendancesEntity implements Serializable {
     private ExcusesEntity excuse;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_trainer_id", referencedColumnName = "trainer_id")
-    private TrainersEntity trainer;
-
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_idStudent", referencedColumnName = "student_id")
     private StudentsEntity student;
 
