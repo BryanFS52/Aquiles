@@ -20,4 +20,4 @@ public class TeamsScrumDto {
     // Relations
     private Long checklistId;
     private Long teamScrumId;
-}
+}   

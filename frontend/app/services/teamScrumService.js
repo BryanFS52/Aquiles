@@ -1,23 +1,60 @@
-import axios from "axios";
+import { client } from '@lib/apollo-client';
+import { LIST_TEAMS_SCRUM, CREATE_TEAM_SCRUM, DELETE_TEAM_SCRUM } from '@graphql/TeamsScrumGraph';
 
-const endpoint = 'http://localhost:8081/api/teamScrum';
+const teamScrumService = {
+  listTeamsScrum: async () => {
+    try {
+      const { data } = await client.query({
+        query: LIST_TEAMS_SCRUM,
+        fetchPolicy: 'network-only',
+      });
 
-export const listTeamsScrum = () => {
-    return axios.get(`${endpoint}/all`).then(response => response.data);
+      if (!data?.listTeamScrum) {
+        throw new Error("No se pudo obtener la lista de equipos Scrum.");
+      }
+
+      return data.listTeamScrum;
+    } catch (error) {
+      console.error("Error al obtener equipos Scrum:", error);
+      throw error;
+    }
+  },
+
+  createTeamScrum: async (input) => {
+    try {
+      const { data } = await client.mutate({
+        mutation: CREATE_TEAM_SCRUM,
+        variables: { input },
+      });
+
+      if (!data?.createTeamScrum?.code) {
+        throw new Error("Error al crear el equipo Scrum.");
+      }
+
+      return data.createTeamScrum;
+    } catch (error) {
+      console.error("Error al crear equipo Scrum:", error);
+      throw error;
+    }
+  },
+
+  deleteTeamScrum: async (teamScrumId) => {
+    try {
+      const { data } = await client.mutate({
+        mutation: DELETE_TEAM_SCRUM,
+        variables: { teamScrumId },
+      });
+
+      if (!data?.deleteTeamScrum?.code) {
+        throw new Error("Error al eliminar el equipo Scrum.");
+      }
+
+      return data.deleteTeamScrum;
+    } catch (error) {
+      console.error("Error al eliminar equipo Scrum:", error);
+      throw error;
+    }
+  },
 };
 
-export const createTeamScrum = (team) => {
-    return axios.post(`${endpoint}/create`, { data: team });
-};
-
-export const updateTeamScrum = (team) => {
-    return axios.put(`${endpoint}/update`, team);
-};
-
-export const deleteTeamScrum = (id) => {
-    return axios.delete(`${endpoint}/delete/${id}`);
-};
-
-export const getTeamScrumById = (id) => {
-    return axios.get(`${endpoint}/${id}`).then(response => response.data);
-};
+export default teamScrumService;

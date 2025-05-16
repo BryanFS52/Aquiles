@@ -1,9 +1,5 @@
 package com.api.aquilesApi.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-@JsonIgnore @JsonIgnore
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
