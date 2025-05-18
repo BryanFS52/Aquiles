@@ -1,5 +1,6 @@
 import { gql } from '@apollo/client';
 
+// Queries and Mutations for ImprovementPlan
 export const GET_ALL_IMPROVEMENT_PLANS = gql`
   query GetAllImprovementPlans($page: Int, $size: Int) {
     allImprovementPlans(page: $page, size: $size) {

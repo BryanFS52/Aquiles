@@ -42,7 +42,7 @@ public class TeamsScrumBusiness {
 
             return new PageImpl<>(teamsScrumDtoList , pageRequest , teamsScrumEntityPage.getTotalElements());
         } catch (Exception e) {
-            throw new CustomException("Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException("Error retrieving TeamScrums: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -53,7 +53,7 @@ public class TeamsScrumBusiness {
 
             // Configurar el mapeo manualmente si los nombres no coinciden
             modelMapper.typeMap(TeamsScrumEntity.class, TeamsScrumDto.class)
-                    .addMapping(TeamsScrumEntity::getId, TeamsScrumDto::setTeamScrumId);
+                    .addMapping(TeamsScrumEntity::getId, TeamsScrumDto::setId);
 
             return modelMapper.map(teamsScrum, TeamsScrumDto.class);
         } catch (CustomException e) {
@@ -76,7 +76,7 @@ public class TeamsScrumBusiness {
     // Update
     public void update(Long teamScrumId , TeamsScrumDto teamsScrumDto){
         try {
-            teamsScrumDto.setTeamScrumId(teamScrumId);
+            teamsScrumDto.setId(teamScrumId);
             TeamsScrumEntity teamsScrumEntity = modelMapper.map(teamsScrumDto, TeamsScrumEntity.class);
             teamScrumService.save(teamsScrumEntity);
         } catch (Exception e){

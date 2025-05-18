@@ -15,11 +15,8 @@ public class JuriesDto {
     private Long id;
 
     @NotNull(message = "La fecha asignada es obligatoria")
-    private Date dateAssigned;
+    private String dateAssigned;
 
-    // Relación con ChecklistEntity (DTO)
+    // Relations
     private List<ChecklistDto> listChecklistSubstantiationLists;
-
-    // Relación con DiarySustainationsEntity (DTO)
-    private List<DiarySustainationsDto> listDiarySustainations;
 }

@@ -49,23 +49,35 @@ public class ChecklistService implements Idao<ChecklistEntity, Long> {
 
     @Override
     public ChecklistEntity save(ChecklistEntity entity) {
+        // Validar que el proyecto asociado no sea null
+        if (entity.getAssociatedProject() == null) {
+            throw new CustomException("El proyecto asociado es obligatorio", HttpStatus.BAD_REQUEST);
+        }
+
         // Manejo de la relación ManyToOne con ProjectEntity
-        ProjectEntity project = projectRepository.findById(entity.getAssociatedProject().getId())
-                .orElseThrow(() -> new CustomException("Project with id " + entity.getAssociatedProject().getId() + " not found", HttpStatus.NOT_FOUND));
+        Long projectId = entity.getAssociatedProject().getId();
+        ProjectEntity project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new CustomException("Project with id " + projectId + " not found", HttpStatus.NOT_FOUND));
         entity.setAssociatedProject(project);
 
         // Manejo de la relación ManyToMany con JuriesEntity
-        Set<JuriesEntity> juries = new HashSet<>(
-                juriesRepository.findAllById(
-                        entity.getJuries().stream()
-                                .map(JuriesEntity::getId)
-                                .collect(Collectors.toList())
-                )
-        );
-        entity.setJuries(juries);
+        if (entity.getJuries() != null && !entity.getJuries().isEmpty()) {
+            Set<JuriesEntity> juries = new HashSet<>(
+                    juriesRepository.findAllById(
+                            entity.getJuries().stream()
+                                    .map(JuriesEntity::getId)
+                                    .collect(Collectors.toList())
+                    )
+            );
+            entity.setJuries(juries);
+        } else {
+            entity.setJuries(new HashSet<>()); // evita null
+        }
 
         return checklistRepository.save(entity);
     }
+
+
 
     @Override
     public void delete(ChecklistEntity entity) {

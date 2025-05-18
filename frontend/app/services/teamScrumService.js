@@ -1,60 +1,50 @@
 import { client } from '@lib/apollo-client';
-import { LIST_TEAMS_SCRUM, CREATE_TEAM_SCRUM, DELETE_TEAM_SCRUM } from '@graphql/TeamsScrumGraph';
 
-const teamScrumService = {
-  listTeamsScrum: async () => {
-    try {
-      const { data } = await client.query({
-        query: LIST_TEAMS_SCRUM,
-        fetchPolicy: 'network-only',
-      });
+import {
+  GET_TEAMS_SCRUMS,
+  GET_TEAM_SCRUM_BY_ID,
+  ADD_TEAM_SCRUM,
+  UPDATE_TEAM_SCRUM,
+  DELETE_TEAM_SCRUM,
+} from '@graphql/TeamsScrumGraph';
 
-      if (!data?.listTeamScrum) {
-        throw new Error("No se pudo obtener la lista de equipos Scrum.");
-      }
-
-      return data.listTeamScrum;
-    } catch (error) {
-      console.error("Error al obtener equipos Scrum:", error);
-      throw error;
-    }
-  },
-
-  createTeamScrum: async (input) => {
-    try {
-      const { data } = await client.mutate({
-        mutation: CREATE_TEAM_SCRUM,
-        variables: { input },
-      });
-
-      if (!data?.createTeamScrum?.code) {
-        throw new Error("Error al crear el equipo Scrum.");
-      }
-
-      return data.createTeamScrum;
-    } catch (error) {
-      console.error("Error al crear equipo Scrum:", error);
-      throw error;
-    }
-  },
-
-  deleteTeamScrum: async (teamScrumId) => {
-    try {
-      const { data } = await client.mutate({
-        mutation: DELETE_TEAM_SCRUM,
-        variables: { teamScrumId },
-      });
-
-      if (!data?.deleteTeamScrum?.code) {
-        throw new Error("Error al eliminar el equipo Scrum.");
-      }
-
-      return data.deleteTeamScrum;
-    } catch (error) {
-      console.error("Error al eliminar equipo Scrum:", error);
-      throw error;
-    }
-  },
+export const fetchTeamsScrums = async (page, size) => {
+  const { data } = await client.query({
+    query: GET_TEAMS_SCRUMS,
+    variables: { page, size },
+    fetchPolicy: 'no-cache',
+  });
+  return data.allTeamsScrums;
 };
 
-export default teamScrumService;
+export const fetchTeamScrumById = async (id) => {
+  const { data } = await client.query({
+    query: GET_TEAM_SCRUM_BY_ID,
+    variables: { id },
+  });
+  return data.teamScrumById;
+};
+
+export const addTeamScrum = async (input) => {
+  const { data } = await client.mutate({
+    mutation: ADD_TEAM_SCRUM,
+    variables: { input },
+  });
+  return data.addTeamScrum;
+};
+
+export const updateTeamScrum = async (id, input) => {
+  const { data } = await client.mutate({
+    mutation: UPDATE_TEAM_SCRUM,
+    variables: { id, input },
+  });
+  return data.updateTeamScrum;
+};
+
+export const deleteTeamScrum = async (id) => {
+  const { data } = await client.mutate({
+    mutation: DELETE_TEAM_SCRUM,
+    variables: { id },
+  });
+  return data.deleteTeamScrum;
+};

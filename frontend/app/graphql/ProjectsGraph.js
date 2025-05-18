@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 
+// Queries and Mutations for Projects
 export const GET_PROJECTS = gql`
   query GetProjects($page: Int, $size: Int) {
     allProjects(page: $page, size: $size) {
@@ -45,14 +46,7 @@ export const ADD_PROJECT = gql`
       code
       message
       id
-      data {
-        projectId
-        description
-        problem
-        objectives
-        justification
-        members
-      }
+      data 
     }
   }
 `;

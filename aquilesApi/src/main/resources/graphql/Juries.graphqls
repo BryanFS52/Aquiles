@@ -1,0 +1,38 @@
+type Juries {
+    id: ID!
+    dateAssigned: String
+    listChecklistSubstantiationLists: [Checklist]
+}
+
+type JuriesPage {
+    code: String
+    data: [Juries]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type JuriesPageId {
+    data: Juries
+    date: String
+    code: String
+    message: String
+}
+
+input JuriesInput {
+    dateAssigned: String
+    listChecklistSubstantiationListsIds: [ID]
+}
+
+extend type Query {
+    allJuries(page: Int, size: Int): JuriesPage
+    juryById(id: ID!): JuriesPageId
+}
+
+extend type Mutation {
+    addJury(input: JuriesInput): Response
+    updateJury(id: ID!, input: JuriesInput): Response
+    deleteJury(id: ID!): Response
+}

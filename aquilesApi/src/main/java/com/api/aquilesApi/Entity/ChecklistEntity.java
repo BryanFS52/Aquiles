@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -50,7 +51,7 @@ public class ChecklistEntity implements Serializable {
             joinColumns = @JoinColumn(name = "checklist_id"),
             inverseJoinColumns = @JoinColumn(name = "jury_id")
     )
-    private Set<JuriesEntity> juries;
+    private Set<JuriesEntity> juries = new HashSet<>();
 
     // 2.Relation (1-M) con item
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -65,8 +66,7 @@ public class ChecklistEntity implements Serializable {
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamsScrumEntity> teams;
 
-
-    // 5.Relation (1-M) con learningOutocome (Model)
+    // 5.Relation (1-M) con learningOutcome (Model)
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LearningOutcomeEntity> learningOutcomes;
 

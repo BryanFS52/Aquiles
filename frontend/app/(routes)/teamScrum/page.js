@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react'; 
-import { Header } from "@components/header"; 
+import React, { useState, useEffect } from 'react';
+import { Header } from "@components/header";
 import { Sidebar } from "@components/Sidebar";
 import { MdAdd, MdAddCircle } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
@@ -9,16 +9,19 @@ import ModalNewProject from "@components/Modals/modalNewProject";
 import ModalComponent from "@components/Modals/modalComponent";
 import ModalAddInformation from "@components/Modals/modalAddInformation";
 import ModalEliminarTeam from "@components/Modals/modalEliminarTeam";
-import { ToastContainer, toast } from "react-toastify"; 
+import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
-import teamScrumService from "@services/teamScrumService";
-
+import {
+  fetchTeamsScrums,
+  addTeamScrum,
+  deleteTeamScrum
+} from "@services/teamScrumService";
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const [openAgregarInfo, setOpenAgregarInfo] = useState(false);
-  const [teams, setTeams] = useState([]); 
+  const [teams, setTeams] = useState([]);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [teamToDelete, setTeamToDelete] = useState(null);
   const [openAddInfoModal, setOpenAddInfoModal] = useState(false);
@@ -31,14 +34,15 @@ export default function Home() {
   const fetchTeams = async () => {
     try {
       setLoading(true);
-      const response = await teamScrumService.listTeamsScrum();
-      const mapped = response?.data?.map((team) => ({
-        team_scrum_id: team.teamScrumId,
-        nameProject: team.name,
+      const response = await fetchTeamsScrums(0, 10);
+      const mapped = response.data?.map(team => ({
+        id: team.id,
+        name: team.name,
         members: team.members,
-        checklistId: team.checklistId,
-      }));
-      setTeams(mapped || []);
+        checklist: team.checklist,
+        project: team.project
+      })) || [];
+      setTeams(mapped);
     } catch (error) {
       console.error("Error fetching teams:", error);
       toast.error("No se pudo cargar los equipos.");
@@ -53,15 +57,22 @@ export default function Home() {
       return;
     }
 
+    // Si members es un array, lo convertimos a string separado por comas
+    const membersString = Array.isArray(team.members) ? team.members.join(', ') : (team.members || "");
+
     const input = {
       name: team.nameProject,
-      members: team.members || [],
-      checklistId: team.checklistId || null,
-      teamScrumId: team.team_scrum_id || null,
+      members: membersString,  // enviamos string
+      checklist: team.checklist || null,
+      project: team.project ? {
+        // campos válidos de ProjectInput, sin id
+        name: team.project.name || "",
+        // etc.
+      } : null,
     };
 
     try {
-      await teamScrumService.createTeamScrum(input);
+      await addTeamScrum(input);
       toast.success('¡Nuevo Team creado con éxito!');
       handleCloseModal();
       fetchTeams();
@@ -71,10 +82,11 @@ export default function Home() {
     }
   };
 
+
   const handleDeleteTeam = async (teamId) => {
     try {
-      await teamScrumService.deleteTeamScrum(teamId);
-      setTeams(prev => prev.filter(team => team.team_scrum_id !== teamId));
+      await deleteTeamScrum(teamId);
+      setTeams(prev => prev.filter(team => team.id !== teamId));
       toast.success('Equipo eliminado exitosamente.');
     } catch (error) {
       console.error('Error deleting team:', error);
@@ -126,44 +138,64 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-8">
             {teams.map((team) => (
-              <div key={team.team_scrum_id} className="w-full rounded-lg overflow-hidden shadow-lg bg-zinc-200 relative mb-4">
-                <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-[#00324d] border-l-[240px] border-l-transparent -z-1"></div>
-                <div className="px-6 py-4">
+              <div
+                key={team.id}
+                className="w-full rounded-2xl overflow-hidden shadow-md bg-white relative p-6 hover:shadow-lg transition duration-300 border border-gray-200 flex flex-col"
+              >
+                {/* Línea diagonal decorativa */}
+                <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-[#00324d] border-l-[240px] border-l-transparent z-0" />
+
+                <div className="relative z-10 flex flex-col flex-grow">
+                  {/* Título y botón "Ver más" */}
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-[#40b003] font-inter font-semibold text-xl sm:text-2xl">
-                      Nombre del Proyecto
-                    </span>
+                    <h2 className="text-xl font-bold text-[#00324d]">{team.name}</h2>
                     <button
                       onClick={handleOpenAgregarInfo}
-                      className="font-inter font-semibold text-xl text-white bg-[#00324d] hover:bg-[#00263d] px-2 py-1 rounded-lg"
+                      className="text-sm font-medium text-white bg-[#40b003] hover:bg-[#2a7d02] px-3 py-1 rounded-md shadow"
                     >
                       Ver Más
                     </button>
                   </div>
 
-                  <p className="text-black-700 text-base mb-2">{team.nameProject}</p>
-
-                  <div className="text-[#0e324d] font-inter font-semibold text-lg sm:text-xl mb-2">
-                    Team Número
+                  {/* Team ID */}
+                  <div className="mb-3">
+                    <h3 className="text-sm font-semibold text-gray-500">Team ID</h3>
+                    <p className="text-gray-800">{team.id}</p>
                   </div>
-                  <p className="text-black-700 text-base mb-4">{team.team_scrum_id}</p>
 
-                  <div className="text-[#000000] font-inter font-medium text-xl flex items-center justify-between">
-                    <div className="font-inter flex items-center gap-2">
-                      <span>Agregar Información</span>
-                      <button onClick={handleOpenAddInfoModal}>
-                        <MdAddCircle className="text-3xl text-[#00324d]" />
-                      </button>
+                  {/* Miembros con altura limitada y scroll si hay muchos */}
+                  {team.members && (
+                    <div className="mb-4 max-h-28 overflow-y-auto">
+                      <h3 className="text-sm font-semibold text-gray-500">Miembros del equipo</h3>
+                      <ul className="list-disc list-inside text-gray-700 text-sm">
+                        {team.members.split(',').map((member, index) => (
+                          <li key={index}>{member.trim()}</li>
+                        ))}
+                      </ul>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => handleOpenConfirmModal(team.team_scrum_id)}>
-                        <FaTrashAlt className="text-2xl text-[#00324d]" />
-                      </button>
-                    </div>
+                  )}
+
+                  {/* Botones alineados abajo */}
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-200">
+                    <button
+                      onClick={handleOpenAddInfoModal}
+                      className="flex items-center gap-2 text-[#00324d] hover:text-[#40b003] transition"
+                    >
+                      <MdAddCircle className="text-2xl" />
+                      <span className="text-sm font-medium">Agregar Información</span>
+                    </button>
+                    <button
+                      onClick={() => handleOpenConfirmModal(team.id)}
+                      className="text-red-600 hover:text-red-800 transition"
+                      title="Eliminar equipo"
+                    >
+                      <FaTrashAlt className="text-xl" />
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
+
           </div>
 
           <ModalNewProject isOpen={modalOpen} onClose={handleCloseModal} onCreate={handleCreateTeam} />

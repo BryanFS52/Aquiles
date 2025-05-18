@@ -40,14 +40,14 @@ public class TeamsScrumController {
                 return ResponseHttpApi.responseHttpFindAll(
                         null,
                         ResponseHttpApi.NO_CONTENT,
-                        "No attendances found",
+                        "No TeamScrums found",
                         0,
                         0,
                         0);
             }
         } catch (Exception e){
             return ResponseHttpApi.responseHttpError(
-                    "Error retrieving Teams Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error retrieving Teams Scrums: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -72,7 +72,7 @@ public class TeamsScrumController {
         try {
             TeamsScrumDto teamsScrumDto1 = teamsScrumBusiness.add(teamsScrumDto);
             return ResponseHttpApi.responseHttpAction(
-                    teamsScrumDto1.getTeamScrumId(),
+                    teamsScrumDto1.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Team Scrum added successfully");
         } catch (CustomException e){
@@ -116,7 +116,7 @@ public class TeamsScrumController {
                         e.getMessage(), HttpStatus.BAD_REQUEST);
             } catch (Exception e) {
                 return ResponseHttpApi.responseHttpError(
-                        "Error deleting attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                        "Error deleting TeamScrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
     }

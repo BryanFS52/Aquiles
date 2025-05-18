@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -34,10 +35,15 @@ public class ChecklistDto {
 
     // Relations
     @NotNull(message = "El proyecto asociado es obligatorio")
-    private Long associatedProject;
+    private ProjectDto associatedProject;
 
     @NotNull(message = "Los jurados asociados son obligatorios")
-    private List<JuriesDto> associatedJuries;
+    private Set<Long> associatedJuriesIds;
 
-    private List<Long> associatedJuriesIds;
+    private ItemDto item;
+
+    private EvaluationsDto evaluations;
+
+    private TeamsScrumDto teamsScrum;
+
 }

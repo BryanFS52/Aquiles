@@ -4,7 +4,7 @@ type Project {
     problem: String
     objectives: String
     justification: String
-    members: String
+    members: [String!]!
 }
 
 type ProjectPage {
@@ -25,11 +25,12 @@ type ProjectPageId {
 }
 
 input ProjectInput {
+    projectId: ID
     description: String
     problem: String
     objectives: String
     justification: String
-    members: String
+    members: [String!]!
 }
 
 extend type Query {

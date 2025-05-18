@@ -26,12 +26,4 @@ public class JuriesEntity implements Serializable {
     // 1.Relation (M-M) con Checklist
     @ManyToMany(mappedBy = "juries")
     private Set<ChecklistEntity> checklists;
-
-    @ManyToMany
-    @JoinTable(
-            name = "jury_diary_sustaination",
-            joinColumns = @JoinColumn(name = "jury_id"),
-            inverseJoinColumns = @JoinColumn(name = "diary_sustaination_id")
-    )
-    private Set<DiarySustainationsEntity> diarySustainations;
 }

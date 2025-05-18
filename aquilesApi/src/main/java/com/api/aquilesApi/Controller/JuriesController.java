@@ -1,5 +1,4 @@
 package com.api.aquilesApi.Controller;
-/*
 import com.api.aquilesApi.Business.JuriesBusiness;
 import com.api.aquilesApi.Dto.JuriesDto;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
@@ -22,7 +21,7 @@ public class JuriesController {
 
     // FindAll Juries (GraphQL)
     @QueryMapping
-    public Map<String, Object> (@Argument int page, @Argument int size) {
+    public Map<String, Object> allJuries(@Argument int page, @Argument int size) {
         try {
             Page<JuriesDto> juriesDtoPage = juriesBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
@@ -41,7 +40,7 @@ public class JuriesController {
 
     // FindById Jury (GraphQL)
     @QueryMapping
-    public Map<String, Object> (@Argument Long id) {
+    public Map<String, Object> juryById (@Argument Long id) {
         try {
             JuriesDto juriesDto = juriesBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
@@ -58,7 +57,7 @@ public class JuriesController {
 
     // Add a new Jury (GraphQL)
     @MutationMapping
-    public Map<String, Object> (@Argument("input") JuriesDto juriesDto) {
+    public Map<String, Object> addJury (@Argument("input") JuriesDto juriesDto) {
         try {
             JuriesDto
                     juriesDto1= juriesBusiness.add(juriesDto);
@@ -77,7 +76,7 @@ public class JuriesController {
 
     // Update Jury (GraphQL)
     @MutationMapping
-    public Map<String, Object> (@Argument Long id, @Argument ("input")JuriesDto juriesDto) {
+    public Map<String, Object> updateJury (@Argument Long id, @Argument ("input")JuriesDto juriesDto) {
         try {
             juriesBusiness.update(id, juriesDto );
             return ResponseHttpApi.responseHttpAction(
@@ -95,7 +94,7 @@ public class JuriesController {
 
     // Delete Jury (GraphQL)
     @MutationMapping
-    public Map<String, Object> (@Argument Long id) {
+    public Map<String, Object> deleteJury (@Argument Long id) {
         try {
             juriesBusiness.delete(id);
             return ResponseHttpApi.responseHttpAction(
@@ -111,4 +110,3 @@ public class JuriesController {
         }
     }
 }
- */

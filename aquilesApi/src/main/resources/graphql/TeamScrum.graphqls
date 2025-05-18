@@ -2,8 +2,8 @@ type TeamsScrum {
     id: ID!
     name: String
     members: String
-    checklistId: ID
-    teamScrumId: ID
+    checklist: Checklist
+    project: Project
 }
 
 type TeamsScrumPage {
@@ -26,8 +26,8 @@ type TeamsScrumPageId {
 input TeamsScrumInput {
     name: String!
     members: String!
-    checklistId: ID
-    teamScrumId: ID
+    checklist: ChecklistInput
+    project: ProjectInput
 }
 
 extend type Query {

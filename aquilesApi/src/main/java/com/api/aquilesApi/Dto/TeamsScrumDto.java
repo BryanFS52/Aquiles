@@ -18,6 +18,7 @@ public class TeamsScrumDto {
     private String members;
 
     // Relations
-    private Long checklistId;
-    private Long teamScrumId;
+    private ChecklistDto checklist;
+    private ProjectDto project;
+
 }   

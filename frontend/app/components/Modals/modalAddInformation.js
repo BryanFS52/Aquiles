@@ -1,139 +1,250 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { addProject, fetchProjectById } from '@/services/projectService';
 
-const ModalAddinformation = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
+const allApprentices = [
+  'Michael Felipe Laiton Chaparro',
+  'Laura Gómez Rojas',
+  'Santiago Torres Pérez',
+  'Juliana Díaz Martínez',
+  'Andrés Camilo Rodríguez',
+];
 
-  const [selectedApprentices, setSelectedApprentices] = useState([
-    'Michael Felipe Laiton Chaparro',
-    'Michael Felipe Laiton Chaparro',
-    'Michael Felipe Laiton Chaparro',
-    'Michael Felipe Laiton Chaparro',
-  ]);
+const ModalAddInformation = ({ isOpen, onClose }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      setProjectId(null); // limpiar al cerrar
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
+  const [search, setSearch] = useState('');
+  const [selectedApprentices, setSelectedApprentices] = useState([]);
   const [description, setDescription] = useState('');
   const [justification, setJustification] = useState('');
-  const [objective, setObjective] = useState('');
+  const [objectives, setObjectives] = useState('');
   const [problem, setProblem] = useState('');
   const [isError, setIsError] = useState(false);
 
-  const handleCreate = () => {
-    if (!description || !justification || !objective || !problem) {
+  // NUEVO: para guardar id del proyecto creado y mostrar modal detalle
+  const [projectId, setProjectId] = useState(null);
+  const [projectDetail, setProjectDetail] = useState(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [errorDetail, setErrorDetail] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+
+  const handleToggleApprentice = (name) => {
+    if (selectedApprentices.includes(name)) {
+      setSelectedApprentices(selectedApprentices.filter((a) => a !== name));
+    } else {
+      setSelectedApprentices([...selectedApprentices, name]);
+    }
+  };
+
+  const filteredApprentices = allApprentices.filter((a) =>
+    a.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleCreate = async () => {
+    if (!description || !justification || !objectives || !problem) {
       setIsError(true);
       toast.error('¡No coinciden los campos!', {
-        position: "top-right",
+        position: 'top-right',
         autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
+        theme: 'colored',
         style: { backgroundColor: '#f44336', color: '#fff' },
       });
       return;
     }
-   
-    setIsError(false); 
+    setIsError(false);
+
+    const input = {
+      problem,
+      description,
+      objectives,
+      justification,
+      members: selectedApprentices,
+    };
+
+    try {
+      const response = await addProject(input);
+      console.log('Respuesta de creación:', response);
+
+      if (!response || !response.id) {
+        throw new Error('No se pudo obtener el ID del proyecto creado');
+      }
+
+      const projectId = response.id; // aquí tienes el ID como string
+      toast.success(`Proyecto creado exitosamente`, {
+        position: 'top-right',
+        autoClose: 5000,
+        theme: 'colored',
+        style: { backgroundColor: '#4caf50', color: '#fff' },
+      });
+      onClose();
+    } catch (error) {
+      toast.error(`Error al crear proyecto: ${error.message}`, {
+        position: 'top-right',
+        autoClose: 5000,
+        theme: 'colored',
+        style: { backgroundColor: '#f44336', color: '#fff' },
+      });
+    }
+  };
+
+
+  // Traer detalles del proyecto al abrir modal detalle
+  useEffect(() => {
+    if (!showDetailModal || !projectId) return;
+
+    setLoadingDetail(true);
+    fetchProjectById(projectId)
+      .then((data) => {
+        setProjectDetail(data);
+        setLoadingDetail(false);
+      })
+      .catch((err) => {
+        setErrorDetail(err.message);
+        setLoadingDetail(false);
+      });
+  }, [showDetailModal, projectId]);
+
+  const closeDetailModal = () => {
+    setShowDetailModal(false);
+    setProjectDetail(null);
+    setProjectId(null);
   };
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
-        <div className="fixed inset-0 bg-custom-blue opacity-50"></div>
-        <div className="relative w-3/5 my-12 mx-auto bg-white rounded-lg shadow-xl border-2 border-gray-300 p-8">
-          <h2 className="font-inter font-semibold text-2xl pb-3 border-b-2 border-gray-600 w-max mx-auto">Agregar información del Team</h2>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-40 px-4 py-6">
+          <div className="bg-white w-full max-w-6xl max-h-[90vh] rounded-xl shadow-lg p-6 md:p-8 relative font-kiwi-marumaru overflow-auto">
+            <h2 className="text-2xl text-center font-semibold text-darkBlue mb-6 px-2 md:px-0">
+              Agregar <span className="text-shadowBlue">información</span> del Team
+            </h2>
 
-          <div className="grid grid-cols-5 gap-4 pt-12">
-            <div className="col-span-2">
-              <span className="font-inter font-semibold text-base">Aprendices</span>
-              <div className="w-full h-[182%] bg-white rounded-lg shadow-xl border-2 border-gray-300 mt-2">
-                <form className="pt-3 px-4">
-                  <div className="relative">
-                    <input type="search" className="block w-full h-8 pl-8 pr-4 text-sm text-gray-900 border border-gray-300 rounded-lg" placeholder="Filtrar aprendices"/>
-                    <svg className="absolute left-2 top-2 w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                    </svg>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="font-semibold text-darkGray">Aprendices</label>
+                <div className="border border-lightGray rounded-lg mt-2 shadow-sm flex flex-col h-60 md:h-[260px] overflow-hidden">
+                  <input
+                    type="text"
+                    className="px-3 py-2 border-b border-lightGray text-sm outline-none"
+                    placeholder="Filtrar aprendices..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                  <div className="flex-1 overflow-y-auto p-2 space-y-2 bg-white">
+                    {filteredApprentices.map((apprentice, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center text-sm px-2 py-1 border-b cursor-pointer hover:bg-lightGray rounded"
+                        onClick={() => handleToggleApprentice(apprentice)}
+                      >
+                        <span>{apprentice}</span>
+                        {selectedApprentices.includes(apprentice) && (
+                          <span className="text-lightGreen text-lg">✓</span>
+                        )}
+                      </div>
+                    ))}
+                    {filteredApprentices.length === 0 && (
+                      <p className="text-center text-sm text-darkGray">No hay coincidencias</p>
+                    )}
                   </div>
-                </form>
+                </div>
+              </div>
 
-                <div className="pt-4 px-4 h-48 overflow-y-auto">
-                  <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-auto">
-                    <tbody>
-                      {selectedApprentices.map((apprentice, index) => (
-                        <tr key={index}>
-                          <td className="px-2 py-1 border-2 border-gray-300 text-sm">
-                            {apprentice}
-                          </td>
-                          <td className="px-2 py-1 border-2 border-gray-300 text-green-500 font-semibold text-xl">✓</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+              <div>
+                <label className="font-semibold text-darkGray">Aprendices seleccionados</label>
+                <div className="bg-lightGray border border-lightGray rounded-lg mt-2 shadow-sm p-3 h-60 md:h-[260px] overflow-y-auto space-y-1 text-sm">
+                  {selectedApprentices.length === 0 ? (
+                    <p className="text-darkGray">Ningún aprendiz seleccionado</p>
+                  ) : (
+                    selectedApprentices.map((apprentice, index) => (
+                      <div key={index}>{apprentice}</div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
 
-            <div className="col-span-3 flex flex-col items-end mr-48">
-              <span className="font-inter font-semibold text-base mr-20">Aprendices seleccionados</span>
-              <div className="w-auto bg-neutral-200 rounded-lg shadow-xl border-2 border-gray-300 mt-2 p-4">
-                {selectedApprentices.map((apprentice, index) => (
-                  <div key={index} className="text-sm mb-1">
-                    {apprentice}
-                  </div>
-                ))}
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+              {[
+                { label: 'Problemática', value: problem, setter: setProblem },
+                { label: 'Descripción', value: description, setter: setDescription },
+                { label: 'Objetivo', value: objectives, setter: setObjectives },
+                { label: 'Justificación', value: justification, setter: setJustification },
+              ].map(({ label, value, setter }) => (
+                <div key={label}>
+                  <label className="text-sm font-semibold text-darkGray">{label}</label>
+                  <textarea
+                    className={`mt-2 w-full min-h-[100px] md:min-h-[96px] p-3 border rounded-lg resize-y shadow-sm ${isError && !value ? 'border-red-500' : 'border-lightGray'
+                      }`}
+                    placeholder={`Escribe ${label.toLowerCase()}...`}
+                    value={value}
+                    onChange={(e) => setter(e.target.value)}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col md:flex-row justify-end mt-8 gap-4 px-2 md:px-0">
+              <button
+                onClick={onClose}
+                className="px-6 py-2 border border-lightGray text-darkGray bg-lightGray rounded-lg hover:bg-darkGray hover:text-white transition font-medium w-full md:w-auto"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleCreate}
+                className="px-6 py-2 bg-darkBlue text-white rounded-lg hover:bg-shadowBlue transition font-medium w-full md:w-auto"
+              >
+                Confirmar
+              </button>
             </div>
           </div>
+        </div>
+      )}
 
-          <div className="grid grid-cols-2 gap-4 ml-10 pb-10 -mt-4">
-            <div className={`flex flex-col items-start ml-96 ${isError && !problem ? 'border-red-500' : 'border-gray-300'}`}>
-              <span className="font-inter font-semibold text-sm">Problematica</span>
-              <div className={`w-72 h-24 bg-white rounded-lg shadow-xl mt-2 p-4 ${isError && !problem ? 'border-2 border-red-500' : 'border-2 border-gray-300'}`}>
-                <textarea className="w-full h-full bg-transparent border-none outline-none resize-none" placeholder="Problematica" value={problem} onChange={(e) => setProblem(e.target.value)}/>
+      {/* Modal detalle proyecto */}
+      {showDetailModal && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 px-4 py-6">
+          <div className="bg-white max-w-xl w-full rounded-lg shadow-lg p-6 relative">
+            <h3 className="text-xl font-semibold mb-4">Detalle del Proyecto</h3>
+
+            {loadingDetail && <p>Cargando...</p>}
+            {errorDetail && <p className="text-red-600">Error: {errorDetail}</p>}
+            {projectDetail && (
+              <div className="space-y-2">
+                <p><strong>Nombre:</strong> {projectDetail.name}</p>
+                <p><strong>Descripción:</strong> {projectDetail.description}</p>
+                <p><strong>Problemática:</strong> {projectDetail.problem}</p>
+                <p><strong>Objetivos:</strong> {projectDetail.objectives}</p>
+                <p><strong>Justificación:</strong> {projectDetail.justification}</p>
+                <p><strong>Miembros:</strong> {projectDetail.members?.join(', ')}</p>
               </div>
-            </div>
+            )}
 
-            <div className={`flex flex-col items-start ml-52 ${isError && !description ? 'border-red-500' : 'border-gray-300'}`}>
-              <span className="font-inter font-semibold text-sm">Descripción</span>
-              <div className={`w-72 h-24 bg-white rounded-lg shadow-xl mt-2 p-4 ${isError && !description ? 'border-2 border-red-500' : 'border-2 border-gray-300'}`}>
-                <textarea className="w-full h-full bg-transparent border-none outline-none resize-none" placeholder="Descripción" value={description} onChange={(e) => setDescription(e.target.value)}/>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 ml-10 pb-10 -mt-4">
-            <div className={`flex flex-col items-start ml-96 ${isError && !objective ? 'border-red-500' : 'border-gray-300'}`}>
-              <span className="font-inter font-semibold text-sm">Objetivo</span>
-              <div className={`w-72 h-24 bg-white rounded-lg shadow-xl mt-2 p-4 ${isError && !objective ? 'border-2 border-red-500' : 'border-2 border-gray-300'}`}>
-                <textarea className="w-full h-full bg-transparent border-none outline-none resize-none" placeholder="Objetivo" value={objective} onChange={(e) => setObjective(e.target.value)}/>
-              </div>
-            </div>
-
-            <div className={`flex flex-col items-start ml-52 ${isError && !justification ? 'border-red-500' : 'border-gray-300'}`}>
-              <span className="font-inter font-semibold text-sm">Justificación</span>
-              <div className={`w-72 h-24 bg-white rounded-lg shadow-xl mt-2 p-4 ${isError && !justification ? 'border-2 border-red-500' : 'border-2 border-gray-300'}`}>
-                <textarea className="w-full h-full bg-transparent border-none outline-none resize-none" placeholder="Justificación" value={justification} onChange={(e) => setJustification(e.target.value)}/>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-center mt-6">
-            <button onClick={onClose} className="w-44 rounded-md px-6 border-2 border-neutral-400 bg-neutral-200 text-black transition-colors mr-96 font-inter font-medium text-xl ">
-              Cancelar
-            </button>
-
-            <button onClick={handleCreate} className="w-44 rounded-md border-2 border-custom-blue transition-colors bg-custom-blue px-6 py-2 ml-10 text-white font-inter font-medium text-xl ">
-              Crear
+            <button
+              onClick={closeDetailModal}
+              className="mt-6 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+            >
+              Cerrar
             </button>
           </div>
         </div>
-      </div>
+      )}
 
       <ToastContainer />
     </>
   );
 };
 
-export default ModalAddinformation;
+export default ModalAddInformation;

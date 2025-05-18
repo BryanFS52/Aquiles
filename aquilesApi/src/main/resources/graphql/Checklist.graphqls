@@ -1,11 +1,3 @@
-# Pendiente
-type Juries {
-    id: ID
-    name: String
-    signature: String
-    document: String
-}
-
 type Checklist {
     id: ID!
     state: Boolean
@@ -40,8 +32,8 @@ input ChecklistInput {
     instructorSignature: String!
     evaluationCriteria: Boolean!
     checklistHistory: String!
-    associatedProjectId: ID!
-    associatedJuriesIds: [ID!]!
+    associatedProject: ProjectInput
+    associatedJuries: [ID!]!
 }
 
 extend type Query {

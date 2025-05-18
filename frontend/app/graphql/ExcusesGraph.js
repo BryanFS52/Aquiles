@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 
+// Queries and Mutations for Excuses
 export const GET_EXCUSES = gql`
   query GetExcuses($page: Int, $size: Int) {
     allExcuses(page: $page, size: $size) {
