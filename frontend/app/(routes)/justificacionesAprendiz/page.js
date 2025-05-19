@@ -55,6 +55,25 @@ export default function JustificacionAprendiz() {
   const handleFileChange = (e, fileKey) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // Validación de tipo de archivo
+    const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+    const fileType = file.type;
+
+    if (!validTypes.includes(fileType)) {
+      toast.error('Solo se permiten archivos PDF, JPG o PNG');
+      e.target.value = ''; // Limpiar el input
+      return;
+    }
+
+    // Validación de tamaño (opcional, ejemplo 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error('El archivo es demasiado grande. Máximo permitido: 5MB');
+      e.target.value = '';
+      return;
+    }
+
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64 = reader.result.split(",")[1];
@@ -79,12 +98,13 @@ export default function JustificacionAprendiz() {
         toast.success("Justificación enviada con éxito.");
         setShowForm(false);
         setFormData({
-          tipoNovedad: "",
+          justificationTypeId: { id: "" },
           numeroDocumento: "",
           nombreAprendiz: "",
           descripcion: "",
+          justificacionFile: null,
           justificacionFileBase64: "",
-          firmaBase64: "",
+          notificationId: "123456",
         });
       } else {
         toast.error("Error al enviar la justificación.");
@@ -98,7 +118,7 @@ export default function JustificacionAprendiz() {
   const handleCancel = () => {
     setShowForm(false);
     setFormData({
-      tipoNovedad: "",
+      justificationTypeId: { id: "" },
       numeroDocumento: "",
       nombreAprendiz: "",
       descripcion: "",
@@ -107,6 +127,7 @@ export default function JustificacionAprendiz() {
       notificationId: "123456",
     });
   };
+
 
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">

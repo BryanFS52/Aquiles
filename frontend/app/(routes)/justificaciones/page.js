@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Header } from "@components/header";
 import { Sidebar } from "@components/Sidebar";
 import { GoSearch } from "react-icons/go";
@@ -8,6 +8,7 @@ import { GrAttachment } from "react-icons/gr";
 import Image from "next/image";
 import persona from "@public/img/persona.jpg";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import justificationService from "@services/justificationService"; // importa tu servicio
 
 export default function JustificacionesInstructor() {
   const [selectedFiltro, setSelectedFiltro] = useState("");
@@ -15,84 +16,63 @@ export default function JustificacionesInstructor() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
-  // Datos de ejemplo
-  const fichas = [
-    { id: "25785784", nombre: "Análisis y Desarrollo de Software" },
-    { id: "25724865", nombre: "Desarrollo de Software" },
-    // Agrega más fichas según sea necesario
-  ];
+  const [justificaciones, setJustificaciones] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const justificaciones = [
-    {
-      id: 1,
-      programa: "Análisis y Desarrollo de Software",
-      ficha: "25785784",
-      documento: "1015896552",
-      aprendiz: "Luisa Fernanda Gómez",
-      fecha: "12/02/2024",
-      estado: "Activo",
-    },
-    {
-      id: 2,
-      programa: "Análisis y Desarrollo de Software",
-      ficha: "25724865",
-      documento: "1015896553",
-      aprendiz: "Jorge Mario Pineda García",
-      fecha: "12/03/2024",
-      estado: "Activo",
-    },
-    // Add more justificaciones to test pagination
-    {
-      id: 3,
-      programa: "Desarrollo de Software",
-      ficha: "25724865",
-      documento: "1015896554",
-      aprendiz: "Ana María López",
-      fecha: "13/03/2024",
-      estado: "Activo",
-    },
-    {
-      id: 4,
-      programa: "Análisis y Desarrollo de Software",
-      ficha: "25785784",
-      documento: "1015896555",
-      aprendiz: "Carlos Andrés Rodríguez",
-      fecha: "14/03/2024",
-      estado: "Activo",
-    },
-    {
-      id: 5,
-      programa: "Desarrollo de Software",
-      ficha: "25724865",
-      documento: "1015896556",
-      aprendiz: "María José Hernández",
-      fecha: "15/03/2024",
-      estado: "Activo",
-    },
-    {
-      id: 6,
-      programa: "Análisis y Desarrollo de Software",
-      ficha: "25785784",
-      documento: "1015896557",
-      aprendiz: "Juan Pablo Martínez",
-      fecha: "16/03/2024",
-      estado: "Activo",
-    },
-    {
-      id: 7,
-      programa: "Desarrollo de Software",
-      ficha: "25724865",
-      documento: "1015896558",
-      aprendiz: "Laura Sofía Pérez",
-      fecha: "17/03/2024",
-      estado: "Activo",
-    },
-  ];
+  // Carga las justificaciones del backend paginadas
+  useEffect(() => {
+    async function fetchJustifications() {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await justificationService.getAllJustifications(currentPage, itemsPerPage);
+        if (response?.code === "200" || response?.code === 200) {
+          setJustificaciones(
+            response.data.map((j) => ({
+              id: j.id,
+              programa: j.justificationType?.name || "Sin programa", // si quieres mapear a algún campo
+              ficha: j.notificationId || "N/A", // o algún campo que identifique ficha
+              documento: j.documentNumber,
+              aprendiz: j.name,
+              fecha: new Date(j.justificationDate).toLocaleDateString("es-CO"),
+              estado: j.state ? "Activo" : "Inactivo",
+              archivoAdjunto: j.justificationFile,
+            }))
+          );
+          setTotalItems(response.totalItems);
+        } else {
+          setError(response.message || "Error cargando justificaciones");
+          setJustificaciones([]);
+          setTotalItems(0);
+        }
+      } catch (err) {
+        setError(err.message || "Error de conexión");
+        setJustificaciones([]);
+        setTotalItems(0);
+      }
+      setLoading(false);
+    }
 
+    fetchJustifications();
+  }, [currentPage]);
+
+  const downloadBase64File = (base64Data, fileName) => {
+    const linkSource = `data:application/pdf;base64,${base64Data}`;
+    const downloadLink = document.createElement("a");
+    downloadLink.href = linkSource;
+    downloadLink.download = fileName;
+    downloadLink.click();
+  };
+
+
+
+  // Filtrado sobre datos cargados (client side)
   const filteredJustificaciones = useMemo(() => {
-    return justificaciones.filter((j) => {
-      if (!selectedFiltro || !searchTerm) return true;
+    if (!searchTerm || !selectedFiltro) return justificaciones;
 
+    return justificaciones.filter((j) => {
       switch (selectedFiltro) {
         case "programa":
           return j.programa.toLowerCase().includes(searchTerm.toLowerCase());
@@ -108,21 +88,19 @@ export default function JustificacionesInstructor() {
           return true;
       }
     });
-  }, [selectedFiltro, searchTerm]);
+  }, [selectedFiltro, searchTerm, justificaciones]);
 
-  const totalPages = Math.ceil(filteredJustificaciones.length / itemsPerPage);
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  const paginatedJustificaciones = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredJustificaciones.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredJustificaciones, currentPage]);
+  // Aquí no haces paginación manual porque ya la hace el backend
+  // Solo muestras filteredJustificaciones directamente
 
   const handlePreviousPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
   const handleNextPage = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+    setCurrentPage((prev) => Math.min(prev + 0, totalPages));
   };
 
   return (
@@ -165,63 +143,89 @@ export default function JustificacionesInstructor() {
             </div>
           </div>
 
-          {/* Tabla */}
-          <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-            <table className="w-full text-sm text-left text-gray-700 bg-white rounded-lg">
-              <thead className="text-xs uppercase bg-gray-50 text-gray-600">
-                <tr>
-                  <th className="px-4 py-3">Programa</th>
-                  <th className="px-4 py-3">Ficha</th>
-                  <th className="px-4 py-3">Foto</th>
-                  <th className="px-4 py-3">Documento</th>
-                  <th className="px-4 py-3">Aprendiz</th>
-                  <th className="px-4 py-3">Fecha de Justificación</th>
-                  <th className="px-4 py-3">Archivo Adjunto</th>
-                  <th className="px-4 py-3">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedJustificaciones.map((justificacion) => (
-                  <tr key={justificacion.id} className="border-b hover:bg-gray-50 transition-colors duration-200">
-                    <td className="px-4 py-3">{justificacion.programa}</td>
-                    <td className="px-4 py-3">{justificacion.ficha}</td>
-                    <td className="px-4 py-3">
-                      <Image src={persona} alt="Persona" className="w-10 h-9 rounded-full" />
-                    </td>
-                    <td className="px-4 py-3">{justificacion.documento}</td>
-                    <td className="px-4 py-3">{justificacion.aprendiz}</td>
-                    <td className="px-4 py-3">{justificacion.fecha}</td>
-                    <td className="px-4 py-3">
-                      <GrAttachment className="w-5 h-5 text-[#01b001] hover:text-[#00324d] transition-colors duration-300" />
-                    </td>
-                    <td className="px-4 py-3">{justificacion.estado}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {loading && <p>Cargando justificaciones...</p>}
+          {error && <p className="text-red-600">{error}</p>}
 
-          <div className="flex justify-between items-center pt-4 lg:pt-6">
-            <button
-              className="flex items-center p-2 border border-gray-300 rounded"
-              onClick={handlePreviousPage}
-              disabled={currentPage === 1}
-            >
-              <IoIosArrowBack className="mr-2" />
-              Anterior
-            </button>
-            <span>
-              Página {currentPage} de {totalPages}
-            </span>
-            <button
-              className="flex items-center p-2 border border-gray-300 rounded"
-              onClick={handleNextPage}
-              disabled={currentPage === totalPages}
-            >
-              Siguiente
-              <IoIosArrowForward className="ml-2" />
-            </button>
-          </div>
+          {!loading && !error && (
+            <>
+              <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                <table className="w-full text-sm text-left text-gray-700 bg-white rounded-lg">
+                  <thead className="text-xs uppercase bg-gray-50 text-gray-600">
+                    <tr>
+                      <th className="px-4 py-3">Programa</th>
+                      <th className="px-4 py-3">Ficha</th>
+                      <th className="px-4 py-3">Foto</th>
+                      <th className="px-4 py-3">Documento</th>
+                      <th className="px-4 py-3">Aprendiz</th>
+                      <th className="px-4 py-3">Fecha de Justificación</th>
+                      <th className="px-4 py-3">Archivo Adjunto</th>
+                      <th className="px-4 py-3">Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredJustificaciones.map((justificacion) => (
+                      console.log(justificacion),
+                      <tr
+                        key={justificacion.id}
+                        className="border-b hover:bg-gray-50 transition-colors duration-200"
+                      >
+                        <td className="px-4 py-3">{justificacion.programa}</td>
+                        <td className="px-4 py-3">{justificacion.ficha}</td>
+                        <td className="px-4 py-3">
+                          <Image
+                            src={persona}
+                            alt="Persona"
+                            className="w-10 h-9 rounded-full"
+                          />
+                        </td>
+                        <td className="px-4 py-3">{justificacion.documento}</td>
+                        <td className="px-4 py-3">{justificacion.aprendiz}</td>
+                        <td className="px-4 py-3">{justificacion.fecha}</td>
+                        <td className="px-4 py-3">
+                          {justificacion.archivoAdjunto ? (
+                            <GrAttachment
+                              className="w-5 h-5 text-blue-600 hover:text-blue-800 cursor-pointer"
+                              onClick={() =>
+                                downloadBase64File(justificacion.archivoAdjunto, `justificacion_${justificacion.id}.pdf`)
+                              }
+                            />
+
+
+                          ) : (
+                            <span className="text-gray-400">No hay archivo</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">{justificacion.estado}</td>
+                      </tr>
+                    ))}
+
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="flex justify-between items-center pt-4 lg:pt-6">
+                <button
+                  className="flex items-center p-2 border border-gray-300 rounded"
+                  onClick={handlePreviousPage}
+                  disabled={currentPage === 1}
+                >
+                  <IoIosArrowBack className="mr-2" />
+                  Anterior
+                </button>
+                <span>
+                  Página {currentPage} de {totalPages}
+                </span>
+                <button
+                  className="flex items-center p-2 border border-gray-300 rounded"
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  Siguiente
+                  <IoIosArrowForward className="ml-2" />
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

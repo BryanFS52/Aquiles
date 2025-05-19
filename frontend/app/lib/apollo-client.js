@@ -10,7 +10,7 @@ const client = new ApolloClient({
 // New client for Cloudfare tunnel
 const clientCloudfare = new ApolloClient({
     link: new HttpLink({
-        uri: "https://jake-loose-friendly-rocks.trycloudflare.com",
+        uri: "https://partners-activation-creations-arcade.trycloudflare.com/",
     }),
     cache: new InMemoryCache(),
     defaultOptions: {

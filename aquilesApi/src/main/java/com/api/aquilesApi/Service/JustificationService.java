@@ -27,7 +27,7 @@ public class JustificationService implements Idao<JustificationEntity, Long> {
     @Override
     public JustificationEntity getById(Long id) {
         return justificationRepository.findById(id).orElseThrow(() ->
-                new CustomException("Attendance Type with id " + id + " not found", HttpStatus.NO_CONTENT));
+                new CustomException("Justification Type with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
     @Override

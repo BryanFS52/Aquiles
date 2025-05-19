@@ -33,10 +33,10 @@ public class JustificationBusiness {
             return justificationEntityPage.map(entity -> modelMapper.map(entity, JustificationDto.class));
         } catch (DataAccessException e) {
             // Manejo específico para errores de acceso a datos
-            throw new CustomException("Error retrieving justification due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException("Error retrieving justifications due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             // Manejo genérico para cualquier otra excepción
-            throw new CustomException("An unexpected error occurred while retrieving justification.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException("An unexpected error occurred while retrieving justifications.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -48,7 +48,7 @@ public class JustificationBusiness {
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada
         } catch (Exception e) {
-            throw new CustomException("Error Getting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Error Getting Justification: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -69,7 +69,7 @@ public class JustificationBusiness {
             JustificationEntity attendance = modelMapper.map( justificationDto, JustificationEntity.class);
             justificationService.save(attendance);
         } catch (Exception e) {
-            throw new CustomException("Error Updating Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Error Updating Justification: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -81,7 +81,7 @@ public class JustificationBusiness {
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada
         } catch (Exception e) {
-            throw new CustomException("Error Deleting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Error Deleting Justification: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }

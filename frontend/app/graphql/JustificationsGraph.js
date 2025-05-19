@@ -19,7 +19,6 @@ export const GET_ALL_JUSTIFICATIONS = gql`
         justificationDate
         justificationHistory
         state
-        notificationId
         justificationType {
           id
           name

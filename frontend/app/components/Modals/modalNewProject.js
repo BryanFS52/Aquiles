@@ -81,7 +81,7 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
         <div className="p-6 w-full">
           <div className="flex justify-center items-center">
             <h1 className="text-[#0e324d] font-inter font-bold text-2xl flex">
-              Nuevo Proyecto
+              Nuevo Team
             </h1>
           </div>
           <div className="flex flex-col justify-center items-center w-full space-y-6 mt-6">

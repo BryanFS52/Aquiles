@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.Base64;
 import java.util.Date;
 
 @Getter
@@ -51,4 +52,12 @@ public class JustificationEntity implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "justification_type_id", nullable = true)
     private JustificationTypeEntity type;
+
+    public String getJustificationFile() {
+        return Base64.getEncoder().encodeToString(justificationFile);
+    }
+
+    public void setJustificationFile(String justificationFile) {
+        this.justificationFile = Base64.getDecoder().decode(justificationFile);
+    }
 }

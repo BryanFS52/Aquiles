@@ -25,7 +25,7 @@ public class JustificationController {
     @QueryMapping
     public Map<String, Object> allJustifications(@Argument int page, @Argument int size) {
         try {
-            Page<JustificationDto> justificationDtoPage = justificationBusiness.findAll(page, size);
+            Page<JustificationDto> justificationDtoPage = justificationBusiness.findAll(page - 1, size);
             return ResponseHttpApi.responseHttpFindAll(
                     justificationDtoPage.getContent(),
                     ResponseHttpApi.CODE_OK,
@@ -36,7 +36,7 @@ public class JustificationController {
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error retrieving Justifications: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -52,7 +52,7 @@ public class JustificationController {
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error retrieving Justification: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }

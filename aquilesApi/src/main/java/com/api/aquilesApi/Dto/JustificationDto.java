@@ -21,7 +21,7 @@ public class JustificationDto {
     private String description;
 
     @NotNull(message = "El archivo es obligatorio")
-    private byte[] justificationFile;
+    private String justificationFile;
 
     @NotNull(message = "La fecha es obligatoria")
     private String justificationDate;
@@ -35,4 +35,6 @@ public class JustificationDto {
     // Relations
     private JustificationTypeDto justificationTypeId;
     private Long notificationId;
+
+
 }
