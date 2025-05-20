@@ -10,7 +10,7 @@ const client = new ApolloClient({
 // New client for Cloudfare tunnel
 const clientCloudfare = new ApolloClient({
     link: new HttpLink({
-        uri: "https://partners-activation-creations-arcade.trycloudflare.com/",
+        uri: "https://pontiac-advocacy-gain-practitioner.trycloudflare.com/olympo/graphql",
     }),
     cache: new InMemoryCache(),
     defaultOptions: {

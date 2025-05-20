@@ -29,7 +29,7 @@ export const getAllApprentices = async () => {
     const response = await axios.get(`${API_URL}/all`, axiosConfig);
     const filteredData = response.data.data.map(person => ({
       name: person.name,
-      lastName: person.lastName || 'N/A', 
+      lastName: person.lastName || 'N/A',
       documentNumber: person.documentNumber,
       documentType: person.documentType || 'N/A',
       program: person.program || 'N/A',

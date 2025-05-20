@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Header } from "@components/header";
 import { Sidebar } from "@components/Sidebar";
 import { GoSearch } from "react-icons/go";
@@ -8,67 +8,98 @@ import { GrAttachment } from "react-icons/gr";
 import Image from "next/image";
 import persona from "@public/img/persona.jpg";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import justificationService from "@services/justificationService"; // importa tu servicio
+import justificationService from "@services/justificationService";
 
 export default function JustificacionesInstructor() {
   const [selectedFiltro, setSelectedFiltro] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
-
   const [justificaciones, setJustificaciones] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Carga las justificaciones del backend paginadas
-  useEffect(() => {
-    async function fetchJustifications() {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await justificationService.getAllJustifications(currentPage, itemsPerPage);
-        if (response?.code === "200" || response?.code === 200) {
-          setJustificaciones(
-            response.data.map((j) => ({
-              id: j.id,
-              programa: j.justificationType?.name || "Sin programa", // si quieres mapear a algún campo
-              ficha: j.notificationId || "N/A", // o algún campo que identifique ficha
-              documento: j.documentNumber,
-              aprendiz: j.name,
-              fecha: new Date(j.justificationDate).toLocaleDateString("es-CO"),
-              estado: j.state ? "Activo" : "Inactivo",
-              archivoAdjunto: j.justificationFile,
-            }))
-          );
-          setTotalItems(response.totalItems);
-        } else {
-          setError(response.message || "Error cargando justificaciones");
-          setJustificaciones([]);
-          setTotalItems(0);
-        }
-      } catch (err) {
-        setError(err.message || "Error de conexión");
+  // Obtener tipo MIME base64
+  function getMimeTypeFromBase64(base64) {
+    if (!base64) return "application/octet-stream";
+
+    const signatures = {
+      "iVBORw0KGgo": "image/png",
+      "/9j/": "image/jpeg",
+      "JVBERi0": "application/pdf",
+      "R0lGODdh": "image/gif",
+      "R0lGODlh": "image/gif",
+      "UEsDBBQ": "application/zip",
+    };
+
+    const prefix = base64.substring(0, 20);
+
+    for (const sig in signatures) {
+      if (prefix.startsWith(sig)) {
+        return signatures[sig];
+      }
+    }
+
+    return "application/octet-stream";
+  }
+
+  // Obtener extensión según mimeType
+  function getExtensionFromMime(mimeType) {
+    const map = {
+      "image/png": "png",
+      "image/jpeg": "jpg",
+      "application/pdf": "pdf",
+      "image/gif": "gif",
+      "application/zip": "zip",
+    };
+    return map[mimeType] || "bin";
+  }
+
+  // Función para obtener justificaciones (se llama al botón)
+  const fetchJustifications = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await justificationService.getAllJustifications(currentPage, itemsPerPage);
+      if (response?.code === "200" || response?.code === 200) {
+        setJustificaciones(
+          response.data.map((j) => ({
+            id: j.id,
+            programa: j.justificationType?.name || "Sin programa",
+            ficha: j.notificationId || "N/A",
+            documento: j.documentNumber,
+            aprendiz: j.name,
+            fecha: new Date(j.justificationDate).toLocaleDateString("es-CO"),
+            estado: j.state ? "Activo" : "Inactivo",
+            archivoAdjunto: j.justificationFile,
+            archivoMime: j.fileType || getMimeTypeFromBase64(j.justificationFile),
+          }))
+        );
+        setTotalItems(response.totalItems);
+      } else {
+        setError(response.message || "Error cargando justificaciones");
         setJustificaciones([]);
         setTotalItems(0);
       }
-      setLoading(false);
+    } catch (err) {
+      setError(err.message || "Error de conexión");
+      setJustificaciones([]);
+      setTotalItems(0);
     }
+    setLoading(false);
+  };
 
-    fetchJustifications();
-  }, [currentPage]);
-
-  const downloadBase64File = (base64Data, fileName) => {
-    const linkSource = `data:application/pdf;base64,${base64Data}`;
+  // Descargar archivo base64
+  const downloadBase64File = (base64Data, fileName, mimeType = "application/octet-stream") => {
+    const linkSource = `data:${mimeType};base64,${base64Data}`;
     const downloadLink = document.createElement("a");
     downloadLink.href = linkSource;
     downloadLink.download = fileName;
     downloadLink.click();
   };
 
-
-
-  // Filtrado sobre datos cargados (client side)
+  // Filtrado client-side
   const filteredJustificaciones = useMemo(() => {
     if (!searchTerm || !selectedFiltro) return justificaciones;
 
@@ -92,15 +123,12 @@ export default function JustificacionesInstructor() {
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  // Aquí no haces paginación manual porque ya la hace el backend
-  // Solo muestras filteredJustificaciones directamente
-
   const handlePreviousPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
   const handleNextPage = () => {
-    setCurrentPage((prev) => Math.min(prev + 0, totalPages));
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
   return (
@@ -143,7 +171,17 @@ export default function JustificacionesInstructor() {
             </div>
           </div>
 
-          {loading && <p>Cargando justificaciones...</p>}
+          {/* Botón para recargar justificaciones */}
+          <div className="mb-4">
+            <button
+              onClick={fetchJustifications}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+              disabled={loading}
+            >
+              {loading ? "Cargando..." : "Recargar Justificaciones"}
+            </button>
+          </div>
+
           {error && <p className="text-red-600">{error}</p>}
 
           {!loading && !error && (
@@ -164,7 +202,6 @@ export default function JustificacionesInstructor() {
                   </thead>
                   <tbody>
                     {filteredJustificaciones.map((justificacion) => (
-                      console.log(justificacion),
                       <tr
                         key={justificacion.id}
                         className="border-b hover:bg-gray-50 transition-colors duration-200"
@@ -184,13 +221,18 @@ export default function JustificacionesInstructor() {
                         <td className="px-4 py-3">
                           {justificacion.archivoAdjunto ? (
                             <GrAttachment
+                              title={`Descargar archivo (${justificacion.archivoMime || "desconocido"})`}
                               className="w-5 h-5 text-blue-600 hover:text-blue-800 cursor-pointer"
-                              onClick={() =>
-                                downloadBase64File(justificacion.archivoAdjunto, `justificacion_${justificacion.id}.pdf`)
-                              }
+                              onClick={() => {
+                                const mimeType = justificacion.archivoMime || "application/octet-stream";
+                                const extension = getExtensionFromMime(mimeType);
+                                downloadBase64File(
+                                  justificacion.archivoAdjunto,
+                                  `justificacion_${justificacion.id}.${extension}`,
+                                  mimeType
+                                );
+                              }}
                             />
-
-
                           ) : (
                             <span className="text-gray-400">No hay archivo</span>
                           )}
@@ -198,7 +240,6 @@ export default function JustificacionesInstructor() {
                         <td className="px-4 py-3">{justificacion.estado}</td>
                       </tr>
                     ))}
-
                   </tbody>
                 </table>
               </div>

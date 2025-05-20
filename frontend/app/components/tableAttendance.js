@@ -1,85 +1,78 @@
 import React, { useEffect, useState } from 'react';
-import { getAllApprentices } from "@services/apprenticeService";
+import studentService from '@services/Olympo/studentService';
 import { GoSearch } from "react-icons/go";
 import { BsQrCode } from "react-icons/bs";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import ModalQR from "@components/Modals/modalQR";
 import { motion } from "framer-motion";
-import 'react-calendar/dist/Calendar.css';
-import FormularioQr from "@components/formularioQr";
 
 const TablaApprentices = ({ onStatusChange }) => {
     const [apprentices, setApprentices] = useState([]);
-    const [modalOpen, setModalOpen] = useState(false);
     const [modalQROpen, setModalQROpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
-    const [calendarOpen, setCalendarOpen] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(new Date());
     const [currentPage, setCurrentPage] = useState(1);
-    const [apprenticesPerPage] = useState(7);
+    const apprenticesPerPage = 7;
+    const [totalPages, setTotalPages] = useState(1);
     const [alertVisible, setAlertVisible] = useState(false);
-    const [currentTrimester, setCurrentTrimester] = useState(1); // Estado para controlar el trimestre actual
+    const [currentTrimester, setCurrentTrimester] = useState(1);
 
-    useEffect(() => {
-        const fetchApprentices = async () => {
-            try {
-                const apprenticesData = await getAllApprentices();
-                setApprentices(apprenticesData);
-            } catch (error) {
-                console.error('Error al obtener la lista de aprendices:', error);
+    // Cargar aprendices con paginación y búsqueda
+    const fetchApprentices = async (page = 0, search = "") => {
+        try {
+            const response = await studentService.getStudents({
+                name: search,
+                page: page - 1, // servicio usa índice 0-based
+                size: apprenticesPerPage,
+            });
+
+            if (response?.data) {
+                setApprentices(response.data);
+                setTotalPages(response.totalPages || 1);
+                setCurrentPage((response.currentPage ?? 0) + 1); // ajustar a 1-based para UI
+            } else {
+                setApprentices([]);
+                setTotalPages(1);
             }
-        };
+        } catch (error) {
+            console.error("Error al obtener aprendices:", error);
+            setApprentices([]);
+            setTotalPages(1);
+        }
+    };
 
-        fetchApprentices();
-    }, []); // Removida la dependencia onStatusChange
+    // Al cambiar página o búsqueda, recargar datos
+    useEffect(() => {
+        fetchApprentices(currentPage, searchTerm);
+    }, [currentPage, searchTerm]);
 
-    // Efecto separado para notificar cambios al componente padre
+    // Notificar cambios al padre
     useEffect(() => {
         onStatusChange(apprentices);
     }, [apprentices, onStatusChange]);
 
+    // Manejar cambio en input búsqueda
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
+        setCurrentPage(1);
     };
 
-    const handleAttendanceClick = () => {
-        setAlertVisible(true);
-    };
-
+    // Mostrar alert antes de abrir QR
+    const handleAttendanceClick = () => setAlertVisible(true);
     const handleYesClick = () => {
         setModalQROpen(true);
         setAlertVisible(false);
     };
+    const handleNoClick = () => setAlertVisible(false);
 
-    const handleNoClick = () => {
-        setAlertVisible(false);
-    };
-
+    // Cambiar trimestre
     const handlePreviousTrimester = () => {
-        if (currentTrimester > 1) {
-            setCurrentTrimester(currentTrimester - 1);
-        }
+        if (currentTrimester > 1) setCurrentTrimester(currentTrimester - 1);
     };
-
     const handleNextTrimester = () => {
-        if (currentTrimester < 7) {
-            setCurrentTrimester(currentTrimester + 1);
-        } else {
-            // Opcional: Aquí puedes manejar lo que sucede cuando se alcanza el límite
-            console.log("Ya estás en el último trimestre.");
-        }
+        if (currentTrimester < 7) setCurrentTrimester(currentTrimester + 1);
     };
 
-
-    const filteredApprentices = apprentices.filter((apprentice) =>
-        apprentice.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const indexOfLastApprentice = currentPage * apprenticesPerPage;
-    const indexOfFirstApprentice = indexOfLastApprentice - apprenticesPerPage;
-    const currentApprentices = filteredApprentices.slice(indexOfFirstApprentice, indexOfLastApprentice);
-    const totalPages = Math.ceil(filteredApprentices.length / apprenticesPerPage);
-
+    // Cambiar página controlado
     const handlePageChange = (page) => {
         if (page > 0 && page <= totalPages) {
             setCurrentPage(page);
@@ -90,7 +83,6 @@ const TablaApprentices = ({ onStatusChange }) => {
         <div className="w-[98%] h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 mr-2 mt-7 md:mr-6">
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0">
                 <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-4 w-full">
-                    {/* Formulario de búsqueda */}
                     <form className="w-full md:w-auto">
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -106,7 +98,6 @@ const TablaApprentices = ({ onStatusChange }) => {
                         </div>
                     </form>
 
-                    {/* Botón de Toma de Asistencia */}
                     <div className="relative w-full md:w-auto">
                         <button
                             onClick={handleAttendanceClick}
@@ -115,7 +106,6 @@ const TablaApprentices = ({ onStatusChange }) => {
                             <BsQrCode className="w-4 h-4 ml-2" />
                         </button>
 
-                        {/* Alerta de Confirmación */}
                         {alertVisible && (
                             <motion.div
                                 initial={{ opacity: 0, y: -10 }}
@@ -152,11 +142,9 @@ const TablaApprentices = ({ onStatusChange }) => {
                                 </div>
                             </motion.div>
                         )}
-                        {/* Modal QR */}
-                        <ModalQR isOpen={modalQROpen} onClose={() => setModalQROpen(false)} apprentices={currentApprentices} />
+                        <ModalQR isOpen={modalQROpen} onClose={() => setModalQROpen(false)} apprentices={apprentices} />
                     </div>
 
-                    {/* Control de Trimestres */}
                     <div className="flex flex-col md:flex-row justify-between items-end absolute right-4">
                         <div className="flex items-center space-x-4">
                             <button
@@ -174,7 +162,6 @@ const TablaApprentices = ({ onStatusChange }) => {
                     </div>
                 </div>
             </div>
-
 
             <div className="overflow-x-auto mt-4 bg-gray-100 mb-5">
                 <table className="min-w-full table-fixed border border-gray-200">
@@ -195,12 +182,10 @@ const TablaApprentices = ({ onStatusChange }) => {
                             <th className="px-2 py-3 text-left text-xs text-gray-700 uppercase tracking-wider border-2 border-gray-300 font-inter font-semibold"></th>
                             <th className="px-2 py-3 text-xs text-center text-gray-700 uppercase tracking-wider border-2 border-gray-300 font-inter font-semibold"></th>
                             {[...Array(28)].map((_, dayIndex) => {
-                                const dayOfWeek = dayIndex % 7;
                                 return (
                                     <th
                                         key={dayIndex}
-                                        className={`px-2 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700 ${dayIndex === 5 || dayIndex === 6 ? 'text-gray-700' : ''
-                                            }`}
+                                        className={`px-2 py-3 border-2 border-gray-300 bg-gray-100 text-sm font-inter font-semibold text-gray-700 ${[5, 6].includes(dayIndex % 7) ? 'text-gray-700' : ''}`}
                                     >
                                         {["L", "M", "M", "J", "V", "S", "D"][dayIndex % 7]}
                                     </th>
@@ -209,13 +194,13 @@ const TablaApprentices = ({ onStatusChange }) => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-300">
-                        {currentApprentices.map((apprentice) => (
-                            <tr key={apprentice.documentNumber}>
+                        {apprentices.map((apprentice) => (
+                            <tr key={apprentice.id}>
                                 <td className="px-2 py-2 border-2 border-gray-300 text-sm">
-                                    {apprentice.documentNumber}
+                                    {apprentice.person.personKey.document}
                                 </td>
                                 <td className="px-2 py-2 border-2 border-gray-300 text-sm">
-                                    {apprentice.name} {apprentice.lastName}
+                                    {apprentice.person.name} {apprentice.person.lastname}
                                 </td>
                                 {[...Array(4)].map((_, weekIndex) => (
                                     <React.Fragment key={weekIndex}>
@@ -253,7 +238,7 @@ const TablaApprentices = ({ onStatusChange }) => {
                     className={`bg-gray-200 px-4 py-2 rounded-lg ${currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''}`}>
                     <IoIosArrowBack className="text-lg" />
                 </button>
-                <span className="text-sm">Página {currentPage} de {totalPages > 0 ? totalPages : 1}</span>
+                <span className="text-sm">Página {currentPage} de {totalPages}</span>
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
