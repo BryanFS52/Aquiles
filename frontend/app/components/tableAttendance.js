@@ -28,7 +28,7 @@ const TablaApprentices = ({ onStatusChange }) => {
             if (response?.data) {
                 setApprentices(response.data);
                 setTotalPages(response.totalPages || 1);
-                setCurrentPage((response.currentPage ?? 0) + 1); // ajustar a 1-based para UI
+                setCurrentPage((response.currentPage ?? 0) + 1);
             } else {
                 setApprentices([]);
                 setTotalPages(1);

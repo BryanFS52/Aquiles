@@ -1,10 +1,10 @@
-import { clientCloudfare } from '@lib/apollo-client'
+import { clientLAN } from '@lib/apollo-client'
 import { GET_STUDENTS, GET_STUDENT_LIST } from '@graphql/Olympo/studentsGraph';
 
 const studentService = {
     getStudents: async ({ name, idStudySheet, page = 0, size = 10 } = {}) => {
         try {
-            const { data } = await clientCloudfare.query({
+            const { data } = await clientLAN.query({
                 query: GET_STUDENTS,
                 variables: { name, idStudySheet, page, size },
                 fetchPolicy: 'network-only',
@@ -23,7 +23,7 @@ const studentService = {
 
     getStudentList: async () => {
         try {
-            const { data } = await clientCloudfare.query({
+            const { data } = await clientLAN.query({
                 query: GET_STUDENT_LIST,
                 fetchPolicy: 'network-only',
             });

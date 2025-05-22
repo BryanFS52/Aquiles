@@ -14,4 +14,6 @@ public class AttendancesDto {
     private String attendanceDate;
 
     private StateAttendanceEntity stateAttendance;
+
+
 }

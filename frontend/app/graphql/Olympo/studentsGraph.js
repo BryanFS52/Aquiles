@@ -19,7 +19,7 @@ export const GET_STUDENTS = gql`
                     email
                     address
                 }
-                studySheet {
+                studySheets {
                     id
                     number
                     state

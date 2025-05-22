@@ -7,10 +7,10 @@ const client = new ApolloClient({
     cache: new InMemoryCache(),
 });
 
-// New client for Cloudfare tunnel
-const clientCloudfare = new ApolloClient({
+// Cliente Lan por medio de la direccion IP
+const clientLAN = new ApolloClient({
     link: new HttpLink({
-        uri: "https://pontiac-advocacy-gain-practitioner.trycloudflare.com/olympo/graphql",
+        uri: "http://10.1.172.62:8091/olympo/graphql",
     }),
     cache: new InMemoryCache(),
     defaultOptions: {
@@ -24,4 +24,5 @@ const clientCloudfare = new ApolloClient({
     connectToDevTools: true,
 });
 
-export { client, clientCloudfare };
+
+export { client, clientLAN };
