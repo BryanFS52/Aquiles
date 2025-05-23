@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { HeaderCoordinador } from "@components/HeaderCoordinador";
+import { Header } from "@components/header";
 import { Sidebarcoordinador } from "@components/SidebarCoordinador";
 import { GoSearch } from "react-icons/go";
 import { GrAttachment } from "react-icons/gr";
@@ -15,7 +15,7 @@ export default function Options() {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6 bg-gray-100">
       <Sidebarcoordinador />
       <div className="xl:col-span-5">
-        <HeaderCoordinador/>
+        <Header role="Coordinador" />
 
         <div className="container mx-auto p-6 space-y-8">
           <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
@@ -46,13 +46,13 @@ export default function Options() {
                   <th className="px-4 py-3">Fecha de Justificación</th>
                   <th className="px-4 py-3">Archivo Adjunto</th>
                   <th className="px-4 py-3">Estado</th>
-                  
+
                 </tr>
               </thead>
               <tbody>
                 <tr className="border-b hover:bg-gray-50 transition-colors duration-200">
-                <td className="px-4 py-3">Analisis y Desarollo de Software</td>
-                <td className="px-4 py-3">25785784</td>
+                  <td className="px-4 py-3">Analisis y Desarollo de Software</td>
+                  <td className="px-4 py-3">25785784</td>
                   <td className="px-4 py-3">
                     <Image src={persona} alt="Persona" className="w-10 h-9 rounded-full" />
                   </td>

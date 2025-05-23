@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from "react"
-import { HeaderCoordinador } from "@components/HeaderCoordinador";
+import { Header } from "@components/header";
 import { Sidebarcoordinador } from "@components/SidebarCoordinador";
 import { MdAdd } from "react-icons/md"
 import { FaTrashAlt } from "react-icons/fa"
@@ -76,37 +76,38 @@ export default function CoordinadorChecklistView() {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebarcoordinador />
       <div className="xl:col-span-5">
-        <HeaderCoordinador  />
+        <Header role="Coordinador" />
+
         <div className="container mx-auto p-6 space-y-6">
           <h1 className="text-3xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
             Listas de Chequeo Trimestrales
           </h1>
 
           <div className="flex items-center justify-between mb-6">
-         
+
             <div>
-                  <label htmlFor="trimestre" className="block text-sm font-medium text-gray-700">Trimestre</label>
-                  <select
-                    id="trimestre"
-                    value={selectedTrimestre}
-                    onChange={(e) => setSelectedTrimestre(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00324d]"
-                  >
-                    <option value="" disabled hidden>
-                    Selecciona un trimestre
-                    </option>
-                    <option value="1">Primer Trimestre</option>
-                    <option value="2">Segundo Trimestre</option>
-                    <option value="3">Tercer Trimestre</option>
-                    <option value="4">Cuarto Trimestre</option>
-                  </select>
-                </div>
-                
+              <label htmlFor="trimestre" className="block text-sm font-medium text-gray-700">Trimestre</label>
+              <select
+                id="trimestre"
+                value={selectedTrimestre}
+                onChange={(e) => setSelectedTrimestre(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00324d]"
+              >
+                <option value="" disabled hidden>
+                  Selecciona un trimestre
+                </option>
+                <option value="1">Primer Trimestre</option>
+                <option value="2">Segundo Trimestre</option>
+                <option value="3">Tercer Trimestre</option>
+                <option value="4">Cuarto Trimestre</option>
+              </select>
+            </div>
+
             <button >
-                 <ModalNewChecklist isOpen={modalOpen} onClose={handleCloseModal} onCreate={handleCreateChecklist} />
+              <ModalNewChecklist isOpen={modalOpen} onClose={handleCloseModal} onCreate={handleCreateChecklist} />
             </button>
           </div>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-8">
             {checklists
               .filter((checklist) => checklist.trimester === selectedTrimester)
@@ -115,7 +116,7 @@ export default function CoordinadorChecklistView() {
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-[#40b003] font-bold text-xl">{checklist.name}</span>
-                      <button 
+                      <button
                         onClick={() => handleOpenConfirmModal(checklist.id)}
                         className="text-xl text-[#00324d]"
                       >
@@ -126,7 +127,7 @@ export default function CoordinadorChecklistView() {
                   </div>
                 </div>
               ))}
-          </div>       
+          </div>
           <ToastContainer />
         </div>
       </div>

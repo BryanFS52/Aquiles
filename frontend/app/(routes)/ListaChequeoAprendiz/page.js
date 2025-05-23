@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { HeaderAprendiz } from "@components/HeaderAprendiz";
+import { Header } from "@components/header";
 import { Sidebaraprendiz } from "@components/SidebarAprendiz";
 import { Check, FileDown, X, UploadCloud } from "lucide-react";
 
@@ -92,7 +92,8 @@ export default function ChecklistComponent() {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebaraprendiz />
       <div className="xl:col-span-5">
-        <HeaderAprendiz />
+        <Header role="Aprendiz" />
+
         <div className="container mx-auto p-6 space-y-6">
           <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
             Lista de Chequeo

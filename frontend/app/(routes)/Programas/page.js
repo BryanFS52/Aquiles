@@ -1,7 +1,7 @@
 "use client"; // Esto hace que el componente sea un Client Component
 
 import React, { useEffect, useState } from 'react';
-import { Header } from "@components/header"; // importaciones del header y del sidebar para hacer el llamado
+import { Header } from "@components/header";
 import { Sidebar } from "@components/Sidebar";
 
 // Importa correctamente los íconos
@@ -38,7 +38,7 @@ export default function Programas() {
     setPrograms(localPrograms);
   }, []);
 
-  const filteredPrograms = programs.filter(program => 
+  const filteredPrograms = programs.filter(program =>
     program.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -66,7 +66,7 @@ export default function Programas() {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebar />
       <div className="xl:col-span-5">
-      <Header role="Instructor" />
+        <Header role="Instructor" />
         <div className="h-auto p-8 md:p-16 lg:p-16 inline-block w-full">
 
           <h1 className="text-lightGreen dark:text-darkBlue text-5xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 dark:border-darkGray w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">
@@ -74,9 +74,9 @@ export default function Programas() {
           </h1>
 
           {/* Campo de búsqueda */}
-          <input 
-            type="text" 
-            placeholder="Buscar programa..." 
+          <input
+            type="text"
+            placeholder="Buscar programa..."
             className="mb-4 w-80 md:w-96 lg:w-1/2 p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-lightGreen dark:ring-[#00304D] focus:border-transparent"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

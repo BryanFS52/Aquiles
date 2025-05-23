@@ -1,7 +1,7 @@
 "use client"; // Esto hace que el componente sea un Client Component
 
 import React, { useEffect, useState } from 'react';
-import { HeaderCoordinador } from "@components/HeaderCoordinador";
+import { Header } from "@components/header";
 import { Sidebarcoordinador } from "@components/SidebarCoordinador";
 
 // Importa correctamente los íconos
@@ -38,7 +38,7 @@ export default function Programas() {
     setPrograms(localPrograms);
   }, []);
 
-  const filteredPrograms = programs.filter(program => 
+  const filteredPrograms = programs.filter(program =>
     program.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -66,7 +66,7 @@ export default function Programas() {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6 bg-gray-100">
       <Sidebarcoordinador />
       <div className="xl:col-span-5">
-        <HeaderCoordinador />
+        <Header role="Coordinador" />
 
         <div className="h-auto p-12 inline-block w-full">
           <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">
@@ -74,14 +74,14 @@ export default function Programas() {
           </h1>
 
           {/* Campo de búsqueda */}
-          <input 
-            type="text" 
-            placeholder="Buscar programa..." 
+          <input
+            type="text"
+            placeholder="Buscar programa..."
             className="mb-4 w-full p-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#40b003] focus:border-transparent"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-  
+
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 ml-8 py-7">
             {displayedPrograms.map((program) => {
               const Icon = iconMap[program.icon];

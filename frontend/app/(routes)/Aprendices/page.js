@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { HeaderCoordinador } from "@components/HeaderCoordinador"
+import { Header } from "@components/header";
 import { Sidebarcoordinador } from "@components/SidebarCoordinador"
 
 function ListaApprentices() {
@@ -80,7 +80,7 @@ function ListaApprentices() {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6 bg-gray-50">
       <Sidebarcoordinador />
       <div className="xl:col-span-5">
-        <HeaderCoordinador />
+        <Header role="Coordinador" />
 
 
         <div className="container mx-auto p-6 space-y-6">

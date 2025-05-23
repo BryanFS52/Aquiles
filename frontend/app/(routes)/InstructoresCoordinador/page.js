@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { Sidebarcoordinador } from '@/components/SidebarCoordinador'
-import { HeaderCoordinador } from '@/components/HeaderCoordinador'
+import { Header } from "@components/header";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUserGroup } from '@fortawesome/free-solid-svg-icons'
 
@@ -44,7 +44,7 @@ const InstructorCard = ({ instructor }) => {
                         <h3 className="text-lg font-semibold text-[#00324d]">{instructor.name}</h3>
                         <p className="text-sm text-green-600">{instructor.specialty}</p>
                         <p className="text-sm text-gray-600">{instructor.centers}</p>
-                        
+
                     </div>
                 </div>
             </div>
@@ -62,7 +62,7 @@ const InstructorCard = ({ instructor }) => {
                     Fichas asignadas
                 </button>
             </div>
-            
+
             <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
                 <p className="text-sm"><span className="text-lg font-semibold">Tiempo de contrato:</span> {instructor.contractTime}</p>
                 <p className="text-sm"><span className="text-lg font-semibold">Modalidad:</span> {instructor.modalidad}</p>
@@ -149,7 +149,7 @@ export default function InstructoresCoordinador() {
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
             <Sidebarcoordinador />
             <div className="xl:col-span-5">
-                <HeaderCoordinador />
+                <Header role="Coordinador" />
                 <main className="container mx-auto p-6">
                     <h1 className="text-3xl font-bold text-[#00324d] mb-6">Instructores</h1>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

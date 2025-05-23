@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { HeaderAprendiz } from "@components/HeaderAprendiz";
+import { Header } from "@components/header";
 import { Sidebaraprendiz } from "@components/SidebarAprendiz";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -133,7 +133,7 @@ export default function JustificacionAprendiz() {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <Sidebaraprendiz />
       <div className="xl:col-span-5">
-        <HeaderAprendiz />
+        <Header role="Aprendiz" />
         <div className="h-[90vh] p-6 bg-neutral-100 space-y-5">
           <h1 className="text-[#0e324d] text-3xl border-b-2 border-gray-400 w-fit mb-6 font-semibold">
             Justificación para el Aprendiz
