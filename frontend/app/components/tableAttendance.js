@@ -40,7 +40,7 @@ const TablaApprentices = ({ onStatusChange }) => {
         }
     };
 
-    // Al cambiar página o búsqueda, recargar datos
+    // Al cambiar página o búsqueda
     useEffect(() => {
         fetchApprentices(currentPage, searchTerm);
     }, [currentPage, searchTerm]);
@@ -80,7 +80,7 @@ const TablaApprentices = ({ onStatusChange }) => {
     };
 
     return (
-        <div className="w-[98%] h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 mr-2 mt-7 md:mr-6">
+        <div className="w-[98%] h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-4 mr-2 mt-7 md:mr-6 sm:mx-4">
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0">
                 <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-4 w-full">
                     <form className="w-full md:w-auto">
@@ -145,17 +145,17 @@ const TablaApprentices = ({ onStatusChange }) => {
                         <ModalQR isOpen={modalQROpen} onClose={() => setModalQROpen(false)} apprentices={apprentices} />
                     </div>
 
-                    <div className="flex flex-col md:flex-row justify-between items-end absolute right-4">
+                    <div className="flex flex-col md:flex-row justify-between items-end absolute right-4 sm:items-center sm:mx-4 sm:mt-4">
                         <div className="flex items-center space-x-4">
                             <button
                                 onClick={handlePreviousTrimester}
-                                className="bg-gray-200 px-4 py-2 rounded-lg">
+                                className="bg-gray-200 px-4 py-2 rounded-lg mt-2">
                                 <IoIosArrowBack className="text-lg" />
                             </button>
-                            <span className="text-lg font-semibold">Trimestre {currentTrimester}</span>
+                            <span className="text-lg font-semibold sm:text-base">Trimestre {currentTrimester}</span>
                             <button
                                 onClick={handleNextTrimester}
-                                className="bg-gray-200 px-4 py-2 rounded-lg">
+                                className="bg-gray-200 px-4 py-2 rounded-lg mt-2">
                                 <IoIosArrowForward className="text-lg" />
                             </button>
                         </div>

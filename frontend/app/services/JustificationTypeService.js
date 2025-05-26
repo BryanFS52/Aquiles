@@ -1,5 +1,5 @@
 import { client } from '@lib/apollo-client';
-import JustificationGraphQL from '@graphql/JustificationTypeGraph';
+import JustificationGraphQL from '@graphql/justificationTypeGraph';
 
 const justificationTypeService = {
     // Obtener todos los tipos con paginación

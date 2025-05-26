@@ -5,7 +5,7 @@ import {
   ADD_JUSTIFICATION,
   UPDATE_JUSTIFICATION,
   DELETE_JUSTIFICATION,
-} from '@graphql/JustificationsGraph';
+} from '@graphql/justificationsGraph';
 
 const justificationService = {
   getAllJustifications: async (page = 0, size = 10) => {

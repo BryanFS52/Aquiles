@@ -1,37 +1,49 @@
-import axios from 'axios';
+import { client } from '@lib/apollo-client';
+import {
+  GET_ALL_CHECKLISTS,
+  GET_CHECKLIST_BY_ID,
+  ADD_CHECKLIST,
+  UPDATE_CHECKLIST,
+  DELETE_CHECKLIST,
+} from '@graphql/checklistGraph';
 
-// URL base de tu API
-const API_URL = "http://localhost:8081/api"; // Ajusta la URL según la configuración de tu backend
-
-// Función para obtener las listas de chequeo
-export const listChecklists = () => {
-  return axios
-    .get(`${API_URL}/checklists`) // Ajusta la ruta del API según tu backend
-    .then((response) => response.data)
-    .catch((error) => {
-      console.error("Error fetching checklists:", error);
-      throw error; // Lanza el error para manejarlo en el componente
-    });
+export const fetchAllChecklists = async (page, size) => {
+  const { data } = await client.query({
+    query: GET_ALL_CHECKLISTS,
+    variables: { page, size },
+    fetchPolicy: 'no-cache',
+  });
+  return data.allChecklists;
 };
 
-// Función para crear una nueva lista de chequeo
-export const createChecklist = (checklist) => {
-  return axios
-    .post(`${API_URL}/checklists`, checklist) // Ajusta la ruta del API según tu backend
-    .then((response) => response.data)
-    .catch((error) => {
-      console.error("Error creating checklist:", error);
-      throw error; // Lanza el error para manejarlo en el componente
-    });
+export const fetchChecklistById = async (id) => {
+  const { data } = await client.query({
+    query: GET_CHECKLIST_BY_ID,
+    variables: { id },
+  });
+  return data.checklistById;
 };
 
-// Función para eliminar una lista de chequeo
-export const deleteChecklist = (checklistId) => {
-  return axios
-    .delete(`${API_URL}/checklists/${checklistId}`) // Ajusta la ruta del API según tu backend
-    .then((response) => response.data)
-    .catch((error) => {
-      console.error("Error deleting checklist:", error);
-      throw error; // Lanza el error para manejarlo en el componente
-    });
+export const addChecklist = async (input) => {
+  const { data } = await client.mutate({
+    mutation: ADD_CHECKLIST,
+    variables: { input },
+  });
+  return data.addChecklist;
+};
+
+export const updateChecklist = async (id, input) => {
+  const { data } = await client.mutate({
+    mutation: UPDATE_CHECKLIST,
+    variables: { id, input },
+  });
+  return data.updateChecklist;
+};
+
+export const deleteChecklist = async (id) => {
+  const { data } = await client.mutate({
+    mutation: DELETE_CHECKLIST,
+    variables: { id },
+  });
+  return data.deleteChecklist;
 };

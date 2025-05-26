@@ -6,7 +6,7 @@ import {
   ADD_TEAM_SCRUM,
   UPDATE_TEAM_SCRUM,
   DELETE_TEAM_SCRUM,
-} from '@graphql/TeamsScrumGraph';
+} from '@graphql/teamsScrumGraph';
 
 export const fetchTeamsScrums = async (page, size) => {
   const { data } = await client.query({

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'react-toastify'
-import { createChecklist } from '@services/checkListService'
+import { addChecklist } from '@services/checkListService'
 
 export default function CrearListaChequeo() {
   const [isOpen, setIsOpen] = useState(false)
@@ -25,7 +25,7 @@ export default function CrearListaChequeo() {
         items: items.map(i => i.indicador)
       }
 
-      await createChecklist(newChecklist)
+      await addChecklist(newChecklist)
       toast.success('Lista de chequeo creada exitosamente.')
       setIsOpen(false)
       resetForm()

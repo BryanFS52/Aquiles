@@ -1,41 +1,55 @@
-"use client"; // Esto hace que el componente sea un Client Component
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { Header } from "@components/header";
 import { Sidebarcoordinador } from "@components/SidebarCoordinador";
+import programService from '@services/Olympo/programService';
+import { FaComputer, FaPeopleRoof } from 'react-icons/fa6';
+import { FaPeopleCarry } from 'react-icons/fa';
+import { AiOutlineStock } from 'react-icons/ai';
+import { GiTakeMyMoney } from 'react-icons/gi';
+import { BsPersonRolodex } from 'react-icons/bs';
+import { SlCalculator } from 'react-icons/sl';
+import { GrUserSettings } from 'react-icons/gr';
+import { LiaLanguageSolid } from 'react-icons/lia';
 
-// Importa correctamente los íconos
-import { FaComputer, FaPeopleRoof } from 'react-icons/fa6';  // Fa6 (FontAwesome icons)
-import { FaPeopleCarry } from 'react-icons/fa'; // Fa (FontAwesome icons)
-import { AiOutlineStock } from 'react-icons/ai';  // Ai (Ant Design icons)
-import { GiTakeMyMoney } from 'react-icons/gi';  // Gi (Game Icons)
-import { BsPersonRolodex } from 'react-icons/bs';  // Bs (Bootstrap Icons)
-import { SlCalculator } from 'react-icons/sl';  // Sl (Simple Line Icons)
-import { GrUserSettings } from 'react-icons/gr';  // Gr (Grommet Icons)
-import { LiaLanguageSolid } from 'react-icons/lia';  // Lia (Line Awesome Icons)
 
-const ITEMS_PER_PAGE = 4; // Número de programas por página
+const ITEMS_PER_PAGE = 4;
 
-const localPrograms = [
-  { id: 1, name: "Análisis y Desarrollo de Software", description: "Programa para el desarrollo de soluciones informáticas.", icon: "FaComputer" },
-  { id: 2, name: "Gestión Empresarial", description: "Preparación para la gestión eficiente de empresas.", icon: "AiOutlineStock" },
-  { id: 3, name: "Gestión Bancaria y Financiera", description: "Formación en operaciones bancarias y financieras.", icon: "GiTakeMyMoney" },
-  { id: 4, name: "Marketing Digital", description: "Estrategias modernas para el marketing en línea.", icon: "BsPersonRolodex" },
-  { id: 5, name: "Contabilidad Financiera", description: "Fundamentos de contabilidad y gestión financiera.", icon: "SlCalculator" },
-  { id: 6, name: "Gestión de Recursos Humanos", description: "Técnicas para la gestión efectiva del talento humano.", icon: "FaPeopleRoof" },
-  { id: 7, name: "Administración Pública", description: "Preparación para roles administrativos en el sector público.", icon: "GrUserSettings" },
-  { id: 8, name: "Idiomas Extranjeros", description: "Aprendizaje de lenguas extranjeras y cultura.", icon: "LiaLanguageSolid" },
-  { id: 9, name: "Logística Empresarial", description: "Gestión de operaciones logísticas y cadena de suministro.", icon: "FaPeopleCarry" },
-];
+const iconMap = {
+  FaComputer: FaComputer,
+  AiOutlineStock: AiOutlineStock,
+  GiTakeMyMoney: GiTakeMyMoney,
+  BsPersonRolodex: BsPersonRolodex,
+  SlCalculator: SlCalculator,
+  FaPeopleRoof: FaPeopleRoof,
+  GrUserSettings: GrUserSettings,
+  LiaLanguageSolid: LiaLanguageSolid,
+  FaPeopleCarry: FaPeopleCarry,
+};
 
 export default function Programas() {
   const [programs, setPrograms] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    // Simula la obtención de datos locales
-    setPrograms(localPrograms);
+    const fetchPrograms = async () => {
+      setLoading(true);
+      try {
+        const response = await programService.getPrograms({ size: 100 });
+        setPrograms(response.data || []);
+      } catch (err) {
+        setError("No se pudieron cargar los programas.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPrograms();
   }, []);
 
   const filteredPrograms = programs.filter(program =>
@@ -43,23 +57,10 @@ export default function Programas() {
   );
 
   const totalPages = Math.ceil(filteredPrograms.length / ITEMS_PER_PAGE);
+  const displayedPrograms = filteredPrograms.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-  };
-
-  const displayedPrograms = filteredPrograms.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-
-  const iconMap = {
-    FaComputer: FaComputer,
-    AiOutlineStock: AiOutlineStock,
-    GiTakeMyMoney: GiTakeMyMoney,
-    BsPersonRolodex: BsPersonRolodex,
-    SlCalculator: SlCalculator,
-    FaPeopleRoof: FaPeopleRoof,
-    GrUserSettings: GrUserSettings,
-    LiaLanguageSolid: LiaLanguageSolid,
-    FaPeopleCarry: FaPeopleCarry,
   };
 
   return (
@@ -82,12 +83,12 @@ export default function Programas() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
 
+          {loading && <p className="text-center text-gray-600">Cargando programas...</p>}
+          {error && <p className="text-center text-red-500">{error}</p>}
+
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 ml-8 py-7">
             {displayedPrograms.map((program) => {
-              const Icon = iconMap[program.icon];
-              if (!Icon) {
-                return <div key={program.id}>Icono no disponible</div>;
-              }
+              const Icon = iconMap[program.icon] || FaComputer;
               return (
                 <div key={program.id} className="flex w-96 h-52 rounded-lg overflow-hidden shadow-lg bg-zinc-200 relative mb-4 p-4">
                   <div className="z-50 justify-end p-4 space-y-4">

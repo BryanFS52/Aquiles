@@ -5,7 +5,7 @@ import {
     ADD_PROJECT,
     UPDATE_PROJECT,
     DELETE_PROJECT,
-} from '../graphql/ProjectsGraph';
+} from '@graphql/projectsGraph';
 
 export const fetchProjects = async (page = 1, size = 10) => {
     try {

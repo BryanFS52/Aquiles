@@ -5,7 +5,7 @@ import { Header } from "@components/header";
 import { Sidebarcoordinador } from "@components/SidebarCoordinador";
 import { MdAdd } from "react-icons/md"
 import { FaTrashAlt } from "react-icons/fa"
-import { listChecklists, createChecklist, deleteChecklist } from "@services/checkListService"
+import { fetchAllChecklists, fetchChecklistById, addChecklist, deleteChecklist } from "@services/checkListService"
 import { ToastContainer, toast } from "react-toastify"
 import ModalNewChecklist from "@components/Modals/ModalNewChecklist"
 import "react-toastify/dist/ReactToastify.css"
@@ -17,46 +17,20 @@ export default function CoordinadorChecklistView() {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false)
   const [checklistToDelete, setChecklistToDelete] = useState(null)
 
-  useEffect(() => {
-    fetchChecklists()
-  }, [])
-
-  const fetchChecklists = () => {
-    listChecklists()
-      .then((data) => setChecklists(data))
-      .catch((error) => {
-        console.error("Error fetching checklists:", error)
-        toast.error("Error al obtener las listas de chequeo.")
-      })
-  }
-
-  const handleCreateChecklist = (checklist) => {
-    if (!checklist.name) {
-      toast.error('Por favor completa correctamente todos los campos obligatorios.')
-      return
+  const handleCreateChecklist = async (checklistData) => {
+    try {
+      const response = await addChecklist(checklistData)
+      if (response.code === 200) {
+        toast.success("Lista de chequeo creada exitosamente")
+        setChecklists((prev) => [...prev, response.data])
+        setModalOpen(false)
+      } else {
+        toast.error(response.message)
+      }
+    } catch (error) {
+      console.error("Error creating checklist:", error)
+      toast.error("Error al crear la lista de chequeo")
     }
-    createChecklist(checklist)
-      .then(() => {
-        fetchChecklists()
-        toast.success('¡Nueva lista de chequeo creada con éxito!')
-        handleCloseModal()
-      })
-      .catch(error => {
-        console.error('Error creating checklist:', error)
-        toast.error('Error al crear la lista de chequeo.')
-      })
-  }
-
-  const handleDeleteChecklist = (checklistId) => {
-    deleteChecklist(checklistId)
-      .then(() => {
-        setChecklists(checklists.filter((checklist) => checklist.id !== checklistId))
-        toast.success("Lista de chequeo eliminada exitosamente.")
-      })
-      .catch((error) => {
-        console.error("Error deleting checklist:", error)
-        toast.error("Error al eliminar la lista de chequeo.")
-      })
   }
 
   const handleOpenModal = () => setModalOpen(true)

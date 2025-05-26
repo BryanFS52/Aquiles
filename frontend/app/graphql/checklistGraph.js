@@ -1,0 +1,88 @@
+import { gql } from "@apollo/client";
+
+// Queries and Mutations for Checklist
+export const GET_ALL_CHECKLISTS = gql`
+  query GetAllChecklists($page: Int, $size: Int) {
+    allChecklists(page: $page, size: $size) {
+      date
+      code
+      message
+      currentPage
+      totalPages
+      totalItems
+      data {
+        id
+        state
+        remarks
+        instructorSignature
+        evaluationCriteria
+        checklistHistory
+        associatedProject {
+          projectId
+          description
+        }
+        associatedJuries {
+          id
+          name
+        }
+      }
+    }
+  }
+`
+
+
+export const GET_CHECKLIST_BY_ID = gql`
+  query GetChecklistById($id: ID!) {
+    checklistById(id: $id) {
+      code
+      date
+      message
+      data {
+        id
+        state
+        remarks
+        instructorSignature
+        evaluationCriteria
+        checklistHistory
+        associatedProject {
+          id
+          name
+        }
+        associatedJuries {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
+
+export const ADD_CHECKLIST = gql`
+  mutation AddChecklist($input: ChecklistInput!) {
+    addChecklist(input: $input) {
+      code
+      message
+      date
+    }
+  }
+`;
+
+export const UPDATE_CHECKLIST = gql`
+  mutation UpdateChecklist($id: ID!, $input: ChecklistInput!) {
+    updateChecklist(id: $id, input: $input) {
+      code
+      message
+      date
+    }
+  }
+`;
+
+export const DELETE_CHECKLIST = gql`
+  mutation DeleteChecklist($id: ID!) {
+    deleteChecklist(id: $id) {
+      code
+      message
+      date
+    }
+  }
+`;
