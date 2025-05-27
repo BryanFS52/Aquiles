@@ -25,7 +25,7 @@ type AttendancePageId{
     message : String
 }
 
-input AttendanceInput {
+input AttendancesDto {
     attendanceDate: String
     stateAttendanceId: ID!
 }
@@ -37,7 +37,7 @@ extend type Query {
 
 
 extend type Mutation {
-    addAttendance(input: AttendanceInput): Response
-    updateAttendance(id: ID!, input: AttendanceInput): Response
+    addAttendance(input: AttendancesDto): Response
+    updateAttendance(id: ID!, input: AttendancesDto): Response
     deleteAttendance(id: ID!): Response
 }

@@ -30,9 +30,8 @@ public class AttendancesEntity implements Serializable {
     @JoinColumn(name = "fk_idExcuse", referencedColumnName = "excuse_id")
     private ExcusesEntity excuse;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_idStudent", referencedColumnName = "student_id")
-    private StudentsEntity student;
+    @Column (name = "fk_student")
+    private Long student;
 
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

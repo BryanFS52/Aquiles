@@ -3,7 +3,6 @@ type TeamsScrum {
     name: String
     members: String
     checklist: Checklist
-    project: Project
 }
 
 type TeamsScrumPage {
@@ -23,11 +22,10 @@ type TeamsScrumPageId {
     message: String
 }
 
-input TeamsScrumInput {
+input TeamsScrumDto {
     name: String!
     members: String!
     checklist: ChecklistInput
-    project: ProjectInput
 }
 
 extend type Query {
@@ -36,7 +34,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addTeamScrum(input: TeamsScrumInput!): Response
-    updateTeamScrum(id: ID!, input: TeamsScrumInput): Response
+    addTeamScrum(input: TeamsScrumDto!): Response
+    updateTeamScrum(id: ID!, input: TeamsScrumDto): Response
     deleteTeamScrum(id: ID!): Response
 }

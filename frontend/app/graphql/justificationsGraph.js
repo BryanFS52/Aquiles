@@ -54,7 +54,7 @@ export const GET_JUSTIFICATION_BY_ID = gql`
 `;
 
 export const ADD_JUSTIFICATION = gql`
-  mutation AddJustification($input: JustificationInput) {
+  mutation AddJustification($input: JustificationDto!) {
     addJustification(input: $input) {
       code
       message
@@ -63,7 +63,7 @@ export const ADD_JUSTIFICATION = gql`
 `;
 
 export const UPDATE_JUSTIFICATION = gql`
-  mutation UpdateJustification($id: ID!, $input: JustificationInput) {
+  mutation UpdateJustification($id: ID!, $input: JustificationDto!) {
     updateJustification(id: $id, input: $input) {
       code
       message

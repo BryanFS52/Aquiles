@@ -51,7 +51,7 @@ export const GET_TEAM_SCRUM_BY_ID = gql`
 `;
 
 export const ADD_TEAM_SCRUM = gql`
-  mutation AddTeamScrum($input: TeamsScrumInput!) {
+  mutation AddTeamScrum($input: TeamsScrumDto!) {
     addTeamScrum(input: $input) {
       code
       message
@@ -61,7 +61,7 @@ export const ADD_TEAM_SCRUM = gql`
 `;
 
 export const UPDATE_TEAM_SCRUM = gql`
-  mutation UpdateTeamScrum($id: ID!, $input: TeamsScrumInput!) {
+  mutation UpdateTeamScrum($id: ID!, $input: TeamsScrumDto!) {
     updateTeamScrum(id: $id, input: $input) {
       code
       message

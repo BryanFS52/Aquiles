@@ -21,7 +21,7 @@ type ExcusePageId {
     message: String
 }
 
-input ExcuseInput {
+input ExcusesDto {
     excuseDescription: String
     excuseDocument: String
 }
@@ -32,7 +32,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addExcuse(input: ExcuseInput): Response
-    updateExcuse(id: ID!, input: ExcuseInput): Response
+    addExcuse(input: ExcusesDto): Response
+    updateExcuse(id: ID!, input: ExcusesDto): Response
     deleteExcuse(id: ID!): Response
 }

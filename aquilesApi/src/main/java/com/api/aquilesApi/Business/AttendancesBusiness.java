@@ -93,6 +93,7 @@ public class AttendancesBusiness {
     // Find By Id
     public AttendancesDto findById(Long id) {
         try {
+
             AttendancesEntity attendances = attendancesService.getById(id);
             return modelMapper.map(attendances, AttendancesDto.class);
         } catch (CustomException e) {

@@ -41,7 +41,7 @@ export const GET_IMPROVEMENT_PLAN_BY_ID = gql`
 `;
 
 export const ADD_IMPROVEMENT_PLAN = gql`
-  mutation AddImprovementPlan($input: ImprovementPlanInput!) {
+  mutation AddImprovementPlan($input: ImprovementPlanDto!) {
     addImprovementPlan(input: $input) {
       code
       message
@@ -51,7 +51,7 @@ export const ADD_IMPROVEMENT_PLAN = gql`
 `;
 
 export const UPDATE_IMPROVEMENT_PLAN = gql`
-  mutation UpdateImprovementPlan($id: ID!, $input: ImprovementPlanInput!) {
+  mutation UpdateImprovementPlan($id: ID!, $input: ImprovementPlanDto!) {
     updateImprovementPlan(id: $id, input: $input) {
       code
       message

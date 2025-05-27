@@ -1,5 +1,5 @@
 package com.api.aquilesApi.Business;
-
+/*
 import com.api.aquilesApi.Dto.ChecklistDto;
 import com.api.aquilesApi.Entity.ChecklistEntity;
 import com.api.aquilesApi.Repository.JuriesRepository;
@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-
 @Component
 public class ChecklistBusiness {
 
@@ -88,3 +87,4 @@ public class ChecklistBusiness {
         }
     }
 }
+ */

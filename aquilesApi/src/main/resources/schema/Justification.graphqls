@@ -28,7 +28,7 @@ type JustificationPageId {
     message: String
 }
 
-input JustificationInput {
+input JustificationDto {
     documentNumber: String
     name: String
     description: String
@@ -37,7 +37,7 @@ input JustificationInput {
     justificationHistory: String
     state: Boolean
     notificationId: ID
-    justificationTypeId: JustificationTypeInput
+    justificationTypeId: JustificationTypeDto
 }
 
 extend type Query {
@@ -46,7 +46,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addJustification(input: JustificationInput): Response
-    updateJustification(id: ID!, input: JustificationInput): Response
+    addJustification(input: JustificationDto): Response
+    updateJustification(id: ID!, input: JustificationDto): Response
     deleteJustification(id: ID!): Response
 }

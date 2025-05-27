@@ -1,27 +1,29 @@
-package com.api.aquilesApi.Controller;
+package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.ExcusesBusiness;
 import com.api.aquilesApi.Dto.ExcusesDto;
+import com.api.aquilesApi.Utilities.DataConvert;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.netflix.graphql.dgs.DgsQuery;
+import com.netflix.graphql.dgs.InputArgument;
 import org.springframework.data.domain.Page;
-import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
+
 import java.util.Map;
 
-@Controller
+@DgsComponent
 public class ExcusesController {
     private final ExcusesBusiness excusesBusiness;
-
+    private final DataConvert dataConvert = new DataConvert();
     public ExcusesController(ExcusesBusiness excusesBusiness) {
         this.excusesBusiness = excusesBusiness;
     }
 
     // FindAll these excuses (GraphQL)
-    @QueryMapping
-    public Map<String, Object> allExcuses(@Argument int page, @Argument int size) {
+    @DgsQuery
+    public Map<String, Object> allExcuses(@InputArgument Integer page, @InputArgument Integer size) {
         try {
             Page<ExcusesDto> excusesDtoPage = excusesBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
@@ -40,10 +42,11 @@ public class ExcusesController {
     }
 
     // FindById a excuse (GraphQL)
-    @QueryMapping
-    public Map<String, Object> excuseById(@Argument Long id) {
+    @DgsQuery
+    public Map<String, Object> excuseById(@InputArgument String id) {
         try {
-            ExcusesDto excusesDto = excusesBusiness.findById(id);
+            Long idLong = dataConvert.parseLongOrNull(id);
+            ExcusesDto excusesDto = excusesBusiness.findById(idLong);
             return ResponseHttpApi.responseHttpFindId(
                     excusesDto,
                     ResponseHttpApi.CODE_OK,
@@ -57,8 +60,8 @@ public class ExcusesController {
     }
 
     // Add a new excuse (GraphQL)
-    @MutationMapping
-    public Map<String, Object> addExcuse(@Argument("input") ExcusesDto excusesDto) {
+    @DgsMutation
+    public Map<String, Object> addExcuse(@InputArgument(name = "input") ExcusesDto excusesDto) {
         try {
             ExcusesDto excusesDto1 = excusesBusiness.add(excusesDto);
             return ResponseHttpApi.responseHttpAction(
@@ -74,12 +77,13 @@ public class ExcusesController {
     }
 
     // Update excuse (GraphQL)
-    @MutationMapping
-    public Map<String, Object> updateExcuse(@Argument Long id, @Argument("input") ExcusesDto excusesDto) {
+    @DgsMutation
+    public Map<String, Object> updateExcuse(@InputArgument String id, @InputArgument( name = "input")ExcusesDto excusesDto) {
         try {
-            excusesBusiness.update(id, excusesDto);
+            Long idLong = dataConvert.parseLongOrNull(id);
+            excusesBusiness.update(idLong, excusesDto);
             return ResponseHttpApi.responseHttpAction(
-                    id,
+                    idLong,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
@@ -91,12 +95,13 @@ public class ExcusesController {
     }
 
     // Delete excuse (GraphQL)
-    @MutationMapping
-    public Map<String, Object> deleteExcuse(@Argument Long id) {
+    @DgsMutation
+    public Map<String, Object> deleteExcuse(@InputArgument String id) {
         try {
-            excusesBusiness.delete(id);
+            Long idLong = dataConvert.parseLongOrNull(id);
+            excusesBusiness.delete(idLong);
             return ResponseHttpApi.responseHttpAction(
-                    id,
+                    idLong,
                     ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );

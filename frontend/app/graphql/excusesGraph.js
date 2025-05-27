@@ -35,7 +35,7 @@ export const GET_EXCUSE_BY_ID = gql`
 `;
 
 export const ADD_EXCUSE = gql`
-  mutation AddExcuse($input: ExcuseInput!) {
+  mutation AddExcuse($input: ExcuseDto!) {
     addExcuse(input: $input) {
       code
       message
@@ -50,7 +50,7 @@ export const ADD_EXCUSE = gql`
 `;
 
 export const UPDATE_EXCUSE = gql`
-  mutation UpdateExcuse($id: ID!, $input: ExcuseInput!) {
+  mutation UpdateExcuse($id: ID!, $input: ExcuseDto!) {
     updateExcuse(id: $id, input: $input) {
       code
       message

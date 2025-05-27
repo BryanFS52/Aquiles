@@ -27,7 +27,7 @@ type FinalReportPageId {
     date: String
 }
 
-input FinalReportInput {
+input FinalReportDto {
     fileNumber: String!
     objectives: String!
     disciplinaryOffenses: String
@@ -44,7 +44,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addFinalReport(input: FinalReportInput): Response
-    updateFinalReport(id: ID!, input: FinalReportInput): Response
+    addFinalReport(input: FinalReportDto): Response
+    updateFinalReport(id: ID!, input: FinalReportDto): Response
     deleteFinalReport(id: ID!): Response
 }

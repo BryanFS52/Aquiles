@@ -1,4 +1,4 @@
-package com.api.aquilesApi.Controller;
+package com.api.aquilesApi.Resolver;
 
 
 import com.api.aquilesApi.Business.StateAttendancesBusiness;

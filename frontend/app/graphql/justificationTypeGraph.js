@@ -35,7 +35,7 @@ export const GET_JUSTIFICATION_TYPE_BY_ID = gql`
 `;
 
 export const ADD_JUSTIFICATION_TYPE = gql`
-  mutation AddJustificationType($input: JustificationTypeInput!) {
+  mutation AddJustificationType($input: JustificationTypeDto!) {
     addJustificationType(input: $input) {
       code
       message
@@ -45,7 +45,7 @@ export const ADD_JUSTIFICATION_TYPE = gql`
 `;
 
 export const UPDATE_JUSTIFICATION_TYPE = gql`
-  mutation UpdateJustificationType($id: ID!, $input: JustificationTypeInput!) {
+  mutation UpdateJustificationType($id: ID!, $input: JustificationTypeDto!) {
     updateJustificationType(id: $id, input: $input) {
       code
       message

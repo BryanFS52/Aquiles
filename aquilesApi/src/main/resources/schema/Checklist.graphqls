@@ -32,7 +32,6 @@ input ChecklistInput {
     instructorSignature: String!
     evaluationCriteria: Boolean!
     checklistHistory: String!
-    associatedProject: ProjectInput
     associatedJuries: [ID!]!
 }
 

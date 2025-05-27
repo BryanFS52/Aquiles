@@ -1,25 +1,28 @@
-package com.api.aquilesApi.Controller;
+package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.AttendancesBusiness;
 import com.api.aquilesApi.Dto.AttendancesDto;
 import com.api.aquilesApi.Dto.QRCodePayload;
+import com.api.aquilesApi.Utilities.DataConvert;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.api.aquilesApi.Utilities.QrCodeGenerator;
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.netflix.graphql.dgs.DgsQuery;
+import com.netflix.graphql.dgs.InputArgument;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
+
 import java.util.Base64;
 import java.util.Map;
 import java.util.UUID;
 
-@Controller
+@DgsComponent
 public class AttendancesController {
     private final AttendancesBusiness attendancesBusiness;
     private final QrCodeGenerator qrCodeGenerator;
+    private final DataConvert dataConvert = new DataConvert();
 
     public AttendancesController(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator) {
         this.attendancesBusiness = attendancesBusiness;
@@ -27,8 +30,8 @@ public class AttendancesController {
     }
 
     // FindAll Attendances (GraphQL)
-    @QueryMapping
-    public Map<String, Object> allAttendances(@Argument int page, @Argument int size) {
+    @DgsQuery
+    public Map<String, Object> allAttendances(@InputArgument Integer page, @InputArgument Integer size) {
         try {
             Page<AttendancesDto> attendancesDtoPage = attendancesBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
@@ -46,10 +49,11 @@ public class AttendancesController {
     }
 
     // FindById Attendance (GraphQL)
-    @QueryMapping
-    public Map<String, Object> attendanceById(@Argument Long id) {
+    @DgsQuery
+    public Map<String, Object> attendanceById(@InputArgument String id) {
         try {
-            AttendancesDto attendancesDto = attendancesBusiness.findById(id);
+            Long idLong = dataConvert.parseLongOrNull(id);
+            AttendancesDto attendancesDto = attendancesBusiness.findById(idLong);
             return ResponseHttpApi.responseHttpFindId(
                     attendancesDto,
                     ResponseHttpApi.CODE_OK,
@@ -63,8 +67,8 @@ public class AttendancesController {
     }
 
     // Add a new Attendance (GraphQL)
-    @MutationMapping
-    public Map<String, Object> addAttendance(@Argument("input") AttendancesDto attendancesDto) {
+    @DgsMutation
+    public Map<String, Object> addAttendance(@InputArgument(name = "input") AttendancesDto attendancesDto) {
         try {
             AttendancesDto attendancesDto1 = attendancesBusiness.add(attendancesDto);
             return ResponseHttpApi.responseHttpAction(
@@ -80,12 +84,13 @@ public class AttendancesController {
     }
 
     // Update Attendance (GraphQL)
-    @MutationMapping
-    public Map<String, Object> updateAttendance(@Argument Long id, @Argument ("input")AttendancesDto attendancesDto) {
+    @DgsMutation
+    public Map<String, Object> updateAttendance(@InputArgument String id, @InputArgument ( name = "input")AttendancesDto attendancesDto) {
         try {
-             attendancesBusiness.update(id, attendancesDto );
+            Long idLong = dataConvert.parseLongOrNull(id);
+             attendancesBusiness.update(idLong, attendancesDto );
             return ResponseHttpApi.responseHttpAction(
-                    id,
+                    idLong,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
@@ -98,12 +103,13 @@ public class AttendancesController {
     }
 
     // Delete Attendance (GraphQL)
-    @MutationMapping
-    public Map<String, Object> deleteAttendance(@Argument Long id) {
+    @DgsMutation
+    public Map<String, Object> deleteAttendance(@InputArgument String id) {
         try {
-            attendancesBusiness.delete(id);
+            Long idLong = dataConvert.parseLongOrNull(id);
+            attendancesBusiness.delete(idLong);
             return ResponseHttpApi.responseHttpAction(
-                   id,
+                    idLong,
                    ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );
@@ -118,7 +124,7 @@ public class AttendancesController {
     // Generate QR (GraphQL)
     @Value("${frontend.url}")
     private String frontendUrl;
-    @MutationMapping
+    @DgsMutation
     public QRCodePayload generateQRCode() throws Exception {
         String sessionId = UUID.randomUUID().toString();
         String qrUrl = frontendUrl + "/FormularioQRAsistencia?session=" + sessionId;

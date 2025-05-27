@@ -1,4 +1,4 @@
-package com.api.aquilesApi.Controller;
+package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Service.EmailService;
 import com.api.aquilesApi.Utilities.EmailRequest;

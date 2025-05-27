@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,11 +28,15 @@ public class ChecklistEntity implements Serializable {
     @Column(name = "remarks", nullable = false, length = 255)
     private String remarks;
 
-    @Column(name = "instructor_signature", nullable = false, length = 255)
-    private String instructorSignature;
+    @Lob
+    @Column(name = "instructor_signature", nullable = false)
+    private byte [] instructorSignature;
 
     @Column(name = "evaluation_criteria", nullable = false)
     private boolean evaluationCriteria;
+
+    @Column(name = "date_assigned", length = 30)
+    private Date dateAssigned;
 
     @Column(name = "checklist_history", nullable = false)
     private String checklistHistory;
@@ -44,14 +47,6 @@ public class ChecklistEntity implements Serializable {
     @JoinColumn(name = "project_id", nullable = false)
     private ProjectEntity associatedProject;
 
-    // 1.Relation (M-M) con juries
-    @ManyToMany
-    @JoinTable(
-            name = "checklist_jury",
-            joinColumns = @JoinColumn(name = "checklist_id"),
-            inverseJoinColumns = @JoinColumn(name = "jury_id")
-    )
-    private Set<JuriesEntity> juries = new HashSet<>();
 
     // 2.Relation (1-M) con item
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)

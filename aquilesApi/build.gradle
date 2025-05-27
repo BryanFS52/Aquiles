@@ -22,6 +22,9 @@ configurations {
 repositories {
 	mavenCentral()
 }
+ext {
+	set('netflixDgsVersion', "10.1.2")
+}
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -49,11 +52,15 @@ dependencies {
 	implementation 'org.apache.pdfbox:pdfbox:2.0.28' // Usa la versión más reciente
 	// JSON
 	implementation group: 'org.json', name: 'json', version: '20240303'
-	//GraphQL
-	implementation 'org.springframework.boot:spring-boot-starter-graphql:3.3.4'
-	implementation 'org.springframework.boot:spring-boot-starter-web:3.3.4'
+	// DGS (GraphQL)
+	implementation 'com.netflix.graphql.dgs:graphql-dgs-spring-graphql-starter'
 }
 
+dependencyManagement {
+	imports {
+		mavenBom "com.netflix.graphql.dgs:graphql-dgs-platform-dependencies:${netflixDgsVersion}"
+	}
+}
 tasks.named('test') {
 	useJUnitPlatform()
 }

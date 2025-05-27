@@ -1,27 +1,29 @@
-package com.api.aquilesApi.Controller;
+package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.JustificationTypeBusiness;
 import com.api.aquilesApi.Dto.JustificationTypeDto;
+import com.api.aquilesApi.Utilities.DataConvert;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.netflix.graphql.dgs.DgsQuery;
+import com.netflix.graphql.dgs.InputArgument;
 import org.springframework.data.domain.Page;
-import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
+
 import java.util.Map;
 
-@Controller
+@DgsComponent
 public class JustificationTypeController {
     private final JustificationTypeBusiness justificationTypeBusiness;
-
+    private final DataConvert dataConvert = new DataConvert();
     public JustificationTypeController(JustificationTypeBusiness justificationTypeBusiness) {
         this.justificationTypeBusiness = justificationTypeBusiness;
     }
 
     // FindAll JustificationTypes (GraphQL)
-    @QueryMapping
-    public Map<String, Object> allJustificationTypes(@Argument int page, @Argument int size) {
+    @DgsQuery
+    public Map<String, Object> allJustificationTypes(@InputArgument Integer page, @InputArgument Integer size) {
         try {
             Page<JustificationTypeDto> justificationtypeDtoPage = justificationTypeBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
@@ -39,10 +41,11 @@ public class JustificationTypeController {
     }
 
     // FindById JustificationType (GraphQL)
-    @QueryMapping
-    public Map<String, Object> justificationTypeById(@Argument Long id) {
+    @DgsQuery
+    public Map<String, Object> justificationTypeById(@InputArgument String id) {
         try {
-            JustificationTypeDto justificationtypeDto = justificationTypeBusiness.findById(id);
+            Long idLong = dataConvert.parseLongOrNull(id);
+            JustificationTypeDto justificationtypeDto = justificationTypeBusiness.findById(idLong);
             return ResponseHttpApi.responseHttpFindId(
                     justificationtypeDto,
                     ResponseHttpApi.CODE_OK,
@@ -56,8 +59,8 @@ public class JustificationTypeController {
     }
 
     // Add a new JustificationType (GraphQL)
-    @MutationMapping
-    public Map<String, Object> addJustificationType(@Argument("input") JustificationTypeDto justificationtypeDto) {
+    @DgsMutation
+    public Map<String, Object> addJustificationType(@InputArgument(name = "input") JustificationTypeDto justificationtypeDto) {
         try {
             JustificationTypeDto justificationTypeDto1 = justificationTypeBusiness.add(justificationtypeDto);
             return ResponseHttpApi.responseHttpAction(
@@ -73,12 +76,13 @@ public class JustificationTypeController {
     }
 
     // Update JustificationType (GraphQL)
-    @MutationMapping
-    public Map<String, Object> updateJustificationType(@Argument Long id, @Argument ("input")JustificationTypeDto justificationtypeDto) {
+    @DgsMutation
+    public Map<String, Object> updateJustificationType(@InputArgument String id, @InputArgument (name = "input")JustificationTypeDto justificationtypeDto) {
         try {
-            justificationTypeBusiness.update(id, justificationtypeDto );
+            Long idLong = dataConvert.parseLongOrNull(id);
+            justificationTypeBusiness.update(idLong, justificationtypeDto );
             return ResponseHttpApi.responseHttpAction(
-                    id,
+                    idLong,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
@@ -91,12 +95,13 @@ public class JustificationTypeController {
     }
 
     // Delete JustificationType (GraphQL)
-    @MutationMapping
-    public Map<String, Object> deleteJustificationType(@Argument Long id) {
+    @DgsMutation
+    public Map<String, Object> deleteJustificationType(@InputArgument String id) {
         try {
-            justificationTypeBusiness.delete(id);
+            Long idLong = dataConvert.parseLongOrNull(id);
+            justificationTypeBusiness.delete(idLong);
             return ResponseHttpApi.responseHttpAction(
-                    id,
+                    idLong,
                     ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );

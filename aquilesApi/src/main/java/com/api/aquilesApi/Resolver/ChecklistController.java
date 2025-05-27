@@ -1,7 +1,7 @@
-package com.api.aquilesApi.Controller;
-
-import com.api.aquilesApi.Business.ImprovementPlanBusiness;
-import com.api.aquilesApi.Dto.ImprovementPlanDto;
+package com.api.aquilesApi.Resolver;
+/*
+import com.api.aquilesApi.Business.ChecklistBusiness;
+import com.api.aquilesApi.Dto.ChecklistDto;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import org.springframework.data.domain.Page;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -12,25 +12,25 @@ import org.springframework.stereotype.Controller;
 import java.util.Map;
 
 @Controller
-public class ImprovementPlanController {
-    private final ImprovementPlanBusiness improvementPlanBusiness;
+public class ChecklistController {
+    private final ChecklistBusiness checklistBusiness;
 
-    public ImprovementPlanController(ImprovementPlanBusiness improvementPlanBusiness) {
-        this.improvementPlanBusiness = improvementPlanBusiness;
+    public ChecklistController(ChecklistBusiness checklistBusiness) {
+        this.checklistBusiness = checklistBusiness;
     }
 
-    // FindAll ImprovementPlan (GraphQL)
+    // FindAll Checklist (GraphQL)
     @QueryMapping
-    public Map<String, Object> allImprovementPlans(@Argument int page, @Argument int size) {
+    public Map<String, Object> allChecklists(@Argument int page, @Argument int size) {
         try {
-            Page<ImprovementPlanDto> improvementPlanPage = improvementPlanBusiness.findAll(page, size);
+            Page<ChecklistDto> checklistDtoPage = checklistBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
-                    improvementPlanPage.getContent(),
+                    checklistDtoPage.getContent(),
                     ResponseHttpApi.CODE_OK,
                     "Query ok",
-                    improvementPlanPage.getTotalPages(),
+                    checklistDtoPage.getTotalPages(),
                     page,
-                    (int) improvementPlanPage.getTotalElements()
+                    (int) checklistDtoPage.getTotalElements()
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
@@ -38,13 +38,13 @@ public class ImprovementPlanController {
         }
     }
 
-    // FindById ImprovementPlan (GraphQL)
+    // FindById Checklist (GraphQL)
     @QueryMapping
-    public Map<String, Object> improvementPlanById(@Argument Long id) {
+    public Map<String, Object> checklistById(@Argument Long id) {
         try {
-            ImprovementPlanDto improvementplanDto = improvementPlanBusiness.findById(id);
+            ChecklistDto checklistDto = checklistBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
-                    improvementplanDto,
+                    checklistDto,
                     ResponseHttpApi.CODE_OK,
                     "Query by id ok"
             );
@@ -55,28 +55,28 @@ public class ImprovementPlanController {
         }
     }
 
-    // Add a new ImprovementPlan (GraphQL)
+    // Add a new Checklist (GraphQL)
     @MutationMapping
-    public Map<String, Object> addImprovementPlan(@Argument("input") ImprovementPlanDto improvementplanDto) {
+    public Map<String, Object> addChecklist(@Argument("input") ChecklistDto checklistDto) {
         try {
-            ImprovementPlanDto improvementplanDto1 = improvementPlanBusiness.add(improvementplanDto);
+            ChecklistDto checklistDto1 = checklistBusiness.add(checklistDto);
             return ResponseHttpApi.responseHttpAction(
-                    improvementplanDto1.getId(),
+                    checklistDto1.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
             );
         }catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error adding ImprovementPlan: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error adding Checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
 
-    // Update ImprovementPlan (GraphQL)
+    // Update Checklist (GraphQL)
     @MutationMapping
-    public Map<String, Object> updateImprovementPlan(@Argument Long id, @Argument ("input")ImprovementPlanDto improvementplanDto) {
+    public Map<String, Object> updateChecklist(@Argument Long id, @Argument ("input")ChecklistDto checklistDto) {
         try {
-            improvementPlanBusiness.update(id, improvementplanDto );
+            checklistBusiness.update(id, checklistDto );
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
@@ -85,16 +85,16 @@ public class ImprovementPlanController {
         }
         catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error updating ImprovementPlan: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error updating Checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
 
-    // Delete ImprovementPlan (GraphQL)
+    // Delete Checklist (GraphQL)
     @MutationMapping
-    public Map<String, Object> deleteImprovementPlan(@Argument Long id) {
+    public Map<String, Object> deleteChecklist(@Argument Long id) {
         try {
-            improvementPlanBusiness.delete(id);
+            checklistBusiness.delete(id);
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
@@ -103,8 +103,9 @@ public class ImprovementPlanController {
         }
         catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error deleting ImprovementPlan: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error deleting Checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
-}
+}0
+ */

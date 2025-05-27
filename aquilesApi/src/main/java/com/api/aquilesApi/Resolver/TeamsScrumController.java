@@ -1,31 +1,33 @@
-package com.api.aquilesApi.Controller;
+package com.api.aquilesApi.Resolver;
 
 
 import com.api.aquilesApi.Business.TeamsScrumBusiness;
 import com.api.aquilesApi.Dto.TeamsScrumDto;
 import com.api.aquilesApi.Utilities.CustomException;
+import com.api.aquilesApi.Utilities.DataConvert;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
+import com.netflix.graphql.dgs.DgsComponent;
 import org.springframework.data.domain.Page;
-import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
+import com.netflix.graphql.dgs.InputArgument;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.netflix.graphql.dgs.DgsQuery;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 
 import java.util.Map;
 
-@Controller
+@DgsComponent
 public class TeamsScrumController {
 
     private final TeamsScrumBusiness teamsScrumBusiness;
+    private final DataConvert dataConvert = new DataConvert();
 
     public TeamsScrumController(TeamsScrumBusiness teamsScrumBusiness) {
         this.teamsScrumBusiness = teamsScrumBusiness;
     };
 
     // FindAll TeamsScrums (GraphQL)
-    @QueryMapping
-    public Map<String , Object> allTeamsScrums(@Argument int page, @Argument int size){
+    @DgsQuery
+    public Map<String , Object> allTeamsScrums(@InputArgument Integer page, @InputArgument Integer size){
         try {
             Page<TeamsScrumDto> teamsScrumDtoPage = teamsScrumBusiness.findAll(page, size);
             if (!teamsScrumDtoPage.isEmpty()){
@@ -52,10 +54,11 @@ public class TeamsScrumController {
     }
 
     // FindById TeamScrum (GraphQL)
-    @QueryMapping
-    public Map<String , Object> teamScrumById(@Argument Long id){
+    @DgsQuery
+    public Map<String , Object> teamScrumById(@InputArgument String id){
         try {
-            TeamsScrumDto teamsScrumDto = this.teamsScrumBusiness.findById(id);
+            Long idLong = dataConvert.parseLongOrNull(id);
+            TeamsScrumDto teamsScrumDto = this.teamsScrumBusiness.findById(idLong);
             return ResponseHttpApi.responseHttpFindId(
                     teamsScrumDto,
                     ResponseHttpApi.CODE_OK,
@@ -67,8 +70,8 @@ public class TeamsScrumController {
     }
 
     // Add a new teamScrum (GraphQL)
-    @MutationMapping
-    public Map<String , Object>addTeamScrum(@Argument("input")TeamsScrumDto teamsScrumDto){
+    @DgsMutation
+    public Map<String , Object>addTeamScrum(@InputArgument(name = "input")TeamsScrumDto teamsScrumDto){
         try {
             TeamsScrumDto teamsScrumDto1 = teamsScrumBusiness.add(teamsScrumDto);
             return ResponseHttpApi.responseHttpAction(
@@ -85,12 +88,13 @@ public class TeamsScrumController {
     }
 
     // Update TeamScrum (GraphQL)
-    @MutationMapping
-    public Map<String , Object>updateTeamScrum(@Argument Long id , @Argument ("input")TeamsScrumDto teamsScrumDto){
+    @DgsMutation
+    public Map<String , Object>updateTeamScrum(@InputArgument String id , @InputArgument (name = "input")TeamsScrumDto teamsScrumDto){
         try {
-            teamsScrumBusiness.update(id, teamsScrumDto);
+            Long idLong = dataConvert.parseLongOrNull(id);
+            teamsScrumBusiness.update(idLong, teamsScrumDto);
             return ResponseHttpApi.responseHttpAction(
-                    id,
+                    idLong,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
@@ -101,23 +105,27 @@ public class TeamsScrumController {
     }
 
     // Delete TeamScrum (GraphQL)
-    @MutationMapping
-    public Map<String , Object> deleteTeamScrum(@Argument Long id) {
-        {
-            try {
-                teamsScrumBusiness.delete(id);
-                return ResponseHttpApi.responseHttpAction(
-                        id,
-                        ResponseHttpApi.CODE_OK,
-                        "Delete ok"
-                );
-            } catch (CustomException e) {
-                return ResponseHttpApi.responseHttpError(
-                        e.getMessage(), HttpStatus.BAD_REQUEST);
-            } catch (Exception e) {
-                return ResponseHttpApi.responseHttpError(
-                        "Error deleting TeamScrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+    @DgsMutation
+    public Map<String, Object> deleteTeamScrum(@InputArgument String id) {
+        try {
+            Long idLong = dataConvert.parseLongOrNull(id);
+            teamsScrumBusiness.delete(idLong);
+            return ResponseHttpApi.responseHttpAction(
+                    idLong,
+                    ResponseHttpApi.CODE_OK,
+                    "Delete ok"
+            );
+        } catch (CustomException e) {
+            return ResponseHttpApi.responseHttpError(
+                    e.getMessage(),
+                    HttpStatus.BAD_REQUEST
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error deleting TeamScrum: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
+
 }

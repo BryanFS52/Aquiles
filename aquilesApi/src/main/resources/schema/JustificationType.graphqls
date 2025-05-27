@@ -20,7 +20,7 @@ type JustificationTypePageId {
     message: String
 }
 
-input JustificationTypeInput {
+input JustificationTypeDto {
     id : ID
     name: String
     description: String
@@ -32,7 +32,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addJustificationType(input: JustificationTypeInput): Response
-    updateJustificationType(id: ID!, input: JustificationTypeInput): Response
+    addJustificationType(input: JustificationTypeDto): Response
+    updateJustificationType(id: ID!, input: JustificationTypeDto): Response
     deleteJustificationType(id: ID!): Response
 }

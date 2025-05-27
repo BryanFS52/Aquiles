@@ -1,20 +1,22 @@
-package com.api.aquilesApi.Controller;
+package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.JustificationBusiness;
 import com.api.aquilesApi.Dto.JustificationDto;
+import com.api.aquilesApi.Utilities.DataConvert;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
+import com.netflix.graphql.dgs.DgsComponent;
 import org.springframework.data.domain.Page;
-import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
+import com.netflix.graphql.dgs.InputArgument;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.netflix.graphql.dgs.DgsQuery;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 
 import java.util.Map;
 
-@Controller
+@DgsComponent
 public class JustificationController {
     private final JustificationBusiness justificationBusiness;
+    private final DataConvert dataConvert = new DataConvert();
 
     public JustificationController(JustificationBusiness justificationBusiness) {
         this.justificationBusiness = justificationBusiness;
@@ -22,8 +24,8 @@ public class JustificationController {
 
 
     // FindAll Justifications (GraphQL)
-    @QueryMapping
-    public Map<String, Object> allJustifications(@Argument int page, @Argument int size) {
+    @DgsQuery
+    public Map<String, Object> allJustifications(@InputArgument Integer page, @InputArgument Integer size) {
         try {
             Page<JustificationDto> justificationDtoPage = justificationBusiness.findAll(page - 1, size);
             return ResponseHttpApi.responseHttpFindAll(
@@ -41,10 +43,11 @@ public class JustificationController {
     }
 
     // FindById Justification (GraphQL)
-    @QueryMapping
-    public Map<String, Object> justificationById(@Argument Long id) {
+    @DgsQuery
+    public Map<String, Object> justificationById(@InputArgument String id) {
         try {
-            JustificationDto justificationDto = justificationBusiness.findById(id);
+            Long idLong = dataConvert.parseLongOrNull(id);
+            JustificationDto justificationDto = justificationBusiness.findById(idLong);
             return ResponseHttpApi.responseHttpFindId(
                     justificationDto,
                     ResponseHttpApi.CODE_OK,
@@ -58,8 +61,8 @@ public class JustificationController {
     }
 
     // Add a new Justification (GraphQL)
-    @MutationMapping
-    public Map<String, Object> addJustification(@Argument("input") JustificationDto justificationDto) {
+    @DgsMutation
+    public Map<String, Object> addJustification(@InputArgument(name = "input") JustificationDto justificationDto) {
         try {
             JustificationDto justificationDto1 = justificationBusiness.add(justificationDto);
             return ResponseHttpApi.responseHttpAction(
@@ -75,12 +78,13 @@ public class JustificationController {
     }
 
     // Update Justification (GraphQL)
-    @MutationMapping
-    public Map<String, Object> updateJustification(@Argument Long id, @Argument ("input")JustificationDto justificationDto) {
+    @DgsMutation
+    public Map<String, Object> updateJustification(@InputArgument String id, @InputArgument (name = "input")JustificationDto justificationDto) {
         try {
-            justificationBusiness.update(id, justificationDto );
+            Long idLong = dataConvert.parseLongOrNull(id);
+            justificationBusiness.update(idLong, justificationDto );
             return ResponseHttpApi.responseHttpAction(
-                    id,
+                    idLong,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
@@ -93,12 +97,13 @@ public class JustificationController {
     }
 
     // Delete Justification (GraphQL)
-    @MutationMapping
-    public Map<String, Object> deleteJustification(@Argument Long id) {
+    @DgsMutation
+    public Map<String, Object> deleteJustification(@InputArgument String id) {
         try {
-            justificationBusiness.delete(id);
+            Long idLong = dataConvert.parseLongOrNull(id);
+            justificationBusiness.delete(idLong);
             return ResponseHttpApi.responseHttpAction(
-                    id,
+                    idLong,
                     ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );

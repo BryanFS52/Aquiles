@@ -41,7 +41,7 @@ export const GET_ATTENDANCE_BY_ID = gql`
 `;
 
 export const ADD_ATTENDANCE = gql`
-  mutation AddAttendance($input: AttendanceInput!) {
+  mutation AddAttendance($input: AttendancesDto!) {
     addAttendance(input: $input) {
       code
       message
@@ -59,7 +59,7 @@ export const ADD_ATTENDANCE = gql`
 `;
 
 export const UPDATE_ATTENDANCE = gql`
-  mutation UpdateAttendance($id: ID!, $input: AttendanceInput!) {
+  mutation UpdateAttendance($id: ID!, $input: AttendancesDto!) {
     updateAttendance(id: $id, input: $input) {
       code
       message

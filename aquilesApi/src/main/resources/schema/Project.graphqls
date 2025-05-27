@@ -24,7 +24,7 @@ type ProjectPageId {
     message : String
 }
 
-input ProjectInput {
+input ProjectDto {
     projectId: ID
     description: String
     problem: String
@@ -39,7 +39,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addProject(input: ProjectInput): Response
-    updateProject(id: ID!, input: ProjectInput): Response
+    addProject(input: ProjectDto): Response
+    updateProject(id: ID!, input: ProjectDto): Response
     deleteProject(id: ID!): Response
 }

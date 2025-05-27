@@ -6,8 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Set;
 
 @NoArgsConstructor
 @Entity
@@ -19,11 +17,11 @@ public class JuriesEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "date_assigned", length = 30)
-    private Date dateAssigned;
-
     // Relations
     // 1.Relation (M-M) con Checklist
+    /*
     @ManyToMany(mappedBy = "juries")
     private Set<ChecklistEntity> checklists;
+
+     */
 }

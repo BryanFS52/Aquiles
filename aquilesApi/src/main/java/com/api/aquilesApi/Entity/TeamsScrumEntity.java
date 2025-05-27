@@ -31,8 +31,8 @@ public class TeamsScrumEntity implements Serializable {
     @JoinColumn(name = "checklist_id", nullable = true)
     private ChecklistEntity checklist;
 
-    @OneToMany(mappedBy = "fk_team_scrum_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<StudentsEntity> studentList;
+    @Column(name = "fk_idStudent")
+    private Long studentList;
 
     @OneToMany(mappedBy = "fk_team_scrum_id", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<ProjectEntity> projectList;

@@ -14,7 +14,6 @@ import java.util.Set;
 @Setter
 @Table(name = "excuses")
 public class ExcusesEntity implements Serializable {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "excuse_id", nullable = false)

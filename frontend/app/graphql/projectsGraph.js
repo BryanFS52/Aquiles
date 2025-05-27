@@ -41,7 +41,7 @@ export const GET_PROJECT_BY_ID = gql`
 `;
 
 export const ADD_PROJECT = gql`
-  mutation AddProject($input: ProjectInput!) {
+  mutation AddProject($input: ProjectDto!) {
     addProject(input: $input) {
       code
       message
@@ -52,7 +52,7 @@ export const ADD_PROJECT = gql`
 `;
 
 export const UPDATE_PROJECT = gql`
-  mutation UpdateProject($id: ID!, $input: ProjectInput!) {
+  mutation UpdateProject($id: ID!, $input: ProjectDto!) {
     updateProject(id: $id, input: $input) {
       code
       message

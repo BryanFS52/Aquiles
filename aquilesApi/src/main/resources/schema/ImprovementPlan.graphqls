@@ -7,7 +7,7 @@ type ImprovementPlan {
     state: Boolean!
 }
 
-input ImprovementPlanInput {
+input ImprovementPlanDto {
     city: String!
     date: String!
     reason: String!
@@ -38,7 +38,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addImprovementPlan(input: ImprovementPlanInput): Response
-    updateImprovementPlan(id: ID!, input: ImprovementPlanInput): Response
+    addImprovementPlan(input: ImprovementPlanDto): Response
+    updateImprovementPlan(id: ID!, input: ImprovementPlanDto): Response
     deleteImprovementPlan(id: ID!): Response
 }

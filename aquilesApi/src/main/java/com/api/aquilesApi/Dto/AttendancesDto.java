@@ -15,5 +15,5 @@ public class AttendancesDto {
 
     private StateAttendanceEntity stateAttendance;
 
-
+    private Long idStudent;
 }
