@@ -12,7 +12,8 @@ import { BsPersonRolodex } from 'react-icons/bs';
 import { SlCalculator } from 'react-icons/sl';
 import { GrUserSettings } from 'react-icons/gr';
 import { LiaLanguageSolid } from 'react-icons/lia';
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ITEMS_PER_PAGE = 4;
 
@@ -33,7 +34,6 @@ export default function Programas() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchPrograms = async () => {
@@ -42,7 +42,7 @@ export default function Programas() {
         const response = await programService.getPrograms({ size: 100 });
         setPrograms(response.data || []);
       } catch (err) {
-        setError("No se pudieron cargar los programas.");
+        toast.error("No se pudieron cargar los programas.");
         console.error(err);
       } finally {
         setLoading(false);
@@ -84,7 +84,6 @@ export default function Programas() {
           />
 
           {loading && <p className="text-center text-gray-600">Cargando programas...</p>}
-          {error && <p className="text-center text-red-500">{error}</p>}
 
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 ml-8 py-7">
             {displayedPrograms.map((program) => {
@@ -118,6 +117,17 @@ export default function Programas() {
           </div>
         </div>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 }

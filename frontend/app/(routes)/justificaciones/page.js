@@ -20,7 +20,7 @@ export default function JustificacionesInstructor() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Obtener tipo MIME base64
+  // Obtener el MIMETYPE base64
   function getMimeTypeFromBase64(base64) {
     if (!base64) return "application/octet-stream";
 
@@ -56,7 +56,7 @@ export default function JustificacionesInstructor() {
     return map[mimeType] || "bin";
   }
 
-  // Función para obtener justificaciones (se llama al botón)
+  // Función para obtener justificaciones 
   const fetchJustifications = async () => {
     setLoading(true);
     setError(null);

@@ -14,7 +14,7 @@ export default function Aprendiz() {
         <Header />
 
         <div className="h-[90vh] overflow-y-scroll p-4 xl:p-12 w-full">
-        <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Mis Cursos</h1>
+          <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">Mis Cursos</h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 py-5 xl:ml-40">
             {/* Card 1 */}
             <div className="flex w-full xl:w-96 h-52 rounded-lg overflow-hidden shadow-lg bg-zinc-200 relative p-4">
@@ -61,7 +61,8 @@ export default function Aprendiz() {
                 <p className="text-black-700 text-sm">Presencial</p>
               </div>
               <FaPeopleCarry className="z-50 text-5xl text-white ml-auto w-20 xl:w-40" />
-              <div className="absolute top-0 right-0 w-0 h-0 border-t-[100px] xl:border-t-[130px] border-t-cyan-900 border-l-[150px] xl:border-l-[240px] border-l-transparent -z-1"></div>
+              <div className="absolute top-0 right-0 w-0 h-0 border-t-[100px] xl:border-t-[130px] border-t-cyan-900 border-l-[150px] xl:border-l-[240px] border-l-transparent -z-1">
+              </div>
             </div>
           </div>
         </div>
