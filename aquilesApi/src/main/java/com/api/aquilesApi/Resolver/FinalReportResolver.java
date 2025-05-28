@@ -14,10 +14,10 @@ import org.springframework.http.HttpStatus;
 import java.util.Map;
 
 @DgsComponent
-public class FinalReportController {
+public class FinalReportResolver {
     private final FinalReportBusiness finalReportBusiness;
     private final DataConvert dataConvert = new DataConvert();
-    public FinalReportController(FinalReportBusiness finalReportBusiness) {
+    public FinalReportResolver(FinalReportBusiness finalReportBusiness) {
         this.finalReportBusiness = finalReportBusiness;
     }
 

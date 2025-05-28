@@ -19,12 +19,12 @@ import java.util.Map;
 import java.util.UUID;
 
 @DgsComponent
-public class AttendancesController {
+public class AttendancesResolver {
     private final AttendancesBusiness attendancesBusiness;
     private final QrCodeGenerator qrCodeGenerator;
     private final DataConvert dataConvert = new DataConvert();
 
-    public AttendancesController(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator) {
+    public AttendancesResolver(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator) {
         this.attendancesBusiness = attendancesBusiness;
         this.qrCodeGenerator = qrCodeGenerator;
     }

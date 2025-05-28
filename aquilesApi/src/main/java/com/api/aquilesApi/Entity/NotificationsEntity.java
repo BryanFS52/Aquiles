@@ -33,7 +33,7 @@ public class NotificationsEntity implements Serializable {
     private Boolean state;
 
     // Relations
-    // 1.Relation (1-1) con apprendiceRegulations
+    // 1.Relation (1-1) con apprenticeRegulations
     @OneToOne(mappedBy = "notification")
     private ApprenticeRegulationsEntity apprenticeRegulations;
 

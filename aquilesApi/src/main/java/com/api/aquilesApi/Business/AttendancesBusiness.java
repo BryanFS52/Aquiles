@@ -22,14 +22,12 @@ import java.util.Map;
 public class AttendancesBusiness {
 
     private final AttendancesService attendancesService;
-    private final StateAttendanceService stateAttendanceService;
     private final Util util;
     private final ModelMapper modelMapper = new ModelMapper();
 
 
     public AttendancesBusiness(AttendancesService attendancesService, StateAttendanceService stateAttendanceService, Util util) {
         this.attendancesService = attendancesService;
-        this.stateAttendanceService = stateAttendanceService;
         this.util = util;
     }
 

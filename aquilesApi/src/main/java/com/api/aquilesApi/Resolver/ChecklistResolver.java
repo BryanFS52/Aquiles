@@ -1,27 +1,27 @@
 package com.api.aquilesApi.Resolver;
-/*
 import com.api.aquilesApi.Business.ChecklistBusiness;
 import com.api.aquilesApi.Dto.ChecklistDto;
+import com.api.aquilesApi.Utilities.DataConvert;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsQuery;
 import org.springframework.data.domain.Page;
-import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
+import com.netflix.graphql.dgs.InputArgument;
+import com.netflix.graphql.dgs.DgsMutation;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import java.util.Map;
 
-@Controller
-public class ChecklistController {
+@DgsComponent
+public class ChecklistResolver {
     private final ChecklistBusiness checklistBusiness;
-
-    public ChecklistController(ChecklistBusiness checklistBusiness) {
+    private final DataConvert dataConvert = new DataConvert();
+    public ChecklistResolver(ChecklistBusiness checklistBusiness) {
         this.checklistBusiness = checklistBusiness;
     }
 
     // FindAll Checklist (GraphQL)
-    @QueryMapping
-    public Map<String, Object> allChecklists(@Argument int page, @Argument int size) {
+    @DgsQuery
+    public Map<String, Object> allChecklists(@InputArgument Integer page, @InputArgument Integer size) {
         try {
             Page<ChecklistDto> checklistDtoPage = checklistBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
@@ -39,10 +39,11 @@ public class ChecklistController {
     }
 
     // FindById Checklist (GraphQL)
-    @QueryMapping
-    public Map<String, Object> checklistById(@Argument Long id) {
+    @DgsQuery
+    public Map<String, Object> checklistById(@InputArgument String id) {
         try {
-            ChecklistDto checklistDto = checklistBusiness.findById(id);
+            Long idLong = dataConvert.parseLongOrNull(id);
+            ChecklistDto checklistDto = checklistBusiness.findById(idLong);
             return ResponseHttpApi.responseHttpFindId(
                     checklistDto,
                     ResponseHttpApi.CODE_OK,
@@ -56,8 +57,8 @@ public class ChecklistController {
     }
 
     // Add a new Checklist (GraphQL)
-    @MutationMapping
-    public Map<String, Object> addChecklist(@Argument("input") ChecklistDto checklistDto) {
+    @DgsMutation
+    public Map<String, Object> addChecklist(@InputArgument(name = "input") ChecklistDto checklistDto) {
         try {
             ChecklistDto checklistDto1 = checklistBusiness.add(checklistDto);
             return ResponseHttpApi.responseHttpAction(
@@ -73,12 +74,13 @@ public class ChecklistController {
     }
 
     // Update Checklist (GraphQL)
-    @MutationMapping
-    public Map<String, Object> updateChecklist(@Argument Long id, @Argument ("input")ChecklistDto checklistDto) {
+    @DgsMutation
+    public Map<String, Object> updateChecklist(@InputArgument String id, @InputArgument (name = "input")ChecklistDto checklistDto) {
         try {
-            checklistBusiness.update(id, checklistDto );
+            Long idLong = dataConvert.parseLongOrNull(id);
+            checklistBusiness.update(idLong, checklistDto );
             return ResponseHttpApi.responseHttpAction(
-                    id,
+                    idLong,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
@@ -91,12 +93,13 @@ public class ChecklistController {
     }
 
     // Delete Checklist (GraphQL)
-    @MutationMapping
-    public Map<String, Object> deleteChecklist(@Argument Long id) {
+    @DgsMutation
+    public Map<String, Object> deleteChecklist(@InputArgument String id) {
         try {
-            checklistBusiness.delete(id);
+            Long idLong = dataConvert.parseLongOrNull(id);
+            checklistBusiness.delete(idLong);
             return ResponseHttpApi.responseHttpAction(
-                    id,
+                    idLong,
                     ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );
@@ -107,5 +110,4 @@ public class ChecklistController {
             );
         }
     }
-}0
- */
+}

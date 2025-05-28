@@ -14,10 +14,10 @@ import org.springframework.http.HttpStatus;
 import java.util.Map;
 
 @DgsComponent
-public class ExcusesController {
+public class ExcusesResolver {
     private final ExcusesBusiness excusesBusiness;
     private final DataConvert dataConvert = new DataConvert();
-    public ExcusesController(ExcusesBusiness excusesBusiness) {
+    public ExcusesResolver(ExcusesBusiness excusesBusiness) {
         this.excusesBusiness = excusesBusiness;
     }
 

@@ -15,11 +15,11 @@ import org.springframework.http.HttpStatus;
 import java.util.Map;
 
 @DgsComponent
-public class ProjectController {
+public class ProjectResolver {
 
     private final ProjectBusiness projectBusiness;
     private final DataConvert dataConvert = new DataConvert();
-    public ProjectController(ProjectBusiness projectBusiness) {
+    public ProjectResolver(ProjectBusiness projectBusiness) {
         this.projectBusiness = projectBusiness;
     }
 

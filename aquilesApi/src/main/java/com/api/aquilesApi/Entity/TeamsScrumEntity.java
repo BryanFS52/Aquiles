@@ -2,8 +2,8 @@ package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -23,7 +23,10 @@ public class TeamsScrumEntity implements Serializable {
     private String name;
 
     @Column(name = "members", nullable = false, length = 200)
-    private  String members;
+    private String members;
+
+    @Column(name = "fk_idStudent")
+    private Long studentList;
 
     // Relations
     // 1.Relation (M-1) con Checklist
@@ -31,9 +34,17 @@ public class TeamsScrumEntity implements Serializable {
     @JoinColumn(name = "checklist_id", nullable = true)
     private ChecklistEntity checklist;
 
-    @Column(name = "fk_idStudent")
-    private Long studentList;
-
+    // 2.Relation (1-M) con Project
     @OneToMany(mappedBy = "fk_team_scrum_id", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<ProjectEntity> projectList;
+
+    // 3. Relation (M-M) con apprentice
+    // Guardas solo los IDs de los usuarios
+    @ElementCollection
+    @CollectionTable(
+            name = "team_scrum_members",
+            joinColumns = @JoinColumn(name = "team_id")
+    )
+    @Column(name = "user_id")
+    private List<Long> memberIds = new ArrayList<>();
 }

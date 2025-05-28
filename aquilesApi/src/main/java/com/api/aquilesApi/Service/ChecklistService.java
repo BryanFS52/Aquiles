@@ -1,7 +1,6 @@
 package com.api.aquilesApi.Service;
-/*
+
 import com.api.aquilesApi.Entity.ChecklistEntity;
-import com.api.aquilesApi.Entity.JuriesEntity;
 import com.api.aquilesApi.Entity.ProjectEntity;
 import com.api.aquilesApi.Repository.ChecklistRepository;
 import com.api.aquilesApi.Repository.JuriesRepository;
@@ -13,21 +12,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 @Service
 public class ChecklistService implements Idao<ChecklistEntity, Long> {
 
     private final ChecklistRepository checklistRepository;
-    private final ProjectRepository projectRepository;  // Repositorio de ProjectEntity
-    private final JuriesRepository juriesRepository;    // Repositorio de JuriesEntity
+    private final ProjectRepository projectRepository;
 
-    public ChecklistService(ChecklistRepository checklistRepository, ProjectRepository projectRepository, JuriesRepository juriesRepository) {
+    public ChecklistService(ChecklistRepository checklistRepository, ProjectRepository projectRepository) {
         this.checklistRepository = checklistRepository;
         this.projectRepository = projectRepository;
-        this.juriesRepository = juriesRepository;
     }
 
     @Override
@@ -60,24 +53,8 @@ public class ChecklistService implements Idao<ChecklistEntity, Long> {
                 .orElseThrow(() -> new CustomException("Project with id " + projectId + " not found", HttpStatus.NOT_FOUND));
         entity.setAssociatedProject(project);
 
-        // Manejo de la relación ManyToMany con JuriesEntity
-        if (entity.getJuries() != null && !entity.getJuries().isEmpty()) {
-            Set<JuriesEntity> juries = new HashSet<>(
-                    juriesRepository.findAllById(
-                            entity.getJuries().stream()
-                                    .map(JuriesEntity::getId)
-                                    .collect(Collectors.toList())
-                    )
-            );
-            entity.setJuries(juries);
-        } else {
-            entity.setJuries(new HashSet<>()); // evita null
-        }
-
         return checklistRepository.save(entity);
     }
-
-
 
     @Override
     public void delete(ChecklistEntity entity) {
@@ -90,4 +67,3 @@ public class ChecklistService implements Idao<ChecklistEntity, Long> {
         save(entity);
     }
 }
- */

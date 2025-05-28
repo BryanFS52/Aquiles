@@ -16,12 +16,12 @@ import org.springframework.http.HttpStatus;
 import java.util.Map;
 
 @DgsComponent
-public class TeamsScrumController {
+public class TeamsScrumResolver {
 
     private final TeamsScrumBusiness teamsScrumBusiness;
     private final DataConvert dataConvert = new DataConvert();
 
-    public TeamsScrumController(TeamsScrumBusiness teamsScrumBusiness) {
+    public TeamsScrumResolver(TeamsScrumBusiness teamsScrumBusiness) {
         this.teamsScrumBusiness = teamsScrumBusiness;
     };
 

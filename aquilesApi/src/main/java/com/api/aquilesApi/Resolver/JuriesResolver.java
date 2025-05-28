@@ -12,10 +12,10 @@ import org.springframework.stereotype.Controller;
 import java.util.Map;
 
 @Controller
-public class JuriesController {
+public class JuriesResolver {
     private final JuriesBusiness juriesBusiness;
 
-    public JuriesController(JuriesBusiness juriesBusiness) {
+    public JuriesResolver(JuriesBusiness juriesBusiness) {
         this.juriesBusiness = juriesBusiness;
     }
 

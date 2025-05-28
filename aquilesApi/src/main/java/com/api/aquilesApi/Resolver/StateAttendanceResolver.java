@@ -14,10 +14,10 @@ import org.springframework.stereotype.Controller;
 import java.util.Map;
 
 @Controller
-public class StateAttendanceController {
+public class StateAttendanceResolver {
     private final StateAttendancesBusiness stateAttendancesBusiness;
 
-    public StateAttendanceController(StateAttendancesBusiness stateAttendancesBusiness) {
+    public StateAttendanceResolver(StateAttendancesBusiness stateAttendancesBusiness) {
         this.stateAttendancesBusiness = stateAttendancesBusiness;
     }
 

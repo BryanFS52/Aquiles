@@ -26,7 +26,7 @@ type ChecklistPageId {
     message: String
 }
 
-input ChecklistInput {
+input ChecklistDto {
     state: Boolean!
     remarks: String!
     instructorSignature: String!
@@ -41,7 +41,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addChecklist(input: ChecklistInput): Response
-    updateChecklist(id: ID!, input: ChecklistInput): Response
+    addChecklist(input: ChecklistDto): Response
+    updateChecklist(id: ID!, input: ChecklistDto): Response
     deleteChecklist(id: ID!): Response
 }

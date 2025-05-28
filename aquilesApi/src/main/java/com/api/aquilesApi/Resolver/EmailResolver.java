@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS})
-public class EmailController {
+public class EmailResolver {
 
     private final EmailService emailService;
 
-    public EmailController(EmailService emailService) {
+    public EmailResolver(EmailService emailService) {
         this.emailService = emailService;
     }
 

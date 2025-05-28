@@ -14,11 +14,11 @@ import org.springframework.http.HttpStatus;
 import java.util.Map;
 
 @DgsComponent
-public class JustificationController {
+public class JustificationResolver {
     private final JustificationBusiness justificationBusiness;
     private final DataConvert dataConvert = new DataConvert();
 
-    public JustificationController(JustificationBusiness justificationBusiness) {
+    public JustificationResolver(JustificationBusiness justificationBusiness) {
         this.justificationBusiness = justificationBusiness;
     }
 

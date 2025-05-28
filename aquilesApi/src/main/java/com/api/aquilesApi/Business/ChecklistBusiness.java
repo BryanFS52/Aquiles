@@ -1,5 +1,5 @@
 package com.api.aquilesApi.Business;
-/*
+
 import com.api.aquilesApi.Dto.ChecklistDto;
 import com.api.aquilesApi.Entity.ChecklistEntity;
 import com.api.aquilesApi.Repository.JuriesRepository;
@@ -87,4 +87,3 @@ public class ChecklistBusiness {
         }
     }
 }
- */

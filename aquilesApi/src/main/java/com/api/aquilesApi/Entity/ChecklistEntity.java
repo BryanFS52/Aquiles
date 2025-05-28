@@ -47,7 +47,6 @@ public class ChecklistEntity implements Serializable {
     @JoinColumn(name = "project_id", nullable = false)
     private ProjectEntity associatedProject;
 
-
     // 2.Relation (1-M) con item
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemEntity> items;

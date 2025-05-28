@@ -25,7 +25,7 @@ type TeamsScrumPageId {
 input TeamsScrumDto {
     name: String!
     members: String!
-    checklist: ChecklistInput
+    checklist: ChecklistDto
 }
 
 extend type Query {
