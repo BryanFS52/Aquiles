@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FiAlignRight } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import dynamic from 'next/dynamic';
@@ -36,7 +36,7 @@ export const Sidebar = () => {
     return (
         <div className="grid grid-flow-row">
             <div className="flex relative">
-            <div className={` min-h-screen h-full overflow-y-auto fixed xl:static bg-lightGreen dark:bg-darkBlue w-4/5 md:w-2/5 lg:w-1/3 xl:w-auto border-r border-gray-300 xl:border-r-0 top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
+                <div className={` min-h-screen h-full overflow-y-auto fixed xl:static bg-lightGreen dark:bg-darkBlue w-4/5 md:w-2/5 lg:w-1/3 xl:w-auto border-r border-gray-300 xl:border-r-0 top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
 
                     <div>
                         {/* LOGO */}
@@ -60,7 +60,7 @@ export const Sidebar = () => {
                     <ul>
                         <ButtonTheme />
                     </ul>
-                    
+
                     {/* Botón para togglear el menú */}
                     <button onClick={toggleMenu} className='text-white bg-custom-blue fixed bottom-4 right-4 p-2 text-lg rounded-full lg:hidden'>
                         {showMenu ? <IoClose /> : <FiAlignRight />}

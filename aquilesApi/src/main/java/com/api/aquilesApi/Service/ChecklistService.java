@@ -1,10 +1,7 @@
 package com.api.aquilesApi.Service;
 
 import com.api.aquilesApi.Entity.ChecklistEntity;
-import com.api.aquilesApi.Entity.ProjectEntity;
 import com.api.aquilesApi.Repository.ChecklistRepository;
-import com.api.aquilesApi.Repository.JuriesRepository;
-import com.api.aquilesApi.Repository.ProjectRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.springframework.data.domain.Page;
@@ -16,11 +13,9 @@ import org.springframework.stereotype.Service;
 public class ChecklistService implements Idao<ChecklistEntity, Long> {
 
     private final ChecklistRepository checklistRepository;
-    private final ProjectRepository projectRepository;
 
-    public ChecklistService(ChecklistRepository checklistRepository, ProjectRepository projectRepository) {
+    public ChecklistService(ChecklistRepository checklistRepository) {
         this.checklistRepository = checklistRepository;
-        this.projectRepository = projectRepository;
     }
 
     @Override
@@ -42,17 +37,6 @@ public class ChecklistService implements Idao<ChecklistEntity, Long> {
 
     @Override
     public ChecklistEntity save(ChecklistEntity entity) {
-        // Validar que el proyecto asociado no sea null
-        if (entity.getAssociatedProject() == null) {
-            throw new CustomException("El proyecto asociado es obligatorio", HttpStatus.BAD_REQUEST);
-        }
-
-        // Manejo de la relación ManyToOne con ProjectEntity
-        Long projectId = entity.getAssociatedProject().getId();
-        ProjectEntity project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new CustomException("Project with id " + projectId + " not found", HttpStatus.NOT_FOUND));
-        entity.setAssociatedProject(project);
-
         return checklistRepository.save(entity);
     }
 

@@ -1,21 +1,20 @@
 'use client'
 
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { Header } from "@components/header";
 import { Sidebarcoordinador } from "@components/SidebarCoordinador";
-import { MdAdd } from "react-icons/md"
 import { FaTrashAlt } from "react-icons/fa"
-import { fetchAllChecklists, fetchChecklistById, addChecklist, deleteChecklist } from "@services/checkListService"
+import { addChecklist } from "@services/checkListService"
 import { ToastContainer, toast } from "react-toastify"
-import ModalNewChecklist from "@components/Modals/ModalNewChecklist"
 import "react-toastify/dist/ReactToastify.css"
+import ModalNewChecklist from "@components/Modals/ModalNewChecklist"
 
 export default function CoordinadorChecklistView() {
   const [modalOpen, setModalOpen] = useState(false)
   const [checklists, setChecklists] = useState([])
   const [selectedTrimestre, setSelectedTrimestre] = useState("Q1")
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false)
-  const [checklistToDelete, setChecklistToDelete] = useState(null)
+  const [/*confirmModalOpen*/, setConfirmModalOpen] = useState(false)
+  const [/*checklistToDelete*/, setChecklistToDelete] = useState(null)
 
   const handleCreateChecklist = async (checklistData) => {
     try {
@@ -33,17 +32,12 @@ export default function CoordinadorChecklistView() {
     }
   }
 
-  const handleOpenModal = () => setModalOpen(true)
+  //const handleOpenModal = () => setModalOpen(true)
   const handleCloseModal = () => setModalOpen(false)
 
   const handleOpenConfirmModal = (checklistId) => {
     setChecklistToDelete(checklistId)
     setConfirmModalOpen(true)
-  }
-
-  const handleConfirmDelete = () => {
-    handleDeleteChecklist(checklistToDelete)
-    setConfirmModalOpen(false)
   }
 
   return (
@@ -84,7 +78,7 @@ export default function CoordinadorChecklistView() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-8">
             {checklists
-              .filter((checklist) => checklist.trimester === selectedTrimester)
+              .filter((checklist) => checklist.trimester === selectedTrimestre)
               .map((checklist) => (
                 <div key={checklist.id} className="border border-gray-300 rounded-lg overflow-hidden">
                   <div className="p-4">

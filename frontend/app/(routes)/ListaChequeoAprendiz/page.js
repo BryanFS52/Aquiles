@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import Image from 'next/image';
 import { Header } from "@components/header";
-import { Sidebaraprendiz } from "@components/SidebarAprendiz";
+import { SidebarAprendiz } from "@components/SidebarAprendiz";
 import { Check, FileDown, X, UploadCloud } from "lucide-react";
 
 // Moving checklistData outside the component to prevent unnecessary re-renders
@@ -90,7 +91,7 @@ export default function ChecklistComponent() {
 
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-      <Sidebaraprendiz />
+      <SidebarAprendiz />
       <div className="xl:col-span-5">
         <Header role="Aprendiz" />
 
@@ -239,10 +240,12 @@ export default function ChecklistComponent() {
                 </label>
                 <div className="w-full flex justify-center">
                   {firmaAnterior && (
-                    <img
+                    <Image
                       src={firmaAnterior}
                       alt="Firma instructor anterior"
                       className="h-16 w-auto object-contain border border-[#00324d] rounded-md"
+                      width={64} // Establecer un ancho fijo
+                      height={64} // Establecer una altura fija
                     />
                   )}
                 </div>
@@ -265,10 +268,12 @@ export default function ChecklistComponent() {
                 </label>
                 <div className="w-full flex justify-center">
                   {firmaNuevo && (
-                    <img
+                    <Image
                       src={firmaNuevo}
                       alt="Firma instructor nuevo"
                       className="h-16 w-auto object-contain border border-[#00324d] rounded-md"
+                      width={64} // Establecer un ancho fijo
+                      height={64} // Establecer una altura fija
                     />
                   )}
                 </div>

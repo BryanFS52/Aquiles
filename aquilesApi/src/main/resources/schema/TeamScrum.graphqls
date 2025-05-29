@@ -1,7 +1,10 @@
 type TeamsScrum {
     id: ID!
     name: String
-    members: String
+    problem: String
+    objectives: String
+    description: String
+    justification: String
     checklist: Checklist
 }
 
@@ -24,7 +27,10 @@ type TeamsScrumPageId {
 
 input TeamsScrumDto {
     name: String!
-    members: String!
+    problem: String!
+    objectives: String!
+    description: String!
+    justification: String!
     checklist: ChecklistDto
 }
 

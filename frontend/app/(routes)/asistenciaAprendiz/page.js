@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Header } from "@components/header";
-import { Sidebaraprendiz } from "@components/SidebarAprendiz";
-import { GoSearch } from "react-icons/go";
+import { SidebarAprendiz } from "@components/SidebarAprendiz";
 import { IoIosArrowDown } from "react-icons/io";
 import { useRouter } from 'next/navigation';
 import { createEventsServicePlugin } from '@schedule-x/events-service'
@@ -248,7 +247,7 @@ export default function AsistenciaAprendiz() {
     plugins: [eventsService],
     callbacks: {
       onRender: () => eventsService.getAll(),
-      onEventClick: (event) => {
+      onEventClick: () => {
         router.push('/justificacionesAprendiz');
       },
       onJustificarClick: () => {
@@ -295,7 +294,7 @@ export default function AsistenciaAprendiz() {
       {/* Inyectar estilos CSS personalizados */}
       <style dangerouslySetInnerHTML={{ __html: customStyles }} />
 
-      <Sidebaraprendiz />
+      <SidebarAprendiz />
       <div className="xl:col-span-5">
         <Header role="Aprendiz" />
 

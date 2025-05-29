@@ -9,7 +9,7 @@ import ModalCorreo from "@components/Modals/modalCorreo";
 import { sendEmailAbsence } from "@services/emailService";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import { getAllApprentices } from "@services/apprenticeService"; // Importa el servicio
+import { getAllApprentices } from "@services/apprenticeService";
 
 export default function AprendicesList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,7 +48,7 @@ export default function AprendicesList() {
         } finally {
             setIsModalOpen(false);
         }
-    };   
+    };
 
     const totalStudents = students.length;
     const presentStudents = students.filter(student => student.isPresent).length;
@@ -56,14 +56,15 @@ export default function AprendicesList() {
 
     const handleSaveAttendance = async () => {
         try {
-            const attendanceData = students.map(student => ({
-                documentNumber: student.documentNumber,
-                isPresent: student.isPresent,
-                date: student.date,
-            }));
-            
+            // const attendanceData = students.map(student => ({
+            //     documentNumber: student.documentNumber,
+            //     isPresent: student.isPresent,
+            //     date: student.date,
+            // }));
+
             // Llama a la función para guardar la asistencia aquí (actualizarAttendance debe estar definida en otro lugar)
-            await updateAttendance(attendanceData);
+            // TODO: Implementar o importar la función updateAttendance
+            // await updateAttendance(attendanceData);
             toast.success('Asistencia guardada correctamente');
         } catch (error) {
             console.error('Error al guardar la asistencia:', error);

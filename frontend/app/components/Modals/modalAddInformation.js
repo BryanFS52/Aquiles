@@ -80,7 +80,6 @@ const ModalAddInformation = ({ isOpen, onClose }) => {
         throw new Error('No se pudo obtener el ID del proyecto creado');
       }
 
-      const projectId = response.id; // aquí tienes el ID como string
       toast.success(`Proyecto creado exitosamente`, {
         position: 'top-right',
         autoClose: 5000,

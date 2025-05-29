@@ -1,6 +1,6 @@
 import React from "react";
 import { Header } from "@components/header";
-import { Sidebaraprendiz } from "@components/SidebarAprendiz";
+import { SidebarAprendiz } from "@components/SidebarAprendiz";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { LiaLanguageSolid } from "react-icons/lia";
 import { FaComputer } from "react-icons/fa6";
@@ -9,7 +9,7 @@ import { FaPeopleCarry } from "react-icons/fa";
 export default function Aprendiz() {
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-      <Sidebaraprendiz />
+      <SidebarAprendiz />
       <div className="xl:col-span-5">
         <Header />
 

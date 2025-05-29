@@ -1,14 +1,12 @@
 "use client";
 
-import React from "react";
 import { Header } from "@components/header";
-import { Sidebaraprendiz } from "@components/SidebarAprendiz";
+import { SidebarAprendiz } from "@components/SidebarAprendiz";
 import Image from 'next/image';
-
 import { IoPersonCircleSharp } from "react-icons/io5";
 import { IoCameraSharp, IoCalendar } from 'react-icons/io5';
-import Slider from 'react-slick'; // Importa el componente Slider
-import { FaArrowLeft, FaArrowRight, FaHashtag } from 'react-icons/fa'; // Importa íconos de flechas
+import Slider from 'react-slick';
+import { FaArrowLeft, FaArrowRight, FaHashtag } from 'react-icons/fa';
 
 
 const CustomNextArrow = ({ onClick }) => {
@@ -47,7 +45,7 @@ export default function TeamScrum() {
 
     return (
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-            <Sidebaraprendiz />
+            <SidebarAprendiz />
             <div className="xl:col-span-5">
                 <Header role="Aprendiz" />
 

@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useState, useMemo } from "react"
-import { Header } from "@components/header"
-import { Sidebar } from "@components/Sidebar"
-import { toast } from "react-toastify"
-import { Check, FileDown, Save, UploadCloud, X } from "lucide-react"
+import React, { useState, useMemo } from "react";
+import { Header } from "@components/header";
+import { Sidebar } from "@components/Sidebar";
+import { toast } from "react-toastify";
+import { Check, FileDown, Save, UploadCloud, X } from "lucide-react";
+import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGreaterThan } from '@fortawesome/free-solid-svg-icons';
 import { faLessThan } from '@fortawesome/free-solid-svg-icons';
@@ -453,16 +454,14 @@ const teams = [
 ];
 
 export default function InstructorChecklistView() {
-  const [selectedTrimester, setSelectedTrimester] = useState("Trimestre 5")
-  const [selectedComponent, setSelectedComponent] = useState("Componente Técnico")
-  const [selectedTeam, setSelectedTeam] = useState(teams[0])
-  const [currentPage, setCurrentPage] = useState(1)
-  const [instructorSignature, setInstructorSignature] = useState(null)
-  const [coInstructorSignature, setCoInstructorSignature] = useState(null)
+  const [selectedTrimester, setSelectedTrimester] = useState("Trimestre 5");
+  const [selectedComponent, setSelectedComponent] = useState("Componente Técnico");
+  const [selectedTeam, setSelectedTeam] = useState(teams[0]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [firmaAnterior, setFirmaAnterior] = useState(null);
   const [firmaNuevo, setFirmaNuevo] = useState(null);
 
-  const itemsPerPage = 3
+  const itemsPerPage = 3;
 
   const items = useMemo(() => {
     return checklistData[selectedTrimester][selectedComponent]
@@ -492,20 +491,20 @@ export default function InstructorChecklistView() {
     console.log("Updated items:", updatedItems)
   }
 
-  const handleSignatureUpload = (event, setSignature) => {
-    const file = event.target.files?.[0]
+  const handleFileUpload = (event, setSignature) => {
+    const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setSignature(reader.result)
-      }
-      reader.readAsDataURL(file)
+        setSignature(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleSaveChecklist = () => {
-    console.log("Saving checklist:", { selectedTeam, items, instructorSignature, coInstructorSignature })
-    toast.success("La lista de chequeo ha sido guardada exitosamente.")
+    console.log("Saving checklist:", { selectedTeam, items });
+    toast.success("La lista de chequeo ha sido guardada exitosamente.");
   }
 
   return (
@@ -680,10 +679,16 @@ export default function InstructorChecklistView() {
                 </label>
                 <div className="w-full flex justify-center">
                   {firmaAnterior && (
-                    <img
+                    <Image
                       src={firmaAnterior}
                       alt="Firma instructor anterior"
-                      className="h-16 w-auto object-contain border border-[#00324d] rounded-md"
+                      width={100}
+                      height={64}
+                      style={{
+                        width: 'auto',
+                        height: '64px',
+                      }}
+                      className="h-16 object-contain border border-[#00324d] rounded-md"
                     />
                   )}
                 </div>
@@ -706,10 +711,16 @@ export default function InstructorChecklistView() {
                 </label>
                 <div className="w-full flex justify-center">
                   {firmaNuevo && (
-                    <img
+                    <Image
                       src={firmaNuevo}
                       alt="Firma instructor nuevo"
-                      className="h-16 w-auto object-contain border border-[#00324d] rounded-md"
+                      width={100}
+                      height={64}
+                      style={{
+                        width: 'auto',
+                        height: '64px',
+                      }}
+                      className="h-16 object-contain border border-[#00324d] rounded-md"
                     />
                   )}
                 </div>

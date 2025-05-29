@@ -93,8 +93,6 @@ const fetchReminderNotifications = () => {
 
 export const Notifications = () => {
   const [notifications, setNotifications] = useState(notificationsData);
-  const unreadCount = notifications.filter((n) => n.unread).length;
-
   // Fetch de recordatorios al cargar el componente
   useEffect(() => {
     const reminderNotifications = fetchReminderNotifications();

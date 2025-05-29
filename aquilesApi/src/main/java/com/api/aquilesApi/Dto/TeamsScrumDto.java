@@ -9,16 +9,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TeamsScrumDto {
+
     private Long id;
     @NotNull(message = "El nombre es obligatorio")
     private String name;
-    @NotNull(message = "El nombre es obligatorio")
+
+    // @NotNull(message = "El problema es obligatorio")
+    private String problem;
+
+    // @NotNull(message = "Los objetivos son obligatorios")
+    private String objectives;
+
+    // @NotNull(message = "El nombre es obligatorio")
     private String description;
-    @NotNull(message = "Los miembros son obligatorio")
-    private String members;
+
+    // @NotNull(message = "La justifacion es obligatoria")
+    private String justification;
 
     // Relations
     private ChecklistDto checklist;
-    private ProjectDto project;
-
 }   

@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { clientLan } from "@apollo/client"
 // Queries and Mutations for Study Sheets
 export const GET_STUDY_SHEETS = gql`
 
@@ -51,17 +50,6 @@ export const GET_STUDY_SHEET_BY_ID = gql`
                 id
                 number
                 numberStudents
-                startLective
-                endLective
-                state
-                offer {
-                    id
-                    name
-                }
-                journey {
-                    id
-                    name
-                }
                 quarter {
                     id
                     name {
@@ -74,10 +62,9 @@ export const GET_STUDY_SHEET_BY_ID = gql`
                 }
                 students {
                     id
-                    person {
-                        personKey {
+                    person { 
                         id 
-                        document}
+                        document
                         name
                         lastname
                     }

@@ -11,7 +11,6 @@ import Image from "next/image";
 import logoSena from '@public/img/LogoSena.png'
 import LogoAquilesDarkBlue from '@public/img/LogoAquilesDarkBlue.png'
 import ModalOlvidoContraseña from '@components/Modals/modalOlvidoContraseña'
-import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
 export default function Login() {
@@ -23,7 +22,6 @@ export default function Login() {
   });
   const [error, setError] = useState(null);
   const [validationError, setValidationError] = useState('');
-  const router = useRouter();
 
   const handleOpenModal = () => {
     setModalOpen(true);

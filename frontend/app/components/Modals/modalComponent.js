@@ -5,7 +5,7 @@ import ModalObjetivos from '@components/Modals/modalObjetivos';
 import ModalJustificacion from '@components/Modals/modalJustificacion';
 import ModalVerMas from '@components/Modals/modalVerMas';
 
-const ModalComponent = ({ isOpen, onClose, modalContent }) => {
+const ModalComponent = ({ isOpen, onClose }) => {
   const [buttonText, setButtonText] = useState('Descripción');
   const [currentModal, setCurrentModal] = useState('Descripcion');
 
@@ -31,8 +31,8 @@ const ModalComponent = ({ isOpen, onClose, modalContent }) => {
             <button
               onClick={() => handleButtonClick(currentModal === 'Descripcion' ? 'VerMas' : 'Descripcion')}
               className={`rounded-lg transition-colors md:px-4 py-1 my-1 border font-medium ${currentModal === 'Descripcion'
-                  ? 'bg-darkBlue text-white border-darkBlue hover:bg-shadowBlue'
-                  : 'bg-white text-darkGray border-lightGray hover:bg-lightGray'
+                ? 'bg-darkBlue text-white border-darkBlue hover:bg-shadowBlue'
+                : 'bg-white text-darkGray border-lightGray hover:bg-lightGray'
                 }`}
             >
               {buttonText}
@@ -41,8 +41,8 @@ const ModalComponent = ({ isOpen, onClose, modalContent }) => {
             <button
               onClick={() => handleButtonClick('Problematicas')}
               className={`rounded-lg transition-colors md:px-4 py-1 my-1 border font-medium ${currentModal === 'Problematicas'
-                  ? 'bg-darkBlue text-white border-darkBlue hover:bg-shadowBlue'
-                  : 'bg-white text-darkGray border-lightGray hover:bg-lightGray'
+                ? 'bg-darkBlue text-white border-darkBlue hover:bg-shadowBlue'
+                : 'bg-white text-darkGray border-lightGray hover:bg-lightGray'
                 }`}
             >
               Problemática
@@ -50,8 +50,8 @@ const ModalComponent = ({ isOpen, onClose, modalContent }) => {
             <button
               onClick={() => handleButtonClick('Objetivos')}
               className={`rounded-lg transition-colors md:px-4 py-1 my-1 border font-medium ${currentModal === 'Objetivos'
-                  ? 'bg-darkBlue text-white border-darkBlue hover:bg-shadowBlue'
-                  : 'bg-white text-darkGray border-lightGray hover:bg-lightGray'
+                ? 'bg-darkBlue text-white border-darkBlue hover:bg-shadowBlue'
+                : 'bg-white text-darkGray border-lightGray hover:bg-lightGray'
                 }`}
             >
               Objetivos
@@ -59,8 +59,8 @@ const ModalComponent = ({ isOpen, onClose, modalContent }) => {
             <button
               onClick={() => handleButtonClick('Justificacion')}
               className={`rounded-lg transition-colors md:px-4 py-1 my-1 border font-medium ${currentModal === 'Justificacion'
-                  ? 'bg-darkBlue text-white border-darkBlue hover:bg-shadowBlue'
-                  : 'bg-white text-darkGray border-lightGray hover:bg-lightGray'
+                ? 'bg-darkBlue text-white border-darkBlue hover:bg-shadowBlue'
+                : 'bg-white text-darkGray border-lightGray hover:bg-lightGray'
                 }`}
             >
               Justificación

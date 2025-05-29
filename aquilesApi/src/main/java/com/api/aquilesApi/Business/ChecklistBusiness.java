@@ -3,7 +3,6 @@ package com.api.aquilesApi.Business;
 import com.api.aquilesApi.Dto.ChecklistDto;
 import com.api.aquilesApi.Entity.ChecklistEntity;
 import com.api.aquilesApi.Repository.JuriesRepository;
-import com.api.aquilesApi.Repository.ProjectRepository;
 import com.api.aquilesApi.Service.ChecklistService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
@@ -18,7 +17,7 @@ public class ChecklistBusiness {
     private final ChecklistService checklistService;
     private final ModelMapper modelMapper = new ModelMapper();
 
-    public ChecklistBusiness(ChecklistService checklistService, ProjectRepository projectRepository, JuriesRepository juriesRepository) {
+    public ChecklistBusiness(ChecklistService checklistService, JuriesRepository juriesRepository) {
         this.checklistService = checklistService;
     }
 

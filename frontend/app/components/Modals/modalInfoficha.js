@@ -1,5 +1,4 @@
 "use client";
-import React, { useState } from "react";
 
 const ModalInfoficha = ({ isOpen, onClose }) => {
 	// se crea los eventos de cerrar y abri el modal

@@ -3,10 +3,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Header } from "@components/header";
-import { Sidebaraprendiz } from "@components/SidebarAprendiz";
+import { SidebarAprendiz } from "@components/SidebarAprendiz";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { BsPersonCircle } from "react-icons/bs";
 import justificationService from "@services/justificationService";
 import justificationTypeService from "@services/JustificationTypeService";
 
@@ -173,7 +172,7 @@ export default function JustificacionAprendiz() {
       // Manejar diferentes tipos de respuesta
       if (result) {
         // Si la respuesta tiene una propiedad success explícita
-        if (result.hasOwnProperty('success')) {
+        if (Object.prototype.hasOwnProperty.call(result, 'success')) {
           if (result.success === true) {
             toast.success(result.message || "¡Tu justificación ha sido enviada exitosamente!");
             resetForm();
@@ -251,7 +250,7 @@ export default function JustificacionAprendiz() {
 
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-      <Sidebaraprendiz />
+      <SidebarAprendiz />
       <div className="xl:col-span-5">
         <Header role="Aprendiz" />
         <div className="h-[90vh] p-6 bg-neutral-100 space-y-5">

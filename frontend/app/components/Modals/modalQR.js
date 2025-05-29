@@ -11,8 +11,8 @@ const ModalQR = ({ isOpen, onClose }) => {
   const [timer, setTimer] = useState(900);
   const [qrCodeImage, setQrCodeImage] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [sessionId, setSessionId] = useState(null); // Mover los estados aquí
-  const [qrUrl, setQrUrl] = useState(null); // Mover los estados aquí
+  const [, setSessionId] = useState(null); // Mover los estados aquí
+  const [, setQrUrl] = useState(null); // Mover los estados aquí
   const router = useRouter();
 
   const apprenticeEmail = "caceresgabriel305@gmail.com";

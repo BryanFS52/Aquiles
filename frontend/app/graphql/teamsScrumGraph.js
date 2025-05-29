@@ -13,14 +13,9 @@ export const GET_TEAMS_SCRUMS = gql`
       data {
         id
         name
-        members
         checklist {
           id
           remarks
-        }
-        project {
-          projectId
-          description
         }
       }
     }
@@ -36,14 +31,9 @@ export const GET_TEAM_SCRUM_BY_ID = gql`
       data {
         id
         name
-        members
         checklist {
           id
           remarks
-        }
-        project {
-          projectId
-          description
         }
       }
     }
@@ -68,7 +58,6 @@ export const UPDATE_TEAM_SCRUM = gql`
       data {
         id
         name
-        members
       }
     }
   }

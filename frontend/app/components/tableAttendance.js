@@ -6,58 +6,19 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { motion } from "framer-motion";
 import ModalQR from "@components/Modals/modalQR";
 import ModalManualAssistance from "@components/Modals/modalManualAssistance";
-import studentService from '@services/Olympo/studentService';
 
-const TablaApprentices = ({ onStatusChange }) => {
-    const [apprentices, setApprentices] = useState([]);
+const TableAttendance = ({ studySheetData }) => {
     const [modalQROpen, setModalQROpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const apprenticesPerPage = 7;
-    const [totalPages, setTotalPages] = useState(1);
     const [alertVisible, setAlertVisible] = useState(false);
-    const [currentTrimester, setCurrentTrimester] = useState(1);
     const [manualAssistanceModalOpen, setManualAssistanceModalOpen] = useState(false);
+    const [currentTrimester, setCurrentTrimester] = useState(1);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredStudents, setFilteredStudents] = useState(studySheetData?.students || []);
 
-    // Cargar aprendices con paginación y búsqueda
-    const fetchApprentices = async (page = 0, search = "") => {
-        try {
-            const response = await studentService.getStudents({
-                name: search,
-                page: page - 1, // servicio usa índice 0-based
-                size: apprenticesPerPage,
-            });
-
-            if (response?.data) {
-                setApprentices(response.data);
-                setTotalPages(response.totalPages || 1);
-                setCurrentPage((response.currentPage ?? 0) + 1);
-            } else {
-                setApprentices([]);
-                setTotalPages(1);
-            }
-        } catch (error) {
-            console.error("Error al obtener aprendices:", error);
-            setApprentices([]);
-            setTotalPages(1);
-        }
-    };
-
-    // Al cambiar página o búsqueda
+    // Actualizar la lista de estudiantes filtrados cuando cambia la hoja de estudio
     useEffect(() => {
-        fetchApprentices(currentPage, searchTerm);
-    }, [currentPage, searchTerm]);
-
-    // Notificar cambios al padre
-    useEffect(() => {
-        onStatusChange(apprentices);
-    }, [apprentices, onStatusChange]);
-
-    // Manejar cambio en input búsqueda
-    const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value);
-        setCurrentPage(1);
-    };
+        setFilteredStudents(studySheetData?.students || []);
+    }, [studySheetData]);
 
     // Mostrar alert antes de abrir QR
     const handleAttendanceClick = () => setAlertVisible(true);
@@ -75,11 +36,15 @@ const TablaApprentices = ({ onStatusChange }) => {
         if (currentTrimester < 7) setCurrentTrimester(currentTrimester + 1);
     };
 
-    // Cambiar página controlado
-    const handlePageChange = (page) => {
-        if (page > 0 && page <= totalPages) {
-            setCurrentPage(page);
-        }
+    // Manejar cambio en input búsqueda
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+        const filtered = filteredStudents?.filter(student =>
+            student.person.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
+            student.person.lastname.toLowerCase().includes(e.target.value.toLowerCase()) ||
+            student.person.document.toLowerCase().includes(e.target.value.toLowerCase())
+        ) || [];
+        setFilteredStudents(filtered);
     };
 
     return (
@@ -100,7 +65,6 @@ const TablaApprentices = ({ onStatusChange }) => {
                             />
                         </div>
                     </form>
-
                     <div className="relative flex items-center space-x-4 w-full md:w-auto">
                         <button
                             onClick={handleAttendanceClick}
@@ -158,7 +122,6 @@ const TablaApprentices = ({ onStatusChange }) => {
                     <ModalQR
                         isOpen={modalQROpen}
                         onClose={() => setModalQROpen(false)}
-                        apprentices={apprentices}
                     />
                 </div>
                 <div className="flex flex-col md:flex-row justify-between items-end absolute right-4 sm:items-center sm:mx-4 sm:mt-4">
@@ -187,7 +150,11 @@ const TablaApprentices = ({ onStatusChange }) => {
                     mode="event"
                     isOpen={manualAssistanceModalOpen}
                     onClose={() => setManualAssistanceModalOpen(false)}
-                    students={apprentices}
+                    students={studySheetData?.students || []}
+                    onSave={(attendanceData) => {
+                        console.log('Attendance data to save:', attendanceData);
+                        setManualAssistanceModalOpen(false);
+                    }}
                 />
             )}
 
@@ -222,19 +189,20 @@ const TablaApprentices = ({ onStatusChange }) => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-300">
-                        {apprentices.map((apprentice) => (
-                            <tr key={apprentice.id}>
+                        {filteredStudents?.map((student) => (
+                            <tr key={student.id}>
                                 <td className="px-2 py-2 border-2 border-gray-300 text-sm">
-                                    {apprentice.person.personKey.document}
+                                    {student.person.document}
                                 </td>
                                 <td className="px-2 py-2 border-2 border-gray-300 text-sm">
-                                    {apprentice.person.name} {apprentice.person.lastname}
+                                    {student.person.name} {student.person.lastname}
                                 </td>
                                 {[...Array(4)].map((_, weekIndex) => (
                                     <React.Fragment key={weekIndex}>
                                         {[...Array(7)].map((_, dayIndex) => {
                                             const isWeekend = dayIndex === 5 || dayIndex === 6;
-                                            const cellValue = apprentice.weeks && apprentice.weeks[weekIndex] ? apprentice.weeks[weekIndex][dayIndex] : '';
+                                            //const cellValue = apprentice.weeks && apprentice.weeks[weekIndex] ? apprentice.weeks[weekIndex][dayIndex] : '';
+                                            const cellValue = ''; // No hay datos de asistencia por semana
 
                                             return (
                                                 <td
@@ -259,23 +227,8 @@ const TablaApprentices = ({ onStatusChange }) => {
                     </tbody>
                 </table>
             </div>
-            <div className="flex justify-between items-center mt-4">
-                <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className={`bg-gray-200 px-4 py-2 rounded-lg ${currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''}`}>
-                    <IoIosArrowBack className="text-lg" />
-                </button>
-                <span className="text-sm">Página {currentPage} de {totalPages}</span>
-                <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className={`bg-gray-200 px-4 py-2 rounded-lg ${currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''}`}>
-                    <IoIosArrowForward className="text-lg" />
-                </button>
-            </div>
         </div>
     );
 };
 
-export default TablaApprentices;
+export default TableAttendance;

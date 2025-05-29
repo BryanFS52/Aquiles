@@ -1,46 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, Clock, Users, Save, X, Search, Calendar } from 'lucide-react';
 
-const ModalManualAssistance = ({ isOpen, onClose, students = [] }) => {
+const ModalManualAssistance = ({ isOpen, onClose, students = [], onSave }) => {
     const [attendance, setAttendance] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [filteredStudents, setFilteredStudents] = useState(students);
 
-    const mockStudents = [
-        { id: '1234567890', name: 'Michael Felipe Laiton Chaparro', program: 'Desarrollo de Aplicaciones Web II' },
-        { id: '1234567891', name: 'Ana María García Rodríguez', program: 'Desarrollo de Aplicaciones Web II' },
-        { id: '1234567892', name: 'Carlos Andrés Ruiz Méndez', program: 'Desarrollo de Aplicaciones Web II' },
-        { id: '1234567893', name: 'Laura Sofía Martínez López', program: 'Desarrollo de Aplicaciones Web II' },
-        { id: '1234567894', name: 'Diego Alejandro Vargas Cruz', program: 'Desarrollo de Aplicaciones Web II' },
-        { id: '1234567895', name: 'Valentina Morales Jiménez', program: 'Desarrollo de Aplicaciones Web II' },
-        { id: '1234567896', name: 'Juan Pablo Herrera Sánchez', program: 'Desarrollo de Aplicaciones Web II' },
-        { id: '1234567897', name: 'Camila Andrea Pérez Rojas', program: 'Desarrollo de Aplicaciones Web II' }
-    ];
-
-    const studentsToUse = students.length > 0 ? students : mockStudents;
-
     useEffect(() => {
         if (isOpen) {
             const initialAttendance = {};
-            studentsToUse.forEach(student => {
+            students.forEach(student => {
                 initialAttendance[student.id] = student.attendance || 'presente';
             });
             setAttendance(initialAttendance);
         }
-        // solo escuchar isOpen, no studentsToUse
-    }, [isOpen]);
+    }, [isOpen, students]);
 
 
     useEffect(() => {
-        const filtered = studentsToUse.filter(student =>
-            student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            student.id.includes(searchTerm)
+        const filtered = students.filter(student =>
+            student.person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            student.person.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            student.person.document.toLowerCase().includes(searchTerm)
         );
         setFilteredStudents(filtered);
-    }, [searchTerm, studentsToUse]);
+    }, [searchTerm, students]);
 
-    // Bloquear scroll del body cuando el modal está abierto
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
@@ -53,17 +39,15 @@ const ModalManualAssistance = ({ isOpen, onClose, students = [] }) => {
     }, [isOpen]);
 
     const handleAttendanceChange = (studentId, value) => {
-        console.log(`Cambiando estado de ${studentId} a ${value}`);
-        setAttendance(prev => {
-            const nuevo = { ...prev, [studentId]: value };
-            console.log('Nuevo attendance:', nuevo);
-            return nuevo;
-        });
+        setAttendance(prev => ({ ...prev, [studentId]: value }));
     };
 
     const handleSave = () => {
-        console.log('Attendance to save:', attendance);
-        console.log('Date:', selectedDate);
+        const attendanceData = {
+            date: selectedDate,
+            attendance: attendance
+        };
+        onSave(attendanceData);
         onClose();
     };
 
@@ -186,8 +170,8 @@ const ModalManualAssistance = ({ isOpen, onClose, students = [] }) => {
                                             {index + 1}
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <h3 className="font-semibold text-darkBlue text-sm sm:text-base truncate">{student.name}</h3>
-                                            <p className="text-xs sm:text-sm text-darkGray truncate">Doc: {student.id}</p>
+                                            <h3 className="font-semibold text-darkBlue text-sm sm:text-base truncate">{student.person.name} {student.person.lastname}</h3>
+                                            <p className="text-xs sm:text-sm text-darkGray truncate">Doc: {student.person.document}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">

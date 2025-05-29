@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Header } from "@components/header";
-import { Sidebaraprendiz } from "@components/SidebarAprendiz";
+import { SidebarAprendiz } from "@components/SidebarAprendiz";
 import InfoBox from "@components/infoBox";
 import { FaUsers, FaRegClock, FaGraduationCap, FaRegListAlt } from "react-icons/fa"; // Iconos
 
 const ApprenticeView = () => {
-  // Datos simulados
-  const [apprenticeData, setApprenticeData] = useState({
+  // Datos simulados  
+  const [apprenticeData,] = useState({
     ficha: "123456",
     jornada: "Mañana",
     programa: "Analisís y Desarrollo de Software",
@@ -23,7 +23,7 @@ const ApprenticeView = () => {
 
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-      <Sidebaraprendiz />
+      <SidebarAprendiz />
       <div className="xl:col-span-5">
         <Header role="Aprendiz" />
 

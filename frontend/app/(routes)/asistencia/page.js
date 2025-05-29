@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { BsPersonCircle } from "react-icons/bs";
 import TableAttendance from "@components/tableAttendance";
@@ -8,26 +7,32 @@ import { Header } from "@components/header";
 import { Sidebar } from "@components/Sidebar";
 import { FaCheck } from "react-icons/fa";
 import { TbLetterR, TbLetterX, TbLetterJ } from "react-icons/tb";
+import studySheetService from '@services/Olympo/studySheetService';
 
 export default function Attendance() {
+    const [studySheet, setStudySheet] = useState(null);
     const [students, setStudents] = useState([]);
 
     useEffect(() => {
-        const fetchStudents = async () => {
+        const fetchStudySheet = async () => {
             try {
-                const studentsData = await getAllApprentices();
-                setStudents(studentsData);
+                const response = await studySheetService.getStudySheetById("1");
+                if (response?.data) {
+                    setStudySheet(response.data);
+                    setStudents(response.data.students || []);
+                } else {
+                    setStudySheet(null);
+                    setStudents([]);
+                }
             } catch (error) {
-                console.error("Error al obtener la lista de aprendices:", error);
+                console.error("Error al obtener la hoja de estudio:", error);
+                setStudySheet(null);
+                setStudents([]);
             }
         };
 
-        fetchStudents();
+        fetchStudySheet();
     }, []);
-
-    const handleStatusChange = (studentsData) => {
-        setStudents(studentsData);
-    };
 
     const activeStudents = students.filter((s) => s.status === "active").length;
     const withdrawnStudents = students.filter((s) => s.status === "withdrawn").length;
@@ -74,12 +79,12 @@ export default function Attendance() {
                     </div>
 
                     <div className="mt-6">
-                        <TableAttendance onStatusChange={handleStatusChange} />
+                        <TableAttendance studySheetData={studySheet} />
                     </div>
 
                     <div className="flex flex-col md:flex-row md:space-x-6 space-y-4 md:space-y-0 justify-center items-center w-full md:w-[60%]">
                         <div className="flex h-14 w-full md:w-40 rounded-lg shadow-lg bg-white border-2 border-gray-300 text-custom-blue font-inter font-semibold text-2xl justify-center p-3">
-                            255873
+                            {studySheet?.number}
                         </div>
                         <div className="flex flex-col md:flex-row md:space-x-6 w-full max-w-4xl rounded-lg shadow-lg bg-white border-2 border-gray-300 p-4 space-y-4 md:space-y-0">
                             <div className="flex items-center space-x-4 flex-1">

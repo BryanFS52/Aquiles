@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Header } from "@components/header";
 import { Sidebar } from "@components/Sidebar";
 import { IoPeople } from "react-icons/io5";
-import { FaUsers, FaRegClock, FaGraduationCap, FaRegListAlt } from "react-icons/fa"; // Iconos
 import ApprenticeModal from "@components/Modals/ApprenticeModal"; // Importa el modal
 
 const FichasInstructor = () => {

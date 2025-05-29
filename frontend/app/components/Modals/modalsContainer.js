@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ModalComponent from '@components/Modals/modalComponent'; // Ajusta la ruta según tu estructura de archivos
 
 

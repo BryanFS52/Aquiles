@@ -5,7 +5,6 @@ type Checklist {
     instructorSignature: String
     evaluationCriteria: Boolean
     checklistHistory: String
-    associatedProject: Project
     associatedJuries: [Juries]
 }
 

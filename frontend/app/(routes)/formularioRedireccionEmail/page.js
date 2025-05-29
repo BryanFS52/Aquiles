@@ -1,19 +1,9 @@
 "use client";
-
-import { useState } from 'react';
 import logoSenaFormulario from "@public/img/Logo-sena-green.png";
-import logo from "@public/img/aquiles.jpg";
 import Image from 'next/image';
 
-const formularioRedireccionEmail = () => {
-  const [apprenticeName, setApprenticeName] = useState('');
-  const [qrCode, setQrCode] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Nombre del aprendiz:', apprenticeName);
-    console.log('Código QR:', qrCode);
-  };
+const FormularioRedireccionEmail = () => {
+  const logo = "URL_DEL_LOGO"; // Reemplazar con la URL del logo o importarlo
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -66,4 +56,4 @@ const formularioRedireccionEmail = () => {
   );
 };
 
-export default formularioRedireccionEmail;
+export default FormularioRedireccionEmail;

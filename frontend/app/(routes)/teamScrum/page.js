@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Header } from "@components/header";
-import { Sidebar } from "@components/Sidebar";
 import { MdAdd, MdAddCircle } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
+import { Header } from "@components/header";
+import { Sidebar } from "@components/Sidebar";
 import ModalNewProject from "@components/Modals/modalNewProject";
 import ModalComponent from "@components/Modals/modalComponent";
 import ModalAddInformation from "@components/Modals/modalAddInformation";
@@ -31,6 +31,7 @@ export default function Home() {
     fetchTeams();
   }, []);
 
+  loading && toast.info('Cargando equipos...');
   const fetchTeams = async () => {
     try {
       setLoading(true);
@@ -38,9 +39,7 @@ export default function Home() {
       const mapped = response.data?.map(team => ({
         id: team.id,
         name: team.name,
-        members: team.members,
         checklist: team.checklist,
-        project: team.project
       })) || [];
       setTeams(mapped);
     } catch (error) {
@@ -57,19 +56,16 @@ export default function Home() {
       return;
     }
 
-    // Si members es un array, lo convertimos a string separado por comas
-    const membersString = Array.isArray(team.members) ? team.members.join(', ') : (team.members || "");
-
     const input = {
       name: team.nameProject,
-      members: membersString,  // enviamos string
+      problem: "",
+      objectives: "",
+      description: "",
+      justification: "",
       checklist: team.checklist || null,
-      project: team.project ? {
-        // campos válidos de ProjectInput, sin id
-        name: team.project.name || "",
-        // etc.
-      } : null,
     };
+
+
 
     try {
       await addTeamScrum(input);

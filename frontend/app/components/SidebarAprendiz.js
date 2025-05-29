@@ -15,7 +15,7 @@ const IconTeam = dynamic(() => import('react-icons/hi2').then((mod) => mod.HiUse
 const IconSustentaciones = dynamic(() => import('react-icons/fa6').then((mod) => mod.FaChalkboardUser), { ssr: false });
 const IconJustificaciones = dynamic(() => import('react-icons/gi').then((mod) => mod.GiNotebook), { ssr: false });
 
-export const Sidebaraprendiz = () => {
+export const SidebarAprendiz = () => {
     const [showMenu, setShowMenu] = useState(false);
 
     const toggleMenu = () => {

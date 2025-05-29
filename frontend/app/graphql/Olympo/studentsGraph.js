@@ -10,9 +10,8 @@ export const GET_STUDENTS = gql`
                 id
                 state
                 person {
-                    personKey{
                     id
-                    document}
+                    document
                     name
                     lastname
                     phone
@@ -43,17 +42,8 @@ export const GET_STUDENT_LIST = gql`
                 person {
                     id
                     name
-                    lastName
-                    documentType
-                    documentNumber
-                    phone
-                    email
-                    address
-                }
-                studySheet {
-                    id
-                    name
-                    state
+                    lastname
+                    document
                 }
             }
             totalItems

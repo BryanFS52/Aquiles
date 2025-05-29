@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 import { HiLockClosed } from "react-icons/hi";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Image from "next/image";
-import logoSena from "@public/img/LogoSena.png";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -29,13 +27,13 @@ export default function ResetPassword() {
   return (
     <div className="w-screen h-screen flex justify-center items-center bg-white">
       <div className="w-full h-full flex justify-between items-center">
-      <div className="w-[50%] justify-center items-center bg-cover bg-center h-screen hidden xl:block" style={{ backgroundImage: "url('/img/restorePassword.png')" }}>
+        <div className="w-[50%] justify-center items-center bg-cover bg-center h-screen hidden xl:block" style={{ backgroundImage: "url('/img/restorePassword.png')" }}>
           <div className="relative w-full h-full">
             <div className="absolute inset-0 bg-black opacity-20"></div>
             <div className="relative z-10 h-full flex flex-col justify-between p-10 text-center text-white">
-              <div className='flex justify-end '> 
+              <div className='flex justify-end '>
                 <div className="w-36">
-                 
+
                 </div>
               </div>
               <div>
@@ -49,9 +47,9 @@ export default function ResetPassword() {
                   </div>
                 </div>
               </div>
-            </div>     
-          </div>   
-        </div> 
+            </div>
+          </div>
+        </div>
         <div className="xl:w-1/2 h-full flex justify-center items-center sm:w-full">
           <div className="xl:w-1/2 p-5">
             <div className="flex items-center">
@@ -65,10 +63,10 @@ export default function ResetPassword() {
             <div className="text-custom-blue pt-10">
               <h1 className="text-4xl">Restablecer Contraseña</h1>
               <p className="text-2xl pt-5">
-                Crea una nueva contraseña segura. 
+                Crea una nueva contraseña segura.
               </p>
               <p className="text-base pt-3">
-              Elige una contraseña nueva que cumpla con todos los requisitos de seguridad y que no hayas utilizado en otros sitios web.
+                Elige una contraseña nueva que cumpla con todos los requisitos de seguridad y que no hayas utilizado en otros sitios web.
               </p>
             </div>
             <div className="mt-20">
@@ -84,13 +82,12 @@ export default function ResetPassword() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
-                      <FontAwesomeIcon
-                          icon={showPassword ? faEyeSlash : faEye}
-                          className={`mx-3 w-5 h-5 cursor-pointer transition-colors duration-300 ${
-                            showPassword ? 'text-[#3da900]' : 'text-[#0E324D]' 
-                          }`}
-                          onClick={handleTogglePassword}
-                        />
+                    <FontAwesomeIcon
+                      icon={showPassword ? faEyeSlash : faEye}
+                      className={`mx-3 w-5 h-5 cursor-pointer transition-colors duration-300 ${showPassword ? 'text-[#3da900]' : 'text-[#0E324D]'
+                        }`}
+                      onClick={handleTogglePassword}
+                    />
                   </div>
                   <div className="flex items-center w-full mt-4 rounded border-solid border-2">
                     <HiLockClosed className="w-5 mr-2 mx-3 h-5 text-gray-500" />
@@ -102,20 +99,19 @@ export default function ResetPassword() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                     />
-                      <FontAwesomeIcon
-                            icon={showConfirmPassword ? faEyeSlash : faEye}
-                            className={`mx-3 w-5 h-5 cursor-pointer transition-colors duration-300 ${
-                              showConfirmPassword ? 'text-[#3da900]' : 'text-[#0E324D]'  
-                            }`}
-                            onClick={handleToggleConfirmPassword}
-                          />
+                    <FontAwesomeIcon
+                      icon={showConfirmPassword ? faEyeSlash : faEye}
+                      className={`mx-3 w-5 h-5 cursor-pointer transition-colors duration-300 ${showConfirmPassword ? 'text-[#3da900]' : 'text-[#0E324D]'
+                        }`}
+                      onClick={handleToggleConfirmPassword}
+                    />
                   </div>
                 </div>
                 <button
                   className="bg-custom-blue w-full p-2 text-white font-medium rounded mt-20 hover:bg-custom-blues  transition-colors duration-300 dark:focus:ring-custom-blue"
                   type="submit"
                 >
-                  Confirmar 
+                  Confirmar
 
 
 
@@ -123,7 +119,7 @@ export default function ResetPassword() {
               </form>
             </div>
           </div>
-        </div> 
+        </div>
       </div>
     </div>
   );
