@@ -4,6 +4,8 @@ import qrCodeService from "@services/QRService";
 import { BsQrCode } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const ModalQR = ({ isOpen, onClose }) => {
   const [timer, setTimer] = useState(900);
@@ -175,10 +177,10 @@ const ModalQR = ({ isOpen, onClose }) => {
         }
       );
       console.log(response.data.message);
-      alert("Correo enviado con éxito!");
+      toast.success("Correo enviado con éxito!");
     } catch (error) {
       console.error("Error al enviar correo:", error);
-      alert("Error al enviar el correo.");
+      toast.error("Error al enviar el correo.");
     }
   };
 
@@ -253,6 +255,7 @@ const ModalQR = ({ isOpen, onClose }) => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

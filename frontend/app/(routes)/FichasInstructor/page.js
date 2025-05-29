@@ -75,7 +75,7 @@ const FichasInstructor = () => {
 
           <div className="flex items-center border border-gray-300 shadow-black shadow-md rounded-lg p-4 bg-white dark:bg-lightGray">
             <div>
-              <div 
+              <div
                 className="flex-shrink-0 bg-[#0e324d] rounded-2xl h-20 w-20 flex items-center justify-center mx-auto border-[#01b001] border-4 cursor-pointer"
                 onClick={() => openModal(null)} // Abre el modal al hacer clic en el ícono
               >
