@@ -69,6 +69,7 @@ export default function TeamScrum() {
                             <div className="w-full flex flex-col items-center space-y-2">
                                 <label className="text-[#40b003] text-lg font-bold">Nombre del equipo:</label>
                                 <input
+                                    onChange={() => { }}
                                     type="text"
                                     value="Aquiles Team"
                                     className="border border-gray-300 rounded-lg p-2 w-full text-center focus:outline-none focus:ring-2 focus:ring-[#0e324d]"

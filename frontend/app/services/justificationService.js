@@ -10,6 +10,7 @@ import {
 const justificationService = {
   getAllJustifications: async (page = 0, size = 10) => {
     try {
+      // Simulating an error by using an invalid URL
       const { data } = await client.query({
         query: GET_ALL_JUSTIFICATIONS,
         variables: { page, size },
@@ -18,7 +19,7 @@ const justificationService = {
       return data.allJustifications;
     } catch (error) {
       console.error("Error fetching all justifications:", error);
-      throw error;
+      throw new Error("Simulated error");
     }
   },
 

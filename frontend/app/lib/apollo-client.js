@@ -12,7 +12,9 @@ const clientLAN = new ApolloClient({
     link: new HttpLink({
         uri: "http://10.1.172.62:4000/graphql",
     }),
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+        addTypename: false,
+    }),
     defaultOptions: {
         watchQuery: {
             fetchPolicy: 'no-cache',
@@ -23,6 +25,5 @@ const clientLAN = new ApolloClient({
     },
     connectToDevTools: true,
 });
-
 
 export { client, clientLAN };

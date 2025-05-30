@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Header } from "@components/header";
 import { Sidebar } from "@components/Sidebar";
 import { IoPeople } from "react-icons/io5";
-import ApprenticeModal from "@components/Modals/ApprenticeModal"; // Importa el modal
+import ApprenticeModal from "@components/Modals/ApprenticeModal";
 
 const FichasInstructor = () => {
   const [ficha, setFicha] = useState(null);
@@ -109,7 +109,6 @@ const FichasInstructor = () => {
             apprentice={selectedApprentice}
             students={ficha.students} // Asegúrate de que esto esté definido
           />
-
         </div>
       </div>
     </div>
