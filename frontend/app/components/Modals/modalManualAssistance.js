@@ -90,7 +90,7 @@ const ModalManualAssistance = ({ isOpen, onClose, students = [], onSave }) => {
                 {/* Header */}
                 <div className="bg-darkBlue text-white px-4 sm:px-6 lg:px-8 py-4 sm:py-6 rounded-t-xl sm:rounded-t-2xl">
                     <div className="flex items-center justify-between mb-2 sm:mb-4">
-                        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold font-kiwi-maru">TOMA DE ASISTENCIA</h1>
+                        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold font-kiwi-marumaru">TOMA DE ASISTENCIA</h1>
                         <button
                             onClick={onClose}
                             className="bg-white bg-opacity-20 hover:bg-opacity-30 transition-colors p-1.5 sm:p-2 rounded-full"

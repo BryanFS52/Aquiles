@@ -53,7 +53,10 @@
       ],
       "@graphql/*": [
         "./app/graphql/*"
-      ]
+      ],
+      "@context/*": [
+        "./app/context/*"
+      ],
     }
   },
   "include": [

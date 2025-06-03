@@ -43,7 +43,7 @@ public class TeamsScrumEntity implements Serializable {
     private ChecklistEntity checklist;
 
     // 3. Relation (M-M) con apprentice
-// Guardas solo los IDs de los usuarios
+    // Guardas solo los IDs de los usuarios
     @ElementCollection
     @CollectionTable(
             name = "team_scrum_members",
