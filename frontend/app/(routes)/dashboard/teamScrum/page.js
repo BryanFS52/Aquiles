@@ -30,6 +30,7 @@ export default function Home() {
   }, []);
 
   loading && toast.info('Cargando equipos...');
+
   const fetchTeams = async () => {
     try {
       setLoading(true);
@@ -63,8 +64,6 @@ export default function Home() {
       checklist: team.checklist || null,
     };
 
-
-
     try {
       await addTeamScrum(input);
       toast.success('¡Nuevo Team creado con éxito!');
@@ -75,7 +74,6 @@ export default function Home() {
       toast.error('Error al crear equipo Scrum.');
     }
   };
-
 
   const handleDeleteTeam = async (teamId) => {
     try {
@@ -106,97 +104,100 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
+    <div className="space-y-6">
+      {/* Título principal */}
+      <h1 className="text-3xl font-bold text-[#00324d] dark:text-white hover:text-[#01b001] dark:hover:text-[#01b001] transition-colors duration-300">
+        Team Scrums
+      </h1>
 
-      <div className="xl:col-span-5">
-
-        <div className="container mx-auto p-6 space-y-6">
-          <h1 className="text-3xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
-            Team Scrums
-          </h1>
-
-          <div className="flex items-center justify-between mb-6">
-            {teams.length === 0 ? (
-              <p className="text-gray-600">No hay equipos de trabajo disponibles. Pulsa el botón + para crear un nuevo team.</p>
-            ) : (
-              <p className="text-gray-600">Teams disponibles. Puedes seguir creando nuevos teams.</p>
-            )}
-            <button
-              onClick={handleOpenModal}
-              className="flex items-center justify-center bg-[#00324d] hover:bg-[#40b003] text-white px-4 py-2 rounded-lg"
-            >
-              <MdAdd className="mr-2" /> Añadir Team
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-8">
-            {teams.map((team) => (
-              <div
-                key={team.id}
-                className="w-full rounded-2xl overflow-hidden shadow-md bg-white relative p-6 hover:shadow-lg transition duration-300 border border-gray-200 flex flex-col"
-              >
-                {/* Línea diagonal decorativa */}
-                <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-[#00324d] border-l-[240px] border-l-transparent z-0" />
-
-                <div className="relative z-10 flex flex-col flex-grow">
-                  {/* Título y botón "Ver más" */}
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-[#00324d]">{team.name}</h2>
-                    <button
-                      onClick={handleOpenAgregarInfo}
-                      className="text-sm font-medium text-white bg-[#40b003] hover:bg-[#2a7d02] px-3 py-1 rounded-md shadow"
-                    >
-                      Ver Más
-                    </button>
-                  </div>
-
-                  {/* Team ID */}
-                  <div className="mb-3">
-                    <h3 className="text-sm font-semibold text-gray-500">Team ID</h3>
-                    <p className="text-gray-800">{team.id}</p>
-                  </div>
-
-                  {/* Miembros con altura limitada y scroll si hay muchos */}
-                  {team.members && (
-                    <div className="mb-4 max-h-28 overflow-y-auto">
-                      <h3 className="text-sm font-semibold text-gray-500">Miembros del equipo</h3>
-                      <ul className="list-disc list-inside text-gray-700 text-sm">
-                        {team.members.split(',').map((member, index) => (
-                          <li key={index}>{member.trim()}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {/* Botones alineados abajo */}
-                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-200">
-                    <button
-                      onClick={handleOpenAddInfoModal}
-                      className="flex items-center gap-2 text-[#00324d] hover:text-[#40b003] transition"
-                    >
-                      <MdAddCircle className="text-2xl" />
-                      <span className="text-sm font-medium">Agregar Información</span>
-                    </button>
-                    <button
-                      onClick={() => handleOpenConfirmModal(team.id)}
-                      className="text-red-600 hover:text-red-800 transition"
-                      title="Eliminar equipo"
-                    >
-                      <FaTrashAlt className="text-xl" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-
-          </div>
-
-          <ModalNewProject isOpen={modalOpen} onClose={handleCloseModal} onCreate={handleCreateTeam} />
-          <ModalAddInformation isOpen={openAddInfoModal} onClose={handleCloseAddInfoModal} />
-          <ModalComponent isOpen={openAgregarInfo} onClose={handleCloseAgregarInfo} />
-          <ModalEliminarTeam isOpen={confirmModalOpen} onClose={() => setConfirmModalOpen(false)} onConfirm={handleConfirmDelete} />
-        </div>
+      {/* Sección de información y botón añadir */}
+      <div className="flex items-center justify-between">
+        {teams.length === 0 ? (
+          <p className="text-gray-600 dark:text-gray-300">
+            No hay equipos de trabajo disponibles. Pulsa el botón + para crear un nuevo team.
+          </p>
+        ) : (
+          <p className="text-gray-600 dark:text-gray-300">
+            Teams disponibles. Puedes seguir creando nuevos teams.
+          </p>
+        )}
+        <button
+          onClick={handleOpenModal}
+          className="flex items-center justify-center bg-[#00324d] hover:bg-[#40b003] dark:bg-[#40b003] dark:hover:bg-[#2a7d02] text-white px-4 py-2 rounded-lg transition-colors duration-300"
+        >
+          <MdAdd className="mr-2" /> Añadir Team
+        </button>
       </div>
+
+      {/* Grid de equipos */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
+        {teams.map((team) => (
+          <div
+            key={team.id}
+            className="w-full rounded-2xl overflow-hidden shadow-md bg-white dark:bg-[#003044] relative p-6 hover:shadow-lg transition duration-300 border border-gray-200 dark:border-gray-600 flex flex-col"
+          >
+            {/* Línea diagonal decorativa */}
+            <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-[#00324d] dark:border-t-[#40b003] border-l-[240px] border-l-transparent z-0" />
+
+            <div className="relative z-10 flex flex-col flex-grow">
+              {/* Título y botón "Ver más" */}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-[#00324d] dark:text-white">{team.name}</h2>
+                <button
+                  onClick={handleOpenAgregarInfo}
+                  className="text-sm font-medium text-white bg-[#40b003] hover:bg-[#2a7d02] dark:bg-[#40b003] dark:hover:bg-[#2a7d02] px-3 py-1 rounded-md shadow transition-colors duration-300"
+                >
+                  Ver Más
+                </button>
+              </div>
+
+              {/* Team ID */}
+              <div className="mb-3">
+                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400">Team ID</h3>
+                <p className="text-gray-800 dark:text-gray-200">{team.id}</p>
+              </div>
+
+              {/* Miembros con altura limitada y scroll si hay muchos */}
+              {team.members && (
+                <div className="mb-4 max-h-28 overflow-y-auto">
+                  <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400">Miembros del equipo</h3>
+                  <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 text-sm">
+                    {team.members.split(',').map((member, index) => (
+                      <li key={index}>{member.trim()}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Botones alineados abajo */}
+              <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-200 dark:border-gray-600">
+                <button
+                  onClick={handleOpenAddInfoModal}
+                  className="flex items-center gap-2 text-[#00324d] dark:text-[#40b003] hover:text-[#40b003] dark:hover:text-[#2a7d02] transition-colors duration-300"
+                >
+                  <MdAddCircle className="text-2xl" />
+                  <span className="text-sm font-medium">Agregar Información</span>
+                </button>
+                <button
+                  onClick={() => handleOpenConfirmModal(team.id)}
+                  className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-300"
+                  title="Eliminar equipo"
+                >
+                  <FaTrashAlt className="text-xl" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Modales */}
+      <ModalNewProject isOpen={modalOpen} onClose={handleCloseModal} onCreate={handleCreateTeam} />
+      <ModalAddInformation isOpen={openAddInfoModal} onClose={handleCloseAddInfoModal} />
+      <ModalComponent isOpen={openAgregarInfo} onClose={handleCloseAgregarInfo} />
+      <ModalEliminarTeam isOpen={confirmModalOpen} onClose={() => setConfirmModalOpen(false)} onConfirm={handleConfirmDelete} />
+
+      {/* Toast Container */}
       <ToastContainer />
     </div>
   );

@@ -54,24 +54,24 @@ export const Sidebar = ({ role }) => {
     return (
         <div className="grid grid-flow-row font-inter">
             <div className="flex relative">
-                <div className={`min-h-screen h-full overflow-y-auto fixed xl:static bg-green-gradient dark:bg-blue-gradient w-4/5 md:w-2/5 lg:w-1/3 xl:w-auto border-r border-gray-300 xl:border-r-0 top-0 p-8 z-50 flex flex-col justify-between transition-all text-white ${showMenu ? "left-0" : "-left-full"}`}>
+                <div className={`min-h-screen h-full overflow-y-auto fixed xl:static bg-green-gradient dark:bg-blue-gradient w-4/5 md:w-2/5 lg:w-1/3 xl:w-auto border-r border-gray-300 xl:border-r-0 top-0 p-8 z-50 flex flex-col justify-between transition-all ${showMenu ? "left-0" : "-left-full"}`}>
 
                     <div>
                         {/* LOGO */}
                         <div className="flex items-center mb-10">
                             <Image src="/img/LogoAquilesWhite.png" alt="Logo Aquiles" width={96} height={96} />
-                            <span className="text-xs font-inter text-grayText">
+                            <span className="text-xs font-inter text-gray-300 dark:text-white">
                                 PROYECTOS FORMATIVOS (C.S.F.) {role?.toUpperCase()}
                             </span>
                         </div>
 
                         {/* Menú con todos los items */}
-                        <ul className="text-grayText">
+                        <ul className="text-gray-600 dark:text-white">
                             {menuItems.map((item, index) => (
                                 <li key={index}>
                                     <Link
                                         href={item.href}
-                                        className="flex items-center gap-4 py-3 px-4 hover:bg-darkGreen dark:hover:bg-shadowBlue rounded-xl transition-colors"
+                                        className="flex items-center gap-4 py-3 px-4 hover:bg-darkGreen dark:hover:bg-shadowBlue rounded-xl transition-colors text-gray-600 dark:text-white"
                                     >
                                         {item.icon}
                                         {item.label}
