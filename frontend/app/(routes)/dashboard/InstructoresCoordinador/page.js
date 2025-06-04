@@ -147,7 +147,7 @@ export default function InstructoresCoordinador() {
         <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
             <div className="xl:col-span-5">
                 <main className="container mx-auto p-6">
-                    <h1 className="text-3xl font-bold text-[#00324d] mb-6">Instructores</h1>
+                    <h1 className="text-[#01b001] dark:text-blue-400 text-3xl lg:text-4xl pb-3 border-b-2 border-gray-300 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">Instructores</h1>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {instructors.map((instructor, index) => (
                             <InstructorCard key={index} instructor={instructor} />

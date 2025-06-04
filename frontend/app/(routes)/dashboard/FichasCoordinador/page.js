@@ -66,7 +66,7 @@ const FichasCoordinator = () => {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <div className="xl:col-span-5">
         <div className="container mx-auto p-6 space-y-8">
-          <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
+          <h1 className="text-[#01b001] dark:text-blue-400 text-3xl lg:text-4xl pb-3 border-b-2 border-gray-300 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
             Asignación de Instructores a Fichas
           </h1>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

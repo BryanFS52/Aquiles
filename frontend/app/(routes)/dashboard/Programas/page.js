@@ -126,7 +126,7 @@ export default function Programas() {
         ) : (
           <div className="col-span-full text-center py-12">
             <p className="text-gray-500 dark:text-gray-400 text-lg">
-              No se encontraron programas que coincidan con "{searchTerm}"
+              No se encontraron programas que coincidan con {searchTerm}
             </p>
           </div>
         )}

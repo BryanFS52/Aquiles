@@ -106,7 +106,7 @@ export default function Home() {
   return (
     <div className="space-y-6">
       {/* Título principal */}
-      <h1 className="text-3xl font-bold text-[#00324d] dark:text-white hover:text-[#01b001] dark:hover:text-[#01b001] transition-colors duration-300">
+      <h1 className="text-[#01b001] dark:text-blue-400 text-3xl lg:text-4xl pb-3 border-b-2 border-gray-300 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
         Team Scrums
       </h1>
 

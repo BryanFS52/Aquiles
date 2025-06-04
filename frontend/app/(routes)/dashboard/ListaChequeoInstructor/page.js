@@ -124,7 +124,7 @@ export default function InstructorChecklistView() {
     <div className="w-full">
       {/* Contenido principal adaptado al layout */}
       <div className="p-6 space-y-6">
-        <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
+        <h1 className="text-[#01b001] dark:text-blue-400 text-3xl lg:text-4xl pb-3 border-b-2 border-gray-300 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
           Lista de Chequeo - Vista del Instructor
         </h1>
 
