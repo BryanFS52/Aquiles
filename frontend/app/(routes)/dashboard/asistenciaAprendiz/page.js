@@ -202,106 +202,97 @@ export default function AsistenciaAprendiz() {
 
 
   return (
-    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-      {/* Inyectar estilos CSS personalizados */}
-      <style dangerouslySetInnerHTML={{ __html: customStyles }} />
-      <div className="xl:col-span-5">
-        <div className="h-[90vh] overflow-y-auto p-4 sm:p-6 md:p-8 lg:p-12">
-          <h1 className="text-[#0e324d] text-xl sm:text-2xl md:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-4 sm:mb-6 lg:mb-12 font-inter font-semibold">
-            Mi Asistencia
-          </h1>
-
-          <div className="w-full h-auto border-2 border-gray-400 rounded-lg overflow-hidden shadow-lg bg-zinc-100 relative mb-4 p-2 sm:p-4">
-            <div className="w-full">
-              <div className="w-full h-auto rounded-lg overflow-hidden shadow-lg bg-white border-2 border-gray-300 relative mb-4 p-2 sm:p-3 mt-4 sm:mt-6">
-
-                {/* Header de mes y filtros */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-                  <h1 className="text-green-600 font-inter font-semibold text-xl sm:text-2xl md:text-3xl ml-2 sm:ml-6">
-                    Calendario
-                  </h1>
-
-                  <div className="relative w-full sm:w-72 h-10 mr-2 sm:mr-6">
-                    <button
-                      className="font-inter font-normal h-8 w-full sm:w-48 pl-2 pr-10 text-sm rounded-lg border-2 border-slate-300 dark:text-black focus:outline-none focus:border-slate-300 flex items-center justify-between"
-                      onClick={toggleDropdown}
-                      type="button"
+    <div className="w-full min-h-screen">
+      <div className="p-0 sm:p-0 md:p-0 xl:p-0 h-full flex flex-col justify-start">
+        <h1 className="text-darkGreen dark:text-blue-400 text-3xl lg:text-4xl pb-3 border-b-2 border-darkGreen/20 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300 mb-6 px-4 pt-6">
+          Mi Asistencia
+        </h1>
+        {/* Header de mes y filtros */}
+        <div className="w-full max-w-4xl flex flex-col gap-4 px-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 w-full">
+            <h2 className="text-darkGreen dark:text-blue-400 font-inter font-semibold text-xl sm:text-2xl md:text-3xl ml-0 sm:ml-6">
+              Calendario
+            </h2>
+            <div className="relative w-full sm:w-72 h-10 mr-0 sm:mr-6">
+              <button
+                className="font-inter font-normal h-8 w-full sm:w-48 pl-2 pr-10 text-sm rounded-lg border-2 border-darkGreen/20 dark:border-gray-600 bg-white dark:bg-gray-800 text-darkBlue dark:text-white focus:outline-none focus:border-slate-300 flex items-center justify-between"
+                onClick={toggleDropdown}
+                type="button"
+              >
+                <span className="truncate">{getFilterText()}</span>
+                <IoIosArrowDown className="text-darkBlue dark:text-blue-400 cursor-pointer flex-shrink-0 ml-2" />
+              </button>
+              {isDropdownOpen && (
+                <div className="absolute top-12 right-0 w-full sm:w-48 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg z-20">
+                  <ul className="text-sm">
+                    <li
+                      className="font-inter flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={() => handleFilterChange('Inasistencia')}
                     >
-                      <span className="truncate">{getFilterText()}</span>
-                      <IoIosArrowDown className="text-black cursor-pointer flex-shrink-0 ml-2" />
-                    </button>
-                    {isDropdownOpen && (
-                      <div className="absolute top-12 right-0 w-full sm:w-48 bg-white border border-gray-300 rounded shadow-lg z-20">
-                        <ul className="text-sm">
-                          <li
-                            className="font-inter flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
-                            onClick={() => handleFilterChange('Inasistencia')}
-                          >
-                            <span className="text-red-500 mr-2 flex-shrink-0">❌</span>
-                            <span className="truncate">Inasistencia</span>
-                          </li>
-                          <li
-                            className="font-inter flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
-                            onClick={() => handleFilterChange('Retardo')}
-                          >
-                            <span className="text-yellow-500 mr-2 flex-shrink-0">🟡</span>
-                            <span className="truncate">Retardo</span>
-                          </li>
-                          <li
-                            className="font-inter flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
-                            onClick={() => handleFilterChange('Justificacion')}
-                          >
-                            <span className="text-blue-500 mr-2 flex-shrink-0">🟦</span>
-                            <span className="truncate">Justificación</span>
-                          </li>
-                          <li
-                            className="font-inter flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
-                            onClick={() => handleFilterChange('all')}
-                          >
-                            <span className="mr-2 flex-shrink-0">📅</span>
-                            <span className="truncate">Todos</span>
-                          </li>
-                        </ul>
-                      </div>
-                    )}
-                  </div>
+                      <span className="text-red-500 mr-2 flex-shrink-0">❌</span>
+                      <span className="truncate">Inasistencia</span>
+                    </li>
+                    <li
+                      className="font-inter flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={() => handleFilterChange('Retardo')}
+                    >
+                      <span className="text-yellow-500 mr-2 flex-shrink-0">🟡</span>
+                      <span className="truncate">Retardo</span>
+                    </li>
+                    <li
+                      className="font-inter flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={() => handleFilterChange('Justificacion')}
+                    >
+                      <span className="text-blue-500 mr-2 flex-shrink-0">🟦</span>
+                      <span className="truncate">Justificación</span>
+                    </li>
+                    <li
+                      className="font-inter flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={() => handleFilterChange('all')}
+                    >
+                      <span className="mr-2 flex-shrink-0">📅</span>
+                      <span className="truncate">Todos</span>
+                    </li>
+                  </ul>
                 </div>
-
-                {/* Leyenda responsive para móviles */}
-                {isMobile && (
-                  <div className="mb-4 px-2">
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="flex items-center">
-                        <span className="text-red-500 mr-1">❌</span>
-                        <span>Inasistencia</span>
-                      </div>
-                      <div className="flex items-center">
-                        <span className="text-yellow-500 mr-1">🟡</span>
-                        <span>Retardo</span>
-                      </div>
-                      <div className="flex items-center">
-                        <span className="text-blue-500 mr-1">🟦</span>
-                        <span>Justificación</span>
-                      </div>
-                      <div className="flex items-center">
-                        <span className="mr-1">📅</span>
-                        <span>Todos</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Calendario ScheduleX */}
-                <div className="mt-4 sm:mt-6 mx-2 sm:mx-6">
-                  <ScheduleXCalendar
-                    calendarApp={calendar}
-                  />
+              )}
+            </div>
+          </div>
+          {/* Leyenda responsive para móviles */}
+          {isMobile && (
+            <div className="mb-4 px-2">
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex items-center">
+                  <span className="text-red-500 mr-1">❌</span>
+                  <span>Inasistencia</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="text-yellow-500 mr-1">🟡</span>
+                  <span>Retardo</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="text-blue-500 mr-1">🟦</span>
+                  <span>Justificación</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="mr-1">📅</span>
+                  <span>Todos</span>
                 </div>
               </div>
+            </div>
+          )}
+        </div>
+        {/* Calendario ScheduleX expandido y alineado a la izquierda (max-w-7xl) */}
+        <div className="flex-1 w-full flex flex-col items-start justify-center px-4 pb-6">
+          <div className="w-full max-w-7xl h-full border-2 border-darkGreen/20 dark:border-gray-700 rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800 flex flex-col">
+            <div className="flex-1 w-full h-full flex flex-col">
+              <ScheduleXCalendar calendarApp={calendar} className="flex-1 w-full h-full !min-h-0 !min-w-0" style={{ height: '100%', width: '100%' }} />
             </div>
           </div>
         </div>
       </div>
+      {/* Inyectar estilos CSS personalizados */}
+      <style dangerouslySetInnerHTML={{ __html: customStyles }} />
     </div>
   );
 }

@@ -41,7 +41,6 @@ const MENU_CONFIG = {
         { href: "/dashboard/ListaChequeoCoordinador", label: "Sustentaciones", icon: <IconSustentaciones className='text-2xl' /> },
         { href: "/dashboard/justificacionesCoordinador", label: "Justificaciones", icon: <IconJustificaciones className='text-2xl' /> },
         { href: "/dashboard/Aprendices", label: "Aprendices", icon: <IconAprendices className='text-2xl' /> },
-
     ]
 };
 
@@ -69,38 +68,84 @@ export const Sidebar = ({ role: initialRole }) => {
         <>
             {/* Overlay para móvil */}
             <div
-                className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 lg:hidden ${showMenu ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                className={`
+                    fixed inset-0 bg-black/50 z-40 
+                    transition-opacity duration-300 
+                    lg:hidden 
+                    ${showMenu ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
+                `}
                 onClick={() => setShowMenu(false)}
             />
+
+            {/* Sidebar */}
             <aside
                 className={`
-                    fixed top-0 left-0 z-50 h-full w-[90vw] max-w-xs sm:w-2/5 md:w-1/3 lg:w-1/4 xl:w-[300px]
+                    fixed top-0 left-0 z-50 h-full 
+                    w-[280px] sm:w-[300px]
+                    lg:static lg:w-full lg:max-w-[300px]
                     bg-white/95 dark:bg-gradient-to-b dark:from-shadowBlue dark:to-darkBlue
-                    shadow-2xl transition-transform duration-300
+                    shadow-2xl lg:shadow-none
+                    transition-transform duration-300
                     ${showMenu ? 'translate-x-0' : '-translate-x-full'}
-                    lg:translate-x-0 lg:static lg:shadow-none
+                    lg:translate-x-0
                     flex flex-col justify-between
                     border-r border-darkGreen/10 dark:border-shadowBlue/30
                 `}
             >
-                <div className="p-5 sm:p-7">
-                    {/* Selector temporal de rol (solo para pruebas/desarrollo) */}
-
+                <div className="p-4 lg:p-6 xl:p-7 overflow-y-auto">
                     {/* LOGO */}
-                    <div className="flex items-center gap-4 mb-8">
-                        <Image src="/img/LogoAquilesWhite.png" alt="Logo Aquiles" width={80} height={80} className='bg-green-600 drop-shadow-xl pl-2 py-1 w-[80px] h-[80px] rounded-2xl border-2 border-darkGreen/30 dark:border-shadowBlue/40 dark:bg-darkBlue/80' />
-                        <span className="text-lg font-bold text-darkBlue dark:text-white tracking-wide drop-shadow-md leading-tight">
+                    <div className="flex items-center gap-3 lg:gap-4 mb-6 lg:mb-8">
+                        <Image
+                            src="/img/LogoAquilesWhite.png"
+                            alt="Logo Aquiles"
+                            width={80}
+                            height={80}
+                            className='
+                                bg-green-600 drop-shadow-xl pl-2 py-1 
+                                w-[60px] h-[60px] lg:w-[70px] lg:h-[70px] xl:w-[80px] xl:h-[80px]
+                                rounded-2xl border-2 border-darkGreen/30 
+                                dark:border-shadowBlue/40 dark:bg-darkBlue/80
+                            '
+                        />
+                        <span className="
+                            text-base lg:text-lg font-bold 
+                            text-darkBlue dark:text-white 
+                            tracking-wide drop-shadow-md leading-tight
+                        ">
                             PROYECTOS FORMATIVOS<br />
-                            <span className="uppercase text-[13px] text-darkGreen dark:text-shadowBlue font-extrabold tracking-widest">{role}</span>
+                            <span className="
+                                uppercase text-xs lg:text-[13px] 
+                                text-darkGreen dark:text-lightGreen 
+                                font-extrabold tracking-widest
+                            ">
+                                {role}
+                            </span>
                         </span>
                     </div>
-                    <div className="mb-8 flex items-center justify-center">
-                        <div className="bg-gradient-to-r from-darkGreen/90 to-shadowBlue/90 dark:from-shadowBlue/90 dark:to-darkBlue/90 rounded-xl shadow px-4 py-2 flex gap-2 items-center text-sm font-semibold text-white backdrop-blur-md border border-white/20">
+
+                    {/* Selector temporal de rol */}
+                    <div className="mb-6 lg:mb-8 flex items-center justify-center">
+                        <div className="
+                            bg-gradient-to-r from-darkGreen/90 to-shadowBlue/90 
+                            dark:from-shadowBlue/90 dark:to-darkBlue/90 
+                            rounded-xl shadow px-3 lg:px-4 py-2 
+                            flex gap-2 items-center 
+                            text-sm font-semibold text-white 
+                            backdrop-blur-md border border-white/20
+                        ">
                             <span className="font-bold tracking-wide drop-shadow">Rol:</span>
                             <select
                                 value={role}
                                 onChange={e => setRole(e.target.value)}
-                                className="rounded-lg px-3 py-1 border-2 border-white/30 bg-white/90 dark:bg-darkBlue/80 text-darkBlue dark:text-white font-bold shadow focus:outline-none focus:ring-2 focus:ring-darkGreen/60 transition-all duration-200"
+                                className="
+                                    rounded-lg px-2 lg:px-3 py-1 
+                                    border-2 border-white/30 
+                                    bg-white/90 dark:bg-darkBlue/80 
+                                    text-darkBlue dark:text-white 
+                                    font-bold shadow text-sm
+                                    focus:outline-none focus:ring-2 focus:ring-darkGreen/60 
+                                    transition-all duration-200
+                                "
                             >
                                 <option value="instructor">Instructor</option>
                                 <option value="aprendiz">Aprendiz</option>
@@ -108,6 +153,7 @@ export const Sidebar = ({ role: initialRole }) => {
                             </select>
                         </div>
                     </div>
+
                     {/* Menú dinámico */}
                     <nav>
                         <ul className="space-y-2">
@@ -115,17 +161,32 @@ export const Sidebar = ({ role: initialRole }) => {
                                 <li key={idx}>
                                     <Link
                                         href={item.href}
-                                        className="flex items-center gap-3 py-2 px-3 rounded-xl transition-all text-base
+                                        className="
+                                            flex items-center gap-3 
+                                            py-2.5 lg:py-3 px-3 lg:px-4
+                                            rounded-xl transition-all 
+                                            text-sm lg:text-base
                                             text-darkBlue dark:text-white
                                             bg-white/70 dark:bg-shadowBlue/50
                                             hover:bg-lightGreen/80 dark:hover:bg-darkGreen/70
                                             hover:text-white dark:hover:text-lightGreen
-                                            font-semibold group shadow-sm hover:shadow-lg border border-darkGreen/10 dark:border-shadowBlue/30
-                                            duration-200"
+                                            font-semibold group shadow-sm hover:shadow-lg 
+                                            border border-darkGreen/10 dark:border-shadowBlue/30
+                                            duration-200
+                                        "
                                         onClick={handleLinkClick}
                                     >
-                                        <span className="transition-transform group-hover:scale-125 text-2xl drop-shadow">{item.icon}</span>
-                                        <span className="tracking-wide text-base font-semibold">{item.label}</span>
+                                        <span className="
+                                            transition-transform group-hover:scale-125 
+                                            text-xl lg:text-2xl drop-shadow flex-shrink-0
+                                        ">
+                                            {item.icon}
+                                        </span>
+                                        <span className="
+                                            tracking-wide font-semibold truncate
+                                        ">
+                                            {item.label}
+                                        </span>
                                     </Link>
                                 </li>
                             ))}
@@ -133,10 +194,19 @@ export const Sidebar = ({ role: initialRole }) => {
                     </nav>
                 </div>
             </aside>
+
             {/* Botón toggle para móvil */}
             <button
                 onClick={() => setShowMenu(!showMenu)}
-                className='fixed bottom-4 right-4 z-50 text-white bg-gradient-to-br from-darkGreen to-shadowBlue p-3 text-2xl rounded-full shadow-2xl border-2 border-white/30 lg:hidden transition-all duration-200 hover:scale-110 active:scale-95'
+                className='
+                    fixed bottom-4 right-4 z-50 
+                    text-white bg-gradient-to-br from-darkGreen to-shadowBlue 
+                    p-3 text-2xl rounded-full shadow-2xl 
+                    border-2 border-white/30 
+                    lg:hidden 
+                    transition-all duration-200 
+                    hover:scale-110 active:scale-95
+                '
                 aria-label="Abrir menú"
             >
                 {showMenu ? <IoClose /> : <FiAlignRight />}

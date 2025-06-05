@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { IoPeople } from "react-icons/io5";
-import ApprenticeModal from "@/components/Modals/apprenticeModal";
+import ApprenticeModal from '@components/Modals/apprenticeModal';
 
 // Datos locales simulados
 const fichaMock = {

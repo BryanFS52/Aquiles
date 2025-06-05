@@ -1,70 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { notificationsData } from "@data/notificationData";
 import Image from "next/image";
-
-// ... (tus datos de notificaciones y fetchReminderNotifications permanecen igual)
-const notificationsData = [
-  {
-    id: 1,
-    user: 'Coordinación',
-    action: 'Acercarse el dia sabado 17 de julio a las',
-    content: '8:00 am',
-    time: '1m ago',
-    unread: true,
-    avatar: '/img/InstructorAvatar.jpg',
-  },
-  {
-    id: 2,
-    user: 'Diego Boada',
-    action: 'Es tu nuevo instructor tecnico',
-    time: '1h ago',
-    unread: true,
-    avatar: '/img/InstructorAvatar.jpg',
-  },
-  {
-    id: 3,
-    user: 'Julian Paredes',
-    action: 'Nuevo aprendiz en la ficha',
-    content: '278483',
-    time: '1 day ago',
-    unread: true,
-    avatar: '/img/InstructorAvatar.jpg',
-  },
-  {
-    id: 4,
-    user: 'Katalina Torres',
-    action: 'Ha subido la justificación de su ausencia en el componente',
-    time: '5 days ago',
-    unread: false,
-    avatar: '/img/InstructorAvatar.jpg',
-    // image: '/assets/images/image-chess.webp',
-  },
-  {
-    id: 5,
-    user: 'Paula Contreras',
-    action: 'No asistió al componente de Bases de datos',
-    time: '1 week ago',
-    unread: false,
-    avatar: '/img/InstructorAvatar.jpg',
-  },
-  {
-    id: 6,
-    user: 'Natalia Martinez',
-    action: 'Asignación a la nueva ficha',
-    content: '2968472',
-    time: '2 weeks ago',
-    unread: false,
-    avatar: '/img/InstructorAvatar.jpg',
-  },
-  {
-    id: 7,
-    user: 'Anna Rincon',
-    action: 'es nueva la instructora tecnica de la ficha',
-    content: '255794',
-    time: '2 weeks ago',
-    unread: false,
-    avatar: '/img/InstructorAvatar.jpg',
-  },
-];
 
 // Simulación de recordatorios basados en plazos de justificaciones
 const fetchReminderNotifications = () => {
@@ -125,9 +61,9 @@ export const Notifications = () => {
         </button>
       </div>
       <ul className="p-2 max-h-96 overflow-y-auto">
-        {notifications.map((notification) => (
+        {notifications.map((notification, index) => (
           <li
-            key={notification.id}
+            key={`${notification.id}-${index}`} // combina id + índice para asegurar unicidad
             className={`flex items-center p-2 rounded-lg cursor-pointer ${notification.unread ? 'bg-blue-50' : ''}`}
             onClick={() => handleNotificationClick(notification.id)}
           >
@@ -142,7 +78,10 @@ export const Notifications = () => {
             </div>
             <div className="ml-4 flex-1">
               <p className="text-[#00324d]">
-                <strong className="hover:text-[#40b003]">{notification.user}</strong> {notification.action} {notification.content && <strong className="text-[#40b003]">{notification.content}</strong>}
+                <strong className="hover:text-[#40b003]">{notification.user}</strong> {notification.action}{' '}
+                {notification.content && (
+                  <strong className="text-[#40b003]">{notification.content}</strong>
+                )}
               </p>
               <p className="text-gray-500 text-sm">{notification.time}</p>
             </div>

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import qrCodeService from "@/services/qrService";
+import { useState, useEffect } from "react";
+import qrCodeService from "@services/qrService";
 import { BsQrCode } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 import axios from "axios";

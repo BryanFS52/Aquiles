@@ -25,7 +25,7 @@ export default function ClientLayoutWrapper({ children }) {
         },
     };
 
-    const currentRole = 'coordinador';
+    const currentRole = 'instructor';
     const user = users[currentRole];
 
     return (

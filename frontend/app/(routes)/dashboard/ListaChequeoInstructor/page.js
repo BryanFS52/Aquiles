@@ -3,14 +3,7 @@
 import { useState, useMemo } from "react";
 import { Check, FileDown, Save, UploadCloud, X } from "lucide-react";
 import Image from "next/image";
-import { checklistData } from "@data/checklistData";
-
-const teams = [
-  { id: 1, name: "Team 1" },
-  { id: 2, name: "Team 2" },
-  { id: 3, name: "Team 3" },
-  { id: 4, name: "Team 4" }
-];
+import { checklistData, teams } from "@data/checklistData";
 
 export default function InstructorChecklistView() {
   const [selectedTrimester, setSelectedTrimester] = useState("Trimestre 1");
@@ -76,23 +69,23 @@ export default function InstructorChecklistView() {
 
         {/* Información del centro y datos generales */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 bg-white shadow rounded space-y-2">
-            <p className="text-2xl font-bold text-[#00324d]">Centro de Formación:</p>
-            <p className="text-base">Centro de Servicios Financieros</p>
-            <p className="text-2xl font-bold text-[#00324d]">Fecha:</p>
-            <p className="text-base">05/02/2024 - 05/05/2024</p>
+          <div className="p-4 bg-white dark:bg-[#002033] shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
+            <p className="text-2xl font-bold text-darkGreen dark:text-blue-400">Centro de Formación:</p>
+            <p className="text-base text-darkBlue dark:text-white">Centro de Servicios Financieros</p>
+            <p className="text-2xl font-bold text-darkGreen dark:text-blue-400">Fecha:</p>
+            <p className="text-base text-darkBlue dark:text-white">05/02/2024 - 05/05/2024</p>
           </div>
-          <div className="p-4 bg-white shadow rounded space-y-2">
-            <p className="text-2xl font-bold text-[#00324d]">Jornada:</p>
-            <p className="text-base">Diurna</p>
-            <p className="text-2xl font-bold text-[#00324d]">Ficha:</p>
-            <p className="text-base">2558735</p>
+          <div className="p-4 bg-white dark:bg-[#002033] shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
+            <p className="text-2xl font-bold text-darkGreen dark:text-blue-400">Jornada:</p>
+            <p className="text-base text-darkBlue dark:text-white">Diurna</p>
+            <p className="text-2xl font-bold text-darkGreen dark:text-blue-400">Ficha:</p>
+            <p className="text-base text-darkBlue dark:text-white">2558735</p>
           </div>
-          <div className="p-4 bg-white shadow rounded space-y-2">
-            <p className="text-2xl font-bold text-[#00324d]">Instructor Calificador:</p>
-            <p className="text-base">Juan Pérez</p>
-            <p className="text-2xl font-bold text-[#00324d]">Team</p>
-            <select onChange={(e) => handleTeamChange(e.target.value)} className="border rounded p-2 w-full">
+          <div className="p-4 bg-white dark:bg-[#002033] shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
+            <p className="text-2xl font-bold text-darkGreen dark:text-blue-400">Instructor Calificador:</p>
+            <p className="text-base text-darkBlue dark:text-white">Juan Pérez</p>
+            <p className="text-2xl font-bold text-darkGreen dark:text-blue-400">Team</p>
+            <select onChange={(e) => handleTeamChange(e.target.value)} className="border rounded p-2 w-full bg-white dark:bg-[#001829] text-darkBlue dark:text-white border-darkGreen/20 dark:border-shadowBlue/40 focus:ring-2 focus:ring-darkGreen/40">
               {teams.map((team) => (
                 <option key={team.id} value={team.id.toString()}>
                   {team.name}
@@ -108,7 +101,7 @@ export default function InstructorChecklistView() {
             <select
               onChange={(e) => handleTrimesterChange(e.target.value)}
               value={selectedTrimester}
-              className="border rounded p-2"
+              className="p-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300 "
             >
               {Object.keys(checklistData).map((trimester) => (
                 <option key={trimester} value={trimester}>
@@ -149,21 +142,23 @@ export default function InstructorChecklistView() {
 
         {/* Tabla principal */}
         <div className="overflow-x-auto bg-white shadow-md rounded-lg border border-gray-300">
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr>
-                <th className="text-xl font-bold text-[#00324d] p-3 text-center">Item</th>
-                <th className="text-xl font-bold text-[#00324d] p-3 text-left">Indicadores y/o Variables</th>
-                <th className="text-xl font-bold text-[#00324d] p-3 text-center">Sí / No</th>
-                <th className="text-xl font-bold text-[#00324d] p-3 text-left">Observaciones</th>
+          <table className="min-w-full text-sm  text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
+            <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-600 text-gray-600 dark:text-gray-400">
+              <tr className="font-medium text-gray-900 dark:text-white">
+                <th className="text-xl font-bold p-3 text-center">Item</th>
+                <th className="text-xl font-bold p-3 text-left">Indicadores y/o Variables</th>
+                <th className="text-xl font-bold p-3 text-center">Sí / No</th>
+                <th className="text-xl font-bold p-3 text-left">Observaciones</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {currentItems.map((item) => (
-                <tr key={item.id} className="border-t">
-                  <td className="p-6 text-center">{item.id}</td>
-                  <td className="p-6">{item.indicator}</td>
-                  <td className="p-6 text-center">
+                <tr key={item.id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                >
+                  <td className="p-6 text-center font-medium text-gray-900 dark:text-white">{item.id}</td>
+                  <td className="p-6 font-medium text-gray-900 dark:text-white">{item.indicator}</td>
+                  <td className="p-6 text-center font-medium text-gray-900 dark:text-white">
                     <div className="flex justify-center space-x-2">
                       <label className="flex items-center space-x-1">
                         <input
@@ -226,11 +221,11 @@ export default function InstructorChecklistView() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
           {/* Firma Instructor Técnico Anterior */}
           <div className="bg-white p-4 rounded-lg shadow-md border border-gray-300">
-            <p className="text-lg font-semibold text-[#00324d] text-center mb-4">Instructor técnico anterior</p>
+            <p className="text-lg font-semibold text-center mb-4">Instructor técnico anterior</p>
             <div className="flex flex-col items-center">
               <label className="flex flex-col items-center cursor-pointer mb-3 p-4 border-2 border-dashed border-[#00324d] rounded-lg w-full hover:border-[#01b001] transition-colors duration-300">
-                <UploadCloud className="w-8 h-8 text-[#00324d] hover:text-[#01b001] transition-colors duration-300 mb-2" />
-                <span className="text-[#00324d] font-semibold text-sm text-center">Subir firma</span>
+                <UploadCloud className="w-8 h-8 hover:text-[#01b001] transition-colors duration-300 mb-2" />
+                <span className="font-semibold text-sm text-center">Subir firma</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -254,11 +249,11 @@ export default function InstructorChecklistView() {
 
           {/* Firma Instructor Técnico Nuevo */}
           <div className="bg-white p-4 rounded-lg shadow-md border border-gray-300">
-            <p className="text-lg font-semibold text-[#00324d] text-center mb-4">Instructor técnico nuevo</p>
+            <p className="text-lg font-semibold text-center mb-4">Instructor técnico nuevo</p>
             <div className="flex flex-col items-center">
               <label className="flex flex-col items-center cursor-pointer mb-3 p-4 border-2 border-dashed border-[#00324d] rounded-lg w-full hover:border-[#01b001] transition-colors duration-300">
-                <UploadCloud className="w-8 h-8 text-[#00324d] hover:text-[#01b001] transition-colors duration-300 mb-2" />
-                <span className="text-[#00324d] font-semibold text-sm text-center">Subir firma</span>
+                <UploadCloud className="w-8 h-8 hover:text-[#01b001] transition-colors duration-300 mb-2" />
+                <span className="font-semibold text-sm text-center">Subir firma</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -281,6 +276,6 @@ export default function InstructorChecklistView() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   )
 }

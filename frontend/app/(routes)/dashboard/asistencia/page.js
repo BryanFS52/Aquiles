@@ -5,7 +5,7 @@ import { BsPersonCircle } from "react-icons/bs";
 import TableAttendance from "@components/tableAttendance";
 import { FaCheck } from "react-icons/fa";
 import { TbLetterR, TbLetterX, TbLetterJ } from "react-icons/tb";
-import studySheetService from '@/services/olympo/studySheetService';
+import studySheetService from '@services/olympo/studySheetService';
 
 export default function Attendance() {
     const [studySheet, setStudySheet] = useState(null);
