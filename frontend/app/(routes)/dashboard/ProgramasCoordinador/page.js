@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import programService from '@services/Olympo/programService';
+import programService from '@/services/olympo/programService';
 import { FaComputer, FaPeopleRoof } from 'react-icons/fa6';
 import { FaPeopleCarry } from 'react-icons/fa';
 import { AiOutlineStock } from 'react-icons/ai';

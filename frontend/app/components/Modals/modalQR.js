@@ -1,11 +1,13 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
-import qrCodeService from "@services/QRService";
+import qrCodeService from "@/services/qrService";
 import { BsQrCode } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import Image from "next/image";
 
 const ModalQR = ({ isOpen, onClose }) => {
   const [timer, setTimer] = useState(900);
@@ -221,9 +223,11 @@ const ModalQR = ({ isOpen, onClose }) => {
           <div className="flex justify-center">
             <div className="w-56 h-56 sm:w-72 sm:h-72">
               {qrCodeImage ? (
-                <img
+                <Image
                   src={qrCodeImage}
                   alt="QR Code"
+                  width={300}
+                  height={300}
                   className="w-full h-full object-cover"
                 />
               ) : (

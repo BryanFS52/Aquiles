@@ -1,5 +1,5 @@
 import { clientLAN } from '@lib/apollo-client'
-import { GET_STUDENTS, GET_STUDENT_LIST } from '@graphql/Olympo/studentsGraph';
+import { GET_STUDENTS, GET_STUDENT_LIST } from '@/graphql/olympo/studentsGraph';
 
 const studentService = {
     getStudents: async ({ name, idStudySheet, page = 0, size = 10 } = {}) => {

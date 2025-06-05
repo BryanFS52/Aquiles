@@ -57,6 +57,9 @@
       "@context/*": [
         "./app/context/*"
       ],
+      "@data/*": [
+        "app/data/*"
+      ],
     }
   },
   "include": [

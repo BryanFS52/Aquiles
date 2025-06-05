@@ -1,4 +1,5 @@
 'use client';
+import Image from "next/image";
 
 export default function Perfil() {
     return (
@@ -11,9 +12,12 @@ export default function Perfil() {
                     <div className="inline-block w-full sm:w-4/6 md:w-3/4 lg:w-4/6 relative border border-gray-400 rounded-lg p-4 sm:p-6 md:p-8 mx-4 sm:mx-8 md:mx-12 lg:mx-36">
                         <div className="flex flex-col sm:flex-row items-start">
                             <div className="mb-4 sm:mb-0 sm:mr-8">
-                                <img
+                                <Image
                                     src="https://img.freepik.com/foto-gratis/joven-bella-mujer-pie-sobre-pared-blanca_114579-90514.jpg"
-                                    className="w-40 h-40 sm:w-60 sm:h-60 object-cover rounded-full"
+                                    alt="Foto de perfil"
+                                    width={240}
+                                    height={240}
+                                    className="rounded-full object-cover"
                                 />
                             </div>
 

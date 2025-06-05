@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { useRouter } from 'next/navigation';
 import { createEventsServicePlugin } from '@schedule-x/events-service'
 import { useNextCalendarApp, ScheduleXCalendar } from '@schedule-x/react'
 import '@schedule-x/theme-default/dist/index.css'
+import { allEvents } from '@data/allEvents';
 
 // Estilos CSS personalizados para forzar los colores y responsividad
 const customStyles = `
@@ -124,102 +125,15 @@ export default function AsistenciaAprendiz() {
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-  // Eventos base
-  const allEvents = [
-    // Semana actual (19-23 Mayo 2025)
-    {
-      id: '1',
-      title: 'Justificado',
-      start: '2025-05-23', // Viernes
-      end: '2025-05-23',
-      className: 'calendar-event-justificacion',
-      type: 'Justificacion',
-    },
-    {
-      id: '2',
-      title: 'Inasistencia',
-      start: '2025-05-22', // Jueves
-      end: '2025-05-22',
-      className: 'calendar-event-inasistencia',
-      type: 'Inasistencia',
-    },
-    {
-      id: '3',
-      title: 'Retardo',
-      start: '2025-05-21', // Miércoles
-      end: '2025-05-21',
-      className: 'calendar-event-retardo',
-      type: 'Retardo',
-    },
-    {
-      id: '4',
-      title: 'Inasistencia',
-      start: '2025-05-20', // Martes
-      end: '2025-05-20',
-      className: 'calendar-event-inasistencia',
-      type: 'Inasistencia',
-    },
-    {
-      id: '5',
-      title: 'Justificado',
-      start: '2025-05-19', // Lunes
-      end: '2025-05-19',
-      className: 'calendar-event-justificacion',
-      type: 'Justificacion',
-    },
-    // Semana anterior (12-16 Mayo 2025)
-    {
-      id: '6',
-      title: 'Retardo',
-      start: '2025-05-16', // Viernes
-      end: '2025-05-16',
-      className: 'calendar-event-retardo',
-      type: 'Retardo',
-    },
-    {
-      id: '7',
-      title: 'Inasistencia',
-      start: '2025-05-15', // Jueves
-      end: '2025-05-15',
-      className: 'calendar-event-inasistencia',
-      type: 'Inasistencia',
-    },
-    {
-      id: '8',
-      title: 'Justificado',
-      start: '2025-05-14', // Miércoles
-      end: '2025-05-14',
-      className: 'calendar-event-justificacion',
-      type: 'Justificacion',
-    },
-    {
-      id: '9',
-      title: 'Retardo',
-      start: '2025-05-13', // Martes
-      end: '2025-05-13',
-      className: 'calendar-event-retardo',
-      type: 'Retardo',
-    },
-    {
-      id: '10',
-      title: 'Inasistencia',
-      start: '2025-05-12', // Lunes
-      end: '2025-05-12',
-      className: 'calendar-event-inasistencia',
-      type: 'Inasistencia',
-    }
-  ];
-
   // Configurar el calendario
   const eventsService = useState(() => createEventsServicePlugin())[0];
 
   // Función para obtener eventos filtrados
-  const getFilteredEvents = () => {
-    if (filter === 'all') {
-      return allEvents;
-    }
+  const getFilteredEvents = useCallback(() => {
+    if (filter === 'all') return allEvents;
     return allEvents.filter(event => event.type === filter);
-  };
+  }, [filter]);
+
 
   // Configurar vistas del calendario según dispositivo
   const getCalendarViews = () => {
@@ -257,19 +171,18 @@ export default function AsistenciaAprendiz() {
   // Actualizar eventos cuando cambie el filtro
   useEffect(() => {
     if (calendar && eventsService) {
-      // Limpiar eventos existentes
       const currentEvents = eventsService.getAll();
       currentEvents.forEach(event => {
         eventsService.remove(event.id);
       });
 
-      // Agregar eventos filtrados
       const filteredEvents = getFilteredEvents();
       filteredEvents.forEach(event => {
         eventsService.add(event);
       });
     }
-  }, [filter, calendar, eventsService]);
+  }, [filter, calendar, eventsService, getFilteredEvents]);
+
 
   // Función para manejar el cambio de filtro
   const handleFilterChange = (newFilter) => {
@@ -286,6 +199,7 @@ export default function AsistenciaAprendiz() {
       default: return 'Todos';
     }
   };
+
 
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">

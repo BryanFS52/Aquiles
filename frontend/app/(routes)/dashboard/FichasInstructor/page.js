@@ -1,47 +1,39 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { IoPeople } from "react-icons/io5";
-import ApprenticeModal from "@components/Modals/ApprenticeModal";
+import ApprenticeModal from "@/components/Modals/apprenticeModal";
 
+// Datos locales simulados
+const fichaMock = {
+  number: "123456",
+  quarter: { name: "Mañana" },
+  program: { name: "Análisis y Desarrollo de Software" },
+  students: [
+    { id: 1, name: "Juan Pérez", attendance: "Presente" },
+    { id: 2, name: "María López", attendance: "Ausente" },
+    { id: 3, name: "Carlos Sánchez", attendance: "Presente" }
+  ]
+};
 const FichasInstructor = () => {
   const [ficha, setFicha] = useState(null);
   const [selectedApprentice, setSelectedApprentice] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
 
-  // Datos locales simulados
-  const fichaMock = {
-    number: "123456",
-    quarter: { name: "Mañana" },
-    program: { name: "Análisis y Desarrollo de Software" },
-    students: [
-      { id: 1, name: "Juan Pérez", attendance: "Presente" },
-      { id: 2, name: "María López", attendance: "Ausente" },
-      { id: 3, name: "Carlos Sánchez", attendance: "Presente" }
-    ]
-  };
-
-  const fetchFicha = () => {
-    try {
-      // Simula la carga de datos locales
-      const data = {
-        ...fichaMock,
-        numberStudents: fichaMock.students.length // Calcula el número de estudiantes
-      };
-      setFicha(data);
-    } catch (error) {
-      console.error("Error fetching ficha:", error);
-    }
-  };
-
   useEffect(() => {
-    fetchFicha(); // Llama la función al iniciar
+    const fetchFicha = () => {
+      try {
+        const data = {
+          ...fichaMock,
+          numberStudents: fichaMock.students.length,
+        };
+        setFicha(data);
+      } catch (error) {
+        console.error("Error fetching ficha:", error);
+      }
+    };
 
-    const intervalId = setInterval(() => {
-      fetchFicha(); // Actualiza la ficha cada 10 segundos (10000 ms)
-    }, 10000);
-
-    return () => clearInterval(intervalId); // Limpia el intervalo al desmontar el componente
+    fetchFicha();
   }, []);
 
   const openModal = (apprentice) => {

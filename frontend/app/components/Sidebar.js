@@ -6,7 +6,6 @@ import { FiAlignRight } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import ButtonTheme from "@components/ButtonTheme";
 
 // Íconos dinámicos
 const IconFichas = dynamic(() => import('react-icons/fa').then(mod => mod.FaRegListAlt), { ssr: false });
@@ -88,20 +87,20 @@ export const Sidebar = ({ role: initialRole }) => {
                     {/* Selector temporal de rol (solo para pruebas/desarrollo) */}
 
                     {/* LOGO */}
-                    <div className="flex items-center gap-4 mb-10">
-                        <Image src="/img/LogoAquilesWhite.png" alt="Logo Aquiles" width={70} height={70} className='bg-green-600 drop-shadow-xl pl-2 py-1 w-15 h-15 rounded-3xl border-2 border-darkGreen/30 dark:border-shadowBlue/40 dark:bg-darkBlue/80' />
-                        <span className="text-sm font-bold text-darkBlue dark:text-white tracking-wide drop-shadow-sm">
+                    <div className="flex items-center gap-4 mb-8">
+                        <Image src="/img/LogoAquilesWhite.png" alt="Logo Aquiles" width={80} height={80} className='bg-green-600 drop-shadow-xl pl-2 py-1 w-[80px] h-[80px] rounded-2xl border-2 border-darkGreen/30 dark:border-shadowBlue/40 dark:bg-darkBlue/80' />
+                        <span className="text-lg font-bold text-darkBlue dark:text-white tracking-wide drop-shadow-md leading-tight">
                             PROYECTOS FORMATIVOS<br />
-                            <span className="uppercase text-[11px] text-darkGreen dark:text-shadowBlue font-extrabold tracking-widest">{role}</span>
+                            <span className="uppercase text-[13px] text-darkGreen dark:text-shadowBlue font-extrabold tracking-widest">{role}</span>
                         </span>
                     </div>
                     <div className="mb-8 flex items-center justify-center">
-                        <div className="bg-gradient-to-r from-darkGreen/90 to-shadowBlue/90 dark:from-shadowBlue/90 dark:to-darkBlue/90 rounded-xl shadow px-4 py-2 flex gap-2 items-center text-xs font-medium text-white backdrop-blur-md border border-white/20">
-                            <span className="font-semibold tracking-wide drop-shadow">Rol:</span>
+                        <div className="bg-gradient-to-r from-darkGreen/90 to-shadowBlue/90 dark:from-shadowBlue/90 dark:to-darkBlue/90 rounded-xl shadow px-4 py-2 flex gap-2 items-center text-sm font-semibold text-white backdrop-blur-md border border-white/20">
+                            <span className="font-bold tracking-wide drop-shadow">Rol:</span>
                             <select
                                 value={role}
                                 onChange={e => setRole(e.target.value)}
-                                className="rounded-lg px-3 py-1 border-2 border-white/30 bg-white/80 dark:bg-darkBlue/80 text-darkBlue dark:text-white font-semibold shadow focus:outline-none focus:ring-2 focus:ring-darkGreen/60 transition-all duration-200"
+                                className="rounded-lg px-3 py-1 border-2 border-white/30 bg-white/90 dark:bg-darkBlue/80 text-darkBlue dark:text-white font-bold shadow focus:outline-none focus:ring-2 focus:ring-darkGreen/60 transition-all duration-200"
                             >
                                 <option value="instructor">Instructor</option>
                                 <option value="aprendiz">Aprendiz</option>
@@ -111,35 +110,27 @@ export const Sidebar = ({ role: initialRole }) => {
                     </div>
                     {/* Menú dinámico */}
                     <nav>
-                        <ul className="space-y-3">
+                        <ul className="space-y-2">
                             {menuItems.map((item, idx) => (
                                 <li key={idx}>
                                     <Link
                                         href={item.href}
-                                        className="flex items-center gap-3 py-2 px-4 rounded-xl transition-all
+                                        className="flex items-center gap-3 py-2 px-3 rounded-xl transition-all text-base
                                             text-darkBlue dark:text-white
-                                            hover:bg-darkGreen/15 dark:hover:bg-shadowBlue/40
-                                            hover:text-darkGreen dark:hover:text-shadowBlue
-                                            font-semibold group shadow-sm hover:shadow-md"
+                                            bg-white/70 dark:bg-shadowBlue/50
+                                            hover:bg-lightGreen/80 dark:hover:bg-darkGreen/70
+                                            hover:text-white dark:hover:text-lightGreen
+                                            font-semibold group shadow-sm hover:shadow-lg border border-darkGreen/10 dark:border-shadowBlue/30
+                                            duration-200"
                                         onClick={handleLinkClick}
                                     >
-                                        <span className="transition-transform group-hover:scale-125 text-xl drop-shadow">{item.icon}</span>
-                                        <span className="tracking-wide text-base">{item.label}</span>
+                                        <span className="transition-transform group-hover:scale-125 text-2xl drop-shadow">{item.icon}</span>
+                                        <span className="tracking-wide text-base font-semibold">{item.label}</span>
                                     </Link>
                                 </li>
                             ))}
                         </ul>
                     </nav>
-                </div>
-                <div className="p-5 sm:p-7 border-t border-gray-200 dark:border-shadowBlue/30 flex items-center justify-between bg-white/80 dark:bg-darkBlue/80 rounded-b-2xl">
-                    <ButtonTheme />
-                    <button
-                        className="lg:hidden ml-2 text-gray-500 hover:text-darkGreen dark:hover:text-shadowBlue transition"
-                        onClick={() => setShowMenu(false)}
-                        aria-label="Cerrar menú"
-                    >
-                        <IoClose size={28} />
-                    </button>
                 </div>
             </aside>
             {/* Botón toggle para móvil */}

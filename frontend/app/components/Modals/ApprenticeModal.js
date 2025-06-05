@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
 
 const ApprenticeModal = ({ isOpen, onClose, students }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,7 +19,7 @@ const ApprenticeModal = ({ isOpen, onClose, students }) => {
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-25"
       onClick={handleClickOutside}  // Detectar clics fuera del modal
     >
@@ -67,9 +68,11 @@ const ApprenticeCard = ({ apprentice }) => {
       <div className="flex items-center gap-4">
         <div className="flex-shrink-0">
           <div className="h-12 w-12 rounded-full overflow-hidden">
-            <img
+            <Image
               src={`https://api.dicebear.com/6.x/initials/svg?seed=${apprentice.name} ${apprentice.lastName}`}
               alt={`${apprentice.name} ${apprentice.lastName}`}
+              width={48}
+              height={48}
               className="w-full h-full object-cover"
             />
           </div>
@@ -89,17 +92,17 @@ const ApprenticeCard = ({ apprentice }) => {
       <div className="mt-2">
         <dl className="grid grid-cols-2 gap-2 text-sm">
           <div>
-          <dt className="font-medium">Email:</dt>
-          <dd>{apprentice.email}</dd>
+            <dt className="font-medium">Email:</dt>
+            <dd>{apprentice.email}</dd>
             <dt className="font-medium">Teléfono:</dt>
             <dd>{apprentice.phone}</dd>
           </div>
           <div>
-          <dt className="font-medium">Tipo de Sangre:</dt>
-          <dd>{apprentice.blood_type}</dd>
+            <dt className="font-medium">Tipo de Sangre:</dt>
+            <dd>{apprentice.blood_type}</dd>
             <dt className="font-medium">Fecha Nacimiento:</dt>
             <dd>{apprentice.date_birth}</dd>
-            
+
           </div>
           <div className="col-span-2">
             <dt className="font-medium">Curso:</dt>

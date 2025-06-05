@@ -6,7 +6,8 @@ import Link from "next/link";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { RiCheckboxBlankCircleFill } from "react-icons/ri";
 import { Notifications } from "@components/notifications";
-import Switch from "@components/Switch";
+import Switch from "@/components/switch";
+import Image from "next/image";
 
 export const Header = ({ role }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -64,29 +65,20 @@ export const Header = ({ role }) => {
     Coordinador: "text-lightGreen group-hover:text-darkBlue",
   }[role];
 
-  const bgColor = "bg-darkBlue dark:bg-lightGreen";
-
   return (
     <header
-      className={`w-full sm:w-[90vw] md:w-[85vw] lg:w-full h-[9vh] min-h-[60px] mx-auto flex items-center justify-between px-3 sm:px-6 lg:px-10 py-2 lg:py-4 shadow-none bg-lime-500 dark:bg-gradient-to-r dark:from-shadowBlue dark:to-darkBlue border-b border-darkGreen/10 dark:border-shadowBlue/30 transition-all duration-300`}
+      className={`w-full sm:w-[90vw] md:w-[85vw] lg:w-full h-[9vh] min-h-[60px] mx-auto flex items-center justify-between px-3 sm:px-6 lg:px-10 py-2 lg:py-4 shadow-md border border-darkGreen/30 dark:border-shadowBlue/60 rounded-2xl bg-white/90 dark:bg-gradient-to-r dark:from-shadowBlue dark:to-darkBlue backdrop-blur-md transition-all duration-300`}
     >
-      {/* Logo y Switch */}
-      <div className="flex items-center gap-4">
-        <div className="ml-2">
-          <Switch />
-        </div>
-      </div>
-      {/* Notificaciones y Perfil */}
+      {/* Logo o espacio izquierdo (puedes poner logo aquí si quieres) */}
+      <div className="flex-1" />
+      {/* Notificaciones, Switch y Perfil a la derecha */}
       <div className="flex items-center gap-2 sm:gap-4">
-        <div className="ml-2">
-          <Switch />
-        </div>
         {/* Notificaciones */}
         <div className="relative">
           <ul>
             <li
               ref={buttonRef}
-              className="h-9 w-9 sm:h-10 sm:w-10 lg:h-11 lg:w-11 flex items-center justify-center rounded-full bg-white hover:bg-lightGray transition-all duration-300 shadow-md cursor-pointer group"
+              className="h-9 w-9 sm:h-10 sm:w-10 lg:h-11 lg:w-11 flex items-center justify-center rounded-full bg-white dark:bg-shadowBlue hover:bg-lightGray dark:hover:bg-darkBlue transition-all duration-300 shadow-md cursor-pointer group border border-darkGreen/20 dark:border-shadowBlue/40"
               onClick={toggleMenu}
               role="button"
               tabIndex={0}
@@ -100,10 +92,10 @@ export const Header = ({ role }) => {
             >
               <a
                 href="#"
-                className="text-gray-400 text-xl sm:text-xl lg:text-2xl relative group-hover:text-darkBlue"
+                className="text-grayText text-xl sm:text-xl lg:text-2xl relative group-hover:text-darkBlue dark:group-hover:text-lightGreen"
                 onClick={(e) => e.preventDefault()}
               >
-                <IoNotificationsOutline className="text-lightGreen group-hover:text-darkBlue transition-colors duration-300" />
+                <IoNotificationsOutline className="text-lightGreen group-hover:text-darkBlue dark:group-hover:text-lightGreen transition-colors duration-300" />
                 {unreadCount > 0 && (
                   <RiCheckboxBlankCircleFill className="absolute top-0.5 right-0.5 text-red-600 h-2.5 w-2.5 sm:h-3 sm:w-3 animate-pulse" />
                 )}
@@ -122,22 +114,28 @@ export const Header = ({ role }) => {
             </div>
           )}
         </div>
+        {/* Switch al lado del botón de notificaciones */}
+        <div className="flex items-center ml-6 sm:ml-2">
+          <Switch />
+        </div>
         {/* Perfil */}
         <Link
           href="/perfil"
-          className="group flex items-center font-semibold text-white gap-2 sm:gap-3 py-2 px-3 sm:px-4 bg-darkBlue hover:bg-lightGreen dark:bg-lightGreen dark:hover:bg-darkBlue rounded-lg transition-all duration-300 shadow-lg"
+          className="group flex items-center font-semibold text-darkBlue dark:text-white gap-2 sm:gap-3 py-2 px-3 sm:px-4 bg-lightGreen hover:bg-darkBlue dark:bg-darkBlue dark:hover:bg-lightGreen rounded-lg transition-all duration-300 shadow-lg border border-darkGreen/20 dark:border-shadowBlue/40"
         >
           <div className="hidden xs:flex flex-col text-end">
             <span className="text-sm sm:text-base lg:text-lg text-darkBlue dark:text-white">Usuario</span>
             <span className={`text-xs sm:text-sm lg:text-base ${roleColor}`}>{roleLabel}</span>
           </div>
           <div className="relative">
-            <img
+            <Image
               src="https://img.freepik.com/foto-gratis/joven-bella-mujer-pie-sobre-pared-blanca_114579-90514.jpg"
               alt="Avatar de usuario"
+              width={40}
+              height={40}
               className="w-9 h-9 sm:w-10 sm:h-10 lg:w-11 lg:h-11 object-cover rounded-full border-2 border-white shadow-sm transition-all duration-300"
             />
-            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-400 border-2 border-white rounded-full"></div>
+            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-lightGreen border-2 border-white rounded-full"></div>
           </div>
           <div className="flex xs:hidden flex-col text-start">
             <span className="text-xs leading-tight text-darkBlue dark:text-white">Usuario</span>

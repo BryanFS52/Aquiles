@@ -5,7 +5,7 @@ import { FaTrashAlt } from "react-icons/fa"
 import { addChecklist } from "@services/checkListService"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import ModalNewChecklist from "@components/Modals/ModalNewChecklist"
+import ModalNewChecklist from "@/components/Modals/modalNewChecklist"
 
 export default function CoordinadorChecklistView() {
   const [modalOpen, setModalOpen] = useState(false)

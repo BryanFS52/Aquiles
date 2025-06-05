@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 
-// Notificaciones estáticas y recordatorios de ejemplo (en lugar de obtener desde backend)
+// ... (tus datos de notificaciones y fetchReminderNotifications permanecen igual)
 const notificationsData = [
   {
     id: 1,
@@ -93,7 +94,7 @@ const fetchReminderNotifications = () => {
 
 export const Notifications = () => {
   const [notifications, setNotifications] = useState(notificationsData);
-  // Fetch de recordatorios al cargar el componente
+
   useEffect(() => {
     const reminderNotifications = fetchReminderNotifications();
     setNotifications((prevNotifications) => [
@@ -130,11 +131,15 @@ export const Notifications = () => {
             className={`flex items-center p-2 rounded-lg cursor-pointer ${notification.unread ? 'bg-blue-50' : ''}`}
             onClick={() => handleNotificationClick(notification.id)}
           >
-            <img
-              src={notification.avatar}
-              alt="avatar"
-              className="w-10 h-10 rounded-full"
-            />
+            <div className="relative w-10 h-10 rounded-full overflow-hidden">
+              <Image
+                src={notification.avatar}
+                alt="avatar"
+                width={40}
+                height={40}
+                objectFit="cover"
+              />
+            </div>
             <div className="ml-4 flex-1">
               <p className="text-[#00324d]">
                 <strong className="hover:text-[#40b003]">{notification.user}</strong> {notification.action} {notification.content && <strong className="text-[#40b003]">{notification.content}</strong>}

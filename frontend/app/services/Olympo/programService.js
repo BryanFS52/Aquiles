@@ -1,5 +1,5 @@
 import { clientLAN } from '@lib/apollo-client';
-import { GET_PROGRAMS } from '@graphql/Olympo/programGraph';
+import { GET_PROGRAMS } from '@/graphql/olympo/programGraph';
 
 const programService = {
     getPrograms: async ({ idCoordination, idTrainingLevel, name, page = 0, size = 10 } = {}) => {

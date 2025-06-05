@@ -3,6 +3,7 @@
 import { useState } from "react";
 import InfoBox from "@components/infoBox";
 import { FaUsers, FaRegClock, FaGraduationCap, FaRegListAlt } from "react-icons/fa";
+import Image from "next/image";
 
 const ApprenticeView = () => {
   const [apprenticeData] = useState({
@@ -39,12 +40,14 @@ const ApprenticeView = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {compañeros.map((compañero) => (
             <div key={compañero.documentNumber} className="flex flex-col items-center bg-white dark:bg-[#001d33] p-4 shadow-md rounded-lg border border-gray-200 dark:border-gray-700">
-              <img
+              <Image
                 src={
                   compañero.profilePicture ||
                   `https://ui-avatars.com/api/?name=${encodeURIComponent(compañero.name + ' ' + compañero.lastName)}&background=0D8ABC&color=fff`
                 }
                 alt="Profile"
+                width={96}
+                height={96}
                 className="w-24 h-24 rounded-full object-cover mb-2"
               />
               <p className="text-lg font-semibold text-gray-800 dark:text-white">{compañero.name} {compañero.lastName}</p>
