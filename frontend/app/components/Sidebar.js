@@ -4,43 +4,49 @@ import Link from 'next/link';
 import React, { useState, useMemo } from 'react';
 import { FiAlignRight } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { FaRegListAlt, FaLaptopCode, FaChalkboardTeacher } from 'react-icons/fa';
+import { BsPersonFillCheck } from 'react-icons/bs';
+import { HiUserGroup } from 'react-icons/hi2';
+import { FaChalkboardUser } from 'react-icons/fa6';
+import { GiNotebook } from 'react-icons/gi';
+import { PiStudentFill } from 'react-icons/pi';
 
-// Íconos dinámicos
-const IconFichas = dynamic(() => import('react-icons/fa').then(mod => mod.FaRegListAlt), { ssr: false });
-const IconProgramas = dynamic(() => import('react-icons/fa').then(mod => mod.FaLaptopCode), { ssr: false });
-const IconAsistencia = dynamic(() => import('react-icons/bs').then(mod => mod.BsPersonFillCheck), { ssr: false });
-const IconTeams = dynamic(() => import('react-icons/hi2').then(mod => mod.HiUserGroup), { ssr: false });
-const IconSustentaciones = dynamic(() => import('react-icons/fa6').then(mod => mod.FaChalkboardUser), { ssr: false });
-const IconJustificaciones = dynamic(() => import('react-icons/gi').then(mod => mod.GiNotebook), { ssr: false });
-const IconProfesor = dynamic(() => import('react-icons/fa').then(mod => mod.FaChalkboardTeacher), { ssr: false });
-const IconAprendices = dynamic(() => import('react-icons/pi').then(mod => mod.PiStudentFill), { ssr: false });
+// Íconos estáticos
+const IconFichas = <FaRegListAlt className='text-2xl' />;
+const IconProgramas = <FaLaptopCode className='text-2xl' />;
+const IconAsistencia = <BsPersonFillCheck className='text-2xl' />;
+const IconTeams = <HiUserGroup className='text-2xl' />;
+const IconSustentaciones = <FaChalkboardUser className='text-2xl' />;
+const IconJustificaciones = <GiNotebook className='text-2xl' />;
+const IconProfesor = <FaChalkboardTeacher className='text-2xl' />;
+const IconAprendices = <PiStudentFill className='text-2xl' />;
 
 // Configuración de menú por rol
 const MENU_CONFIG = {
     instructor: [
-        { href: "/dashboard/FichasInstructor", label: "Fichas", icon: <IconFichas className='text-2xl' /> },
-        { href: "/dashboard/Programas", label: "Programas", icon: <IconProgramas className='text-2xl' /> },
-        { href: "/dashboard/asistencia", label: "Asistencia", icon: <IconAsistencia className='text-2xl' /> },
-        { href: "/dashboard/teamScrum", label: "Teams", icon: <IconTeams className='text-2xl' /> },
-        { href: "/dashboard/ListaChequeoInstructor", label: "Sustentaciones", icon: <IconSustentaciones className='text-2xl' /> },
-        { href: "/dashboard/justificaciones", label: "Justificaciones", icon: <IconJustificaciones className='text-2xl' /> },
+        { href: "/dashboard/FichasInstructor", label: "Fichas", icon: IconFichas },
+        { href: "/dashboard/Programas", label: "Programas", icon: IconProgramas },
+        { href: "/dashboard/asistencia", label: "Asistencia", icon: IconAsistencia },
+        { href: "/dashboard/teamScrum", label: "Teams", icon: IconTeams },
+        { href: "/dashboard/ListaChequeoInstructor", label: "Sustentaciones", icon: IconSustentaciones },
+        { href: "/dashboard/justificaciones", label: "Justificaciones", icon: IconJustificaciones },
     ],
     aprendiz: [
-        { href: "/dashboard/FichaAprendiz", label: "Ficha", icon: <IconFichas className='text-2xl' /> },
-        { href: "/dashboard/asistenciaAprendiz", label: "Asistencia", icon: <IconAsistencia className='text-2xl' /> },
-        { href: "/dashboard/teamScrumAprendiz", label: "Team", icon: <IconTeams className='text-2xl' /> },
-        { href: "/dashboard/ListaChequeoAprendiz", label: "Sustentaciones", icon: <IconSustentaciones className='text-2xl' /> },
-        { href: "/dashboard/justificacionesAprendiz", label: "Justificaciones", icon: <IconJustificaciones className='text-2xl' /> },
+        { href: "/dashboard/FichaAprendiz", label: "Ficha", icon: IconFichas },
+        { href: "/dashboard/asistenciaAprendiz", label: "Asistencia", icon: IconAsistencia },
+        { href: "/dashboard/teamScrumAprendiz", label: "Team", icon: IconTeams },
+        { href: "/dashboard/ListaChequeoAprendiz", label: "Sustentaciones", icon: IconSustentaciones },
+        { href: "/dashboard/justificacionesAprendiz", label: "Justificaciones", icon: IconJustificaciones },
     ],
     coordinador: [
-        { href: "/dashboard/FichasCoordinador", label: "Fichas", icon: <IconFichas className='text-2xl' /> },
-        { href: "/dashboard/InstructoresCoordinador", label: "Instructores", icon: <IconProfesor className='text-2xl' /> },
-        { href: "/dashboard/ProgramasCoordinador", label: "Programas", icon: <IconProgramas className='text-2xl' /> },
-        { href: "/dashboard/ListaChequeoCoordinador", label: "Sustentaciones", icon: <IconSustentaciones className='text-2xl' /> },
-        { href: "/dashboard/justificacionesCoordinador", label: "Justificaciones", icon: <IconJustificaciones className='text-2xl' /> },
-        { href: "/dashboard/Aprendices", label: "Aprendices", icon: <IconAprendices className='text-2xl' /> },
+        { href: "/dashboard/FichasCoordinador", label: "Fichas", icon: IconFichas },
+        { href: "/dashboard/InstructoresCoordinador", label: "Instructores", icon: IconProfesor },
+        { href: "/dashboard/ProgramasCoordinador", label: "Programas", icon: IconProgramas },
+        { href: "/dashboard/ListaChequeoCoordinador", label: "Sustentaciones", icon: IconSustentaciones },
+        { href: "/dashboard/justificacionesCoordinador", label: "Justificaciones", icon: IconJustificaciones },
+        { href: "/dashboard/Aprendices", label: "Aprendices", icon: IconAprendices },
     ]
 };
 
@@ -54,10 +60,9 @@ const getMenuByRole = (role) => {
 
 export const Sidebar = ({ role: initialRole }) => {
     const [showMenu, setShowMenu] = useState(false);
-    // Selector temporal de rol para desarrollo
     const [role, setRole] = useState(initialRole || 'instructor');
-
     const menuItems = useMemo(() => getMenuByRole(role), [role]);
+    const pathname = usePathname();
 
     // Cierra el menú al navegar en móvil
     const handleLinkClick = () => {
@@ -109,7 +114,7 @@ export const Sidebar = ({ role: initialRole }) => {
                         />
                         <span className="
                             text-base lg:text-lg font-bold 
-                            text-darkBlue dark:text-white 
+                            text-black dark:text-white 
                             tracking-wide drop-shadow-md leading-tight
                         ">
                             PROYECTOS FORMATIVOS<br />
@@ -157,39 +162,46 @@ export const Sidebar = ({ role: initialRole }) => {
                     {/* Menú dinámico */}
                     <nav>
                         <ul className="space-y-2">
-                            {menuItems.map((item, idx) => (
-                                <li key={idx}>
-                                    <Link
-                                        href={item.href}
-                                        className="
-                                            flex items-center gap-3 
-                                            py-2.5 lg:py-3 px-3 lg:px-4
-                                            rounded-xl transition-all 
-                                            text-sm lg:text-base
-                                            text-darkBlue dark:text-white
-                                            bg-white/70 dark:bg-shadowBlue/50
-                                            hover:bg-lightGreen/80 dark:hover:bg-darkGreen/70
-                                            hover:text-white dark:hover:text-lightGreen
-                                            font-semibold group shadow-sm hover:shadow-lg 
-                                            border border-darkGreen/10 dark:border-shadowBlue/30
-                                            duration-200
-                                        "
-                                        onClick={handleLinkClick}
-                                    >
-                                        <span className="
-                                            transition-transform group-hover:scale-125 
-                                            text-xl lg:text-2xl drop-shadow flex-shrink-0
-                                        ">
-                                            {item.icon}
-                                        </span>
-                                        <span className="
-                                            tracking-wide font-semibold truncate
-                                        ">
-                                            {item.label}
-                                        </span>
-                                    </Link>
-                                </li>
-                            ))}
+                            {menuItems.map((item, idx) => {
+                                const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                                return (
+                                    <li key={idx}>
+                                        <Link
+                                            href={item.href}
+                                            className={`
+                                                flex items-center gap-3 
+                                                py-2.5 lg:py-3 px-3 lg:px-4
+                                                rounded-xl transition-all 
+                                                text-sm lg:text-base
+                                                font-semibold group shadow-sm hover:shadow-lg 
+                                                border border-darkGreen/10 dark:border-shadowBlue/30
+                                                duration-200
+                                                tracking-wide truncate
+                                                relative overflow-hidden
+                                                before:absolute before:inset-0 before:rounded-xl before:-z-10 before:opacity-0 before:transition-opacity before:duration-200
+                                                hover:before:opacity-100
+                                                ${isActive ? 'before:opacity-100' : ''}
+                                                before:bg-gradient-to-r before:from-darkGreen before:to-lightGreen dark:before:from-[#1e3a8a] dark:before:to-[#2563eb]
+                                                ${isActive ? 'border-l-4 border-darkGreen dark:border-blue-400 pl-5' : 'hover:border-l-4 hover:border-darkGreen dark:hover:border-blue-400 hover:pl-5'}
+                                                text-darkBlue dark:text-white hover:text-white
+                                                ${isActive ? 'text-white' : ''}
+                                            `}
+                                            onClick={handleLinkClick}
+                                            aria-current={isActive ? 'page' : undefined}
+                                        >
+                                            <span className="
+                                                transition-transform group-hover:scale-125 
+                                                text-xl lg:text-2xl drop-shadow flex-shrink-0
+                                            ">
+                                                {item.icon}
+                                            </span>
+                                            <span className="tracking-wide font-semibold truncate">
+                                                {item.label}
+                                            </span>
+                                        </Link>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </nav>
                 </div>

@@ -132,7 +132,7 @@ export default function JustificacionesInstructor() {
   return (
     <div className="space-y-6">
       {/* Title */}
-      <h1 className="text-[#01b001] dark:text-blue-400 text-3xl lg:text-4xl pb-3 border-b-2 border-gray-300 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
+      <h1 className="text-black dark:text-white text-3xl lg:text-4xl pb-3 border-b-2 border-gray-300 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
         Justificaciones de Aprendices
       </h1>
 
@@ -189,7 +189,7 @@ export default function JustificacionesInstructor() {
         <>
           <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
             <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
-              <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
+              <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700 text-black dark:text-white">
                 <tr>
                   <th className="px-6 py-4 font-medium">Programa</th>
                   <th className="px-6 py-4 font-medium">Ficha</th>
@@ -259,7 +259,7 @@ export default function JustificacionesInstructor() {
           {/* Pagination */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
             <button
-              className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+              className="flex items-center px-4 py-2 text-sm font-medium text-black dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
               onClick={handlePreviousPage}
               disabled={currentPage === 1}
             >

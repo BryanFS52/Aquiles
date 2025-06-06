@@ -22,7 +22,7 @@ const ApprenticeView = () => {
   return (
     <div className="space-y-8 w-full">
       {/* Título */}
-      <h1 className="text-darkGreen dark:text-blue-400 text-3xl lg:text-4xl pb-3 border-b-2 border-darkGreen/20 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
+      <h1 className="text-black dark:text-white text-3xl lg:text-4xl pb-3 border-b-2 border-darkGreen/20 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
         Ficha y Aprendices
       </h1>
 
@@ -36,7 +36,7 @@ const ApprenticeView = () => {
 
       {/* Lista de compañeros */}
       <div>
-        <h2 className="text-xl font-semibold mb-4 text-darkBlue dark:text-blue-400">Compañeros de la ficha:</h2>
+        <h2 className="text-xl font-semibold mb-4 text-black dark:text-white">Compañeros de la ficha:</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {compañeros.map((compañero) => (
             <div key={compañero.documentNumber} className="flex flex-col items-center bg-white dark:bg-gray-800 p-4 shadow-md rounded-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300">
@@ -50,7 +50,7 @@ const ApprenticeView = () => {
                 height={96}
                 className="w-24 h-24 rounded-full object-cover mb-2 border-2 border-darkGreen/20 dark:border-blue-400"
               />
-              <p className="text-lg font-semibold text-darkBlue dark:text-blue-400">{compañero.name} {compañero.lastName}</p>
+              <p className="text-lg font-semibold text-black dark:text-white">{compañero.name} {compañero.lastName}</p>
               <p className="text-sm text-gray-500 dark:text-gray-300">{compañero.email}</p>
             </div>
           ))}

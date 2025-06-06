@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['img.freepik.com', 'ui-avatars.com'],
+    domains: ['img.freepik.com', 'ui-avatars.com', 'api.dicebear.com'],
     dangerouslyAllowSVG: true,
   },
   async rewrites() {

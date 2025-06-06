@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import programService from '@/services/olympo/programService';
 import { FaComputer, FaPeopleRoof } from 'react-icons/fa6';
 import { FaPeopleCarry } from 'react-icons/fa';
 import { AiOutlineStock } from 'react-icons/ai';
@@ -12,6 +11,7 @@ import { GrUserSettings } from 'react-icons/gr';
 import { LiaLanguageSolid } from 'react-icons/lia';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import programService from '@/services/olympo/programService';
 
 const ITEMS_PER_PAGE = 4;
 

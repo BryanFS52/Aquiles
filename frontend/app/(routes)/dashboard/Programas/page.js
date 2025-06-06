@@ -63,7 +63,7 @@ export default function Programas() {
   return (
     <div className="space-y-6">
       {/* Title */}
-      <h1 className="text-[#01b001] dark:text-blue-400 text-3xl lg:text-4xl pb-3 border-b-2 border-gray-300 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
+      <h1 className="text-black dark:text-white text-3xl lg:text-4xl pb-3 border-b-2 border-gray-300 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
         Programas
       </h1>
 
@@ -103,23 +103,27 @@ export default function Programas() {
                 className="flex w-full max-w-md h-52 rounded-lg overflow-hidden shadow-lg bg-gray-100 dark:bg-gray-700 relative p-4 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
               >
                 <div className="z-10 flex flex-col justify-between p-2 flex-1">
-                  <div className="space-y-2">
-                    <h3 className="text-[#01b001] dark:text-blue-400 font-inter font-semibold text-lg leading-tight">
+                  <div className="space-y-2 flex flex-col h-full">
+                    <h3 className="text-black dark:text-white font-inter font-semibold text-lg leading-tight">
                       {program.name}
                     </h3>
-                    <p className="font-inter font-normal text-gray-700 dark:text-gray-300 text-sm leading-relaxed pr-2">
-                      {program.description}
-                    </p>
+                    <div className="flex-1 flex">
+                      <p className="font-inter font-normal text-gray-700 dark:text-gray-300 text-sm leading-relaxed pr-2 w-full max-w-[calc(100%-60px)] truncate whitespace-pre-line break-words">
+                        {program.description}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Icon Container */}
-                <div className="z-10 flex items-center justify-center w-20 flex-shrink-0">
-                  <Icon className="text-4xl text-white drop-shadow-lg" />
+                {/* Icon Container en la pestañita */}
+                <div className="absolute top-0 right-0 w-0 h-0 z-20 flex items-start justify-end pt-7 pr-1">
+                  <div className="absolute top-2 right-2">
+                    <Icon className="text-3xl md:text-4xl lg:text-5xl drop-shadow-lg text-black dark:text-white transition-colors duration-300" />
+                  </div>
                 </div>
 
                 {/* Decorative Triangle */}
-                <div className="absolute top-0 right-0 w-0 h-0 border-l-[120px] border-l-transparent border-t-[130px] border-t-[#01b001] dark:border-t-blue-500 opacity-80"></div>
+                <div className="absolute top-0 right-0 w-0 h-0 border-l-[120px] border-l-transparent border-t-[130px] border-t-lightGreen dark:border-t-blue-900 opacity-90 transition-colors duration-300"></div>
               </div>
             );
           })

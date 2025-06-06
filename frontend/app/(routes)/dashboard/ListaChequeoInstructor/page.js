@@ -4,6 +4,8 @@ import { useState, useMemo } from "react";
 import { Check, FileDown, Save, UploadCloud, X } from "lucide-react";
 import Image from "next/image";
 import { checklistData, teams } from "@data/checklistData";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function InstructorChecklistView() {
   const [selectedTrimester, setSelectedTrimester] = useState("Trimestre 1");
@@ -56,35 +58,35 @@ export default function InstructorChecklistView() {
 
   const handleSaveChecklist = () => {
     console.log("Saving checklist:", { selectedTeam, items });
-    alert("La lista de chequeo ha sido guardada exitosamente.");
+    toast.success("La lista de chequeo ha sido guardada exitosamente.");
   }
 
   return (
     <div className="w-full">
       {/* Contenido principal adaptado al layout */}
       <div className="p-6 space-y-6">
-        <h1 className="text-[#01b001] dark:text-blue-400 text-3xl lg:text-4xl pb-3 border-b-2 border-gray-300 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
+        <h1 className="text-black dark:text-white text-3xl lg:text-4xl pb-3 border-b-2 border-gray-300 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
           Lista de Chequeo - Vista del Instructor
         </h1>
 
         {/* Información del centro y datos generales */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 bg-white dark:bg-[#002033] shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
-            <p className="text-2xl font-bold text-darkGreen dark:text-blue-400">Centro de Formación:</p>
+            <p className="text-2xl font-bold text-black dark:text-white">Centro de Formación:</p>
             <p className="text-base text-darkBlue dark:text-white">Centro de Servicios Financieros</p>
-            <p className="text-2xl font-bold text-darkGreen dark:text-blue-400">Fecha:</p>
+            <p className="text-2xl font-bold text-black dark:text-white">Fecha:</p>
             <p className="text-base text-darkBlue dark:text-white">05/02/2024 - 05/05/2024</p>
           </div>
           <div className="p-4 bg-white dark:bg-[#002033] shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
-            <p className="text-2xl font-bold text-darkGreen dark:text-blue-400">Jornada:</p>
+            <p className="text-2xl font-bold text-black dark:text-white">Jornada:</p>
             <p className="text-base text-darkBlue dark:text-white">Diurna</p>
-            <p className="text-2xl font-bold text-darkGreen dark:text-blue-400">Ficha:</p>
+            <p className="text-2xl font-bold text-black dark:text-white">Ficha:</p>
             <p className="text-base text-darkBlue dark:text-white">2558735</p>
           </div>
           <div className="p-4 bg-white dark:bg-[#002033] shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
-            <p className="text-2xl font-bold text-darkGreen dark:text-blue-400">Instructor Calificador:</p>
+            <p className="text-2xl font-bold text-black dark:text-white">Instructor Calificador:</p>
             <p className="text-base text-darkBlue dark:text-white">Juan Pérez</p>
-            <p className="text-2xl font-bold text-darkGreen dark:text-blue-400">Team</p>
+            <p className="text-2xl font-bold text-black dark:text-white">Team</p>
             <select onChange={(e) => handleTeamChange(e.target.value)} className="border rounded p-2 w-full bg-white dark:bg-[#001829] text-darkBlue dark:text-white border-darkGreen/20 dark:border-shadowBlue/40 focus:ring-2 focus:ring-darkGreen/40">
               {teams.map((team) => (
                 <option key={team.id} value={team.id.toString()}>
@@ -101,7 +103,7 @@ export default function InstructorChecklistView() {
             <select
               onChange={(e) => handleTrimesterChange(e.target.value)}
               value={selectedTrimester}
-              className="p-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300 "
+              className="p-2 border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300 border rounded"
             >
               {Object.keys(checklistData).map((trimester) => (
                 <option key={trimester} value={trimester}>
@@ -113,8 +115,7 @@ export default function InstructorChecklistView() {
             <select
               onChange={(e) => handleComponentChange(e.target.value)}
               value={selectedComponent}
-              className="border rounded p-2"
-            >
+              className="p-2 border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300 border rounded"            >
               {Object.keys(checklistData[selectedTrimester]).map((component) => (
                 <option key={component} value={component}>
                   {component}
@@ -276,6 +277,7 @@ export default function InstructorChecklistView() {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div >
   )
 }
