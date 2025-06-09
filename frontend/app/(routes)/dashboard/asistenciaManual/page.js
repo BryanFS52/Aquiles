@@ -393,7 +393,7 @@ const AttendancePage = () => {
                         <div className="flex justify-end">
                             <button
                                 onClick={handleSave}
-                                className="px-8 py-3 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors font-medium flex items-center space-x-2 shadow-sm"
+                                className="px-8 py-3 bg-lightGreen dark:bg-darkBlue text-black dark:text-white rounded-2xl  transition-colors font-medium flex items-center space-x-2 shadow-sm"
                             >
                                 <Save className="w-5 h-5" />
                                 <span>Guardar Asistencia</span>

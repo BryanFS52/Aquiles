@@ -204,13 +204,13 @@ export default function AsistenciaAprendiz() {
   return (
     <div className="w-full min-h-screen">
       <div className="p-0 sm:p-0 md:p-0 xl:p-0 h-full flex flex-col justify-start">
-        <h1 className="text-darkGreen dark:text-blue-400 text-3xl lg:text-4xl pb-3 border-b-2 border-darkGreen/20 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300 mb-6 px-4 pt-6">
+        <h1 className="text-black dark:text-white text-3xl lg:text-4xl pb-3 border-b-2 border-darkGreen/20 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300 mb-6 px-4 pt-6">
           Mi Asistencia
         </h1>
         {/* Header de mes y filtros */}
         <div className="w-full max-w-4xl flex flex-col gap-4 px-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 w-full">
-            <h2 className="text-darkGreen dark:text-blue-400 font-inter font-semibold text-xl sm:text-2xl md:text-3xl ml-0 sm:ml-6">
+            <h2 className="text-black dark:text-white font-inter font-semibold text-xl sm:text-2xl md:text-3xl ml-0 sm:ml-6">
               Calendario
             </h2>
             <div className="relative w-full sm:w-72 h-10 mr-0 sm:mr-6">

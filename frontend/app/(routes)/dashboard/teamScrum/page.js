@@ -87,6 +87,7 @@ export default function Home() {
   };
 
   const handleOpenModal = () => setModalOpen(true);
+  console.log("Modal Opened");
   const handleCloseModal = () => setModalOpen(false);
   const handleOpenAddInfoModal = () => setOpenAddInfoModal(true);
   const handleCloseAddInfoModal = () => setOpenAddInfoModal(false);
@@ -123,7 +124,7 @@ export default function Home() {
         )}
         <button
           onClick={handleOpenModal}
-          className="flex items-center justify-center bg-[#00324d] hover:bg-[#40b003] dark:bg-[#40b003] dark:hover:bg-[#2a7d02] text-white px-4 py-2 rounded-lg transition-colors duration-300"
+          className="flex items-center justify-center bg-lightGreen hover:bg-[#40b003] dark:bg-darkBlue dark:hover:bg-[#2a7d02] text-white px-4 py-2 rounded-lg transition-colors duration-300"
         >
           <MdAdd className="mr-2" /> Añadir Team
         </button>
@@ -137,7 +138,7 @@ export default function Home() {
             className="w-full rounded-2xl overflow-hidden shadow-md bg-white dark:bg-[#003044] relative p-6 hover:shadow-lg transition duration-300 border border-gray-200 dark:border-gray-600 flex flex-col"
           >
             {/* Línea diagonal decorativa */}
-            <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-[#00324d] dark:border-t-[#40b003] border-l-[240px] border-l-transparent z-0" />
+            <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-t-darkBlue dark:border-t-lightGreen border-l-[240px] border-l-transparent z-0" />
 
             <div className="relative z-10 flex flex-col flex-grow">
               {/* Título y botón "Ver más" */}

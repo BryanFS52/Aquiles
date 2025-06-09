@@ -88,191 +88,194 @@ export default function ChecklistComponent() {
   const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
 
   return (
-    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-      <div className="xl:col-span-5">
-        <div className="container mx-auto p-6 space-y-6">
-          <h1 className="text-4xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">
-            Lista de Chequeo
-          </h1>
+    <div className="space-y-6">
+      {/* Título */}
+      <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
+        Lista de Chequeo
+      </h1>
 
-          {/* Información */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-white shadow-md rounded-lg space-y-2">
-              <p className="text-2xl font-semibold text-[#0e324b]">Centro de Formación:</p>
-              <p>Centro de Servicios Financieros</p>
-              <p className="text-2xl font-semibold text-[#0e324b]">Fecha:</p>
-              <p>05/02/2024 - 05/05/2024</p>
-            </div>
-            <div className="p-4 bg-white shadow-md rounded-lg space-y-2">
-              <p className="text-2xl font-semibold text-[#0e324b]">Jornada:</p>
-              <p>Diurna</p>
-              <p className="text-2xl font-semibold text-[#0e324b]">Ficha:</p>
-              <p>2558735</p>
-            </div>
-            <div className="p-4 bg-white shadow-md rounded-lg space-y-2">
-              <p className="text-2xl font-semibold text-[#0e324b]">Team Scrum:</p>
-              <p>Team 3</p>
-              <p className="text-2xl font-semibold text-[#0e324b]">Integrantes:</p>
-              <p>Andres Ruiz, Alejandra Gonzalez, Juan Pullido, Sebastian Pineda</p>
-            </div>
-          </div>
+      {/* Información */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-4 bg-gray-50 dark:bg-[#001829] shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 space-y-2">
+          <p className="text-lg font-semibold text-gray-900 dark:text-white">Centro de Formación:</p>
+          <p className="text-gray-700 dark:text-gray-300">Centro de Servicios Financieros</p>
+          <p className="text-lg font-semibold text-gray-900 dark:text-white">Fecha:</p>
+          <p className="text-gray-700 dark:text-gray-300">05/02/2024 - 05/05/2024</p>
+        </div>
+        <div className="p-4 bg-gray-50 dark:bg-[#001829] shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 space-y-2">
+          <p className="text-lg font-semibold text-gray-900 dark:text-white">Jornada:</p>
+          <p className="text-gray-700 dark:text-gray-300">Diurna</p>
+          <p className="text-lg font-semibold text-gray-900 dark:text-white">Ficha:</p>
+          <p className="text-gray-700 dark:text-gray-300">2558735</p>
+        </div>
+        <div className="p-4 bg-gray-50 dark:bg-[#001829] shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 space-y-2">
+          <p className="text-lg font-semibold text-gray-900 dark:text-white">Team Scrum:</p>
+          <p className="text-gray-700 dark:text-gray-300">Team 3</p>
+          <p className="text-lg font-semibold text-gray-900 dark:text-white">Integrantes:</p>
+          <p className="text-gray-700 dark:text-gray-300">Andres Ruiz, Alejandra Gonzalez, Juan Pullido, Sebastian Pineda</p>
+        </div>
+      </div>
 
-          {/* Selectores */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-              <select
-                className="w-full md:w-[200px] p-2 border rounded-md"
-                value={selectedTrimester}
-                onChange={(e) => setSelectedTrimester(e.target.value)}
-              >
-                {Object.keys(checklistData).map((trimester) => (
-                  <option key={trimester} value={trimester}>
-                    {trimester}
-                  </option>
-                ))}
-              </select>
+      {/* Selectores */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+          <select
+            className="w-full sm:w-[200px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#001829] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+            value={selectedTrimester}
+            onChange={(e) => setSelectedTrimester(e.target.value)}
+          >
+            {Object.keys(checklistData).map((trimester) => (
+              <option key={trimester} value={trimester}>
+                {trimester}
+              </option>
+            ))}
+          </select>
 
-              <select
-                className="w-full md:w-[200px] p-2 border rounded-md"
-                value={selectedComponent}
-                onChange={(e) => setSelectedComponent(e.target.value)}
-              >
-                {selectedTrimester && checklistData[selectedTrimester] ?
-                  Object.keys(checklistData[selectedTrimester]).map((component) => (
-                    <option key={component} value={component}>
-                      {component}
-                    </option>
-                  )) : null}
-              </select>
-            </div>
+          <select
+            className="w-full sm:w-[200px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#001829] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+            value={selectedComponent}
+            onChange={(e) => setSelectedComponent(e.target.value)}
+          >
+            {selectedTrimester && checklistData[selectedTrimester] ?
+              Object.keys(checklistData[selectedTrimester]).map((component) => (
+                <option key={component} value={component}>
+                  {component}
+                </option>
+              )) : null}
+          </select>
+        </div>
 
-            <div className="flex items-center gap-2">
-              <button className="flex items-center gap-1 px-4 py-2 rounded-md bg-[#0e324b] text-white hover:bg-[#01b001] transition-colors duration-300">
-                <FileDown className="w-4 h-4" /> PDF
-              </button>
-              <button className="flex items-center gap-1 px-4 py-2 rounded-md bg-[#0e324b] text-white hover:bg-[#01b001] transition-colors duration-300">
-                <FileDown className="w-4 h-4" /> Excel
-              </button>
-            </div>
-          </div>
+        <div className="flex items-center gap-2">
+          <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-300 shadow-sm">
+            <FileDown className="w-4 h-4" /> PDF
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-colors duration-300 shadow-sm">
+            <FileDown className="w-4 h-4" /> Excel
+          </button>
+        </div>
+      </div>
 
-          {/* Tabla */}
-          <div className="overflow-x-auto bg-white shadow-md rounded-lg border border-gray-300">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr>
-                  <th className="text-xl font-bold text-[#00324d] p-3 text-center">Item</th>
-                  <th className="text-xl font-bold text-[#00324d] p-3 text-left">Indicadores y/o Variables</th>
-                  <th className="text-xl font-bold text-[#00324d] p-3 text-center">Sí</th>
-                  <th className="text-xl font-bold text-[#00324d] p-3 text-center">No</th>
-                  <th className="text-xl font-bold text-[#00324d] p-3 text-left">Observaciones</th>
+      {/* Tabla */}
+      <div className="overflow-x-auto bg-white dark:bg-[#001829] shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+        <table className="min-w-full text-sm">
+          <thead className="bg-gray-50 dark:bg-[#002033]">
+            <tr>
+              <th className="text-lg font-semibold text-gray-900 dark:text-white p-4 text-center border-b border-gray-200 dark:border-gray-700">Item</th>
+              <th className="text-lg font-semibold text-gray-900 dark:text-white p-4 text-left border-b border-gray-200 dark:border-gray-700">Indicadores y/o Variables</th>
+              <th className="text-lg font-semibold text-gray-900 dark:text-white p-4 text-center border-b border-gray-200 dark:border-gray-700">Sí</th>
+              <th className="text-lg font-semibold text-gray-900 dark:text-white p-4 text-center border-b border-gray-200 dark:border-gray-700">No</th>
+              <th className="text-lg font-semibold text-gray-900 dark:text-white p-4 text-left border-b border-gray-200 dark:border-gray-700">Observaciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentItems.length > 0 ? (
+              currentItems.map((item) => (
+                <tr key={item.id} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#002033] transition-colors duration-200">
+                  <td className="p-4 text-center text-gray-900 dark:text-white">{item.id}</td>
+                  <td className="p-4 text-gray-900 dark:text-white">{item.indicator}</td>
+                  <td className="p-4 text-center">
+                    {item.completed ? <Check className="w-5 h-5 text-green-500 mx-auto" /> : null}
+                  </td>
+                  <td className="p-4 text-center">
+                    {!item.completed ? <X className="w-5 h-5 text-red-500 mx-auto" /> : null}
+                  </td>
+                  <td className="p-4 text-gray-900 dark:text-white">{item.observations}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {currentItems.length > 0 ? (
-                  currentItems.map((item) => (
-                    <tr key={item.id} className="border-t">
-                      <td className="p-4 text-center">{item.id}</td>
-                      <td className="p-4">{item.indicator}</td>
-                      <td className="p-3 text-center">
-                        {item.completed ? <Check className="w-5 h-5 text-green-500 mx-auto" /> : null}
-                      </td>
-                      <td className="p-3 text-center">
-                        {!item.completed ? <X className="w-5 h-5 text-red-500 mx-auto" /> : null}
-                      </td>
-                      <td className="p-3">{item.observations}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={5} className="p-4 text-center">
-                      No hay datos disponibles
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="p-8 text-center text-gray-500 dark:text-gray-400">
+                  No hay datos disponibles
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Paginación */}
+      {currentItems.length > 0 && (
+        <div className="flex justify-between items-center">
+          <button
+            className={`px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg transition-all duration-300 ${currentPage === 1
+                ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800 text-gray-400'
+                : 'bg-white dark:bg-[#001829] text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-[#002033]'
+              }`}
+            onClick={goToPreviousPage}
+            disabled={currentPage === 1}
+          >
+            Anterior
+          </button>
+          <div className="text-lg text-gray-900 dark:text-white">
+            Página {currentPage} de {totalPages}
           </div>
+          <button
+            className={`px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg transition-all duration-300 ${currentPage === totalPages
+                ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800 text-gray-400'
+                : 'bg-white dark:bg-[#001829] text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-[#002033]'
+              }`}
+            onClick={goToNextPage}
+            disabled={currentPage === totalPages}
+          >
+            Siguiente
+          </button>
+        </div>
+      )}
 
-          {/* Paginación */}
-          {currentItems.length > 0 && (
-            <div className="flex justify-between items-center mt-4">
-              <button
-                className={`px-4 py-2 border rounded-md ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                onClick={goToPreviousPage}
-                disabled={currentPage === 1}
-              >
-                Anterior
-              </button>
-              <div className="text-lg">
-                Página {currentPage} de {totalPages}
-              </div>
-              <button
-                className={`px-4 py-2 border rounded-md ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
-                onClick={goToNextPage}
-                disabled={currentPage === totalPages}
-              >
-                Siguiente
-              </button>
+      {/* Firmas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Firma Instructor Técnico Anterior */}
+        <div className="bg-gray-50 dark:bg-[#001829] p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          <p className="text-lg font-semibold text-gray-900 dark:text-white text-center mb-4">Instructor técnico anterior</p>
+          <div className="flex flex-col items-center">
+            <label className="flex flex-col items-center cursor-pointer mb-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors duration-300">
+              <UploadCloud className="w-8 h-8 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-300 mb-2" />
+              <span className="text-gray-700 dark:text-gray-300 font-medium text-sm text-center">Elegir archivo</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileUpload(e, setFirmaAnterior)}
+                className="hidden"
+              />
+            </label>
+            <div className="w-full flex justify-center">
+              {firmaAnterior && (
+                <Image
+                  src={firmaAnterior}
+                  alt="Firma instructor anterior"
+                  className="h-20 w-auto object-contain border border-gray-300 dark:border-gray-600 rounded-md"
+                  width={80}
+                  height={80}
+                />
+              )}
             </div>
-          )}
+          </div>
+        </div>
 
-          {/* Firmas */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-6">
-            {/* Firma Instructor Técnico Anterior */}
-            <div className="bg-white p-1 rounded-lg shadow-md border border-gray-300">
-              <p className="text-lg font-semibold text-[#00324d] text-center mb-3">Instructor técnico anterior</p>
-              <div className="flex flex-col items-center">
-                <label className="flex flex-col items-center cursor-pointer mb-3">
-                  <UploadCloud className="w-6 h-6 text-[#00324d] hover:text-[#01b001] transition-colors duration-300 mb-1" />
-                  <span className="text-[#00324d] font-semibold text-sm text-center">Elegir archivo</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileUpload(e, setFirmaAnterior)}
-                    className="hidden"
-                  />
-                </label>
-                <div className="w-full flex justify-center">
-                  {firmaAnterior && (
-                    <Image
-                      src={firmaAnterior}
-                      alt="Firma instructor anterior"
-                      className="h-16 w-auto object-contain border border-[#00324d] rounded-md"
-                      width={64} // Establecer un ancho fijo
-                      height={64} // Establecer una altura fija
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Firma Instructor Técnico Nuevo */}
-            <div className="bg-white p-1 rounded-lg shadow-md border border-gray-300">
-              <p className="text-lg font-semibold text-[#00324d] text-center mb-3">Instructor técnico nuevo</p>
-              <div className="flex flex-col items-center">
-                <label className="flex flex-col items-center cursor-pointer mb-3">
-                  <UploadCloud className="w-6 h-6 text-[#00324d] hover:text-[#01b001] transition-colors duration-300 mb-1" />
-                  <span className="text-[#00324d] font-semibold text-sm text-center">Elegir archivo</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileUpload(e, setFirmaNuevo)}
-                    className="hidden"
-                  />
-                </label>
-                <div className="w-full flex justify-center">
-                  {firmaNuevo && (
-                    <Image
-                      src={firmaNuevo}
-                      alt="Firma instructor nuevo"
-                      className="h-16 w-auto object-contain border border-[#00324d] rounded-md"
-                      width={64} // Establecer un ancho fijo
-                      height={64} // Establecer una altura fija
-                    />
-                  )}
-                </div>
-              </div>
+        {/* Firma Instructor Técnico Nuevo */}
+        <div className="bg-gray-50 dark:bg-[#001829] p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+          <p className="text-lg font-semibold text-gray-900 dark:text-white text-center mb-4">Instructor técnico nuevo</p>
+          <div className="flex flex-col items-center">
+            <label className="flex flex-col items-center cursor-pointer mb-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors duration-300">
+              <UploadCloud className="w-8 h-8 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-300 mb-2" />
+              <span className="text-gray-700 dark:text-gray-300 font-medium text-sm text-center">Elegir archivo</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileUpload(e, setFirmaNuevo)}
+                className="hidden"
+              />
+            </label>
+            <div className="w-full flex justify-center">
+              {firmaNuevo && (
+                <Image
+                  src={firmaNuevo}
+                  alt="Firma instructor nuevo"
+                  className="h-20 w-auto object-contain border border-gray-300 dark:border-gray-600 rounded-md"
+                  width={80}
+                  height={80}
+                />
+              )}
             </div>
           </div>
         </div>

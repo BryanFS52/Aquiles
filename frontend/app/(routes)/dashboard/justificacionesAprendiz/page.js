@@ -247,173 +247,188 @@ export default function JustificacionAprendiz() {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
-      <div className="xl:col-span-5">
-        <div className="h-[90vh] p-6 bg-neutral-100 space-y-5">
-          <h1 className="text-[#0e324d] text-3xl border-b-2 border-gray-400 w-fit mb-6 font-semibold">
-            Justificación para el Aprendiz
-          </h1>
+    <div className="w-full h-full">
+      {/* Título de la página */}
+      <div className="mb-6">
+        <h1 className="text-2xl lg:text-3xl font-bold text-black dark:text-white border-b-2 border-lightGray dark:border-shadowBlue pb-2 w-fit">
+          Justificación para el Aprendiz
+        </h1>
+      </div>
 
-          <AnimatePresence>
-            {!showForm && (
-              <motion.div
-                initial={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="w-full lg:w-1/2 bg-white p-8 rounded-lg shadow-md"
-              >
-                <h2 className="text-[#0e324d] text-xl font-semibold mb-4">
-                  Componente: {sessions["1"].componentName}
-                </h2>
-                <div className="space-y-2 text-gray-700">
-                  <div className="flex items-center">
-                    <FaCalendarDay className="mr-3 text-[#0e324d]" />
-                    Fecha: {sessions["1"].date}
-                  </div>
-                  <div className="flex items-center">
-                    <FaRegClock className="mr-3 text-[#0e324d]" />
-                    Hora: {sessions["1"].time}
-                  </div>
-                  <div className="flex items-center">
-                    <FaRegListAlt className="mr-3 text-[#0e324d]" />
-                    Ficha: {sessions["1"].sheet}
-                  </div>
-                  <div className="flex items-center">
-                    <IoPeople className="mr-3 text-[#0e324d]" />
-                    Instructores: {sessions["1"].instructors.join(", ")}
-                  </div>
+      {/* Contenido principal */}
+      <div className="space-y-6">
+        <AnimatePresence>
+          {!showForm && (
+            <motion.div
+              initial={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="w-full max-w-2xl bg-white dark:bg-shadowBlue p-6 lg:p-8 rounded-xl shadow-sm border border-lightGray dark:border-darkGray"
+            >
+              <h2 className="text-xl font-semibold mb-6 text-black dark:text-white">
+                Componente: {sessions["1"].componentName}
+              </h2>
+              <div className="space-y-4 text-darkGray dark:text-lightGray">
+                <div className="flex items-center">
+                  <FaCalendarDay className="mr-3 text-darkBlue dark:text-darkBlue" />
+                  <span><strong>Fecha:</strong> {sessions["1"].date}</span>
                 </div>
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="w-full mt-6 py-2 rounded bg-[#0e324d] text-white hover:bg-[#01b001] transition-colors"
-                >
-                  Justificar
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence>
-            {showForm && (
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 50 }}
-                transition={{ duration: 0.5 }}
-                className="w-full lg:w-1/2 bg-white p-8 rounded-lg shadow-md"
+                <div className="flex items-center">
+                  <FaRegClock className="mr-3 text-darkBlue dark:text-darkBlue" />
+                  <span><strong>Hora:</strong> {sessions["1"].time}</span>
+                </div>
+                <div className="flex items-center">
+                  <FaRegListAlt className="mr-3 text-darkBlue dark:text-darkBlue" />
+                  <span><strong>Ficha:</strong> {sessions["1"].sheet}</span>
+                </div>
+                <div className="flex items-center">
+                  <IoPeople className="mr-3 text-darkBlue dark:text-darkBlue" />
+                  <span><strong>Instructores:</strong> {sessions["1"].instructors.join(", ")}</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowForm(true)}
+                className="w-full mt-8 py-3 px-6 rounded-lg bg-lightGreen text-black dark:text-white dark:bg-darkBlue transition-colors font-medium"
               >
-                <h2 className="text-[#0e324d] text-xl font-semibold mb-6">
-                  Formulario de Justificación
-                </h2>
-                <form onSubmit={handleSave} className="space-y-4">
-                  <div className="flex flex-col">
-                    <label className="mb-1 font-medium">Número de Documento *</label>
+                Justificar
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {showForm && (
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              transition={{ duration: 0.5 }}
+              className="w-full max-w-4xl bg-white dark:bg-shadowBlue p-6 lg:p-8 rounded-xl shadow-sm border border-lightGray dark:border-darkGray"
+            >
+              <h2 className="text-xl font-semibold mb-6 text-darkBlue dark:text-white">
+                Formulario de Justificación
+              </h2>
+              <form onSubmit={handleSave} className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="flex flex-col space-y-2">
+                    <label className="text-sm font-medium text-darkBlue dark:text-lightGray">
+                      Número de Documento *
+                    </label>
                     <input
                       type="text"
                       name="numeroDocumento"
                       value={formData.numeroDocumento}
                       onChange={(e) => handleInputChange(e)}
-                      className="h-10 border border-gray-300 rounded pl-3 focus:border-[#0e324d] focus:outline-none"
+                      className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-darkBlue dark:text-white focus:border-darkBlue dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-darkBlue dark:focus:ring-lightGreen"
                       placeholder="123456789"
                       required
                     />
                   </div>
 
-                  <div className="flex flex-col">
-                    <label className="mb-1 font-medium">Nombre Aprendiz *</label>
+                  <div className="flex flex-col space-y-2">
+                    <label className="text-sm font-medium text-darkBlue dark:text-lightGray">
+                      Nombre Aprendiz *
+                    </label>
                     <input
                       type="text"
                       name="nombreAprendiz"
                       value={formData.nombreAprendiz}
                       onChange={(e) => handleInputChange(e, true)}
-                      className="h-10 border border-gray-300 rounded pl-3 focus:border-[#0e324d] focus:outline-none"
+                      className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-darkBlue dark:text-white focus:border-darkBlue dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-darkBlue dark:focus:ring-lightGreen"
                       placeholder="Juan Pérez"
                       required
                     />
                   </div>
+                </div>
 
-                  <div className="flex flex-col">
-                    <label className="mb-1 font-medium">Descripción *</label>
-                    <textarea
-                      name="descripcion"
-                      value={formData.descripcion}
-                      onChange={(e) => setFormData(prev => ({ ...prev, descripcion: e.target.value }))}
-                      className="min-h-20 border border-gray-300 rounded p-3 focus:border-[#0e324d] focus:outline-none resize-vertical"
-                      placeholder="Motivo de la justificación"
-                      required
-                    />
-                  </div>
+                <div className="flex flex-col space-y-2">
+                  <label className="text-sm font-medium text-darkBlue dark:text-lightGray">
+                    Descripción *
+                  </label>
+                  <textarea
+                    name="descripcion"
+                    value={formData.descripcion}
+                    onChange={(e) => setFormData(prev => ({ ...prev, descripcion: e.target.value }))}
+                    className="min-h-24 border border-lightGray dark:border-darkGray rounded-lg p-4 bg-white dark:bg-shadowBlue text-darkBlue dark:text-white focus:border-darkBlue dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-darkBlue dark:focus:ring-lightGreen resize-vertical"
+                    placeholder="Motivo de la justificación"
+                    required
+                  />
+                </div>
 
-                  <div className="flex flex-col">
-                    <label className="mb-1 font-medium">Tipo De Novedad *</label>
-                    <select
-                      name="justificationType"
-                      value={formData.justificationTypeId.id}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          justificationTypeId: { id: e.target.value },
-                        }))
-                      }
-                      className="h-10 border border-gray-300 rounded pl-3 focus:border-[#0e324d] focus:outline-none"
-                      disabled={loadingTypes}
-                      required
-                    >
-                      <option value="" disabled hidden>
-                        {loadingTypes ? "Cargando tipos..." : "Seleccione el tipo"}
+                <div className="flex flex-col space-y-2">
+                  <label className="text-sm font-medium text-darkBlue dark:text-lightGray">
+                    Tipo De Novedad *
+                  </label>
+                  <select
+                    name="justificationType"
+                    value={formData.justificationTypeId.id}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        justificationTypeId: { id: e.target.value },
+                      }))
+                    }
+                    className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-darkBlue dark:text-white focus:border-darkBlue dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-darkBlue dark:focus:ring-lightGreen"
+                    disabled={loadingTypes}
+                    required
+                  >
+                    <option value="" disabled hidden>
+                      {loadingTypes ? "Cargando tipos..." : "Seleccione el tipo"}
+                    </option>
+                    {justificationTypes.map(({ id, name }) => (
+                      <option key={id} value={id}>
+                        {name}
                       </option>
-                      {justificationTypes.map(({ id, name }) => (
-                        <option key={id} value={id}>
-                          {name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                    ))}
+                  </select>
+                </div>
 
-                  <div className="flex flex-col">
-                    <label className="mb-1 font-medium">Justificación (Archivo) *</label>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRefPrev.current?.click()}
-                      className="bg-[#0e324d] text-white h-10 rounded mt-1 hover:bg-[#0a2738] transition-colors"
-                    >
-                      {formData.justificacionFile?.name || "📎 Subir Archivo"}
-                    </button>
-                    <input
-                      type="file"
-                      ref={fileInputRefPrev}
-                      onChange={(e) => handleFileChange(e, "justificacionFile")}
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      className="hidden"
-                    />
-                    <small className="text-gray-500 mt-1">
-                      Formatos permitidos: PDF, JPG, PNG (máx. 5MB)
-                    </small>
-                  </div>
+                <div className="flex flex-col space-y-2">
+                  <label className="text-sm font-medium text-darkBlue dark:text-lightGray">
+                    Justificación (Archivo) *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRefPrev.current?.click()}
+                    className="bg-darkBlue dark:bg-lightGreen text-white h-11 rounded-lg hover:bg-lightGreen dark:hover:bg-darkGreen transition-colors font-medium"
+                  >
+                    {formData.justificacionFile?.name || "📎 Subir Archivo"}
+                  </button>
+                  <input
+                    type="file"
+                    ref={fileInputRefPrev}
+                    onChange={(e) => handleFileChange(e, "justificacionFile")}
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    className="hidden"
+                  />
+                  <small className="text-darkGray dark:text-grayText">
+                    Formatos permitidos: PDF, JPG, PNG (máx. 5MB)
+                  </small>
+                </div>
 
-                  <div className="flex justify-between pt-4">
-                    <button
-                      type="button"
-                      onClick={handleCancel}
-                      className="px-6 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
-                      disabled={isSubmitting}
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-6 py-2 bg-[#0e324d] text-white rounded hover:bg-[#0a2738] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? "Enviando..." : "Enviar Justificación"}
-                    </button>
-                  </div>
-                </form>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+                <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-lightGray dark:border-darkGray">
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="px-6 py-3 bg-darkGray dark:bg-shadowBlue text-white rounded-lg hover:bg-darkBlue dark:hover:bg-lightGray dark:hover:text-darkBlue transition-colors font-medium"
+                    disabled={isSubmitting}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-3 bg-darkBlue dark:bg-lightGreen text-white rounded-lg hover:bg-lightGreen dark:hover:bg-darkGreen transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Enviando..." : "Enviar Justificación"}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
+
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -424,6 +439,8 @@ export default function JustificacionAprendiz() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        theme="light"
+        toastClassName="dark:!bg-shadowBlue dark:!text-white dark:!border dark:!border-darkGray"
       />
     </div>
   );
