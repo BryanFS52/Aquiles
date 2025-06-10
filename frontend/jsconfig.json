@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "target": "ES2017",
     "lib": [
       "dom",
       "dom.iterable",
@@ -16,7 +17,6 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "target": "ES2017",
     "baseUrl": ".",
     "plugins": [
       {
@@ -46,7 +46,7 @@
         "./app/hooks/*"
       ],
       "@public/*": [
-        "./public/*"
+        "public/*"
       ],
       "@services/*": [
         "./app/services/*"
@@ -58,15 +58,18 @@
         "./app/context/*"
       ],
       "@data/*": [
-        "app/data/*"
-      ],
+        "./app/data/*"
+      ]
     }
   },
   "include": [
     "next-env.d.ts",
+    "**/*.js",
+    "**/*.jsx",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "app/(routes)/dashboard/Aprendices/page.jss"
   ],
   "exclude": [
     "node_modules"

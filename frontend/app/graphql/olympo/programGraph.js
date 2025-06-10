@@ -1,4 +1,4 @@
-const { gql } = require("@apollo/client");
+import { gql } from "@apollo/client";
 
 // Query con filtros y paginación
 export const GET_PROGRAMS = gql`

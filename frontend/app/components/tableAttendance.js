@@ -4,13 +4,14 @@ import { BsQrCode } from "react-icons/bs";
 import { FaClipboardList } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { motion } from "framer-motion";
+import { useRouter } from 'next/navigation';
 import ModalQR from "@components/Modals/modalQR";
-import ModalManualAssistance from "@components/Modals/modalManualAssistance";
+
 
 const TableAttendance = ({ studySheetData }) => {
+    const router = useRouter();
     const [modalQROpen, setModalQROpen] = useState(false);
     const [alertVisible, setAlertVisible] = useState(false);
-    const [manualAssistanceModalOpen, setManualAssistanceModalOpen] = useState(false);
     const [currentTrimester, setCurrentTrimester] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredStudents, setFilteredStudents] = useState(studySheetData?.students || []);
@@ -70,11 +71,12 @@ const TableAttendance = ({ studySheetData }) => {
                     </button>
 
                     <button
-                        onClick={() => setManualAssistanceModalOpen(true)}
+                        onClick={() => router.push('/dashboard/asistenciaManual')}
                         className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl shadow bg-darkBlue text-white hover:bg-lightGreen hover:text-darkBlue transition border border-darkBlue hover:border-lightGreen"
                     >
                         Asistencia Manual <FaClipboardList className="w-4 h-4" />
                     </button>
+
                 </div>
 
                 <div className="flex items-center gap-3 mt-2 md:mt-0">
@@ -126,19 +128,6 @@ const TableAttendance = ({ studySheetData }) => {
             )}
 
             <ModalQR isOpen={modalQROpen} onClose={() => setModalQROpen(false)} />
-
-            {manualAssistanceModalOpen && (
-                <ModalManualAssistance
-                    mode="event"
-                    isOpen={manualAssistanceModalOpen}
-                    onClose={() => setManualAssistanceModalOpen(false)}
-                    students={studySheetData?.students || []}
-                    onSave={(attendanceData) => {
-                        console.log('Attendance data to save:', attendanceData);
-                        setManualAssistanceModalOpen(false);
-                    }}
-                />
-            )}
 
             <div className="overflow-x-auto mt-6 rounded-xl shadow-sm border border-lightGray">
                 <table className="min-w-full table-fixed">

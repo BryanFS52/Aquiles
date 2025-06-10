@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import Image from 'next/image';
 import { Check, FileDown, X, UploadCloud } from "lucide-react";
+import Image from 'next/image';
+import PageTitle from "@components/UI/pageTitle";
 
 // Moving checklistData outside the component to prevent unnecessary re-renders
 const checklistData = {
@@ -90,9 +91,7 @@ export default function ChecklistComponent() {
   return (
     <div className="space-y-6">
       {/* Título */}
-      <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
-        Lista de Chequeo
-      </h1>
+      <PageTitle>Lista de Chequeo</PageTitle>
 
       {/* Información */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -198,8 +197,8 @@ export default function ChecklistComponent() {
         <div className="flex justify-between items-center">
           <button
             className={`px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg transition-all duration-300 ${currentPage === 1
-                ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800 text-gray-400'
-                : 'bg-white dark:bg-[#001829] text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-[#002033]'
+              ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800 text-gray-400'
+              : 'bg-white dark:bg-[#001829] text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-[#002033]'
               }`}
             onClick={goToPreviousPage}
             disabled={currentPage === 1}
@@ -211,8 +210,8 @@ export default function ChecklistComponent() {
           </div>
           <button
             className={`px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg transition-all duration-300 ${currentPage === totalPages
-                ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800 text-gray-400'
-                : 'bg-white dark:bg-[#001829] text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-[#002033]'
+              ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800 text-gray-400'
+              : 'bg-white dark:bg-[#001829] text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-[#002033]'
               }`}
             onClick={goToNextPage}
             disabled={currentPage === totalPages}

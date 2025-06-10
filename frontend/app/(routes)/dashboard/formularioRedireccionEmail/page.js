@@ -1,4 +1,5 @@
 "use client";
+
 import logoSenaFormulario from "@public/img/Logo-sena-green.png";
 import Image from 'next/image';
 

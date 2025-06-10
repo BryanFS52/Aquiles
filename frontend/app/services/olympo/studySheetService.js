@@ -29,17 +29,21 @@ const studySheetService = {
                 fetchPolicy: 'network-only',
             });
 
-            if (data?.studySheetById?.code === '200' || data?.studySheetById?.code === 200) {
-                console.log("ficha encontrada", data.studySheetById);
-                return data.studySheetById;
+            const response = data?.studySheetById;
+
+            if (response?.code === '200' || response?.code === 200) {
+                return response.data;
             } else {
-                throw new Error(data?.studySheetById?.message || 'Error fetching study sheet by ID');
+                throw new Error(response?.message || 'Error obteniendo la ficha');
             }
         } catch (error) {
-            console.error('Error fetching study sheet by ID:', error);
-            throw error;
+            const status = error.networkError?.statusCode || 500;
+            const message = `[${status}] Error de red o microservicio inactivo`;
+            console.error('Error Apollo:', message, error);
+            throw new Error(message);
         }
-    },
+    }
+
 }
 
 export default studySheetService;

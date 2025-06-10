@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import InfoBox from "@components/infoBox";
 import { FaUsers, FaRegClock, FaGraduationCap, FaRegListAlt } from "react-icons/fa";
+import InfoBox from "@components/infoBox";
 import Image from "next/image";
+import PageTitle from "@components/UI/pageTitle";
 
 const ApprenticeView = () => {
   const [apprenticeData] = useState({
@@ -22,9 +23,7 @@ const ApprenticeView = () => {
   return (
     <div className="space-y-8 w-full">
       {/* Título */}
-      <h1 className="text-black dark:text-white text-3xl lg:text-4xl pb-3 border-b-2 border-darkGreen/20 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
-        Ficha y Aprendices
-      </h1>
+      <PageTitle>Ficha y Aprendices</PageTitle>
 
       {/* InfoBoxes */}
       <div className="flex flex-col items-center justify-center space-y-5 w-full max-w-full md:flex-row md:flex-wrap md:justify-center md:space-y-0 md:space-x-8">

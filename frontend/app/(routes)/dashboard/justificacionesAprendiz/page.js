@@ -2,10 +2,10 @@
 
 import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import justificationService from "@services/justificationService";
+import { toast } from "react-toastify";
+import PageTitle from "@components/UI/pageTitle";
 import justificationTypeService from "@services/JustificationTypeService";
+import justificationService from "@services/justificationService";
 
 import {
   FaCalendarDay,
@@ -250,9 +250,7 @@ export default function JustificacionAprendiz() {
     <div className="w-full h-full">
       {/* Título de la página */}
       <div className="mb-6">
-        <h1 className="text-2xl lg:text-3xl font-bold text-black dark:text-white border-b-2 border-lightGray dark:border-shadowBlue pb-2 w-fit">
-          Justificación para el Aprendiz
-        </h1>
+        <PageTitle>Justificaciones</PageTitle>
       </div>
 
       {/* Contenido principal */}
@@ -428,20 +426,6 @@ export default function JustificacionAprendiz() {
           )}
         </AnimatePresence>
       </div>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        toastClassName="dark:!bg-shadowBlue dark:!text-white dark:!border dark:!border-darkGray"
-      />
     </div>
   );
 }

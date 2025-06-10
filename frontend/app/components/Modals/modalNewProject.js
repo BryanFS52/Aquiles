@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Select from 'react-select';
-import studentService from "@/services/olympo/studentService";
+import studentService from "@services/olympo/studentService";
 
 const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
   const [teamData, setTeamData] = useState({

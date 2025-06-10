@@ -3,9 +3,9 @@
 import Image from 'next/image';
 import { IoPersonCircleSharp } from "react-icons/io5";
 import { IoCameraSharp, IoCalendar } from 'react-icons/io5';
-import Slider from 'react-slick';
 import { FaArrowLeft, FaArrowRight, FaHashtag } from 'react-icons/fa';
-
+import Slider from 'react-slick';
+import PageTitle from '@components/UI/pageTitle';
 
 const CustomNextArrow = ({ onClick }) => {
     return (
@@ -43,9 +43,8 @@ export default function TeamScrum() {
 
     return (
         <>
-            <h1 className="text-3xl md:text-4xl font-bold text-black dark:text-white mb-6">
-                Mi Team Scrum
-            </h1>
+            { /* Title */}
+            <PageTitle>Mi Team Scrum</PageTitle>
 
             {/* Grid principal: Información del equipo */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

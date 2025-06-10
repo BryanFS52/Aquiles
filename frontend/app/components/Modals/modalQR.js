@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import qrCodeService from "@services/qrService";
 import { BsQrCode } from "react-icons/bs";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
 import Image from "next/image";
+import qrCodeService from "@services/qrService";
 
 const ModalQR = ({ isOpen, onClose }) => {
   const [timer, setTimer] = useState(900);
@@ -259,7 +258,6 @@ const ModalQR = ({ isOpen, onClose }) => {
           </div>
         </div>
       </div>
-      <ToastContainer />
     </div>
   );
 };

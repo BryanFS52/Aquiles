@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { TbArrowBigRight } from "react-icons/tb";
 import { MdAdd } from "react-icons/md";
-import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
 import ModalFichas from "@components/Modals/modalFichas";
 import axios from 'axios';
 
@@ -85,7 +84,6 @@ export default function Options() {
           </div>
         </div>
       </div>
-      <ToastContainer />
       <ModalFichas isOpen={isModalOpen} onClose={handleCloseModal} onCreate={handleCreateFicha} />
     </div>
   );

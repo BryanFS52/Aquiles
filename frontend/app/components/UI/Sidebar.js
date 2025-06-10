@@ -4,7 +4,6 @@ import Link from 'next/link';
 import React, { useState, useMemo } from 'react';
 import { FiAlignRight } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { FaRegListAlt, FaLaptopCode, FaChalkboardTeacher } from 'react-icons/fa';
 import { BsPersonFillCheck } from 'react-icons/bs';
@@ -12,6 +11,7 @@ import { HiUserGroup } from 'react-icons/hi2';
 import { FaChalkboardUser } from 'react-icons/fa6';
 import { GiNotebook } from 'react-icons/gi';
 import { PiStudentFill } from 'react-icons/pi';
+import Image from 'next/image';
 
 // Íconos estáticos
 const IconFichas = <FaRegListAlt className='text-2xl' />;

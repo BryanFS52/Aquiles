@@ -1,17 +1,17 @@
 'use client';
 
-import { Sidebar } from "@components/Sidebar";
-import { Header } from "@components/header";
-import { useUser } from "@context/UserContext";
+import { Sidebar } from "@components/UI/Sidebar";
+import { Header } from "@components/UI/header";
+import { useUser } from "@context/userContext";
 
 export default function LayoutContent({ children }) {
     const user = useUser();
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-[#001829] transition-colors duration-300">
-            {/* Layout principal con flex para mejor control */}
+            {/* Layout principal */}
             <div className="flex min-h-screen">
-                {/* Sidebar - Ancho fijo y consistente */}
+                {/* Sidebar */}
                 <aside className="
                     w-0 lg:w-[300px] 
                     flex-shrink-0 
@@ -21,7 +21,7 @@ export default function LayoutContent({ children }) {
                     <Sidebar role={user?.rol} />
                 </aside>
 
-                {/* Contenido principal - Ocupa el resto del espacio disponible */}
+                {/* Contenido principal */}
                 <section className="
                     flex-1 
                     flex flex-col 
@@ -30,7 +30,7 @@ export default function LayoutContent({ children }) {
                     lg:w-[calc(100%-300px)]
                     min-w-0
                 ">
-                    {/* Header - Perfectamente alineado con el contenido */}
+                    {/* Header -  */}
                     <div className="
                         w-full 
                         flex-shrink-0

@@ -5,8 +5,9 @@ import { IoIosArrowDown } from "react-icons/io";
 import { useRouter } from 'next/navigation';
 import { createEventsServicePlugin } from '@schedule-x/events-service'
 import { useNextCalendarApp, ScheduleXCalendar } from '@schedule-x/react'
-import '@schedule-x/theme-default/dist/index.css'
 import { allEvents } from '@data/allEvents';
+import '@schedule-x/theme-default/dist/index.css'
+import PageTitle from "@components/UI/pageTitle";
 
 // Estilos CSS personalizados para forzar los colores y responsividad
 const customStyles = `
@@ -204,15 +205,10 @@ export default function AsistenciaAprendiz() {
   return (
     <div className="w-full min-h-screen">
       <div className="p-0 sm:p-0 md:p-0 xl:p-0 h-full flex flex-col justify-start">
-        <h1 className="text-black dark:text-white text-3xl lg:text-4xl pb-3 border-b-2 border-darkGreen/20 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300 mb-6 px-4 pt-6">
-          Mi Asistencia
-        </h1>
+        <PageTitle>Mi Asistencia</PageTitle>
         {/* Header de mes y filtros */}
         <div className="w-full max-w-4xl flex flex-col gap-4 px-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 w-full">
-            <h2 className="text-black dark:text-white font-inter font-semibold text-xl sm:text-2xl md:text-3xl ml-0 sm:ml-6">
-              Calendario
-            </h2>
             <div className="relative w-full sm:w-72 h-10 mr-0 sm:mr-6">
               <button
                 className="font-inter font-normal h-8 w-full sm:w-48 pl-2 pr-10 text-sm rounded-lg border-2 border-darkGreen/20 dark:border-gray-600 bg-white dark:bg-gray-800 text-darkBlue dark:text-white focus:outline-none focus:border-slate-300 flex items-center justify-between"

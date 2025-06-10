@@ -2,15 +2,16 @@
 
 import { useEffect, useState } from 'react';
 
-// Importa correctamente los íconos
-import { FaComputer, FaPeopleRoof } from 'react-icons/fa6';  // Fa6 (FontAwesome icons)
-import { FaPeopleCarry } from 'react-icons/fa'; // Fa (FontAwesome icons)
-import { AiOutlineStock } from 'react-icons/ai';  // Ai (Ant Design icons)
-import { GiTakeMyMoney } from 'react-icons/gi';  // Gi (Game Icons)
-import { BsPersonRolodex } from 'react-icons/bs';  // Bs (Bootstrap Icons)
-import { SlCalculator } from 'react-icons/sl';  // Sl (Simple Line Icons)
-import { GrUserSettings } from 'react-icons/gr';  // Gr (Grommet Icons)
-import { LiaLanguageSolid } from 'react-icons/lia';  // Lia (Line Awesome Icons)
+// Icons
+import { FaComputer, FaPeopleRoof } from 'react-icons/fa6';
+import { FaPeopleCarry } from 'react-icons/fa';
+import { AiOutlineStock } from 'react-icons/ai';
+import { GiTakeMyMoney } from 'react-icons/gi';
+import { BsPersonRolodex } from 'react-icons/bs';
+import { SlCalculator } from 'react-icons/sl';
+import { GrUserSettings } from 'react-icons/gr';
+import { LiaLanguageSolid } from 'react-icons/lia';
+import PageTitle from '@/components/UI/pageTitle';
 
 const ITEMS_PER_PAGE = 4; // Número de programas por página
 
@@ -63,9 +64,7 @@ export default function Programas() {
   return (
     <div className="space-y-6">
       {/* Title */}
-      <h1 className="text-black dark:text-white text-3xl lg:text-4xl pb-3 border-b-2 border-gray-300 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
-        Programas
-      </h1>
+      <PageTitle>Programas</PageTitle>
 
       {/* Search Field */}
       <div className="flex flex-col sm:flex-row gap-4 items-start">

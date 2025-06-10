@@ -112,9 +112,6 @@ export default function ResetPassword() {
                   type="submit"
                 >
                   Confirmar
-
-
-
                 </button>
               </form>
             </div>

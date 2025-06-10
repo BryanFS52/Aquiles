@@ -1,10 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { PiStudentFill } from "react-icons/pi";
+import { useState, useEffect } from 'react';
+import { PiStudentFill } from 'react-icons/pi';
 import { ImMail4 } from "react-icons/im";
-import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
 import ModalCorreo from "@components/Modals/modalCorreo";
 import { sendEmailAbsence } from "@services/emailService";
 import { getAllApprentices } from "@services/apprenticeService";
@@ -152,7 +151,6 @@ export default function AprendicesList() {
                     </div>
 
                 </div>
-                <ToastContainer />
             </div>
         </div>
     );

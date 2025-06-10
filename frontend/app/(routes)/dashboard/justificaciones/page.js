@@ -3,10 +3,12 @@
 import { useState, useMemo } from "react";
 import { GoSearch } from "react-icons/go";
 import { GrAttachment } from "react-icons/gr";
+import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import Image from "next/image";
 import persona from "@public/img/persona.jpg";
-import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import PageTitle from "@components/UI/pageTitle";
 import justificationService from "@services/justificationService";
+
 
 export default function JustificacionesInstructor() {
   const [selectedFiltro, setSelectedFiltro] = useState("");
@@ -132,10 +134,8 @@ export default function JustificacionesInstructor() {
   return (
     <div className="space-y-6">
       {/* Title */}
-      <h1 className="text-black dark:text-white text-3xl lg:text-4xl pb-3 border-b-2 border-gray-300 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
-        Justificaciones de Aprendices
-      </h1>
 
+      <PageTitle>Justificaciones de aprendices</PageTitle>
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 items-center">
         <div className="w-full md:w-1/3">

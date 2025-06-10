@@ -9,9 +9,9 @@ import { BsPersonRolodex } from 'react-icons/bs';
 import { SlCalculator } from 'react-icons/sl';
 import { GrUserSettings } from 'react-icons/gr';
 import { LiaLanguageSolid } from 'react-icons/lia';
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import programService from '@/services/olympo/programService';
+import { toast } from "react-toastify";
+import PageTitle from '@components/UI/pageTitle';
+import programService from '@services/olympo/programService';
 
 const ITEMS_PER_PAGE = 4;
 
@@ -65,9 +65,7 @@ export default function Programas() {
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6 bg-gray-100">
       <div className="xl:col-span-5 w-full">
         <div className="h-auto p-4 sm:p-6 md:p-8 lg:p-12 inline-block w-full">
-          <h1 className="text-[#0e324d] text-2xl sm:text-3xl lg:text-4xl pb-3 border-b-2 border-gray-400 w-full sm:w-3/4 lg:w-1/2 mb-6 lg:mb-12 font-inter font-semibold">
-            Programas
-          </h1>
+          <PageTitle>Programas Coordinación</PageTitle>
 
           {/* Campo de búsqueda */}
           <input
@@ -112,17 +110,6 @@ export default function Programas() {
           </div>
         </div>
       </div>
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
     </div>
   );
 }

@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import { toast } from 'react-toastify'
+import PageTitle from '@components/UI/pageTitle'
 
 function ListaApprentices() {
   const [apprentices, setApprentices] = useState([])
@@ -35,11 +35,10 @@ function ListaApprentices() {
   const filteredApprentices = Array.isArray(apprentices)
     ? apprentices.filter(apprentice =>
       Object.values(apprentice).some(value =>
-        value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
       )
     )
-    : [];
-
+    : []
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -51,9 +50,7 @@ function ListaApprentices() {
     try {
       const response = await fetch('http://localhost:8081/api/students', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newApprentice),
       })
       const createdApprentice = await response.json()
@@ -75,145 +72,95 @@ function ListaApprentices() {
   }
 
   return (
-    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6 bg-gray-50">
-      <div className="xl:col-span-5">
-        <div className="container mx-auto p-6 space-y-6">
-          <h1 className="text-3xl font-bold text-[#00324d] hover:text-[#01b001] transition-colors duration-300">Gestión de Aprendices</h1>
+    <>
+      <PageTitle>Gestión de Aprendices</PageTitle>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Crear Nuevo Aprendiz */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-4 text-gray-800">Crear Nuevo Aprendiz</h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700" htmlFor="name">Nombres</label>
-                    <input
-                      className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      id="name"
-                      name="name"
-                      value={newApprentice.name}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700" htmlFor="lastName">Apellidos</label>
-                    <input
-                      className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      id="lastName"
-                      name="lastName"
-                      value={newApprentice.lastName}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700" htmlFor="documentType">Tipo de Documento</label>
-                    <select
-                      className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      name="documentType"
-                      onChange={handleInputChange}
-                      required
-                    >
-                      <option value="">Seleccionar</option>
-                      <option value="CC">Cédula de Ciudadanía</option>
-                      <option value="TI">Tarjeta de Identidad</option>
-                      <option value="CE">Cédula de Extranjería</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700" htmlFor="documentNumber">Número de Documento</label>
-                    <input
-                      className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      id="documentNumber"
-                      name="documentNumber"
-                      value={newApprentice.documentNumber}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700" htmlFor="program">Programa</label>
-                  <input
-                    className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    id="program"
-                    name="program"
-                    value={newApprentice.program}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700" htmlFor="email">Correo Institucional</label>
-                  <input
-                    className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={newApprentice.email}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700" htmlFor="teamNumber">Número del Team</label>
-                  <input
-                    className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    id="teamNumber"
-                    name="teamNumber"
-                    value={newApprentice.teamNumber}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <button type="submit" className="bg-blue-500 text-white px-6 py-3 rounded-lg mt-4 hover:bg-blue-600">Crear Aprendiz</button>
-              </form>
-            </div>
-
-            {/* Lista de Aprendices */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-4 text-gray-800">Lista de Aprendices</h2>
-              <div className="mb-4">
-                <input
-                  type="text"
-                  placeholder="Buscar aprendices"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="input px-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Crear Nuevo Aprendiz */}
+        <div className="bg-white dark:bg-[#0b1f33] p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Crear Nuevo Aprendiz</h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium" htmlFor="name">Nombres</label>
+                <input className="input px-4 py-2 border rounded-lg w-full" id="name" name="name" value={newApprentice.name} onChange={handleInputChange} required />
               </div>
-              <div className="border rounded-lg overflow-hidden shadow-md">
-                <table className="w-full">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Documento</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Programa</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Team</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredApprentices.map((apprentice) => (
-                      <tr key={apprentice.documentNumber}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{apprentice.name} {apprentice.lastName}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{apprentice.documentNumber}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{apprentice.program}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{apprentice.teamNumber}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium" htmlFor="lastName">Apellidos</label>
+                <input className="input px-4 py-2 border rounded-lg w-full" id="lastName" name="lastName" value={newApprentice.lastName} onChange={handleInputChange} required />
               </div>
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium" htmlFor="documentType">Tipo de Documento</label>
+                <select className="input px-4 py-2 border rounded-lg w-full" name="documentType" value={newApprentice.documentType} onChange={handleInputChange} required>
+                  <option value="">Seleccionar</option>
+                  <option value="CC">Cédula de Ciudadanía</option>
+                  <option value="TI">Tarjeta de Identidad</option>
+                  <option value="CE">Cédula de Extranjería</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium" htmlFor="documentNumber">Número de Documento</label>
+                <input className="input px-4 py-2 border rounded-lg w-full" id="documentNumber" name="documentNumber" value={newApprentice.documentNumber} onChange={handleInputChange} required />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium" htmlFor="program">Programa</label>
+              <input className="input px-4 py-2 border rounded-lg w-full" id="program" name="program" value={newApprentice.program} onChange={handleInputChange} required />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium" htmlFor="email">Correo Institucional</label>
+              <input className="input px-4 py-2 border rounded-lg w-full" type="email" id="email" name="email" value={newApprentice.email} onChange={handleInputChange} required />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium" htmlFor="teamNumber">Número del Team</label>
+              <input className="input px-4 py-2 border rounded-lg w-full" id="teamNumber" name="teamNumber" value={newApprentice.teamNumber} onChange={handleInputChange} required />
+            </div>
+
+            <button type="submit" className="bg-lightGreen text-black font-bold dark:bg-darkBlue dark:text-white px-6 py-3 rounded-lg mt-4 ">Crear Aprendiz</button>
+          </form>
+        </div>
+
+        {/* Lista de Aprendices */}
+        <div className="bg-white dark:bg-[#0b1f33] p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Lista de Aprendices</h2>
+          <input
+            type="text"
+            placeholder="Buscar aprendices"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="input px-4 py-2 border rounded-lg w-full mb-4"
+          />
+          <div className="overflow-x-auto border rounded-lg">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                <tr>
+                  <th className="px-6 py-3 text-left font-medium">Nombre</th>
+                  <th className="px-6 py-3 text-left font-medium">Documento</th>
+                  <th className="px-6 py-3 text-left font-medium">Programa</th>
+                  <th className="px-6 py-3 text-left font-medium">Team</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-[#002033] divide-y divide-gray-200 dark:divide-gray-600">
+                {filteredApprentices.map((apprentice) => (
+                  <tr key={apprentice.documentNumber}>
+                    <td className="px-6 py-4 whitespace-nowrap">{apprentice.name} {apprentice.lastName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{apprentice.documentNumber}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{apprentice.program}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{apprentice.teamNumber}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-        <ToastContainer />
       </div>
-    </div>
+    </>
   )
 }
 

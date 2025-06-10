@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { addProject, fetchProjectById } from '@/services/projectService';
+import { addProject, fetchProjectById } from '@services/projectService';
 
 const allApprentices = [
   'Michael Felipe Laiton Chaparro',
@@ -240,8 +240,6 @@ const ModalAddInformation = ({ isOpen, onClose }) => {
           </div>
         </div>
       )}
-
-      <ToastContainer />
     </>
   );
 };

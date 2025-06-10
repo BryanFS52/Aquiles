@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import PropTypes from "prop-types";
-import Link from "next/link";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { RiCheckboxBlankCircleFill } from "react-icons/ri";
-import { Notifications } from "@components/notifications";
-import Switch from '@components/Switch';
+import { Notifications } from "@components/UI/notifications";
+import Link from "next/link";
+import PropTypes from "prop-types";
+import Switch from '@components/UI/switch';
 import Image from "next/image";
 
 export const Header = ({ role }) => {
@@ -149,16 +149,15 @@ export const Header = ({ role }) => {
 
         {/* Perfil */}
         <Link
-          href="/perfil"
+          href="/dashboard/perfil"
           className="
             group flex items-center 
-            font-semibold text-darkBlue dark:text-white 
+            font-semibold text-black dark:text-white 
             gap-2 sm:gap-3 
             py-2 px-2 sm:px-3 lg:px-4 
-            bg-lightGreen hover:bg-darkBlue 
-            dark:bg-darkBlue dark:hover:bg-lightGreen 
+            bg-lightGreen
+            dark:bg-darkBlue 
             rounded-lg 
-            transition-all duration-300 
             shadow-lg 
             border border-darkGreen/20 dark:border-shadowBlue/40
             min-w-0
@@ -166,7 +165,7 @@ export const Header = ({ role }) => {
         >
           {/* Texto del usuario - Solo visible en pantallas medianas y grandes */}
           <div className="hidden sm:flex flex-col text-end min-w-0">
-            <span className="text-xs sm:text-sm lg:text-base text-darkBlue dark:text-white truncate">
+            <span className="text-xs sm:text-sm lg:text-base text-black dark:text-white truncate">
               Usuario
             </span>
             <span className={`text-xs lg:text-sm ${roleColor} truncate`}>

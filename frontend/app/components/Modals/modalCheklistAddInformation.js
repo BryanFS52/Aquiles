@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Modal from 'react-modal'; // Usando react-modal para el modal
+import Modal from 'react-modal';
 import { MdClose } from 'react-icons/md';
 
 Modal.setAppElement('#root'); // Importante para accesibilidad

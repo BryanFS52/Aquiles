@@ -2,10 +2,10 @@
 
 import { useState, useMemo } from "react";
 import { Check, FileDown, Save, UploadCloud, X } from "lucide-react";
-import Image from "next/image";
 import { checklistData, teams } from "@data/checklistData";
-import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
+import Image from "next/image";
+import PageTitle from "@components/UI/pageTitle";
 
 export default function InstructorChecklistView() {
   const [selectedTrimester, setSelectedTrimester] = useState("Trimestre 1");
@@ -65,9 +65,7 @@ export default function InstructorChecklistView() {
     <div className="w-full">
       {/* Contenido principal adaptado al layout */}
       <div className="p-6 space-y-6">
-        <h1 className="text-black dark:text-white text-3xl lg:text-4xl pb-3 border-b-2 border-gray-300 dark:border-gray-600 w-full sm:w-3/4 lg:w-1/2 font-inter font-semibold transition-colors duration-300">
-          Lista de Chequeo - Vista del Instructor
-        </h1>
+        <PageTitle>Lista de Chequeo - Vista del Instructor</PageTitle>
 
         {/* Información del centro y datos generales */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -277,7 +275,6 @@ export default function InstructorChecklistView() {
           </div>
         </div>
       </div>
-      <ToastContainer />
     </div >
   )
 }

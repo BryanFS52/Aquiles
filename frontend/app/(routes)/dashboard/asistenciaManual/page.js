@@ -1,25 +1,16 @@
 'use client';
+
 import { useState, useEffect, useMemo } from 'react';
+import { toast } from 'react-toastify';
 import {
     CheckCircle, XCircle, Clock, Users, Save, Search, Calendar,
     ArrowLeft, BarChart3, Download, Filter,
     TrendingUp, BookOpen, GraduationCap,
-    FileText, ChevronDown, Mail, Phone, MapPin
+    FileText, ChevronDown, Mail, Phone
 } from 'lucide-react';
 
-const AttendancePage = () => {
-    // Mock data - mover fuera del componente para evitar recreación
-    const mockStudents = useMemo(() => [
-        { id: 1, person: { name: 'Ana María', lastname: 'González Pérez', document: '1234567890', email: 'ana.gonzalez@email.com', phone: '+57 300 123 4567' } },
-        { id: 2, person: { name: 'Carlos', lastname: 'Rodríguez Silva', document: '0987654321', email: 'carlos.rodriguez@email.com', phone: '+57 301 234 5678' } },
-        { id: 3, person: { name: 'María José', lastname: 'Martínez López', document: '1122334455', email: 'maria.martinez@email.com', phone: '+57 302 345 6789' } },
-        { id: 4, person: { name: 'Juan Pablo', lastname: 'Hernández Castro', document: '5566778899', email: 'juan.hernandez@email.com', phone: '+57 303 456 7890' } },
-        { id: 5, person: { name: 'Laura', lastname: 'García Ruiz', document: '9988776655', email: 'laura.garcia@email.com', phone: '+57 304 567 8901' } },
-        { id: 6, person: { name: 'Diego', lastname: 'López Morales', document: '1357924680', email: 'diego.lopez@email.com', phone: '+57 305 678 9012' } },
-        { id: 7, person: { name: 'Valentina', lastname: 'Jiménez Torres', document: '2468135790', email: 'valentina.jimenez@email.com', phone: '+57 306 789 0123' } },
-        { id: 8, person: { name: 'Andrés', lastname: 'Vargas Delgado', document: '1029384756', email: 'andres.vargas@email.com', phone: '+57 307 890 1234' } }
-    ], []);
-
+const AttendanceManualPage = ({ students, studySheet = null, loading = false }) => {
+    const error = null;
     const [attendance, setAttendance] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -27,39 +18,50 @@ const AttendancePage = () => {
     const [selectedStudent, setSelectedStudent] = useState(null);
     const [attendanceHistory, setAttendanceHistory] = useState([]);
 
-    // Inicializar asistencia - Solo una vez
+    // Inicializar asistencia cuando lleguen los estudiantes
     useEffect(() => {
-        const initialAttendance = {};
-        mockStudents.forEach(student => {
-            initialAttendance[student.id] = 'presente';
-        });
-        setAttendance(initialAttendance);
+        if (students && students.length > 0) {
+            const initialAttendance = {};
+            students.forEach(student => {
+                initialAttendance[student.id] = 'presente';
+            });
+            setAttendance(initialAttendance);
 
-        // Mock historial de asistencia
-        const mockHistory = [
-            { date: '2024-12-01', presente: 6, ausente: 1, justificado: 1, retardo: 0 },
-            { date: '2024-12-02', presente: 7, ausente: 0, justificado: 0, retardo: 1 },
-            { date: '2024-12-03', presente: 5, ausente: 2, justificado: 1, retardo: 0 },
-            { date: '2024-12-04', presente: 8, ausente: 0, justificado: 0, retardo: 0 },
-            { date: '2024-12-05', presente: 6, ausente: 1, justificado: 0, retardo: 1 },
-        ];
-        setAttendanceHistory(mockHistory);
-    }, [mockStudents]);
+            // Mock historial de asistencia
+            const mockHistory = [
+                { date: '2024-12-01', presente: 6, ausente: 1, justificado: 1, retardo: 0 },
+                { date: '2024-12-02', presente: 7, ausente: 0, justificado: 0, retardo: 1 },
+                { date: '2024-12-03', presente: 5, ausente: 2, justificado: 1, retardo: 0 },
+                { date: '2024-12-04', presente: 8, ausente: 0, justificado: 0, retardo: 0 },
+                { date: '2024-12-05', presente: 6, ausente: 1, justificado: 0, retardo: 1 },
+            ];
+            setAttendanceHistory(mockHistory);
+        }
+    }, [students]);
 
     // Filtrar estudiantes usando useMemo para optimizar
     const filteredStudents = useMemo(() => {
-        let filtered = mockStudents.filter(student =>
-            student.person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            student.person.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            student.person.document.toLowerCase().includes(searchTerm)
-        );
+        if (!students || !students.length) return [];
+
+        let filtered = students.filter(student => {
+            const person = student.person || {};
+            const name = person.name || '';
+            const lastname = person.lastname || '';
+            const document = person.document || '';
+
+            return (
+                name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                document.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        });
 
         if (selectedFilter !== 'todos') {
             filtered = filtered.filter(student => attendance[student.id] === selectedFilter);
         }
 
         return filtered;
-    }, [searchTerm, mockStudents, selectedFilter, attendance]);
+    }, [searchTerm, students, selectedFilter, attendance]);
 
     const handleAttendanceChange = (studentId, value) => {
         setAttendance(prev => ({ ...prev, [studentId]: value }));
@@ -68,10 +70,11 @@ const AttendancePage = () => {
     const handleSave = () => {
         const attendanceData = {
             date: selectedDate,
-            attendance: attendance
+            attendance: attendance,
+            studySheetId: studySheet?.id
         };
         console.log('Guardando asistencia:', attendanceData);
-        alert('Asistencia guardada exitosamente');
+        toast.success('Asistencia guardada exitosamente');
     };
 
     const getAttendanceStats = () => {
@@ -106,7 +109,7 @@ const AttendancePage = () => {
         const csvContent = "data:text/csv;charset=utf-8,"
             + "Nombre,Apellido,Documento,Estado\n"
             + filteredStudents.map(student =>
-                `${student.person.name},${student.person.lastname},${student.person.document},${attendance[student.id]}`
+                `${student.person?.name || ''},${student.person?.lastname || ''},${student.person?.document || ''},${attendance[student.id]}`
             ).join("\n");
 
         const encodedUri = encodeURI(csvContent);
@@ -118,12 +121,48 @@ const AttendancePage = () => {
         document.body.removeChild(link);
     };
 
+    // Estados de carga y error
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-lightGreen dark:border-darkBlue"></div>
+                    <p className="mt-4 text-gray-600 dark:text-gray-400">Cargando estudiantes...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+                <div className="text-center">
+                    <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Error al cargar datos</h2>
+                    <p className="text-gray-600 dark:text-gray-400">{error}</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!students || !students.length) {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+                <div className="text-center">
+                    <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">No hay estudiantes</h2>
+                    <p className="text-gray-600 dark:text-gray-400">No se encontraron estudiantes en esta ficha de estudio.</p>
+                </div>
+            </div>
+        );
+    }
+
     const stats = getAttendanceStats();
-    const attendancePercentage = Math.round((stats.presente / mockStudents.length) * 100);
+    const attendancePercentage = students.length > 0 ? Math.round((stats.presente / students.length) * 100) : 0;
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
-            {/* Header */}
+            {/* Sub Header */}
             <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between py-4">
@@ -132,12 +171,14 @@ const AttendancePage = () => {
                                 <ArrowLeft className="w-6 h-6" />
                             </button>
                             <div className="flex items-center space-x-3">
-                                <div className="bg-blue-600 dark:bg-blue-500 p-2 rounded-lg">
+                                <div className="bg-lightGreen dark:bg-blue-600 p-2 rounded-lg">
                                     <Users className="w-6 h-6 text-white" />
                                 </div>
                                 <div>
-                                    <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">Control de Asistencia Manual</h1>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">Desarrollo de Aplicaciones Web II</p>
+                                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Control de Asistencia</h1>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                        {studySheet?.name || studySheet?.program || 'Ficha de Estudio'}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -199,22 +240,32 @@ const AttendancePage = () => {
                                 <div className="flex items-center space-x-3">
                                     <GraduationCap className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                     <div>
-                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">ADSO - Ficha 2758438</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Análisis y Desarrollo de Software</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                            {studySheet?.program || 'ADSO'} - Ficha {studySheet?.id || studySheet?.number || '2758438'}
+                                        </p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                            {studySheet?.description || 'Análisis y Desarrollo de Software'}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center space-x-3">
-                                    <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                                    <Users className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                     <div>
-                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Aula 204</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Sede Principal</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                            {students.length} Estudiantes
+                                        </p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Matriculados</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center space-x-3">
                                     <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                     <div>
-                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">7:00 AM - 12:00 PM</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Horario Matutino</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                            {studySheet?.schedule || '7:00 AM - 12:00 PM'}
+                                        </p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                            {studySheet?.shift || 'Horario Matutino'}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -298,13 +349,13 @@ const AttendancePage = () => {
                                     >
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center space-x-4 min-w-0 flex-1">
-                                                <div className="bg-blue-600 dark:bg-blue-500 text-white w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0">
+                                                <div className="bg-lightGreen dark:bg-darkBlue text-white w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm flex-shrink-0">
                                                     {index + 1}
                                                 </div>
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center space-x-2">
                                                         <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate">
-                                                            {student.person.name} {student.person.lastname}
+                                                            {student.person?.name || 'N/A'} {student.person?.lastname || ''}
                                                         </h3>
                                                         <button
                                                             onClick={() => setSelectedStudent(selectedStudent === student.id ? null : student.id)}
@@ -313,18 +364,24 @@ const AttendancePage = () => {
                                                             <ChevronDown className={`w-4 h-4 transition-transform ${selectedStudent === student.id ? 'rotate-180' : ''}`} />
                                                         </button>
                                                     </div>
-                                                    <p className="text-sm text-gray-500 dark:text-gray-400">Doc: {student.person.document}</p>
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                        Doc: {student.person?.document || 'N/A'}
+                                                    </p>
 
                                                     {/* Información expandida */}
                                                     {selectedStudent === student.id && (
                                                         <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                                                             <div className="flex items-center space-x-2">
                                                                 <Mail className="w-3 h-3 text-gray-400 dark:text-gray-500" />
-                                                                <span className="text-gray-600 dark:text-gray-300">{student.person.email}</span>
+                                                                <span className="text-gray-600 dark:text-gray-300">
+                                                                    {student.person?.email || 'No disponible'}
+                                                                </span>
                                                             </div>
                                                             <div className="flex items-center space-x-2">
                                                                 <Phone className="w-3 h-3 text-gray-400 dark:text-gray-500" />
-                                                                <span className="text-gray-600 dark:text-gray-300">{student.person.phone}</span>
+                                                                <span className="text-gray-600 dark:text-gray-300">
+                                                                    {student.person?.phone || 'No disponible'}
+                                                                </span>
                                                             </div>
                                                         </div>
                                                     )}
@@ -405,5 +462,4 @@ const AttendancePage = () => {
         </div>
     );
 };
-
-export default AttendancePage;
+export default AttendanceManualPage;
