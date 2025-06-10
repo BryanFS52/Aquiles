@@ -8,16 +8,16 @@ import AttendanceFooter from "@components/attendanceFooter";
 import studySheetService from '@services/olympo/studySheetService';
 
 export default function Attendance() {
-    const [studySheet, setStudySheet] = useState(null);
+    const [studySheet, setStudySheet] = useState([]);
     const [students, setStudents] = useState([]);
 
     useEffect(() => {
         const fetchStudySheet = async () => {
             try {
                 const response = await studySheetService.getStudySheetById("1");
-                if (response?.data) {
-                    setStudySheet(response.data);
-                    setStudents(response.data.students || []);
+                if (response) {
+                    setStudySheet(response);
+                    setStudents(response.students || []);
                 } else {
                     setStudySheet(null);
                     setStudents([]);

@@ -1,4 +1,5 @@
 import { client } from '@lib/apollo-client';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import {
   GET_TEAMS_SCRUMS,
@@ -17,13 +18,16 @@ export const fetchTeamsScrums = async (page, size) => {
   return data.allTeamsScrums;
 };
 
-export const fetchTeamScrumById = async (id) => {
-  const { data } = await client.query({
-    query: GET_TEAM_SCRUM_BY_ID,
-    variables: { id },
-  });
-  return data.teamScrumById;
-};
+export const fetchTeamScrumById = createAsyncThunk(
+  'teamScrum/fetchById',
+  async ({ id }) => {
+    const { data } = await client.query({
+      query: GET_TEAM_SCRUM_BY_ID,
+      variables: { id },
+    });
+    return data.teamScrumById;
+  }
+);
 
 export const addTeamScrum = async (input) => {
   const { data } = await client.mutate({

@@ -59,7 +59,10 @@
       ],
       "@data/*": [
         "./app/data/*"
-      ]
+      ],
+      "@slice/*": [
+        "./app/redux/slices/*"
+      ],
     }
   },
   "include": [

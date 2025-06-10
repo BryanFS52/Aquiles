@@ -2,58 +2,61 @@
 
 import { Sidebar } from "@components/UI/Sidebar";
 import { Header } from "@components/UI/header";
-import { useUser } from "@context/userContext";
+import { useUser } from "@context/UserContext";
+import { Provider } from "react-redux";
+import store from '@/redux/store';
 
 export default function LayoutContent({ children }) {
     const user = useUser();
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-[#001829] transition-colors duration-300">
-            {/* Layout principal */}
-            <div className="flex min-h-screen">
-                {/* Sidebar */}
-                <aside className="
+        <Provider store={store}>
+            <div className="min-h-screen bg-gray-50 dark:bg-[#001829] transition-colors duration-300">
+                {/* Layout principal */}
+                <div className="flex min-h-screen">
+                    {/* Sidebar */}
+                    <aside className="
                     w-0 lg:w-[300px] 
                     flex-shrink-0 
                     bg-transparent 
                     transition-all duration-300
-                ">
-                    <Sidebar role={user?.rol} />
-                </aside>
+                    ">
+                        <Sidebar role={user?.rol} />
+                    </aside>
 
-                {/* Contenido principal */}
-                <section className="
+                    {/* Contenido principal */}
+                    <section className="
                     flex-1 
                     flex flex-col 
                     min-h-screen 
                     w-full 
                     lg:w-[calc(100%-300px)]
                     min-w-0
-                ">
-                    {/* Header -  */}
-                    <div className="
+                    ">
+                        {/* Header -  */}
+                        <div className="
                         w-full 
                         flex-shrink-0
                         lg:pl-0
-                    ">
-                        <Header role={user?.rol} />
-                    </div>
+                        ">
+                            <Header role={user?.rol} />
+                        </div>
 
-                    {/* Área de contenido principal */}
-                    <main className="
+                        {/* Área de contenido principal */}
+                        <main className="
                         flex-1 
                         p-3 sm:p-4 lg:p-6 xl:p-8
                         bg-gray-50 dark:bg-[#001829] 
                         transition-colors duration-300
                         min-w-0
                         overflow-x-hidden
-                    ">
-                        <div className="
+                        ">
+                            <div className="
                             w-full 
                             max-w-none
                             h-full
-                        ">
-                            <div className="
+                            ">
+                                <div className="
                                 bg-white dark:bg-[#002033] 
                                 rounded-xl 
                                 shadow-sm 
@@ -62,13 +65,14 @@ export default function LayoutContent({ children }) {
                                 p-4 sm:p-6 lg:p-8
                                 transition-all duration-300
                                 w-full
-                            ">
-                                {children}
+                                ">
+                                    {children}
+                                </div>
                             </div>
-                        </div>
-                    </main>
-                </section>
+                        </main>
+                    </section>
+                </div>
             </div>
-        </div>
+        </Provider>
     );
 }

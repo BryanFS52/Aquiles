@@ -16,6 +16,8 @@ const TableAttendance = ({ studySheetData }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [filteredStudents, setFilteredStudents] = useState(studySheetData?.students || []);
 
+
+    console.log(studySheetData)
     useEffect(() => {
         setFilteredStudents(studySheetData?.students || []);
     }, [studySheetData]);

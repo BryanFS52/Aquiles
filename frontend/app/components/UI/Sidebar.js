@@ -106,7 +106,7 @@ export const Sidebar = ({ role: initialRole }) => {
                             width={80}
                             height={80}
                             className='
-                                bg-green-600 drop-shadow-xl pl-2 py-1 
+                                bg-gradient-to-r from-lime-600 to-lime-500 drop-shadow-xl pl-2 py-1 
                                 w-[60px] h-[60px] lg:w-[70px] lg:h-[70px] xl:w-[80px] xl:h-[80px]
                                 rounded-2xl border-2 border-darkGreen/30 
                                 dark:border-shadowBlue/40 dark:bg-darkBlue/80
@@ -131,7 +131,7 @@ export const Sidebar = ({ role: initialRole }) => {
                     {/* Selector temporal de rol */}
                     <div className="mb-6 lg:mb-8 flex items-center justify-center">
                         <div className="
-                            bg-gradient-to-r from-darkGreen/90 to-shadowBlue/90 
+                            bg-gradient-to-r from-lime-600 to-lime-500 
                             dark:from-shadowBlue/90 dark:to-darkBlue/90 
                             rounded-xl shadow px-3 lg:px-4 py-2 
                             flex gap-2 items-center 
@@ -181,8 +181,8 @@ export const Sidebar = ({ role: initialRole }) => {
                                                 before:absolute before:inset-0 before:rounded-xl before:-z-10 before:opacity-0 before:transition-opacity before:duration-200
                                                 hover:before:opacity-100
                                                 ${isActive ? 'before:opacity-100' : ''}
-                                                before:bg-gradient-to-r before:from-darkGreen before:to-lightGreen dark:before:from-[#1e3a8a] dark:before:to-[#2563eb]
-                                                ${isActive ? 'border-l-4 border-darkGreen dark:border-blue-400 pl-5' : 'hover:border-l-4 hover:border-darkGreen dark:hover:border-blue-400 hover:pl-5'}
+                                                before:bg-gradient-to-r before:from-lime-600 before:to-lime-500
+                                                ${isActive ? 'border-l-4 border-darkGreen dark:border-blue-400 pl-5' : 'hover:border-l-4 hover:border-t-lightGreen dark:hover:border-blue-400 hover:pl-5'}
                                                 text-darkBlue dark:text-white hover:text-white
                                                 ${isActive ? 'text-white' : ''}
                                             `}
