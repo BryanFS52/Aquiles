@@ -2,7 +2,6 @@ package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.FinalReportBusiness;
 import com.api.aquilesApi.Dto.FinalReportDto;
-import com.api.aquilesApi.Utilities.DataConvert;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
@@ -16,7 +15,6 @@ import java.util.Map;
 @DgsComponent
 public class FinalReportResolver {
     private final FinalReportBusiness finalReportBusiness;
-    private final DataConvert dataConvert = new DataConvert();
     public FinalReportResolver(FinalReportBusiness finalReportBusiness) {
         this.finalReportBusiness = finalReportBusiness;
     }
@@ -42,10 +40,9 @@ public class FinalReportResolver {
 
     // FindById finalReport (GraphQL)
     @DgsQuery
-    public Map<String, Object> finalReportById(@InputArgument String id) {
+    public Map<String, Object> finalReportById(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            FinalReportDto finalreportDto = finalReportBusiness.findById(idLong);
+            FinalReportDto finalreportDto = finalReportBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
                     finalreportDto,
                     ResponseHttpApi.CODE_OK,
@@ -88,12 +85,11 @@ public class FinalReportResolver {
 
     // Update finalReport (GraphQL)
     @DgsMutation
-    public Map<String, Object> updateFinalReport(@InputArgument String id, @InputArgument (name = "input") FinalReportDto finalreportDto) {
+    public Map<String, Object> updateFinalReport(@InputArgument Long id, @InputArgument (name = "input") FinalReportDto finalreportDto) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            finalReportBusiness.update(idLong, finalreportDto );
+            finalReportBusiness.update(id, finalreportDto );
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
@@ -107,12 +103,11 @@ public class FinalReportResolver {
 
     // Delete finalReport (GraphQL)
     @DgsMutation
-    public Map<String, Object> deleteFinalReport(@InputArgument String id) {
+    public Map<String, Object> deleteFinalReport(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            finalReportBusiness.delete(idLong);
+            finalReportBusiness.delete(id);
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );

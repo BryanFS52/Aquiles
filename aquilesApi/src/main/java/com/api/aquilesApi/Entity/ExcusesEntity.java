@@ -16,7 +16,6 @@ import java.util.Set;
 public class ExcusesEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "excuse_id", nullable = false)
     private Long excuseId;
 
     @Column(name = "excuse_description", nullable = false, length = 100)

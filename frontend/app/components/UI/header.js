@@ -118,7 +118,7 @@ export const Header = ({ role }) => {
                 className="text-lg sm:text-3xl lg:text-2xl relative group-hover:text-darkBlue dark:group-hover:text-lightGreen"
                 onClick={(e) => e.preventDefault()}
               >
-                <IoNotificationsOutline className="sm:w-xl text-lightGreen group-hover:text-darkBlue dark:group-hover:text-lightGreen transition-colors duration-300" />
+                <IoNotificationsOutline className="sm:w-xl text-lightGreen  group-hover:text-darkBlue dark:group-hover:text-lightGreen transition-colors duration-300" />
                 {unreadCount > 0 && (
                   <RiCheckboxBlankCircleFill className="absolute top-0 right-0 text-red-600 h-2 w-2 sm:h-2.5 sm:w-2.5 lg:h-3 lg:w-3 animate-pulse" />
                 )}
@@ -155,7 +155,7 @@ export const Header = ({ role }) => {
             font-semibold text-black dark:text-white 
             gap-2 sm:gap-3 
             py-2 px-2 sm:px-3 lg:px-4 
-            bg-lightGreen
+            bg-transparent
             dark:bg-darkBlue 
             rounded-lg 
             shadow-lg 

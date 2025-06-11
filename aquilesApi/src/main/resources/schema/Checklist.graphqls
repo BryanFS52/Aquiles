@@ -36,11 +36,11 @@ input ChecklistDto {
 
 extend type Query {
     allChecklists(page: Int, size: Int): ChecklistPage
-    checklistById(id: ID!): ChecklistPageId
+    checklistById(id: Long!): ChecklistPageId
 }
 
 extend type Mutation {
     addChecklist(input: ChecklistDto): Response
-    updateChecklist(id: ID!, input: ChecklistDto): Response
-    deleteChecklist(id: ID!): Response
+    updateChecklist(id: Long!, input: ChecklistDto): Response
+    deleteChecklist(id: Long!): Response
 }

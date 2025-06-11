@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.List;
-
 @NoArgsConstructor
 @Entity
 @Getter
@@ -17,8 +16,7 @@ import java.util.List;
 public class StateAttendanceEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "stateAttendance_id", nullable = false)
-    private Long stateAttendanceId;
+    private Long id;
 
     @Column (name = "status")
     private String status;

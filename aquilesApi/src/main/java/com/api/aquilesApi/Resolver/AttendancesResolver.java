@@ -3,13 +3,9 @@ package com.api.aquilesApi.Resolver;
 import com.api.aquilesApi.Business.AttendancesBusiness;
 import com.api.aquilesApi.Dto.AttendancesDto;
 import com.api.aquilesApi.Dto.QRCodePayload;
-import com.api.aquilesApi.Utilities.DataConvert;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.api.aquilesApi.Utilities.QrCodeGenerator;
-import com.netflix.graphql.dgs.DgsComponent;
-import com.netflix.graphql.dgs.DgsMutation;
-import com.netflix.graphql.dgs.DgsQuery;
-import com.netflix.graphql.dgs.InputArgument;
+import com.netflix.graphql.dgs.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -22,11 +18,19 @@ import java.util.UUID;
 public class AttendancesResolver {
     private final AttendancesBusiness attendancesBusiness;
     private final QrCodeGenerator qrCodeGenerator;
-    private final DataConvert dataConvert = new DataConvert();
 
     public AttendancesResolver(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator) {
         this.attendancesBusiness = attendancesBusiness;
         this.qrCodeGenerator = qrCodeGenerator;
+
+    }
+    @DgsData(parentType = "Attendance")
+    public Map<String, Object> student(DgsDataFetchingEnvironment env)  {
+        AttendancesDto attendance = env.getSource();
+        assert attendance != null;
+        return Map.of(
+                "__typename", "Student",
+                "id", attendance.getIdStudent());
     }
 
     // FindAll Attendances (GraphQL)
@@ -50,10 +54,9 @@ public class AttendancesResolver {
 
     // FindById Attendance (GraphQL)
     @DgsQuery
-    public Map<String, Object> attendanceById(@InputArgument String id) {
+    public Map<String, Object> attendanceById(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            AttendancesDto attendancesDto = attendancesBusiness.findById(idLong);
+            AttendancesDto attendancesDto = attendancesBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
                     attendancesDto,
                     ResponseHttpApi.CODE_OK,
@@ -85,12 +88,11 @@ public class AttendancesResolver {
 
     // Update Attendance (GraphQL)
     @DgsMutation
-    public Map<String, Object> updateAttendance(@InputArgument String id, @InputArgument ( name = "input")AttendancesDto attendancesDto) {
+    public Map<String, Object> updateAttendance(@InputArgument Long id, @InputArgument ( name = "input")AttendancesDto attendancesDto) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-             attendancesBusiness.update(idLong, attendancesDto );
+             attendancesBusiness.update(id, attendancesDto );
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
@@ -104,12 +106,11 @@ public class AttendancesResolver {
 
     // Delete Attendance (GraphQL)
     @DgsMutation
-    public Map<String, Object> deleteAttendance(@InputArgument String id) {
+    public Map<String, Object> deleteAttendance(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            attendancesBusiness.delete(idLong);
+            attendancesBusiness.delete(id);
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                    ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );

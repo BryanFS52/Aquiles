@@ -2,7 +2,6 @@ package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.ExcusesBusiness;
 import com.api.aquilesApi.Dto.ExcusesDto;
-import com.api.aquilesApi.Utilities.DataConvert;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
@@ -16,7 +15,6 @@ import java.util.Map;
 @DgsComponent
 public class ExcusesResolver {
     private final ExcusesBusiness excusesBusiness;
-    private final DataConvert dataConvert = new DataConvert();
     public ExcusesResolver(ExcusesBusiness excusesBusiness) {
         this.excusesBusiness = excusesBusiness;
     }
@@ -43,10 +41,9 @@ public class ExcusesResolver {
 
     // FindById a excuse (GraphQL)
     @DgsQuery
-    public Map<String, Object> excuseById(@InputArgument String id) {
+    public Map<String, Object> excuseById(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            ExcusesDto excusesDto = excusesBusiness.findById(idLong);
+            ExcusesDto excusesDto = excusesBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
                     excusesDto,
                     ResponseHttpApi.CODE_OK,
@@ -78,12 +75,11 @@ public class ExcusesResolver {
 
     // Update excuse (GraphQL)
     @DgsMutation
-    public Map<String, Object> updateExcuse(@InputArgument String id, @InputArgument( name = "input")ExcusesDto excusesDto) {
+    public Map<String, Object> updateExcuse(@InputArgument Long id, @InputArgument( name = "input")ExcusesDto excusesDto) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            excusesBusiness.update(idLong, excusesDto);
+            excusesBusiness.update(id, excusesDto);
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
@@ -96,12 +92,11 @@ public class ExcusesResolver {
 
     // Delete excuse (GraphQL)
     @DgsMutation
-    public Map<String, Object> deleteExcuse(@InputArgument String id) {
+    public Map<String, Object> deleteExcuse(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            excusesBusiness.delete(idLong);
+            excusesBusiness.delete(id);
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );

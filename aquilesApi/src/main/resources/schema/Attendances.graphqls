@@ -1,7 +1,12 @@
+type Student @key(fields: "id"){
+    id: ID
+}
+
 type Attendance {
     attendanceId: ID!
     attendanceDate: String
     stateAttendance: StateAttendance
+    student : Student
 }
 type StateAttendance {
     id: ID!
@@ -32,12 +37,12 @@ input AttendancesDto {
 
 extend type Query {
     allAttendances(page: Int , size: Int ): AttendancePage
-    attendanceById(id: ID!): AttendancePageId
+    attendanceById(id: Long!): AttendancePageId
 }
 
 
 extend type Mutation {
     addAttendance(input: AttendancesDto): Response
-    updateAttendance(id: ID!, input: AttendancesDto): Response
-    deleteAttendance(id: ID!): Response
+    updateAttendance(id: Long!, input: AttendancesDto): Response
+    deleteAttendance(id: Long!): Response
 }

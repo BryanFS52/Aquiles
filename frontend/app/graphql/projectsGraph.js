@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 // Queries and Mutations for Projects
-export const GET_PROJECTS = gql`
+export const GET_All_PROJECTS = gql`
   query GetProjects($page: Int, $size: Int) {
     allProjects(page: $page, size: $size) {
       date

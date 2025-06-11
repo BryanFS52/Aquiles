@@ -28,11 +28,11 @@ input ExcusesDto {
 
 extend type Query {
     allExcuses(page: Int, size: Int): ExcusePage
-    excuseById(id: ID!): ExcusePageId
+    excuseById(id: Long!): ExcusePageId
 }
 
 extend type Mutation {
     addExcuse(input: ExcusesDto): Response
-    updateExcuse(id: ID!, input: ExcusesDto): Response
-    deleteExcuse(id: ID!): Response
+    updateExcuse(id: Long!, input: ExcusesDto): Response
+    deleteExcuse(id: Long!): Response
 }

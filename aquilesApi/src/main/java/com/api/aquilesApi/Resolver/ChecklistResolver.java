@@ -1,7 +1,6 @@
 package com.api.aquilesApi.Resolver;
 import com.api.aquilesApi.Business.ChecklistBusiness;
 import com.api.aquilesApi.Dto.ChecklistDto;
-import com.api.aquilesApi.Utilities.DataConvert;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsQuery;
@@ -14,7 +13,6 @@ import java.util.Map;
 @DgsComponent
 public class ChecklistResolver {
     private final ChecklistBusiness checklistBusiness;
-    private final DataConvert dataConvert = new DataConvert();
     public ChecklistResolver(ChecklistBusiness checklistBusiness) {
         this.checklistBusiness = checklistBusiness;
     }
@@ -40,10 +38,9 @@ public class ChecklistResolver {
 
     // FindById Checklist (GraphQL)
     @DgsQuery
-    public Map<String, Object> checklistById(@InputArgument String id) {
+    public Map<String, Object> checklistById(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            ChecklistDto checklistDto = checklistBusiness.findById(idLong);
+            ChecklistDto checklistDto = checklistBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
                     checklistDto,
                     ResponseHttpApi.CODE_OK,
@@ -75,12 +72,11 @@ public class ChecklistResolver {
 
     // Update Checklist (GraphQL)
     @DgsMutation
-    public Map<String, Object> updateChecklist(@InputArgument String id, @InputArgument (name = "input")ChecklistDto checklistDto) {
+    public Map<String, Object> updateChecklist(@InputArgument Long id, @InputArgument (name = "input")ChecklistDto checklistDto) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            checklistBusiness.update(idLong, checklistDto );
+            checklistBusiness.update(id, checklistDto );
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
@@ -94,12 +90,11 @@ public class ChecklistResolver {
 
     // Delete Checklist (GraphQL)
     @DgsMutation
-    public Map<String, Object> deleteChecklist(@InputArgument String id) {
+    public Map<String, Object> deleteChecklist(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            checklistBusiness.delete(idLong);
+            checklistBusiness.delete(id);
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );

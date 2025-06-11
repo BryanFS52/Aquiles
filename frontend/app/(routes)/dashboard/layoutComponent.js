@@ -1,6 +1,6 @@
 'use client';
 
-import { Sidebar } from "@components/UI/Sidebar";
+import { Sidebar } from "@/components/UI/sidebar";
 import { Header } from "@components/UI/header";
 import { useUser } from "@context/UserContext";
 import { Provider } from "react-redux";
@@ -11,7 +11,7 @@ export default function LayoutContent({ children }) {
 
     return (
         <Provider store={store}>
-            <div className="min-h-screen bg-gray-50 dark:bg-[#001829] transition-colors duration-300">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
                 {/* Layout principal */}
                 <div className="flex min-h-screen">
                     {/* Sidebar */}
@@ -46,7 +46,7 @@ export default function LayoutContent({ children }) {
                         <main className="
                         flex-1 
                         p-3 sm:p-4 lg:p-6 xl:p-8
-                        bg-gray-50 dark:bg-[#001829] 
+                        bg-gray-50 dark:bg-gray-900
                         transition-colors duration-300
                         min-w-0
                         overflow-x-hidden

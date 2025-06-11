@@ -88,7 +88,7 @@ export const Sidebar = ({ role: initialRole }) => {
                     fixed top-0 left-0 z-50 h-full 
                     w-[280px] sm:w-[300px]
                     lg:static lg:w-full lg:max-w-[300px]
-                    bg-white/95 dark:bg-gradient-to-b dark:from-shadowBlue dark:to-darkBlue
+                    bg-white/95 dark:bg-gray-900
                     shadow-2xl lg:shadow-none
                     transition-transform duration-300
                     ${showMenu ? 'translate-x-0' : '-translate-x-full'}
@@ -109,7 +109,7 @@ export const Sidebar = ({ role: initialRole }) => {
                                 bg-gradient-to-r from-lime-600 to-lime-500 drop-shadow-xl pl-2 py-1 
                                 w-[60px] h-[60px] lg:w-[70px] lg:h-[70px] xl:w-[80px] xl:h-[80px]
                                 rounded-2xl border-2 border-darkGreen/30 
-                                dark:border-shadowBlue/40 dark:bg-darkBlue/80
+                                dark:from-shadowBlue dark:to-darkBlue 
                             '
                         />
                         <span className="
@@ -120,7 +120,7 @@ export const Sidebar = ({ role: initialRole }) => {
                             PROYECTOS FORMATIVOS<br />
                             <span className="
                                 uppercase text-xs lg:text-[13px] 
-                                text-darkGreen dark:text-lightGreen 
+                                text-darkGreen dark:text-blue-600
                                 font-extrabold tracking-widest
                             ">
                                 {role}
@@ -146,7 +146,7 @@ export const Sidebar = ({ role: initialRole }) => {
                                     rounded-lg px-2 lg:px-3 py-1 
                                     border-2 border-white/30 
                                     bg-white/90 dark:bg-darkBlue/80 
-                                    text-darkBlue dark:text-white 
+                                    text-black dark:text-white 
                                     font-bold shadow text-sm
                                     focus:outline-none focus:ring-2 focus:ring-darkGreen/60 
                                     transition-all duration-200
@@ -169,36 +169,29 @@ export const Sidebar = ({ role: initialRole }) => {
                                         <Link
                                             href={item.href}
                                             className={`
-                                                flex items-center gap-3 
-                                                py-2.5 lg:py-3 px-3 lg:px-4
-                                                rounded-xl transition-all 
-                                                text-sm lg:text-base
-                                                font-semibold group shadow-sm hover:shadow-lg 
-                                                border border-darkGreen/10 dark:border-shadowBlue/30
-                                                duration-200
-                                                tracking-wide truncate
-                                                relative overflow-hidden
-                                                before:absolute before:inset-0 before:rounded-xl before:-z-10 before:opacity-0 before:transition-opacity before:duration-200
-                                                hover:before:opacity-100
-                                                ${isActive ? 'before:opacity-100' : ''}
-                                                before:bg-gradient-to-r before:from-lime-600 before:to-lime-500
-                                                ${isActive ? 'border-l-4 border-darkGreen dark:border-blue-400 pl-5' : 'hover:border-l-4 hover:border-t-lightGreen dark:hover:border-blue-400 hover:pl-5'}
-                                                text-darkBlue dark:text-white hover:text-white
-                                                ${isActive ? 'text-white' : ''}
-                                            `}
+    flex items-center gap-3 
+    py-2.5 lg:py-3 px-3 lg:px-4
+    rounded-lg transition-all 
+    text-sm lg:text-base
+    font-semibold group hover:shadow-lg 
+    tracking-wide truncate relative overflow-hidden
+    before:absolute before:inset-0 before:-z-10 before:opacity-0 hover:before:opacity-100
+    before:bg-gradient-to-r before:from-lime-600 before:to-lime-500
+    dark:before:from-blue-900 dark:before:to-blue-800
+    ${isActive ? 'before:opacity-100 bg-gradient-to-r from-lime-600 to-lime-500 text-white shadow-md pl-4' : 'hover:bg-lime-200 dark:hover:bg-blue-900/30 hover:pl-4'}
+    text- dark:text-white
+  `}
                                             onClick={handleLinkClick}
                                             aria-current={isActive ? 'page' : undefined}
                                         >
-                                            <span className="
-                                                transition-transform group-hover:scale-125 
-                                                text-xl lg:text-2xl drop-shadow flex-shrink-0
-                                            ">
+                                            <span className="transition-transform group-hover:scale-125 text-xl lg:text-2xl drop-shadow flex-shrink-0">
                                                 {item.icon}
                                             </span>
                                             <span className="tracking-wide font-semibold truncate">
                                                 {item.label}
                                             </span>
                                         </Link>
+
                                     </li>
                                 );
                             })}

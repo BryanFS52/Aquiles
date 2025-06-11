@@ -2,7 +2,6 @@ package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.ImprovementPlanBusiness;
 import com.api.aquilesApi.Dto.ImprovementPlanDto;
-import com.api.aquilesApi.Utilities.DataConvert;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsQuery;

@@ -1,3 +1,5 @@
+scalar Long
+
 type Response {
     id : ID
     message : String

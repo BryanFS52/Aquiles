@@ -11,7 +11,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         'kiwi-marumaru': ['Kiwi Maru', 'serif'],
-        'inter': ['Inter', 'sans-serif'], // Se mantiene
+        'inter': ['Inter', 'sans-serif'],
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -22,8 +22,8 @@ const config: Config = {
         "green-gradient": "linear-gradient(to right, #398f0d, #84cc16)", // lime-500 ≈ #84cc16
       },
       colors: {
-        'darkBlue': '#00304D',
-        'shadowBlue': '#161727',
+        'darkBlue': '#005386',
+        'shadowBlue': '#00304d',
         'lightGray': '#E4E4E5',
         'darkGray': '#5e5c5c',
         'lightGreen': '#39A900',

@@ -30,12 +30,12 @@ public class AttendancesEntity implements Serializable {
     @JoinColumn(name = "fk_idExcuse", referencedColumnName = "excuse_id")
     private ExcusesEntity excuse;
 
-    @Column (name = "fk_student")
+    @Column (name = "student_id")
     private Long student;
 
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "fk_stateAttendance_id", referencedColumnName = "stateAttendance_id")
+    @JoinColumn(name = "stateAttendance_id", referencedColumnName = "stateAttendance_id")
     private StateAttendanceEntity stateAttendance;
 
     // 3.Relation (M-M) con notifications

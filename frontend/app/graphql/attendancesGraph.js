@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 // Queries and Mutations for Attendances
-export const GET_ATTENDANCES = gql`
+export const GET_ALL_ATTENDANCES = gql`
   query GetAttendances($page: Int, $size: Int) {
     allAttendances(page: $page, size: $size) {
       date
@@ -23,7 +23,7 @@ export const GET_ATTENDANCES = gql`
 `;
 
 export const GET_ATTENDANCE_BY_ID = gql`
-  query GetAttendanceById($id: ID!) {
+  query GetAttendanceById($id: Long!) {
     attendanceById(id: $id) {
       date
       code
@@ -59,7 +59,7 @@ export const ADD_ATTENDANCE = gql`
 `;
 
 export const UPDATE_ATTENDANCE = gql`
-  mutation UpdateAttendance($id: ID!, $input: AttendancesDto!) {
+  mutation UpdateAttendance($id: Long!, $input: AttendancesDto!) {
     updateAttendance(id: $id, input: $input) {
       code
       message
@@ -77,7 +77,7 @@ export const UPDATE_ATTENDANCE = gql`
 `;
 
 export const DELETE_ATTENDANCE = gql`
-  mutation DeleteAttendance($id: ID!) {
+  mutation DeleteAttendance($id: Long!) {
     deleteAttendance(id: $id) {
       code
       message

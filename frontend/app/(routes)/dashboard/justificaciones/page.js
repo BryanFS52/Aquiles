@@ -1,146 +1,182 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { GoSearch } from "react-icons/go";
 import { GrAttachment } from "react-icons/gr";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import Image from "next/image";
 import persona from "@public/img/persona.jpg";
 import PageTitle from "@components/UI/pageTitle";
-import justificationService from "@services/justificationService";
-
+import {
+  fetchJustifications,
+  setSelectedFiltro,
+  setSearchTerm,
+  nextPage,
+  previousPage,
+  downloadFile,
+  clearError,
+  selectJustifications,
+  selectFilteredJustifications,
+  selectJustificationLoading,
+  selectJustificationError,
+  selectCurrentPage,
+  selectTotalPages,
+  selectTotalItems,
+  selectItemsPerPage,
+  selectSelectedFiltro,
+  selectSearchTerm
+} from "@slice/justificationSlice";
 
 export default function JustificacionesInstructor() {
-  const [selectedFiltro, setSelectedFiltro] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
-  const [justificaciones, setJustificaciones] = useState([]);
-  const [totalItems, setTotalItems] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
 
-  // Obtener el MIMETYPE base64
-  function getMimeTypeFromBase64(base64) {
-    if (!base64) return "application/octet-stream";
+  // Selectors
+  const justificaciones = useSelector(selectJustifications);
+  const filteredJustificaciones = useSelector(selectFilteredJustifications);
+  const loading = useSelector(selectJustificationLoading);
+  const error = useSelector(selectJustificationError);
+  const currentPage = useSelector(selectCurrentPage);
+  const totalPages = useSelector(selectTotalPages);
+  const totalItems = useSelector(selectTotalItems);
+  const itemsPerPage = useSelector(selectItemsPerPage);
+  const selectedFiltro = useSelector(selectSelectedFiltro);
+  const searchTerm = useSelector(selectSearchTerm);
 
-    const signatures = {
-      "iVBORw0KGgo": "image/png",
-      "/9j/": "image/jpeg",
-      "JVBERi0": "application/pdf",
-      "R0lGODdh": "image/gif",
-      "R0lGODlh": "image/gif",
-      "UEsDBBQ": "application/zip",
-    };
-
-    const prefix = base64.substring(0, 20);
-
-    for (const sig in signatures) {
-      if (prefix.startsWith(sig)) {
-        return signatures[sig];
-      }
-    }
-
-    return "application/octet-stream";
-  }
-
-  // Obtener extensión según mimeType
-  function getExtensionFromMime(mimeType) {
-    const map = {
-      "image/png": "png",
-      "image/jpeg": "jpg",
-      "application/pdf": "pdf",
-      "image/gif": "gif",
-      "application/zip": "zip",
-    };
-    return map[mimeType] || "bin";
-  }
-
-  // Función para obtener justificaciones 
-  const fetchJustifications = async () => {
-    setLoading(true);
-    setError(null);
+  // Función helper para obtener extensión del archivo según mimeType
+  const getExtensionFromMime = (mimeType) => {
     try {
-      const response = await justificationService.getAllJustifications(currentPage, itemsPerPage);
-      if (response?.code === "200" || response?.code === 200) {
-        setJustificaciones(
-          response.data.map((j) => ({
-            id: j.id,
-            programa: j.justificationType?.name || "Sin programa",
-            ficha: j.notificationId || "N/A",
-            documento: j.documentNumber,
-            aprendiz: j.name,
-            fecha: new Date(j.justificationDate).toLocaleDateString("es-CO"),
-            estado: j.state ? "Activo" : "Inactivo",
-            archivoAdjunto: j.justificationFile,
-            archivoMime: j.fileType || getMimeTypeFromBase64(j.justificationFile),
-          }))
-        );
-        setTotalItems(response.totalItems);
-      } else {
-        setError(response.message || "Error cargando justificaciones");
-        setJustificaciones([]);
-        setTotalItems(0);
-      }
-    } catch (err) {
-      setError(err.message || "Error de conexión");
-      setJustificaciones([]);
-      setTotalItems(0);
+      const map = {
+        "image/png": "png",
+        "image/jpeg": "jpg",
+        "application/pdf": "pdf",
+        "image/gif": "gif",
+        "application/zip": "zip",
+      };
+      return map[mimeType] || "bin";
+    } catch (error) {
+      console.error("Error al obtener extensión de archivo:", error);
+      return "bin";
     }
-    setLoading(false);
   };
 
-  // Descargar archivo base64
-  const downloadBase64File = (base64Data, fileName, mimeType = "application/octet-stream") => {
-    const linkSource = `data:${mimeType};base64,${base64Data}`;
-    const downloadLink = document.createElement("a");
-    downloadLink.href = linkSource;
-    downloadLink.download = fileName;
-    downloadLink.click();
+  // Función para cargar justificaciones
+  const loadJustifications = async (page, size) => {
+    try {
+      dispatch(fetchJustifications({ page, size }));
+    } catch (error) {
+      console.error("Error al cargar justificaciones:", error);
+    }
   };
 
-  // Filtrado client-side
-  const filteredJustificaciones = useMemo(() => {
-    if (!searchTerm || !selectedFiltro) return justificaciones;
+  // Efectos
+  useEffect(() => {
+    loadJustifications(currentPage, itemsPerPage);
+  }, [dispatch, currentPage, itemsPerPage]);
 
-    return justificaciones.filter((j) => {
-      switch (selectedFiltro) {
-        case "programa":
-          return j.programa.toLowerCase().includes(searchTerm.toLowerCase());
-        case "ficha":
-          return j.ficha.includes(searchTerm);
-        case "documento":
-          return j.documento.includes(searchTerm);
-        case "aprendiz":
-          return j.aprendiz.toLowerCase().includes(searchTerm.toLowerCase());
-        case "fecha":
-          return j.fecha.includes(searchTerm);
-        default:
-          return true;
+
+  // Handlers
+  const handleFiltroChange = async (filtro) => {
+    try {
+      dispatch(setSelectedFiltro(filtro));
+    } catch (error) {
+      console.error("Error al cambiar filtro:", error);
+    }
+  };
+
+  const handleSearchChange = async (term) => {
+    try {
+      dispatch(setSearchTerm(term));
+    } catch (error) {
+      console.error("Error al cambiar término de búsqueda:", error);
+    }
+  };
+
+  const handleReloadJustifications = async () => {
+    try {
+      dispatch(fetchJustifications({ page: currentPage, size: itemsPerPage }));
+    } catch (error) {
+      console.error("Error al recargar justificaciones:", error);
+    }
+  };
+
+  const handlePreviousPage = async () => {
+    try {
+      dispatch(previousPage());
+    } catch (error) {
+      console.error("Error al ir a página anterior:", error);
+    }
+  };
+
+  const handleNextPage = async () => {
+    try {
+      dispatch(nextPage());
+    } catch (error) {
+      console.error("Error al ir a página siguiente:", error);
+      // mostrar feedback al usuario
+      showFeedback("error", "navegar", "página siguiente");
+    }
+  };
+
+  const handleDownloadFile = async (justificacion) => {
+    try {
+      if (!justificacion) {
+        throw new Error("Justificación no encontrada");
       }
-    });
-  }, [selectedFiltro, searchTerm, justificaciones]);
 
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+      if (!justificacion.archivoAdjunto) {
+        throw new Error("No hay archivo adjunto para descargar");
+      }
 
-  const handlePreviousPage = () => {
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
+      const mimeType = justificacion.archivoMime || "application/octet-stream";
+      const extension = getExtensionFromMime(mimeType);
+      const fileName = `justificacion_${justificacion.id}.${extension}`;
+
+      dispatch(downloadFile({
+        base64Data: justificacion.archivoAdjunto,
+        fileName: fileName,
+        mimeType: mimeType
+      }));
+
+      // mostrar feedback de éxito
+      showFeedback("success", "descargado", fileName);
+    } catch (error) {
+      console.error("Error al descargar archivo:", error);
+      // Mostrar feedback de error
+      showFeedback("error", "descargar", "archivo");
+    }
   };
 
-  const handleNextPage = () => {
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const handleClearError = async () => {
+    try {
+      dispatch(clearError());
+    } catch (error) {
+      console.error("Error al limpiar error:", error);
+    }
   };
+
+  // Los datos a mostrar dependen de si hay filtros activos
+  const getDataToShow = () => {
+    try {
+      return selectedFiltro && searchTerm ? filteredJustificaciones : justificaciones;
+    } catch (error) {
+      console.error("Error al obtener datos a mostrar:", error);
+      return [];
+    }
+  };
+
+  const dataToShow = getDataToShow();
 
   return (
     <div className="space-y-6">
       {/* Title */}
-
       <PageTitle>Justificaciones de aprendices</PageTitle>
+
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 items-center">
         <div className="w-full md:w-1/3">
           <select
-            onChange={(e) => setSelectedFiltro(e.target.value)}
+            onChange={(e) => handleFiltroChange(e.target.value)}
             value={selectedFiltro}
             className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
           >
@@ -158,7 +194,7 @@ export default function JustificacionesInstructor() {
             type="search"
             placeholder={`Buscar por ${selectedFiltro || "..."}`}
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="w-full pl-10 p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
             disabled={!selectedFiltro}
           />
@@ -169,8 +205,8 @@ export default function JustificacionesInstructor() {
       {/* Reload Button */}
       <div className="flex justify-start">
         <button
-          onClick={fetchJustifications}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={handleReloadJustifications}
+          className="px-6 py-3 bg-gradient-to-r from-lime-600 to-lime-500  hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={loading}
         >
           {loading ? "Cargando..." : "Recargar Justificaciones"}
@@ -180,7 +216,17 @@ export default function JustificacionesInstructor() {
       {/* Error Message */}
       {error && (
         <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-red-600 dark:text-red-400">{error}</p>
+          <div className="flex justify-between items-center">
+            <p className="text-red-600 dark:text-red-400">
+              {typeof error === 'string' ? error : error.message || 'Error desconocido'}
+            </p>
+            <button
+              onClick={handleClearError}
+              className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-medium"
+            >
+              ✕
+            </button>
+          </div>
         </div>
       )}
 
@@ -202,86 +248,99 @@ export default function JustificacionesInstructor() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredJustificaciones.map((justificacion) => (
-                  <tr
-                    key={justificacion.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-                  >
-                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                      {justificacion.programa}
-                    </td>
-                    <td className="px-6 py-4">{justificacion.ficha}</td>
-                    <td className="px-6 py-4">
-                      <Image
-                        src={persona}
-                        alt="Persona"
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                    </td>
-                    <td className="px-6 py-4">{justificacion.documento}</td>
-                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                      {justificacion.aprendiz}
-                    </td>
-                    <td className="px-6 py-4">{justificacion.fecha}</td>
-                    <td className="px-6 py-4">
-                      {justificacion.archivoAdjunto ? (
-                        <GrAttachment
-                          title={`Descargar archivo (${justificacion.archivoMime || "desconocido"})`}
-                          className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
-                          onClick={() => {
-                            const mimeType = justificacion.archivoMime || "application/octet-stream";
-                            const extension = getExtensionFromMime(mimeType);
-                            downloadBase64File(
-                              justificacion.archivoAdjunto,
-                              `justificacion_${justificacion.id}.${extension}`,
-                              mimeType
-                            );
-                          }}
+                {dataToShow.length > 0 ? (
+                  dataToShow.map((justificacion) => (
+                    <tr
+                      key={justificacion.id}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                    >
+                      <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                        {justificacion.programa}
+                      </td>
+                      <td className="px-6 py-4">{justificacion.ficha}</td>
+                      <td className="px-6 py-4">
+                        <Image
+                          src={persona}
+                          alt="Persona"
+                          className="w-10 h-10 rounded-full object-cover"
                         />
-                      ) : (
-                        <span className="text-gray-400 dark:text-gray-500">No hay archivo</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${justificacion.estado === "Activo"
-                        ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
-                        : "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
-                        }`}>
-                        {justificacion.estado}
-                      </span>
+                      </td>
+                      <td className="px-6 py-4">{justificacion.documento}</td>
+                      <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                        {justificacion.aprendiz}
+                      </td>
+                      <td className="px-6 py-4">{justificacion.fecha}</td>
+                      <td className="px-6 py-4">
+                        {justificacion.archivoAdjunto ? (
+                          <GrAttachment
+                            title={`Descargar archivo (${justificacion.archivoMime || "desconocido"})`}
+                            className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
+                            onClick={() => handleDownloadFile(justificacion)}
+                          />
+                        ) : (
+                          <span className="text-gray-400 dark:text-gray-500">No hay archivo</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${justificacion.estado === "Activo"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                          : "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                          }`}>
+                          {justificacion.estado}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="8" className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                      {selectedFiltro && searchTerm
+                        ? "No se encontraron resultados para la búsqueda"
+                        : "No hay justificaciones disponibles"
+                      }
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
 
           {/* Pagination */}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
-            <button
-              className="flex items-center px-4 py-2 text-sm font-medium text-black dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
-              onClick={handlePreviousPage}
-              disabled={currentPage === 1}
-            >
-              <IoIosArrowBack className="mr-2" />
-              Anterior
-            </button>
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
+              <button
+                className="flex items-center px-4 py-2 text-sm font-medium text-black dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1 || loading}
+              >
+                <IoIosArrowBack className="mr-2" />
+                Anterior
+              </button>
 
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-              Página {currentPage} de {totalPages} ({totalItems} registros)
-            </span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                Página {currentPage} de {totalPages} ({totalItems} registros)
+              </span>
 
-            <button
-              className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
-              onClick={handleNextPage}
-              disabled={currentPage === totalPages}
-            >
-              Siguiente
-              <IoIosArrowForward className="ml-2" />
-            </button>
-          </div>
+              <button
+                className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages || loading}
+              >
+                Siguiente
+                <IoIosArrowForward className="ml-2" />
+              </button>
+            </div>
+          )}
         </>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <span className="ml-3 text-gray-600 dark:text-gray-400">Cargando justificaciones...</span>
+        </div>
       )}
     </div>
   );
-} 
+}

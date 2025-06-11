@@ -42,7 +42,7 @@ export const GET_STUDY_SHEETS = gql`
 `;
 
 export const GET_STUDY_SHEET_BY_ID = gql`
-    query GetStudySheetById($id: ID!) {
+    query GetStudySheetById($id: Long!) {
         studySheetById(id: $id) {
             code
             message

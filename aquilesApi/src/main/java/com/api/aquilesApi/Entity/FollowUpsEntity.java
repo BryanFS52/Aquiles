@@ -14,8 +14,7 @@ import java.io.Serializable;
 public class FollowUpsEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "follow_up_id", nullable = false)
-    private Long followUpId;
+    private Long id;
 
     @Column(name = "fk_idStudent")
     private Long fkIdStudent;

@@ -2,7 +2,6 @@ package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.JustificationTypeBusiness;
 import com.api.aquilesApi.Dto.JustificationTypeDto;
-import com.api.aquilesApi.Utilities.DataConvert;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;

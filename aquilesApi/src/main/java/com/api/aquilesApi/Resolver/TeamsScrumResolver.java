@@ -4,7 +4,6 @@ package com.api.aquilesApi.Resolver;
 import com.api.aquilesApi.Business.TeamsScrumBusiness;
 import com.api.aquilesApi.Dto.TeamsScrumDto;
 import com.api.aquilesApi.Utilities.CustomException;
-import com.api.aquilesApi.Utilities.DataConvert;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.DgsComponent;
 import org.springframework.data.domain.Page;

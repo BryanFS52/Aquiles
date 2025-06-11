@@ -117,12 +117,12 @@ export default function Programas() {
                 {/* Icon Container en la pestañita */}
                 <div className="absolute top-0 right-0 w-0 h-0 z-20 flex items-start justify-end pt-7 pr-1">
                   <div className="absolute top-2 right-2">
-                    <Icon className="text-3xl md:text-4xl lg:text-5xl drop-shadow-lg text-black dark:text-white transition-colors duration-300" />
+                    <Icon className="text-3xl md:text-4xl lg:text-5xl drop-shadow-lg text-black/75 dark:text-white transition-colors duration-300" />
                   </div>
                 </div>
 
                 {/* Decorative Triangle */}
-                <div className="absolute top-0 right-0 w-0 h-0 border-l-[120px] border-l-transparent border-t-[130px] border-t-lightGreen dark:border-t-blue-900 opacity-90 transition-colors duration-300"></div>
+                <div className="absolute top-0 right-0 w-0 h-0 border-l-[120px] border-l-transparent border-t-[130px] border-t-lime-500/85 dark:border-t-blue-900 opacity-90 transition-colors duration-300"></div>
               </div>
             );
           })
