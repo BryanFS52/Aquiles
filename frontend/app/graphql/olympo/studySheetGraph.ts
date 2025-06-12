@@ -3,7 +3,7 @@ import { gql } from "@apollo/client";
 // Queries and Mutations for Study Sheets
 export const GET_STUDY_SHEETS = gql`
 
-    query GetStudySheets($name: String, $idJourney: Int, $page: Int, $size: Int) {
+    query GetStudySheets($name: String, $idJourney: Long, $page: Int, $size: Int) {
         allStudySheets(name: $name, idJourney: $idJourney, page: $page, size: $size) {
             date
             code

@@ -45,7 +45,7 @@ export const ADD_TEAM_SCRUM = gql`
     addTeamScrum(input: $input) {
       code
       message
-      data 
+      id 
     }
   }
 `;
@@ -55,10 +55,7 @@ export const UPDATE_TEAM_SCRUM = gql`
     updateTeamScrum(id: $id, input: $input) {
       code
       message
-      data {
-        id
-        name
-      }
+      id
     }
   }
 `;
@@ -68,7 +65,7 @@ export const DELETE_TEAM_SCRUM = gql`
     deleteTeamScrum(id: $id) {
       code
       message
-      data 
+      id 
     }
   }
 `;

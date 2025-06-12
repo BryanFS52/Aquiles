@@ -1,10 +1,3 @@
-type FinalReportResponse {
-    code: String
-    message: String
-    date: String
-    data: FinalReport
-}
-
 type FinalReport {
     id: ID!
     fileNumber: String
@@ -51,7 +44,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addFinalReport(input: FinalReportDto): FinalReportResponse
-    updateFinalReport(id: Long!, input: FinalReportDto): FinalReportResponse
-    deleteFinalReport(id: Long!): FinalReportResponse
+    addFinalReport(input: FinalReportDto): Response
+    updateFinalReport(id: Long!, input: FinalReportDto): Response
+    deleteFinalReport(id: Long!): Response
 }

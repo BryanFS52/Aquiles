@@ -1,10 +1,3 @@
-type JuriesResponse {
-    code: String
-    message: String
-    date: String
-    data: Juries
-}
-
 type Juries {
     id: ID!
     dateAssigned: String
@@ -39,7 +32,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addJury(input: JuriesDto): JuriesResponse
-    updateJury(id: Long!, input: JuriesDto): JuriesResponse
-    deleteJury(id: Long!): JuriesResponse
+    addJury(input: JuriesDto): Response
+    updateJury(id: Long!, input: JuriesDto): Response
+    deleteJury(id: Long!): Response
 }

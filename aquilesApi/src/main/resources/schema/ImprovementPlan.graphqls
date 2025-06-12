@@ -1,10 +1,3 @@
-type ImprovementPlanResponse {
-    code: String
-    message: String
-    date: String
-    data: ImprovementPlan
-}
-
 type ImprovementPlan {
     id: ID!
     city: String!
@@ -45,7 +38,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addImprovementPlan(input: ImprovementPlanDto): ImprovementPlanResponse
-    updateImprovementPlan(id: Long!, input: ImprovementPlanDto): ImprovementPlanResponse
-    deleteImprovementPlan(id: Long!): ImprovementPlanResponse
+    addImprovementPlan(input: ImprovementPlanDto): Response
+    updateImprovementPlan(id: Long!, input: ImprovementPlanDto): Response
+    deleteImprovementPlan(id: Long!): Response
 }

@@ -54,7 +54,7 @@ export const ADD_CHECKLIST = gql`
     addChecklist(input: $input) {
       code
       message
-      date
+      id
     }
   }
 `;
@@ -64,7 +64,7 @@ export const UPDATE_CHECKLIST = gql`
     updateChecklist(id: $id, input: $input) {
       code
       message
-      date
+      id
     }
   }
 `;
@@ -74,7 +74,7 @@ export const DELETE_CHECKLIST = gql`
     deleteChecklist(id: $id) {
       code
       message
-      date
+      id
     }
   }
 `;

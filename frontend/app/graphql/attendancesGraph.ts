@@ -48,14 +48,7 @@ export const ADD_ATTENDANCE = gql`
     addAttendance(input: $input) {
       code
       message
-      data {
-        attendanceId
-        attendanceDate
-        stateAttendance {
-          id
-          name
-        }
-      }
+      id
     }
   }
 `;
@@ -66,14 +59,7 @@ export const UPDATE_ATTENDANCE = gql`
     updateAttendance(id: $id, input: $input) {
       code
       message
-      data {
-        attendanceId
-        attendanceDate
-        stateAttendance {
-          id
-          name
-        }
-      }
+      id
     }
   }
 `;
@@ -84,14 +70,7 @@ export const DELETE_ATTENDANCE = gql`
     deleteAttendance(id: $id) {
       code
       message
-      data {
-        attendanceId
-        attendanceDate
-        stateAttendance {
-          id
-          name
-        }
-      }
+      id
     }
   }
 `;

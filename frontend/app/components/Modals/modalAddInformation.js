@@ -1,125 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { addProject, fetchProjectById } from '@services/projectService';
-
-const allApprentices = [
-  'Michael Felipe Laiton Chaparro',
-  'Laura Gómez Rojas',
-  'Santiago Torres Pérez',
-  'Juliana Díaz Martínez',
-  'Andrés Camilo Rodríguez',
-];
 
 const ModalAddInformation = ({ isOpen, onClose }) => {
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-      setProjectId(null); // limpiar al cerrar
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
-  const [search, setSearch] = useState('');
-  const [selectedApprentices, setSelectedApprentices] = useState([]);
-  const [description, setDescription] = useState('');
-  const [justification, setJustification] = useState('');
-  const [objectives, setObjectives] = useState('');
-  const [problem, setProblem] = useState('');
-  const [isError, setIsError] = useState(false);
-
-  // NUEVO: para guardar id del proyecto creado y mostrar modal detalle
-  const [projectId, setProjectId] = useState(null);
-  const [projectDetail, setProjectDetail] = useState(null);
-  const [loadingDetail, setLoadingDetail] = useState(false);
-  const [errorDetail, setErrorDetail] = useState(null);
-  const [showDetailModal, setShowDetailModal] = useState(false);
-
-  const handleToggleApprentice = (name) => {
-    if (selectedApprentices.includes(name)) {
-      setSelectedApprentices(selectedApprentices.filter((a) => a !== name));
-    } else {
-      setSelectedApprentices([...selectedApprentices, name]);
-    }
-  };
-
-  const filteredApprentices = allApprentices.filter((a) =>
-    a.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const handleCreate = async () => {
-    if (!description || !justification || !objectives || !problem) {
-      setIsError(true);
-      toast.error('¡No coinciden los campos!', {
-        position: 'top-right',
-        autoClose: 5000,
-        theme: 'colored',
-        style: { backgroundColor: '#f44336', color: '#fff' },
-      });
-      return;
-    }
-    setIsError(false);
-
-    const input = {
-      problem,
-      description,
-      objectives,
-      justification,
-      members: selectedApprentices,
-    };
-
-    try {
-      const response = await addProject(input);
-      console.log('Respuesta de creación:', response);
-
-      if (!response || !response.id) {
-        throw new Error('No se pudo obtener el ID del proyecto creado');
-      }
-
-      toast.success(`Proyecto creado exitosamente`, {
-        position: 'top-right',
-        autoClose: 5000,
-        theme: 'colored',
-        style: { backgroundColor: '#4caf50', color: '#fff' },
-      });
-      onClose();
-    } catch (error) {
-      toast.error(`Error al crear proyecto: ${error.message}`, {
-        position: 'top-right',
-        autoClose: 5000,
-        theme: 'colored',
-        style: { backgroundColor: '#f44336', color: '#fff' },
-      });
-    }
-  };
-
-
-  // Traer detalles del proyecto al abrir modal detalle
-  useEffect(() => {
-    if (!showDetailModal || !projectId) return;
-
-    setLoadingDetail(true);
-    fetchProjectById(projectId)
-      .then((data) => {
-        setProjectDetail(data);
-        setLoadingDetail(false);
-      })
-      .catch((err) => {
-        setErrorDetail(err.message);
-        setLoadingDetail(false);
-      });
-  }, [showDetailModal, projectId]);
-
-  const closeDetailModal = () => {
-    setShowDetailModal(false);
-    setProjectDetail(null);
-    setProjectId(null);
-  };
-
   return (
     <>
       {isOpen && (
@@ -213,33 +96,6 @@ const ModalAddInformation = ({ isOpen, onClose }) => {
       )}
 
       {/* Modal detalle proyecto */}
-      {showDetailModal && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50 px-4 py-6">
-          <div className="bg-white max-w-xl w-full rounded-lg shadow-lg p-6 relative">
-            <h3 className="text-xl font-semibold mb-4">Detalle del Proyecto</h3>
-
-            {loadingDetail && <p>Cargando...</p>}
-            {errorDetail && <p className="text-red-600">Error: {errorDetail}</p>}
-            {projectDetail && (
-              <div className="space-y-2">
-                <p><strong>Nombre:</strong> {projectDetail.name}</p>
-                <p><strong>Descripción:</strong> {projectDetail.description}</p>
-                <p><strong>Problemática:</strong> {projectDetail.problem}</p>
-                <p><strong>Objetivos:</strong> {projectDetail.objectives}</p>
-                <p><strong>Justificación:</strong> {projectDetail.justification}</p>
-                <p><strong>Miembros:</strong> {projectDetail.members?.join(', ')}</p>
-              </div>
-            )}
-
-            <button
-              onClick={closeDetailModal}
-              className="mt-6 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
     </>
   );
 };

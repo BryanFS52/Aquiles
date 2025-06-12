@@ -1,10 +1,3 @@
-type JustificationResponse {
-    code: String
-    message: String
-    date: String
-    data: Justification
-}
-
 type Justification {
     id: ID!
     documentNumber: String
@@ -53,7 +46,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addJustification(input: JustificationDto): JustificationResponse
-    updateJustification(id: Long!, input: JustificationDto): JustificationResponse
-    deleteJustification(id: Long!): JustificationResponse
+    addJustification(input: JustificationDto): Response
+    updateJustification(id: Long!, input: JustificationDto): Response
+    deleteJustification(id: Long!): Response
 }

@@ -45,7 +45,7 @@ export const ADD_IMPROVEMENT_PLAN = gql`
     addImprovementPlan(input: $input) {
       code
       message
-      date
+      id
     }
   }
 `;
@@ -55,7 +55,7 @@ export const UPDATE_IMPROVEMENT_PLAN = gql`
     updateImprovementPlan(id: $id, input: $input) {
       code
       message
-      date
+      id
     }
   }
 `;
@@ -65,7 +65,7 @@ export const DELETE_IMPROVEMENT_PLAN = gql`
     deleteImprovementPlan(id: $id) {
       code
       message
-      date
+      id
     }
   }
 `;

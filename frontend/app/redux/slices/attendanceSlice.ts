@@ -1,11 +1,24 @@
-import { client } from '@/lib/apollo-client'
+import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { GET_ALL_ATTENDANCES, GET_ATTENDANCE_BY_ID, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph'
+import {
+    GetAttendancesQuery,
+    GetAttendancesQueryVariables,
+    GetAttendanceByIdQuery,
+    AddAttendanceMutation,
+    AddAttendanceMutationVariables,
+    UpdateAttendanceMutation,
+    DeleteAttendanceMutation,
+    GetTeamScrumByIdQuery,
+    GetTeamScrumByIdQueryVariables,
+    GetAttendanceByIdQueryVariables,
+    UpdateAttendanceMutationVariables
+} from '@graphql/generated'
 
-export const fetchAttendances = createAsyncThunk(
+export const fetchAttendances = createAsyncThunk<GetAttendancesQuery['allAttendances'], GetAttendancesQueryVariables>(
     'attendance/fetchAll',
     async ({ page, size }) => {
-        const { data } = await client.query({
+        const { data } = await client.query<GetAttendancesQuery, GetAttendancesQueryVariables>({
             query: GET_ALL_ATTENDANCES,
             variables: { page, size },
             fetchPolicy: 'no-cache',
@@ -14,10 +27,11 @@ export const fetchAttendances = createAsyncThunk(
     }
 );
 
-export const fetchAttendanceById = createAsyncThunk(
+
+export const fetchAttendanceById = createAsyncThunk<GetAttendanceByIdQuery['attendanceById'], GetTeamScrumByIdQueryVariables>(
     'attendance/fetchById',
     async ({ id }) => {
-        const { data } = await client.query({
+        const { data } = await client.query<GetAttendanceByIdQuery, GetAttendanceByIdQueryVariables>({
             query: GET_ATTENDANCE_BY_ID,
             variables: { id },
         });
@@ -25,35 +39,41 @@ export const fetchAttendanceById = createAsyncThunk(
     }
 );
 
-export const addAttendance = createAsyncThunk(
+export const addAttendance = createAsyncThunk<AddAttendanceMutation['addAttendance'], AddAttendanceMutationVariables['input']>(
     'attendance/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate({
+            const { data } = await client.mutate<AddAttendanceMutation, AddAttendanceMutationVariables>({
                 mutation: ADD_ATTENDANCE,
                 variables: { input }
             });
-            const { addAttendance } = data;
-            if (addAttendance.code !== "200") {
-                return rejectWithValue({ code: addAttendance.code, message: addAttendance.message });
+            const res = data?.addAttendance;
+            if (!res || res.code !== '200') {
+                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
             }
-            return { ...input, id: addAttendance.id };
-        } catch (error) {
-            return rejectWithValue({ code: "500", message: error.message });
+            return res;
+        } catch (error: any) {
+            return rejectWithValue({ code: '500', message: error.message });
         }
     }
 );
 
-export const updateAttendance = createAsyncThunk(
+export const updateAttendance = createAsyncThunk<UpdateAttendanceMutation['updateAttendance'], AddAttendanceMutationVariables>(
     'attendance/update',
     async ({ id, input }, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate({
+            const { data } = await client.mutate<UpdateAttendanceMutation, UpdateAttendanceMutationVariables>({
                 mutation: UPDATE_ATTENDANCE,
                 variables: { id, input },
             });
-            return data.updateAttendance;
-        } catch (error) {
+
+            const res = data?.updateAttendance;
+            if (!res || res.code !== '200') {
+                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
+            }
+
+            return res;
+        } catch (error: any) {
             return rejectWithValue({ code: "500", message: error.message })
         }
     }
