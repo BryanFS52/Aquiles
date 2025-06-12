@@ -23,7 +23,7 @@ export const GET_ALL_IMPROVEMENT_PLANS = gql`
 `;
 
 export const GET_IMPROVEMENT_PLAN_BY_ID = gql`
-  query GetImprovementPlanById($id: ID!) {
+  query GetImprovementPlanById($id: Long!) {
     improvementPlanById(id: $id) {
       code
       message
@@ -51,7 +51,7 @@ export const ADD_IMPROVEMENT_PLAN = gql`
 `;
 
 export const UPDATE_IMPROVEMENT_PLAN = gql`
-  mutation UpdateImprovementPlan($id: ID!, $input: ImprovementPlanDto!) {
+  mutation UpdateImprovementPlan($id: Long!, $input: ImprovementPlanDto!) {
     updateImprovementPlan(id: $id, input: $input) {
       code
       message
@@ -61,7 +61,7 @@ export const UPDATE_IMPROVEMENT_PLAN = gql`
 `;
 
 export const DELETE_IMPROVEMENT_PLAN = gql`
-  mutation DeleteImprovementPlan($id: ID!) {
+  mutation DeleteImprovementPlan($id: Long!) {
     deleteImprovementPlan(id: $id) {
       code
       message

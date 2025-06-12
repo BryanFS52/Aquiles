@@ -1,4 +1,4 @@
-import { client } from '@lib/apollo-client';
+import { client } from '@/lib/apollo-client';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
     GET_TEAMS_SCRUMS,

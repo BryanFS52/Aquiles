@@ -1,4 +1,4 @@
-import { clientLAN } from '@lib/apollo-client';
+import { clientLAN } from '@/lib/apollo-client';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { GET_PROGRAMS } from '@graphql/olympo/programGraph';
 

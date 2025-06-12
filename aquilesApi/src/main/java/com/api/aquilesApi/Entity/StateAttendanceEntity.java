@@ -22,6 +22,7 @@ public class StateAttendanceEntity implements Serializable {
     private String status;
 
     // Relations
+
     @OneToMany(mappedBy = "stateAttendance" ,cascade = CascadeType.ALL ,  fetch = FetchType.LAZY)
     private List<AttendancesEntity> attendancesEntityList;
 

@@ -264,7 +264,7 @@ export default function Login() {
       <div className="font-inter min-h-screen flex flex-col lg:flex-row bg-white">
         {/* Panel de login */}
         <div className="lg:w-1/2 p-6 md:p-8 flex flex-col justify-center min-h-screen items-center">
-          <div className="max-w-md mx-auto w-full max-w-sm">
+          <div className="max-w-md mx-auto w-full">
             {/* Logo y título */}
             <div className="flex items-center mb-8">
               <Image

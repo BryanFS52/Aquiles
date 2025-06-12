@@ -25,18 +25,21 @@ export const GET_ALL_ATTENDANCES = gql`
 export const GET_ATTENDANCE_BY_ID = gql`
   query GetAttendanceById($id: Long!) {
     attendanceById(id: $id) {
-      date
-      code
-      message
-      data {
-        attendanceId
-        attendanceDate
-        stateAttendance {
-          id
-          name
-        }
+    code
+    message
+    date
+    data {
+      attendanceId
+      attendanceDate
+      stateAttendance {
+        id
+        name
+      }
+      student {
+        id
       }
     }
+  }
   }
 `;
 
@@ -45,7 +48,6 @@ export const ADD_ATTENDANCE = gql`
     addAttendance(input: $input) {
       code
       message
-      id
       data {
         attendanceId
         attendanceDate
@@ -57,13 +59,13 @@ export const ADD_ATTENDANCE = gql`
     }
   }
 `;
+
 
 export const UPDATE_ATTENDANCE = gql`
   mutation UpdateAttendance($id: Long!, $input: AttendancesDto!) {
     updateAttendance(id: $id, input: $input) {
       code
       message
-      id
       data {
         attendanceId
         attendanceDate
@@ -76,12 +78,12 @@ export const UPDATE_ATTENDANCE = gql`
   }
 `;
 
+
 export const DELETE_ATTENDANCE = gql`
   mutation DeleteAttendance($id: Long!) {
     deleteAttendance(id: $id) {
       code
       message
-      id
       data {
         attendanceId
         attendanceDate

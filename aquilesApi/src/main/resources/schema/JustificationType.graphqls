@@ -1,3 +1,10 @@
+type JustificationTypeResponse {
+    code: String
+    message: String
+    date: String
+    data: JustificationType
+}
+
 type JustificationType {
     id: ID!
     name: String
@@ -28,11 +35,11 @@ input JustificationTypeDto {
 
 extend type Query {
     allJustificationTypes(page: Int, size: Int): JustificationTypePage
-    justificationTypeById(id: ID!): JustificationTypePageId
+    justificationTypeById(id: Long!): JustificationTypePageId
 }
 
 extend type Mutation {
-    addJustificationType(input: JustificationTypeDto): Response
-    updateJustificationType(id: ID!, input: JustificationTypeDto): Response
-    deleteJustificationType(id: ID!): Response
+    addJustificationType(input: JustificationTypeDto): JustificationTypeResponse
+    updateJustificationType(id: Long!, input: JustificationTypeDto): JustificationTypeResponse
+    deleteJustificationType(id: Long!): JustificationTypeResponse
 }

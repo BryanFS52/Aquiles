@@ -15,7 +15,6 @@ import java.util.Map;
 @DgsComponent
 public class JustificationResolver {
     private final JustificationBusiness justificationBusiness;
-    private final DataConvert dataConvert = new DataConvert();
 
     public JustificationResolver(JustificationBusiness justificationBusiness) {
         this.justificationBusiness = justificationBusiness;
@@ -43,10 +42,9 @@ public class JustificationResolver {
 
     // FindById Justification (GraphQL)
     @DgsQuery
-    public Map<String, Object> justificationById(@InputArgument String id) {
+    public Map<String, Object> justificationById(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            JustificationDto justificationDto = justificationBusiness.findById(idLong);
+            JustificationDto justificationDto = justificationBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
                     justificationDto,
                     ResponseHttpApi.CODE_OK,
@@ -78,12 +76,11 @@ public class JustificationResolver {
 
     // Update Justification (GraphQL)
     @DgsMutation
-    public Map<String, Object> updateJustification(@InputArgument String id, @InputArgument (name = "input")JustificationDto justificationDto) {
+    public Map<String, Object> updateJustification(@InputArgument Long id, @InputArgument (name = "input")JustificationDto justificationDto) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            justificationBusiness.update(idLong, justificationDto );
+            justificationBusiness.update(id, justificationDto );
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
@@ -97,12 +94,11 @@ public class JustificationResolver {
 
     // Delete Justification (GraphQL)
     @DgsMutation
-    public Map<String, Object> deleteJustification(@InputArgument String id) {
+    public Map<String, Object> deleteJustification(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            justificationBusiness.delete(idLong);
+            justificationBusiness.delete(id);
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );

@@ -1,4 +1,4 @@
-import { client } from '@lib/apollo-client';
+import { client } from '@/lib/apollo-client';
 import {
   GET_ALL_CHECKLISTS,
   GET_CHECKLIST_BY_ID,

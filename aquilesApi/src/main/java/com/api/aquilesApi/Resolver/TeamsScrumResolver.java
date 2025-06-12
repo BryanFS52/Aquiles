@@ -18,7 +18,6 @@ import java.util.Map;
 public class TeamsScrumResolver {
 
     private final TeamsScrumBusiness teamsScrumBusiness;
-    private final DataConvert dataConvert = new DataConvert();
 
     public TeamsScrumResolver(TeamsScrumBusiness teamsScrumBusiness) {
         this.teamsScrumBusiness = teamsScrumBusiness;
@@ -54,10 +53,9 @@ public class TeamsScrumResolver {
 
     // FindById TeamScrum (GraphQL)
     @DgsQuery
-    public Map<String , Object> teamScrumById(@InputArgument String id){
+    public Map<String , Object> teamScrumById(@InputArgument Long id){
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            TeamsScrumDto teamsScrumDto = this.teamsScrumBusiness.findById(idLong);
+            TeamsScrumDto teamsScrumDto = this.teamsScrumBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
                     teamsScrumDto,
                     ResponseHttpApi.CODE_OK,
@@ -88,12 +86,11 @@ public class TeamsScrumResolver {
 
     // Update TeamScrum (GraphQL)
     @DgsMutation
-    public Map<String , Object>updateTeamScrum(@InputArgument String id , @InputArgument (name = "input")TeamsScrumDto teamsScrumDto){
+    public Map<String , Object>updateTeamScrum(@InputArgument Long id , @InputArgument (name = "input")TeamsScrumDto teamsScrumDto){
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            teamsScrumBusiness.update(idLong, teamsScrumDto);
+            teamsScrumBusiness.update(id, teamsScrumDto);
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
@@ -105,12 +102,11 @@ public class TeamsScrumResolver {
 
     // Delete TeamScrum (GraphQL)
     @DgsMutation
-    public Map<String, Object> deleteTeamScrum(@InputArgument String id) {
+    public Map<String, Object> deleteTeamScrum(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            teamsScrumBusiness.delete(idLong);
+            teamsScrumBusiness.delete(id);
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );

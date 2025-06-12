@@ -29,7 +29,7 @@ export const GET_ALL_JUSTIFICATIONS = gql`
 `;
 
 export const GET_JUSTIFICATION_BY_ID = gql`
-  query GetJustificationById($id: ID!) {
+  query GetJustificationById($id: Long!) {
     justificationById(id: $id) {
       code
       message
@@ -63,7 +63,7 @@ export const ADD_JUSTIFICATION = gql`
 `;
 
 export const UPDATE_JUSTIFICATION = gql`
-  mutation UpdateJustification($id: ID!, $input: JustificationDto!) {
+  mutation UpdateJustification($id: Long!, $input: JustificationDto!) {
     updateJustification(id: $id, input: $input) {
       code
       message
@@ -72,7 +72,7 @@ export const UPDATE_JUSTIFICATION = gql`
 `;
 
 export const DELETE_JUSTIFICATION = gql`
-  mutation DeleteJustification($id: ID!) {
+  mutation DeleteJustification($id: Long!) {
     deleteJustification(id: $id) {
       code
       message

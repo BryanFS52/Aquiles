@@ -2,16 +2,15 @@ package com.api.aquilesApi.Resolver;
 import com.api.aquilesApi.Business.JuriesBusiness;
 import com.api.aquilesApi.Dto.JuriesDto;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.netflix.graphql.dgs.DgsQuery;
 import org.springframework.data.domain.Page;
-import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
+import com.netflix.graphql.dgs.InputArgument;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-
 import java.util.Map;
 
-@Controller
+@DgsComponent
 public class JuriesResolver {
     private final JuriesBusiness juriesBusiness;
 
@@ -20,8 +19,8 @@ public class JuriesResolver {
     }
 
     // FindAll Juries (GraphQL)
-    @QueryMapping
-    public Map<String, Object> allJuries(@Argument int page, @Argument int size) {
+    @DgsQuery
+    public Map<String, Object> allJuries(@InputArgument Integer page, @InputArgument Integer size) {
         try {
             Page<JuriesDto> juriesDtoPage = juriesBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
@@ -39,8 +38,8 @@ public class JuriesResolver {
     }
 
     // FindById Jury (GraphQL)
-    @QueryMapping
-    public Map<String, Object> juryById (@Argument Long id) {
+    @DgsQuery
+    public Map<String, Object> juryById (@InputArgument Long id) {
         try {
             JuriesDto juriesDto = juriesBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
@@ -56,11 +55,10 @@ public class JuriesResolver {
     }
 
     // Add a new Jury (GraphQL)
-    @MutationMapping
-    public Map<String, Object> addJury (@Argument("input") JuriesDto juriesDto) {
+    @DgsMutation
+    public Map<String, Object> addJury (@InputArgument( name = "input") JuriesDto juriesDto) {
         try {
-            JuriesDto
-                    juriesDto1= juriesBusiness.add(juriesDto);
+            JuriesDto juriesDto1= juriesBusiness.add(juriesDto);
             return ResponseHttpApi.responseHttpAction(
 
                     juriesDto1.getId(),
@@ -75,8 +73,8 @@ public class JuriesResolver {
     }
 
     // Update Jury (GraphQL)
-    @MutationMapping
-    public Map<String, Object> updateJury (@Argument Long id, @Argument ("input")JuriesDto juriesDto) {
+    @DgsMutation
+    public Map<String, Object> updateJury (@InputArgument Long id, @InputArgument ( name = "input")JuriesDto juriesDto) {
         try {
             juriesBusiness.update(id, juriesDto );
             return ResponseHttpApi.responseHttpAction(
@@ -93,8 +91,8 @@ public class JuriesResolver {
     }
 
     // Delete Jury (GraphQL)
-    @MutationMapping
-    public Map<String, Object> deleteJury (@Argument Long id) {
+    @DgsMutation
+    public Map<String, Object> deleteJury (@InputArgument Long id) {
         try {
             juriesBusiness.delete(id);
             return ResponseHttpApi.responseHttpAction(

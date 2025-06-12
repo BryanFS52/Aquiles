@@ -15,7 +15,6 @@ import java.util.Map;
 @DgsComponent
 public class JustificationTypeResolver {
     private final JustificationTypeBusiness justificationTypeBusiness;
-    private final DataConvert dataConvert = new DataConvert();
     public JustificationTypeResolver(JustificationTypeBusiness justificationTypeBusiness) {
         this.justificationTypeBusiness = justificationTypeBusiness;
     }
@@ -41,10 +40,9 @@ public class JustificationTypeResolver {
 
     // FindById JustificationType (GraphQL)
     @DgsQuery
-    public Map<String, Object> justificationTypeById(@InputArgument String id) {
+    public Map<String, Object> justificationTypeById(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            JustificationTypeDto justificationtypeDto = justificationTypeBusiness.findById(idLong);
+            JustificationTypeDto justificationtypeDto = justificationTypeBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
                     justificationtypeDto,
                     ResponseHttpApi.CODE_OK,
@@ -76,12 +74,11 @@ public class JustificationTypeResolver {
 
     // Update JustificationType (GraphQL)
     @DgsMutation
-    public Map<String, Object> updateJustificationType(@InputArgument String id, @InputArgument (name = "input")JustificationTypeDto justificationtypeDto) {
+    public Map<String, Object> updateJustificationType(@InputArgument Long id, @InputArgument (name = "input")JustificationTypeDto justificationtypeDto) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            justificationTypeBusiness.update(idLong, justificationtypeDto );
+            justificationTypeBusiness.update(id, justificationtypeDto );
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
@@ -95,12 +92,11 @@ public class JustificationTypeResolver {
 
     // Delete JustificationType (GraphQL)
     @DgsMutation
-    public Map<String, Object> deleteJustificationType(@InputArgument String id) {
+    public Map<String, Object> deleteJustificationType(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            justificationTypeBusiness.delete(idLong);
+            justificationTypeBusiness.delete(id);
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );

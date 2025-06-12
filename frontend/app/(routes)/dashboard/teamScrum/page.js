@@ -102,8 +102,13 @@ export default function Home() {
   };
 
   // --- MODALS CONTROL ---
-  const handleOpenModal = () => setModalOpen(true);
-  const handleCloseModal = () => setModalOpen(false);
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
 
   const handleOpenAddInfoModal = () => setOpenAddInfoModal(true);
   const handleCloseAddInfoModal = () => setOpenAddInfoModal(false);
@@ -126,14 +131,13 @@ export default function Home() {
     setTeamToDelete(null);
   };
 
-
   return (
     <div className="space-y-6">
       {/* Título principal */}
       <PageTitle>Teams Scrum</PageTitle>
 
       {/* Sección de información y botón añadir */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between relative z-50">
         {loading ? (
           <p>Cargando equipos...</p>
         ) : teams.length === 0 ? (
@@ -143,6 +147,7 @@ export default function Home() {
         )}
 
         <button
+          type="button"
           onClick={handleOpenModal}
           className="flex items-center justify-center bg-[#40b003] hover:bg-[#2a7d02] dark:bg-[#40b003] dark:hover:bg-[#2a7d02] text-white px-4 py-2 rounded-lg transition-colors duration-300"
         >

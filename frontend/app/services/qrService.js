@@ -1,5 +1,5 @@
 // qrCodeService.js
-import { client } from '@lib/apollo-client';
+import { client } from '@/lib/apollo-client';
 import { GENERATE_QR_CODE } from '@graphql/generateQrGraph';
 
 const qrCodeService = {

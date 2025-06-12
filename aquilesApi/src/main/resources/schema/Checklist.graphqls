@@ -1,3 +1,10 @@
+type ChecklistResponse {
+    code: String
+    message: String
+    date: String
+    data: Checklist
+}
+
 type Checklist {
     id: ID!
     state: Boolean
@@ -40,7 +47,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addChecklist(input: ChecklistDto): Response
-    updateChecklist(id: Long!, input: ChecklistDto): Response
-    deleteChecklist(id: Long!): Response
+    addChecklist(input: ChecklistDto): ChecklistResponse
+    updateChecklist(id: Long!, input: ChecklistDto): ChecklistResponse
+    deleteChecklist(id: Long!): ChecklistResponse
 }

@@ -15,7 +15,6 @@ import java.util.Map;
 @DgsComponent
 public class ImprovementPlanResolver {
     private final ImprovementPlanBusiness improvementPlanBusiness;
-    private final DataConvert dataConvert = new DataConvert();
     public ImprovementPlanResolver(ImprovementPlanBusiness improvementPlanBusiness) {
         this.improvementPlanBusiness = improvementPlanBusiness;
     }
@@ -41,10 +40,9 @@ public class ImprovementPlanResolver {
 
     // FindById ImprovementPlan (GraphQL)
     @DgsQuery
-    public Map<String, Object> improvementPlanById(@InputArgument String id) {
+    public Map<String, Object> improvementPlanById(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            ImprovementPlanDto improvementplanDto = improvementPlanBusiness.findById(idLong);
+            ImprovementPlanDto improvementplanDto = improvementPlanBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
                     improvementplanDto,
                     ResponseHttpApi.CODE_OK,
@@ -76,12 +74,11 @@ public class ImprovementPlanResolver {
 
     // Update ImprovementPlan (GraphQL)
     @DgsMutation
-    public Map<String, Object> updateImprovementPlan(@InputArgument String id, @InputArgument (name = "input")ImprovementPlanDto improvementplanDto) {
+    public Map<String, Object> updateImprovementPlan(@InputArgument Long id, @InputArgument (name = "input")ImprovementPlanDto improvementplanDto) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            improvementPlanBusiness.update(idLong, improvementplanDto );
+            improvementPlanBusiness.update(id, improvementplanDto );
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
@@ -95,12 +92,11 @@ public class ImprovementPlanResolver {
 
     // Delete ImprovementPlan (GraphQL)
     @DgsMutation
-    public Map<String, Object> deleteImprovementPlan(@InputArgument String id) {
+    public Map<String, Object> deleteImprovementPlan(@InputArgument Long id) {
         try {
-            Long idLong = dataConvert.parseLongOrNull(id);
-            improvementPlanBusiness.delete(idLong);
+            improvementPlanBusiness.delete(id);
             return ResponseHttpApi.responseHttpAction(
-                    idLong,
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );

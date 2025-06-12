@@ -23,7 +23,7 @@ export const GET_TEAMS_SCRUMS = gql`
 `;
 
 export const GET_TEAM_SCRUM_BY_ID = gql`
-  query GetTeamScrumById($id: ID!) {
+  query GetTeamScrumById($id: Long!) {
     teamScrumById(id: $id) {
       date
       code
@@ -51,7 +51,7 @@ export const ADD_TEAM_SCRUM = gql`
 `;
 
 export const UPDATE_TEAM_SCRUM = gql`
-  mutation UpdateTeamScrum($id: ID!, $input: TeamsScrumDto!) {
+  mutation UpdateTeamScrum($id: Long!, $input: TeamsScrumDto!) {
     updateTeamScrum(id: $id, input: $input) {
       code
       message
@@ -64,7 +64,7 @@ export const UPDATE_TEAM_SCRUM = gql`
 `;
 
 export const DELETE_TEAM_SCRUM = gql`
-  mutation DeleteTeamScrum($id: ID!) {
+  mutation DeleteTeamScrum($id: Long!) {
     deleteTeamScrum(id: $id) {
       code
       message

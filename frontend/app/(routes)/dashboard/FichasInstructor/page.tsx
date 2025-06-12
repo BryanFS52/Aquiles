@@ -3,54 +3,48 @@
 import { useState, useEffect } from 'react';
 import { IoPeople } from "react-icons/io5";
 import { toast } from 'react-toastify';
+import { Student, FichaData, fichaMock } from '@/types/instructorSheets';
 import ApprenticeModal from '@components/Modals/apprenticeModal';
 import PageTitle from '@components/UI/pageTitle';
 
-// Datos locales simulados
-const fichaMock = {
-  number: "123456",
-  quarter: { name: "Mañana" },
-  program: { name: "Análisis y Desarrollo de Software" },
-  students: [
-    { id: 1, name: "Juan Pérez", attendance: "Presente" },
-    { id: 2, name: "María López", attendance: "Ausente" },
-    { id: 3, name: "Carlos Sánchez", attendance: "Presente" }
-  ]
-};
-const FichasInstructor = () => {
-  const [ficha, setFicha] = useState(null);
-  const [selectedApprentice, setSelectedApprentice] = useState(null);
-  const [isModalOpen, setModalOpen] = useState(false);
+const FichasInstructor: React.FC = () => {
+  const [ficha, setFicha] = useState<FichaData | null>(null);
+  const [selectedApprentice, setSelectedApprentice] = useState<Student | null>(null);
+  const [isModalOpen, setModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchFicha = () => {
+    const fetchFicha = (): void => {
       try {
-        const data = {
+        const data: FichaData = {
           ...fichaMock,
           numberStudents: fichaMock.students.length,
         };
         setFicha(data);
       } catch (error) {
-        toast.error("Error fetching ficha:", error);
+        toast.error(`Error fetching ficha: ${error}`);
       }
     };
 
     fetchFicha();
   }, []);
 
-  const openModal = (apprentice) => {
+  const openModal = (apprentice: Student | null): void => {
     setSelectedApprentice(apprentice);
     setModalOpen(true);
   };
 
-  const closeModal = () => {
+  const closeModal = (): void => {
     setSelectedApprentice(null);
     setModalOpen(false);
   };
 
   // Si la ficha no ha cargado aún, mostramos un mensaje de carga
   if (!ficha) {
-    return <p>Cargando ficha...</p>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-lg text-gray-600 dark:text-gray-300">Cargando ficha...</p>
+      </div>
+    );
   }
 
   return (
@@ -62,8 +56,16 @@ const FichasInstructor = () => {
           <div className="flex items-center shadow-xl dark:shadow-[0_4px_32px_0_rgba(22,23,39,0.7)] rounded-2xl p-6 bg-white dark:bg-gradient-to-br dark:from-shadowBlue dark:to-darkBlue ring-2 ring-white/10 dark:ring-shadowBlue/40 transition-all duration-300">
             <div>
               <div
-                className="flex-shrink-0 bg-gradient-to-r from-lime-300 to-lime-400 dark:bg-darkBlue rounded-2xl h-20 w-20 flex items-center justify-center mx-auto border-black dark:border-white border-4 cursor-pointer transition-colors duration-300 shadow-lg dark:shadow-md"
+                className="flex-shrink-0 bg-gradient-to-r from-lime-300 to-lime-400 dark:bg-darkBlue rounded-2xl h-20 w-20 flex items-center justify-center mx-auto border-black/50 dark:border-white border-4 cursor-pointer transition-colors duration-300 shadow-lg dark:shadow-md hover:scale-105 transform"
                 onClick={() => openModal(null)} // Abre el modal al hacer clic en el ícono
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    openModal(null);
+                  }
+                }}
+                aria-label="Ver lista de aprendices"
               >
                 <IoPeople className="text-5xl text-white" />
               </div>
@@ -93,8 +95,7 @@ const FichasInstructor = () => {
           <ApprenticeModal
             isOpen={isModalOpen}
             onClose={closeModal}
-            apprentice={selectedApprentice}
-            students={ficha.students} // Asegúrate de que esto esté definido
+            students={ficha.students}
           />
         </div>
       </div>

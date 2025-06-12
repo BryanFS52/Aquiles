@@ -1,4 +1,4 @@
-import { client } from "@lib/apollo-client";
+import { client } from "@/lib/apollo-client";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { GET_All_PROJECTS, GET_PROJECT_BY_ID, ADD_PROJECT, UPDATE_PROJECT, DELETE_PROJECT } from '@graphql/projectsGraph'
 

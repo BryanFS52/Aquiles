@@ -1,6 +1,6 @@
-import { client } from '@lib/apollo-client';
+import { client } from '@/lib/apollo-client';
 import {
-    GET_PROJECTS,
+    GET_All_PROJECTS,
     GET_PROJECT_BY_ID,
     ADD_PROJECT,
     UPDATE_PROJECT,
@@ -10,7 +10,7 @@ import {
 export const fetchProjects = async (page = 1, size = 10) => {
     try {
         const { data } = await client.query({
-            query: GET_PROJECTS,
+            query: GET_All_PROJECTS,
             variables: { page, size },
             fetchPolicy: 'network-only',
         });

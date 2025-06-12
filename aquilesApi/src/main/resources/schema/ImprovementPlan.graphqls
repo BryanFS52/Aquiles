@@ -1,3 +1,10 @@
+type ImprovementPlanResponse {
+    code: String
+    message: String
+    date: String
+    data: ImprovementPlan
+}
+
 type ImprovementPlan {
     id: ID!
     city: String!
@@ -34,11 +41,11 @@ type ImprovementPlanPageId {
 
 extend type Query {
     allImprovementPlans(page: Int, size: Int): ImprovementPlanPage
-    improvementPlanById(id: ID!): ImprovementPlanPageId
+    improvementPlanById(id: Long!): ImprovementPlanPageId
 }
 
 extend type Mutation {
-    addImprovementPlan(input: ImprovementPlanDto): Response
-    updateImprovementPlan(id: ID!, input: ImprovementPlanDto): Response
-    deleteImprovementPlan(id: ID!): Response
+    addImprovementPlan(input: ImprovementPlanDto): ImprovementPlanResponse
+    updateImprovementPlan(id: Long!, input: ImprovementPlanDto): ImprovementPlanResponse
+    deleteImprovementPlan(id: Long!): ImprovementPlanResponse
 }

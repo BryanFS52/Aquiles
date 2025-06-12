@@ -63,6 +63,9 @@
       "@slice/*": [
         "./app/redux/slices/*"
       ],
+      "@type/*": [
+        "./app/types/*"
+      ],
     }
   },
   "include": [
@@ -72,7 +75,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/(routes)/dashboard/Aprendices/page.jss"
+    "app/(routes)/dashboard/Aprendices/page.jss",
+    "app/graphql/olympo/programGraph.s",
+    "app/graphql/justificationsGraph.ts"
   ],
   "exclude": [
     "node_modules"

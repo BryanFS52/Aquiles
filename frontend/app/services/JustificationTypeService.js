@@ -1,4 +1,4 @@
-import { client } from '@lib/apollo-client';
+import { client } from '@/lib/apollo-client';
 import {
     GET_ALL_JUSTIFICATION_TYPES,
     GET_JUSTIFICATION_TYPE_BY_ID,

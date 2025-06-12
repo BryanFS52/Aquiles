@@ -1,3 +1,10 @@
+type ExcuseResponse {
+    code: String
+    message: String
+    date: String
+    data: Excuse
+}
+
 type Excuse {
     excuseId: ID!
     excuseDescription: String
@@ -32,7 +39,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addExcuse(input: ExcusesDto): Response
-    updateExcuse(id: Long!, input: ExcusesDto): Response
-    deleteExcuse(id: Long!): Response
+    addExcuse(input: ExcusesDto): ExcuseResponse
+    updateExcuse(id: Long!, input: ExcusesDto): ExcuseResponse
+    deleteExcuse(id: Long!): ExcuseResponse
 }

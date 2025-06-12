@@ -1,3 +1,10 @@
+type JuriesResponse {
+    code: String
+    message: String
+    date: String
+    data: Juries
+}
+
 type Juries {
     id: ID!
     dateAssigned: String
@@ -21,18 +28,18 @@ type JuriesPageId {
     message: String
 }
 
-input JuriesInput {
+input JuriesDto {
     dateAssigned: String
     listChecklistSubstantiationListsIds: [ID]
 }
 
 extend type Query {
     allJuries(page: Int, size: Int): JuriesPage
-    juryById(id: ID!): JuriesPageId
+    juryById(id: Long!): JuriesPageId
 }
 
 extend type Mutation {
-    addJury(input: JuriesInput): Response
-    updateJury(id: ID!, input: JuriesInput): Response
-    deleteJury(id: ID!): Response
+    addJury(input: JuriesDto): JuriesResponse
+    updateJury(id: Long!, input: JuriesDto): JuriesResponse
+    deleteJury(id: Long!): JuriesResponse
 }

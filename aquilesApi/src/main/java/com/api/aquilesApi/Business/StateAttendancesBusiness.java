@@ -37,10 +37,6 @@ public class StateAttendancesBusiness {
         stateAttendanceDto.setStateAttendanceId(dataObject.getLong("stateAttendanceId"));
         stateAttendanceDto.setStatus(dataObject.getString("status"));// Asegúrate de que el nombre del campo coincide con el JSON
 
-        // Validación para evitar duplicados (ajusta según tu lógica)
-        if (stateAttendanceService.existsStateAttendance(stateAttendanceDto.getStateAttendanceId())) {
-            throw new CustomException("Duplicate state attendance entry for id: " + stateAttendanceDto.getStateAttendanceId(), HttpStatus.BAD_REQUEST);
-        }
 
         return stateAttendanceDto;
     }

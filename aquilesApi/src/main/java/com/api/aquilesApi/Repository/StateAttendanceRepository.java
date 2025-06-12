@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StateAttendanceRepository extends JpaRepository<StateAttendanceEntity, Long> {
-    boolean existsByStateAttendanceId(Long stateAttendanceId);
 }

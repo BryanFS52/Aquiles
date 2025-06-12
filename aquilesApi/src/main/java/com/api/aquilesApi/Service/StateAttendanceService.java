@@ -48,7 +48,4 @@ public class StateAttendanceService implements Idao<StateAttendanceEntity , Long
         this.stateAttendanceRepository.save(entity);
     }
 
-    public boolean existsStateAttendance(Long stateAttendanceId) {
-        return stateAttendanceRepository.existsByStateAttendanceId(stateAttendanceId);
-    }
 }

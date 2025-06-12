@@ -1,4 +1,4 @@
-import { client } from '@lib/apollo-client';
+/* import { client } from '@lib/apollo-client';
 import {
   GET_ALL_JUSTIFICATIONS,
   GET_JUSTIFICATION_BY_ID,
@@ -166,3 +166,4 @@ const justificationService = {
 };
 
 export default justificationService;
+*/

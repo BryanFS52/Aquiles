@@ -17,22 +17,18 @@ export const GET_ALL_CHECKLISTS = gql`
         instructorSignature
         evaluationCriteria
         checklistHistory
-        associatedProject {
-          projectId
-          description
-        }
         associatedJuries {
           id
-          name
         }
       }
     }
   }
-`
+`;
+
 
 
 export const GET_CHECKLIST_BY_ID = gql`
-  query GetChecklistById($id: ID!) {
+  query GetChecklistById($id: Long!) {
     checklistById(id: $id) {
       code
       date
@@ -44,21 +40,17 @@ export const GET_CHECKLIST_BY_ID = gql`
         instructorSignature
         evaluationCriteria
         checklistHistory
-        associatedProject {
-          id
-          name
-        }
         associatedJuries {
           id
-          name
         }
       }
     }
   }
 `;
 
+
 export const ADD_CHECKLIST = gql`
-  mutation AddChecklist($input: ChecklistInput!) {
+  mutation AddChecklist($input: ChecklistDto!) {
     addChecklist(input: $input) {
       code
       message
@@ -68,7 +60,7 @@ export const ADD_CHECKLIST = gql`
 `;
 
 export const UPDATE_CHECKLIST = gql`
-  mutation UpdateChecklist($id: ID!, $input: ChecklistInput!) {
+  mutation UpdateChecklist($id: Long!, $input: ChecklistDto!) {
     updateChecklist(id: $id, input: $input) {
       code
       message
@@ -78,7 +70,7 @@ export const UPDATE_CHECKLIST = gql`
 `;
 
 export const DELETE_CHECKLIST = gql`
-  mutation DeleteChecklist($id: ID!) {
+  mutation DeleteChecklist($id: Long!) {
     deleteChecklist(id: $id) {
       code
       message

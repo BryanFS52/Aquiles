@@ -23,7 +23,7 @@ export const GET_All_PROJECTS = gql`
 `;
 
 export const GET_PROJECT_BY_ID = gql`
-  query GetProjectById($id: ID!) {
+  query GetProjectById($id: Long!) {
     projectById(id: $id) {
       date
       code
@@ -52,7 +52,7 @@ export const ADD_PROJECT = gql`
 `;
 
 export const UPDATE_PROJECT = gql`
-  mutation UpdateProject($id: ID!, $input: ProjectDto!) {
+  mutation UpdateProject($id: Long!, $input: ProjectDto!) {
     updateProject(id: $id, input: $input) {
       code
       message
@@ -70,7 +70,7 @@ export const UPDATE_PROJECT = gql`
 `;
 
 export const DELETE_PROJECT = gql`
-  mutation DeleteProject($id: ID!) {
+  mutation DeleteProject($id: Long!) {
     deleteProject(id: $id) {
       code
       message

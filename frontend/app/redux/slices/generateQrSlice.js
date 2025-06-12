@@ -1,4 +1,4 @@
-import { client } from '@lib/apollo-client';
+import { client } from '@/lib/apollo-client';
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { GENERATE_QR_CODE } from '@graphql/generateQrGraph'
 

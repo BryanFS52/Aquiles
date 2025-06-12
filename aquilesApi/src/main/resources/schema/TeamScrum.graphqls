@@ -1,3 +1,10 @@
+type TeamsScrumResponse {
+    code: String
+    message: String
+    date: String
+    data: TeamsScrum
+}
+
 type TeamsScrum {
     id: ID!
     name: String
@@ -36,11 +43,11 @@ input TeamsScrumDto {
 
 extend type Query {
     allTeamsScrums(page: Int, size: Int): TeamsScrumPage
-    teamScrumById(id: ID!): TeamsScrumPageId
+    teamScrumById(id: Long!): TeamsScrumPageId
 }
 
 extend type Mutation {
-    addTeamScrum(input: TeamsScrumDto!): Response
-    updateTeamScrum(id: ID!, input: TeamsScrumDto): Response
-    deleteTeamScrum(id: ID!): Response
+    addTeamScrum(input: TeamsScrumDto!): TeamsScrumResponse
+    updateTeamScrum(id: Long!, input: TeamsScrumDto): TeamsScrumResponse
+    deleteTeamScrum(id: Long!): TeamsScrumResponse
 }

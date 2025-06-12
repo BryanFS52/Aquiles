@@ -1,4 +1,4 @@
-import { clientLAN } from '@lib/apollo-client';
+import { clientLAN } from '@/lib/apollo-client';
 import { GET_PROGRAMS } from '@graphql/olympo/programGraph';
 
 const programService = {
