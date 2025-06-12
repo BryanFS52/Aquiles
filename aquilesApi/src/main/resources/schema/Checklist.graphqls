@@ -1,0 +1,46 @@
+type Checklist {
+    id: ID!
+    state: Boolean
+    remarks: String
+    instructorSignature: String
+    evaluationCriteria: Boolean
+    checklistHistory: String
+    associatedJuries: [Juries]
+}
+
+type ChecklistPage {
+    code: String
+    data: [Checklist]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type ChecklistPageId {
+    data: Checklist
+    date: String
+    code: String
+    message: String
+}
+
+input ChecklistDto {
+    state: Boolean!
+    remarks: String!
+    instructorSignature: String!
+    evaluationCriteria: Boolean!
+    checklistHistory: String!
+    associatedJuries: [ID!]!
+}
+
+extend type Query {
+    allChecklists(page: Int, size: Int): ChecklistPage
+    checklistById(id: Long!): ChecklistPageId
+}
+
+extend type Mutation {
+    addChecklist(input: ChecklistDto): Response
+    updateChecklist(id: Long!, input: ChecklistDto): Response
+    deleteChecklist(id: Long!): Response
+}

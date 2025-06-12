@@ -1,106 +1,103 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const ModalAddinformation = ({ isOpen, onClose }) => {
-	if (!isOpen) return null;
+const ModalAddInformation = ({ isOpen, onClose }) => {
+  return (
+    <>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-40 px-4 py-6">
+          <div className="bg-white w-full max-w-6xl max-h-[90vh] rounded-xl shadow-lg p-6 md:p-8 relative font-kiwi-marumaru overflow-auto">
+            <h2 className="text-2xl text-center font-semibold text-darkBlue mb-6 px-2 md:px-0">
+              Agregar <span className="text-shadowBlue">información</span> del Team
+            </h2>
 
-	// Estados para cada campo de entrada
-	const [selectedApprentices, setSelectedApprentices] = useState(
-		"Michael Felipe Laiton Chaparro"
-	);
-	const [description, setDescription] = useState("");
-	const [problem, setProblem] = useState("");
-	const [justification, setJustification] = useState("");
-	const [objective, setObjective] = useState("");
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="font-semibold text-darkGray">Aprendices</label>
+                <div className="border border-lightGray rounded-lg mt-2 shadow-sm flex flex-col h-60 md:h-[260px] overflow-hidden">
+                  <input
+                    type="text"
+                    className="px-3 py-2 border-b border-lightGray text-sm outline-none"
+                    placeholder="Filtrar aprendices..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                  <div className="flex-1 overflow-y-auto p-2 space-y-2 bg-white">
+                    {filteredApprentices.map((apprentice, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center text-sm px-2 py-1 border-b cursor-pointer hover:bg-lightGray rounded"
+                        onClick={() => handleToggleApprentice(apprentice)}
+                      >
+                        <span>{apprentice}</span>
+                        {selectedApprentices.includes(apprentice) && (
+                          <span className="text-lightGreen text-lg">✓</span>
+                        )}
+                      </div>
+                    ))}
+                    {filteredApprentices.length === 0 && (
+                      <p className="text-center text-sm text-darkGray">No hay coincidencias</p>
+                    )}
+                  </div>
+                </div>
+              </div>
 
-	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
-			<div className="fixed inset-0 bg-cyan-900 opacity-35"></div>
-			<div className="relative w-[90%] md:w-[35%] mx-auto my-12 bg-white rounded-lg shadow-lg">
-				<div className="p-8 flex flex-col items-center">
-					<h2 className="text-xl font-bold mb-4">Creación del Team</h2>
+              <div>
+                <label className="font-semibold text-darkGray">Aprendices seleccionados</label>
+                <div className="bg-lightGray border border-lightGray rounded-lg mt-2 shadow-sm p-3 h-60 md:h-[260px] overflow-y-auto space-y-1 text-sm">
+                  {selectedApprentices.length === 0 ? (
+                    <p className="text-darkGray">Ningún aprendiz seleccionado</p>
+                  ) : (
+                    selectedApprentices.map((apprentice, index) => (
+                      <div key={index}>{apprentice}</div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
 
-					{/* Campo para Aprendices seleccionados */}
-					<div className="w-full mb-4">
-						<label className="block text-left mb-1 font-bold">
-							Aprendices seleccionados
-						</label>
-						<select
-							value={selectedApprentices}
-							onChange={(e) => setSelectedApprentices(e.target.value)}
-							className="w-full p-2 border rounded"
-						>
-							<option>Michael Felipe Laiton Chaparro</option>
-						</select>
-					</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+              {[
+                { label: 'Problemática', value: problem, setter: setProblem },
+                { label: 'Descripción', value: description, setter: setDescription },
+                { label: 'Objetivo', value: objectives, setter: setObjectives },
+                { label: 'Justificación', value: justification, setter: setJustification },
+              ].map(({ label, value, setter }) => (
+                <div key={label}>
+                  <label className="text-sm font-semibold text-darkGray">{label}</label>
+                  <textarea
+                    className={`mt-2 w-full min-h-[100px] md:min-h-[96px] p-3 border rounded-lg resize-y shadow-sm ${isError && !value ? 'border-red-500' : 'border-lightGray'
+                      }`}
+                    placeholder={`Escribe ${label.toLowerCase()}...`}
+                    value={value}
+                    onChange={(e) => setter(e.target.value)}
+                  />
+                </div>
+              ))}
+            </div>
 
-					{/* Campo para Descripción */}
-					<div className="w-full mb-4">
-						<label className="block text-left mb-1 font-bold">
-							Descripción
-						</label>
-						<textarea
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-							className="w-full p-2 border rounded"
-							placeholder="Esto es una descripción de prueba"
-						></textarea>
-					</div>
+            <div className="flex flex-col md:flex-row justify-end mt-8 gap-4 px-2 md:px-0">
+              <button
+                onClick={onClose}
+                className="px-6 py-2 border border-lightGray text-darkGray bg-lightGray rounded-lg hover:bg-darkGray hover:text-white transition font-medium w-full md:w-auto"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleCreate}
+                className="px-6 py-2 bg-darkBlue text-white rounded-lg hover:bg-shadowBlue transition font-medium w-full md:w-auto"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-					{/* Campo para Problemática */}
-					<div className="w-full mb-4">
-						<label className="block text-left mb-1 font-bold">
-							Problemática
-						</label>
-						<textarea
-							value={problem}
-							onChange={(e) => setProblem(e.target.value)}
-							className="w-full p-2 border rounded"
-							placeholder="Esto es una problemática de prueba"
-						></textarea>
-					</div>
-
-					{/* Campo para Justificación */}
-					<div className="w-full mb-4">
-						<label className="block text-left mb-1 font-bold">
-							Justificación
-						</label>
-						<textarea
-							value={justification}
-							onChange={(e) => setJustification(e.target.value)}
-							className="w-full p-2 border rounded"
-							placeholder="Esto es una justificación"
-						></textarea>
-					</div>
-
-					{/* Campo para Objetivo */}
-					<div className="w-full mb-4">
-						<label className="block text-left mb-1 font-bold">Objetivo</label>
-						<textarea
-							value={objective}
-							onChange={(e) => setObjective(e.target.value)}
-							className="w-full p-2 border rounded"
-							placeholder="Este es el objetivo"
-						></textarea>
-					</div>
-
-					<div className="flex justify-center mt-4">
-						<button
-							onClick={onClose}
-							className="rounded-md px-8 py-4 border bg-custom-blue text-white hover:text-gray-900 hover:bg-gray-300 transition-colors mr-4"
-						>
-							Cancelar
-						</button>
-						<button
-							onClick={onClose}
-							className="hover:bg-gray-500 rounded-md transition-colors bg-custom-blue px-8 py-4 border text-white"
-						>
-							Crear
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
+      {/* Modal detalle proyecto */}
+    </>
+  );
 };
 
-export default ModalAddinformation;
+export default ModalAddInformation;

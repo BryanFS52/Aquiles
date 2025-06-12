@@ -1,0 +1,38 @@
+type JustificationType {
+    id: ID!
+    name: String
+    description: String
+}
+type JustificationTypePage {
+    code: String
+    data: [JustificationType]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type JustificationTypePageId {
+    data: JustificationType
+    date: String
+    code: String
+    message: String
+}
+
+input JustificationTypeDto {
+    id : ID
+    name: String
+    description: String
+}
+
+extend type Query {
+    allJustificationTypes(page: Int, size: Int): JustificationTypePage
+    justificationTypeById(id: Long!): JustificationTypePageId
+}
+
+extend type Mutation {
+    addJustificationType(input: JustificationTypeDto): Response
+    updateJustificationType(id: Long!, input: JustificationTypeDto): Response
+    deleteJustificationType(id: Long!): Response
+}

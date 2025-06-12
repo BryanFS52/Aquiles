@@ -5,11 +5,11 @@ const ModalVerMas = ({ isOpen }) => {
 
   return (
     <div className='flex flex-col my-6 items-center'>
-      
-        <span className='font-serif text-black-700'>Nombre del Team</span>
-        <div className="rounded-lg border-solid border-2 text-custom-blue ">
-                      <input type="text" name="document" placeholder='Nombre del Team' className='text-base text-gray-950 p-1 shadow-lg' />
-                  </div><br/><br/>
+
+      <span className='font-serif text-black-700'>Nombre del Team</span>
+      <div className="rounded-lg border-solid border-2 text-custom-blue ">
+        <input type="text" name="document" placeholder='Nombre del Team' className='text-base text-gray-950 p-1 shadow-lg' />
+      </div><br /><br />
       <span className='font-serif text-black-700'>Integrantes</span>
       <div className="flex flex-col">
         <div className="overflow-x-auto">

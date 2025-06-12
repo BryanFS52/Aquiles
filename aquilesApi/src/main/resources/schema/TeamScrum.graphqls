@@ -1,0 +1,46 @@
+type TeamsScrum {
+    id: ID!
+    name: String
+    problem: String
+    objectives: String
+    description: String
+    justification: String
+    checklist: Checklist
+}
+
+type TeamsScrumPage {
+    code: String
+    data: [TeamsScrum]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type TeamsScrumPageId {
+    data: TeamsScrum
+    date: String
+    code: String
+    message: String
+}
+
+input TeamsScrumDto {
+    name: String!
+    problem: String!
+    objectives: String!
+    description: String!
+    justification: String!
+    checklist: ChecklistDto
+}
+
+extend type Query {
+    allTeamsScrums(page: Int, size: Int): TeamsScrumPage
+    teamScrumById(id: Long!): TeamsScrumPageId
+}
+
+extend type Mutation {
+    addTeamScrum(input: TeamsScrumDto!): Response
+    updateTeamScrum(id: Long!, input: TeamsScrumDto): Response
+    deleteTeamScrum(id: Long!): Response
+}

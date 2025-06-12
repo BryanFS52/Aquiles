@@ -1,0 +1,44 @@
+type ImprovementPlan {
+    id: ID!
+    city: String!
+    date: String!
+    reason: String!
+    number: Int!
+    state: Boolean!
+}
+
+input ImprovementPlanDto {
+    city: String!
+    date: String!
+    reason: String!
+    number: Int!
+    state: Boolean!
+}
+
+type ImprovementPlanPage {
+    code: String
+    data: [ImprovementPlan]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type ImprovementPlanPageId {
+    data: ImprovementPlan
+    date: String
+    code: String
+    message: String
+}
+
+extend type Query {
+    allImprovementPlans(page: Int, size: Int): ImprovementPlanPage
+    improvementPlanById(id: Long!): ImprovementPlanPageId
+}
+
+extend type Mutation {
+    addImprovementPlan(input: ImprovementPlanDto): Response
+    updateImprovementPlan(id: Long!, input: ImprovementPlanDto): Response
+    deleteImprovementPlan(id: Long!): Response
+}

@@ -1,6 +1,11 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -12,15 +17,69 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./app/*"
+      ],
+      "@components/*": [
+        "./app/components/*"
+      ],
+      "@routes/*": [
+        "./app/(routes)/*"
+      ],
+      "@styles/*": [
+        "./app/styles/*"
+      ],
+      "@lib/*": [
+        "./app/lib/*"
+      ],
+      "@utils/*": [
+        "./app/utils/*"
+      ],
+      "@hooks/*": [
+        "./app/hooks/*"
+      ],
+      "@public/*": [
+        "public/*"
+      ],
+      "@services/*": [
+        "./app/services/*"
+      ],
+      "@graphql/*": [
+        "./app/graphql/*"
+      ],
+      "@context/*": [
+        "./app/context/*"
+      ],
+      "@data/*": [
+        "./app/data/*"
+      ],
+      "@slice/*": [
+        "./app/redux/slices/*"
+      ],
+      "@type/*": [
+        "./app/types/*"
+      ],
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/(routes)/home/page.js", "app/(routes)/inventario/page.js", "app/(routes)/roles/page.js", "app/components/estadistica.js", "app/components/header.js", "app/components/product.js", "app/components/sidebar.js", "app/page.js", "app/layout.js"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "app/(routes)/dashboard/Aprendices/page.jss",
+    "app/graphql/olympo/programGraph.s",
+    "app/graphql/justificationsGraph.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
