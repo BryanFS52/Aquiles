@@ -1,17 +1,28 @@
 import { client } from "@/lib/apollo-client";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
-    GET_ALL_CHECKLISTS,
-    GET_CHECKLIST_BY_ID,
-    ADD_CHECKLIST,
-    UPDATE_CHECKLIST,
+    GET_ALL_CHECKLISTS, GET_CHECKLIST_BY_ID, ADD_CHECKLIST, UPDATE_CHECKLIST,
     DELETE_CHECKLIST,
 } from '@graphql/checklistGraph';
+import {
+    GetAllChecklistsQuery,
+    GetAllChecklistsQueryVariables,
+    GetChecklistByIdQuery,
+    GetChecklistByIdQueryVariables,
+    AddChecklistMutation,
+    AddChecklistMutationVariables,
+    UpdateChecklistMutation,
+    UpdateChecklistMutationVariables,
+    DeleteChecklistMutation,
+    DeleteChecklistMutationVariables
+} from '@/generated'
 
-export const fetchChecklists = createAsyncThunk(
+export const fetchChecklists = createAsyncThunk<GetAllChecklistsQuery['allChecklists'],
+    GetAllChecklistsQueryVariables
+>(
     'checklist/fetchAll',
     async ({ page, size }) => {
-        const { data } = await client.query({
+        const { data } = await client.query<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>({
             query: GET_ALL_CHECKLISTS,
             variables: { page, size },
             fetchPolicy: 'no-cache',
@@ -20,10 +31,12 @@ export const fetchChecklists = createAsyncThunk(
     }
 );
 
-export const fetchChecklistById = createAsyncThunk(
+export const fetchChecklistById = createAsyncThunk<GetChecklistByIdQuery['checklistById'],
+    GetChecklistByIdQueryVariables
+>(
     'checklist/fetchById',
     async ({ id }) => {
-        const { data } = await client.query({
+        const { data } = await client.query<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>({
             query: GET_CHECKLIST_BY_ID,
             variables: { id },
         });
@@ -31,58 +44,77 @@ export const fetchChecklistById = createAsyncThunk(
     }
 );
 
-export const addChecklist = createAsyncThunk(
+export const addChecklist = createAsyncThunk<AddChecklistMutation['addChecklist'],
+    AddChecklistMutationVariables['input']
+>(
     'checklist/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate({
+            const { data } = await client.mutate<AddChecklistMutation, AddChecklistMutationVariables>({
                 mutation: ADD_CHECKLIST,
                 variables: { input }
             });
-            const { addChecklist } = data;
+            const res = data?.addChecklist;
             // Verificamos el código de la respuesta
-            if (addChecklist.code !== "200") {
-                // Si el código no es 200, retornamos el mensaje de error
-                return rejectWithValue({ code: addChecklist.code, message: addChecklist.message });
+            if (!res || res.code !== '200') {
+                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
             }
             // Si el código es 200, retornamos los datos
-            return { ...input, id: addChecklist.id };
-        } catch (error) {
-            return rejectWithValue({ code: "500", message: error.message });
+            return res;
+        } catch (error: any) {
+            return rejectWithValue({ code: '500', message: error.message });
         }
     }
 );
 
-export const updateChecklist = createAsyncThunk(
+export const updateChecklist = createAsyncThunk<UpdateChecklistMutation['updateChecklist'],
+    UpdateChecklistMutationVariables,
+    { rejectValue: { code: string; message: string } }
+>(
     'checklist/update',
     async ({ id, input }, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate({
+            const { data } = await client.mutate<UpdateChecklistMutation, UpdateChecklistMutationVariables>({
                 mutation: UPDATE_CHECKLIST,
                 variables: { id, input },
             });
-            return data.updateChecklist;
-        } catch (error) {
-            return rejectWithValue({ code: "500", message: error.message })
+
+            const res = data?.updateChecklist;
+            if (!res || res.code !== '200') {
+                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
+            }
+
+            return res;
+        } catch (error: any) {
+            return rejectWithValue({ code: '500', message: error.message });
         }
     }
 );
 
-export const deleteChecklist = createAsyncThunk(
+export const deleteChecklist = createAsyncThunk<string, string,
+    { rejectValue: { code: string; message: string } }
+>(
     'checklist/delete',
     async (id, { rejectWithValue }) => {
         try {
-            await client.mutate({
+            const { data } = await client.mutate<DeleteChecklistMutation, DeleteChecklistMutationVariables>({
                 mutation: DELETE_CHECKLIST,
                 variables: { id },
             });
+            const res = data?.deleteChecklist;
+            if (!res || res.code !== '200') {
+                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
+            }
+
             return id;
-        } catch (error) {
-            return rejectWithValue({ code: "500", message: error.message })
+
+        } catch (error: any) {
+            return rejectWithValue({ code: '500', message: error.message });
         }
     }
 );
 
+/*
 const checklistSlice = createSlice({
     name: 'checklist',
     initialState: {
@@ -159,5 +191,5 @@ const checklistSlice = createSlice({
 });
 
 export const { } = checklistSlice.actions;
-
 export default checklistSlice.reducer;
+*/
