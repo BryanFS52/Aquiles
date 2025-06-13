@@ -27,7 +27,7 @@ export default function Options() {
       {/* Tabla */}
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table className="w-full text-sm text-left text-gray-700 bg-white rounded-lg">
-          <thead className="text-xs uppercase bg-gray-50 text-gray-600">
+          <thead className="text-xs uppercase bg-gray-50 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
             <tr>
               <th className="px-4 py-3">Pograma</th>
               <th className="px-4 py-3">Ficha</th>

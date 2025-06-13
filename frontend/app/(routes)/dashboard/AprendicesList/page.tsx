@@ -6,7 +6,7 @@ import { ImMail4 } from "react-icons/im";
 import { toast } from "react-toastify";
 import ModalCorreo from "@components/Modals/modalCorreo";
 import { sendEmailAbsence } from "@services/emailService";
-import { getAllApprentices } from "@services/apprenticeService";
+// import { getAllApprentices } from "@services/apprenticeService"; corregir
 
 export default function AprendicesList() {
     const [isModalOpen, setIsModalOpen] = useState(false);

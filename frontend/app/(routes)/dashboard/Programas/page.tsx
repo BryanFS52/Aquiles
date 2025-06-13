@@ -105,7 +105,7 @@ const Programas: React.FC = () => {
     return (
       <div
         key={program.id}
-        className="flex w-full max-w-md h-52 rounded-lg overflow-hidden shadow-lg bg-gray-100 dark:bg-gray-700 relative p-4 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+        className="fflex w-full max-w-md h-52 rounded-lg overflow-hidden shadow-lg bg-gray-100 dark:bg-gray-700 relative p-4 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
       >
         <div className="z-10 flex flex-col justify-between p-2 flex-1">
           <div className="space-y-2 flex flex-col h-full">

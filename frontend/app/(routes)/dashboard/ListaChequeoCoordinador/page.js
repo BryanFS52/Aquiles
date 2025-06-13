@@ -43,7 +43,7 @@ export default function CoordinadorChecklistView() {
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <label htmlFor="trimestre" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="trimestre" className="block text-sm font-medium text-gray-700 dark:text-gray-100">
             Trimestre
           </label>
           <select

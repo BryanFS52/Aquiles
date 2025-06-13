@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 
 // Card reutilizable
 const Card = ({ children, className = '' }) => (
-  <div className={`bg-white dark:bg-[#0b1f33] shadow-xl rounded-xl p-6 w-full md:w-[400px] lg:w-[450px] flex flex-col justify-between ${className}`}>
+  <div className={`bg-white dark:bg-gray-500/40 shadow-xl rounded-xl p-6 w-full md:w-[400px] lg:w-[450px] flex flex-col justify-between ${className}`}>
     {children}
   </div>
 )
