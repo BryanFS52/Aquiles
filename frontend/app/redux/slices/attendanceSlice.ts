@@ -1,7 +1,8 @@
 import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { GET_ALL_ATTENDANCES, GET_ATTENDANCE_BY_ID, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph'
-import { AttendanceItem, initialAttendanceState, RejectedPayload } from '@type/slices/attendance'
+import { AttendanceItem, initialAttendanceState } from '@type/slices/attendance'
+import { RejectedPayload } from '@type/slices/common/errores'
 import {
     GetAttendancesQuery,
     GetAttendancesQueryVariables,
@@ -13,7 +14,7 @@ import {
     UpdateAttendanceMutationVariables,
     DeleteAttendanceMutation,
     DeleteAttendanceMutationVariables
-} from '@/generated'
+} from '@graphql/generated'
 
 // Función para transformar datos de GraphQL a AttendanceItem
 const transformGraphQLToAttendanceItem = (graphqlData: any): AttendanceItem => {

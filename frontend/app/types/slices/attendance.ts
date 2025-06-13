@@ -30,8 +30,4 @@ export const initialAttendanceState: AttendanceState = {
     totalPages: 0,
 };
 
-// Tipo para errores rechazados (Global)
-export interface RejectedPayload {
-    code?: string;
-    message?: string;
-}
+

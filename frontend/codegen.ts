@@ -14,6 +14,8 @@ const config: CodegenConfig = {
                 withHooks: true,
                 withHOC: false,
                 withComponent: false,
+                skipTypename: true,
+                omitTypename: true,
             },
         },
     },
