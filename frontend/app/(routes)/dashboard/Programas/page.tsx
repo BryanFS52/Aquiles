@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 
@@ -10,9 +10,9 @@ import { BsPersonRolodex } from 'react-icons/bs';
 import { SlCalculator } from 'react-icons/sl';
 import { GrUserSettings } from 'react-icons/gr';
 import { LiaLanguageSolid } from 'react-icons/lia';
-import PageTitle from '@components/UI/pageTitle';
 import { Program, IconMapType, programsData, ITEMS_PER_PAGE } from '@type/programs';
-import { PaginationState } from '@type/General/pagination'
+import { PaginationState } from '@type/global/pagination'
+import PageTitle from '@components/UI/pageTitle';
 
 const Programas: React.FC = () => {
   const [programs, setPrograms] = useState<Program[]>([]);

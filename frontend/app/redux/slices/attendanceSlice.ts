@@ -1,19 +1,31 @@
 import { client } from '@lib/apollo-client'
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { GET_ALL_ATTENDANCES, GET_ATTENDANCE_BY_ID, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph'
+import { AttendanceItem, initialAttendanceState, RejectedPayload } from '@type/slices/attendance'
 import {
     GetAttendancesQuery,
     GetAttendancesQueryVariables,
     GetAttendanceByIdQuery,
+    GetAttendanceByIdQueryVariables,
     AddAttendanceMutation,
     AddAttendanceMutationVariables,
     UpdateAttendanceMutation,
+    UpdateAttendanceMutationVariables,
     DeleteAttendanceMutation,
-    GetTeamScrumByIdQuery,
-    GetTeamScrumByIdQueryVariables,
-    GetAttendanceByIdQueryVariables,
-    UpdateAttendanceMutationVariables
-} from '@graphql/generated'
+    DeleteAttendanceMutationVariables
+} from '@/generated'
+
+// Función para transformar datos de GraphQL a AttendanceItem
+const transformGraphQLToAttendanceItem = (graphqlData: any): AttendanceItem => {
+    return {
+        id: graphqlData.attendanceId || graphqlData.id,
+        attendanceDate: graphqlData.attendanceDate,
+        stateAttendance: graphqlData.stateAttendance ? {
+            id: graphqlData.stateAttendance.id,
+            name: graphqlData.stateAttendance.name
+        } : null
+    };
+};
 
 export const fetchAttendances = createAsyncThunk<GetAttendancesQuery['allAttendances'], GetAttendancesQueryVariables>(
     'attendance/fetchAll',
@@ -27,8 +39,7 @@ export const fetchAttendances = createAsyncThunk<GetAttendancesQuery['allAttenda
     }
 );
 
-
-export const fetchAttendanceById = createAsyncThunk<GetAttendanceByIdQuery['attendanceById'], GetTeamScrumByIdQueryVariables>(
+export const fetchAttendanceById = createAsyncThunk<GetAttendanceByIdQuery['attendanceById'], GetAttendanceByIdQueryVariables>(
     'attendance/fetchById',
     async ({ id }) => {
         const { data } = await client.query<GetAttendanceByIdQuery, GetAttendanceByIdQueryVariables>({
@@ -39,7 +50,9 @@ export const fetchAttendanceById = createAsyncThunk<GetAttendanceByIdQuery['atte
     }
 );
 
-export const addAttendance = createAsyncThunk<AddAttendanceMutation['addAttendance'], AddAttendanceMutationVariables['input']>(
+export const addAttendance = createAsyncThunk<AddAttendanceMutation['addAttendance'], AddAttendanceMutationVariables['input'],
+    { rejectValue: { code: string; message: string } }
+>(
     'attendance/add',
     async (input, { rejectWithValue }) => {
         try {
@@ -48,6 +61,7 @@ export const addAttendance = createAsyncThunk<AddAttendanceMutation['addAttendan
                 variables: { input }
             });
             const res = data?.addAttendance;
+
             if (!res || res.code !== '200') {
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
             }
@@ -58,7 +72,9 @@ export const addAttendance = createAsyncThunk<AddAttendanceMutation['addAttendan
     }
 );
 
-export const updateAttendance = createAsyncThunk<UpdateAttendanceMutation['updateAttendance'], AddAttendanceMutationVariables>(
+export const updateAttendance = createAsyncThunk<UpdateAttendanceMutation['updateAttendance'], UpdateAttendanceMutationVariables,
+    { rejectValue: { code: string; message: string } }
+>(
     'attendance/update',
     async ({ id, input }, { rejectWithValue }) => {
         try {
@@ -74,36 +90,37 @@ export const updateAttendance = createAsyncThunk<UpdateAttendanceMutation['updat
 
             return res;
         } catch (error: any) {
-            return rejectWithValue({ code: "500", message: error.message })
+            return rejectWithValue({ code: '500', message: error.message });
         }
     }
 );
 
-export const deleteAttendance = createAsyncThunk(
+export const deleteAttendance = createAsyncThunk<string, string,
+    { rejectValue: { code: string; message: string } }
+>(
     'attendance/delete',
     async (id, { rejectWithValue }) => {
         try {
-            await client.mutate({
+            const { data } = await client.mutate<DeleteAttendanceMutation, DeleteAttendanceMutationVariables>({
                 mutation: DELETE_ATTENDANCE,
                 variables: { id },
             });
-            return id;
-        } catch (error) {
-            return rejectWithValue({ code: "500", message: error.message })
+
+            const res = data?.deleteAttendance;
+            if (!res || res.code !== '200') {
+                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
+            }
+
+            return id; // Devolvemos solo el ID borrado para actualizar el estado
+        } catch (error: any) {
+            return rejectWithValue({ code: '500', message: error.message });
         }
     }
 );
 
 const attendanceSlice = createSlice({
     name: 'attendance',
-    initialState: {
-        data: [],
-        totalItems: 0,
-        totalPages: 0,
-        currentPage: 0,
-        loading: false,
-        error: null,
-    },
+    initialState: initialAttendanceState,
     reducers: {},
     extraReducers: (builder) => {
         builder
@@ -111,61 +128,81 @@ const attendanceSlice = createSlice({
             .addCase(fetchAttendances.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(fetchAttendances.fulfilled, (state, action) => {
-                state.data = action.payload.data;
-                state.totalItems = action.payload.totalItems;
-                state.totalPages = action.payload.totalPages;
-                state.currentPage = action.payload.currentPage;
+            .addCase(fetchAttendances.fulfilled, (state, action: PayloadAction<GetAttendancesQuery['allAttendances']>) => {
+                if (action.payload?.data) {
+                    // Filtra nulls y transforma los datos
+                    state.data = action.payload.data
+                        .filter((item): item is NonNullable<typeof item> => item !== null)
+                        .map(transformGraphQLToAttendanceItem);
+                    state.totalItems = action.payload.totalItems ?? 0;
+                    state.totalPages = action.payload.totalPages ?? 0;
+                    state.currentPage = action.payload.currentPage ?? 0;
+                }
                 state.loading = false;
             })
             .addCase(fetchAttendances.rejected, (state, action) => {
-                state.error = action.error.message;
+                state.error = action.error.message || 'Error fetching attendances';
                 state.loading = false;
             })
             // fetchAttendanceById
             .addCase(fetchAttendanceById.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(fetchAttendanceById.fulfilled, (state, action) => {
-                state.data = action.payload; // Guardamos la información del attendance
+            .addCase(fetchAttendanceById.fulfilled, (state, action: PayloadAction<GetAttendanceByIdQuery['attendanceById']>) => {
+                if (action.payload) {
+                    state.data = [transformGraphQLToAttendanceItem(action.payload)];
+                }
                 state.loading = false;
             })
             .addCase(fetchAttendanceById.rejected, (state, action) => {
-                const { code, message } = action.payload || {};
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
                 state.error = { code, message };
                 state.loading = false;
             })
             // addAttendance
-            .addCase(addAttendance.fulfilled, (state, action) => {
-                state.data.push(action.payload);
+            .addCase(addAttendance.fulfilled, (state, action: PayloadAction<AddAttendanceMutation['addAttendance']>) => {
+                if (action.payload) {
+                    // Transforma el payload antes de agregarlo al estado
+                    const newAttendance = transformGraphQLToAttendanceItem(action.payload);
+                    state.data.push(newAttendance);
+                }
                 state.error = null;
             })
             .addCase(addAttendance.rejected, (state, action) => {
-                const { code, message } = action.payload || {};
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
                 state.error = { code, message };
             })
             // updateAttendance
-            .addCase(updateAttendance.fulfilled, (state, action) => {
-                const { id, input } = action.payload;
-                const index = state.data.findIndex((attendance) => attendance.id === id);
-                if (index !== -1) {
-                    state.data[index] = { ...state.data[index], ...input };
+            .addCase(updateAttendance.fulfilled, (state, action: PayloadAction<UpdateAttendanceMutation['updateAttendance']>) => {
+                if (action.payload) {
+                    // Transforma el payload y actualiza el elemento correspondiente
+                    const updatedAttendance = transformGraphQLToAttendanceItem(action.payload);
+                    const index = state.data.findIndex((attendance: AttendanceItem) => attendance.id === updatedAttendance.id);
+                    if (index !== -1) {
+                        state.data[index] = updatedAttendance;
+                    }
                 }
                 state.error = null;
             })
             .addCase(updateAttendance.rejected, (state, action) => {
-                const { code, message } = action.payload || {};
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
                 state.error = { code, message };
             })
             // deleteAttendance
-            .addCase(deleteAttendance.fulfilled, (state, action) => {
-                state.data = state.data.filter((attendance) => attendance.id !== action.payload);
+            .addCase(deleteAttendance.fulfilled, (state, action: PayloadAction<string>) => {
+                if (action.payload) {
+                    state.data = state.data.filter((attendance: AttendanceItem) => attendance.id !== action.payload);
+                }
                 state.error = null;
             })
             .addCase(deleteAttendance.rejected, (state, action) => {
-                const { code, message } = action.payload || {};
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
                 state.error = { code, message };
-            });
+            })
     }
 });
 
