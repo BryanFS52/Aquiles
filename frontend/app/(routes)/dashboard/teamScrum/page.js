@@ -141,7 +141,7 @@ export default function Home() {
         {loading ? (
           <p>Cargando equipos...</p>
         ) : teams.length === 0 ? (
-          <p>No hay equipos disponibles.</p>
+          <p className='dark:text-white'>No hay equipos disponibles.</p>
         ) : (
           <p>Teams disponibles.</p>
         )}

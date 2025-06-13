@@ -67,14 +67,14 @@ const TableAttendance = ({ studySheetData }) => {
                 <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
                     <button
                         onClick={handleAttendanceClick}
-                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl shadow bg-darkBlue text-white hover:bg-lightGreen hover:text-darkBlue transition border border-darkBlue hover:border-lightGreen"
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl shadow bg-gradient-to-r from-lime-400 to-lime-600  dark:text-white hover:bg-lightGree transition borderhover:border-lightGreen"
                     >
                         Toma de Asistencia <BsQrCode className="w-4 h-4" />
                     </button>
 
                     <button
                         onClick={() => router.push('/dashboard/asistenciaManual')}
-                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl shadow bg-darkBlue text-white hover:bg-lightGreen hover:text-darkBlue transition border border-darkBlue hover:border-lightGreen"
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl shadow bg-gradient-to-r from-lime-400 to-lime-600 text-black hover:bg-lightGreen"
                     >
                         Asistencia Manual <FaClipboardList className="w-4 h-4" />
                     </button>
@@ -84,16 +84,16 @@ const TableAttendance = ({ studySheetData }) => {
                 <div className="flex items-center gap-3 mt-2 md:mt-0">
                     <button
                         onClick={handlePreviousTrimester}
-                        className="bg-darkBlue text-white rounded-xl p-2 hover:bg-lightGreen hover:text-darkBlue transition"
+                        className="bg-gradient-to-r from-lime-400 to-lime-600 text-black rounded-xl p-2  hover:text-white transition"
                     >
                         <IoIosArrowBack className="text-xl" />
                     </button>
-                    <span className="text-darkBlue font-semibold text-base">
+                    <span className="text-black/80  font-semibold text-base">
                         Trimestre {currentTrimester}
                     </span>
                     <button
                         onClick={handleNextTrimester}
-                        className="bg-darkBlue text-white rounded-xl p-2 hover:bg-lightGreen hover:text-darkBlue transition"
+                        className="bg-gradient-to-r from-lime-400 to-lime-600 text-black rounded-xl p-2  hover:text-white transition"
                     >
                         <IoIosArrowForward className="text-xl" />
                     </button>
@@ -107,7 +107,7 @@ const TableAttendance = ({ studySheetData }) => {
                     exit={{ opacity: 0, y: -10 }}
                     className="mt-6 bg-white border border-lightGray rounded-xl shadow p-4 flex flex-col md:flex-row justify-between items-center gap-4"
                 >
-                    <span className="text-base font-semibold text-darkBlue text-center">
+                    <span className="text-base font-semibold text- text-center">
                         Se va a generar el QR, ¿desea continuar?
                     </span>
                     <div className="flex gap-2">
@@ -133,7 +133,7 @@ const TableAttendance = ({ studySheetData }) => {
 
             <div className="overflow-x-auto mt-6 rounded-xl shadow-sm border border-lightGray">
                 <table className="min-w-full table-fixed">
-                    <thead className="bg-darkBlue text-white">
+                    <thead className="bg-gradient-to-r from-lime-400 to-lime-600 text-black">
                         <tr>
                             <th className="px-2 py-3 text-xs font-medium uppercase tracking-wider border border-white text-left">Número de Documento</th>
                             <th className="px-2 py-3 text-xs font-medium uppercase tracking-wider border border-white text-center">Nombres y Apellidos</th>

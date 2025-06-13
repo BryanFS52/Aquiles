@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, ChangeEvent, FormEvent } from 'react';
 import { ApolloProvider } from '@apollo/client';
 import { client } from '@lib/apollo-client';
 import { HiLockClosed } from "react-icons/hi";
@@ -11,10 +11,68 @@ import Image from "next/image";
 import logoSena from '@public/img/LogoSena.png'
 import LogoAquilesDarkBlue from '@public/img/LogoAquilesDarkBlue.png'
 import ModalOlvidoContraseña from '@components/Modals/modalOlvidoContraseña'
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+
+// Tipos
+interface DocumentType {
+  value: string;
+  label: string;
+}
+
+interface FormData {
+  documentType: string;
+  documentNumber: string;
+  password: string;
+}
+
+interface FormErrors {
+  documentType?: string;
+  documentNumber?: string;
+  password?: string;
+}
+
+interface InputFieldProps {
+  icon: React.ComponentType<{ className?: string }>;
+  type?: string;
+  name: string;
+  placeholder: string;
+  value: string;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  className?: string;
+  showPasswordToggle?: boolean;
+  onTogglePassword?: () => void;
+  showPassword?: boolean;
+  error?: boolean;
+  autoComplete?: string;
+}
+
+interface SelectFieldProps {
+  icon: React.ComponentType<{ className?: string }>;
+  name: string;
+  value: string;
+  onChange: (e: ChangeEvent<HTMLSelectElement>) => void;
+  options: DocumentType[];
+  placeholder: string;
+  error?: boolean;
+}
+
+interface AlertProps {
+  type?: "error" | "success";
+  message: string;
+  onClose?: () => void;
+}
+
+interface LoginResponse {
+  success: boolean;
+  data?: {
+    redirectUrl: string;
+    rol: string;
+  };
+  message?: string;
+}
 
 // Tipos de documento disponibles
-const DOCUMENT_TYPES = [
+const DOCUMENT_TYPES: DocumentType[] = [
   { value: "CC", label: "Cédula de Ciudadanía" },
   { value: "TI", label: "Tarjeta de Identidad" },
   { value: "CE", label: "Cédula de Extranjería" },
@@ -24,7 +82,7 @@ const DOCUMENT_TYPES = [
 ];
 
 // Componente de campo de entrada reutilizable
-const InputField = ({
+const InputField: React.FC<InputFieldProps> = ({
   icon: Icon,
   type = "text",
   name,
@@ -33,9 +91,10 @@ const InputField = ({
   onChange,
   className = "",
   showPasswordToggle = false,
-  onTogglePassword = null,
+  onTogglePassword,
   showPassword = false,
   error = false,
+  autoComplete,
   ...props
 }) => (
   <div className={`relative font-inter font-normal flex items-center w-full rounded border-solid border-2 ${error ? 'border-red-500' : 'border-gray-300 focus-within:border-custom-blue'
@@ -48,9 +107,10 @@ const InputField = ({
       placeholder={placeholder}
       className={`outline-none text-sm w-full h-10 text-custom-blue bg-transparent ${className}`}
       onChange={onChange}
+      autoComplete={autoComplete}
       {...props}
     />
-    {showPasswordToggle && (
+    {showPasswordToggle && onTogglePassword && (
       <button
         type="button"
         onClick={onTogglePassword}
@@ -68,7 +128,7 @@ const InputField = ({
 );
 
 // Componente de select reutilizable
-const SelectField = ({
+const SelectField: React.FC<SelectFieldProps> = ({
   icon: Icon,
   name,
   value,
@@ -99,7 +159,7 @@ const SelectField = ({
 );
 
 // Componente de alerta
-const Alert = ({ type = "error", message, onClose }) => {
+const Alert: React.FC<AlertProps> = ({ type = "error", message, onClose }) => {
   const bgColor = type === "error" ? "bg-red-500" : "bg-green-500";
 
   return (
@@ -118,21 +178,21 @@ const Alert = ({ type = "error", message, onClose }) => {
   );
 };
 
-export default function Login() {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
+const Login: React.FC = () => {
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [formData, setFormData] = useState<FormData>({
     documentType: '',
     documentNumber: '',
     password: ''
   });
-  const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('error');
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [alertMessage, setAlertMessage] = useState<string>('');
+  const [alertType, setAlertType] = useState<'error' | 'success'>('error');
 
   // Función para limpiar alertas después de un tiempo
-  const showAlert = useCallback((message, type = 'error') => {
+  const showAlert = useCallback((message: string, type: 'error' | 'success' = 'error') => {
     setAlertMessage(message);
     setAlertType(type);
     setTimeout(() => setAlertMessage(''), 5000);
@@ -146,7 +206,7 @@ export default function Login() {
     setModalOpen(false);
   }, []);
 
-  const handleChange = useCallback((e) => {
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -154,7 +214,7 @@ export default function Login() {
     }));
 
     // Limpiar error del campo cuando el usuario empiece a escribir
-    if (errors[name]) {
+    if (errors[name as keyof FormErrors]) {
       setErrors(prev => ({
         ...prev,
         [name]: ''
@@ -167,8 +227,8 @@ export default function Login() {
   }, []);
 
   // Validación del formulario
-  const validateForm = () => {
-    const newErrors = {};
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
 
     if (!formData.documentType) {
       newErrors.documentType = 'Selecciona un tipo de documento';
@@ -190,7 +250,7 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -202,7 +262,7 @@ export default function Login() {
     setAlertMessage('');
 
     try {
-      const response = await axios.post('/api/auth/login', {
+      const response = await axios.post<LoginResponse>('/api/auth/login', {
         documentType: formData.documentType,
         documentNumber: formData.documentNumber,
         password: formData.password
@@ -239,15 +299,21 @@ export default function Login() {
 
       let errorMessage = 'Error al iniciar sesión. ';
 
-      if (error.code === 'ECONNABORTED') {
-        errorMessage += 'Tiempo de espera agotado. Intenta nuevamente.';
-      } else if (error.response?.status === 401) {
-        errorMessage += 'Credenciales incorrectas.';
-      } else if (error.response?.status === 429) {
-        errorMessage += 'Demasiados intentos. Espera un momento.';
-      } else if (error.response?.data?.message) {
-        errorMessage += error.response.data.message;
-      } else if (error.message) {
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError;
+
+        if (axiosError.code === 'ECONNABORTED') {
+          errorMessage += 'Tiempo de espera agotado. Intenta nuevamente.';
+        } else if (axiosError.response?.status === 401) {
+          errorMessage += 'Credenciales incorrectas.';
+        } else if (axiosError.response?.status === 429) {
+          errorMessage += 'Demasiados intentos. Espera un momento.';
+        } else if (axiosError.response?.data && typeof axiosError.response.data === 'object' && 'message' in axiosError.response.data) {
+          errorMessage += (axiosError.response.data as { message: string }).message;
+        } else {
+          errorMessage += 'Verifica tu conexión e intenta nuevamente.';
+        }
+      } else if (error instanceof Error) {
         errorMessage += error.message;
       } else {
         errorMessage += 'Verifica tu conexión e intenta nuevamente.';
@@ -441,4 +507,6 @@ export default function Login() {
       />
     </ApolloProvider>
   );
-}
+};
+
+export default Login;

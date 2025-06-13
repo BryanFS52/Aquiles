@@ -1,5 +1,3 @@
-// Types/general.types.ts
-
 // Tipo general para paginación que se puede reutilizar
 export interface PaginationState {
     currentPage: number;

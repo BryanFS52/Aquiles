@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Header } from "@components/UI/header";
 import { IoPersonCircleOutline, IoCalendarOutline } from "react-icons/io5";
-import { updateAttendanceState } from "@services/attendances";
 import Webcam from "react-webcam";
 import jsQR from "jsqr";
 

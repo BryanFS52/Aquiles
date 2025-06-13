@@ -1,7 +1,7 @@
 import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { GET_ALL_ATTENDANCES, GET_ATTENDANCE_BY_ID, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph'
-import { AttendanceItem, initialAttendanceState } from '@type/slices/attendance'
+import { AttendanceItem, initialAttendanceState } from '@type/slices/attendanceType'
 import { RejectedPayload } from '@type/slices/common/errores'
 import {
     GetAttendancesQuery,

@@ -1,51 +1,107 @@
-// Tipos para el slice de justifications
-export interface JustificationItem {
-    id: string;
-    documentNumber: string;
-    name: string;
-    description: string;
-    justificationFile: string;
-    justificationDate: Date;
-    justificationHistory: String;
-    state: boolean;
-    archivoAdjunto: string;
-    archivoMime: string;
+// Base types
+export interface JustificationType {
+    id: number
+    name: string
 }
 
+export interface Justification {
+    id: number
+    documentNumber: string
+    name: string
+    description: string
+    justificationFile: string
+    justificationDate: string
+    justificationHistory: string
+    state: string
+    notificationId?: number
+    justificationType: JustificationType
+}
+
+// GraphQL Response types
+export interface GraphQLResponse<T> {
+    code: number
+    message: string
+    date?: string
+    data?: T
+}
+
+export interface PaginatedResponse<T> extends GraphQLResponse<T[]> {
+    totalPages: number
+    totalItems: number
+    currentPage: number
+}
+
+// Specific response types
+export interface AllJustificationsResponse extends PaginatedResponse<Justification> { }
+
+export interface JustificationByIdResponse extends GraphQLResponse<Justification> { }
+
+export interface MutationResponse {
+    code: number
+    message: string
+}
+
+// Input types
+export interface JustificationDto {
+    documentNumber: string
+    name: string
+    description: string
+    justificationFile: string
+    justificationDate: string
+    justificationHistory: string
+    state: string
+    notificationId?: number
+    justificationTypeId: number
+}
+
+
+
+// Redux state types
 export interface JustificationState {
-    data: JustificationItem[];
-    totalItems: number;
-    totalPages: number;
-    currentPage: number;
-    loading: boolean;
-    error: {
-        code: string;
-        message: string;
-    } | string | null;
-    selectedFiltro: string;
-    searchTerm: string;
-    itemsPerPage: number;
-    filteredData: JustificationItem[];
+    justifications: Justification[]
+    currentJustification: Justification | null
+    loading: boolean
+    error: string | null
+    currentPage: number
+    totalPages: number
+    totalItems: number
 }
 
-export interface DownloadFilePayload {
-    base64Data: string;
-    fileName: string;
-    mimeType?: string;
-}
-// Tipos para filtros
-export type FiltroType = "programa" | "ficha" | "documento" | "aprendiz" | "fecha" | "";
-
-// Estado inicial tipado
 export const initialJustificationState: JustificationState = {
-    data: [],
-    totalItems: 0,
-    totalPages: 0,
-    currentPage: 1,
+    justifications: [],
+    currentJustification: null,
     loading: false,
     error: null,
-    selectedFiltro: "",
-    searchTerm: "",
-    itemsPerPage: 6,
-    filteredData: [],
-};
+    currentPage: 0,
+    totalPages: 0,
+    totalItems: 0,
+}
+
+// Action payload types
+export interface FetchJustificationsPayload {
+    page?: number
+    size?: number
+}
+
+export interface FetchJustificationByIdPayload {
+    id: number
+}
+
+export interface CreateJustificationPayload {
+    justification: JustificationDto
+}
+
+export interface UpdateJustificationPayload {
+    id: number
+    justification: JustificationDto
+}
+
+export interface DeleteJustificationPayload {
+    id: number
+}
+
+// Error types
+export interface JustificationError {
+    message: string
+    code?: number
+}

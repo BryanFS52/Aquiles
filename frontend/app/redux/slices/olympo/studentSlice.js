@@ -1,12 +1,12 @@
 import { clientLAN } from "@/lib/apollo-client";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { GET_STUDENTS, GET_STUDENT_LIST } from '@graphql/olympo/studentsGraph';
+import { GET_All_STUDENTS, GET_STUDENT_LIST } from '@graphql/olympo/studentsGraph';
 
 export const fetchStudents = createAsyncThunk(
     'student/fetchAll',
     async ({ page, size }) => {
         const { data } = await clientLAN.query({
-            query: GET_STUDENTS,
+            query: GET_All_STUDENTS,
             variables: { page, size },
             fetchPolicy: 'no-cache',
         });

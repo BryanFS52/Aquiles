@@ -1,7 +1,7 @@
 import { client } from '@/lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { GET_ALL_IMPROVEMENT_PLANS, GET_IMPROVEMENT_PLAN_BY_ID, ADD_IMPROVEMENT_PLAN, UPDATE_IMPROVEMENT_PLAN, DELETE_IMPROVEMENT_PLAN } from '@graphql/improvementPlanGraph'
-import { ImprovementPlanItem, initialImprovementPlanState } from '@type/slices/improvementPlan'
+import { ImprovementPlanItem, initialImprovementPlanState } from '@type/slices/improvementPlanType'
 import { RejectedPayload } from '@type/slices/common/errores'
 import {
     GetAllImprovementPlansQuery,

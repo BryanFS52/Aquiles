@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { FaUsers } from "react-icons/fa";
-import { getAllSheets, assignInstructor } from "@services/FichasCoordinadorService";
 
 const FichasCoordinator = () => {
   const [sheets, setSheets] = useState([]);

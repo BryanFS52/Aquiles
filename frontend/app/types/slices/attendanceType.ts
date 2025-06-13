@@ -29,5 +29,3 @@ export const initialAttendanceState: AttendanceState = {
     totalItems: 0,
     totalPages: 0,
 };
-
-

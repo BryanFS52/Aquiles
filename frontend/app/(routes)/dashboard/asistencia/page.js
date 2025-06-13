@@ -82,7 +82,7 @@ export default function Attendance() {
             </div>
 
             {/* Sección inferior con número de ficha y leyenda */}
-            <AttendanceFooter />
+            <AttendanceFooter studySheet={studySheet} />
         </div>
     );
 }

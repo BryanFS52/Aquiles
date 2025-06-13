@@ -1,7 +1,7 @@
 import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { GET_ALL_CHECKLISTS, GET_CHECKLIST_BY_ID, ADD_CHECKLIST, UPDATE_CHECKLIST, DELETE_CHECKLIST } from '@graphql/checklistGraph'
-import { ChecklistItem, initialChecklistState } from '@type/slices/checklist'
+import { ChecklistItem, initialChecklistState } from '@/types/slices/checklistType'
 import { RejectedPayload } from '@type/slices/common/errores'
 import {
     GetAllChecklistsQuery,

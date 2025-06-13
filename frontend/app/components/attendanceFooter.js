@@ -17,9 +17,9 @@ const AttendanceFooter = ({ studySheet }) => {
         <div className="flex flex-col lg:flex-row lg:space-x-6 space-y-4 lg:space-y-0">
             {/* Número de ficha */}
             <div className="lg:w-32">
-                <div className="h-14 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
-                    <span className="text-2xl font-semibold text-blue-600 dark:text-blue-400 font-inter">
-                        {studySheet?.number || "--"}
+                <div className="h-14 rounded-lg border border-gray-200 dark:border-gray-600  bg-gray-50 dark:bg-gray-800 flex items-center justify-center">
+                    <span className="text-2xl font-semibold text-black dark:text-white font-inter">
+                        {studySheet?.number}
                     </span>
                 </div>
             </div>

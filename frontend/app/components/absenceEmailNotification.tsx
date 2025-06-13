@@ -1,7 +1,13 @@
 import logoSena from "@public/img/Logo-sena-green.png";
 import Image from 'next/image';
+import React from 'react';
 
-const Notification = ({ studentName, date }) => {
+interface NotificationProps {
+  studentName: string;
+  date: string;
+}
+
+const Notification: React.FC<NotificationProps> = ({ studentName, date }) => {
   return (
     <div className="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
       <div className="bg-[#0e314d] p-4">

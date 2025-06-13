@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { IoPeople } from "react-icons/io5";
 import { toast } from 'react-toastify';
-import { Student, FichaData, fichaMock } from '@/types/instructorSheets';
+import { Student, FichaData, fichaMock } from '@/types/pages/instructorSheets';
 import ApprenticeModal from '@components/Modals/apprenticeModal';
 import PageTitle from '@components/UI/pageTitle';
 
@@ -53,7 +53,7 @@ const FichasInstructor: React.FC = () => {
         <div className="container mx-auto p-6 space-y-8">
           <PageTitle>Fichas del instructor</PageTitle>
 
-          <div className="flex items-center shadow-xl dark:shadow-[0_4px_32px_0_rgba(22,23,39,0.7)] rounded-2xl p-6 bg-white dark:bg-gradient-to-br dark:from-shadowBlue dark:to-lightGreen ring-2 ring-white/10 dark:ring-shadowBlue/40 transition-all duration-300">
+          <div className="flex items-center shadow-xl dark:shadow-[0_4px_32px_0_rgba(22,23,39,0.7)] rounded-2xl p-6 bg-white dark:bg-gradient-to-br dark:from-shadowBlue dark:to-darkBlue ring-2 ring-white/10 dark:ring-shadowBlue/40 transition-all duration-300">
             <div>
               <div
                 className="flex-shrink-0 bg-gradient-to-r from-lime-300 to-lime-400 dark:bg-darkBlue rounded-2xl h-20 w-20 flex items-center justify-center mx-auto border-black/50 dark:border-white border-4 cursor-pointer transition-colors duration-300 shadow-lg dark:shadow-md hover:scale-105 transform"
