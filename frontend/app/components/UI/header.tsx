@@ -5,15 +5,21 @@ import { IoNotificationsOutline } from "react-icons/io5";
 import { RiCheckboxBlankCircleFill } from "react-icons/ri";
 import { Notifications } from "@components/UI/notifications";
 import Link from "next/link";
-import PropTypes from "prop-types";
 import Switch from '@components/UI/switch';
 import Image from "next/image";
 
-export const Header = ({ role }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const buttonRef = useRef(null);
-  const notificationsRef = useRef(null);
+type RoleType = "Aprendiz" | "Instructor" | "Coordinador";
+
+interface HeaderProps {
+  role: RoleType;
+}
+
+export const Header: React.FC<HeaderProps> = ({ role: initialRole }) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [role, setRole] = useState(initialRole || 'instructor');
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const buttonRef = useRef<HTMLLIElement>(null);
+  const notificationsRef = useRef<HTMLDivElement>(null);
   const unreadCount = Notifications.unreadCount;
 
   // Responsive detection
@@ -26,13 +32,13 @@ export const Header = ({ role }) => {
 
   // Close menu on outside click
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: MouseEvent) => {
       if (
         isOpen &&
         notificationsRef.current &&
-        !notificationsRef.current.contains(event.target) &&
+        !notificationsRef.current.contains(event.target as Node) &&
         buttonRef.current &&
-        !buttonRef.current.contains(event.target)
+        !buttonRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -43,7 +49,7 @@ export const Header = ({ role }) => {
 
   // Close on Escape key
   useEffect(() => {
-    const handleEscape = (e) => {
+    const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isOpen) setIsOpen(false);
     };
     document.addEventListener("keydown", handleEscape);
@@ -53,17 +59,17 @@ export const Header = ({ role }) => {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   // Role-specific color/text
-  const roleLabel = {
+  const roleLabel: Record<RoleType, string> = {
     Aprendiz: "Aprendiz",
     Instructor: "Instructor",
     Coordinador: "Coordinador",
-  }[role];
+  };
 
-  const roleColor = {
-    Aprendiz: "text-lightGreen group-hover:text-darkBlue",
-    Instructor: "text-lightGreen group-hover:text-darkBlue",
-    Coordinador: "text-lightGreen group-hover:text-darkBlue",
-  }[role];
+  const roleColor: Record<RoleType, string> = {
+    Aprendiz: "text-black group-hover:text-darkBlue",
+    Instructor: "text-black  group-hover:text-darkBlue",
+    Coordinador: "text-black group-hover:text-darkBlue",
+  };
 
   return (
     <header
@@ -106,7 +112,7 @@ export const Header = ({ role }) => {
               role="button"
               tabIndex={0}
               aria-label={`Notificaciones${unreadCount > 0 ? ` (${unreadCount} no leídas)` : ""}`}
-              onKeyDown={(e) => {
+              onKeyDown={(e: React.KeyboardEvent<HTMLLIElement>) => {
                 if (["Enter", " "].includes(e.key)) {
                   e.preventDefault();
                   toggleMenu();
@@ -116,7 +122,7 @@ export const Header = ({ role }) => {
               <a
                 href="#"
                 className="text-lg sm:text-3xl lg:text-2xl relative group-hover:text-darkBlue dark:group-hover:text-lightGreen"
-                onClick={(e) => e.preventDefault()}
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault()}
               >
                 <IoNotificationsOutline className="sm:w-xl text-lightGreen  group-hover:text-darkBlue dark:group-hover:text-lightGreen transition-colors duration-300" />
                 {unreadCount > 0 && (
@@ -168,8 +174,8 @@ export const Header = ({ role }) => {
             <span className="text-xs sm:text-sm lg:text-base text-black dark:text-white truncate">
               Usuario
             </span>
-            <span className={`text-xs lg:text-sm ${roleColor} truncate`}>
-              {roleLabel}
+            <span className={`text-xs lg:text-sm ${roleColor[role]} truncate`}>
+              {roleLabel[role]}
             </span>
           </div>
 
@@ -196,18 +202,14 @@ export const Header = ({ role }) => {
             <span className="text-xs leading-tight text-darkBlue dark:text-white truncate">
               Usuario
             </span>
-            <span className={`text-xs ${roleColor} leading-tight truncate`}>
-              {roleLabel}
+            <span className={`text-xs ${roleColor[role]} leading-tight truncate`}>
+              {roleLabel[role]}
             </span>
           </div>
         </Link>
       </div>
     </header>
   );
-};
-
-Header.propTypes = {
-  role: PropTypes.oneOf(["Aprendiz", "Instructor", "Coordinador"]).isRequired,
 };
 
 export default Header;

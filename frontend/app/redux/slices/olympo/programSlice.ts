@@ -1,9 +1,34 @@
 import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { GET_PROGRAMS } from '@graphql/olympo/programGraph';
-import { GetProgramsQuery, GetProgramsQueryVariables, GetStudentsQueryVariables } from '@graphql/generated'
+import { ProgramItem } from '@type/slices/olympo/program';
+import { createInitialPaginatedState } from '@type/slices/common/generic';
+import { GetProgramsQuery, GetProgramsQueryVariables } from '@graphql/generated'
 
-export const fetchPrograms = createAsyncThunk<GetProgramsQuery['allPrograms'], GetStudentsQueryVariables>(
+// Función para transformar datos de GraphQL a ProgramItem
+export const transformGraphQLToProgramItem = (graphqlData: any): ProgramItem => {
+    return {
+        id: graphqlData.id,
+        name: graphqlData.name,
+        description: graphqlData.description,
+        state: graphqlData.state,
+        coordination: graphqlData.coordination
+            ? {
+                id: graphqlData.coordination.id,
+                name: graphqlData.coordination.name,
+            }
+            : null,
+        trainingLevel: graphqlData.trainingLevel
+            ? {
+                id: graphqlData.trainingLevel.id,
+                name: graphqlData.trainingLevel.name,
+            }
+            : null,
+    };
+};
+
+
+export const fetchPrograms = createAsyncThunk<GetProgramsQuery['allPrograms'], GetProgramsQueryVariables>(
     'program/fetchAll',
     async ({ page, size }) => {
         const { data } = await clientLAN.query<GetProgramsQuery, GetProgramsQueryVariables>({
@@ -15,33 +40,41 @@ export const fetchPrograms = createAsyncThunk<GetProgramsQuery['allPrograms'], G
     }
 );
 
+const initialState = createInitialPaginatedState<ProgramItem>();
 const programSlice = createSlice({
     name: 'program',
-    initialState: {
-        data: [],
-        totalItems: 0,
-        totalPages: 0,
-        currentPage: 0,
-        loading: false,
-        error: null,
-    },
+    initialState,
     reducers: {},
     extraReducers: (builder) => {
         builder
-            // fetchPrograms
             .addCase(fetchPrograms.pending, (state) => {
                 state.loading = true;
+                state.error = null;
             })
             .addCase(fetchPrograms.fulfilled, (state, action) => {
-                state.data = action.payload;
+                const payload = action.payload;
+
+                if (payload && payload.data) {
+                    state.data = payload.data
+                        .filter((item): item is NonNullable<typeof item> => item !== null)
+                        .map(transformGraphQLToProgramItem);
+                    state.totalItems = payload.totalItems ?? 0;
+                    state.totalPages = payload.totalPages ?? 0;
+                    state.currentPage = payload.currentPage ?? 0;
+                } else {
+                    // fallback en caso de payload vacío o error no atrapado
+                    state.data = [];
+                    state.totalItems = 0;
+                    state.totalPages = 0;
+                    state.currentPage = 0;
+                }
+
                 state.loading = false;
+                state.error = null;
             })
-            .addCase(fetchPrograms.rejected, (state, action) => {
-                state.error = action.error.message;
-                state.loading = false;
-            });
     }
 });
+
 
 export const { } = programSlice.actions;
 

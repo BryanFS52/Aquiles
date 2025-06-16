@@ -1,17 +1,8 @@
 import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import {
-    GET_ALL_JUSTIFICATIONS,
-    GET_JUSTIFICATION_BY_ID,
-    ADD_JUSTIFICATION,
-    UPDATE_JUSTIFICATION,
-    DELETE_JUSTIFICATION
-} from '@graphql/justificationsGraph'
-import {
-    Justification,
-    initialJustificationState
-} from '@type/slices/justification'
-import { RejectedPayload } from '@type/slices/common/errores'
+import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
+import { GET_ALL_JUSTIFICATIONS, GET_JUSTIFICATION_BY_ID, ADD_JUSTIFICATION, UPDATE_JUSTIFICATION, DELETE_JUSTIFICATION } from '@graphql/justificationsGraph'
+import { JustificationItem } from '@type/slices/justification'
 import {
     GetAllJustificationsQuery,
     GetAllJustificationsQueryVariables,
@@ -25,8 +16,72 @@ import {
     DeleteJustificationMutationVariables
 } from '@graphql/generated'
 
+// Tipos para el estado extendido
+interface TransformedJustificationItem {
+    id: number;
+    programa: string;
+    ficha: string;
+    documento: string;
+    aprendiz: string;
+    fecha: string;
+    estado: string;
+    archivoAdjunto: string;
+    archivoMime: string;
+}
+
+interface FilterOptions {
+    selectedFiltro: string;
+    searchTerm: string;
+}
+
+interface JustificationState extends ReturnType<typeof createInitialPaginatedState> {
+    data: JustificationItem[];
+    transformedData: TransformedJustificationItem[];
+    filteredData: TransformedJustificationItem[];
+    filterOptions: FilterOptions;
+    localCurrentPage: number;
+    itemsPerPage: number;
+}
+
+// Utilidades movidas al slice
+const getMimeTypeFromBase64 = (base64: string): string => {
+    if (!base64) return "application/octet-stream";
+
+    const signatures = {
+        "iVBORw0KGgo": "image/png",
+        "/9j/": "image/jpeg",
+        "JVBERi0": "application/pdf",
+        "R0lGODdh": "image/gif",
+        "R0lGODlh": "image/gif",
+        "UEsDBBQ": "application/zip",
+    };
+
+    const prefix = base64.substring(0, 20);
+
+    for (const sig in signatures) {
+        if (prefix.startsWith(sig)) {
+            const key = sig as keyof typeof signatures;
+            return signatures[key];
+        }
+    }
+
+
+    return "application/octet-stream";
+};
+
+const getExtensionFromMime = (mimeType: string): string => {
+    const map = {
+        "image/png": "png",
+        "image/jpeg": "jpg",
+        "application/pdf": "pdf",
+        "image/gif": "gif",
+        "application/zip": "zip",
+    };
+    return map[mimeType as keyof typeof map] || "bin";
+};
+
 // Función para transformar datos de GraphQL a JustificationItem
-const transformGraphQLToJustificationItem = (graphqlData: any): Justification => {
+const transformGraphQLToJustificationItem = (graphqlData: any): JustificationItem => {
     return {
         id: graphqlData.justificationId || graphqlData.id,
         description: graphqlData.description,
@@ -44,7 +99,74 @@ const transformGraphQLToJustificationItem = (graphqlData: any): Justification =>
     };
 };
 
-export const fetchJustifications = createAsyncThunk<GetAllJustificationsQuery['allJustifications'], GetAllJustificationsQueryVariables>(
+// Función para transformar datos al formato del componente
+const transformToComponentFormat = (justifications: JustificationItem[]): TransformedJustificationItem[] => {
+    return justifications.map((j) => ({
+        id: j.id,
+        programa: j.justificationType?.name || "Sin programa",
+        ficha: j.notificationId || "N/A",
+        documento: j.documentNumber,
+        aprendiz: j.name,
+        fecha: new Date(j.justificationDate).toLocaleDateString("es-CO"),
+        estado: j.state ? "Activo" : "Inactivo",
+        archivoAdjunto: j.justificationFile,
+        archivoMime: getMimeTypeFromBase64(j.justificationFile),
+    }));
+};
+
+// Función para filtrar datos
+const filterJustifications = (
+    data: TransformedJustificationItem[],
+    filterOptions: FilterOptions
+): TransformedJustificationItem[] => {
+    const { selectedFiltro, searchTerm } = filterOptions;
+
+    if (!searchTerm || !selectedFiltro) return data;
+
+    return data.filter((j) => {
+        switch (selectedFiltro) {
+            case "programa":
+                return j.programa.toLowerCase().includes(searchTerm.toLowerCase());
+            case "ficha":
+                return j.ficha.includes(searchTerm);
+            case "documento":
+                return j.documento.includes(searchTerm);
+            case "aprendiz":
+                return j.aprendiz.toLowerCase().includes(searchTerm.toLowerCase());
+            case "fecha":
+                return j.fecha.includes(searchTerm);
+            default:
+                return true;
+        }
+    });
+};
+
+// Función para descargar archivo
+export const downloadBase64File = (base64Data: string, fileName: string, mimeType: string = "application/octet-stream") => {
+    const linkSource = `data:${mimeType};base64,${base64Data}`;
+    const downloadLink = document.createElement("a");
+    downloadLink.href = linkSource;
+    downloadLink.download = fileName;
+    downloadLink.click();
+};
+
+// Función para generar nombre de archivo
+export const generateFileName = (id: number, mimeType: string): string => {
+    const extension = getExtensionFromMime(mimeType);
+    return `justificacion_${id}.${extension}`;
+};
+
+// Función para formatear mensaje de error
+export const formatErrorMessage = (error: any): string | null => {
+    if (!error) return null;
+    if (typeof error === 'string') return error;
+    if (error.message) return error.message;
+    return 'Error desconocido';
+};
+
+// Thunks existentes
+export const fetchJustifications = createAsyncThunk<GetAllJustificationsQuery['allJustifications'], GetAllJustificationsQueryVariables
+>(
     'justifications/fetchAll',
     async ({ page, size }) => {
         const { data } = await client.query<GetAllJustificationsQuery, GetAllJustificationsQueryVariables>({
@@ -56,7 +178,8 @@ export const fetchJustifications = createAsyncThunk<GetAllJustificationsQuery['a
     }
 );
 
-export const fetchJustificationById = createAsyncThunk<GetJustificationByIdQuery['justificationById'], GetJustificationByIdQueryVariables>(
+export const fetchJustificationById = createAsyncThunk<GetJustificationByIdQuery['justificationById'], GetJustificationByIdQueryVariables
+>(
     'justifications/fetchById',
     async ({ id }) => {
         const { data } = await client.query<GetJustificationByIdQuery, GetJustificationByIdQueryVariables>({
@@ -128,17 +251,63 @@ export const deleteJustification = createAsyncThunk<string, string,
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
             }
 
-            return id; // Devolvemos solo el ID borrado para actualizar el estado
+            return id;
         } catch (error: any) {
             return rejectWithValue({ code: '500', message: error.message });
         }
     }
 );
 
+// Estado inicial extendido
+const initialState: JustificationState = {
+    ...createInitialPaginatedState<JustificationItem>(),
+    transformedData: [],
+    filteredData: [],
+    filterOptions: {
+        selectedFiltro: "",
+        searchTerm: ""
+    },
+    localCurrentPage: 1,
+    itemsPerPage: 6
+};
+
 const justificationSlice = createSlice({
     name: 'justifications',
-    initialState: initialJustificationState,
-    reducers: {},
+    initialState,
+    reducers: {
+        // Actualizar filtros
+        setFilterOptions: (state, action: PayloadAction<Partial<FilterOptions>>) => {
+            state.filterOptions = { ...state.filterOptions, ...action.payload };
+            state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+        },
+
+        // Limpiar filtros
+        clearFilters: (state) => {
+            state.filterOptions = { selectedFiltro: "", searchTerm: "" };
+            state.filteredData = state.transformedData;
+        },
+
+        // Actualizar página local
+        setLocalCurrentPage: (state, action: PayloadAction<number>) => {
+            state.localCurrentPage = action.payload;
+        },
+
+        // Ir a página anterior
+        goToPreviousPage: (state) => {
+            state.localCurrentPage = Math.max(state.localCurrentPage - 1, 1);
+        },
+
+        // Ir a página siguiente
+        goToNextPage: (state) => {
+            const maxPages = state.totalPages || 1;
+            state.localCurrentPage = Math.min(state.localCurrentPage + 1, maxPages);
+        },
+
+        // Actualizar items per page
+        setItemsPerPage: (state, action: PayloadAction<number>) => {
+            state.itemsPerPage = action.payload;
+        }
+    },
     extraReducers: (builder) => {
         builder
             // fetchJustifications
@@ -148,9 +317,16 @@ const justificationSlice = createSlice({
             .addCase(fetchJustifications.fulfilled, (state, action: PayloadAction<GetAllJustificationsQuery['allJustifications']>) => {
                 if (action.payload?.data) {
                     // Filtra nulls y transforma los datos
-                    state.justifications = action.payload.data
+                    state.data = action.payload.data
                         .filter((item): item is NonNullable<typeof item> => item !== null)
                         .map(transformGraphQLToJustificationItem);
+
+                    // Transforma datos para el componente
+                    state.transformedData = transformToComponentFormat(state.data);
+
+                    // Aplica filtros actuales
+                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+
                     state.totalItems = action.payload.totalItems ?? 0;
                     state.totalPages = action.payload.totalPages ?? 0;
                     state.currentPage = action.payload.currentPage ?? 0;
@@ -158,8 +334,7 @@ const justificationSlice = createSlice({
                 state.loading = false;
             })
             .addCase(fetchJustifications.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                state.error = payload?.message || 'Error fetching justifications';
+                state.error = action.error.message || 'Error fetching justifications';
                 state.loading = false;
             })
             // fetchJustificationById
@@ -168,58 +343,75 @@ const justificationSlice = createSlice({
             })
             .addCase(fetchJustificationById.fulfilled, (state, action: PayloadAction<GetJustificationByIdQuery['justificationById']>) => {
                 if (action.payload) {
-                    state.currentJustification = transformGraphQLToJustificationItem(action.payload);
+                    state.data = [transformGraphQLToJustificationItem(action.payload)];
+                    state.transformedData = transformToComponentFormat(state.data);
+                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                 }
                 state.loading = false;
             })
             .addCase(fetchJustificationById.rejected, (state, action) => {
                 const payload = action.payload as RejectedPayload;
-                state.error = payload?.message || 'Error fetching justification by id';
+                const { code, message } = payload || {};
+                state.error = { code, message };
                 state.loading = false;
             })
             // addJustification
             .addCase(addJustification.fulfilled, (state, action: PayloadAction<AddJustificationMutation['addJustification']>) => {
                 if (action.payload) {
-                    // Transforma el payload antes de agregarlo al estado
                     const newJustification = transformGraphQLToJustificationItem(action.payload);
-                    state.justifications.push(newJustification);
+                    state.data.push(newJustification);
+                    state.transformedData = transformToComponentFormat(state.data);
+                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                 }
                 state.error = null;
             })
             .addCase(addJustification.rejected, (state, action) => {
                 const payload = action.payload as RejectedPayload;
-                state.error = payload?.message || 'Error adding justification';
+                const { code, message } = payload || {};
+                state.error = { code, message };
             })
             // updateJustification
             .addCase(updateJustification.fulfilled, (state, action: PayloadAction<UpdateJustificationMutation['updateJustification']>) => {
                 if (action.payload) {
-                    // Transforma el payload y actualiza el elemento correspondiente
                     const updatedJustification = transformGraphQLToJustificationItem(action.payload);
-                    const index = state.justifications.findIndex((justification: Justification) => justification.id === updatedJustification.id);
+                    const index = state.data.findIndex((justification: JustificationItem) => justification.id === updatedJustification.id);
                     if (index !== -1) {
-                        state.justifications[index] = updatedJustification;
+                        state.data[index] = updatedJustification;
+                        state.transformedData = transformToComponentFormat(state.data);
+                        state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                     }
                 }
                 state.error = null;
             })
             .addCase(updateJustification.rejected, (state, action) => {
                 const payload = action.payload as RejectedPayload;
-                state.error = payload?.message || 'Error updating justification';
+                const { code, message } = payload || {};
+                state.error = { code, message };
             })
             // deleteJustification
             .addCase(deleteJustification.fulfilled, (state, action: PayloadAction<string>) => {
                 if (action.payload) {
-                    state.justifications = state.justifications.filter((justification: Justification) => String(justification.id) !== action.payload);
+                    state.data = state.data.filter((justification: JustificationItem) => justification.id !== Number(action.payload));
+                    state.transformedData = transformToComponentFormat(state.data);
+                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                 }
                 state.error = null;
             })
             .addCase(deleteJustification.rejected, (state, action) => {
                 const payload = action.payload as RejectedPayload;
-                state.error = payload?.message || 'Error deleting justification';
+                const { code, message } = payload || {};
+                state.error = { code, message };
             })
     }
 });
 
-export const { } = justificationSlice.actions;
+export const {
+    setFilterOptions,
+    clearFilters,
+    setLocalCurrentPage,
+    goToPreviousPage,
+    goToNextPage,
+    setItemsPerPage
+} = justificationSlice.actions;
 
 export default justificationSlice.reducer;

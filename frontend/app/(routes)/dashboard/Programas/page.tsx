@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { FaComputer, FaPeopleRoof } from 'react-icons/fa6';
 import { FaPeopleCarry } from 'react-icons/fa';

@@ -11,14 +11,16 @@ const user = {
   email: 'carlos.rodriguez@empresa.com',
   id: 2
 };
+
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
       <body className={`bg-white text-black font-sans ${inter.className}`}>
         <ToastContainer />
-        <ClientLayoutWrapper user={user}>
+        <ClientLayoutWrapper userContextValue={user}>
           {children}
         </ClientLayoutWrapper>
+
       </body>
     </html>
   );

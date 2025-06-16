@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { PiStudentFill } from 'react-icons/pi';
 import { ImMail4 } from "react-icons/im";
 import { toast } from "react-toastify";
-import ModalCorreo from "@components/Modals/modalCorreo";
 import { sendEmailAbsence } from "@services/emailService";
+import ModalCorreo from "@components/Modals/modalCorreo";
 
 export default function AprendicesList() {
     const [isModalOpen, setIsModalOpen] = useState(false);

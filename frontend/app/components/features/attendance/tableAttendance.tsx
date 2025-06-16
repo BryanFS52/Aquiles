@@ -7,36 +7,58 @@ import { motion } from "framer-motion";
 import { useRouter } from 'next/navigation';
 import ModalQR from "@components/Modals/modalQR";
 
+// Definición de interfaces
+interface Person {
+    name: string;
+    lastname: string;
+    document: string;
+}
 
-const TableAttendance = ({ studySheetData }) => {
+interface Student {
+    id: string | number;
+    person: Person;
+}
+
+interface StudySheetData {
+    students: Student[];
+}
+
+interface TableAttendanceProps {
+    studySheetData?: StudySheetData;
+}
+
+const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData }) => {
     const router = useRouter();
-    const [modalQROpen, setModalQROpen] = useState(false);
-    const [alertVisible, setAlertVisible] = useState(false);
-    const [currentTrimester, setCurrentTrimester] = useState(1);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [filteredStudents, setFilteredStudents] = useState(studySheetData?.students || []);
+    const [modalQROpen, setModalQROpen] = useState<boolean>(false);
+    const [alertVisible, setAlertVisible] = useState<boolean>(false);
+    const [currentTrimester, setCurrentTrimester] = useState<number>(1);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [filteredStudents, setFilteredStudents] = useState<Student[]>(studySheetData?.students || []);
 
+    console.log(studySheetData);
 
-    console.log(studySheetData)
     useEffect(() => {
         setFilteredStudents(studySheetData?.students || []);
     }, [studySheetData]);
 
-    const handleAttendanceClick = () => setAlertVisible(true);
-    const handleYesClick = () => {
+    const handleAttendanceClick = (): void => setAlertVisible(true);
+
+    const handleYesClick = (): void => {
         setModalQROpen(true);
         setAlertVisible(false);
     };
-    const handleNoClick = () => setAlertVisible(false);
 
-    const handlePreviousTrimester = () => {
+    const handleNoClick = (): void => setAlertVisible(false);
+
+    const handlePreviousTrimester = (): void => {
         if (currentTrimester > 1) setCurrentTrimester(currentTrimester - 1);
     };
-    const handleNextTrimester = () => {
+
+    const handleNextTrimester = (): void => {
         if (currentTrimester < 7) setCurrentTrimester(currentTrimester + 1);
     };
 
-    const handleSearchChange = (e) => {
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         setSearchTerm(e.target.value);
         const filtered = studySheetData?.students?.filter(student =>
             student.person.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
@@ -78,7 +100,6 @@ const TableAttendance = ({ studySheetData }) => {
                     >
                         Asistencia Manual <FaClipboardList className="w-4 h-4" />
                     </button>
-
                 </div>
 
                 <div className="flex items-center gap-3 mt-2 md:mt-0">
@@ -169,17 +190,24 @@ const TableAttendance = ({ studySheetData }) => {
                                     <React.Fragment key={weekIndex}>
                                         {[...Array(7)].map((_, dayIndex) => {
                                             const isWeekend = dayIndex === 5 || dayIndex === 6;
-                                            const cellValue = '';
+                                            const cellValue: string = '';
+
+                                            const getCellClassName = (value: string): string => {
+                                                switch (value) {
+                                                    case '✓': return 'text-lightGreen font-bold';
+                                                    case 'R': return 'text-yellow-500 font-bold';
+                                                    case 'X': return 'text-red-500 font-bold';
+                                                    case 'J': return 'text-blue-500 font-bold';
+                                                    default: return 'text-darkGray';
+                                                }
+                                            };
 
                                             return (
                                                 <td
                                                     key={dayIndex}
                                                     className={`px-2 py-2 border border-lightGray text-center ${isWeekend ? 'bg-lightGray' : 'bg-white'}`}
                                                 >
-                                                    <span className={`${cellValue === '✓' ? 'text-lightGreen font-bold' :
-                                                        cellValue === 'R' ? 'text-yellow-500 font-bold' :
-                                                            cellValue === 'X' ? 'text-red-500 font-bold' :
-                                                                cellValue === 'J' ? 'text-blue-500 font-bold' : 'text-darkGray'}`}>
+                                                    <span className={getCellClassName(cellValue)}>
                                                         {cellValue}
                                                     </span>
                                                 </td>

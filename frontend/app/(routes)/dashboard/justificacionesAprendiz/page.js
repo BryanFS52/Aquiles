@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { IoPeople } from "react-icons/io5";
 import { toast } from "react-toastify";
 import PageTitle from "@components/UI/pageTitle";
 import justificationTypeService from "@services/JustificationTypeService";
@@ -12,7 +13,6 @@ import {
   FaRegClock,
   FaRegListAlt,
 } from "react-icons/fa";
-import { IoPeople } from "react-icons/io5";
 
 const sessions = {
   "1": {

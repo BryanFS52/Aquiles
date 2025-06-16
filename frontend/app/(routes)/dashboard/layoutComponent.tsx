@@ -1,12 +1,18 @@
 'use client';
 
-import { Sidebar } from "@/components/UI/sidebar";
+import React from 'react';
+import { Sidebar } from "@components/UI/sidebar";
 import { Header } from "@components/UI/header";
 import { useUser } from "@context/UserContext";
 import { Provider } from "react-redux";
 import store from '@/redux/store';
 
-export default function LayoutContent({ children }) {
+interface LayoutContentProps {
+    children: React.ReactNode;
+}
+
+
+const LayoutContent: React.FC<LayoutContentProps> = ({ children }) => {
     const user = useUser();
 
     return (
@@ -21,7 +27,8 @@ export default function LayoutContent({ children }) {
                     bg-transparent 
                     transition-all duration-300
                     ">
-                        <Sidebar role={user?.rol} />
+                        <Sidebar role={user?.user?.role ?? 'instructor'} />
+
                     </aside>
 
                     {/* Contenido principal */}
@@ -39,7 +46,7 @@ export default function LayoutContent({ children }) {
                         flex-shrink-0
                         lg:pl-0
                         ">
-                            <Header role={user?.rol} />
+                            <Header role={user?.role ?? "Instructor"} />
                         </div>
 
                         {/* Área de contenido principal */}
@@ -75,4 +82,6 @@ export default function LayoutContent({ children }) {
             </div>
         </Provider>
     );
-}
+};
+
+export default LayoutContent;

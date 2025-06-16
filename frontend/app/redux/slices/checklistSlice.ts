@@ -1,8 +1,8 @@
 import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { ChecklistItem } from '@type/slices/checklist'
+import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_CHECKLISTS, GET_CHECKLIST_BY_ID, ADD_CHECKLIST, UPDATE_CHECKLIST, DELETE_CHECKLIST } from '@graphql/checklistGraph'
-import { ChecklistItem, initialChecklistState } from '@/types/slices/checklistType'
-import { RejectedPayload } from '@type/slices/common/errores'
 import {
     GetAllChecklistsQuery,
     GetAllChecklistsQueryVariables,
@@ -120,9 +120,10 @@ export const deleteChecklist = createAsyncThunk<string, string,
     }
 );
 
+const initialState = createInitialPaginatedState<ChecklistItem>();
 const checklistSlice = createSlice({
     name: 'checklist',
-    initialState: initialChecklistState,
+    initialState,
     reducers: {},
     extraReducers: (builder) => {
         builder

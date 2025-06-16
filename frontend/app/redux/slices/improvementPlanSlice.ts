@@ -1,8 +1,8 @@
 import { client } from '@/lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_IMPROVEMENT_PLANS, GET_IMPROVEMENT_PLAN_BY_ID, ADD_IMPROVEMENT_PLAN, UPDATE_IMPROVEMENT_PLAN, DELETE_IMPROVEMENT_PLAN } from '@graphql/improvementPlanGraph'
-import { ImprovementPlanItem, initialImprovementPlanState } from '@type/slices/improvementPlanType'
-import { RejectedPayload } from '@type/slices/common/errores'
+import { ImprovementPlanItem } from '@type/slices/improvementPlan'
 import {
     GetAllImprovementPlansQuery,
     GetAllImprovementPlansQueryVariables,
@@ -118,9 +118,10 @@ export const deleteImprovementPlan = createAsyncThunk<string, string,
     }
 );
 
+const initialState = createInitialPaginatedState<ImprovementPlanItem>();
 const improvementPlanSlice = createSlice({
     name: 'improvementPlan',
-    initialState: initialImprovementPlanState,
+    initialState,
     reducers: {},
     extraReducers: (builder) => {
         builder

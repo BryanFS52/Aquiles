@@ -7,9 +7,6 @@ export const GET_TEAMS_SCRUMS = gql`
       date
       code
       message
-      currentPage
-      totalPages
-      totalItems
       data {
         id
         name
@@ -18,6 +15,9 @@ export const GET_TEAMS_SCRUMS = gql`
           remarks
         }
       }
+      currentPage
+      totalPages
+      totalItems
     }
   }
 `;

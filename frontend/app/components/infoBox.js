@@ -2,7 +2,7 @@
 
 const InfoBox = ({ title, textInfo, icon: Icon }) => {
   return (
-    <div className="flex h-24 w-full md:max-w-60 rounded-xl shadow-xl border-2 bg-white dark:bg-gray-300 border-lightGreen dark:border-darkBlue p-2">
+    <div className="flex h-24 w-full md:max-w-60 rounded-xl shadow-xl border-2 bg-white dark:bg-gray-300 bg-gradient-to-r from-lime-400 to-lime-200 border-lime-600 dark:border-darkBlue p-2">
       <div className="flex items-center w-full">
         <div className="bg-lightGreen dark:bg-darkBlue rounded-2xl p-2 flex-shrink-0">
           {Icon && <Icon className="w-10 h-10 text-white" />}

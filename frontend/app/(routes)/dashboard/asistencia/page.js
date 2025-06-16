@@ -1,39 +1,57 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from 'react-redux';
 import { BsPersonCircle } from "react-icons/bs";
-import TableAttendance from "@components/tableAttendance";
+import { fetchStudySheetById } from '@slice/olympo/studySheetSlice';
+import TableAttendance from "@components/features/attendance/tableAttendance";
 import PageTitle from "@components/UI/pageTitle";
-import AttendanceFooter from "@components/attendanceFooter";
-import studySheetService from '@services/olympo/studySheetService';
+import AttendanceFooter from "@components/features/attendance/attendanceFooter";
 
 export default function Attendance() {
-    const [studySheet, setStudySheet] = useState([]);
-    const [students, setStudents] = useState([]);
+    const dispatch = useDispatch();
+    const { data: studySheets, loading, error } = useSelector((state) => state.studySheet);
+
+    // Get the first study sheet from the data array (since fetchById returns array with single item)
+    const studySheet = studySheets.length > 0 ? studySheets[0] : null;
+    const students = studySheet?.students || [];
 
     useEffect(() => {
         const fetchStudySheet = async () => {
             try {
-                const response = await studySheetService.getStudySheetById("1");
-                if (response) {
-                    setStudySheet(response);
-                    setStudents(response.students || []);
-                } else {
-                    setStudySheet(null);
-                    setStudents([]);
-                }
+                await dispatch(fetchStudySheetById({ id: "1" })).unwrap();
             } catch (error) {
                 console.error("Error al obtener ficha:", error);
-                setStudySheet(null);
-                setStudents([]);
             }
         };
 
         fetchStudySheet();
-    }, []);
+    }, [dispatch]);
 
     const activeStudents = students.filter((s) => s.status === "active").length;
     const withdrawnStudents = students.filter((s) => s.status === "withdrawn").length;
+
+    if (loading) {
+        return (
+            <div className="space-y-6">
+                <PageTitle>Lista de asistencia</PageTitle>
+                <div className="flex items-center justify-center h-64">
+                    <p className="text-gray-500 dark:text-gray-400">Cargando Lista de asistencia...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="space-y-6">
+                <PageTitle>Lista de asistencia</PageTitle>
+                <div className="flex items-center justify-center h-64">
+                    <p className="text-red-500 dark:text-red-400">Error al cargar la ficha: {error}</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -46,7 +64,7 @@ export default function Attendance() {
                 <div className="flex-1 lg:max-w-md">
                     <div className="h-16 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 p-4 flex items-center">
                         <span className="font-inter font-medium text-lg text-black dark:text-white text-center w-full">
-                            Desarrollo de Aplicaciones Web II
+                            {studySheet?.offer?.name || "Desarrollo de Aplicaciones Web II"}
                         </span>
                     </div>
                 </div>

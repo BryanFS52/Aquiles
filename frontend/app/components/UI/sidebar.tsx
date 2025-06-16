@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import React, { useState, useMemo } from 'react';
 import { FiAlignRight } from "react-icons/fi";
 import { IoClose } from "react-icons/io5";
@@ -11,20 +10,40 @@ import { HiUserGroup } from 'react-icons/hi2';
 import { FaChalkboardUser } from 'react-icons/fa6';
 import { GiNotebook } from 'react-icons/gi';
 import { PiStudentFill } from 'react-icons/pi';
+import Link from 'next/link';
 import Image from 'next/image';
 
+// Tipos
+interface MenuItem {
+    href: string;
+    label: string;
+    icon: React.ReactNode;
+}
+
+interface MenuConfig {
+    instructor: MenuItem[];
+    aprendiz: MenuItem[];
+    coordinador: MenuItem[];
+}
+
+interface SidebarProps {
+    role?: string;
+}
+
+type RoleType = 'instructor' | 'aprendiz' | 'coordinador';
+
 // Íconos estáticos
-const IconFichas = <FaRegListAlt className='text-2xl' />;
-const IconProgramas = <FaLaptopCode className='text-2xl' />;
-const IconAsistencia = <BsPersonFillCheck className='text-2xl' />;
-const IconTeams = <HiUserGroup className='text-2xl' />;
-const IconSustentaciones = <FaChalkboardUser className='text-2xl' />;
-const IconJustificaciones = <GiNotebook className='text-2xl' />;
-const IconProfesor = <FaChalkboardTeacher className='text-2xl' />;
-const IconAprendices = <PiStudentFill className='text-2xl' />;
+const IconFichas: React.ReactNode = <FaRegListAlt className='text-2xl' />;
+const IconProgramas: React.ReactNode = <FaLaptopCode className='text-2xl' />;
+const IconAsistencia: React.ReactNode = <BsPersonFillCheck className='text-2xl' />;
+const IconTeams: React.ReactNode = <HiUserGroup className='text-2xl' />;
+const IconSustentaciones: React.ReactNode = <FaChalkboardUser className='text-2xl' />;
+const IconJustificaciones: React.ReactNode = <GiNotebook className='text-2xl' />;
+const IconProfesor: React.ReactNode = <FaChalkboardTeacher className='text-2xl' />;
+const IconAprendices: React.ReactNode = <PiStudentFill className='text-2xl' />;
 
 // Configuración de menú por rol
-const MENU_CONFIG = {
+const MENU_CONFIG: MenuConfig = {
     instructor: [
         { href: "/dashboard/FichasInstructor", label: "Fichas", icon: IconFichas },
         { href: "/dashboard/Programas", label: "Programas", icon: IconProgramas },
@@ -50,7 +69,7 @@ const MENU_CONFIG = {
     ]
 };
 
-const getMenuByRole = (role) => {
+const getMenuByRole = (role: string | undefined): MenuItem[] => {
     if (!role) return [];
     if (role.toLowerCase().includes('coordinador')) return MENU_CONFIG.coordinador;
     if (role.toLowerCase().includes('instructor')) return MENU_CONFIG.instructor;
@@ -58,14 +77,22 @@ const getMenuByRole = (role) => {
     return [];
 };
 
-export const Sidebar = ({ role: initialRole }) => {
-    const [showMenu, setShowMenu] = useState(false);
-    const [role, setRole] = useState(initialRole || 'instructor');
-    const menuItems = useMemo(() => getMenuByRole(role), [role]);
-    const pathname = usePathname();
+export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
+    const [showMenu, setShowMenu] = useState<boolean>(false);
+    const [role, setRole] = useState<string>(initialRole || 'instructor');
+    const menuItems: MenuItem[] = useMemo(() => getMenuByRole(role), [role]);
+    const pathname: string = usePathname();
 
-    const handleLinkClick = () => {
+    const handleLinkClick = (): void => {
         if (window.innerWidth < 1024) setShowMenu(false);
+    };
+
+    const handleRoleChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
+        setRole(event.target.value);
+    };
+
+    const toggleMenu = (): void => {
+        setShowMenu(!showMenu);
     };
 
     return (
@@ -140,7 +167,7 @@ export const Sidebar = ({ role: initialRole }) => {
                             <span className="font-bold tracking-wide drop-shadow">Rol:</span>
                             <select
                                 value={role}
-                                onChange={e => setRole(e.target.value)}
+                                onChange={handleRoleChange}
                                 className="
                   rounded-lg px-2 lg:px-3 py-1 
                   border-2 border-white/30 
@@ -161,8 +188,8 @@ export const Sidebar = ({ role: initialRole }) => {
                     {/* Menú dinámico */}
                     <nav>
                         <ul className="space-y-2">
-                            {menuItems.map((item, idx) => {
-                                const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                            {menuItems.map((item: MenuItem, idx: number) => {
+                                const isActive: boolean = pathname === item.href || pathname.startsWith(item.href + '/');
                                 return (
                                     <li key={idx}>
                                         <Link
@@ -202,7 +229,7 @@ export const Sidebar = ({ role: initialRole }) => {
 
             {/* Botón toggle para móvil */}
             <button
-                onClick={() => setShowMenu(!showMenu)}
+                onClick={toggleMenu}
                 className='
           fixed bottom-4 right-4 z-50 
           text-white bg-gradient-to-br from-darkGreen to-shadowBlue 

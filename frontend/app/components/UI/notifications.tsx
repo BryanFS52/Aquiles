@@ -3,7 +3,20 @@ import { notificationsData } from "@data/notificationData";
 import { BellRing } from 'lucide-react';
 import Image from "next/image";
 
-const fetchReminderNotifications = () => [
+interface Notification {
+  id: number;
+  user: string;
+  action: string;
+  content?: string;
+  time: string;
+  unread: boolean;
+  isSystem?: boolean;
+  avatar?: string;
+}
+
+interface NotificationsProps { }
+
+const fetchReminderNotifications = (): Notification[] => [
   {
     id: 101,
     user: "Sistema",
@@ -24,23 +37,23 @@ const fetchReminderNotifications = () => [
   },
 ];
 
-export const Notifications = () => {
-  const [notifications, setNotifications] = useState(notificationsData);
+export const Notifications: React.FC<NotificationsProps> & { unreadCount: number } = () => {
+  const [notifications, setNotifications] = useState<Notification[]>(notificationsData);
 
   useEffect(() => {
     const reminderNotifications = fetchReminderNotifications();
-    setNotifications((prevNotifications) => [
+    setNotifications((prevNotifications: Notification[]) => [
       ...prevNotifications,
       ...reminderNotifications,
     ]);
   }, []);
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map((notification) => ({ ...notification, unread: false })));
+  const markAllAsRead = (): void => {
+    setNotifications(notifications.map((notification: Notification) => ({ ...notification, unread: false })));
   };
 
-  const handleNotificationClick = (id) => {
-    setNotifications(notifications.map((notification) =>
+  const handleNotificationClick = (id: number): void => {
+    setNotifications(notifications.map((notification: Notification) =>
       notification.id === id ? { ...notification, unread: false } : notification
     ));
   };
@@ -57,7 +70,7 @@ export const Notifications = () => {
         </button>
       </div>
       <ul className="p-2 max-h-96 overflow-y-auto">
-        {notifications.map((notification, index) => (
+        {notifications.map((notification: Notification, index: number) => (
           <li
             key={`${notification.id}-${index}`}
             className={`flex items-center p-2 rounded-lg cursor-pointer ${notification.unread ? 'bg-blue-50' : ''}`}
@@ -68,7 +81,7 @@ export const Notifications = () => {
                 <BellRing className="w-6 h-6 text-[#00324d]" />
               ) : (
                 <Image
-                  src={notification.avatar}
+                  src={notification.avatar || ''}
                   alt="avatar"
                   width={40}
                   height={40}
@@ -95,4 +108,4 @@ export const Notifications = () => {
   );
 };
 
-Notifications.unreadCount = notificationsData.filter((n) => n.unread).length;
+Notifications.unreadCount = notificationsData.filter((n: Notification) => n.unread).length;

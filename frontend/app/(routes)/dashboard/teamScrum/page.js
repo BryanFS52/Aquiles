@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { MdAdd, MdAddCircle } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -14,16 +15,17 @@ import {
   fetchTeamsScrums,
   addTeamScrum,
   deleteTeamScrum
-} from "@services/teamScrumService";
+} from "@slice/teamScrumSlice";
 
 export default function Home() {
+  const dispatch = useDispatch();
+  const { data: teams, loading, error } = useSelector((state) => state.teamScrum);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [openAgregarInfo, setOpenAgregarInfo] = useState(false);
-  const [teams, setTeams] = useState([]);
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [teamToDelete, setTeamToDelete] = useState(null);
   const [openAddInfoModal, setOpenAddInfoModal] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [selectedTeam, setSelectedTeam] = useState(null);
 
   useEffect(() => {
@@ -39,22 +41,19 @@ export default function Home() {
     }
   }, [loading, teams.length]);
 
+  useEffect(() => {
+    if (error) {
+      const errorMessage = typeof error === 'string' ? error : error.message || 'Error desconocido';
+      toast.error(errorMessage);
+    }
+  }, [error]);
+
   const fetchTeams = async () => {
     try {
-      setLoading(true);
-      const response = await fetchTeamsScrums(0, 10);
-      const mapped = response.data?.map(team => ({
-        id: team.id,
-        name: team.name,
-        checklist: team.checklist,
-        members: team.members
-      })) || [];
-      setTeams(mapped);
+      await dispatch(fetchTeamsScrums({ page: 0, size: 10 })).unwrap();
     } catch (error) {
       console.error("Error fetching teams:", error);
       toast.error("No se pudo cargar los equipos.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -74,24 +73,25 @@ export default function Home() {
     };
 
     try {
-      await addTeamScrum(input);
+      await dispatch(addTeamScrum(input)).unwrap();
       toast.success('¡Nuevo Team creado con éxito!');
       handleCloseModal();
       await fetchTeams();
     } catch (error) {
       console.error('Error creating team:', error);
-      toast.error('Error al crear equipo Scrum.');
+      const errorMessage = error.message || 'Error al crear equipo Scrum.';
+      toast.error(errorMessage);
     }
   };
 
   const handleDeleteTeam = async (teamId) => {
     try {
-      await deleteTeamScrum(teamId);
-      setTeams(prev => prev.filter(team => team.id !== teamId));
+      await dispatch(deleteTeamScrum(teamId)).unwrap();
       toast.success('Equipo eliminado exitosamente.');
     } catch (error) {
       console.error('Error deleting team:', error);
-      toast.error('Error al eliminar equipo.');
+      const errorMessage = error.message || 'Error al eliminar equipo.';
+      toast.error(errorMessage);
     }
   };
 

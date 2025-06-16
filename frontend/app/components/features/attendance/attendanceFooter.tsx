@@ -2,7 +2,21 @@ import React from "react";
 import { FaCheck } from "react-icons/fa";
 import { TbLetterJ, TbLetterR, TbLetterX } from "react-icons/tb";
 
-const LegendItem = ({ label, icon: Icon, color }) => (
+interface LegendItemProps {
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    color: string;
+}
+
+interface StudySheet {
+    number: string | number;
+}
+
+interface AttendanceFooterProps {
+    studySheet?: StudySheet;
+}
+
+const LegendItem: React.FC<LegendItemProps> = ({ label, icon: Icon, color }) => (
     <div className="flex items-center space-x-3">
         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
         <div className="relative">
@@ -12,7 +26,7 @@ const LegendItem = ({ label, icon: Icon, color }) => (
     </div>
 );
 
-const AttendanceFooter = ({ studySheet }) => {
+const AttendanceFooter: React.FC<AttendanceFooterProps> = ({ studySheet }) => {
     return (
         <div className="flex flex-col lg:flex-row lg:space-x-6 space-y-4 lg:space-y-0">
             {/* Número de ficha */}

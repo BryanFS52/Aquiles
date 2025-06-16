@@ -3,7 +3,7 @@
 import { createContext, useContext } from 'react';
 
 // Interfaz para el usuario
-interface User {
+export interface User {
     id: string | number;
     name: string;
     email: string;
@@ -12,11 +12,14 @@ interface User {
     documentNumber?: string;
 }
 
+type RoleType = "Aprendiz" | "Instructor" | "Coordinador";
+
 // Interfaz para el contexto
-interface UserContextType {
+export interface UserContextType {
     user: User | null;
     setUser: (user: User | null) => void;
     isAuthenticated: boolean;
+    role: RoleType;
     login: (userData: User) => void;
     logout: () => void;
 }

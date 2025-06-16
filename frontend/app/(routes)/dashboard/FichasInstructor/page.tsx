@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IoPeople } from "react-icons/io5";
 import { toast } from 'react-toastify';
 import { Student, FichaData, fichaMock } from '@/types/pages/instructorSheets';
@@ -57,7 +57,7 @@ const FichasInstructor: React.FC = () => {
             <div>
               <div
                 className="flex-shrink-0 bg-gradient-to-r from-lime-300 to-lime-400 dark:bg-darkBlue rounded-2xl h-20 w-20 flex items-center justify-center mx-auto border-black/50 dark:border-white border-4 cursor-pointer transition-colors duration-300 shadow-lg dark:shadow-md hover:scale-105 transform"
-                onClick={() => openModal(null)} // Abre el modal al hacer clic en el ícono
+                onClick={() => openModal(null)}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {

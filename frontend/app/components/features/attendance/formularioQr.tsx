@@ -1,30 +1,45 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Header } from "@components/UI/header";
 import { IoPersonCircleOutline, IoCalendarOutline } from "react-icons/io5";
 import Webcam from "react-webcam";
 import jsQR from "jsqr";
 
+// Interfaces
+interface AttendanceData {
+    attendance_id: number;
+    attendance_date: string;
+    documentNumber: string;
+    fk_stateAttendance: {
+        stateAttendanceId: number;
+    };
+}
+
 // Función para obtener nombre del día en español
-const getDayName = (date) => {
+const getDayName = (date: Date): string => {
     const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     return days[date.getDay()];
 };
 
-const FormularioQr = () => {
-    const [documentNumber, setDocumentNumber] = useState('');
-    const [attendanceId] = useState(1);
-    const [loading, setLoading] = useState(false);
-    const [attendanceUpdated, setAttendanceUpdated] = useState(false);
-    const [qrResult, setQrResult] = useState('');
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const webcamRef = useRef(null);
+// Función para actualizar el estado de asistencia (debes implementar esta función)
+const updateAttendanceState = async (attendanceData: AttendanceData): Promise<void> => {
+    // Implementa aquí la lógica para actualizar la asistencia
+    console.log('Actualizando asistencia:', attendanceData);
+};
 
-    const handleSubmit = async () => {
+const FormularioQr: React.FC = () => {
+    const [documentNumber, setDocumentNumber] = useState<string>('');
+    const [attendanceId] = useState<number>(1);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [attendanceUpdated, setAttendanceUpdated] = useState<boolean>(false);
+    const [qrResult, setQrResult] = useState<string>('');
+    const [currentDate, setCurrentDate] = useState<Date>(new Date());
+    const webcamRef = useRef<Webcam>(null);
+
+    const handleSubmit = async (): Promise<void> => {
         setLoading(true);
         try {
-            const attendanceData = {
+            const attendanceData: AttendanceData = {
                 attendance_id: attendanceId,
                 attendance_date: currentDate.toISOString(),
                 documentNumber: qrResult || documentNumber,
@@ -82,15 +97,14 @@ const FormularioQr = () => {
     }, []);
 
     const formattedDate = currentDate.toLocaleDateString('es-ES', {
-        year: 'numeric', month: 'long', day: 'numeric'
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
     });
     const dayName = getDayName(currentDate);
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-100">
-            {/* Header ahora ocupa todo el ancho */}
-            <Header />
-
             <div className="flex flex-col items-center justify-center flex-1 p-6">
                 <div className="text-center mb-6">
                     <h1 className="text-2xl font-bold text-custom-blue">¡Hora de tomar la asistencia aprendiz!</h1>
@@ -112,7 +126,7 @@ const FormularioQr = () => {
                         <input
                             type="text"
                             value={qrResult || documentNumber}
-                            onChange={(e) => setDocumentNumber(e.target.value)}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDocumentNumber(e.target.value)}
                             className="flex h-14 w-full rounded-xl border-2 border-gray-300 px-12 shadow focus:outline-none focus:border-custom-blue"
                             placeholder="Número de Documento"
                         />

@@ -9,26 +9,84 @@ import {
     FileText, ChevronDown, Mail, Phone
 } from 'lucide-react';
 
-const AttendanceManualPage = ({ students, studySheet = null, loading = false }) => {
+// Types
+interface Person {
+    name?: string;
+    lastname?: string;
+    document?: string;
+    email?: string;
+    phone?: string;
+}
+
+interface Student {
+    id: string | number;
+    person?: Person;
+}
+
+interface StudySheet {
+    id?: string | number;
+    name?: string;
+    program?: string;
+    number?: string;
+    description?: string;
+    schedule?: string;
+    shift?: string;
+}
+
+interface AttendanceStats {
+    presente: number;
+    ausente: number;
+    justificado: number;
+    retardo: number;
+}
+
+interface AttendanceHistory {
+    date: string;
+    presente: number;
+    ausente: number;
+    justificado: number;
+    retardo: number;
+}
+
+interface AttendanceData {
+    date: string;
+    attendance: Record<string | number, string>;
+    studySheetId?: string | number;
+}
+
+interface AttendanceManualPageProps {
+    students: Student[];
+    studySheet?: StudySheet | null;
+    loading?: boolean;
+}
+
+type AttendanceStatus = 'presente' | 'ausente' | 'justificado' | 'retardo';
+type FilterOption = 'todos' | AttendanceStatus;
+
+const AttendanceManualPage: React.FC<AttendanceManualPageProps> = ({
+    students,
+    studySheet = null,
+    loading = false
+}) => {
     const error = null;
-    const [attendance, setAttendance] = useState({});
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-    const [selectedFilter, setSelectedFilter] = useState('todos');
-    const [selectedStudent, setSelectedStudent] = useState(null);
-    const [attendanceHistory, setAttendanceHistory] = useState([]);
+    const [attendance, setAttendance] = useState<Record<string | number, AttendanceStatus>>({});
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+    const [selectedFilter, setSelectedFilter] = useState<FilterOption>('todos');
+    const [selectedStudent, setSelectedStudent] = useState<string | number | null>(null);
+    const [attendanceHistory, setAttendanceHistory] = useState<AttendanceHistory[]>([]);
 
     // Inicializar asistencia cuando lleguen los estudiantes
     useEffect(() => {
         if (students && students.length > 0) {
-            const initialAttendance = {};
+            const initialAttendance: Record<string | number, AttendanceStatus> = {};
             students.forEach(student => {
                 initialAttendance[student.id] = 'presente';
             });
             setAttendance(initialAttendance);
 
             // Mock historial de asistencia
-            const mockHistory = [
+            const mockHistory: AttendanceHistory[] = [
                 { date: '2024-12-01', presente: 6, ausente: 1, justificado: 1, retardo: 0 },
                 { date: '2024-12-02', presente: 7, ausente: 0, justificado: 0, retardo: 1 },
                 { date: '2024-12-03', presente: 5, ausente: 2, justificado: 1, retardo: 0 },
@@ -63,12 +121,12 @@ const AttendanceManualPage = ({ students, studySheet = null, loading = false }) 
         return filtered;
     }, [searchTerm, students, selectedFilter, attendance]);
 
-    const handleAttendanceChange = (studentId, value) => {
+    const handleAttendanceChange = (studentId: string | number, value: AttendanceStatus): void => {
         setAttendance(prev => ({ ...prev, [studentId]: value }));
     };
 
-    const handleSave = () => {
-        const attendanceData = {
+    const handleSave = (): void => {
+        const attendanceData: AttendanceData = {
             date: selectedDate,
             attendance: attendance,
             studySheetId: studySheet?.id
@@ -77,15 +135,15 @@ const AttendanceManualPage = ({ students, studySheet = null, loading = false }) 
         toast.success('Asistencia guardada exitosamente');
     };
 
-    const getAttendanceStats = () => {
-        const stats = { presente: 0, ausente: 0, justificado: 0, retardo: 0 };
+    const getAttendanceStats = (): AttendanceStats => {
+        const stats: AttendanceStats = { presente: 0, ausente: 0, justificado: 0, retardo: 0 };
         Object.values(attendance).forEach(status => {
             stats[status] = (stats[status] || 0) + 1;
         });
         return stats;
     };
 
-    const getStatusIcon = (status) => {
+    const getStatusIcon = (status: AttendanceStatus): JSX.Element => {
         switch (status) {
             case 'presente': return <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-green-400" />;
             case 'ausente': return <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 dark:text-red-400" />;
@@ -95,7 +153,7 @@ const AttendanceManualPage = ({ students, studySheet = null, loading = false }) 
         }
     };
 
-    const getStatusColor = (status) => {
+    const getStatusColor = (status: AttendanceStatus): string => {
         switch (status) {
             case 'presente': return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700';
             case 'ausente': return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700';
@@ -105,7 +163,7 @@ const AttendanceManualPage = ({ students, studySheet = null, loading = false }) 
         }
     };
 
-    const exportAttendance = () => {
+    const exportAttendance = (): void => {
         const csvContent = "data:text/csv;charset=utf-8,"
             + "Nombre,Apellido,Documento,Estado\n"
             + filteredStudents.map(student =>
@@ -328,7 +386,7 @@ const AttendanceManualPage = ({ students, studySheet = null, loading = false }) 
                                     <Filter className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                     <select
                                         value={selectedFilter}
-                                        onChange={(e) => setSelectedFilter(e.target.value)}
+                                        onChange={(e) => setSelectedFilter(e.target.value as FilterOption)}
                                         className="px-3 py-2.5 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                     >
                                         <option value="todos">Todos</option>
@@ -393,7 +451,7 @@ const AttendanceManualPage = ({ students, studySheet = null, loading = false }) 
                                                 </div>
                                                 <select
                                                     value={attendance[student.id] || 'presente'}
-                                                    onChange={(e) => handleAttendanceChange(student.id, e.target.value)}
+                                                    onChange={(e) => handleAttendanceChange(student.id, e.target.value as AttendanceStatus)}
                                                     className={`px-3 py-2 border rounded-lg font-medium text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${getStatusColor(attendance[student.id])}`}
                                                 >
                                                     <option value="presente">✓ Presente</option>

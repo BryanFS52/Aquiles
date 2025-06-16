@@ -1,8 +1,8 @@
 import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { GET_ALL_ATTENDANCES, GET_ATTENDANCE_BY_ID, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph'
-import { AttendanceItem, initialAttendanceState } from '@type/slices/attendanceType'
-import { RejectedPayload } from '@type/slices/common/errores'
+import { AttendanceItem } from '@type/slices/attendance'
+import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import {
     GetAttendancesQuery,
     GetAttendancesQueryVariables,
@@ -119,9 +119,10 @@ export const deleteAttendance = createAsyncThunk<string, string,
     }
 );
 
+const initialState = createInitialPaginatedState<AttendanceItem>();
 const attendanceSlice = createSlice({
     name: 'attendance',
-    initialState: initialAttendanceState,
+    initialState,
     reducers: {},
     extraReducers: (builder) => {
         builder

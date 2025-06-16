@@ -1,7 +1,8 @@
 {
   "env": {
     "browser": true,
-    "es2021": true
+    "es2021": true,
+    "node": true
   },
   "extends": [
     "next",
@@ -9,7 +10,15 @@
     "eslint:recommended"
   ],
   "plugins": [],
+  "ignorePatterns": [
+    "app/graphql/generated.ts",
+    "**/generated.ts",
+    "**/generated/**/*"
+  ],
   "rules": {
-    // Aquí puedes personalizar tus reglas
+    "no-unused-vars": "off",
+    "no-undef": "off",
+    "react/no-unescaped-entities": "off",
+    "no-empty-pattern": "off"
   }
 }
