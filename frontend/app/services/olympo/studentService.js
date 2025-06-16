@@ -1,11 +1,11 @@
 import { clientLAN } from '@/lib/apollo-client'
-import { GET_STUDENTS, GET_STUDENT_LIST } from '@/graphql/olympo/studentsGraph';
+import { GET_All_STUDENTS, GET_STUDENT_LIST } from '@/graphql/olympo/studentsGraph';
 
 const studentService = {
     getStudents: async ({ name, idStudySheet, page = 0, size = 10 } = {}) => {
         try {
             const { data } = await clientLAN.query({
-                query: GET_STUDENTS,
+                query: GET_All_STUDENTS,
                 variables: { name, idStudySheet, page, size },
                 fetchPolicy: 'network-only',
             });

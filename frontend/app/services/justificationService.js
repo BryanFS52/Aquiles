@@ -1,4 +1,4 @@
-/* import { client } from '@lib/apollo-client';
+import { client } from '@lib/apollo-client';
 import {
   GET_ALL_JUSTIFICATIONS,
   GET_JUSTIFICATION_BY_ID,
@@ -10,7 +10,6 @@ import {
 const justificationService = {
   getAllJustifications: async (page = 0, size = 10) => {
     try {
-      // Simulating an error by using an invalid URL
       const { data } = await client.query({
         query: GET_ALL_JUSTIFICATIONS,
         variables: { page, size },
@@ -166,4 +165,3 @@ const justificationService = {
 };
 
 export default justificationService;
-*/

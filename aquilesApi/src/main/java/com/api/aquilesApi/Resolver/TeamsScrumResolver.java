@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import java.util.Map;
 
 @DgsComponent
-public class TeamsScrumResolver {
+public class    TeamsScrumResolver {
 
     private final TeamsScrumBusiness teamsScrumBusiness;
 

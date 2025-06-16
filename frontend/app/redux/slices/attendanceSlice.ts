@@ -1,7 +1,8 @@
 import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { GET_ALL_ATTENDANCES, GET_ATTENDANCE_BY_ID, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph'
-import { AttendanceItem, initialAttendanceState, RejectedPayload } from '@type/slices/attendance'
+import { AttendanceItem } from '@type/slices/attendance'
+import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import {
     GetAttendancesQuery,
     GetAttendancesQueryVariables,
@@ -13,7 +14,7 @@ import {
     UpdateAttendanceMutationVariables,
     DeleteAttendanceMutation,
     DeleteAttendanceMutationVariables
-} from '@/generated'
+} from '@graphql/generated'
 
 // Función para transformar datos de GraphQL a AttendanceItem
 const transformGraphQLToAttendanceItem = (graphqlData: any): AttendanceItem => {
@@ -118,9 +119,10 @@ export const deleteAttendance = createAsyncThunk<string, string,
     }
 );
 
+const initialState = createInitialPaginatedState<AttendanceItem>();
 const attendanceSlice = createSlice({
     name: 'attendance',
-    initialState: initialAttendanceState,
+    initialState,
     reducers: {},
     extraReducers: (builder) => {
         builder

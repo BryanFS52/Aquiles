@@ -1,9 +1,8 @@
-import { client } from "@/lib/apollo-client";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import {
-    GET_ALL_CHECKLISTS, GET_CHECKLIST_BY_ID, ADD_CHECKLIST, UPDATE_CHECKLIST,
-    DELETE_CHECKLIST,
-} from '@graphql/checklistGraph';
+import { client } from '@lib/apollo-client'
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { ChecklistItem } from '@type/slices/checklist'
+import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
+import { GET_ALL_CHECKLISTS, GET_CHECKLIST_BY_ID, ADD_CHECKLIST, UPDATE_CHECKLIST, DELETE_CHECKLIST } from '@graphql/checklistGraph'
 import {
     GetAllChecklistsQuery,
     GetAllChecklistsQueryVariables,
@@ -15,11 +14,22 @@ import {
     UpdateChecklistMutationVariables,
     DeleteChecklistMutation,
     DeleteChecklistMutationVariables
-} from '@/generated'
+} from '@graphql/generated'
 
-export const fetchChecklists = createAsyncThunk<GetAllChecklistsQuery['allChecklists'],
-    GetAllChecklistsQueryVariables
->(
+// Función para transformar datos de GraphQL a ChecklistItem
+const transformGraphQLToChecklistItem = (graphqlData: any): ChecklistItem => {
+    return {
+        id: graphqlData.id,
+        stateChecklist: graphqlData.state,
+        remarks: graphqlData.remarks,
+        instructorSignature: graphqlData.instructorSignature,
+        evaluationCriteria: graphqlData.evaluationCriteria,
+        checklistHistory: graphqlData.checklistHistory,
+        associatedJuries: graphqlData.associatedJuries
+    };
+};
+
+export const fetchChecklists = createAsyncThunk<GetAllChecklistsQuery['allChecklists'], GetAllChecklistsQueryVariables>(
     'checklist/fetchAll',
     async ({ page, size }) => {
         const { data } = await client.query<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>({
@@ -31,9 +41,7 @@ export const fetchChecklists = createAsyncThunk<GetAllChecklistsQuery['allCheckl
     }
 );
 
-export const fetchChecklistById = createAsyncThunk<GetChecklistByIdQuery['checklistById'],
-    GetChecklistByIdQueryVariables
->(
+export const fetchChecklistById = createAsyncThunk<GetChecklistByIdQuery['checklistById'], GetChecklistByIdQueryVariables>(
     'checklist/fetchById',
     async ({ id }) => {
         const { data } = await client.query<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>({
@@ -44,8 +52,8 @@ export const fetchChecklistById = createAsyncThunk<GetChecklistByIdQuery['checkl
     }
 );
 
-export const addChecklist = createAsyncThunk<AddChecklistMutation['addChecklist'],
-    AddChecklistMutationVariables['input']
+export const addChecklist = createAsyncThunk<AddChecklistMutation['addChecklist'], AddChecklistMutationVariables['input'],
+    { rejectValue: { code: string; message: string } }
 >(
     'checklist/add',
     async (input, { rejectWithValue }) => {
@@ -55,11 +63,10 @@ export const addChecklist = createAsyncThunk<AddChecklistMutation['addChecklist'
                 variables: { input }
             });
             const res = data?.addChecklist;
-            // Verificamos el código de la respuesta
+
             if (!res || res.code !== '200') {
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
             }
-            // Si el código es 200, retornamos los datos
             return res;
         } catch (error: any) {
             return rejectWithValue({ code: '500', message: error.message });
@@ -67,8 +74,7 @@ export const addChecklist = createAsyncThunk<AddChecklistMutation['addChecklist'
     }
 );
 
-export const updateChecklist = createAsyncThunk<UpdateChecklistMutation['updateChecklist'],
-    UpdateChecklistMutationVariables,
+export const updateChecklist = createAsyncThunk<UpdateChecklistMutation['updateChecklist'], UpdateChecklistMutationVariables,
     { rejectValue: { code: string; message: string } }
 >(
     'checklist/update',
@@ -101,30 +107,23 @@ export const deleteChecklist = createAsyncThunk<string, string,
                 mutation: DELETE_CHECKLIST,
                 variables: { id },
             });
+
             const res = data?.deleteChecklist;
             if (!res || res.code !== '200') {
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
             }
 
-            return id;
-
+            return id; // Devolvemos solo el ID borrado para actualizar el estado
         } catch (error: any) {
             return rejectWithValue({ code: '500', message: error.message });
         }
     }
 );
 
-/*
+const initialState = createInitialPaginatedState<ChecklistItem>();
 const checklistSlice = createSlice({
     name: 'checklist',
-    initialState: {
-        data: [],
-        totalItems: 0,
-        totalPages: 0,
-        currentPage: 0,
-        loading: false,
-        error: null,
-    },
+    initialState,
     reducers: {},
     extraReducers: (builder) => {
         builder
@@ -132,64 +131,84 @@ const checklistSlice = createSlice({
             .addCase(fetchChecklists.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(fetchChecklists.fulfilled, (state, action) => {
-                state.data = action.payload.data;
-                state.totalItems = action.payload.totalItems;
-                state.totalPages = action.payload.totalPages;
-                state.currentPage = action.payload.currentPage;
+            .addCase(fetchChecklists.fulfilled, (state, action: PayloadAction<GetAllChecklistsQuery['allChecklists']>) => {
+                if (action.payload?.data) {
+                    // Filtra nulls y transforma los datos
+                    state.data = action.payload.data
+                        .filter((item): item is NonNullable<typeof item> => item !== null)
+                        .map(transformGraphQLToChecklistItem);
+                    state.totalItems = action.payload.totalItems ?? 0;
+                    state.totalPages = action.payload.totalPages ?? 0;
+                    state.currentPage = action.payload.currentPage ?? 0;
+                }
                 state.loading = false;
             })
             .addCase(fetchChecklists.rejected, (state, action) => {
-                state.error = action.error.message;
+                state.error = action.error.message || 'Error fetching checklists';
                 state.loading = false;
             })
             // fetchChecklistById
             .addCase(fetchChecklistById.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(fetchChecklistById.fulfilled, (state, action) => {
-                state.data = action.payload; // Guardamos la información del checklist
+            .addCase(fetchChecklistById.fulfilled, (state, action: PayloadAction<GetChecklistByIdQuery['checklistById']>) => {
+                if (action.payload) {
+                    state.data = [transformGraphQLToChecklistItem(action.payload)];
+                }
                 state.loading = false;
             })
             .addCase(fetchChecklistById.rejected, (state, action) => {
-                const { code, message } = action.payload || {};
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
                 state.error = { code, message };
                 state.loading = false;
             })
             // addChecklist
-            .addCase(addChecklist.fulfilled, (state, action) => {
-                state.data.push(action.payload);
+            .addCase(addChecklist.fulfilled, (state, action: PayloadAction<AddChecklistMutation['addChecklist']>) => {
+                if (action.payload) {
+                    // Transforma el payload antes de agregarlo al estado
+                    const newChecklist = transformGraphQLToChecklistItem(action.payload);
+                    state.data.push(newChecklist);
+                }
                 state.error = null;
             })
             .addCase(addChecklist.rejected, (state, action) => {
-                const { code, message } = action.payload || {};
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
                 state.error = { code, message };
             })
             // updateChecklist
-            .addCase(updateChecklist.fulfilled, (state, action) => {
-                const { id, input } = action.payload;
-                const index = state.data.findIndex((checklist) => checklist.id === id);
-                if (index !== -1) {
-                    state.data[index] = { ...state.data[index], ...input };
+            .addCase(updateChecklist.fulfilled, (state, action: PayloadAction<UpdateChecklistMutation['updateChecklist']>) => {
+                if (action.payload) {
+                    // Transforma el payload y actualiza el elemento correspondiente
+                    const updatedChecklist = transformGraphQLToChecklistItem(action.payload);
+                    const index = state.data.findIndex((checklist: ChecklistItem) => checklist.id === updatedChecklist.id);
+                    if (index !== -1) {
+                        state.data[index] = updatedChecklist;
+                    }
                 }
                 state.error = null;
             })
             .addCase(updateChecklist.rejected, (state, action) => {
-                const { code, message } = action.payload || {};
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
                 state.error = { code, message };
             })
             // deleteChecklist
-            .addCase(deleteChecklist.fulfilled, (state, action) => {
-                state.data = state.data.filter((checklist) => checklist.id !== action.payload);
+            .addCase(deleteChecklist.fulfilled, (state, action: PayloadAction<string>) => {
+                if (action.payload) {
+                    state.data = state.data.filter((checklist: ChecklistItem) => checklist.id !== action.payload);
+                }
                 state.error = null;
             })
             .addCase(deleteChecklist.rejected, (state, action) => {
-                const { code, message } = action.payload || {};
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
                 state.error = { code, message };
-            });
+            })
     }
 });
 
 export const { } = checklistSlice.actions;
+
 export default checklistSlice.reducer;
-*/

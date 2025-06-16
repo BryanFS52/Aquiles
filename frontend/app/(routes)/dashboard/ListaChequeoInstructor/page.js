@@ -69,23 +69,23 @@ export default function InstructorChecklistView() {
 
         {/* Información del centro y datos generales */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 bg-white dark:bg-[#002033] shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
+          <div className="p-4 bg-white dark:bg-black/20 shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
             <p className="text-2xl font-bold text-black dark:text-white">Centro de Formación:</p>
-            <p className="text-base text-darkBlue dark:text-white">Centro de Servicios Financieros</p>
+            <p className="text-base text-black dark:text-white">Centro de Servicios Financieros</p>
             <p className="text-2xl font-bold text-black dark:text-white">Fecha:</p>
-            <p className="text-base text-darkBlue dark:text-white">05/02/2024 - 05/05/2024</p>
+            <p className="text-base text-black dark:text-white">05/02/2024 - 05/05/2024</p>
           </div>
-          <div className="p-4 bg-white dark:bg-[#002033] shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
+          <div className="p-4 bg-white dark:bg-black/20 shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
             <p className="text-2xl font-bold text-black dark:text-white">Jornada:</p>
-            <p className="text-base text-darkBlue dark:text-white">Diurna</p>
+            <p className="text-base text-black dark:text-white">Diurna</p>
             <p className="text-2xl font-bold text-black dark:text-white">Ficha:</p>
-            <p className="text-base text-darkBlue dark:text-white">2558735</p>
+            <p className="text-base text-black dark:text-white">2558735</p>
           </div>
-          <div className="p-4 bg-white dark:bg-[#002033] shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
+          <div className="p-4 bg-white dark:bg-black/20 shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
             <p className="text-2xl font-bold text-black dark:text-white">Instructor Calificador:</p>
-            <p className="text-base text-darkBlue dark:text-white">Juan Pérez</p>
+            <p className="text-base text-black dark:text-white">Juan Pérez</p>
             <p className="text-2xl font-bold text-black dark:text-white">Team</p>
-            <select onChange={(e) => handleTeamChange(e.target.value)} className="border rounded p-2 w-full bg-white dark:bg-[#001829] text-darkBlue dark:text-white border-darkGreen/20 dark:border-shadowBlue/40 focus:ring-2 focus:ring-darkGreen/40">
+            <select onChange={(e) => handleTeamChange(e.target.value)} className="border rounded p-2 w-full bg-white dark:bg-[#001829] text-black dark:text-white border-darkGreen/20 dark:border-shadowBlue/40 focus:ring-2 focus:ring-darkGreen/40">
               {teams.map((team) => (
                 <option key={team.id} value={team.id.toString()}>
                   {team.name}
@@ -113,7 +113,7 @@ export default function InstructorChecklistView() {
             <select
               onChange={(e) => handleComponentChange(e.target.value)}
               value={selectedComponent}
-              className="p-2 border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300 border rounded"            >
+              className="p-2 border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300 border rounded">
               {Object.keys(checklistData[selectedTrimester]).map((component) => (
                 <option key={component} value={component}>
                   {component}
@@ -123,17 +123,17 @@ export default function InstructorChecklistView() {
 
             <button
               onClick={handleSaveChecklist}
-              className="flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md hover:border-[#01b001] bg-[#0e324b] text-white hover:bg-[#01b001] transition-colors duration-300 focus:outline-none"
+              className="flex items-center gap-1 px-4 py-2 rounded-md hover:border-[#01b001] border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none"
             >
               <Save className="w-4 h-4" /> Guardar Lista de Chequeo
             </button>
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md hover:border-[#01b001] bg-[#0e324b] text-white hover:bg-[#01b001] transition-colors duration-300 focus:outline-none">
+            <button className="flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md  bg-gradient-to-r from-lime-600 to-lime-500  text-white focus:outline-none">
               <FileDown className="w-4 h-4" /> PDF
             </button>
-            <button className="flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md hover:border-[#01b001] bg-[#0e324b] text-white hover:bg-[#01b001] transition-colors duration-300 focus:outline-none">
+            <button className="flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md bg-gradient-to-r from-lime-600 to-lime-500 text-white focus:outline-none">
               <FileDown className="w-4 h-4" /> Excel
             </button>
           </div>
