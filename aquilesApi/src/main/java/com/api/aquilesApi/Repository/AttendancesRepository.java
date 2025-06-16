@@ -1,12 +1,15 @@
 package com.api.aquilesApi.Repository;
 
 import com.api.aquilesApi.Entity.AttendancesEntity;
-import com.api.aquilesApi.Entity.StateAttendanceEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface AttendancesRepository extends JpaRepository<AttendancesEntity, Long> {
-    boolean existsByAttendanceDateAndStateAttendance(String attendanceDate, StateAttendanceEntity stateAttendance);
+
+    List<AttendancesEntity> findAllByStudentId(Long studentId);
+
 
 }

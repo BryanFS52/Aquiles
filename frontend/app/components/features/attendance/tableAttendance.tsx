@@ -5,26 +5,12 @@ import { FaClipboardList } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { motion } from "framer-motion";
 import { useRouter } from 'next/navigation';
+import { StudySheetItem, Student } from '@type/slices/olympo/studySheet';
 import ModalQR from "@components/Modals/modalQR";
 
-// Definición de interfaces
-interface Person {
-    name: string;
-    lastname: string;
-    document: string;
-}
-
-interface Student {
-    id: string | number;
-    person: Person;
-}
-
-interface StudySheetData {
-    students: Student[];
-}
 
 interface TableAttendanceProps {
-    studySheetData?: StudySheetData;
+    studySheetData?: StudySheetItem;
 }
 
 const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData }) => {

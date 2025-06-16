@@ -8,8 +8,8 @@
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public class StateAttendanceDto {
-        private Long stateAttendanceId;
+    public class AttendanceStateDto {
+        private Long id;
 
         @NotNull(message = "El estado es obligatorio")
         private String status;

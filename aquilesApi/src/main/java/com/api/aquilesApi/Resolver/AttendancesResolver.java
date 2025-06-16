@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,15 +23,24 @@ public class AttendancesResolver {
     public AttendancesResolver(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator) {
         this.attendancesBusiness = attendancesBusiness;
         this.qrCodeGenerator = qrCodeGenerator;
-
     }
+
+    @DgsData(parentType = "Student", field = "attendance")
+    public List<AttendancesDto> getAttendances(DgsDataFetchingEnvironment environment) {
+        Map<String, Object> variables = environment.getSource();
+        assert variables != null;
+        String attendanceId = (String) variables.get("id");
+        Long attendanceIdLong = Long.parseLong(attendanceId);
+        return attendancesBusiness.findAllByStudentId(attendanceIdLong);
+    }
+
     @DgsData(parentType = "Attendance")
     public Map<String, Object> student(DgsDataFetchingEnvironment env)  {
         AttendancesDto attendance = env.getSource();
         assert attendance != null;
         return Map.of(
                 "__typename", "Student",
-                "id", attendance.getIdStudent());
+                "id", attendance.getStudentId());
     }
 
     // FindAll Attendances (GraphQL)
@@ -75,7 +85,7 @@ public class AttendancesResolver {
         try {
             AttendancesDto attendancesDto1 = attendancesBusiness.add(attendancesDto);
             return ResponseHttpApi.responseHttpAction(
-                    attendancesDto1.getAttendanceId(),
+                    attendancesDto1.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
             );

@@ -1,7 +1,6 @@
 package com.api.aquilesApi.Service;
 
 import com.api.aquilesApi.Entity.AttendancesEntity;
-import com.api.aquilesApi.Entity.StateAttendanceEntity;
 import com.api.aquilesApi.Repository.AttendancesRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -9,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AttendancesService implements Idao<AttendancesEntity , Long> {
@@ -24,13 +25,11 @@ public class AttendancesService implements Idao<AttendancesEntity , Long> {
         return attendancesRepository.findAll(pageRequest);
     }
 
-
     @Override
     public AttendancesEntity getById(Long id) {
         return attendancesRepository.findById(id).orElseThrow(() ->
                 new CustomException("Attendance Type with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
-
 
     @Override
     public void update(AttendancesEntity entity) {
@@ -52,8 +51,9 @@ public class AttendancesService implements Idao<AttendancesEntity , Long> {
         this.attendancesRepository.save(entity);
     }
 
-
-    public boolean existsByAttendanceDateAndStateAttendance(String attendanceDate, StateAttendanceEntity stateAttendance) {
-        return attendancesRepository.existsByAttendanceDateAndStateAttendance(attendanceDate , stateAttendance);
+    public List<AttendancesEntity> findAllByStudentId(Long studentId) {
+        return attendancesRepository.findAllByStudentId(studentId);
     }
+
+
 }

@@ -48,10 +48,30 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheetIt
             ? {
                 id: graphqlData.trainingProject.id,
                 name: graphqlData.trainingProject.name,
+                program: graphqlData.trainingProject.program
+                    ? {
+                        id: graphqlData.trainingProject.program.id,
+                        name: graphqlData.trainingProject.program.name
+                    }
+                    : null
             }
             : null,
+
+        // 👇 Agrega esto para que los estudiantes vengan incluidos si están presentes
+        students: graphqlData.students?.filter((s: any) => s !== null).map((student: any) => ({
+            id: student.id,
+            person: {
+                id: student.person.id,
+                document: student.person.document,
+                name: student.person.name,
+                lastname: student.person.lastname,
+                email: student.person.email,
+                phone: student.person.phone
+            },
+        })) ?? [],
     };
 };
+
 
 
 export const fetchStudySheets = createAsyncThunk<GetStudySheetsQuery['allStudySheets'], GetStudySheetsQueryVariables>(

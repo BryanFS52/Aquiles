@@ -12,34 +12,13 @@ export const GET_ALL_ATTENDANCES = gql`
         attendanceDate
         stateAttendance {
           id
-          name
+          status
         }
       }
       currentPage
       totalPages
       totalItems
     }
-  }
-`;
-
-export const GET_ATTENDANCE_BY_ID = gql`
-  query GetAttendanceById($id: Long!) {
-    attendanceById(id: $id) {
-    code
-    message
-    date
-    data {
-      attendanceId
-      attendanceDate
-      stateAttendance {
-        id
-        name
-      }
-      student {
-        id
-      }
-    }
-  }
   }
 `;
 
