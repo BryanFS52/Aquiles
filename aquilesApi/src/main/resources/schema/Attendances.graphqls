@@ -1,7 +1,6 @@
-
-
- type Student @key(fields: "id") {
-    id: ID
+type Student @key(fields: "id") @extends{
+    id: ID @external
+    attendances : [Attendance]
 }
 type Attendance @key(fields: "id") {
     id: ID!

@@ -3,10 +3,12 @@ package com.api.aquilesApi.Resolver;
 import com.api.aquilesApi.Business.AttendancesBusiness;
 import com.api.aquilesApi.Dto.AttendancesDto;
 import com.api.aquilesApi.Dto.QRCodePayload;
+import com.api.aquilesApi.Dto.Student;
 import com.api.aquilesApi.Entity.AttendancesEntity;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.api.aquilesApi.Utilities.QrCodeGenerator;
 import com.netflix.graphql.dgs.*;
+import graphql.schema.DataFetchingEnvironment;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -31,13 +33,12 @@ public class AttendancesResolver {
     }
 
 
-    @DgsEntityFetcher(name = "Attendance")
-    public List <AttendancesEntity> getAttendance(Map<String, Object> input) {
-
-
-        String id = (String) input.get("id");
-        Long attendanceId = Long.parseLong(id);
-
+    @DgsData(field = "attendances" , parentType = "Student")
+    public List <AttendancesEntity> getAttendance(DataFetchingEnvironment env) {
+        System.out.println("getAttendance");
+        Student student = env.getSource();
+        assert student != null;
+        Long attendanceId = student.getId();
         List< AttendancesDto> attendancesEntityList = attendancesBusiness.findAllByStudentId(attendanceId);
         return attendancesEntityList.stream().map( attendancesEntity ->  modelMapper.map(
                 attendancesEntity, AttendancesEntity.class

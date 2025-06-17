@@ -13,13 +13,13 @@ import type {
 } from "@type/pages/attendanceManual"
 
 // Component imports
-import { AttendanceHeader } from "@components/features/attendanceManual/attendanceManualHeader"
-import { AttendanceStatsSection } from "@components/features/attendanceManual/attendanceStatsCard"
-import { CourseInfoSection } from "@components/features/attendanceManual/courseInfo"
-import { AttendanceControls } from "@components/features/attendanceManual/attendanceControls"
-import { StudentList } from "@components/features/attendanceManual/studentList"
-import { AttendanceHistory } from "@/components/features/attendanceManual/attendanceHistory"
-import { LoadingState, ErrorState, EmptyStudentsState } from "@components/features/attendanceManual/state"
+import { AttendanceHeader } from "@/components/features/attendance/attendanceManual/attendanceManualHeader"
+import { AttendanceStatsSection } from "@/components/features/attendance/attendanceManual/attendanceStatsCard"
+import { CourseInfoSection } from "@/components/features/attendance/attendanceManual/courseInfo"
+import { AttendanceControls } from "@/components/features/attendance/attendanceManual/attendanceControls"
+import { StudentList } from "@/components/features/attendance/attendanceManual/studentList"
+import { AttendanceHistory } from "@/components/features/attendance/attendanceManual/attendanceHistory"
+import { LoadingState, ErrorState, EmptyStudentsState } from "@/components/features/attendance/attendanceManual/state"
 
 const AttendanceManualPage: React.FC = () => {
     const { data: studySheet, loading, error } = useSelector((state: any) => state.studySheet)
