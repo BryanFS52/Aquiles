@@ -3,6 +3,11 @@
 import { Users, ChevronDown, Mail, Phone, CheckCircle, XCircle, Clock } from "lucide-react"
 import type { AttendanceStatus } from "@type/pages/attendanceManual"
 import type { JSX } from "react"
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { fetchAttendanceState } from '@slice/attendanceStateSlice';
+import { RootState } from '@/redux/store';
+import type { AppDispatch } from '@/redux/store';
 
 interface StudentListProps {
     students: any[]
@@ -19,6 +24,29 @@ export function StudentList({
     onAttendanceChange,
     onStudentSelect,
 }: StudentListProps) {
+    const dispatch = useDispatch<AppDispatch>();
+    const { data: attendanceStates, loading, error } = useSelector(
+        (state: RootState) => state.attendanceState
+    ) as {
+        data: { id: string; status: AttendanceStatus }[];
+        loading: boolean;
+        error: any;
+    };
+
+    const statusColorMap: Record<string, string> = {
+        presente: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700",
+        ausente: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700",
+        justificado: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700",
+        retardo: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700",
+        // fallback por si llega otro
+        default: "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600",
+    };
+
+
+    useEffect(() => {
+        dispatch(fetchAttendanceState({ page: 0, size: 100 }));
+    }, [dispatch]);
+
     const getStatusIcon = (status: AttendanceStatus): JSX.Element => {
         switch (status) {
             case "presente":
@@ -34,20 +62,11 @@ export function StudentList({
         }
     }
 
-    const getStatusColor = (status: AttendanceStatus): string => {
-        switch (status) {
-            case "presente":
-                return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700"
-            case "ausente":
-                return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700"
-            case "justificado":
-                return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700"
-            case "retardo":
-                return "bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900 dark:text-orange-200 dark:border-orange-700"
-            default:
-                return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"
-        }
-    }
+    const getStatusColor = (status: string | undefined | null): string => {
+        if (!status) return statusColorMap.default;
+        return statusColorMap[status.toLowerCase()] ?? statusColorMap.default;
+    };
+
 
     if (students.length === 0) {
         return (
@@ -109,16 +128,21 @@ export function StudentList({
                         <div className="flex items-center space-x-3 flex-shrink-0">
                             <div className="hidden sm:block">{getStatusIcon(attendance[student.id])}</div>
                             <select
-                                value={attendance[student.id] || "presente"}
+                                value={attendance[student.id] || ""}
                                 onChange={(e) => onAttendanceChange(student.id, e.target.value as AttendanceStatus)}
                                 className={`px-3 py-2 border rounded-lg font-medium text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${getStatusColor(attendance[student.id])}`}
                             >
-                                <option value="presente">✓ Presente</option>
-                                <option value="ausente">✗ Ausente</option>
-                                <option value="justificado">J Justificado</option>
-                                <option value="retardo">R Retardo</option>
+                                <option value="" disabled hidden>
+                                    Seleccionar
+                                </option>
+                                {attendanceStates?.map((state: any) => (
+                                    <option key={state.id} value={state.status}>
+                                        {state.status}
+                                    </option>
+                                ))}
                             </select>
                         </div>
+
                     </div>
                 </div>
             ))}

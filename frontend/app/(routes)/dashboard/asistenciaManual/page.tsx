@@ -12,7 +12,6 @@ import type {
     FilterOption,
 } from "@type/pages/attendanceManual"
 
-// Component imports
 import { AttendanceHeader } from "@/components/features/attendance/attendanceManual/attendanceManualHeader"
 import { AttendanceStatsSection } from "@/components/features/attendance/attendanceManual/attendanceStatsCard"
 import { CourseInfoSection } from "@/components/features/attendance/attendanceManual/courseInfo"
@@ -26,11 +25,6 @@ const AttendanceManualPage: React.FC = () => {
     const studySheetObj = Array.isArray(studySheet) ? studySheet[0] : studySheet
     const students = studySheetObj?.students || []
 
-    console.log(studySheet)
-    console.log(students)
-
-
-    // State management
     const [attendance, setAttendance] = useState<Record<string | number, AttendanceStatus>>({})
     const [searchTerm, setSearchTerm] = useState<string>("")
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split("T")[0])
@@ -38,13 +32,11 @@ const AttendanceManualPage: React.FC = () => {
     const [selectedStudent, setSelectedStudent] = useState<string | number | null>(null)
     const [attendanceHistory, setAttendanceHistory] = useState<AttendanceHistoryType[]>([])
 
-    // Initialize attendance when students arrive
     useEffect(() => {
         if (students.length > 0) {
+            // No inicialices con valores por defecto, deja que las stats empiecen en 0
             const initialAttendance: Record<string | number, AttendanceStatus> = {}
-            students.forEach((student: any) => {
-                initialAttendance[student.id] = "presente"
-            })
+            // No asignes ningún valor inicial para que las estadísticas estén en 0
             setAttendance(initialAttendance)
 
             const mockHistory: AttendanceHistoryType[] = [
@@ -102,7 +94,7 @@ const AttendanceManualPage: React.FC = () => {
             filteredStudents
                 .map(
                     (student: any) =>
-                        `${student.person?.name || ""},${student.person?.lastname || ""},${student.person?.document || ""},${attendance[student.id]}`,
+                        `${student.person?.name || ""},${student.person?.lastname || ""},${student.person?.document || ""},${attendance[student.id] || "sin marcar"}`,
                 )
                 .join("\n")
 
@@ -117,16 +109,22 @@ const AttendanceManualPage: React.FC = () => {
 
     const getAttendanceStats = (): AttendanceStats => {
         const stats: AttendanceStats = { presente: 0, ausente: 0, justificado: 0, retardo: 0 }
+
         Object.values(attendance).forEach((status) => {
-            stats[status] = (stats[status] || 0) + 1
+            if (status) { // Solo cuenta si el estudiante tiene un estado asignado
+                const key = status.toLowerCase() as keyof AttendanceStats
+                if (key in stats) {
+                    stats[key] += 1
+                }
+            }
         })
+
         return stats
     }
 
     const stats = getAttendanceStats()
     const attendancePercentage = students.length > 0 ? Math.round((stats.presente / students.length) * 100) : 0
 
-    // Conditional UI rendering
     if (loading) return <LoadingState />
     if (error) return <ErrorState error={error} />
     if (!students.length) return <EmptyStudentsState />
@@ -138,11 +136,12 @@ const AttendanceManualPage: React.FC = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                     <div className="lg:col-span-1 space-y-6">
-                        <AttendanceStatsSection stats={stats} attendancePercentage={attendancePercentage} />
                         <CourseInfoSection
                             studySheet={studySheetObj}
                             onExportAttendance={handleExportAttendance}
                         />
+                        <AttendanceStatsSection stats={stats} attendancePercentage={attendancePercentage} />
+
                     </div>
 
                     <div className="lg:col-span-3 space-y-6">
@@ -180,6 +179,7 @@ const AttendanceManualPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     )

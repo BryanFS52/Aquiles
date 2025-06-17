@@ -20,7 +20,7 @@ export function AttendanceHeader({ studySheet }: AttendanceHeaderProps) {
                             <div>
                                 <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Control de Asistencia</h1>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    {studySheet?.name || studySheet?.program || "Ficha de Estudio"}
+                                    {studySheet?.number || studySheet?.program || "Ficha de Estudio"}
                                 </p>
                             </div>
                         </div>

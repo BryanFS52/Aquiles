@@ -8,9 +8,9 @@ export const GET_ALL_ATTENDANCES = gql`
       code
       message
       data {
-        attendanceId
+        id
         attendanceDate
-        stateAttendance {
+        attendanceState {
           id
           status
         }

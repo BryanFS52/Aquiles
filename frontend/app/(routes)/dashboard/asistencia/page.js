@@ -14,7 +14,7 @@ export default function Attendance() {
 
     // Get the first study sheet from the data array (since fetchById returns array with single item)
     const studySheet = studySheets.length > 0 ? studySheets[0] : null;
-    const students = studySheet?.students || [];
+    const students = studySheet?.students?.filter((s) => s.person.status === "active") || [];
 
     useEffect(() => {
         const fetchStudySheet = async () => {
@@ -28,8 +28,8 @@ export default function Attendance() {
         fetchStudySheet();
     }, [dispatch]);
 
-    const activeStudents = students.filter((s) => s.status === "active").length;
-    const withdrawnStudents = students.filter((s) => s.status === "withdrawn").length;
+    const activeStudents = students.length;
+    const withdrawnStudents = 0;
 
     if (loading) {
         return (
@@ -64,7 +64,7 @@ export default function Attendance() {
                 <div className="flex-1 lg:max-w-md">
                     <div className="h-16 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 p-4 flex items-center">
                         <span className="font-inter font-medium text-lg text-black dark:text-white text-center w-full">
-                            {studySheet?.offer?.name || "Desarrollo de Aplicaciones Web II"}
+                            {studySheet?.trainingProject.program?.name}
                         </span>
                     </div>
                 </div>
@@ -73,10 +73,20 @@ export default function Attendance() {
                 <div className="flex-1">
                     <div className="h-16 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 p-4">
                         <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-around h-full space-y-2 sm:space-y-0">
+                            {/* Numero de estudiantes */}
+                            <div className="flex items-center space-x-3">
+                                <BsPersonCircle className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+                                <span className="text-lg font-semibold text-black dark:text-white">{studySheet?.numberStudents || 0}</span>
+                                <span className="text-sm text-gray-600 dark:text-gray-300">Número de Estudiantes</span>
+                            </div>
+
+                            {/* Separador vertical */}
+                            <div className="hidden sm:block w-px h-8 bg-gray-300 dark:bg-gray-600"></div>
+
                             {/* Aprendices Activos */}
                             <div className="flex items-center space-x-3">
                                 <BsPersonCircle className="w-6 h-6 text-gray-500 dark:text-gray-400" />
-                                <span className="text-lg font-semibold text-black dark:text-white">{activeStudents}</span>
+                                <span className="text-lg font-semibold text-black dark:text-white">{activeStudents || 0}</span>
                                 <span className="text-sm text-gray-600 dark:text-gray-300">Aprendices Activos</span>
                             </div>
 

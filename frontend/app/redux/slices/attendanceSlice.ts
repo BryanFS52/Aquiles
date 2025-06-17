@@ -6,8 +6,6 @@ import { createInitialPaginatedState, RejectedPayload } from '@type/slices/commo
 import {
     GetAttendancesQuery,
     GetAttendancesQueryVariables,
-    GetAttendanceByIdQuery,
-    GetAttendanceByIdQueryVariables,
     AddAttendanceMutation,
     AddAttendanceMutationVariables,
     UpdateAttendanceMutation,
@@ -19,7 +17,7 @@ import {
 // Función para transformar datos de GraphQL a AttendanceItem
 const transformGraphQLToAttendanceItem = (graphqlData: any): AttendanceItem => {
     return {
-        id: graphqlData.attendanceId || graphqlData.id,
+        id: graphqlData.id || graphqlData.id,
         attendanceDate: graphqlData.attendanceDate,
         stateAttendance: graphqlData.stateAttendance ? {
             id: graphqlData.stateAttendance.id,

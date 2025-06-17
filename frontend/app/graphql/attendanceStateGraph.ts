@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 // Queries and Mutations for Attendance State
-export const GET_ALL_STATE_ATTENDANCES = gql`
+export const GET_ALL_ATTENDANCES_STATE = gql`
   query GetStateAttendance($page: Int, $size: Int) {
     allStateAttendances(page: $page, size: $size) {
       code
@@ -18,7 +18,7 @@ export const GET_ALL_STATE_ATTENDANCES = gql`
   }
 `;
 
-export const ADD_STATE_ATTENDANCE = gql`
+export const ADD_ATTENDANCE_STATE = gql`
   mutation AddStateAttendance($input: AttendanceStateDto!) {
     addStateAttendance(input: $input) {
       code
@@ -28,7 +28,7 @@ export const ADD_STATE_ATTENDANCE = gql`
   }
 `;
 
-export const UPDATE_STATE_ATTENDANCE = gql`
+export const UPDATE_ATTENDANCE_STATE = gql`
   mutation UpdateStateAttendance($id: Long!, $input: AttendanceStateDto!) {
     updateStateAttendance(id: $id, input: $input) {
       code
@@ -38,7 +38,7 @@ export const UPDATE_STATE_ATTENDANCE = gql`
   }
 `;
 
-export const DELETE_STATE_ATTENDANCE = gql`
+export const DELETE_ATTENDANCE_STATE = gql`
   mutation DeleteStateAttendance($id: Long!) {
     deleteStateAttendance(id: $id) {
       code

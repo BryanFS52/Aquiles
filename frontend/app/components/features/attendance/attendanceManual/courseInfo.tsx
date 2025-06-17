@@ -13,7 +13,7 @@ export function CourseInfoSection({ studySheet, onExportAttendance }: CourseInfo
             {/* Course info */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Info del Curso</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Información del Curso</h3>
                     <BookOpen className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                 </div>
                 <div className="space-y-3">
@@ -50,6 +50,7 @@ export function CourseInfoSection({ studySheet, onExportAttendance }: CourseInfo
             </div>
 
             {/* Quick actions */}
+            {/*}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Acciones</h3>
                 <div className="space-y-3">
@@ -66,6 +67,7 @@ export function CourseInfoSection({ studySheet, onExportAttendance }: CourseInfo
                     </button>
                 </div>
             </div>
+            */}
         </>
     )
 }
