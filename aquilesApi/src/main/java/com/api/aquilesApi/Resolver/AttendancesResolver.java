@@ -32,17 +32,39 @@ public class AttendancesResolver {
         this.qrCodeGenerator = qrCodeGenerator;
     }
 
+    @DgsEntityFetcher(name = "Student")
+    public Student getStudent(Map<String, Object> values) {
+        System.out.println("Resolviendo entidad Student con valores: " + values);
 
-    @DgsData(field = "attendances" , parentType = "Student")
-    public List <AttendancesEntity> getAttendance(DataFetchingEnvironment env) {
-        System.out.println("getAttendance");
+        Long id = null;
+        if (values.get("id") instanceof String) {
+            id = Long.valueOf((String) values.get("id"));
+        } else if (values.get("id") instanceof Integer) {
+            id = ((Integer) values.get("id")).longValue();
+        } else if (values.get("id") instanceof Long) {
+            id = (Long) values.get("id");
+        }
+
+        if (id == null) return null;
+
+        Student student = new Student();
+        student.setId(id);
+        return student;
+    }
+
+
+    @DgsData(parentType = "Student", field = "attendances")
+    public List<AttendancesEntity> getAttendances(DgsDataFetchingEnvironment env) {
         Student student = env.getSource();
         assert student != null;
-        Long attendanceId = student.getId();
-        List< AttendancesDto> attendancesEntityList = attendancesBusiness.findAllByStudentId(attendanceId);
-        return attendancesEntityList.stream().map( attendancesEntity ->  modelMapper.map(
-                attendancesEntity, AttendancesEntity.class
-        )).collect(Collectors.toList()) ;
+
+        Long studentId = student.getId();
+
+        List<AttendancesDto> attendancesDtoList = attendancesBusiness.findAllByStudentId(studentId);
+
+        return attendancesDtoList.stream()
+                .map(dto -> modelMapper.map(dto, AttendancesEntity.class))
+                .collect(Collectors.toList());
     }
 
     // FindAll Attendances (GraphQL)
