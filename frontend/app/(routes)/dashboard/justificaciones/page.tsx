@@ -8,6 +8,7 @@ import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import Image from "next/image";
 import persona from "@public/img/persona.jpg";
 import PageTitle from "@components/UI/pageTitle";
+import JustificationFilters from "@components/features/justification/justificationsFilter";
 import {
   fetchJustifications,
   setFilterOptions,
@@ -15,7 +16,8 @@ import {
   goToNextPage,
   formatErrorMessage,
   downloadBase64File,
-  generateFileName
+  generateFileName,
+  setLocalCurrentPage
 } from '@slice/justificationSlice';
 
 
@@ -30,15 +32,16 @@ export default function JustificacionesInstructor() {
     localCurrentPage,
     filterOptions,
     itemsPerPage
-  } = useSelector((state) => state.justification);
+  } = useSelector((state:any) => state.justification);
 
 
   useEffect(() => {
     dispatch(fetchJustifications({ page: localCurrentPage, size: itemsPerPage }));
   }, [dispatch, localCurrentPage, itemsPerPage]);
 
-  const handleFilterChange = (filterType, value) => {
+  const handleFilterChange = (filterType: string, value: string) => {
     dispatch(setFilterOptions({ [filterType]: value }));
+    dispatch(setLocalCurrentPage(1));
   };
 
   const handleRefresh = () => {
@@ -53,7 +56,7 @@ export default function JustificacionesInstructor() {
     dispatch(goToNextPage());
   };
 
-  const handleDownloadFile = (justificacion) => {
+  const handleDownloadFile = (justificacion:any) => {
     if (justificacion.archivoAdjunto) {
       const mimeType = justificacion.archivoMime || "application/octet-stream";
       const fileName = generateFileName(justificacion.id, mimeType);
@@ -70,45 +73,12 @@ export default function JustificacionesInstructor() {
       <PageTitle>Justificaciones de aprendices</PageTitle>
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4 items-center">
-        <div className="w-full md:w-1/3">
-          <select
-            onChange={(e) => handleFilterChange('selectedFiltro', e.target.value)}
-            value={filterOptions.selectedFiltro}
-            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
-          >
-            <option value="">Filtrar por...</option>
-            <option value="programa">Programa</option>
-            <option value="ficha">Ficha</option>
-            <option value="documento">Documento</option>
-            <option value="aprendiz">Aprendiz</option>
-            <option value="fecha">Fecha de Justificación</option>
-          </select>
-        </div>
-
-        <div className="relative w-full md:w-2/3">
-          <input
-            type="search"
-            placeholder={`Buscar por ${filterOptions.selectedFiltro || "..."}`}
-            value={filterOptions.searchTerm}
-            onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
-            className="w-full pl-10 p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
-            disabled={!filterOptions.selectedFiltro}
-          />
-          <GoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-        </div>
-      </div>
-
-      {/* Reload Button */}
-      <div className="flex justify-start">
-        <button
-          onClick={handleRefresh}
-          className="px-6 py-3 bg-gradient-to-r from-lime-600 to-lime-500 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={loading}
-        >
-          {loading ? "Cargando..." : "Recargar Justificaciones"}
-        </button>
-      </div>
+      <JustificationFilters
+        filterOptions={filterOptions}
+        loading={loading}
+        onFilterChange={handleFilterChange}
+        onRefresh={handleRefresh}
+      />
 
       {/* Error Message */}
       {errorMessage && (
@@ -135,7 +105,7 @@ export default function JustificacionesInstructor() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredData.map((justificacion) => (
+                {filteredData.map((justificacion:any) => (
                   <tr key={justificacion.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
                     <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{justificacion.programa}</td>
                     <td className="px-6 py-4">{justificacion.ficha}</td>
