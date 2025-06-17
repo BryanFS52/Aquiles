@@ -3,9 +3,11 @@ package com.api.aquilesApi.Resolver;
 import com.api.aquilesApi.Business.AttendancesBusiness;
 import com.api.aquilesApi.Dto.AttendancesDto;
 import com.api.aquilesApi.Dto.QRCodePayload;
+import com.api.aquilesApi.Entity.AttendancesEntity;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.api.aquilesApi.Utilities.QrCodeGenerator;
 import com.netflix.graphql.dgs.*;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -14,33 +16,32 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @DgsComponent
 public class AttendancesResolver {
     private final AttendancesBusiness attendancesBusiness;
     private final QrCodeGenerator qrCodeGenerator;
 
-    public AttendancesResolver(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator) {
+    private final ModelMapper modelMapper = new ModelMapper();
+
+    public AttendancesResolver(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator ) {
         this.attendancesBusiness = attendancesBusiness;
         this.qrCodeGenerator = qrCodeGenerator;
     }
 
-    @DgsData(parentType = "Student", field = "attendance")
-    public List<AttendancesDto> getAttendances(DgsDataFetchingEnvironment environment) {
-        Map<String, Object> variables = environment.getSource();
-        assert variables != null;
-        String attendanceId = (String) variables.get("id");
-        Long attendanceIdLong = Long.parseLong(attendanceId);
-        return attendancesBusiness.findAllByStudentId(attendanceIdLong);
-    }
 
-    @DgsData(parentType = "Attendance")
-    public Map<String, Object> student(DgsDataFetchingEnvironment env)  {
-        AttendancesDto attendance = env.getSource();
-        assert attendance != null;
-        return Map.of(
-                "__typename", "Student",
-                "id", attendance.getStudentId());
+    @DgsEntityFetcher(name = "Attendance")
+    public List <AttendancesEntity> getAttendance(Map<String, Object> input) {
+
+
+        String id = (String) input.get("id");
+        Long attendanceId = Long.parseLong(id);
+
+        List< AttendancesDto> attendancesEntityList = attendancesBusiness.findAllByStudentId(attendanceId);
+        return attendancesEntityList.stream().map( attendancesEntity ->  modelMapper.map(
+                attendancesEntity, AttendancesEntity.class
+        )).collect(Collectors.toList()) ;
     }
 
     // FindAll Attendances (GraphQL)

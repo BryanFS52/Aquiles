@@ -1,13 +1,9 @@
-type Student {
 
+
+ type Student @key(fields: "id") {
+    id: ID
 }
-
-extend type Student {
-    id: ID @external
-
-    attendance : [Attendance]
-}
-type Attendance {
+type Attendance @key(fields: "id") {
     id: ID!
     attendanceDate: String
     attendanceState: AttendanceState
@@ -42,7 +38,6 @@ extend type Query {
     allAttendances(page: Int , size: Int ): AttendancePage
     attendanceById(id: Long!): AttendancePageId
 }
-
 
 extend type Mutation {
     addAttendance(input: AttendancesDto): Response

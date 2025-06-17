@@ -108,6 +108,7 @@ public class AttendancesBusiness {
     public List<AttendancesDto> findAllByStudentId(Long studentId) {
         try {
             List<AttendancesEntity> attendancesEntityList =  attendancesService.findAllByStudentId(studentId);
+            System.out.println("Total Attendances: " + attendancesEntityList.size());
             return attendancesEntityList.stream().map(entity -> modelMapper.map(entity, AttendancesDto.class)).collect(Collectors.toList());
         } catch (Exception e) {
             throw new CustomException("error " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,6 +1,6 @@
 import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { GET_ALL_ATTENDANCES, GET_ATTENDANCE_BY_ID, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph'
+import { GET_ALL_ATTENDANCES, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph'
 import { AttendanceItem } from '@type/slices/attendance'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import {
@@ -37,17 +37,6 @@ export const fetchAttendances = createAsyncThunk<GetAttendancesQuery['allAttenda
             fetchPolicy: 'no-cache',
         });
         return data.allAttendances;
-    }
-);
-
-export const fetchAttendanceById = createAsyncThunk<GetAttendanceByIdQuery['attendanceById'], GetAttendanceByIdQueryVariables>(
-    'attendance/fetchById',
-    async ({ id }) => {
-        const { data } = await client.query<GetAttendanceByIdQuery, GetAttendanceByIdQueryVariables>({
-            query: GET_ATTENDANCE_BY_ID,
-            variables: { id },
-        });
-        return data.attendanceById;
     }
 );
 
@@ -144,22 +133,6 @@ const attendanceSlice = createSlice({
             })
             .addCase(fetchAttendances.rejected, (state, action) => {
                 state.error = action.error.message || 'Error fetching attendances';
-                state.loading = false;
-            })
-            // fetchAttendanceById
-            .addCase(fetchAttendanceById.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchAttendanceById.fulfilled, (state, action: PayloadAction<GetAttendanceByIdQuery['attendanceById']>) => {
-                if (action.payload) {
-                    state.data = [transformGraphQLToAttendanceItem(action.payload)];
-                }
-                state.loading = false;
-            })
-            .addCase(fetchAttendanceById.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                const { code, message } = payload || {};
-                state.error = { code, message };
                 state.loading = false;
             })
             // addAttendance
