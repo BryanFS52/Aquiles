@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "stateAttendance")
-public class StateAttendanceEntity implements Serializable {
+public class AttendanceState implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,8 +22,7 @@ public class StateAttendanceEntity implements Serializable {
     private String status;
 
     // Relations
-
-    @OneToMany(mappedBy = "stateAttendance" ,cascade = CascadeType.ALL ,  fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "attendanceState" ,cascade = CascadeType.ALL ,  fetch = FetchType.LAZY)
     private List<AttendancesEntity> attendancesEntityList;
 
 }

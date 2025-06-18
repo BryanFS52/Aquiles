@@ -1,17 +1,39 @@
+export interface Person {
+    id: string;
+    document: string;
+    name: string;
+    lastname: string;
+    email: string;
+    phone: number;
+}
+
+export interface Student {
+    id: string;
+    person: Person;
+}
+
+export interface Program {
+    id: String;
+    name: String;
+}
+
 export interface StudySheetItem {
     id: string;
     number: string;
     numberStudents: number;
-    startLective: string;
-    endLective: string;
-    state: string;
 
-    offer: {
+    startLective?: string; // opcional porque no viene en la query por ID
+    endLective?: string;
+    state?: string;
+    code?: string;
+    message?: string;
+
+    offer?: {
         id: string;
         name: string;
     } | null;
 
-    journey: {
+    journey?: {
         id: string;
         name: string;
     } | null;
@@ -27,5 +49,8 @@ export interface StudySheetItem {
     trainingProject: {
         id: string;
         name: string;
+        program: Program | null
     } | null;
+
+    students: Student[];
 }

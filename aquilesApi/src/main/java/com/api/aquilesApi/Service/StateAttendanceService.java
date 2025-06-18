@@ -1,6 +1,6 @@
 package com.api.aquilesApi.Service;
 
-import com.api.aquilesApi.Entity.StateAttendanceEntity;
+import com.api.aquilesApi.Entity.AttendanceState;
 import com.api.aquilesApi.Repository.StateAttendanceRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
-public class StateAttendanceService implements Idao<StateAttendanceEntity , Long> {
+public class StateAttendanceService implements Idao<AttendanceState, Long> {
     private final StateAttendanceRepository stateAttendanceRepository;
 
     public StateAttendanceService(StateAttendanceRepository stateAttendanceRepository) {
@@ -18,33 +18,33 @@ public class StateAttendanceService implements Idao<StateAttendanceEntity , Long
     }
 
     @Override
-    public Page<StateAttendanceEntity> findAll(PageRequest pageRequest) {
+    public Page<AttendanceState> findAll(PageRequest pageRequest) {
         return stateAttendanceRepository.findAll(pageRequest);
     }
 
     @Override
-    public StateAttendanceEntity getById(Long id) {
+    public AttendanceState getById(Long id) {
         return stateAttendanceRepository.findById(id).orElseThrow(() ->
                 new CustomException("State Attendance with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
     @Override
-    public void update(StateAttendanceEntity entity) {
+    public void update(AttendanceState entity) {
         this.stateAttendanceRepository.save(entity);
     }
 
     @Override
-    public StateAttendanceEntity save(StateAttendanceEntity entity) {
+    public AttendanceState save(AttendanceState entity) {
         return stateAttendanceRepository.save(entity);
     }
 
     @Override
-    public void delete(StateAttendanceEntity entity) {
+    public void delete(AttendanceState entity) {
         this.stateAttendanceRepository.delete(entity);
     }
 
     @Override
-    public void create(StateAttendanceEntity entity) {
+    public void create(AttendanceState entity) {
         this.stateAttendanceRepository.save(entity);
     }
 

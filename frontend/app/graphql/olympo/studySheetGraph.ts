@@ -61,6 +61,10 @@ export const GET_STUDY_SHEET_BY_ID = gql`
                 trainingProject {
                     id
                     name
+                    program{
+                        id
+                        name
+                    }
                 }
                 students {
                     id
@@ -69,6 +73,8 @@ export const GET_STUDY_SHEET_BY_ID = gql`
                         document
                         name
                         lastname
+                        email
+                        phone
                     }
                 }
             }

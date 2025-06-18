@@ -1,6 +1,7 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.AttendancesDto;
+import com.api.aquilesApi.Entity.AttendanceState;
 import com.api.aquilesApi.Entity.AttendancesEntity;
 import com.api.aquilesApi.Service.AttendancesService;
 import com.api.aquilesApi.Service.StateAttendanceService;
@@ -16,18 +17,22 @@ import org.springframework.stereotype.Component;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class AttendancesBusiness {
 
     private final AttendancesService attendancesService;
+    private final StateAttendanceService stateAttendanceService;
     private final Util util;
     private final ModelMapper modelMapper = new ModelMapper();
 
 
     public AttendancesBusiness(AttendancesService attendancesService, StateAttendanceService stateAttendanceService, Util util) {
         this.attendancesService = attendancesService;
+        this.stateAttendanceService = stateAttendanceService;
         this.util = util;
     }
 
@@ -38,18 +43,18 @@ public class AttendancesBusiness {
         JSONObject dataObject = util.getData(json);
 
         // Asigna el valor del JSON al DTO
-        attendancesDTO.setAttendanceId(dataObject.getLong("attendanceId"));
+        attendancesDTO.setId();(dataObject.getLong("attendanceId"));
         attendancesDTO.setAttendanceDate(convertToDate(dataObject.getString("attendanceDate"))); // Convierte el string a Date
 
         // Busca el estado de asistencia basado en el ID proporcionado
         Long stateAttendanceId = dataObject.getLong("fk_stateAttendance_id");
-        StateAttendanceEntity stateAttendance = stateAttendanceService.getById(stateAttendanceId);
+        AttendanceState stateAttendance = stateAttendanceService.getById(stateAttendanceId);
 
         // Verifica si el estado de asistencia existe
         if (stateAttendance == null) {
             throw new CustomException("State Attendance not found for id: " + stateAttendanceId, HttpStatus.BAD_REQUEST);
         }
-        attendancesDTO.setStateAttendance(stateAttendance); // Establece el objeto StateAttendanceEntity
+        attendancesDTO.setStateAttendance(stateAttendance); // Establece el objeto AttendanceState
 
         // Validación para evitar duplicados
         if (attendancesService.existsByAttendanceDateAndStateAttendance(attendancesDTO.getAttendanceDate(), stateAttendance)) {
@@ -91,7 +96,6 @@ public class AttendancesBusiness {
     // Find By Id
     public AttendancesDto findById(Long id) {
         try {
-
             AttendancesEntity attendances = attendancesService.getById(id);
             return modelMapper.map(attendances, AttendancesDto.class);
         } catch (CustomException e) {
@@ -101,10 +105,26 @@ public class AttendancesBusiness {
         }
     }
 
+    public List<AttendancesDto> findAllByStudentId(Long studentId) {
+        try {
+            List<AttendancesEntity> attendancesEntityList =  attendancesService.findAllByStudentId(studentId);
+            System.out.println("Total Attendances: " + attendancesEntityList.size());
+            return attendancesEntityList.stream().map(entity -> modelMapper.map(entity, AttendancesDto.class)).collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new CustomException("error " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // Add
     public AttendancesDto add(AttendancesDto attendancesDto) {
         try {
-            AttendancesEntity attendancesEntity = modelMapper.map(attendancesDto, AttendancesEntity.class);
+            System.out.println(attendancesDto);
+            AttendancesEntity attendancesEntity = new AttendancesEntity();
+            attendancesEntity.setAttendanceDate(attendancesDto.getAttendanceDate());
+            AttendanceState attendanceState =stateAttendanceService.getById(attendancesDto.getAttendanceState().getId());
+
+            attendancesEntity.setAttendanceState(attendanceState);
+            attendancesEntity.setStudentId(attendancesDto.getStudentId());
             return modelMapper.map(attendancesService.save(attendancesEntity), AttendancesDto.class);
         }catch ( Exception e){
             throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);
@@ -114,7 +134,7 @@ public class AttendancesBusiness {
     // Update
     public void update(Long attendanceId, AttendancesDto attendancesDto) {
         try {
-            attendancesDto.setAttendanceId(attendanceId);
+            attendancesDto.setId(attendanceId);
             AttendancesEntity attendance = modelMapper.map( attendancesDto, AttendancesEntity.class);
             attendancesService.save(attendance);
         } catch (Exception e) {

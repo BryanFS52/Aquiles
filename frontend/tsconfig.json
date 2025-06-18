@@ -66,6 +66,9 @@
       "@type/*": [
         "./app/types/*"
       ],
+      "@feature/*": [
+        "./app/features/*"
+      ],
     }
   },
   "include": [

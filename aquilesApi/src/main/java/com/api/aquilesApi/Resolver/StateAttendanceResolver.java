@@ -1,19 +1,17 @@
 package com.api.aquilesApi.Resolver;
 
-
 import com.api.aquilesApi.Business.StateAttendancesBusiness;
-import com.api.aquilesApi.Dto.StateAttendanceDto;
+import com.api.aquilesApi.Dto.AttendanceStateDto;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.netflix.graphql.dgs.DgsQuery;
+import com.netflix.graphql.dgs.InputArgument;
 import org.springframework.data.domain.Page;
-import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-
 import java.util.Map;
 
-@Controller
+@DgsComponent
 public class StateAttendanceResolver {
     private final StateAttendancesBusiness stateAttendancesBusiness;
 
@@ -21,10 +19,10 @@ public class StateAttendanceResolver {
         this.stateAttendancesBusiness = stateAttendancesBusiness;
     }
 
-    @QueryMapping
-    public Map<String , Object> findAll (@Argument int page, @Argument int size) {
+    @DgsQuery
+    public Map<String , Object> allStateAttendances (@InputArgument Integer page, @InputArgument Integer size) {
         try {
-            Page<StateAttendanceDto> stateAttendanceDtoPage  = stateAttendancesBusiness.findAll(page, size);
+            Page<AttendanceStateDto> stateAttendanceDtoPage  = stateAttendancesBusiness.findAll(page, size);
             if (!stateAttendanceDtoPage.isEmpty()){
                 return  ResponseHttpApi.responseHttpFindAll(
                         stateAttendanceDtoPage.getContent(),
@@ -49,12 +47,12 @@ public class StateAttendanceResolver {
     }
 
     //End-Point Para Traer Un Estado Por Id
-    @QueryMapping
-    public Map<String , Object> findById(@Argument Long id){
+    @DgsQuery
+    public Map<String , Object> stateAttendanceById(@InputArgument Long id){
         try {
-            StateAttendanceDto stateAttendanceDto = this.stateAttendancesBusiness.findById(id);
+            AttendanceStateDto attendanceStateDto = this.stateAttendancesBusiness.findById(id);
             return  ResponseHttpApi.responseHttpFindId(
-                    stateAttendanceDto,
+                    attendanceStateDto,
                     ResponseHttpApi.CODE_OK,
                     "Successfully Completed");
         } catch (Exception e){
@@ -64,12 +62,12 @@ public class StateAttendanceResolver {
     }
 
     // Metodo Para Crear-Add Un Estado De Asistencia
-    @MutationMapping
-    public Map<String , Object> add (@Argument("input")StateAttendanceDto stateAttendanceDto){
+    @DgsMutation
+    public Map<String , Object> addStateAttendance(@InputArgument(name = "input") AttendanceStateDto attendanceStateDto){
         try {
-            StateAttendanceDto stateAttendanceDto1 = stateAttendancesBusiness.add(stateAttendanceDto);
+            AttendanceStateDto attendanceStateDto1 = stateAttendancesBusiness.add(attendanceStateDto);
             return  ResponseHttpApi.responseHttpAction(
-                    stateAttendanceDto1.getStateAttendanceId(),
+                    attendanceStateDto1.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
             );
@@ -81,10 +79,10 @@ public class StateAttendanceResolver {
 
 
     // Metodo Para Actualizar Un Estado De Asistencia
-    @MutationMapping
-    public Map<String, Object> update(@Argument Long id, @Argument StateAttendanceDto stateAttendanceDto) {
+    @DgsMutation
+    public Map<String, Object> updateStateAttendance(@InputArgument Long id, @InputArgument(name = "input") AttendanceStateDto attendanceStateDto) {
         try {
-            stateAttendancesBusiness.update(id, stateAttendanceDto);
+            stateAttendancesBusiness.update(id, attendanceStateDto);
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
@@ -96,10 +94,9 @@ public class StateAttendanceResolver {
         }
     }
 
-
     // Metodo Para Eliminar Un Estado Asistencia
-    @MutationMapping
-    public Map<String, Object> delete(@Argument Long id) {
+    @DgsMutation
+    public Map<String, Object> deleteStateAttendance(@InputArgument Long id) {
         try {
             stateAttendancesBusiness.delete(id);
             return  ResponseHttpApi.responseHttpAction(

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { IoPeople } from "react-icons/io5";
 import { toast } from 'react-toastify';
-import { Student, FichaData, fichaMock } from '@/types/pages/instructorSheets';
+import { Student, FichaData, fichaMock } from '@type/pages/instructorSheets';
 import ApprenticeModal from '@components/Modals/apprenticeModal';
 import PageTitle from '@components/UI/pageTitle';
 

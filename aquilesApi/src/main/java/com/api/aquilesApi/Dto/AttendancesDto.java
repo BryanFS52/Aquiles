@@ -1,6 +1,5 @@
 package com.api.aquilesApi.Dto;
 
-import com.api.aquilesApi.Entity.StateAttendanceEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,11 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttendancesDto {
-    private Long attendanceId;
-
+    private Long id;
     private String attendanceDate;
-
-    private StateAttendanceEntity stateAttendance;
-
-    private Long idStudent;
+    private AttendanceStateDto attendanceState;
+    private Long studentId;
 }
