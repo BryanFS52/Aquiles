@@ -19,8 +19,7 @@ const justificaciones = [
     archivo: true,
     estado: "Activo",
   },
-  // ...otros registros...
-    {
+  {
     programa: "Software",
     ficha: "31876265148",
     foto: persona,
@@ -29,7 +28,8 @@ const justificaciones = [
     fecha: "12/02/2025",
     archivo: true,
     estado: "Activo",
-  },  {
+  },
+  {
     programa: "Análisis",
     ficha: "3187232862",
     foto: persona,
@@ -38,7 +38,8 @@ const justificaciones = [
     fecha: "12/05/2024",
     archivo: true,
     estado: "Activo",
-  },  {
+  },
+  {
     programa: "Desarrollo",
     ficha: "246825647",
     foto: persona,
@@ -98,8 +99,9 @@ export default function Options() {
   });
 
   return (
-    <>
+    <div className="space-y-6">
       <PageTitle>Justificaciones de Aprendices</PageTitle>
+      
       <JustificationFilters
         filterOptions={filterOptions}
         loading={loading}
@@ -107,43 +109,83 @@ export default function Options() {
         onRefresh={handleRefresh}
       />
 
-      {/* Tabla de resultados */}
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-        <table className="w-full text-sm text-left text-gray-700 bg-white rounded-lg">
-          <thead className="text-xs uppercase bg-gray-50 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+      {/* Tabla con estilos mejorados */}
+      <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+        <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
+          <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700 text-black dark:text-white">
             <tr>
-              <th className="px-4 py-3">Programa</th>
-              <th className="px-4 py-3">Ficha</th>
-              <th className="px-4 py-3">Foto</th>
-              <th className="px-4 py-3">Documento</th>
-              <th className="px-4 py-3">Aprendiz</th>
-              <th className="px-4 py-3">Fecha de Justificación</th>
-              <th className="px-4 py-3">Archivo Adjunto</th>
-              <th className="px-4 py-3">Estado</th>
+              <th className="px-6 py-4 font-medium">Programa</th>
+              <th className="px-6 py-4 font-medium">Ficha</th>
+              <th className="px-6 py-4 font-medium">Foto</th>
+              <th className="px-6 py-4 font-medium">Documento</th>
+              <th className="px-6 py-4 font-medium">Aprendiz</th>
+              <th className="px-6 py-4 font-medium">Fecha de Justificación</th>
+              <th className="px-6 py-4 font-medium">Archivo Adjunto</th>
+              <th className="px-6 py-4 font-medium">Estado</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {filteredJustificaciones.map((j, idx) => (
-              <tr key={idx} className="border-b hover:bg-gray-50 transition-colors duration-200">
-                <td className="px-4 py-3">{j.programa}</td>
-                <td className="px-4 py-3">{j.ficha}</td>
-                <td className="px-4 py-3">
-                  <Image src={j.foto} alt="Persona" className="w-10 h-9 rounded-full" />
+              <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{j.programa}</td>
+                <td className="px-6 py-4">{j.ficha}</td>
+                <td className="px-6 py-4">
+                  <Image 
+                    src={j.foto} 
+                    alt="Persona" 
+                    className="w-10 h-10 rounded-full object-cover" 
+                  />
                 </td>
-                <td className="px-4 py-3">{j.documento}</td>
-                <td className="px-4 py-3">{j.aprendiz}</td>
-                <td className="px-4 py-3">{j.fecha}</td>
-                <td className="px-4 py-3">
-                  <GrAttachment className="w-5 h-5 text-[#01b001] hover:text-[#00324d] transition-colors duration-300" />
+                <td className="px-6 py-4">{j.documento}</td>
+                <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{j.aprendiz}</td>
+                <td className="px-6 py-4">{j.fecha}</td>
+                <td className="px-6 py-4">
+                  {j.archivo ? (
+                    <GrAttachment 
+                      title="Descargar archivo"
+                      className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200" 
+                    />
+                  ) : (
+                    <span className="text-gray-400 dark:text-gray-500">No hay archivo</span>
+                  )}
                 </td>
-                <td className="px-4 py-3">{j.estado}</td>
+                <td className="px-6 py-4">
+                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    j.estado === "Activo"
+                      ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                      : "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                  }`}>
+                    {j.estado}
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Paginación y otros componentes */}
-    </>
+      {/* Paginación con estilos mejorados */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
+        <button
+          className="flex items-center px-4 py-2 text-sm font-medium text-black dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+          disabled={true} // Placeholder para lógica de paginación
+        >
+          <IoIosArrowBack className="mr-2" />
+          Anterior
+        </button>
+
+        <span className="text-sm text-gray-700 dark:text-gray-300">
+          Mostrando {filteredJustificaciones.length} de {justificaciones.length} registros
+        </span>
+
+        <button
+          className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+          disabled={true} // Placeholder para lógica de paginación
+        >
+          Siguiente
+          <IoIosArrowForward className="ml-2" />
+        </button>
+      </div>
+    </div>
   );
 }

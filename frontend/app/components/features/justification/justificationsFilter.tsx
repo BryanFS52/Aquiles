@@ -66,6 +66,27 @@ export default function JustificationFilters({
                 : "Selecciona un filtro"
             }
             value={filterOptions.searchTerm}
+            onKeyDown={(e) => {
+              const isNumberFiltro = ["ficha", "documento"].includes(filterOptions.selectedFiltro);
+
+              if (!isNumberFiltro) return;
+
+              const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete"];
+              const isNumberKey = /^[0-9]$/.test(e.key);
+              const isAllowed = allowedKeys.includes(e.key);
+
+              if (!isNumberKey && !isAllowed) {
+                e.preventDefault();
+                toast.error("Solo se permiten números");
+              }
+            }}
+            onPaste={(e) => {
+              const pastedText = e.clipboardData.getData("text");
+              if (!/^\d+$/.test(pastedText)) {
+                e.preventDefault();
+                toast.error("Solo se permiten números");
+              }
+            }}
             onChange={(e) => onFilterChange("searchTerm", e.target.value)}
             className="w-full pl-10 pr-4 text-sm border-gray-300 rounded-lg focus:outline-none focus:ring-2 p-3 border text-gray-700 focus:ring-[#01b001]"
           />
