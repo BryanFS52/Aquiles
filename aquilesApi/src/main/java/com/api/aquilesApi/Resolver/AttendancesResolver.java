@@ -4,11 +4,10 @@ import com.api.aquilesApi.Business.AttendancesBusiness;
 import com.api.aquilesApi.Dto.AttendancesDto;
 import com.api.aquilesApi.Dto.QRCodePayload;
 import com.api.aquilesApi.Dto.Student;
-import com.api.aquilesApi.Entity.AttendancesEntity;
+import com.api.aquilesApi.Entity.AttendanceEntity;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.api.aquilesApi.Utilities.QrCodeGenerator;
 import com.netflix.graphql.dgs.*;
-import graphql.schema.DataFetchingEnvironment;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -54,7 +53,7 @@ public class AttendancesResolver {
 
 
     @DgsData(parentType = "Student", field = "attendances")
-    public List<AttendancesEntity> getAttendances(DgsDataFetchingEnvironment env) {
+    public List<AttendanceEntity> getAttendances(DgsDataFetchingEnvironment env) {
         Student student = env.getSource();
         assert student != null;
 
@@ -63,7 +62,7 @@ public class AttendancesResolver {
         List<AttendancesDto> attendancesDtoList = attendancesBusiness.findAllByStudentId(studentId);
 
         return attendancesDtoList.stream()
-                .map(dto -> modelMapper.map(dto, AttendancesEntity.class))
+                .map(dto -> modelMapper.map(dto, AttendanceEntity.class))
                 .collect(Collectors.toList());
     }
 
@@ -107,6 +106,7 @@ public class AttendancesResolver {
     @DgsMutation
     public Map<String, Object> addAttendance(@InputArgument(name = "input") AttendancesDto attendancesDto) {
         try {
+            System.out.println(attendancesDto);
             AttendancesDto attendancesDto1 = attendancesBusiness.add(attendancesDto);
             return ResponseHttpApi.responseHttpAction(
                     attendancesDto1.getId(),

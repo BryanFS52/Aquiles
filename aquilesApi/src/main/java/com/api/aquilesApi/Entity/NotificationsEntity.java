@@ -49,7 +49,7 @@ public class NotificationsEntity implements Serializable {
             joinColumns = @JoinColumn(name = "notification_id"),
             inverseJoinColumns = @JoinColumn(name = "attendance_id")
     )
-    private Set<AttendancesEntity> attendances;
+    private Set<AttendanceEntity> attendances;
 
     // 4.Relation (1-1) con justification
     @OneToOne(cascade = CascadeType.ALL)

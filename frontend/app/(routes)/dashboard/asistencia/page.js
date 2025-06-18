@@ -33,10 +33,12 @@ export default function Attendance() {
 
     if (loading) {
         return (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
                 <PageTitle>Lista de asistencia</PageTitle>
-                <div className="flex items-center justify-center h-64">
-                    <p className="text-gray-500 dark:text-gray-400">Cargando Lista de asistencia...</p>
+                <div className="flex items-center justify-center h-32 sm:h-64">
+                    <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base text-center">
+                        Cargando Lista de asistencia...
+                    </p>
                 </div>
             </div>
         );
@@ -44,26 +46,28 @@ export default function Attendance() {
 
     if (error) {
         return (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
                 <PageTitle>Lista de asistencia</PageTitle>
-                <div className="flex items-center justify-center h-64">
-                    <p className="text-red-500 dark:text-red-400">Error al cargar la ficha: {error}</p>
+                <div className="flex items-center justify-center h-32 sm:h-64">
+                    <p className="text-red-500 dark:text-red-400 text-sm sm:text-base text-center px-4">
+                        Error al cargar la ficha: {error}
+                    </p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
             {/* Título */}
             <PageTitle>Lista de asistencia</PageTitle>
 
             {/* Sección de información del curso y estadísticas */}
-            <div className="flex flex-col space-y-4 lg:flex-row lg:space-x-6 lg:space-y-0">
+            <div className="flex flex-col space-y-4 xl:flex-row xl:space-y-0 xl:space-x-6">
                 {/* Nombre del curso */}
-                <div className="flex-1 lg:max-w-md">
-                    <div className="h-16 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 p-4 flex items-center">
-                        <span className="font-inter font-medium text-lg text-black dark:text-white text-center w-full">
+                <div className="w-full xl:w-auto xl:flex-shrink-0">
+                    <div className="min-h-[4rem] sm:h-16 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 p-3 sm:p-4 flex items-center justify-center">
+                        <span className="font-inter font-medium text-base sm:text-lg text-black dark:text-white text-center leading-tight">
                             {studySheet?.trainingProject.program?.name}
                         </span>
                     </div>
@@ -71,33 +75,91 @@ export default function Attendance() {
 
                 {/* Estadísticas de estudiantes */}
                 <div className="flex-1">
-                    <div className="h-16 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 p-4">
-                        <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-around h-full space-y-2 sm:space-y-0">
+                    <div className="min-h-[4rem] sm:h-16 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 p-3 sm:p-4">
+                        {/* Mobile: Stack vertically */}
+                        <div className="flex flex-col space-y-3 sm:hidden">
                             {/* Numero de estudiantes */}
-                            <div className="flex items-center space-x-3">
-                                <BsPersonCircle className="w-6 h-6 text-gray-500 dark:text-gray-400" />
-                                <span className="text-lg font-semibold text-black dark:text-white">{studySheet?.numberStudents || 0}</span>
-                                <span className="text-sm text-gray-600 dark:text-gray-300">Número de Estudiantes</span>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                    <BsPersonCircle className="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                                    <span className="text-sm text-gray-600 dark:text-gray-300">Número de Estudiantes</span>
+                                </div>
+                                <span className="text-base font-semibold text-black dark:text-white">
+                                    {studySheet?.numberStudents || 0}
+                                </span>
                             </div>
-
-                            {/* Separador vertical */}
-                            <div className="hidden sm:block w-px h-8 bg-gray-300 dark:bg-gray-600"></div>
 
                             {/* Aprendices Activos */}
-                            <div className="flex items-center space-x-3">
-                                <BsPersonCircle className="w-6 h-6 text-gray-500 dark:text-gray-400" />
-                                <span className="text-lg font-semibold text-black dark:text-white">{activeStudents || 0}</span>
-                                <span className="text-sm text-gray-600 dark:text-gray-300">Aprendices Activos</span>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                    <BsPersonCircle className="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                                    <span className="text-sm text-gray-600 dark:text-gray-300">Aprendices Activos</span>
+                                </div>
+                                <span className="text-base font-semibold text-black dark:text-white">
+                                    {activeStudents || 0}
+                                </span>
+                            </div>
+
+                            {/* Aprendices Retirados */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-2">
+                                    <BsPersonCircle className="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                                    <span className="text-sm text-gray-600 dark:text-gray-300">Aprendices Retirados</span>
+                                </div>
+                                <span className="text-base font-semibold text-black dark:text-white">
+                                    {withdrawnStudents}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Tablet and Desktop: Horizontal layout */}
+                        <div className="hidden sm:flex flex-col md:flex-row items-center justify-center md:justify-around h-full space-y-2 md:space-y-0">
+                            {/* Numero de estudiantes */}
+                            <div className="flex items-center space-x-2 lg:space-x-3">
+                                <BsPersonCircle className="w-5 h-5 lg:w-6 lg:h-6 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                                <span className="text-base lg:text-lg font-semibold text-black dark:text-white">
+                                    {studySheet?.numberStudents || 0}
+                                </span>
+                                <span className="text-xs lg:text-sm text-gray-600 dark:text-gray-300 hidden lg:block">
+                                    Número de Estudiantes
+                                </span>
+                                <span className="text-xs text-gray-600 dark:text-gray-300 lg:hidden">
+                                    Total
+                                </span>
                             </div>
 
                             {/* Separador vertical */}
-                            <div className="hidden sm:block w-px h-8 bg-gray-300 dark:bg-gray-600"></div>
+                            <div className="hidden md:block w-px h-6 lg:h-8 bg-gray-300 dark:bg-gray-600"></div>
+
+                            {/* Aprendices Activos */}
+                            <div className="flex items-center space-x-2 lg:space-x-3">
+                                <BsPersonCircle className="w-5 h-5 lg:w-6 lg:h-6 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                                <span className="text-base lg:text-lg font-semibold text-black dark:text-white">
+                                    {activeStudents || 0}
+                                </span>
+                                <span className="text-xs lg:text-sm text-gray-600 dark:text-gray-300 hidden lg:block">
+                                    Aprendices Activos
+                                </span>
+                                <span className="text-xs text-gray-600 dark:text-gray-300 lg:hidden">
+                                    Activos
+                                </span>
+                            </div>
+
+                            {/* Separador vertical */}
+                            <div className="hidden md:block w-px h-6 lg:h-8 bg-gray-300 dark:bg-gray-600"></div>
 
                             {/* Aprendices Retirados */}
-                            <div className="flex items-center space-x-3">
-                                <BsPersonCircle className="w-6 h-6 text-gray-500 dark:text-gray-400" />
-                                <span className="text-lg font-semibold text-black dark:text-white">{withdrawnStudents}</span>
-                                <span className="text-sm text-gray-600 dark:text-gray-300">Aprendices Retirados</span>
+                            <div className="flex items-center space-x-2 lg:space-x-3">
+                                <BsPersonCircle className="w-5 h-5 lg:w-6 lg:h-6 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                                <span className="text-base lg:text-lg font-semibold text-black dark:text-white">
+                                    {withdrawnStudents}
+                                </span>
+                                <span className="text-xs lg:text-sm text-gray-600 dark:text-gray-300 hidden lg:block">
+                                    Aprendices Retirados
+                                </span>
+                                <span className="text-xs text-gray-600 dark:text-gray-300 lg:hidden">
+                                    Retirados
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -106,7 +168,9 @@ export default function Attendance() {
 
             {/* Tabla de asistencia */}
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
-                <TableAttendance studySheetData={studySheet} />
+                <div className="overflow-x-auto">
+                    <TableAttendance studySheetData={studySheet} />
+                </div>
             </div>
 
             {/* Sección inferior con número de ficha y leyenda */}

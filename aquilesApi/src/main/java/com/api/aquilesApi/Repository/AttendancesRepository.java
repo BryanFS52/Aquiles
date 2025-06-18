@@ -1,15 +1,15 @@
 package com.api.aquilesApi.Repository;
 
-import com.api.aquilesApi.Entity.AttendancesEntity;
+import com.api.aquilesApi.Entity.AttendanceEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface AttendancesRepository extends JpaRepository<AttendancesEntity, Long> {
+public interface AttendancesRepository extends JpaRepository<AttendanceEntity, Long> {
 
-    List<AttendancesEntity> findAllByStudentId(Long studentId);
+    List<AttendanceEntity> findAllByStudentId(Long studentId);
 
 
 }

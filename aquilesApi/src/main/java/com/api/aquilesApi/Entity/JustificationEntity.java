@@ -53,6 +53,11 @@ public class JustificationEntity implements Serializable {
     @JoinColumn(name = "justification_type_id", nullable = true)
     private JustificationTypeEntity type;
 
+    // 3. Relation (1-1) con attendance
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "attendance_id", referencedColumnName = "id")
+    private AttendanceEntity attendance;
+
     public String getJustificationFile() {
         return Base64.getEncoder().encodeToString(justificationFile);
     }

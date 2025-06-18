@@ -111,7 +111,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
             {/* Sidebar */}
             <aside
                 className={`
-          fixed top-0 left-0 z-50 h-full 
+          relative left-0 z-50 h-full 
           w-[280px] sm:w-[300px]
           lg:static lg:w-full lg:max-w-[300px]
           bg-white/95 dark:bg-gray-900

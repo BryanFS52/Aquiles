@@ -4,6 +4,14 @@ import { useState, useEffect, useMemo } from "react"
 import { useSelector } from "react-redux"
 import { toast } from "react-toastify"
 import { Save } from "lucide-react"
+import { AttendanceHeader } from "@components/features/attendance/attendanceManual/attendanceManualHeader"
+import { AttendanceStatsSection } from "@components/features/attendance/attendanceManual/attendanceStatsCard"
+import { CourseInfoSection } from "@components/features/attendance/attendanceManual/courseInfo"
+import { AttendanceControls } from "@components/features/attendance/attendanceManual/attendanceControls"
+import { StudentList } from "@components/features/attendance/attendanceManual/studentList"
+import { AttendanceHistory } from "@components/features/attendance/attendanceManual/attendanceHistory"
+import { LoadingState, ErrorState, EmptyStudentsState } from "@components/features/attendance/attendanceManual/state"
+
 import type {
     AttendanceData,
     AttendanceHistory as AttendanceHistoryType,
@@ -12,13 +20,6 @@ import type {
     FilterOption,
 } from "@type/pages/attendanceManual"
 
-import { AttendanceHeader } from "@/components/features/attendance/attendanceManual/attendanceManualHeader"
-import { AttendanceStatsSection } from "@/components/features/attendance/attendanceManual/attendanceStatsCard"
-import { CourseInfoSection } from "@/components/features/attendance/attendanceManual/courseInfo"
-import { AttendanceControls } from "@/components/features/attendance/attendanceManual/attendanceControls"
-import { StudentList } from "@/components/features/attendance/attendanceManual/studentList"
-import { AttendanceHistory } from "@/components/features/attendance/attendanceManual/attendanceHistory"
-import { LoadingState, ErrorState, EmptyStudentsState } from "@/components/features/attendance/attendanceManual/state"
 
 const AttendanceManualPage: React.FC = () => {
     const { data: studySheet, loading, error } = useSelector((state: any) => state.studySheet)
@@ -111,7 +112,7 @@ const AttendanceManualPage: React.FC = () => {
         const stats: AttendanceStats = { presente: 0, ausente: 0, justificado: 0, retardo: 0 }
 
         Object.values(attendance).forEach((status) => {
-            if (status) { // Solo cuenta si el estudiante tiene un estado asignado
+            if (status) {
                 const key = status.toLowerCase() as keyof AttendanceStats
                 if (key in stats) {
                     stats[key] += 1

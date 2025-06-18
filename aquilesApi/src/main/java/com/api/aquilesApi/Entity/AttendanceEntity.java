@@ -17,7 +17,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "attendances")
-public class AttendancesEntity implements Serializable {
+public class AttendanceEntity implements Serializable {
     @Transient
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -31,10 +31,14 @@ public class AttendancesEntity implements Serializable {
     @Column (name = "student_id")
     private Long studentId;
 
+    @Column (name = "study_sheet_quarter")
+    private Long studySheetQuarter;
+
     // Relations
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_idExcuse", referencedColumnName = "excuseId")
-    private ExcusesEntity excuse;
+    // Relation (1-1) con justification
+    @OneToOne(mappedBy = "attendance", cascade = CascadeType.ALL)
+    private JustificationEntity justification;
+
 
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

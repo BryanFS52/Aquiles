@@ -1,45 +1,45 @@
-type Student @key(fields: "id") @extends{
-    id: ID @external
-    attendances : [Attendance]
-}
-type Attendance @key(fields: "id") {
-    id: ID!
-    attendanceDate: String
-    attendanceState: AttendanceState
-    student : Student
-}
+    type Student @key(fields: "id") @extends{
+        id: ID @external
+        attendances : [Attendance]
+    }
+    type Attendance @key(fields: "id") {
+        id: ID!
+        attendanceDate: String
+        attendanceState: AttendanceState
+        student : Student
+    }
 
 
-type AttendancePage {
-    data : [Attendance]
-    code : String
-    date : String
-    totalPages : Int
-    totalItems : Int
-    currentPage : Int
-    message : String
-}
+    type AttendancePage {
+        data : [Attendance]
+        code : String
+        date : String
+        totalPages : Int
+        totalItems : Int
+        currentPage : Int
+        message : String
+    }
 
-type AttendancePageId{
-    data : Attendance
-    date : String
-    code : String
-    message : String
-}
+    type AttendancePageId{
+        data : Attendance
+        date : String
+        code : String
+        message : String
+    }
 
-input AttendancesDto {
-    attendanceDate: String
-    attendanceState: AttendanceStateDto
-    studentId: Long
-}
+    input AttendancesDto {
+        attendanceDate: String
+        attendanceState: AttendanceStateDto
+        studentId: Long
+    }
 
-extend type Query {
-    allAttendances(page: Int , size: Int ): AttendancePage
-    attendanceById(id: Long!): AttendancePageId
-}
+    extend type Query {
+        allAttendances(page: Int , size: Int ): AttendancePage
+        attendanceById(id: Long!): AttendancePageId
+    }
 
-extend type Mutation {
-    addAttendance(input: AttendancesDto): Response
-    updateAttendance(id: Long!, input: AttendancesDto): Response
-    deleteAttendance(id: Long!): Response
-}
+    extend type Mutation {
+        addAttendance(input: AttendancesDto): Response
+        updateAttendance(id: Long!, input: AttendancesDto): Response
+        deleteAttendance(id: Long!): Response
+    }
