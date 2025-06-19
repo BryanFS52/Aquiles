@@ -30,12 +30,14 @@
     input AttendancesDto {
         attendanceDate: String
         attendanceState: AttendanceStateDto
+        studySheetQuarter: Long
         studentId: Long
     }
 
     extend type Query {
         allAttendances(page: Int , size: Int ): AttendancePage
         attendanceById(id: Long!): AttendancePageId
+        allAttendancesByStudentId(id : Long, stateId : Long) : AttendancePage
     }
 
     extend type Mutation {

@@ -34,15 +34,15 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheetIt
             }
             : null,
 
-        quarter: graphqlData.quarter
-            ? {
-                id: graphqlData.quarter.id,
+        quarter: Array.isArray(graphqlData.quarter)
+            ? graphqlData.quarter.map((q: any) => ({
+                id: q.id,
                 name: {
-                    number: graphqlData.quarter.name.number,
-                    extension: graphqlData.quarter.name.extension,
+                    number: q.name?.number,
+                    extension: q.name?.extension,
                 },
-            }
-            : null,
+            }))
+            : [],
 
         trainingProject: graphqlData.trainingProject
             ? {

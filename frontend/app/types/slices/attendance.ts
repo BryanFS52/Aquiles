@@ -1,10 +1,11 @@
 export interface AttendanceItem {
     id: string;
-    userId?: string;
-    date?: string;
-    status?: 'present' | 'absent' | 'late';
-    checkInTime?: string;
-    checkOutTime?: string;
-    notes?: string;
-    [key: string]: any;
+    attendanceDate: string;
+    attendanceState: {
+        id: string;
+        status: string; // o tiparlo como enum si tienes certeza
+    };
+    student?: {
+        id: string;
+    };
 }

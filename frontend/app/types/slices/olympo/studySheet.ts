@@ -21,8 +21,7 @@ export interface StudySheetItem {
     id: string;
     number: string;
     numberStudents: number;
-
-    startLective?: string; // opcional porque no viene en la query por ID
+    startLective?: string;
     endLective?: string;
     state?: string;
     code?: string;
@@ -44,7 +43,8 @@ export interface StudySheetItem {
             number: string;
             extension: string;
         };
-    } | null;
+    }[];
+
 
     trainingProject: {
         id: string;

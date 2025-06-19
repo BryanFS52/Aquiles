@@ -1,6 +1,6 @@
 import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { GET_ALL_ATTENDANCES, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph'
+import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph'
 import { AttendanceItem } from '@type/slices/attendance'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import {
@@ -11,20 +11,23 @@ import {
     UpdateAttendanceMutation,
     UpdateAttendanceMutationVariables,
     DeleteAttendanceMutation,
-    DeleteAttendanceMutationVariables
+    DeleteAttendanceMutationVariables,
+    AllAttendancesByStudentIdQuery,
+    AllAttendancesByStudentIdQueryVariables
 } from '@graphql/generated'
 
 // Función para transformar datos de GraphQL a AttendanceItem
 const transformGraphQLToAttendanceItem = (graphqlData: any): AttendanceItem => {
     return {
-        id: graphqlData.id || graphqlData.id,
+        id: graphqlData.id,
         attendanceDate: graphqlData.attendanceDate,
-        stateAttendance: graphqlData.stateAttendance ? {
-            id: graphqlData.stateAttendance.id,
-            name: graphqlData.stateAttendance.name
-        } : null
+        attendanceState: {
+            id: graphqlData.attendanceState?.id ?? '',
+            status: graphqlData.attendanceState?.status ?? '',
+        }
     };
 };
+
 
 export const fetchAttendances = createAsyncThunk<GetAttendancesQuery['allAttendances'], GetAttendancesQueryVariables>(
     'attendance/fetchAll',
@@ -37,6 +40,18 @@ export const fetchAttendances = createAsyncThunk<GetAttendancesQuery['allAttenda
         return data.allAttendances;
     }
 );
+
+export const fetchAttendancesByStudent = createAsyncThunk<AllAttendancesByStudentIdQuery['allAttendancesByStudentId'], AllAttendancesByStudentIdQueryVariables>(
+    'attendance/fetchByStudent',
+    async ({ id, stateId }) => {
+        const { data } = await client.query<AllAttendancesByStudentIdQuery, AllAttendancesByStudentIdQueryVariables>({
+            query: GET_ATTENDANCES_BY_STUDENT,
+            variables: { id, stateId },
+            fetchPolicy: 'no-cache',
+        });
+        return data.allAttendancesByStudentId
+    }
+)
 
 export const addAttendance = createAsyncThunk<AddAttendanceMutation['addAttendance'], AddAttendanceMutationVariables['input'],
     { rejectValue: { code: string; message: string } }
@@ -106,7 +121,15 @@ export const deleteAttendance = createAsyncThunk<string, string,
     }
 );
 
-const initialState = createInitialPaginatedState<AttendanceItem>();
+const initialState = {
+    ...createInitialPaginatedState<AttendanceItem>(),
+    studentAttendances: {
+        data: [] as AttendanceItem[],
+        loading: false,
+        error: null as string | null,
+    },
+};
+
 const attendanceSlice = createSlice({
     name: 'attendance',
     initialState,
@@ -133,6 +156,29 @@ const attendanceSlice = createSlice({
                 state.error = action.error.message || 'Error fetching attendances';
                 state.loading = false;
             })
+            // fetchAttendancesByStudent
+            .addCase(fetchAttendancesByStudent.pending, (state) => {
+                state.studentAttendances.loading = true;
+                state.studentAttendances.error = null;
+            })
+            .addCase(fetchAttendancesByStudent.fulfilled, (
+                state,
+                action: PayloadAction<AllAttendancesByStudentIdQuery['allAttendancesByStudentId']>
+            ) => {
+                const data = action.payload?.data ?? [];
+
+                state.studentAttendances.data = data
+                    .filter((item): item is NonNullable<typeof item> => item !== null)
+                    .map(transformGraphQLToAttendanceItem);
+
+                state.studentAttendances.loading = false;
+                state.studentAttendances.error = null;
+            })
+            .addCase(fetchAttendancesByStudent.rejected, (state, action) => {
+                state.studentAttendances.loading = false;
+                state.studentAttendances.error = action.error.message ?? 'Error al cargar asistencias del estudiante';
+            })
+
             // addAttendance
             .addCase(addAttendance.fulfilled, (state, action: PayloadAction<AddAttendanceMutation['addAttendance']>) => {
                 if (action.payload) {

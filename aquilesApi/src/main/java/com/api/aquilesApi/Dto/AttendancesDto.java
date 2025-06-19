@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 public class AttendancesDto {
     private Long id;
     private String attendanceDate;
-    private AttendanceStateDto attendanceState;
     private Long studentId;
+    private Long studySheetQuarter;
+    private JustificationDto justification;
+    private AttendanceStateDto attendanceState;
 }

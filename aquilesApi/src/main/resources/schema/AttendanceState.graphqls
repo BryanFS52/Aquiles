@@ -20,7 +20,7 @@
         message: String
     }
 
-    input AttendanceStateDto {
+    input   AttendanceStateDto {
         id: ID
         status: String
     }

@@ -1,6 +1,15 @@
 "use client";
 
-const InfoBox = ({ title, textInfo, icon: Icon }) => {
+import React from "react";
+import type { IconType } from "react-icons";
+
+interface InfoBoxProps {
+  title: string;
+  textInfo: string;
+  icon?: IconType;
+}
+
+const InfoBox: React.FC<InfoBoxProps> = ({ title, textInfo, icon: Icon }) => {
   return (
     <div className="flex h-24 w-full md:max-w-60 rounded-xl shadow-xl border-2 bg-white dark:bg-gray-300 bg-gradient-to-r from-lime-400 to-lime-200 border-lime-600 dark:border-darkBlue p-2">
       <div className="flex items-center w-full">

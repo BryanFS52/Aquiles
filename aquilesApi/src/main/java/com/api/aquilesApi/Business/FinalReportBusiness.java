@@ -20,7 +20,7 @@ public class FinalReportBusiness {
         this.finalReportService = finalReportService;
     }
 
-    // Validación Objeto
+    // Validation object
 
 
     // Find All

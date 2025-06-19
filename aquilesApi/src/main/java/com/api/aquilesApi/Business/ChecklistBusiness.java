@@ -21,7 +21,7 @@ public class ChecklistBusiness {
         this.checklistService = checklistService;
     }
 
-    // Validación Objeto
+    // Validation object
 
     // Find All
     public Page<ChecklistDto> findAll(int page, int size) {

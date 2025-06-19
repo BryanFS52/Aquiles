@@ -1,5 +1,6 @@
+import React from 'react';
 
-const CheckListTable = () => {
+const CheckListTable: React.FC = () => {
     return (
         <div className="container w-2/3 ml-52">
             <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-auto">

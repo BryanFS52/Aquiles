@@ -5,6 +5,10 @@ interface AttendanceHeaderProps {
 }
 
 export function AttendanceHeader({ studySheet }: AttendanceHeaderProps) {
+    const sheet = Array.isArray(studySheet) ? studySheet[0] : studySheet;
+
+    if (!sheet) return null; // evita errores si está vacío
+
     return (
         <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,7 +24,9 @@ export function AttendanceHeader({ studySheet }: AttendanceHeaderProps) {
                             <div>
                                 <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Control de Asistencia</h1>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    {studySheet?.number || studySheet?.program || "Ficha de Estudio"}
+                                    {sheet.number
+                                        ? `Ficha ${sheet.number}`
+                                        : sheet.trainingProject?.program?.name ?? 'Sin info'}
                                 </p>
                             </div>
                         </div>
@@ -28,5 +34,6 @@ export function AttendanceHeader({ studySheet }: AttendanceHeaderProps) {
                 </div>
             </div>
         </div>
-    )
+    );
 }
+

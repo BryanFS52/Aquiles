@@ -4,10 +4,9 @@ import { BookOpen, GraduationCap, Users, Clock, Download, FileText } from "lucid
 
 interface CourseInfoSectionProps {
     studySheet: any
-    onExportAttendance: () => void
 }
 
-export function CourseInfoSection({ studySheet, onExportAttendance }: CourseInfoSectionProps) {
+export function CourseInfoSection({ studySheet, }: CourseInfoSectionProps) {
     return (
         <>
             {/* Course info */}

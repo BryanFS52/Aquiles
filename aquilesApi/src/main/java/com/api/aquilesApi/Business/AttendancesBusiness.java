@@ -115,6 +115,16 @@ public class AttendancesBusiness {
         }
     }
 
+    public List<AttendancesDto> findAllByStudentId(Long studentId, Long idState) {
+        try {
+            List<AttendanceEntity> attendanceEntityList =  attendancesService.findAllByStudentId(studentId, idState);
+            System.out.println("Total Attendances: " + attendanceEntityList.size());
+            return attendanceEntityList.stream().map(entity -> modelMapper.map(entity, AttendancesDto.class)).collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new CustomException("error " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // Add
     public AttendancesDto add(AttendancesDto attendancesDto) {
         try {

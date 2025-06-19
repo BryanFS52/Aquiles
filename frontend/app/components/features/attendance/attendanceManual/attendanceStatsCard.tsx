@@ -1,3 +1,4 @@
+import type { AttendanceStats } from "@type/pages/attendanceManual"
 import {
     BarChart3,
     CheckCircle,
@@ -5,7 +6,6 @@ import {
     Clock,
     FileText,
 } from "lucide-react"
-import type { AttendanceStats } from "@type/pages/attendanceManual"
 
 interface AttendanceStatsSectionProps {
     stats: AttendanceStats
@@ -33,7 +33,7 @@ const statusConfig = {
         value: "text-orange-700 dark:text-orange-400",
         iconColor: "text-orange-600 dark:text-orange-400",
         barColor: "bg-orange-500 dark:bg-orange-400",
-        countsAsAttendance: true, // Los retardos SÍ cuentan como asistencia
+        countsAsAttendance: true,// retardo si cuenta como asistencia
     },
     justificado: {
         label: "Justificados",
@@ -70,7 +70,6 @@ export function AttendanceStatsSection({ stats, attendancePercentage: providedPe
         }
 
         if (totalStudents === 0) return 0;
-
         const attendingStudents = Object.entries(stats).reduce((sum, [key, count]) => {
             const config = statusConfig[key as keyof typeof statusConfig];
             return sum + (config?.countsAsAttendance ? count : 0);
@@ -94,8 +93,6 @@ export function AttendanceStatsSection({ stats, attendancePercentage: providedPe
     };
 
     const statusPercentages = getStatusPercentages();
-
-    // Determinar el color del texto basado en el porcentaje de asistencia
     const getPercentageTextColor = () => {
         if (attendancePercentage >= 80) {
             return "text-green-600 dark:text-green-400";
@@ -106,7 +103,6 @@ export function AttendanceStatsSection({ stats, attendancePercentage: providedPe
         }
     };
 
-    // Orden de renderizado para la barra (primero los que cuentan como asistencia)
     const statusOrder = ['presente', 'retardo', 'justificado', 'ausente'] as const;
 
     return (
@@ -146,7 +142,7 @@ export function AttendanceStatsSection({ stats, attendancePercentage: providedPe
                                     >
                                         {/* Efecto de brillo */}
                                         <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-                                        {/* Separador sutil entre secciones */}
+                                        {/* Separador sutil между secciones */}
                                         {percentage > 0 && (
                                             <div className="absolute right-0 top-0 bottom-0 w-px bg-white/30"></div>
                                         )}
@@ -236,7 +232,6 @@ export function AttendanceStatsSection({ stats, attendancePercentage: providedPe
     )
 }
 
-// Función helper para calcular estadísticas desde datos en bruto (opcional)
 export function calculateAttendanceStats(attendanceData: Array<{ status: string }>): {
     stats: AttendanceStats,
     attendancePercentage: number
@@ -255,7 +250,6 @@ export function calculateAttendanceStats(attendanceData: Array<{ status: string 
         }
     });
 
-    // Calcular porcentaje de asistencia (presentes + retardos)
     const totalStudents = attendanceData.length;
     const attendingStudents = stats.presente + stats.retardo;
     const attendancePercentage = totalStudents > 0 ? Math.round((attendingStudents / totalStudents) * 100) : 0;

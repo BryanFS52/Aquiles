@@ -1,9 +1,12 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { useSelector } from "react-redux"
+import type { AppDispatch } from "@/redux/store"
+import { useDispatch, useSelector } from "react-redux"
 import { toast } from "react-toastify"
 import { Save } from "lucide-react"
+import { fetchStudySheetById } from "@slice/olympo/studySheetSlice"
+import { addAttendance } from "@slice/attendanceSlice"
 import { AttendanceHeader } from "@components/features/attendance/attendanceManual/attendanceManualHeader"
 import { AttendanceStatsSection } from "@components/features/attendance/attendanceManual/attendanceStatsCard"
 import { CourseInfoSection } from "@components/features/attendance/attendanceManual/courseInfo"
@@ -11,18 +14,17 @@ import { AttendanceControls } from "@components/features/attendance/attendanceMa
 import { StudentList } from "@components/features/attendance/attendanceManual/studentList"
 import { AttendanceHistory } from "@components/features/attendance/attendanceManual/attendanceHistory"
 import { LoadingState, ErrorState, EmptyStudentsState } from "@components/features/attendance/attendanceManual/state"
-
 import type {
-    AttendanceData,
     AttendanceHistory as AttendanceHistoryType,
     AttendanceStats,
     AttendanceStatus,
     FilterOption,
 } from "@type/pages/attendanceManual"
 
-
 const AttendanceManualPage: React.FC = () => {
+    const dispatch = useDispatch<AppDispatch>()
     const { data: studySheet, loading, error } = useSelector((state: any) => state.studySheet)
+
     const studySheetObj = Array.isArray(studySheet) ? studySheet[0] : studySheet
     const students = studySheetObj?.students || []
 
@@ -34,10 +36,15 @@ const AttendanceManualPage: React.FC = () => {
     const [attendanceHistory, setAttendanceHistory] = useState<AttendanceHistoryType[]>([])
 
     useEffect(() => {
+        console.log(studySheet)
+        if (Array.isArray(studySheet) && studySheet.length === 0) {
+            dispatch(fetchStudySheetById({ id: 1 }))
+        }
+    }, [studySheet, dispatch])
+
+    useEffect(() => {
         if (students.length > 0) {
-            // No inicialices con valores por defecto, deja que las stats empiecen en 0
             const initialAttendance: Record<string | number, AttendanceStatus> = {}
-            // No asignes ningún valor inicial para que las estadísticas estén en 0
             setAttendance(initialAttendance)
 
             const mockHistory: AttendanceHistoryType[] = [
@@ -78,53 +85,76 @@ const AttendanceManualPage: React.FC = () => {
         setAttendance((prev) => ({ ...prev, [studentId]: value }))
     }
 
-    const handleSave = (): void => {
-        const attendanceData: AttendanceData = {
-            date: selectedDate,
-            attendance,
-            studySheetId: studySheet?.id,
+    const handleSave = async (): Promise<void> => {
+        if (!studySheetObj?.id) {
+            toast.error("No se encontró la ficha de estudio.")
+            return
         }
-        console.log("Guardando asistencia:", attendanceData)
-        toast.success("Asistencia guardada exitosamente")
-    }
 
-    const handleExportAttendance = (): void => {
-        const csvContent =
-            "data:text/csv;charset=utf-8," +
-            "Nombre,Apellido,Documento,Estado\n" +
-            filteredStudents
-                .map(
-                    (student: any) =>
-                        `${student.person?.name || ""},${student.person?.lastname || ""},${student.person?.document || ""},${attendance[student.id] || "sin marcar"}`,
-                )
-                .join("\n")
+        const entries = Object.entries(attendance)
+        if (!entries.length) {
+            toast.warning("No hay asistencia marcada para guardar.")
+            return
+        }
 
-        const encodedUri = encodeURI(csvContent)
-        const link = document.createElement("a")
-        link.setAttribute("href", encodedUri)
-        link.setAttribute("download", `asistencia_${selectedDate}.csv`)
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
+        try {
+            await Promise.all(
+                entries.map(([studentId, statusId]) => {
+                    if (!statusId) return Promise.resolve()
+
+                    const attendanceState = {
+                        id: statusId,
+                        status: undefined,
+                    }
+                    return dispatch(
+                        addAttendance({
+                            attendanceDate: selectedDate,
+                            studentId: Number(studentId),
+                            attendanceState,
+                        })
+                    ).unwrap()
+                })
+            )
+            toast.success("Asistencia guardada exitosamente")
+        } catch (error: any) {
+            toast.error(`Error al guardar asistencia: ${error.message ?? "Error desconocido"}`)
+        }
     }
 
     const getAttendanceStats = (): AttendanceStats => {
         const stats: AttendanceStats = { presente: 0, ausente: 0, justificado: 0, retardo: 0 }
 
+        // MAPEO CORRECTO: Los valores son strings numéricos ("1", "2", etc.)
+        const statusMap: Record<string, keyof AttendanceStats> = {
+            '1': 'presente',
+            '2': 'ausente',
+            '4': 'justificado',
+            '3': 'retardo'
+        };
+
         Object.values(attendance).forEach((status) => {
             if (status) {
-                const key = status.toLowerCase() as keyof AttendanceStats
-                if (key in stats) {
-                    stats[key] += 1
+                const statusString = status.toString();
+                const statusKey = statusMap[statusString];
+
+                if (statusKey && statusKey in stats) {
+                    stats[statusKey] += 1;
                 }
             }
         })
-
         return stats
     }
 
+    const getAttendancePercentage = (stats: AttendanceStats): number => {
+        const totalStudents = students.length;
+        if (totalStudents === 0) return 0;
+
+        const effectiveAttendance = stats.presente + stats.retardo;
+        return Math.round((effectiveAttendance / totalStudents) * 100);
+    }
+
     const stats = getAttendanceStats()
-    const attendancePercentage = students.length > 0 ? Math.round((stats.presente / students.length) * 100) : 0
+    const attendancePercentage = getAttendancePercentage(stats)
 
     if (loading) return <LoadingState />
     if (error) return <ErrorState error={error} />
@@ -139,10 +169,8 @@ const AttendanceManualPage: React.FC = () => {
                     <div className="lg:col-span-1 space-y-6">
                         <CourseInfoSection
                             studySheet={studySheetObj}
-                            onExportAttendance={handleExportAttendance}
                         />
                         <AttendanceStatsSection stats={stats} attendancePercentage={attendancePercentage} />
-
                     </div>
 
                     <div className="lg:col-span-3 space-y-6">
@@ -180,7 +208,6 @@ const AttendanceManualPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     )

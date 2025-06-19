@@ -54,8 +54,8 @@ export const GET_STUDY_SHEET_BY_ID = gql`
                 quarter {
                     id
                     name {
-                    extension
-                    number
+                        number
+                        extension
                     }
                 }
                 trainingProject {

@@ -25,7 +25,7 @@ export function StudentList({
     onStudentSelect,
 }: StudentListProps) {
     const dispatch = useDispatch<AppDispatch>();
-    const { data: attendanceStates, loading, error } = useSelector(
+    const { data: attendanceStates, } = useSelector(
         (state: RootState) => state.attendanceState
     ) as {
         data: { id: string; status: AttendanceStatus }[];
@@ -136,7 +136,7 @@ export function StudentList({
                                     Seleccionar
                                 </option>
                                 {attendanceStates?.map((state: any) => (
-                                    <option key={state.id} value={state.status}>
+                                    <option key={state.id} value={state.id}>
                                         {state.status}
                                     </option>
                                 ))}

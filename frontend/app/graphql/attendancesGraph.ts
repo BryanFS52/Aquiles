@@ -22,6 +22,25 @@ export const GET_ALL_ATTENDANCES = gql`
   }
 `;
 
+export const GET_ATTENDANCES_BY_STUDENT = gql`
+  query allAttendancesByStudentId($id: Long, $stateId: Long) {
+    allAttendancesByStudentId(id: $id, stateId: $stateId) {
+      data {
+        id
+        attendanceDate
+        student {
+          id
+        }
+        attendanceState {
+          id
+          status
+        }
+      }
+    }
+  }
+`;
+
+
 export const ADD_ATTENDANCE = gql`
   mutation AddAttendance($input: AttendancesDto!) {
     addAttendance(input: $input) {
