@@ -22,9 +22,8 @@ El sistema está compuesto por un frontend desarrollado con **Next.js**, **React
 ### Backend
 - **Java 17+**
 - **Spring Boot**
-- **JavaMailSender** (para envío de notificaciones por correo)
 - **Base de datos relacional** (ej. MySQL, PostgreSQL)
-- **Maven** para la gestión de dependencias
+- **Gradle** para la gestión de dependencias
 
 ### Frontend
 - **Node.js 18+**
@@ -52,7 +51,7 @@ El sistema está compuesto por un frontend desarrollado con **Next.js**, **React
 
 2. Ejecutar la aplicación: 
     ```bash
-    mvn spring-boot:run
+    ./gradlew bootRun
     ```
 
 ### Frontend (Next.js)
@@ -64,15 +63,19 @@ El sistema está compuesto por un frontend desarrollado con **Next.js**, **React
 
 2. Instalar las dependencias:
     ```bash
+     npm install --legacy-peer-deps
+    ```
+3. Instalar las dependencias:
+    ```bash
     npm install
     ```
 
-3. Configurar las variables de entorno en el archivo `.env.local` para conectar con el backend:
+4. Configurar las variables de entorno en el archivo `.env.local` para conectar con el backend:
     ```bash
     NEXT_PUBLIC_API_URL=http://localhost:8080/api
     ```
 
-4. Ejecutar la aplicación:
+5. Ejecutar la aplicación:
     ```bash
     npm run dev
     ```

@@ -1,18 +1,32 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoPeople } from "react-icons/io5";
 import { toast } from "react-toastify";
 import PageTitle from "@components/UI/pageTitle";
 import justificationTypeService from "@services/JustificationTypeService";
 import justificationService from "@services/justificationService";
-
 import {
   FaCalendarDay,
   FaRegClock,
   FaRegListAlt,
 } from "react-icons/fa";
+
+interface JustificationType {
+  id: string;
+  name: string;
+}
+
+interface FormDataState {
+  justificationTypeId: { id: string };
+  numeroDocumento: string;
+  nombreAprendiz: string;
+  descripcion: string;
+  justificacionFile: File | null;
+  justificacionFileBase64: string;
+  notificationId: string;
+}
 
 const sessions = {
   "1": {
@@ -27,7 +41,7 @@ const sessions = {
 export default function JustificacionAprendiz() {
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormDataState>({
     justificationTypeId: { id: "" },
     numeroDocumento: "",
     nombreAprendiz: "",
@@ -37,9 +51,9 @@ export default function JustificacionAprendiz() {
     notificationId: "123456",
   });
 
-  const [justificationTypes, setJustificationTypes] = useState([]);
+  const [justificationTypes, setJustificationTypes] = useState<JustificationType[]>([]);
   const [loadingTypes, setLoadingTypes] = useState(true);
-  const fileInputRefPrev = useRef(null);
+  const fileInputRefPrev = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const loadTypes = async () => {
@@ -47,7 +61,6 @@ export default function JustificacionAprendiz() {
         setLoadingTypes(true);
         const typesResponse = await justificationTypeService.getAll(0, 50);
 
-        // Verificar la estructura de la respuesta
         if (typesResponse && typesResponse.data && Array.isArray(typesResponse.data)) {
           setJustificationTypes(typesResponse.data);
         } else if (Array.isArray(typesResponse)) {
@@ -68,14 +81,22 @@ export default function JustificacionAprendiz() {
     loadTypes();
   }, []);
 
-  const handleInputChange = (e, allowAlpha = false) => {
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    allowAlpha = false
+  ) => {
     const { name, value } = e.target;
-    const cleanedValue = allowAlpha ? value.replace(/[^a-zA-Z\s]/g, "") : value.replace(/[^0-9]/g, "");
+    let cleanedValue = value;
+    if (name === "numeroDocumento") {
+      cleanedValue = value.replace(/[^0-9]/g, "");
+    } else if (allowAlpha && name === "nombreAprendiz") {
+      cleanedValue = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]/g, "");
+    }
     setFormData((prev) => ({ ...prev, [name]: cleanedValue }));
   };
 
-  const handleFileChange = (e, fileKey) => {
-    const file = e.target.files[0];
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>, fileKey: string) => {
+    const file = e.target.files?.[0];
     if (!file) return;
 
     const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
@@ -94,7 +115,7 @@ export default function JustificacionAprendiz() {
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      const base64 = reader.result.split(",")[1];
+      const base64 = (reader.result as string).split(",")[1];
       setFormData((prev) => ({
         ...prev,
         [fileKey]: file,
@@ -108,51 +129,31 @@ export default function JustificacionAprendiz() {
     reader.readAsDataURL(file);
   };
 
-  // Validar campos del formulario
   const validateForm = () => {
-    const errors = [];
-
-    if (!formData.numeroDocumento.trim()) {
-      errors.push("El número de documento es obligatorio");
-    }
-
-    if (!formData.nombreAprendiz.trim()) {
-      errors.push("El nombre del aprendiz es obligatorio");
-    }
-
-    if (!formData.descripcion.trim()) {
-      errors.push("La descripción es obligatoria");
-    }
-
-    if (!formData.justificationTypeId.id) {
-      errors.push("Debe seleccionar un tipo de novedad");
-    }
-
-    if (!formData.justificacionFile) {
-      errors.push("Debe adjuntar un archivo de justificación");
-    }
-
+    const errors: string[] = [];
+    if (!formData.numeroDocumento.trim()) errors.push("El número de documento es obligatorio");
+    if (!formData.nombreAprendiz.trim()) errors.push("El nombre del aprendiz es obligatorio");
+    if (!formData.descripcion.trim()) errors.push("La descripción es obligatoria");
+    if (!formData.justificationTypeId.id) errors.push("Debe seleccionar un tipo de novedad");
+    if (!formData.justificacionFile) errors.push("Debe adjuntar un archivo de justificación");
     return errors;
   };
 
-  const handleSave = async (e) => {
+  const handleSave = async (e: FormEvent) => {
     e.preventDefault();
 
-    // Validar formulario
     const validationErrors = validateForm();
     if (validationErrors.length > 0) {
       validationErrors.forEach(error => toast.error(error));
       return;
     }
 
-    // Verificar que el tipo de justificación existe
     const selectedType = justificationTypes.find((t) => t.id === formData.justificationTypeId.id);
     if (!selectedType) {
       toast.error("El tipo de justificación seleccionado no es válido.");
       return;
     }
 
-    // Verificar tamaño del archivo otra vez
     if (formData.justificacionFile && formData.justificacionFile.size > 5 * 1024 * 1024) {
       toast.error("El archivo de justificación no puede ser mayor de 5 MB.");
       return;
@@ -161,15 +162,9 @@ export default function JustificacionAprendiz() {
     setIsSubmitting(true);
 
     try {
-      console.log("Enviando datos:", formData);
-
       const result = await justificationService.submitJustification(formData);
 
-      console.log("Respuesta del servicio:", result);
-
-      // Manejar diferentes tipos de respuesta
       if (result) {
-        // Si la respuesta tiene una propiedad success explícita
         if (Object.prototype.hasOwnProperty.call(result, 'success')) {
           if (result.success === true) {
             toast.success(result.message || "¡Tu justificación ha sido enviada exitosamente!");
@@ -177,23 +172,17 @@ export default function JustificacionAprendiz() {
           } else {
             toast.error(result.message || "Error al enviar la justificación.");
           }
-        }
-        // Si la respuesta tiene un status code
-        else if (result.status) {
+        } else if (result.status) {
           if (result.status >= 200 && result.status < 300) {
             toast.success(result.message || result.data?.message || "¡Tu justificación ha sido enviada exitosamente!");
             resetForm();
           } else {
             toast.error(result.message || result.data?.message || "Error al enviar la justificación.");
           }
-        }
-        // Si la respuesta indica éxito de otra manera
-        else if (result.message && result.message.toLowerCase().includes('éxito')) {
+        } else if (result.message && result.message.toLowerCase().includes('éxito')) {
           toast.success(result.message);
           resetForm();
-        }
-        // Si no hay indicadores claros de error, asumir éxito
-        else if (!result.error && !result.message?.toLowerCase().includes('error')) {
+        } else if (!result.error && !result.message?.toLowerCase().includes('error')) {
           toast.success("¡Tu justificación ha sido enviada exitosamente!");
           resetForm();
         } else {
@@ -202,21 +191,16 @@ export default function JustificacionAprendiz() {
       } else {
         toast.error("No se recibió respuesta del servidor.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error al enviar justificación:", error);
-
-      // Manejar diferentes tipos de errores
       if (error.response) {
-        // Error de respuesta del servidor
         const errorMessage = error.response.data?.message ||
           error.response.data?.error ||
           `Error del servidor: ${error.response.status}`;
         toast.error(errorMessage);
       } else if (error.request) {
-        // Error de red
         toast.error("Error de conexión. Verifica tu conexión a internet.");
       } else {
-        // Otro tipo de error
         toast.error(error.message || "Error inesperado al enviar la justificación.");
       }
     } finally {
@@ -235,7 +219,6 @@ export default function JustificacionAprendiz() {
       justificacionFileBase64: "",
       notificationId: "123456",
     });
-    // Limpiar el input de archivo
     if (fileInputRefPrev.current) {
       fileInputRefPrev.current.value = '';
     }
@@ -316,10 +299,17 @@ export default function JustificacionAprendiz() {
                       type="text"
                       name="numeroDocumento"
                       value={formData.numeroDocumento}
+<<<<<<< HEAD:frontend/app/(routes)/dashboard/justificacionesAprendiz/page.js
                       onChange={(e) => handleInputChange(e)}
                       className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen"
+=======
+                      onChange={handleInputChange}
+                      className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-darkBlue dark:text-white focus:border-darkBlue dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-darkBlue dark:focus:ring-lightGreen"
+>>>>>>> origin/jonatanDev:frontend/app/(routes)/dashboard/justificacionesAprendiz/page.tsx
                       placeholder="123456789"
                       required
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                     />
                   </div>
 
@@ -354,11 +344,20 @@ export default function JustificacionAprendiz() {
                 </div>
 
                 <div className="flex flex-col space-y-2">
+<<<<<<< HEAD:frontend/app/(routes)/dashboard/justificacionesAprendiz/page.js
                   <label className="text-sm font-medium text-black dark:text-lightGray">
+=======
+                  <label
+                    htmlFor="justificationTypeSelect"
+                    className="text-sm font-medium text-darkBlue dark:text-lightGray"
+                  >
+>>>>>>> origin/jonatanDev:frontend/app/(routes)/dashboard/justificacionesAprendiz/page.tsx
                     Tipo De Novedad *
                   </label>
                   <select
+                    id="justificationTypeSelect"
                     name="justificationType"
+                    aria-label="Tipo De Novedad"
                     value={formData.justificationTypeId.id}
                     onChange={(e) =>
                       setFormData((prev) => ({
@@ -398,6 +397,8 @@ export default function JustificacionAprendiz() {
                     onChange={(e) => handleFileChange(e, "justificacionFile")}
                     accept=".pdf,.jpg,.jpeg,.png"
                     className="hidden"
+                    placeholder="Adjuntar archivo de justificación"
+                    title="Adjuntar archivo de justificación"
                   />
                   <small className="text-darkGray dark:text-grayText">
                     Formatos permitidos: PDF, JPG, PNG (máx. 5MB)

@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, ChangeEvent, FormEvent } from 'react'
 import { toast } from 'react-toastify'
 import PageTitle from '@components/UI/pageTitle'
 
+import { Apprentice, NewApprentice } from '@/types/aprendices'
 function ListaApprentices() {
-  const [apprentices, setApprentices] = useState([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [newApprentice, setNewApprentice] = useState({
+  const [apprentices, setApprentices] = useState<Apprentice[]>([])
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const [newApprentice, setNewApprentice] = useState<NewApprentice>({
     name: '',
     lastName: '',
     documentType: '',
@@ -32,7 +33,7 @@ function ListaApprentices() {
     fetchApprentices()
   }, [])
 
-  const filteredApprentices = Array.isArray(apprentices)
+  const filteredApprentices: Apprentice[] = Array.isArray(apprentices)
     ? apprentices.filter(apprentice =>
       Object.values(apprentice).some(value =>
         value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
@@ -40,12 +41,12 @@ function ListaApprentices() {
     )
     : []
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setNewApprentice(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     try {
       const response = await fetch('http://localhost:8081/api/students', {
@@ -53,7 +54,7 @@ function ListaApprentices() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newApprentice),
       })
-      const createdApprentice = await response.json()
+      const createdApprentice: Apprentice = await response.json()
       setApprentices(prev => [...prev, createdApprentice])
       setNewApprentice({
         name: '',
@@ -82,19 +83,19 @@ function ListaApprentices() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="block text-sm font-medium" htmlFor="name">Nombres</label>
+                <label className="block text-sm font-medium text-gray-800 dark:text-gray-100" htmlFor="name">Nombres</label>
                 <input className="input px-4 py-2 border rounded-lg w-full" id="name" name="name" value={newApprentice.name} onChange={handleInputChange} required />
               </div>
               <div className="space-y-2">
-                <label className="block text-sm font-medium" htmlFor="lastName">Apellidos</label>
+                <label className="block text-sm font-medium text-gray-800 dark:text-gray-100" htmlFor="lastName">Apellidos</label>
                 <input className="input px-4 py-2 border rounded-lg w-full" id="lastName" name="lastName" value={newApprentice.lastName} onChange={handleInputChange} required />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="block text-sm font-medium" htmlFor="documentType">Tipo de Documento</label>
-                <select className="input px-4 py-2 border rounded-lg w-full" name="documentType" value={newApprentice.documentType} onChange={handleInputChange} required>
+                <label className="block text-sm font-medium text-gray-800 dark:text-gray-100" htmlFor="documentType">Tipo de Documento</label>
+                <select className="input px-4 py-2 border rounded-lg w-full" id='documentType' name="documentType" value={newApprentice.documentType} onChange={handleInputChange} required>
                   <option value="">Seleccionar</option>
                   <option value="CC">Cédula de Ciudadanía</option>
                   <option value="TI">Tarjeta de Identidad</option>
@@ -102,23 +103,23 @@ function ListaApprentices() {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="block text-sm font-medium" htmlFor="documentNumber">Número de Documento</label>
+                <label className="block text-sm font-medium text-gray-800 dark:text-gray-100" htmlFor="documentNumber">Número de Documento</label>
                 <input className="input px-4 py-2 border rounded-lg w-full" id="documentNumber" name="documentNumber" value={newApprentice.documentNumber} onChange={handleInputChange} required />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium" htmlFor="program">Programa</label>
+              <label className="block text-sm font-medium text-gray-800 dark:text-gray-100" htmlFor="program">Programa</label>
               <input className="input px-4 py-2 border rounded-lg w-full" id="program" name="program" value={newApprentice.program} onChange={handleInputChange} required />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium" htmlFor="email">Correo Institucional</label>
+              <label className="block text-sm font-medium text-gray-800 dark:text-gray-100" htmlFor="email">Correo Institucional</label>
               <input className="input px-4 py-2 border rounded-lg w-full" type="email" id="email" name="email" value={newApprentice.email} onChange={handleInputChange} required />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium" htmlFor="teamNumber">Número del Team</label>
+              <label className="block text-sm font-medium text-gray-800 dark:text-gray-100" htmlFor="teamNumber">Número del Team</label>
               <input className="input px-4 py-2 border rounded-lg w-full" id="teamNumber" name="teamNumber" value={newApprentice.teamNumber} onChange={handleInputChange} required />
             </div>
 

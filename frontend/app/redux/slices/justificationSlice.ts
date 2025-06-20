@@ -121,21 +121,38 @@ const filterJustifications = (
 ): TransformedJustificationItem[] => {
     const { selectedFiltro, searchTerm } = filterOptions;
 
-    if (!searchTerm || !selectedFiltro) return data;
+    if (!searchTerm) return data;
 
+    // Si el filtro es "todo" o no se seleccionó ninguno, buscar en todos los campos
+    if (!selectedFiltro || selectedFiltro === "todo") {
+        return data.filter((j) =>
+            j.programa.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            j.ficha.toString().includes(searchTerm) ||
+            j.documento.includes(searchTerm) ||
+            j.aprendiz.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            j.fecha.includes(searchTerm) ||
+            j.estado.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }
+
+    // Si hay un filtro específico, buscar solo en ese campo
     return data.filter((j) => {
         switch (selectedFiltro) {
             case "programa":
                 return j.programa.toLowerCase().includes(searchTerm.toLowerCase());
             case "ficha":
-                return j.ficha.includes(searchTerm);
+                return j.ficha.toString().includes(searchTerm);
             case "documento":
                 return j.documento.includes(searchTerm);
             case "aprendiz":
                 return j.aprendiz.toLowerCase().includes(searchTerm.toLowerCase());
             case "fecha":
                 return j.fecha.includes(searchTerm);
-            default:
+            case "estado":
+                if (searchTerm === "true") return j.estado === "Activo";
+                if (searchTerm === "false") return j.estado === "Inactivo";
+                return true;
+                default:
                 return true;
         }
     });

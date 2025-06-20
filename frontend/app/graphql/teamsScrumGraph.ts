@@ -31,6 +31,7 @@ export const GET_TEAM_SCRUM_BY_ID = gql`
       data {
         id
         name
+        
         checklist {
           id
           remarks

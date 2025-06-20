@@ -62,53 +62,71 @@ export default function Programas() {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6 bg-gray-100">
-      <div className="xl:col-span-5 w-full">
-        <div className="h-auto p-4 sm:p-6 md:p-8 lg:p-12 inline-block w-full">
-          <PageTitle>Programas Coordinación</PageTitle>
+    <div className="space-y-6">
+      <PageTitle>Programas Coordinación</PageTitle>
 
-          {/* Campo de búsqueda */}
-          <input
-            type="text"
-            placeholder="Buscar programa..."
-            className="mb-4 w-full sm:w-1/2 md:w-2/3 lg:w-1/2 p-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#40b003] focus:border-transparent"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        {/* Campo de búsqueda */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start">
+        <input
+          type="text"
+          placeholder="Buscar programa..."
+          className="w-full sm:w-80 md:w-96 lg:w-1/2 p-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#01b001] dark:focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
-          {loading && <p className="text-center text-gray-600">Cargando programas...</p>}
+        {/* Results counter */}
+        {searchTerm && (
+          <span className="text-sm text-gray-600 dark:text-gray-400 pt-3">
+            {filteredPrograms.length} programa{filteredPrograms.length !== 1 ? 's' : ''} encontrado{filteredPrograms.length !== 1 ? 's' : ''}
+          </span>
+        )}
+      </div>
+        {loading && <p className="text-center text-gray-600">Cargando programas...</p>}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ml-8 py-7">
-            {displayedPrograms.map((program) => {
-              const Icon = iconMap[program.icon] || FaComputer;
-              return (
-                <div key={program.id} className="flex w-full sm:w-96 h-52 rounded-lg overflow-hidden shadow-lg bg-zinc-200 relative mb-4 p-4">
-                  <div className="z-50 justify-end p-4 space-y-4">
-                    <div className="space-y-2">
-                      <span className="text-[#40b003] font-inter font-semibold text-xl">{program.name}</span>
-                      <p className="font-inter font-normal text-black text-sm sm:text-sm pr-5">{program.description}</p>
-                    </div>
+        {displayedPrograms.map((program) => {
+          const Icon = iconMap[program.icon] || FaComputer;
+          
+          return (
+            <div
+              key={program.id}
+              className="fflex w-full max-w-md h-52 rounded-lg overflow-hidden shadow-lg bg-gray-100 dark:bg-gray-700 relative p-4 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+            >
+              <div className="z-10 flex flex-col justify-between p-2 flex-1">
+                <div className="space-y-2 flex flex-col h-full">
+                  <h3 className="text-black dark:text-white font-inter font-semibold text-lg leading-tight">
+                    {program.name}
+                  </h3>
+                  <div className="flex-1 flex">
+                    <p className="font-inter font-normal text-gray-700 dark:text-gray-300 text-sm leading-relaxed pr-2 w-full max-w-[calc(100%-60px)] truncate whitespace-pre-line break-words">
+                      {program.description}
+                    </p>
                   </div>
-                  <Icon className="z-50 text-5xl text-white ml-auto w-40" />
-                  <div className="absolute top-0 right-0 w-0 h-0 border-t-[130px] border-[#0e324d] border-l-[190px] border-l-transparent -z-1"></div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+              {/* Icon Container en la pestañita */}
+              <div className="absolute top-0 right-0 w-0 h-0 z-20 flex items-start justify-end pt-7 pr-1">
+                <div className="absolute top-2 right-2">
+                  <Icon className="text-3xl md:text-4xl lg:text-5xl drop-shadow-lg text-black/75 dark:text-white transition-colors duration-300" />
+                </div>
+              </div>
+              {/* Decorative Triangle */}
+              <div className="absolute top-0 right-0 w-0 h-0 border-l-[120px] border-l-transparent border-t-[130px] border-t-lime-500/85 dark:border-t-blue-900 opacity-90 transition-colors duration-300"></div>
+            </div>
+          );
+        })}
 
-          {/* Paginación */}
-          <div className="flex justify-center mt-4">
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index + 1}
-                onClick={() => handlePageChange(index + 1)}
-                className={`mx-1 px-3 py-1 rounded transition-colors duration-300 ${currentPage === index + 1 ? 'bg-[#0e324b] text-white' : 'bg-gray-300 hover:bg-[#40b003] hover:text-white'}`}
-              >
-                {index + 1}
-              </button>
-            ))}
-          </div>
-        </div>
+      {/* Paginación */}
+      <div className="flex justify-center mt-4">
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => handlePageChange(index + 1)}
+            className={`mx-1 px-3 py-1 rounded transition-colors duration-300 ${currentPage === index + 1 ? 'bg-[#0e324b] text-white' : 'bg-gray-300 hover:bg-[#40b003] hover:text-white'}`}
+          >
+            {index + 1}
+          </button>
+        ))}
       </div>
     </div>
   );
