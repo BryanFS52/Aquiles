@@ -268,25 +268,25 @@ export default function JustificacionAprendiz() {
               </h2>
               <div className="space-y-4 text-darkGray dark:text-lightGray">
                 <div className="flex items-center">
-                  <FaCalendarDay className="mr-3 text-darkBlue dark:text-darkBlue" />
+                  <FaCalendarDay className="mr-3 text-black dark:text-white" />
                   <span><strong>Fecha:</strong> {sessions["1"].date}</span>
                 </div>
                 <div className="flex items-center">
-                  <FaRegClock className="mr-3 text-darkBlue dark:text-darkBlue" />
+                  <FaRegClock className="mr-3 text-black dark:text-white" />
                   <span><strong>Hora:</strong> {sessions["1"].time}</span>
                 </div>
                 <div className="flex items-center">
-                  <FaRegListAlt className="mr-3 text-darkBlue dark:text-darkBlue" />
+                  <FaRegListAlt className="mr-3 text-black dark:text-white" />
                   <span><strong>Ficha:</strong> {sessions["1"].sheet}</span>
                 </div>
                 <div className="flex items-center">
-                  <IoPeople className="mr-3 text-darkBlue dark:text-darkBlue" />
+                  <IoPeople className="mr-3 text-black dark:text-white" />
                   <span><strong>Instructores:</strong> {sessions["1"].instructors.join(", ")}</span>
                 </div>
               </div>
               <button
                 onClick={() => setShowForm(true)}
-                className="w-full mt-8 py-3 px-6 rounded-lg bg-lightGreen text-black dark:text-white dark:bg-darkBlue transition-colors font-medium"
+                className="w-full mt-8 py-3 px-6 rounded-lg bg-lightGreen text-black dark:text-white dark:bg-black transition-colors font-medium"
               >
                 Justificar
               </button>
@@ -303,13 +303,13 @@ export default function JustificacionAprendiz() {
               transition={{ duration: 0.5 }}
               className="w-full max-w-4xl bg-white dark:bg-shadowBlue p-6 lg:p-8 rounded-xl shadow-sm border border-lightGray dark:border-darkGray"
             >
-              <h2 className="text-xl font-semibold mb-6 text-darkBlue dark:text-white">
+              <h2 className="text-xl font-semibold mb-6 text-black dark:text-white">
                 Formulario de Justificación
               </h2>
               <form onSubmit={handleSave} className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="flex flex-col space-y-2">
-                    <label className="text-sm font-medium text-darkBlue dark:text-lightGray">
+                    <label className="text-sm font-medium text-black dark:text-lightGray">
                       Número de Documento *
                     </label>
                     <input
@@ -317,14 +317,14 @@ export default function JustificacionAprendiz() {
                       name="numeroDocumento"
                       value={formData.numeroDocumento}
                       onChange={(e) => handleInputChange(e)}
-                      className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-darkBlue dark:text-white focus:border-darkBlue dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-darkBlue dark:focus:ring-lightGreen"
+                      className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen"
                       placeholder="123456789"
                       required
                     />
                   </div>
 
                   <div className="flex flex-col space-y-2">
-                    <label className="text-sm font-medium text-darkBlue dark:text-lightGray">
+                    <label className="text-sm font-medium text-black dark:text-lightGray">
                       Nombre Aprendiz *
                     </label>
                     <input
@@ -332,7 +332,7 @@ export default function JustificacionAprendiz() {
                       name="nombreAprendiz"
                       value={formData.nombreAprendiz}
                       onChange={(e) => handleInputChange(e, true)}
-                      className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-darkBlue dark:text-white focus:border-darkBlue dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-darkBlue dark:focus:ring-lightGreen"
+                      className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen"
                       placeholder="Juan Pérez"
                       required
                     />
@@ -340,21 +340,21 @@ export default function JustificacionAprendiz() {
                 </div>
 
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-medium text-darkBlue dark:text-lightGray">
+                  <label className="text-sm font-medium text-black dark:text-lightGray">
                     Descripción *
                   </label>
                   <textarea
                     name="descripcion"
                     value={formData.descripcion}
                     onChange={(e) => setFormData(prev => ({ ...prev, descripcion: e.target.value }))}
-                    className="min-h-24 border border-lightGray dark:border-darkGray rounded-lg p-4 bg-white dark:bg-shadowBlue text-darkBlue dark:text-white focus:border-darkBlue dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-darkBlue dark:focus:ring-lightGreen resize-vertical"
+                    className="min-h-24 border border-lightGray dark:border-darkGray rounded-lg p-4 bg-white dark:bg-shadowBlue text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen resize-vertical"
                     placeholder="Motivo de la justificación"
                     required
                   />
                 </div>
 
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-medium text-darkBlue dark:text-lightGray">
+                  <label className="text-sm font-medium text-black dark:text-lightGray">
                     Tipo De Novedad *
                   </label>
                   <select
@@ -366,7 +366,7 @@ export default function JustificacionAprendiz() {
                         justificationTypeId: { id: e.target.value },
                       }))
                     }
-                    className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-darkBlue dark:text-white focus:border-darkBlue dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-darkBlue dark:focus:ring-lightGreen"
+                    className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen"
                     disabled={loadingTypes}
                     required
                   >
@@ -382,13 +382,13 @@ export default function JustificacionAprendiz() {
                 </div>
 
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-medium text-darkBlue dark:text-lightGray">
+                  <label className="text-sm font-medium text-black dark:text-lightGray">
                     Justificación (Archivo) *
                   </label>
                   <button
                     type="button"
                     onClick={() => fileInputRefPrev.current?.click()}
-                    className="bg-darkBlue dark:bg-lightGreen text-white h-11 rounded-lg hover:bg-lightGreen dark:hover:bg-darkGreen transition-colors font-medium"
+                    className="bg-black dark:bg-lightGreen text-white h-11 rounded-lg hover:bg-lightGreen dark:hover:bg-darkGreen transition-colors font-medium"
                   >
                     {formData.justificacionFile?.name || "📎 Subir Archivo"}
                   </button>
@@ -408,14 +408,14 @@ export default function JustificacionAprendiz() {
                   <button
                     type="button"
                     onClick={handleCancel}
-                    className="px-6 py-3 bg-darkGray dark:bg-shadowBlue text-white rounded-lg hover:bg-darkBlue dark:hover:bg-lightGray dark:hover:text-darkBlue transition-colors font-medium"
+                    className="px-6 py-3 bg-darkGray dark:bg-shadowBlue text-white rounded-lg hover:bg-black dark:hover:bg-lightGray dark:hover:text-black transition-colors font-medium"
                     disabled={isSubmitting}
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-3 bg-darkBlue dark:bg-lightGreen text-white rounded-lg hover:bg-lightGreen dark:hover:bg-darkGreen transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                    className="px-6 py-3 bg-black dark:bg-lightGreen text-white rounded-lg hover:bg-lightGreen dark:hover:bg-darkGreen transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? "Enviando..." : "Enviar Justificación"}
