@@ -5,6 +5,7 @@ export interface Person {
     lastname: string;
     email: string;
     phone: number;
+    state: boolean
 }
 
 export interface Student {

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch, RootState } from '@/redux/store'
 import { BsPersonCircle } from "react-icons/bs";
 import { fetchStudySheetById } from '@slice/olympo/studySheetSlice';
 import TableAttendance from "@components/features/attendance/tableAttendance";
@@ -9,12 +10,14 @@ import PageTitle from "@components/UI/pageTitle";
 import AttendanceFooter from "@components/features/attendance/attendanceFooter";
 
 export default function Attendance() {
-    const dispatch = useDispatch();
-    const { data: studySheets, loading, error } = useSelector((state) => state.studySheet);
+    const dispatch = useDispatch<AppDispatch>();
+    const { data: studySheets, loading, error } = useSelector(
+        (state: RootState) => state.studySheet
+    );
 
     // Get the first study sheet from the data array (since fetchById returns array with single item)
-    const studySheet = studySheets.length > 0 ? studySheets[0] : null;
-    const students = studySheet?.students?.filter((s) => s.person.status === "active") || [];
+    const studySheet = studySheets.length > 0 ? studySheets[0] : undefined;
+    const students = studySheet?.students?.filter((s) => s.person.state === true) || [];
 
     useEffect(() => {
         const fetchStudySheet = async () => {
@@ -50,7 +53,7 @@ export default function Attendance() {
                 <PageTitle>Lista de asistencia</PageTitle>
                 <div className="flex items-center justify-center h-32 sm:h-64">
                     <p className="text-red-500 dark:text-red-400 text-sm sm:text-base text-center px-4">
-                        Error al cargar la ficha: {error}
+                        Error al cargar la ficha: {typeof error === 'string' ? error : error?.message ?? "Error desconocido"}
                     </p>
                 </div>
             </div>
@@ -68,7 +71,7 @@ export default function Attendance() {
                 <div className="w-full xl:w-auto xl:flex-shrink-0">
                     <div className="min-h-[4rem] sm:h-16 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 p-3 sm:p-4 flex items-center justify-center">
                         <span className="font-inter font-medium text-base sm:text-lg text-black dark:text-white text-center leading-tight">
-                            {studySheet?.trainingProject.program?.name}
+                            {studySheet?.trainingProject?.program?.name ?? "Sin programa"}
                         </span>
                     </div>
                 </div>

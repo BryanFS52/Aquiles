@@ -299,13 +299,8 @@ export default function JustificacionAprendiz() {
                       type="text"
                       name="numeroDocumento"
                       value={formData.numeroDocumento}
-<<<<<<< HEAD:frontend/app/(routes)/dashboard/justificacionesAprendiz/page.js
-                      onChange={(e) => handleInputChange(e)}
-                      className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen"
-=======
                       onChange={handleInputChange}
                       className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-darkBlue dark:text-white focus:border-darkBlue dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-darkBlue dark:focus:ring-lightGreen"
->>>>>>> origin/jonatanDev:frontend/app/(routes)/dashboard/justificacionesAprendiz/page.tsx
                       placeholder="123456789"
                       required
                       inputMode="numeric"
@@ -344,14 +339,10 @@ export default function JustificacionAprendiz() {
                 </div>
 
                 <div className="flex flex-col space-y-2">
-<<<<<<< HEAD:frontend/app/(routes)/dashboard/justificacionesAprendiz/page.js
-                  <label className="text-sm font-medium text-black dark:text-lightGray">
-=======
                   <label
                     htmlFor="justificationTypeSelect"
                     className="text-sm font-medium text-darkBlue dark:text-lightGray"
                   >
->>>>>>> origin/jonatanDev:frontend/app/(routes)/dashboard/justificacionesAprendiz/page.tsx
                     Tipo De Novedad *
                   </label>
                   <select
