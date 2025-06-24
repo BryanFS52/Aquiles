@@ -253,18 +253,6 @@ export type CollaboratorPage = {
   totalPages?: Maybe<Scalars['Int']['output']>;
 };
 
-export type Committee = {
-  committeeDate?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['ID']['output']>;
-  proceeding?: Maybe<Proceeding>;
-};
-
-export type CommitteeDto = {
-  committeeDate?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  proceeding?: InputMaybe<ProceedingDto>;
-};
-
 export type Company = {
   id?: Maybe<Scalars['ID']['output']>;
   name?: Maybe<Scalars['String']['output']>;
@@ -420,14 +408,6 @@ export type DocumentTypeDto = {
   id?: InputMaybe<Scalars['ID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   state?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-export type EmailResponse = {
-  code: Scalars['String']['output'];
-  emailDestinatario?: Maybe<Scalars['String']['output']>;
-  message: Scalars['String']['output'];
-  noveltyId?: Maybe<Scalars['String']['output']>;
-  totalDestinatarios?: Maybe<Scalars['Int']['output']>;
 };
 
 export type Environment = {
@@ -789,6 +769,7 @@ export type FloorDto = {
 
 export type Headquarter = {
   address?: Maybe<Scalars['String']['output']>;
+  floor?: Maybe<Array<Maybe<Floor>>>;
   id?: Maybe<Scalars['ID']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   state?: Maybe<Scalars['Boolean']['output']>;
@@ -797,6 +778,7 @@ export type Headquarter = {
 
 export type HeadquarterDto = {
   address?: InputMaybe<Scalars['String']['input']>;
+  floor?: InputMaybe<Array<InputMaybe<FloorDto>>>;
   id?: InputMaybe<Scalars['ID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   state?: InputMaybe<Scalars['Boolean']['input']>;
@@ -1051,6 +1033,7 @@ export type LoginRequestDto = {
 };
 
 export type LoginResponseDto = {
+  refreshToken?: Maybe<Scalars['String']['output']>;
   token?: Maybe<Scalars['String']['output']>;
   user?: Maybe<User>;
 };
@@ -1099,8 +1082,6 @@ export type Mutation = {
   addLearningOutcome?: Maybe<Response>;
   addMacroRegion?: Maybe<Response>;
   addNew?: Maybe<Response>;
-  addNovelty?: Maybe<Response>;
-  addNoveltyType?: Maybe<Response>;
   addOffer?: Maybe<Response>;
   addPermission?: Maybe<Response>;
   addPerson?: Maybe<Response>;
@@ -1126,8 +1107,6 @@ export type Mutation = {
   addTrainingLevel?: Maybe<Response>;
   addTrainingProject?: Maybe<Response>;
   addUser?: Maybe<Response>;
-  changeNoveltyStatus?: Maybe<NoveltyResponse>;
-  createNotification?: Maybe<Response>;
   deleteAdministrative?: Maybe<Response>;
   deleteAdministrativeType?: Maybe<Response>;
   deleteAssignments?: Maybe<Response>;
@@ -1156,9 +1135,6 @@ export type Mutation = {
   deleteLearningOutcome?: Maybe<Response>;
   deleteMacroRegion?: Maybe<Scalars['String']['output']>;
   deleteNew?: Maybe<NewPage>;
-  deleteNotification?: Maybe<Response>;
-  deleteNovelty?: Maybe<Response>;
-  deleteNoveltyType?: Maybe<Response>;
   deleteOffer?: Maybe<Response>;
   deletePermission?: Maybe<Response>;
   deletePerson?: Maybe<Response>;
@@ -1187,12 +1163,10 @@ export type Mutation = {
   findByStateAssignments?: Maybe<Response>;
   generateQRCode?: Maybe<QrCodePayload>;
   login?: Maybe<LoginResponseDto>;
+  logout?: Maybe<Scalars['Boolean']['output']>;
+  refreshToken?: Maybe<LoginResponseDto>;
   rejectAssignment?: Maybe<Response>;
   saveProductCategory?: Maybe<Response>;
-  sendMultipleHtmlEmail: EmailResponse;
-  sendNoveltyCreationNotification: EmailResponse;
-  sendNoveltyUpdateNotification: EmailResponse;
-  sendSingleHtmlEmail: EmailResponse;
   updateAdministrative?: Maybe<Response>;
   updateAdministrativeType?: Maybe<Response>;
   updateAssignments?: Maybe<Response>;
@@ -1220,9 +1194,6 @@ export type Mutation = {
   updateLearningActivity?: Maybe<Response>;
   updateLearningOutcome?: Maybe<Response>;
   updateMacroRegion?: Maybe<Response>;
-  updateNotification?: Maybe<Response>;
-  updateNovelty?: Maybe<Response>;
-  updateNoveltyType?: Maybe<Response>;
   updateOffer?: Maybe<Response>;
   updatePermission?: Maybe<Response>;
   updatePerson?: Maybe<Response>;
@@ -1394,16 +1365,6 @@ export type MutationAddNewArgs = {
 };
 
 
-export type MutationAddNoveltyArgs = {
-  input?: InputMaybe<NoveltyDto>;
-};
-
-
-export type MutationAddNoveltyTypeArgs = {
-  input?: InputMaybe<NoveltyTypeDto>;
-};
-
-
 export type MutationAddOfferArgs = {
   input?: InputMaybe<OfferDto>;
 };
@@ -1527,20 +1488,6 @@ export type MutationAddTrainingProjectArgs = {
 
 export type MutationAddUserArgs = {
   input?: InputMaybe<UserDto>;
-};
-
-
-export type MutationChangeNoveltyStatusArgs = {
-  id: Scalars['String']['input'];
-  status: Scalars['String']['input'];
-};
-
-
-export type MutationCreateNotificationArgs = {
-  dateAttention?: InputMaybe<Scalars['String']['input']>;
-  notiMessage: Scalars['String']['input'];
-  notiStatus: Scalars['String']['input'];
-  registrationDate?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1684,21 +1631,6 @@ export type MutationDeleteNewArgs = {
 };
 
 
-export type MutationDeleteNotificationArgs = {
-  id: Scalars['String']['input'];
-};
-
-
-export type MutationDeleteNoveltyArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteNoveltyTypeArgs = {
-  id: Scalars['Long']['input'];
-};
-
-
 export type MutationDeleteOfferArgs = {
   id?: InputMaybe<Scalars['Long']['input']>;
 };
@@ -1834,6 +1766,17 @@ export type MutationLoginArgs = {
 };
 
 
+export type MutationLogoutArgs = {
+  idUser?: InputMaybe<Scalars['Long']['input']>;
+  token?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationRefreshTokenArgs = {
+  refreshTokenInput: Scalars['String']['input'];
+};
+
+
 export type MutationRejectAssignmentArgs = {
   idAssignment?: InputMaybe<Scalars['Long']['input']>;
   reason?: InputMaybe<Scalars['String']['input']>;
@@ -1842,32 +1785,6 @@ export type MutationRejectAssignmentArgs = {
 
 export type MutationSaveProductCategoryArgs = {
   input?: InputMaybe<ProductCategoryDto>;
-};
-
-
-export type MutationSendMultipleHtmlEmailArgs = {
-  emailsDestinatarios: Array<Scalars['String']['input']>;
-  htmlContent: Scalars['String']['input'];
-  subject: Scalars['String']['input'];
-};
-
-
-export type MutationSendNoveltyCreationNotificationArgs = {
-  noveltyId: Scalars['String']['input'];
-  noveltyTypeId: Scalars['String']['input'];
-};
-
-
-export type MutationSendNoveltyUpdateNotificationArgs = {
-  noveltyId: Scalars['String']['input'];
-  noveltyTypeId: Scalars['String']['input'];
-};
-
-
-export type MutationSendSingleHtmlEmailArgs = {
-  emailDestinatario: Scalars['String']['input'];
-  htmlContent: Scalars['String']['input'];
-  subject: Scalars['String']['input'];
 };
 
 
@@ -2033,27 +1950,6 @@ export type MutationUpdateMacroRegionArgs = {
 };
 
 
-export type MutationUpdateNotificationArgs = {
-  dateAttention?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['String']['input'];
-  notiMessage: Scalars['String']['input'];
-  notiStatus: Scalars['String']['input'];
-  registrationDate?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type MutationUpdateNoveltyArgs = {
-  id: Scalars['ID']['input'];
-  input?: InputMaybe<NoveltyDto>;
-};
-
-
-export type MutationUpdateNoveltyTypeArgs = {
-  id: Scalars['Long']['input'];
-  input?: InputMaybe<NoveltyTypeDto>;
-};
-
-
 export type MutationUpdateOfferArgs = {
   id?: InputMaybe<Scalars['Long']['input']>;
   input?: InputMaybe<OfferDto>;
@@ -2216,91 +2112,6 @@ export type NewPage = {
   totalPages?: Maybe<Scalars['Int']['output']>;
 };
 
-/** 1. crear el tipo novedad */
-export type Notication = {
-  dateAttentation?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['ID']['output']>;
-  notiMessage?: Maybe<Scalars['String']['output']>;
-  notiStatus?: Maybe<Scalars['String']['output']>;
-  registrationDate?: Maybe<Scalars['String']['output']>;
-};
-
-/**  3. Actualizar la notificaion */
-export type NotificationDto = {
-  dateAttention?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  notiMessage?: InputMaybe<Scalars['String']['input']>;
-  notiStatus?: InputMaybe<Scalars['String']['input']>;
-  registrationDate?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type Novelty = {
-  id?: Maybe<Scalars['ID']['output']>;
-  noveltyDate?: Maybe<Scalars['String']['output']>;
-  noveltyFiles?: Maybe<Scalars['String']['output']>;
-  noveltyType?: Maybe<NoveltyType>;
-  observation?: Maybe<Scalars['String']['output']>;
-  person?: Maybe<Person>;
-  status?: Maybe<Scalars['String']['output']>;
-  student?: Maybe<Student>;
-};
-
-export type NoveltyDto = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-  idPerson?: InputMaybe<Scalars['String']['input']>;
-  idStudent?: InputMaybe<Scalars['String']['input']>;
-  noveltyDate?: InputMaybe<Scalars['String']['input']>;
-  noveltyFiles?: InputMaybe<Scalars['String']['input']>;
-  noveltyType?: InputMaybe<NoveltyTypeDto>;
-  observation?: InputMaybe<Scalars['String']['input']>;
-  status?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type NoveltyPage = {
-  code?: Maybe<Scalars['String']['output']>;
-  currentPage?: Maybe<Scalars['Int']['output']>;
-  data?: Maybe<Array<Maybe<Novelty>>>;
-  date?: Maybe<Scalars['String']['output']>;
-  message?: Maybe<Scalars['String']['output']>;
-  totalItems?: Maybe<Scalars['Int']['output']>;
-  totalPages?: Maybe<Scalars['Int']['output']>;
-};
-
-export type NoveltyResponse = {
-  id?: Maybe<Scalars['String']['output']>;
-  message?: Maybe<Scalars['String']['output']>;
-  status?: Maybe<Scalars['String']['output']>;
-  success?: Maybe<Scalars['Boolean']['output']>;
-};
-
-export type NoveltyType = {
-  description?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['ID']['output']>;
-  nameNovelty?: Maybe<Scalars['String']['output']>;
-  noveltyState?: Maybe<Scalars['Boolean']['output']>;
-  procedureDescription?: Maybe<Scalars['String']['output']>;
-  role?: Maybe<Array<Maybe<Role>>>;
-};
-
-export type NoveltyTypeDto = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  externalRoleIds?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  nameNovelty?: InputMaybe<Scalars['String']['input']>;
-  noveltyState?: InputMaybe<Scalars['Boolean']['input']>;
-  procedureDescription?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type NoveltyTypePage = {
-  code?: Maybe<Scalars['String']['output']>;
-  currentPage?: Maybe<Scalars['Int']['output']>;
-  data?: Maybe<Array<Maybe<NoveltyType>>>;
-  date?: Maybe<Scalars['String']['output']>;
-  message?: Maybe<Scalars['String']['output']>;
-  totalItems?: Maybe<Scalars['Int']['output']>;
-  totalPages?: Maybe<Scalars['Int']['output']>;
-};
-
 export type Offer = {
   id?: Maybe<Scalars['ID']['output']>;
   name?: Maybe<Scalars['String']['output']>;
@@ -2449,20 +2260,6 @@ export type PhasesPage = {
   message?: Maybe<Scalars['String']['output']>;
   totalItems?: Maybe<Scalars['Int']['output']>;
   totalPages?: Maybe<Scalars['Int']['output']>;
-};
-
-export type Proceeding = {
-  id?: Maybe<Scalars['ID']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  noveltyType?: Maybe<NoveltyType>;
-  proceedingFile?: Maybe<Scalars['String']['output']>;
-};
-
-export type ProceedingDto = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  noveltyType?: InputMaybe<NoveltyTypeDto>;
-  proceedingFile?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Process = {
@@ -2730,10 +2527,6 @@ export type Query = {
   allLearningOutcomesList?: Maybe<LearningOutcomePage>;
   allMacroRegions?: Maybe<PageResponseMacroRegionDto>;
   allMacroRegionsList?: Maybe<PageResponseMacroRegionDto>;
-  allNotification?: Maybe<NoticationAnswer>;
-  allNovelties?: Maybe<NoveltyPage>;
-  allNoveltyTypeList?: Maybe<NoveltyTypePage>;
-  allNoveltyTypes?: Maybe<NoveltyTypePage>;
   allOffers?: Maybe<OfferPage>;
   allOffersList?: Maybe<OfferPage>;
   allPermissions?: Maybe<PermissionPage>;
@@ -2785,7 +2578,6 @@ export type Query = {
   findAllStateProduct?: Maybe<StateProductPage>;
   findByIdAssignments?: Maybe<AssignmentsPage>;
   getByIdStateProduct?: Maybe<StateProductPage>;
-  getNotificationById?: Maybe<NoticationAnswer>;
   getProductCategoryById?: Maybe<ProductCategoryPage>;
   improvementPlanById?: Maybe<ImprovementPlanPageId>;
   juryById?: Maybe<JuriesPageId>;
@@ -2793,8 +2585,6 @@ export type Query = {
   justificationTypeById?: Maybe<JustificationTypePageId>;
   newFindAll?: Maybe<NewPage>;
   newFindById?: Maybe<NewPage>;
-  noveltiesByPerson?: Maybe<Array<Maybe<Novelty>>>;
-  noveltyById?: Maybe<NoveltyPage>;
   personById?: Maybe<PersonById>;
   productById?: Maybe<ProductPage>;
   stateAttendanceById?: Maybe<AttendanceStatePageId>;
@@ -2999,24 +2789,6 @@ export type QueryAllMacroRegionsArgs = {
 };
 
 
-export type QueryAllNotificationArgs = {
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type QueryAllNoveltiesArgs = {
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type QueryAllNoveltyTypesArgs = {
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
 export type QueryAllOffersArgs = {
   offerName?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -3209,6 +2981,13 @@ export type QueryFinalReportByIdArgs = {
 };
 
 
+export type QueryFindAllAssignmentsArgs = {
+  idAssignment?: InputMaybe<Scalars['Long']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryFindByIdAssignmentsArgs = {
   idAssignment?: InputMaybe<Scalars['Long']['input']>;
 };
@@ -3216,11 +2995,6 @@ export type QueryFindByIdAssignmentsArgs = {
 
 export type QueryGetByIdStateProductArgs = {
   idStateProduct?: InputMaybe<Scalars['Long']['input']>;
-};
-
-
-export type QueryGetNotificationByIdArgs = {
-  id: Scalars['String']['input'];
 };
 
 
@@ -3251,18 +3025,6 @@ export type QueryJustificationTypeByIdArgs = {
 
 export type QueryNewFindByIdArgs = {
   idNovelty?: InputMaybe<Scalars['Long']['input']>;
-};
-
-
-export type QueryNoveltiesByPersonArgs = {
-  page?: InputMaybe<Scalars['Int']['input']>;
-  personId: Scalars['ID']['input'];
-  size?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type QueryNoveltyByIdArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 
@@ -3647,17 +3409,6 @@ export type Document_Type = {
   id?: Maybe<Scalars['ID']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   state?: Maybe<Scalars['Boolean']['output']>;
-};
-
-/** 2. respuesta */
-export type NoticationAnswer = {
-  code?: Maybe<Scalars['String']['output']>;
-  currentPage?: Maybe<Scalars['Int']['output']>;
-  data?: Maybe<Array<Maybe<Notication>>>;
-  date?: Maybe<Scalars['String']['output']>;
-  message?: Maybe<Scalars['String']['output']>;
-  totalItems?: Maybe<Scalars['Int']['output']>;
-  totalPages?: Maybe<Scalars['Int']['output']>;
 };
 
 export type GetStateAttendanceQueryVariables = Exact<{

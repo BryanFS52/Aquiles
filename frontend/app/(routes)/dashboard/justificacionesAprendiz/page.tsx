@@ -5,8 +5,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { IoPeople } from "react-icons/io5";
 import { toast } from "react-toastify";
 import PageTitle from "@components/UI/pageTitle";
-import justificationTypeService from "@services/JustificationTypeService";
-import justificationService from "@services/justificationService";
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch, RootState } from '@/redux/store'
+import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
+import { fetchAttendancesByStudent } from '@slice/attendanceSlice'
+import { addJustification } from '@slice/justificationSlice';
 import {
   FaCalendarDay,
   FaRegClock,
@@ -39,8 +42,17 @@ const sessions = {
 };
 
 export default function JustificacionAprendiz() {
+  const dispatch = useDispatch<AppDispatch>();
   const [showForm, setShowForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { data: justificationTypesData, loading: loadingJustificationTypes, error: errorJustificationTypes } =
+    useSelector((state: RootState) => state.justificationType);
+  const { data: attendancesData, loading: loadingAttendances, error: errorAttendances } =
+    useSelector((state: RootState) => state.attendances);
+  const { loading: loadingJustification, error: errorJustification } =
+    useSelector((state: RootState) => state.justification);
+
   const [formData, setFormData] = useState<FormDataState>({
     justificationTypeId: { id: "" },
     numeroDocumento: "",
@@ -51,35 +63,15 @@ export default function JustificacionAprendiz() {
     notificationId: "123456",
   });
 
-  const [justificationTypes, setJustificationTypes] = useState<JustificationType[]>([]);
-  const [loadingTypes, setLoadingTypes] = useState(true);
   const fileInputRefPrev = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const loadTypes = async () => {
-      try {
-        setLoadingTypes(true);
-        const typesResponse = await justificationTypeService.getAll(0, 50);
+    dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
+    dispatch(fetchAttendancesByStudent({ id: 1, stateId: 2 }))
+  }, [dispatch]);
 
-        if (typesResponse && typesResponse.data && Array.isArray(typesResponse.data)) {
-          setJustificationTypes(typesResponse.data);
-        } else if (Array.isArray(typesResponse)) {
-          setJustificationTypes(typesResponse);
-        } else {
-          console.warn("Respuesta inesperada del servicio de tipos:", typesResponse);
-          setJustificationTypes([]);
-          toast.warning("No se pudieron cargar todos los tipos de justificación");
-        }
-      } catch (error) {
-        console.error("Error cargando tipos de justificación:", error);
-        toast.error("Error cargando tipos de justificación. Por favor, recarga la página.");
-        setJustificationTypes([]);
-      } finally {
-        setLoadingTypes(false);
-      }
-    };
-    loadTypes();
-  }, []);
+  if (loadingJustificationTypes || loadingAttendances) return <p>Cargando...</p>;
+  if (errorJustificationTypes || errorAttendances) return <p>Error cargando datos</p>;
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement>,
@@ -148,7 +140,7 @@ export default function JustificacionAprendiz() {
       return;
     }
 
-    const selectedType = justificationTypes.find((t) => t.id === formData.justificationTypeId.id);
+    const selectedType = justificationTypesData?.find((t: JustificationType) => t.id === formData.justificationTypeId.id);
     if (!selectedType) {
       toast.error("El tipo de justificación seleccionado no es válido.");
       return;
@@ -162,46 +154,17 @@ export default function JustificacionAprendiz() {
     setIsSubmitting(true);
 
     try {
-      const result = await justificationService.submitJustification(formData);
+      const result = await dispatch(addJustification(formData)).unwrap();
 
-      if (result) {
-        if (Object.prototype.hasOwnProperty.call(result, 'success')) {
-          if (result.success === true) {
-            toast.success(result.message || "¡Tu justificación ha sido enviada exitosamente!");
-            resetForm();
-          } else {
-            toast.error(result.message || "Error al enviar la justificación.");
-          }
-        } else if (result.status) {
-          if (result.status >= 200 && result.status < 300) {
-            toast.success(result.message || result.data?.message || "¡Tu justificación ha sido enviada exitosamente!");
-            resetForm();
-          } else {
-            toast.error(result.message || result.data?.message || "Error al enviar la justificación.");
-          }
-        } else if (result.message && result.message.toLowerCase().includes('éxito')) {
-          toast.success(result.message);
-          resetForm();
-        } else if (!result.error && !result.message?.toLowerCase().includes('error')) {
-          toast.success("¡Tu justificación ha sido enviada exitosamente!");
-          resetForm();
-        } else {
-          toast.error(result.message || "Error al enviar la justificación.");
-        }
-      } else {
-        toast.error("No se recibió respuesta del servidor.");
-      }
+      toast.success("¡Tu justificación ha sido enviada exitosamente!");
+      resetForm();
     } catch (error: any) {
       console.error("Error al enviar justificación:", error);
-      if (error.response) {
-        const errorMessage = error.response.data?.message ||
-          error.response.data?.error ||
-          `Error del servidor: ${error.response.status}`;
-        toast.error(errorMessage);
-      } else if (error.request) {
-        toast.error("Error de conexión. Verifica tu conexión a internet.");
+
+      if (error.message) {
+        toast.error(error.message);
       } else {
-        toast.error(error.message || "Error inesperado al enviar la justificación.");
+        toast.error("Error inesperado al enviar la justificación.");
       }
     } finally {
       setIsSubmitting(false);
@@ -357,13 +320,13 @@ export default function JustificacionAprendiz() {
                       }))
                     }
                     className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen"
-                    disabled={loadingTypes}
+                    disabled={loadingJustificationTypes}
                     required
                   >
                     <option value="" disabled hidden>
-                      {loadingTypes ? "Cargando tipos..." : "Seleccione el tipo"}
+                      {loadingJustificationTypes ? "Cargando tipos..." : "Seleccione el tipo"}
                     </option>
-                    {justificationTypes.map(({ id, name }) => (
+                    {justificationTypesData?.map(({ id, name }: JustificationType) => (
                       <option key={id} value={id}>
                         {name}
                       </option>
@@ -408,9 +371,9 @@ export default function JustificacionAprendiz() {
                   <button
                     type="submit"
                     className="px-6 py-3 bg-black dark:bg-lightGreen text-white rounded-lg hover:bg-lightGreen dark:hover:bg-darkGreen transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || loadingJustification}
                   >
-                    {isSubmitting ? "Enviando..." : "Enviar Justificación"}
+                    {isSubmitting || loadingJustification ? "Enviando..." : "Enviar Justificación"}
                   </button>
                 </div>
               </form>

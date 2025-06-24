@@ -15,13 +15,17 @@ const config: Config = {
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-        // Nuevos degradados personalizados
-        "blue-gradient": "linear-gradient(to right, #00304D, #005386)",
-        "green-gradient": "linear-gradient(to right, #398f0d, #84cc16)", // lime-500 ≈ #84cc16
+        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       colors: {
+        'primary': {
+          DEFAULT: '#398F0F',
+          light: '#84CC16',
+        },
+        'secondary': {
+          DEFAULT: '#00304D',
+          light: '#39A900',
+        },
         'darkBlue': '#005386',
         'shadowBlue': '#00304d',
         'lightGray': '#E4E4E5',
