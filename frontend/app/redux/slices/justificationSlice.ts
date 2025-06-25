@@ -34,6 +34,29 @@ interface FilterOptions {
     searchTerm: string;
 }
 
+// Nuevos tipos para el formulario
+interface JustificationType {
+    id: string;
+    name: string;
+}
+
+export interface FormDataState {
+    justificationTypeId: { id: string };
+    numeroDocumento: string;
+    nombreAprendiz: string;
+    descripcion: string;
+    justificacionFile: File | null;
+    justificacionFileBase64: string;
+    notificationId: string;
+}
+
+interface JustificationFormState {
+    showForm: boolean;
+    isSubmitting: boolean;
+    formData: FormDataState;
+    validationErrors: string[];
+}
+
 interface JustificationState extends ReturnType<typeof createInitialPaginatedState> {
     data: JustificationItem[];
     transformedData: TransformedJustificationItem[];
@@ -41,9 +64,10 @@ interface JustificationState extends ReturnType<typeof createInitialPaginatedSta
     filterOptions: FilterOptions;
     localCurrentPage: number;
     itemsPerPage: number;
+    form: JustificationFormState;
 }
 
-// Utilidades movidas al slice
+// Utilidades existentes
 const getMimeTypeFromBase64 = (base64: string): string => {
     if (!base64) return "application/octet-stream";
 
@@ -64,7 +88,6 @@ const getMimeTypeFromBase64 = (base64: string): string => {
             return signatures[key];
         }
     }
-
 
     return "application/octet-stream";
 };
@@ -123,7 +146,6 @@ const filterJustifications = (
 
     if (!searchTerm) return data;
 
-    // Si el filtro es "todo" o no se seleccionó ninguno, buscar en todos los campos
     if (!selectedFiltro || selectedFiltro === "todo") {
         return data.filter((j) =>
             j.programa.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -135,7 +157,6 @@ const filterJustifications = (
         );
     }
 
-    // Si hay un filtro específico, buscar solo en ese campo
     return data.filter((j) => {
         switch (selectedFiltro) {
             case "programa":
@@ -152,9 +173,55 @@ const filterJustifications = (
                 if (searchTerm === "true") return j.estado === "Activo";
                 if (searchTerm === "false") return j.estado === "Inactivo";
                 return true;
-                default:
+            default:
                 return true;
         }
+    });
+};
+
+// Nuevas funciones de validación
+const validateFormData = (formData: FormDataState): string[] => {
+    const errors: string[] = [];
+    if (!formData.numeroDocumento.trim()) errors.push("El número de documento es obligatorio");
+    if (!formData.nombreAprendiz.trim()) errors.push("El nombre del aprendiz es obligatorio");
+    if (!formData.descripcion.trim()) errors.push("La descripción es obligatoria");
+    if (!formData.justificationTypeId.id) errors.push("Debe seleccionar un tipo de novedad");
+    if (!formData.justificacionFile) errors.push("Debe adjuntar un archivo de justificación");
+    return errors;
+};
+
+const validateFileSize = (file: File): boolean => {
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    return file.size <= maxSize;
+};
+
+const validateFileType = (file: File): boolean => {
+    const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+    return validTypes.includes(file.type);
+};
+
+// Función para limpiar solo caracteres numéricos
+const cleanNumericInput = (value: string): string => {
+    return value.replace(/[^0-9]/g, "");
+};
+
+// Función para limpiar texto con caracteres especiales permitidos
+const cleanTextInput = (value: string): string => {
+    return value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]/g, "");
+};
+
+// Función para leer archivo como base64
+const readFileAsBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64 = (reader.result as string).split(",")[1];
+            resolve(base64);
+        };
+        reader.onerror = () => {
+            reject(new Error('Error al leer el archivo'));
+        };
+        reader.readAsDataURL(file);
     });
 };
 
@@ -182,8 +249,7 @@ export const formatErrorMessage = (error: any): string | null => {
 };
 
 // Thunks existentes
-export const fetchJustifications = createAsyncThunk<GetAllJustificationsQuery['allJustifications'], GetAllJustificationsQueryVariables
->(
+export const fetchJustifications = createAsyncThunk<GetAllJustificationsQuery['allJustifications'], GetAllJustificationsQueryVariables>(
     'justifications/fetchAll',
     async ({ page, size }) => {
         const { data } = await client.query<GetAllJustificationsQuery, GetAllJustificationsQueryVariables>({
@@ -195,8 +261,7 @@ export const fetchJustifications = createAsyncThunk<GetAllJustificationsQuery['a
     }
 );
 
-export const fetchJustificationById = createAsyncThunk<GetJustificationByIdQuery['justificationById'], GetJustificationByIdQueryVariables
->(
+export const fetchJustificationById = createAsyncThunk<GetJustificationByIdQuery['justificationById'], GetJustificationByIdQueryVariables>(
     'justifications/fetchById',
     async ({ id }) => {
         const { data } = await client.query<GetJustificationByIdQuery, GetJustificationByIdQueryVariables>({
@@ -275,7 +340,46 @@ export const deleteJustification = createAsyncThunk<string, string,
     }
 );
 
-// Estado inicial extendido
+// Nuevo thunk para procesar archivo
+export const processFile = createAsyncThunk<
+    { file: File; base64: string },
+    File,
+    { rejectValue: string }
+>(
+    'justifications/processFile',
+    async (file, { rejectWithValue }) => {
+        try {
+            // Validar tipo de archivo
+            if (!validateFileType(file)) {
+                return rejectWithValue('Solo se permiten archivos PDF, JPG o PNG');
+            }
+
+            // Validar tamaño de archivo
+            if (!validateFileSize(file)) {
+                return rejectWithValue('El archivo es demasiado grande. Máximo permitido: 5MB');
+            }
+
+            // Leer archivo como base64
+            const base64 = await readFileAsBase64(file);
+
+            return { file, base64 };
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Error al procesar el archivo');
+        }
+    }
+);
+
+// Estado inicial con formulario
+const initialFormData: FormDataState = {
+    justificationTypeId: { id: "" },
+    numeroDocumento: "",
+    nombreAprendiz: "",
+    descripcion: "",
+    justificacionFile: null,
+    justificacionFileBase64: "",
+    notificationId: "123456",
+};
+
 const initialState: JustificationState = {
     ...createInitialPaginatedState<JustificationItem>(),
     transformedData: [],
@@ -285,63 +389,113 @@ const initialState: JustificationState = {
         searchTerm: ""
     },
     localCurrentPage: 1,
-    itemsPerPage: 6
+    itemsPerPage: 6,
+    form: {
+        showForm: true,
+        isSubmitting: false,
+        formData: initialFormData,
+        validationErrors: []
+    }
 };
 
 const justificationSlice = createSlice({
     name: 'justifications',
     initialState,
     reducers: {
-        // Actualizar filtros
+        // Reducers existentes para filtros
         setFilterOptions: (state, action: PayloadAction<Partial<FilterOptions>>) => {
             state.filterOptions = { ...state.filterOptions, ...action.payload };
             state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
         },
 
-        // Limpiar filtros
         clearFilters: (state) => {
             state.filterOptions = { selectedFiltro: "", searchTerm: "" };
             state.filteredData = state.transformedData;
         },
 
-        // Actualizar página local
         setLocalCurrentPage: (state, action: PayloadAction<number>) => {
             state.localCurrentPage = action.payload;
         },
 
-        // Ir a página anterior
         goToPreviousPage: (state) => {
             state.localCurrentPage = Math.max(state.localCurrentPage - 1, 1);
         },
 
-        // Ir a página siguiente
         goToNextPage: (state) => {
             const maxPages = state.totalPages || 1;
             state.localCurrentPage = Math.min(state.localCurrentPage + 1, maxPages);
         },
 
-        // Actualizar items per page
         setItemsPerPage: (state, action: PayloadAction<number>) => {
             state.itemsPerPage = action.payload;
+        },
+
+        // Nuevos reducers para el formulario
+        showForm: (state) => {
+            state.form.showForm = true;
+        },
+
+        hideForm: (state) => {
+            state.form.showForm = false;
+        },
+
+        resetForm: (state) => {
+            state.form.showForm = false;
+            state.form.formData = initialFormData;
+            state.form.validationErrors = [];
+            state.form.isSubmitting = false;
+        },
+
+        updateFormField: (state, action: PayloadAction<{ field: keyof FormDataState; value: any }>) => {
+            const { field, value } = action.payload;
+            (state.form.formData as any)[field] = value;
+        },
+
+        updateNumericField: (state, action: PayloadAction<{ field: string; value: string }>) => {
+            const { field, value } = action.payload;
+            const cleanedValue = cleanNumericInput(value);
+            (state.form.formData as any)[field] = cleanedValue;
+        },
+
+        updateTextField: (state, action: PayloadAction<{ field: string; value: string }>) => {
+            const { field, value } = action.payload;
+            const cleanedValue = cleanTextInput(value);
+            (state.form.formData as any)[field] = cleanedValue;
+        },
+
+        updateJustificationTypeId: (state, action: PayloadAction<string>) => {
+            state.form.formData.justificationTypeId.id = action.payload;
+        },
+
+        setValidationErrors: (state, action: PayloadAction<string[]>) => {
+            state.form.validationErrors = action.payload;
+        },
+
+        clearValidationErrors: (state) => {
+            state.form.validationErrors = [];
+        },
+
+        setSubmitting: (state, action: PayloadAction<boolean>) => {
+            state.form.isSubmitting = action.payload;
+        },
+
+        validateForm: (state) => {
+            state.form.validationErrors = validateFormData(state.form.formData);
         }
     },
     extraReducers: (builder) => {
         builder
-            // fetchJustifications
+            // fetchJustifications - existente
             .addCase(fetchJustifications.pending, (state) => {
                 state.loading = true;
             })
             .addCase(fetchJustifications.fulfilled, (state, action: PayloadAction<GetAllJustificationsQuery['allJustifications']>) => {
                 if (action.payload?.data) {
-                    // Filtra nulls y transforma los datos
                     state.data = action.payload.data
                         .filter((item): item is NonNullable<typeof item> => item !== null)
                         .map(transformGraphQLToJustificationItem);
 
-                    // Transforma datos para el componente
                     state.transformedData = transformToComponentFormat(state.data);
-
-                    // Aplica filtros actuales
                     state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
 
                     state.totalItems = action.payload.totalItems ?? 0;
@@ -354,7 +508,7 @@ const justificationSlice = createSlice({
                 state.error = action.error.message || 'Error fetching justifications';
                 state.loading = false;
             })
-            // fetchJustificationById
+            // fetchJustificationById - existente
             .addCase(fetchJustificationById.pending, (state) => {
                 state.loading = true;
             })
@@ -372,22 +526,33 @@ const justificationSlice = createSlice({
                 state.error = { code, message };
                 state.loading = false;
             })
-            // addJustification
+            // addJustification - modificado para resetear formulario
+            .addCase(addJustification.pending, (state) => {
+                state.form.isSubmitting = true;
+                state.form.validationErrors = [];
+            })
             .addCase(addJustification.fulfilled, (state, action: PayloadAction<AddJustificationMutation['addJustification']>) => {
                 if (action.payload) {
                     const newJustification = transformGraphQLToJustificationItem(action.payload);
                     state.data.push(newJustification);
                     state.transformedData = transformToComponentFormat(state.data);
                     state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+
+                    // Resetear formulario después de éxito
+                    state.form.showForm = false;
+                    state.form.formData = initialFormData;
+                    state.form.validationErrors = [];
                 }
+                state.form.isSubmitting = false;
                 state.error = null;
             })
             .addCase(addJustification.rejected, (state, action) => {
                 const payload = action.payload as RejectedPayload;
                 const { code, message } = payload || {};
                 state.error = { code, message };
+                state.form.isSubmitting = false;
             })
-            // updateJustification
+            // updateJustification - existente
             .addCase(updateJustification.fulfilled, (state, action: PayloadAction<UpdateJustificationMutation['updateJustification']>) => {
                 if (action.payload) {
                     const updatedJustification = transformGraphQLToJustificationItem(action.payload);
@@ -405,7 +570,7 @@ const justificationSlice = createSlice({
                 const { code, message } = payload || {};
                 state.error = { code, message };
             })
-            // deleteJustification
+            // deleteJustification - existente
             .addCase(deleteJustification.fulfilled, (state, action: PayloadAction<string>) => {
                 if (action.payload) {
                     state.data = state.data.filter((justification: JustificationItem) => justification.id !== Number(action.payload));
@@ -423,12 +588,25 @@ const justificationSlice = createSlice({
 });
 
 export const {
+    // Existentes
     setFilterOptions,
     clearFilters,
     setLocalCurrentPage,
     goToPreviousPage,
     goToNextPage,
-    setItemsPerPage
+    setItemsPerPage,
+    // Nuevos
+    showForm,
+    hideForm,
+    resetForm,
+    updateFormField,
+    updateNumericField,
+    updateTextField,
+    updateJustificationTypeId,
+    setValidationErrors,
+    clearValidationErrors,
+    setSubmitting,
+    validateForm
 } = justificationSlice.actions;
 
 export default justificationSlice.reducer;
