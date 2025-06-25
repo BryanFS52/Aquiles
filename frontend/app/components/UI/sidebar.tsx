@@ -202,11 +202,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
                         font-semibold group hover:shadow-lg 
                         tracking-wide truncate relative overflow-hidden
                         before:absolute before:inset-0 before:-z-10 before:opacity-0 hover:before:opacity-100
-                        before:bg-gradient-to-r before:from-lime-600 before:to-lime-500
-                        dark:before:from-blue-900 dark:before:to-blue-800
+                        before:bg-gradient-to-r before:from-lime-600 before:to-lime-500 hover:text-white
                         ${isActive
                                                     ? 'before:opacity-100 bg-gradient-to-r from-lime-600 to-lime-500 dark:bg-gradient-to-r dark:from-shadowBlue dark:to-darkBlue  text-white shadow-md pl-4'
-                                                    : 'hover:bg-lime-200 dark:hover:bg-blue-900/30 hover:pl-4'}
+                                                    : 'dark:hover:bg-blue-900/30 hover:pl-4'}
                         text- dark:text-white
                       `}
                                             onClick={handleLinkClick}

@@ -72,21 +72,7 @@ export const Header: React.FC<HeaderProps> = ({ role: initialRole }) => {
   };
 
   return (
-    <header
-      className={`
-        w-full 
-        h-[9vh] min-h-[60px] max-h-[80px]
-        flex items-center justify-between 
-        px-4 sm:px-6 lg:px-8 xl:px-10
-        py-3 lg:py-4
-        shadow-md 
-        border border-darkGreen/30 dark:border-shadowBlue/60
-        bg-gradient-to-r from-lime-600 to-lime-500 
-        dark:bg-gradient-to-r dark:from-shadowBlue dark:to-darkBlue 
-        backdrop-blur-md 
-        transition-all duration-300
-        sticky top-0 z-30
-      `}
+    <header className="h-[7vh] md:h-[10vh] w-full flex items-center justify-between bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500"
     >
       {/* Espacio izquierdo */}
       <div className="flex-1"></div>
