@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, ChangeEvent, FormEvent } from "react";
+import { useRef, useEffect, ChangeEvent, FormEvent, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoPeople } from "react-icons/io5";
 import { toast } from "react-toastify";
@@ -29,6 +29,7 @@ import {
   FaRegClock,
   FaRegListAlt,
 } from "react-icons/fa";
+import JustificationsHistorical from "@/components/features/justification/justificationsHistorical";
 
 
 const sessions = {
@@ -45,6 +46,7 @@ export default function JustificacionAprendiz() {
   const fileRef = useRef<File | null>(null);
   const base64Ref = useRef<string>("");
 
+  const [loading, setLoading] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
   const fileInputRefPrev = useRef<HTMLInputElement>(null);
 
@@ -57,7 +59,8 @@ export default function JustificacionAprendiz() {
 
   useEffect(() => {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-    dispatch(fetchAttendancesByStudent({ id: 1, stateId: 2 }));
+    dispatch(fetchAttendancesByStudent({ id: 1, stateId: 1 }));
+    setLoading(false);
   }, [dispatch]);
 
   if (loadingJustificationTypes || loadingAttendances) return <p>Cargando...</p>;
@@ -141,6 +144,7 @@ export default function JustificacionAprendiz() {
         description: form.formData.descripcion,
         justificationFile: base64Ref.current,
         justificationDate: new Date().toISOString(),
+        state: true,
         justificationHistory: "",
         notificationId: form.formData.notificationId,
         justificationTypeId: { id: form.formData.justificationTypeId.id },
@@ -168,6 +172,14 @@ export default function JustificacionAprendiz() {
     toast.info("Formulario cancelado");
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black dark:border-white"></div>
+        <span className="ml-3 text-black dark:text-white">Cargando justificaciones...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full">
@@ -179,21 +191,28 @@ export default function JustificacionAprendiz() {
       {/* Contenido principal */}
       <AnimatePresence>
         {form.showForm && (
-          <JustificationFormComponent
-            form={form}
-            justificationTypesData={justificationTypesData}
-            loadingJustificationTypes={loadingJustificationTypes}
-            loadingJustification={loadingJustification}
-            handleSave={handleSave}
-            handleCancel={handleCancel}
-            handleInputChange={handleInputChange}
-            handleTextInputChange={handleTextInputChange}
-            handleNumericInputChange={handleNumericInputChange}
-            handleFileChange={handleFileChange}
-            updateJustificationTypeId={(value) => dispatch(updateJustificationTypeId(value))}
-            fileRef={fileRef}
-            fileInputRefPrev={fileInputRefPrev}
-          />
+          <div className="flex flex-col lg:flex-row gap-6 w-full">
+            <div className="w-full lg:w-1/2">
+              <JustificationFormComponent
+                form={form}
+                justificationTypesData={justificationTypesData}
+                loadingJustificationTypes={loadingJustificationTypes}
+                loadingJustification={loadingJustification}
+                handleSave={handleSave}
+                handleCancel={handleCancel}
+                handleInputChange={handleInputChange}
+                handleTextInputChange={handleTextInputChange}
+                handleNumericInputChange={handleNumericInputChange}
+                handleFileChange={handleFileChange}
+                updateJustificationTypeId={(value) => dispatch(updateJustificationTypeId(value))}
+                fileRef={fileRef}
+                fileInputRefPrev={fileInputRefPrev}
+              />
+            </div>
+            <div className="w-full lg:w-1/2">
+              <JustificationsHistorical />
+            </div>
+          </div>
         )}
       </AnimatePresence>
     </div>

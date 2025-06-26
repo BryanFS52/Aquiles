@@ -1,20 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from 'react-redux';
-import type { AppDispatch, RootState } from '@/redux/store';
-import { motion } from "framer-motion";
-import { 
-  FaDownload, 
-  FaEye, 
-  FaCheckCircle, 
-  FaTimesCircle, 
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FaDownload,
+  FaEye,
+  FaCheckCircle,
+  FaTimesCircle,
   FaClock,
-  FaCalendarAlt,
-  FaFileAlt 
+  FaFileAlt,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
+// Interfaz de justificación
 interface Justification {
   id: string;
   tipoNovedad: string;
@@ -29,68 +29,56 @@ interface Justification {
   nombreAprendiz: string;
 }
 
-// Datos de ejemplo - esto normalmente vendría de Redux/API
+// Datos de prueba
 const mockJustifications: Justification[] = [
-//   {
-//     id: "1",
-//     tipoNovedad: "Incapacidad médica",
-//     fechaJustificacion: "2024-01-15",
-//     descripcion: "Incapacidad por gripe común",
-//     nombreArchivo: "incapacidad_medica.pdf",
-//     archivoUrl: "/documents/incapacidad_medica.pdf",
-//     estado: "APROBADA",
-//     fechaRespuesta: "2024-01-16",
-//     numeroDocumento: "1234567890",
-//     nombreAprendiz: "Juan Pérez"
-//   },
-//   {
-//     id: "2",
-//     tipoNovedad: "Calamidad doméstica",
-//     fechaJustificacion: "2024-01-20",
-//     descripcion: "Emergencia familiar",
-//     nombreArchivo: "calamidad_domestica.jpg",
-//     archivoUrl: "/documents/calamidad_domestica.jpg",
-//     estado: "PENDIENTE",
-//     numeroDocumento: "1234567890",
-//     nombreAprendiz: "Juan Pérez"
-//   },
-//   {
-//     id: "3",
-//     tipoNovedad: "Cita médica",
-//     fechaJustificacion: "2024-01-25",
-//     descripcion: "Cita médica especializada",
-//     nombreArchivo: "cita_medica.pdf",
-//     archivoUrl: "/documents/cita_medica.pdf",
-//     estado: "RECHAZADA",
-//     fechaRespuesta: "2024-01-26",
-//     observaciones: "Documento no legible",
-//     numeroDocumento: "1234567890",
-//     nombreAprendiz: "Juan Pérez"
-//   }
+  // puedes descomentar estas justificaciones para pruebas
+  //   {
+  //     id: "1",
+  //     tipoNovedad: "Incapacidad médica",
+  //     fechaJustificacion: "2024-01-15",
+  //     descripcion: "Incapacidad por gripe común",
+  //     nombreArchivo: "incapacidad_medica.pdf",
+  //     archivoUrl: "/documents/incapacidad_medica.pdf",
+  //     estado: "APROBADA",
+  //     fechaRespuesta: "2024-01-16",
+  //     numeroDocumento: "1234567890",
+  //     nombreAprendiz: "Juan Pérez"
+  //   },
+  //   {
+  //     id: "2",
+  //     tipoNovedad: "Calamidad doméstica",
+  //     fechaJustificacion: "2024-01-20",
+  //     descripcion: "Emergencia familiar",
+  //     nombreArchivo: "calamidad_domestica.jpg",
+  //     archivoUrl: "/documents/calamidad_domestica.jpg",
+  //     estado: "PENDIENTE",
+  //     numeroDocumento: "1234567890",
+  //     nombreAprendiz: "Juan Pérez"
+  //   },
+  //   {
+  //     id: "3",
+  //     tipoNovedad: "Cita médica",
+  //     fechaJustificacion: "2024-01-25",
+  //     descripcion: "Cita médica especializada",
+  //     nombreArchivo: "cita_medica.pdf",
+  //     archivoUrl: "/documents/cita_medica.pdf",
+  //     estado: "RECHAZADA",
+  //     fechaRespuesta: "2024-01-26",
+  //     observaciones: "Documento no legible",
+  //     numeroDocumento: "1234567890",
+  //     nombreAprendiz: "Juan Pérez"
+  //   }
 ];
 
 export default function JustificationsHistorical() {
-  const dispatch = useDispatch<AppDispatch>();
-  const [justifications, setJustifications] = useState<Justification[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedJustification, setSelectedJustification] = useState<Justification | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  // Aquí normalmente obtendrías los datos del store de Redux
-  // const { data: justificationsData, loading, error } = useSelector((state: RootState) => state.justifications);
+  const justifications = useSelector((state: RootState) => state.justification.transformedData);
+  const loading = useSelector((state: RootState) => state.justification.loading);
 
-  useEffect(() => {
-    // Simular carga de datos
-    setTimeout(() => {
-      setJustifications(mockJustifications);
-      setLoading(false);
-    }, 1000);
 
-    // Aquí normalmente harías el dispatch para obtener las justificaciones
-    // dispatch(fetchJustificationsByStudent(studentId));
-  }, [dispatch]);
-
-  const getStatusColor = (estado: string) => {
+  const getStatusColor = (estado: Justification["estado"]) => {
     switch (estado) {
       case 'APROBADA':
         return 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30';
@@ -98,36 +86,31 @@ export default function JustificationsHistorical() {
         return 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30';
       case 'PENDIENTE':
         return 'text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30';
-      default:
-        return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-900/30';
     }
   };
 
-  const getStatusIcon = (estado: string) => {
+  const getStatusIcon = (estado: Justification["estado"]) => {
     switch (estado) {
       case 'APROBADA':
         return <FaCheckCircle className="w-4 h-4" />;
       case 'RECHAZADA':
         return <FaTimesCircle className="w-4 h-4" />;
       case 'PENDIENTE':
-        return <FaClock className="w-4 h-4" />;
       default:
         return <FaClock className="w-4 h-4" />;
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-CO', {
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('es-CO', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
-  };
 
   const handleDownloadFile = (justification: Justification) => {
-    // Aquí implementarías la lógica para descargar el archivo
     toast.info(`Descargando ${justification.nombreArchivo}...`);
-    // window.open(justification.archivoUrl, '_blank');
+    // Aquí puedes usar: window.open(justification.archivoUrl, '_blank');
   };
 
   const handleViewDetails = (justification: Justification) => {
@@ -140,17 +123,8 @@ export default function JustificationsHistorical() {
     setSelectedJustification(null);
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black dark:border-white"></div>
-        <span className="ml-3 text-black dark:text-white">Cargando justificaciones...</span>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-fulljustify-end gap-4 pt-6 border-t border-lightGray dark:border-darkGray">
+    <div className="w-full max-w-4xl bg-white dark:bg-shadowBlue p-6 lg:p-8 rounded-xl shadow-sm border border-lightGray dark:border-darkGray">
       <div className="mb-6">
         <h2 className="text-2xl font-semibold text-black dark:text-white mb-2">
           Historial de Justificaciones
@@ -160,18 +134,18 @@ export default function JustificationsHistorical() {
         </p>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-lightGray dark:border-darkGray shadow-sm">
-        <table className="w-full text-sm text-left text-black dark:text-white bg-white dark:bg-shadowBlue">
+      <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+        <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
           <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700 text-black dark:text-white">
             <tr>
               <th className="px-6 py-4 font-medium">Tipo de Novedad</th>
               <th className="px-6 py-4 font-medium">Fecha de Justificación</th>
               <th className="px-6 py-4 font-medium">Archivo</th>
               <th className="px-6 py-4 font-medium">Estado</th>
-              <th className="px-6 py-4 font-medium">Acciones</th>
+              {/* <th className="px-6 py-4 font-medium">Acciones</th> */}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {justifications.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-8 text-center text-darkGray dark:text-lightGray">
@@ -189,51 +163,43 @@ export default function JustificationsHistorical() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.1 }}
-                  className="border-b border-lightGray dark:border-darkGray hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-black dark:text-white">
-                      {justification.tipoNovedad}
-                    </div>
+                  <td className="px-6 py-4 text-black dark:text-white font-medium">
+                    {justification.tipoNovedad}
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center text-darkGray dark:text-lightGray">
-                      <FaCalendarAlt className="w-4 h-4 mr-2" />
-                      {formatDate(justification.fechaJustificacion)}
-                    </div>
-                  </td>
+                  <td className="px-6 py-4">{formatDate(justification.fecha)}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <FaFileAlt className="w-4 h-4 mr-2 text-darkGray dark:text-lightGray" />
-                      <span className="text-darkGray dark:text-lightGray truncate max-w-32">
-                        {justification.nombreArchivo}
-                      </span>
+                      <span className="truncate max-w-32">{justification.archivoAdjunto}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(justification.estado)}`}>
-                      {getStatusIcon(justification.estado)}
-                      <span className="ml-1">{justification.estado}</span>
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
+              <td className="px-6 py-4">
+                <span
+                  className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      justification.estado === "APOROBADA"
+                      ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                      : justification.estado === "PENDIENTE"
+                      ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
+                      : justification.estado === "RECHAZADA"
+                      ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                      : ""
+                  }`}
+                >
+                  {justification.estado}
+                </span>
+              </td>
+                  {/* <td className="px-6 py-4">
                     <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleViewDetails(justification)}
-                        className="p-2 text-black dark:text-white hover:bg-lightGray dark:hover:bg-darkGray rounded-lg transition-colors"
-                        title="Ver detalles"
-                      >
-                        <FaEye className="w-4 h-4" />
+                      <button onClick={() => handleViewDetails(justification)} title="Ver detalles">
+                        <FaEye className="w-4 h-4 text-black dark:text-white hover:text-blue-600" />
                       </button>
-                      <button
-                        onClick={() => handleDownloadFile(justification)}
-                        className="p-2 text-black dark:text-white hover:bg-lightGray dark:hover:bg-darkGray rounded-lg transition-colors"
-                        title="Descargar archivo"
-                      >
-                        <FaDownload className="w-4 h-4" />
+                      <button onClick={() => handleDownloadFile(justification)} title="Descargar archivo">
+                        <FaDownload className="w-4 h-4 text-black dark:text-white hover:text-green-600" />
                       </button>
                     </div>
-                  </td>
+                  </td> */}
                 </motion.tr>
               ))
             )}
@@ -241,114 +207,75 @@ export default function JustificationsHistorical() {
         </table>
       </div>
 
-      {/* Modal de detalles */}
-      {showModal && selectedJustification && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      {/* Modal con AnimatePresence */}
+      <AnimatePresence>
+        {showModal && selectedJustification && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-white dark:bg-shadowBlue rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={closeModal}
           >
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-semibold text-black dark:text-white">
-                  Detalles de la Justificación
-                </h3>
-                <button
-                  onClick={closeModal}
-                  className="text-darkGray dark:text-lightGray hover:text-black dark:hover:text-white"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-darkGray dark:text-lightGray">
-                    Tipo de Novedad
-                  </label>
-                  <p className="text-black dark:text-white">{selectedJustification.tipoNovedad}</p>
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="bg-white dark:bg-shadowBlue rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro
+            >
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-semibold text-black dark:text-white">
+                    Detalles de la Justificación
+                  </h3>
+                  <button
+                    onClick={closeModal}
+                    className="text-darkGray dark:text-lightGray hover:text-black dark:hover:text-white"
+                  >
+                    ✕
+                  </button>
                 </div>
 
-                <div>
-                  <label className="text-sm font-medium text-darkGray dark:text-lightGray">
-                    Fecha de Justificación
-                  </label>
-                  <p className="text-black dark:text-white">
-                    {formatDate(selectedJustification.fechaJustificacion)}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-darkGray dark:text-lightGray">
-                    Descripción
-                  </label>
-                  <p className="text-black dark:text-white">{selectedJustification.descripcion}</p>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-darkGray dark:text-lightGray">
-                    Estado
-                  </label>
-                  <div className="mt-1">
+                <div className="space-y-4">
+                  <p><strong>Tipo:</strong> {selectedJustification.tipoNovedad}</p>
+                  <p><strong>Fecha:</strong> {formatDate(selectedJustification.fechaJustificacion)}</p>
+                  <p><strong>Descripción:</strong> {selectedJustification.descripcion}</p>
+                  <p>
+                    <strong>Estado:</strong>{' '}
                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedJustification.estado)}`}>
                       {getStatusIcon(selectedJustification.estado)}
                       <span className="ml-1">{selectedJustification.estado}</span>
                     </span>
-                  </div>
-                </div>
+                  </p>
 
-                {selectedJustification.fechaRespuesta && (
-                  <div>
-                    <label className="text-sm font-medium text-darkGray dark:text-lightGray">
-                      Fecha de Respuesta
-                    </label>
-                    <p className="text-black dark:text-white">
-                      {formatDate(selectedJustification.fechaRespuesta)}
-                    </p>
-                  </div>
-                )}
-
-                {selectedJustification.observaciones && (
-                  <div>
-                    <label className="text-sm font-medium text-darkGray dark:text-lightGray">
-                      Observaciones
-                    </label>
-                    <p className="text-black dark:text-white">{selectedJustification.observaciones}</p>
-                  </div>
-                )}
-
-                <div>
-                  <label className="text-sm font-medium text-darkGray dark:text-lightGray">
-                    Archivo Adjunto
-                  </label>
-                  <div className="flex items-center justify-between mt-1 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                    <span className="text-black dark:text-white text-sm">
-                      {selectedJustification.nombreArchivo}
-                    </span>
-                    <button
-                      onClick={() => handleDownloadFile(selectedJustification)}
-                      className="text-black dark:text-white hover:text-lightGreen dark:hover:text-lightGreen"
-                    >
-                      <FaDownload className="w-4 h-4" />
+                  {selectedJustification.fechaRespuesta && (
+                    <p><strong>Respuesta:</strong> {formatDate(selectedJustification.fechaRespuesta)}</p>
+                  )}
+                  {selectedJustification.observaciones && (
+                    <p><strong>Observaciones:</strong> {selectedJustification.observaciones}</p>
+                  )}
+                  <div className="flex justify-between items-center mt-4 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                    <span>{selectedJustification.nombreArchivo}</span>
+                    <button onClick={() => handleDownloadFile(selectedJustification)}>
+                      <FaDownload className="w-4 h-4 text-black dark:text-white" />
                     </button>
                   </div>
                 </div>
-              </div>
 
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={closeModal}
-                  className="px-4 py-2 bg-black dark:bg-lightGreen text-white rounded-lg hover:bg-lightGreen dark:hover:bg-darkGreen transition-colors"
-                >
-                  Cerrar
-                </button>
+                <div className="mt-6 flex justify-end">
+                  <button
+                    onClick={closeModal}
+                    className="px-4 py-2 bg-black dark:bg-lightGreen text-white rounded-lg hover:bg-lightGreen dark:hover:bg-darkGreen"
+                  >
+                    Cerrar
+                  </button>
+                </div>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 }

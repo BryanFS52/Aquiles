@@ -18,6 +18,7 @@ import {
 
 // Tipos para el estado extendido
 interface TransformedJustificationItem {
+    tipoNovedad: ReactNode
     id: number;
     programa: string;
     ficha: string;
