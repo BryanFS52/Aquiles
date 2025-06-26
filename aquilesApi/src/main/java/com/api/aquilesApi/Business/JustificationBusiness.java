@@ -1,8 +1,12 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.JustificationDto;
+import com.api.aquilesApi.Entity.AttendanceEntity;
 import com.api.aquilesApi.Entity.JustificationEntity;
+import com.api.aquilesApi.Entity.JustificationTypeEntity;
+import com.api.aquilesApi.Service.AttendancesService;
 import com.api.aquilesApi.Service.JustificationService;
+import com.api.aquilesApi.Service.JustificationTypeService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
@@ -14,10 +18,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class JustificationBusiness {
     private final JustificationService justificationService;
+    private final AttendancesService attendancesService;
+    private final JustificationTypeService justificationTypeService;
     private final ModelMapper modelMapper = new ModelMapper();
 
-    public JustificationBusiness(JustificationService justificationService) {
+    public JustificationBusiness(JustificationService justificationService, AttendancesService attendancesService, JustificationTypeService justificationTypeService) {
         this.justificationService = justificationService;
+        this.attendancesService = attendancesService;
+        this.justificationTypeService = justificationTypeService;
     }
     // Validación Objeto
 
@@ -55,7 +63,16 @@ public class JustificationBusiness {
     // Add
     public JustificationDto add(JustificationDto justificationDto) {
         try {
-            JustificationEntity justificationEntity = modelMapper.map(justificationDto, JustificationEntity.class);
+            JustificationEntity justificationEntity = new JustificationEntity();
+            justificationEntity.setJustificationDate(justificationDto.getJustificationDate());
+            AttendanceEntity attendance = attendancesService.getById(justificationDto.getAttendance().getId());
+            JustificationTypeEntity justificationType = justificationTypeService.getById(justificationDto.getJustificationTypeId().getId());
+            justificationEntity.setAttendance(attendance);
+            justificationEntity.setDescription(justificationDto.getDescription());
+            justificationEntity.setJustificationFile(justificationDto.getJustificationFile());
+            justificationEntity.setJustificationDate(justificationDto.getJustificationDate());
+            justificationEntity.setState(justificationDto.getState());
+            justificationEntity.setJustificationTypeId(justificationType);
             return modelMapper.map(justificationService.save(justificationEntity), JustificationDto.class);
         }catch ( Exception e){
             throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);
@@ -63,6 +80,7 @@ public class JustificationBusiness {
     }
 
     // Update
+    
     public void update(Long id, JustificationDto justificationDto) {
         try {
             justificationDto.setId(id);

@@ -91,9 +91,8 @@ export type AssignmentsDto = {
   AssignmentState?: InputMaybe<AssignmentState>;
   assignmentState?: InputMaybe<AssignmentState>;
   dateAssignment?: InputMaybe<Scalars['String']['input']>;
-  descriptionAssignment?: InputMaybe<Scalars['String']['input']>;
+  descriptionAssignment?: InputMaybe<Scalars['Int']['input']>;
   idAssignment?: InputMaybe<Scalars['ID']['input']>;
-  person?: InputMaybe<Scalars['Long']['input']>;
   product?: InputMaybe<ProductDto>;
 };
 
@@ -161,6 +160,7 @@ export type AttendanceStatePageId = {
 export type AttendancesDto = {
   attendanceDate?: InputMaybe<Scalars['String']['input']>;
   attendanceState?: InputMaybe<AttendanceStateDto>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   studentId?: InputMaybe<Scalars['Long']['input']>;
   studySheetQuarter?: InputMaybe<Scalars['Long']['input']>;
 };
@@ -880,28 +880,24 @@ export type JuriesPageId = {
 };
 
 export type Justification = {
+  attendance?: Maybe<Attendance>;
   description?: Maybe<Scalars['String']['output']>;
-  documentNumber?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   justificationDate?: Maybe<Scalars['String']['output']>;
   justificationFile?: Maybe<Scalars['String']['output']>;
-  justificationHistory?: Maybe<Scalars['String']['output']>;
   justificationType?: Maybe<JustificationType>;
   name?: Maybe<Scalars['String']['output']>;
-  notificationId?: Maybe<Scalars['ID']['output']>;
   state?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type JustificationDto = {
+  attendance?: InputMaybe<AttendancesDto>;
   description?: InputMaybe<Scalars['String']['input']>;
-  documentNumber?: InputMaybe<Scalars['String']['input']>;
   justificationDate?: InputMaybe<Scalars['String']['input']>;
   justificationFile?: InputMaybe<Scalars['String']['input']>;
-  justificationHistory?: InputMaybe<Scalars['String']['input']>;
   justificationTypeId?: InputMaybe<JustificationTypeDto>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  notificationId?: InputMaybe<Scalars['ID']['input']>;
   state?: InputMaybe<Scalars['Boolean']['input']>;
+  studentId?: InputMaybe<Scalars['Long']['input']>;
 };
 
 export type JustificationPage = {
@@ -2264,6 +2260,7 @@ export type PhasesPage = {
 
 export type Process = {
   description?: Maybe<Scalars['String']['output']>;
+  functionName?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   processDetail?: Maybe<Array<Maybe<ProcessDetail>>>;
@@ -2272,6 +2269,7 @@ export type Process = {
 
 export type ProcessDto = {
   description?: InputMaybe<Scalars['String']['input']>;
+  functionName?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   state?: InputMaybe<Scalars['Boolean']['input']>;
@@ -2481,13 +2479,14 @@ export type QuarterPage = {
 };
 
 export type Query = {
-  FindAllCategories?: Maybe<ProductCategoryPage>;
   allAdministrative?: Maybe<AdministrativePage>;
   allAdministrativeList?: Maybe<AdministrativePage>;
   allAdministrativeTypes?: Maybe<AdministrativeTypePage>;
   allAdministrativeTypesList?: Maybe<AdministrativeTypePage>;
+  allAssignments?: Maybe<AssignmentsPage>;
   allAttendances?: Maybe<AttendancePage>;
   allAttendancesByStudentId?: Maybe<AttendancePage>;
+  allCategories?: Maybe<ProductCategoryPage>;
   allChecklists?: Maybe<ChecklistPage>;
   allClassType?: Maybe<ClassTypePage>;
   allClassTypeList?: Maybe<ClassTypePage>;
@@ -2539,7 +2538,7 @@ export type Query = {
   allProcessDetailsList?: Maybe<ProcessDetailPage>;
   allProcesses?: Maybe<ProcessPage>;
   allProcessesList?: Maybe<ProcessPage>;
-  allProduct?: Maybe<ProductPage>;
+  allProducts?: Maybe<ProductPage>;
   allPrograms?: Maybe<ProgramPage>;
   allProgramsList?: Maybe<ProgramPage>;
   allProjectActivities?: Maybe<ProjectActivityPage>;
@@ -2574,7 +2573,6 @@ export type Query = {
   attendanceById?: Maybe<AttendancePageId>;
   checklistById?: Maybe<ChecklistPageId>;
   finalReportById?: Maybe<FinalReportPageId>;
-  findAllAssignments?: Maybe<AssignmentsPage>;
   findAllStateProduct?: Maybe<StateProductPage>;
   findByIdAssignments?: Maybe<AssignmentsPage>;
   getByIdStateProduct?: Maybe<StateProductPage>;
@@ -2593,13 +2591,6 @@ export type Query = {
 };
 
 
-export type QueryFindAllCategoriesArgs = {
-  nameCategory?: InputMaybe<Scalars['String']['input']>;
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
 export type QueryAllAdministrativeArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   personName?: InputMaybe<Scalars['String']['input']>;
@@ -2609,6 +2600,12 @@ export type QueryAllAdministrativeArgs = {
 
 export type QueryAllAdministrativeTypesArgs = {
   administrativeTypeName?: InputMaybe<Scalars['String']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAllAssignmentsArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -2833,8 +2830,8 @@ export type QueryAllProcessesArgs = {
 };
 
 
-export type QueryAllProductArgs = {
-  nameProduct?: InputMaybe<Scalars['String']['input']>;
+export type QueryAllProductsArgs = {
+  name?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -2978,13 +2975,6 @@ export type QueryChecklistByIdArgs = {
 
 export type QueryFinalReportByIdArgs = {
   id: Scalars['Long']['input'];
-};
-
-
-export type QueryFindAllAssignmentsArgs = {
-  idAssignment?: InputMaybe<Scalars['Long']['input']>;
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -3601,14 +3591,14 @@ export type GetAllJustificationsQueryVariables = Exact<{
 }>;
 
 
-export type GetAllJustificationsQuery = { allJustifications?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, documentNumber?: string | null, name?: string | null, description?: string | null, justificationFile?: string | null, justificationDate?: string | null, justificationHistory?: string | null, state?: boolean | null, justificationType?: { id: string, name?: string | null } | null } | null> | null } | null };
+export type GetAllJustificationsQuery = { allJustifications?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, description?: string | null, justificationFile?: string | null, justificationDate?: string | null, state?: boolean | null, justificationType?: { id: string, name?: string | null } | null } | null> | null } | null };
 
 export type GetJustificationByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
 
 
-export type GetJustificationByIdQuery = { justificationById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id: string, documentNumber?: string | null, name?: string | null, description?: string | null, justificationFile?: string | null, justificationDate?: string | null, justificationHistory?: string | null, state?: boolean | null, notificationId?: string | null, justificationType?: { id: string, name?: string | null } | null } | null } | null };
+export type GetJustificationByIdQuery = { justificationById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id: string, description?: string | null, justificationFile?: string | null, justificationDate?: string | null, state?: boolean | null, justificationType?: { id: string, name?: string | null } | null } | null } | null };
 
 export type AddJustificationMutationVariables = Exact<{
   input: JustificationDto;
@@ -4752,12 +4742,9 @@ export const GetAllJustificationsDocument = gql`
     currentPage
     data {
       id
-      documentNumber
-      name
       description
       justificationFile
       justificationDate
-      justificationHistory
       state
       justificationType {
         id
@@ -4809,14 +4796,10 @@ export const GetJustificationByIdDocument = gql`
     date
     data {
       id
-      documentNumber
-      name
       description
       justificationFile
       justificationDate
-      justificationHistory
       state
-      notificationId
       justificationType {
         id
         name

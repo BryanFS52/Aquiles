@@ -12,12 +12,9 @@ export const GET_ALL_JUSTIFICATIONS = gql`
       currentPage
       data {
         id
-        documentNumber
-        name
         description
         justificationFile
         justificationDate
-        justificationHistory
         state
         justificationType {
           id
@@ -36,14 +33,10 @@ export const GET_JUSTIFICATION_BY_ID = gql`
       date
       data {
         id
-        documentNumber
-        name
         description
         justificationFile
         justificationDate
-        justificationHistory
         state
-        notificationId
         justificationType {
           id
           name

@@ -6,8 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -19,12 +20,7 @@ public class JustificationEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Columns
-    @Column(name = "documentNumber", nullable = false)
-    private String documentNumber;
 
-    @Column(name = "name", nullable = false)
-    private String name;
 
     @Column(name = "description")
     private String description;
@@ -34,14 +30,10 @@ public class JustificationEntity implements Serializable {
     private byte[] justificationFile;
 
     @Column(name = "justification_date", nullable = false)
-    private Date justificationDate;
+    private LocalDate justificationDate;
 
     @Column(name = "state", nullable = false)
     private Boolean state;
-
-    /// TABLA INTERMEDIA OK????
-    @Column(name = "justification_history", nullable = false)
-    private String justificationHistory;
 
     // Relations
     // 1.Relation (1-1) con notifications
@@ -51,7 +43,7 @@ public class JustificationEntity implements Serializable {
     // 2.Relation (M-1) con justificationType
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "justification_type_id", nullable = true)
-    private JustificationTypeEntity type;
+    private JustificationTypeEntity justificationTypeId;
 
     // 3. Relation (1-1) con attendance
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -65,4 +57,11 @@ public class JustificationEntity implements Serializable {
     public void setJustificationFile(String justificationFile) {
         this.justificationFile = Base64.getDecoder().decode(justificationFile);
     }
+
+    public void setJustificationDate(String justificationDateString) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        this.justificationDate = LocalDate.parse(justificationDateString);
+    }
+
 }

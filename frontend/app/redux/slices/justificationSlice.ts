@@ -21,8 +21,6 @@ interface TransformedJustificationItem {
     id: number;
     programa: string;
     ficha: string;
-    documento: string;
-    aprendiz: string;
     fecha: string;
     estado: string;
     archivoAdjunto: string;
@@ -109,12 +107,8 @@ const transformGraphQLToJustificationItem = (graphqlData: any): JustificationIte
         id: graphqlData.justificationId || graphqlData.id,
         description: graphqlData.description,
         justificationDate: graphqlData.justificationDate,
-        name: graphqlData.name,
-        documentNumber: graphqlData.documentNumber,
         justificationFile: graphqlData.justificationFile,
-        justificationHistory: graphqlData.justificationHistory,
         state: graphqlData.state,
-        notificationId: graphqlData.notificationId,
         justificationType: graphqlData.justificationType ? {
             id: graphqlData.justificationType.id,
             name: graphqlData.justificationType.name
@@ -127,9 +121,7 @@ const transformToComponentFormat = (justifications: JustificationItem[]): Transf
     return justifications.map((j) => ({
         id: j.id,
         programa: j.justificationType?.name || "Sin programa",
-        ficha: j.notificationId || "N/A",
-        documento: j.documentNumber,
-        aprendiz: j.name,
+        ficha: j.justificationType?.id ? j.justificationType.id.toString() : "Sin ficha",
         fecha: new Date(j.justificationDate).toLocaleDateString("es-CO"),
         estado: j.state ? "Activo" : "Inactivo",
         archivoAdjunto: j.justificationFile,
@@ -150,8 +142,6 @@ const filterJustifications = (
         return data.filter((j) =>
             j.programa.toLowerCase().includes(searchTerm.toLowerCase()) ||
             j.ficha.toString().includes(searchTerm) ||
-            j.documento.includes(searchTerm) ||
-            j.aprendiz.toLowerCase().includes(searchTerm.toLowerCase()) ||
             j.fecha.includes(searchTerm) ||
             j.estado.toLowerCase().includes(searchTerm.toLowerCase())
         );
@@ -163,10 +153,6 @@ const filterJustifications = (
                 return j.programa.toLowerCase().includes(searchTerm.toLowerCase());
             case "ficha":
                 return j.ficha.toString().includes(searchTerm);
-            case "documento":
-                return j.documento.includes(searchTerm);
-            case "aprendiz":
-                return j.aprendiz.toLowerCase().includes(searchTerm.toLowerCase());
             case "fecha":
                 return j.fecha.includes(searchTerm);
             case "estado":
@@ -391,7 +377,7 @@ const initialState: JustificationState = {
     localCurrentPage: 1,
     itemsPerPage: 6,
     form: {
-        showForm: true,
+        showForm: false,
         isSubmitting: false,
         formData: initialFormData,
         validationErrors: []
@@ -588,14 +574,12 @@ const justificationSlice = createSlice({
 });
 
 export const {
-    // Existentes
     setFilterOptions,
     clearFilters,
     setLocalCurrentPage,
     goToPreviousPage,
     goToNextPage,
     setItemsPerPage,
-    // Nuevos
     showForm,
     hideForm,
     resetForm,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, ChangeEvent, FormEvent } from "react";
+import { useRef, useEffect, useState, ChangeEvent, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoPeople } from "react-icons/io5";
 import { toast } from "react-toastify";
@@ -8,8 +8,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
 import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
 import type { AppDispatch, RootState } from '@/redux/store'
+import type { FormDataState } from '@slice/justificationSlice';
+import type { AttendanceItem } from '@type/slices/attendance';
 import PageTitle from "@components/UI/pageTitle";
-import JustificationFormComponent from '@/components/features/justification/justificationForm';
+import JustificationFormComponent from '@components/features/justification/justificationForm';
 
 import {
   showForm,
@@ -18,40 +20,32 @@ import {
   updateNumericField,
   updateTextField,
   updateJustificationTypeId,
-  processFile,
   addJustification,
   validateForm,
   setSubmitting,
 } from '@slice/justificationSlice';
-import type { FormDataState } from '@slice/justificationSlice';
 import {
   FaCalendarDay,
-  FaRegClock,
   FaRegListAlt,
+  FaCheckCircle,
 } from "react-icons/fa";
-
-
-const sessions = {
-  "1": {
-    componentName: "Nombre del Componente",
-    date: "01/09/2024",
-    time: "10:00 AM",
-    sheet: "Ficha 12345",
-    instructors: ["Instructor 1", "Instructor 2"],
-  },
-};
 
 export default function JustificacionAprendiz() {
   const fileRef = useRef<File | null>(null);
   const base64Ref = useRef<string>("");
+  const formRef = useRef<HTMLDivElement>(null);
+  const topRef = useRef<HTMLDivElement>(null);
+
+  // Estado local para controlar la carga del modal
+  const [shouldLoadModal, setShouldLoadModal] = useState(false);
 
   const dispatch = useDispatch<AppDispatch>();
   const fileInputRefPrev = useRef<HTMLInputElement>(null);
 
   const { data: justificationTypesData, loading: loadingJustificationTypes, error: errorJustificationTypes } =
     useSelector((state: RootState) => state.justificationType);
-  const { data: attendancesData, loading: loadingAttendances, error: errorAttendances } =
-    useSelector((state: RootState) => state.attendances);
+  const { data: attendancesData, loading: loadingAttendances, error: errorAttendances
+  } = useSelector((state: RootState) => state.attendances.studentAttendances);
   const { loading: loadingJustification, error: errorJustification, form } =
     useSelector((state: RootState) => state.justification);
 
@@ -60,16 +54,24 @@ export default function JustificacionAprendiz() {
     dispatch(fetchAttendancesByStudent({ id: 1, stateId: 2 }));
   }, [dispatch]);
 
+  // Efecto para sincronizar el estado local con el estado global
+  useEffect(() => {
+    if (form.showForm && !shouldLoadModal) {
+      const timer = setTimeout(() => {
+        setShouldLoadModal(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else if (!form.showForm && shouldLoadModal) {
+      setShouldLoadModal(false);
+    }
+  }, [form.showForm, shouldLoadModal]);
+
   if (loadingJustificationTypes || loadingAttendances) return <p>Cargando...</p>;
   if (errorJustificationTypes || errorAttendances) return <p>Error cargando datos</p>;
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     dispatch(updateFormField({ field: name as keyof FormDataState, value }));
-  };
-
-  const handleDescriptionChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    dispatch(updateFormField({ field: e.target.name as keyof FormDataState, value: e.target.value }));
   };
 
   const handleNumericInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -117,7 +119,6 @@ export default function JustificacionAprendiz() {
     }
   };
 
-
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
     dispatch(validateForm());
@@ -136,23 +137,23 @@ export default function JustificacionAprendiz() {
 
     try {
       const formDataWithFile = {
-        documentNumber: form.formData.numeroDocumento,
         name: form.formData.nombreAprendiz,
         description: form.formData.descripcion,
         justificationFile: base64Ref.current,
         justificationDate: new Date().toISOString(),
-        justificationHistory: "",
-        notificationId: form.formData.notificationId,
         justificationTypeId: { id: form.formData.justificationTypeId.id },
       };
 
-
-      const result = await dispatch(addJustification(formDataWithFile)).unwrap();
+      await dispatch(addJustification(formDataWithFile)).unwrap();
 
       toast.success("¡Tu justificación ha sido enviada exitosamente!");
       dispatch(resetForm());
       fileRef.current = null;
       base64Ref.current = "";
+
+      setTimeout(() => {
+        topRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 200);
     } catch (error: any) {
       console.error("Error al enviar justificación:", error);
       toast.error(error.message || "Error inesperado al enviar la justificación.");
@@ -165,37 +166,185 @@ export default function JustificacionAprendiz() {
     dispatch(resetForm());
     fileRef.current = null;
     base64Ref.current = "";
+    setShouldLoadModal(false);
     toast.info("Formulario cancelado");
+
+    setTimeout(() => {
+      topRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 200);
   };
 
+  const handleShowForm = (attendanceId?: string) => {
+    if (attendanceId) {
+      dispatch(updateFormField({ field: 'notificationId', value: attendanceId }));
+    }
+    dispatch(showForm());
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-CO', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const absences = attendancesData || [];
 
   return (
     <div className="w-full h-full">
-      {/* Título de la página */}
-      <div className="mb-6">
+      <div ref={topRef} className="mb-6">
         <PageTitle>Justificaciones</PageTitle>
       </div>
 
-      {/* Contenido principal */}
-      <AnimatePresence>
-        {form.showForm && (
-          <JustificationFormComponent
-            form={form}
-            justificationTypesData={justificationTypesData}
-            loadingJustificationTypes={loadingJustificationTypes}
-            loadingJustification={loadingJustification}
-            handleSave={handleSave}
-            handleCancel={handleCancel}
-            handleInputChange={handleInputChange}
-            handleTextInputChange={handleTextInputChange}
-            handleNumericInputChange={handleNumericInputChange}
-            handleFileChange={handleFileChange}
-            updateJustificationTypeId={(value) => dispatch(updateJustificationTypeId(value))}
-            fileRef={fileRef}
-            fileInputRefPrev={fileInputRefPrev}
-          />
-        )}
-      </AnimatePresence>
+      <div className="mb-8">
+
+        <AnimatePresence mode="wait">
+          {!form.showForm && !shouldLoadModal && (
+            <motion.div
+              key="absences-list"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+              className="bg-white rounded-xl shadow-lg p-8 border border-gray-100"
+            >
+              <div className="flex items-center mb-6">
+                <div className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 p-3 rounded-full shadow-lg">
+                  <IoPeople className="text-2xl text-white" />
+                </div>
+                <div className="ml-4">
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    Ausencias Registradas
+                  </h2>
+                  <p className="text-gray-600 text-sm">
+                    Gestiona tus justificaciones de ausencias
+                  </p>
+                </div>
+              </div>
+
+              {absences.length > 0 && (
+                <div className="mb-6">
+                  <div className="max-h-80 overflow-y-auto pr-2 space-y-4">
+                    {absences.map((attendance: AttendanceItem, index) => (
+                      <motion.div
+                        key={attendance.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="group hover:shadow-md transition-all duration-300 p-4 bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-xl relative overflow-hidden"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="relative flex items-center justify-between">
+                          <div className="flex items-center">
+                            <div className="bg-red-500 p-2 rounded-lg shadow-md">
+                              <FaCalendarDay className="text-white text-lg" />
+                            </div>
+                            <div className="ml-4">
+                              <div className="font-semibold text-gray-800 text-lg">
+                                {formatDate(attendance.attendanceDate)}
+                              </div>
+                              <div className="text-sm text-red-600 font-medium">
+                                Estado: {attendance.attendanceState?.status || 'Ausente'}
+                              </div>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleShowForm(attendance.id)}
+                            className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
+                          >
+                            <FaRegListAlt className="mr-2" />
+                            Justificar
+                          </button>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {absences.length === 0 && (
+                <div className="text-center py-12">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", duration: 0.6 }}
+                    className="mb-6"
+                  >
+                    <div className="bg-gradient-to-r from-green-400 to-emerald-500 p-6 rounded-full inline-block shadow-lg">
+                      <FaCheckCircle className="text-6xl text-white" />
+                    </div>
+                  </motion.div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                    ¡Excelente asistencia!
+                  </h3>
+                  <p className="text-gray-600 text-lg">
+                    No tienes ausencias pendientes por justificar.
+                  </p>
+                  <p className="text-gray-500 text-sm mt-2">
+                    Continúa manteniendo tu buen récord de asistencia.
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {form.showForm && shouldLoadModal && (
+            <motion.div
+              key="justification-form"
+              ref={formRef}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -30, scale: 0.95 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className="bg-white rounded-xl shadow-2xl p-8 border border-gray-100"
+            >
+              <div className="mb-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 p-3 rounded-full shadow-lg">
+                      <FaRegListAlt className="text-2xl text-white" />
+                    </div>
+                    <div className="ml-4">
+                      <h2 className="text-2xl font-bold text-gray-800">
+                        Formulario de Justificación
+                      </h2>
+                      <p className="text-gray-600 text-sm">
+                        Completa los datos para justificar tu ausencia
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleCancel}
+                    className="text-gray-400 hover:text-gray-600 text-2xl transition-colors duration-200 hover:bg-gray-100 p-2 rounded-full"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+
+              <JustificationFormComponent
+                form={form}
+                justificationTypesData={justificationTypesData}
+                loadingJustificationTypes={loadingJustificationTypes}
+                loadingJustification={loadingJustification}
+                handleSave={handleSave}
+                handleCancel={handleCancel}
+                handleInputChange={handleInputChange}
+                handleTextInputChange={handleTextInputChange}
+                handleNumericInputChange={handleNumericInputChange}
+                handleFileChange={handleFileChange}
+                updateJustificationTypeId={(value) => dispatch(updateJustificationTypeId(value))}
+                fileRef={fileRef}
+                fileInputRefPrev={fileInputRefPrev}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

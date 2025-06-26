@@ -1,13 +1,11 @@
 type Justification {
     id: ID!
-    documentNumber: String
     name: String
     description: String
     justificationFile: String
     justificationDate: String
-    justificationHistory: String
     state: Boolean
-    notificationId: ID
+    attendance: Attendance
     justificationType: JustificationType
 }
 
@@ -29,14 +27,12 @@ type JustificationPageId {
 }
 
 input JustificationDto {
-    documentNumber: String
-    name: String
+    studentId: Long
     description: String
     justificationFile: String
     justificationDate: String
-    justificationHistory: String
     state: Boolean
-    notificationId: ID
+    attendance: AttendancesDto
     justificationTypeId: JustificationTypeDto
 }
 
