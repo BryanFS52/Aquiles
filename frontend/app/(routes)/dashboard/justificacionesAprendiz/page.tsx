@@ -23,6 +23,7 @@ import {
   addJustification,
   validateForm,
   setSubmitting,
+  setCurrentAttendance
 } from '@slice/justificationSlice';
 import {
   FaCalendarDay,
@@ -61,6 +62,10 @@ export default function JustificacionAprendiz() {
   } = useSelector((state: RootState) => state.attendances.studentAttendances);
   const { loading: loadingJustification, error: errorJustification, form } =
     useSelector((state: RootState) => state.justification);
+  const currentAttendance = useSelector(
+    (state: RootState) => state.justification.form.currentAttendance
+  );
+
 
   useEffect(() => {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
@@ -151,14 +156,12 @@ export default function JustificacionAprendiz() {
 
     try {
       const formDataWithFile = {
-        name: form.formData.nombreAprendiz,
         description: form.formData.descripcion,
         justificationFile: base64Ref.current,
-        justificationDate: new Date().toISOString(),
-        state: true,
-        justificationHistory: "",
-        notificationId: form.formData.notificationId,
+        justificationDate: new Date().toISOString().split('T')[0],
         justificationTypeId: { id: form.formData.justificationTypeId.id },
+        attendance: { id: currentAttendance?.id },
+        state: false,
       };
 
       await dispatch(addJustification(formDataWithFile)).unwrap();
@@ -191,15 +194,38 @@ export default function JustificacionAprendiz() {
     }, 200);
   };
 
+
   const handleShowForm = (attendanceId?: string) => {
-    if (attendanceId) {
-      dispatch(updateFormField({ field: 'notificationId', value: attendanceId }));
+    console.log("🟡 handleShowForm llamado con ID:", attendanceId);
+    if (attendanceId && attendancesData) {
+      const currentAttendance = attendancesData.find((a) => a.id === attendanceId);
+      console.log("📄 currentAttendance encontrada:", currentAttendance);
+
+      if (currentAttendance) {
+        const person = currentAttendance.student?.person;
+
+        if (person?.document && person?.name && person?.lastname) {
+          dispatch(updateFormField({ field: 'numeroDocumento', value: person.document }));
+          dispatch(updateFormField({ field: 'nombreAprendiz', value: `${person.name} ${person.lastname}` }));
+        }
+
+        dispatch(updateFormField({ field: 'notificationId', value: attendanceId }));
+
+        // 🔥 ESTO ES LO QUE FALTABA
+        dispatch(setCurrentAttendance(currentAttendance));
+
+        // Esperar a que Redux actualice el estado antes de mostrar el form
+        setTimeout(() => {
+          dispatch(showForm());
+          formRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 10);
+      } else {
+        console.warn("No se encontró la asistencia con ID:", attendanceId);
+      }
     }
-    dispatch(showForm());
-    setTimeout(() => {
-      formRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
   };
+
+
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -225,7 +251,7 @@ export default function JustificacionAprendiz() {
         <PageTitle>Justificaciones</PageTitle>
       </div>
 
-      <div className="mb-8">
+      <div className="mb-8 lg:w-1/2">
 
         <AnimatePresence mode="wait">
           {!form.showForm && !shouldLoadModal && (
@@ -252,7 +278,7 @@ export default function JustificacionAprendiz() {
               </div>
 
               {absences.length > 0 && (
-                <div className="mb-6">
+                <div className="mb-6 ">
                   <div className="max-h-80 overflow-y-auto pr-2 space-y-4">
                     {absences.map((attendance: AttendanceItem, index) => (
                       <motion.div

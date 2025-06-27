@@ -32,6 +32,8 @@ export const GET_ATTENDANCES_BY_STUDENT = gql`
           id
           person {
             name
+            lastname
+            document
           }
         }
         attendanceState {

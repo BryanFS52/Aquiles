@@ -3,9 +3,14 @@ export interface AttendanceItem {
     attendanceDate: string;
     attendanceState: {
         id: string;
-        status: string; // o tiparlo como enum si tienes certeza
+        status: string;
     };
-    student?: {
+    student: {
         id: string;
+        person: {
+            name: string;
+            lastname: string;
+            document: string;
+        };
     };
 }

@@ -1,4 +1,4 @@
-import { motion } from "framer-motion"; // AnimatePresence se puede quitar si no se usa internamente para otros elementos
+import { motion } from "framer-motion";
 import { ChangeEvent, FormEvent, RefObject } from "react";
 
 interface JustificationType {
@@ -56,6 +56,7 @@ export default function JustificationFormComponent({
                             Número de Documento *
                         </label>
                         <input
+                            disabled
                             type="text"
                             name="numeroDocumento"
                             value={form.formData.numeroDocumento}
@@ -72,6 +73,7 @@ export default function JustificationFormComponent({
                             Nombre Aprendiz *
                         </label>
                         <input
+                            disabled
                             type="text"
                             name="nombreAprendiz"
                             value={form.formData.nombreAprendiz}
