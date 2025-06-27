@@ -30,6 +30,9 @@ export const GET_ATTENDANCES_BY_STUDENT = gql`
         attendanceDate
         student {
           id
+          person {
+            name
+          }
         }
         attendanceState {
           id

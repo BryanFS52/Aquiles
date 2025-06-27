@@ -28,6 +28,7 @@
     }
 
     input AttendancesDto {
+        id: ID
         attendanceDate: String
         attendanceState: AttendanceStateDto
         studySheetQuarter: Long

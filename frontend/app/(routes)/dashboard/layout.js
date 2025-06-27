@@ -20,7 +20,6 @@ export default function RootLayout({ children }) {
         <ClientLayoutWrapper userContextValue={user}>
           {children}
         </ClientLayoutWrapper>
-
       </body>
     </html>
   );

@@ -25,7 +25,7 @@ public class JustificationResolver {
     @DgsQuery
     public Map<String, Object> allJustifications(@InputArgument Integer page, @InputArgument Integer size) {
         try {
-            Page<JustificationDto> justificationDtoPage = justificationBusiness.findAll(page - 1, size);
+            Page<JustificationDto> justificationDtoPage = justificationBusiness.findAll(page , size);
             return ResponseHttpApi.responseHttpFindAll(
                     justificationDtoPage.getContent(),
                     ResponseHttpApi.CODE_OK,

@@ -11,12 +11,6 @@ import lombok.NoArgsConstructor;
 public class JustificationDto {
     private Long id;
 
-    @NotNull(message = "El número es obligatorio")
-    private String documentNumber;
-
-    @NotNull(message = "El nombre es obligatorio")
-    private String name;
-
     @NotNull(message = "La descripción es obligatoria")
     private String description;
 
@@ -29,12 +23,8 @@ public class JustificationDto {
     @NotNull(message = "El estado es obligatorio")
     private Boolean state;
 
-    @NotNull(message = "El historial es obligatorio")
-    private String justificationHistory;
-
     // Relations
     private JustificationTypeDto justificationTypeId;
+    private AttendancesDto attendance;
     private Long notificationId;
-
-
 }
