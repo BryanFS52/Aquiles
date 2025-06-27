@@ -15,7 +15,6 @@ import {
     AllAttendancesByStudentIdQuery,
     AllAttendancesByStudentIdQueryVariables
 } from '@graphql/generated';
-import { showForm } from './justificationSlice';
 
 const transformGraphQLToAttendanceItem = (graphqlData: any): AttendanceItem => {
     return {
@@ -24,9 +23,18 @@ const transformGraphQLToAttendanceItem = (graphqlData: any): AttendanceItem => {
         attendanceState: {
             id: graphqlData.attendanceState?.id ?? '',
             status: graphqlData.attendanceState?.status ?? '',
+        },
+        student: {
+            id: graphqlData.student?.id ?? '',
+            person: {
+                name: graphqlData.student?.person?.name ?? '',
+                lastname: graphqlData.student?.person?.lastname ?? '',
+                document: graphqlData.student?.person?.document ?? '',
+            }
         }
     };
 };
+
 
 export const fetchAttendances = createAsyncThunk<
     GetAttendancesQuery['allAttendances'],

@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_JUSTIFICATIONS, GET_JUSTIFICATION_BY_ID, ADD_JUSTIFICATION, UPDATE_JUSTIFICATION, DELETE_JUSTIFICATION } from '@graphql/justificationsGraph'
 import { JustificationItem } from '@type/slices/justification'
+import { AttendanceItem } from '@type/slices/attendance'
 import {
     GetAllJustificationsQuery,
     GetAllJustificationsQueryVariables,
@@ -53,6 +54,7 @@ interface JustificationFormState {
     isSubmitting: boolean;
     formData: FormDataState;
     validationErrors: string[];
+    currentAttendance: AttendanceItem | null;
 }
 
 interface JustificationState extends ReturnType<typeof createInitialPaginatedState> {
@@ -380,7 +382,8 @@ const initialState: JustificationState = {
         showForm: false,
         isSubmitting: false,
         formData: initialFormData,
-        validationErrors: []
+        validationErrors: [],
+        currentAttendance: null,
     }
 };
 
@@ -414,6 +417,9 @@ const justificationSlice = createSlice({
 
         setItemsPerPage: (state, action: PayloadAction<number>) => {
             state.itemsPerPage = action.payload;
+        },
+        setCurrentAttendance: (state, action: PayloadAction<AttendanceItem>) => {
+            state.form.currentAttendance = action.payload;
         },
 
         // Nuevos reducers para el formulario
@@ -590,7 +596,8 @@ export const {
     setValidationErrors,
     clearValidationErrors,
     setSubmitting,
-    validateForm
+    validateForm,
+    setCurrentAttendance,
 } = justificationSlice.actions;
 
 export default justificationSlice.reducer;
