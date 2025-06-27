@@ -69,7 +69,7 @@ export default function JustificacionAprendiz() {
 
   useEffect(() => {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-    dispatch(fetchAttendancesByStudent({ id: 1, stateId: 1 }));
+    dispatch(fetchAttendancesByStudent({ id: 1, stateId: 2 }));
     setLoading(false);
   }, [dispatch]);
 
@@ -162,6 +162,8 @@ export default function JustificacionAprendiz() {
         justificationTypeId: { id: form.formData.justificationTypeId.id },
         attendance: { id: currentAttendance?.id },
         state: false,
+        justificationHistory: "",
+        notificationId: form.formData.notificationId,
       };
 
       await dispatch(addJustification(formDataWithFile)).unwrap();

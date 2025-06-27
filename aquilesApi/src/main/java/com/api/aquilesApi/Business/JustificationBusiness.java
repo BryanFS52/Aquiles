@@ -37,7 +37,7 @@ public class JustificationBusiness {
             Page<JustificationEntity> justificationEntityPage = justificationService.findAll(pageRequest);
 
             System.out.println("Total Justifications: " + justificationEntityPage.getTotalElements());
-
+            System.out.println("Total Justifications: " + justificationEntityPage);
             return justificationEntityPage.map(entity -> modelMapper.map(entity, JustificationDto.class));
         } catch (DataAccessException e) {
             // Manejo específico para errores de acceso a datos

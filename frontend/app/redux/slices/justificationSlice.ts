@@ -1,4 +1,4 @@
-import { client } from '@lib/apollo-client'
+import { client, clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_JUSTIFICATIONS, GET_JUSTIFICATION_BY_ID, ADD_JUSTIFICATION, UPDATE_JUSTIFICATION, DELETE_JUSTIFICATION } from '@graphql/justificationsGraph'
@@ -241,7 +241,7 @@ export const formatErrorMessage = (error: any): string | null => {
 export const fetchJustifications = createAsyncThunk<GetAllJustificationsQuery['allJustifications'], GetAllJustificationsQueryVariables>(
     'justifications/fetchAll',
     async ({ page, size }) => {
-        const { data } = await client.query<GetAllJustificationsQuery, GetAllJustificationsQueryVariables>({
+        const { data } = await clientLAN.query<GetAllJustificationsQuery, GetAllJustificationsQueryVariables>({
             query: GET_ALL_JUSTIFICATIONS,
             variables: { page, size },
             fetchPolicy: 'no-cache',
@@ -253,7 +253,7 @@ export const fetchJustifications = createAsyncThunk<GetAllJustificationsQuery['a
 export const fetchJustificationById = createAsyncThunk<GetJustificationByIdQuery['justificationById'], GetJustificationByIdQueryVariables>(
     'justifications/fetchById',
     async ({ id }) => {
-        const { data } = await client.query<GetJustificationByIdQuery, GetJustificationByIdQueryVariables>({
+        const { data } = await clientLAN.query<GetJustificationByIdQuery, GetJustificationByIdQueryVariables>({
             query: GET_JUSTIFICATION_BY_ID,
             variables: { id },
         });
@@ -267,7 +267,7 @@ export const addJustification = createAsyncThunk<AddJustificationMutation['addJu
     'justifications/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<AddJustificationMutation, AddJustificationMutationVariables>({
+            const { data } = await clientLAN.mutate<AddJustificationMutation, AddJustificationMutationVariables>({
                 mutation: ADD_JUSTIFICATION,
                 variables: { input }
             });
@@ -289,7 +289,7 @@ export const updateJustification = createAsyncThunk<UpdateJustificationMutation[
     'justifications/update',
     async ({ id, input }, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<UpdateJustificationMutation, UpdateJustificationMutationVariables>({
+            const { data } = await clientLAN.mutate<UpdateJustificationMutation, UpdateJustificationMutationVariables>({
                 mutation: UPDATE_JUSTIFICATION,
                 variables: { id, input },
             });
@@ -312,7 +312,7 @@ export const deleteJustification = createAsyncThunk<string, string,
     'justifications/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<DeleteJustificationMutation, DeleteJustificationMutationVariables>({
+            const { data } = await clientLAN.mutate<DeleteJustificationMutation, DeleteJustificationMutationVariables>({
                 mutation: DELETE_JUSTIFICATION,
                 variables: { id },
             });
