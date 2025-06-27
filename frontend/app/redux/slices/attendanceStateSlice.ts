@@ -1,4 +1,4 @@
-import { client } from '@lib/apollo-client'
+import { client,clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { GET_ALL_ATTENDANCES_STATE, ADD_ATTENDANCE_STATE, UPDATE_ATTENDANCE_STATE, DELETE_ATTENDANCE_STATE } from '@graphql/attendanceStateGraph'
 import { AttendanceStateItem } from '@type/slices/attendanceState'
