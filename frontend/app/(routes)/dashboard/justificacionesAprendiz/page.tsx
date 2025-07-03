@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { IoPeople } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from 'react-redux';
+import { useUser } from '@context/UserContext';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
 import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
 import type { AppDispatch, RootState } from '@/redux/store'
@@ -14,6 +15,7 @@ import PageTitle from "@components/UI/pageTitle";
 import JustificationFormComponent from '@components/features/justification/justificationForm';
 
 import {
+  fetchJustificationsByStudent,
   showForm,
   resetForm,
   updateFormField,
@@ -48,6 +50,7 @@ export default function JustificacionAprendiz() {
   const base64Ref = useRef<string>("");
   const formRef = useRef<HTMLDivElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
+  const { user } = useUser();
 
   // Estado local para controlar la carga del modal
   const [shouldLoadModal, setShouldLoadModal] = useState(false);
@@ -68,10 +71,13 @@ export default function JustificacionAprendiz() {
 
 
   useEffect(() => {
-    dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-    dispatch(fetchAttendancesByStudent({ id: 1, stateId: 2 }));
-    setLoading(false);
-  }, [dispatch]);
+    if (user?.id) {
+      dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
+      dispatch(fetchAttendancesByStudent({ id: Number(user.id), stateId: 2 }));
+      dispatch(fetchJustificationsByStudent({ studentId: Number(user.id) }));
+      setLoading(false);
+    }
+  }, [dispatch, user]);
 
   // Efecto para sincronizar el estado local con el estado global
   useEffect(() => {
@@ -396,6 +402,10 @@ export default function JustificacionAprendiz() {
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+
+      <div className="mt-8">
+        <JustificationsHistorical />
       </div>
     </div>
   );
