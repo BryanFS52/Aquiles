@@ -44,11 +44,11 @@ export default function JustificationFormComponent({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
             transition={{ duration: 0.5 }}
-            className="w-full max-w-4xl bg-white dark:bg-shadowBlue p-6 lg:p-8 rounded-xl shadow-sm border border-lightGray dark:border-darkGray"
+            className="w-auto max-w-4xl bg-white dark:bg-shadowBlue p-6 lg:p-8 rounded-xl shadow-sm border border-lightGray dark:border-darkGray h-auto"
         >
-            <h2 className="text-xl font-semibold mb-6 text-black dark:text-white">
+            {/* <h2 className="text-xl font-semibold mb-6 text-black dark:text-white">
                 Formulario de Justificación
-            </h2>
+            </h2> */}
             <form onSubmit={handleSave} className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div className="flex flex-col space-y-2">

@@ -66,17 +66,7 @@ export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
           id
           status
         }
-        justification {
-          id
-          description
-          justificationFile
-          justificationDate
-          state
-          justificationType {
-            id
-            name
-          }
-        }
+        justification
       }
     }
   }
