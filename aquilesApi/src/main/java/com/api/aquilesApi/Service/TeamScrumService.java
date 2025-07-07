@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TeamScrumService implements Idao<TeamsScrumEntity, Long> {
     private final TeamScrumRepository teamsScrumRepository;
@@ -26,6 +28,10 @@ public class TeamScrumService implements Idao<TeamsScrumEntity, Long> {
     public TeamsScrumEntity getById(Long id) {
         return teamsScrumRepository.findById(id).orElseThrow(() ->
                 new CustomException("Team Scrum with id " + id + " not found", HttpStatus.NO_CONTENT));
+    }
+
+    public List<TeamsScrumEntity> findAllByStudentId(Long studentId) {
+        return teamsScrumRepository.findByMemberId(studentId);
     }
 
     @Override

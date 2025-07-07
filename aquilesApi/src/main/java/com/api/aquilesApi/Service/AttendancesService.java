@@ -55,6 +55,6 @@ public class AttendancesService implements Idao<AttendanceEntity, Long> {
         return attendancesRepository.findAllByStudentId(studentId);
     }
     public List<AttendanceEntity> findAllByStudentId(Long studentId, Long attendanceState) {
-        return attendancesRepository.findAllByStudentIdAndAttendanceState_Id(studentId, attendanceState);
+        return attendancesRepository.findByStudentIdAndOrAttendanceStateId(studentId, attendanceState);
     }
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class QRCodePayload {
+public class QRCodePayloadDto {
     private String sessionId;
     private String qrCodeBase64;
     private String qrUrl;

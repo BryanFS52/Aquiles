@@ -2,13 +2,13 @@
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { GoSearch } from "react-icons/go";
 import { GrAttachment } from "react-icons/gr";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import Image from "next/image";
 import persona from "@public/img/persona.jpg";
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFilters from "@components/features/justification/justificationsFilter";
+import type { AppDispatch } from "@/redux/store";
 import {
   fetchJustifications,
   setFilterOptions,
@@ -22,7 +22,7 @@ import {
 
 
 export default function JustificacionesInstructor() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const {
     filteredData,
     loading,
@@ -32,8 +32,9 @@ export default function JustificacionesInstructor() {
     localCurrentPage,
     filterOptions,
     itemsPerPage
-  } = useSelector((state:any) => state.justification);
+  } = useSelector((state: any) => state.justification);
 
+  console.log(filteredData)
 
   useEffect(() => {
     dispatch(fetchJustifications({ page: localCurrentPage, size: itemsPerPage }));
@@ -56,7 +57,7 @@ export default function JustificacionesInstructor() {
     dispatch(goToNextPage());
   };
 
-  const handleDownloadFile = (justificacion:any) => {
+  const handleDownloadFile = (justificacion: any) => {
     if (justificacion.archivoAdjunto) {
       const mimeType = justificacion.archivoMime || "application/octet-stream";
       const fileName = generateFileName(justificacion.id, mimeType);
@@ -105,7 +106,7 @@ export default function JustificacionesInstructor() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredData.map((justificacion:any) => (
+                {filteredData.map((justificacion: any) => (
                   <tr key={justificacion.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
                     <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{justificacion.programa}</td>
                     <td className="px-6 py-4">{justificacion.ficha}</td>

@@ -1,30 +1,67 @@
 package com.api.aquilesApi.Resolver;
 
-
 import com.api.aquilesApi.Business.TeamsScrumBusiness;
+import com.api.aquilesApi.Dto.Student;
 import com.api.aquilesApi.Dto.TeamsScrumDto;
+import com.api.aquilesApi.Entity.TeamsScrumEntity;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
-import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.*;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import com.netflix.graphql.dgs.InputArgument;
-import com.netflix.graphql.dgs.DgsMutation;
-import com.netflix.graphql.dgs.DgsQuery;
 import org.springframework.http.HttpStatus;
-
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @DgsComponent
-public class    TeamsScrumResolver {
+public class TeamsScrumResolver {
 
     private final TeamsScrumBusiness teamsScrumBusiness;
+    private final ModelMapper modelMapper = new ModelMapper();
 
     public TeamsScrumResolver(TeamsScrumBusiness teamsScrumBusiness) {
         this.teamsScrumBusiness = teamsScrumBusiness;
     };
 
-    // FindAll TeamsScrums (GraphQL)
-    @DgsQuery
+    @DgsData(parentType = "Student", field = "teamScrums")
+    public List<TeamsScrumEntity> teamsScrum(DgsDataFetchingEnvironment env) {
+        Student student = env.getSource();
+        assert student != null;
+
+        Long studentId = student.getId();
+
+        List<TeamsScrumDto> teamsScrumDtoList = teamsScrumBusiness.findAllByStudentId(studentId);
+
+        return teamsScrumDtoList.stream()
+                .map(dto -> modelMapper.map(dto, TeamsScrumEntity.class))
+                .collect(Collectors.toList());
+    }
+
+    @DgsData(parentType = "TeamsScrum", field = "students")
+    public List<Map<String, String>> studentsReference(DgsDataFetchingEnvironment env) {
+        TeamsScrumDto teamsScrum = env.getSource();
+        if (teamsScrum == null || teamsScrum.getMemberIds() == null) {
+            return Collections.emptyList();
+        }
+
+        return teamsScrum.getMemberIds().stream()
+                .map(id -> Map.of("id", id.toString()))
+                .collect(Collectors.toList());
+    }
+
+
+
+    @DgsEntityFetcher(name = "TeamsScrum")
+    public TeamsScrumEntity teamScrum(Map<String, Object> values) {
+        String id = (String) values.get("id");
+        Long attendanceId = id != null ? Long.valueOf(id) : null;
+        return modelMapper.map( teamsScrumBusiness.findById(attendanceId), TeamsScrumEntity.class);
+    }
+
+
+@DgsQuery
     public Map<String , Object> allTeamsScrums(@InputArgument Integer page, @InputArgument Integer size){
         try {
             Page<TeamsScrumDto> teamsScrumDtoPage = teamsScrumBusiness.findAll(page, size);
@@ -122,5 +159,4 @@ public class    TeamsScrumResolver {
             );
         }
     }
-
 }

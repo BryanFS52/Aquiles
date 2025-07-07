@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 // Queries and Mutations for Justifications
 export const GET_ALL_JUSTIFICATIONS = gql`
-  query GetAllJustifications($page: Int, $size: Int) {
+ query GetAllJustifications($page: Int, $size: Int) {
     allJustifications(page: $page, size: $size) {
       code
       message
@@ -19,6 +19,16 @@ export const GET_ALL_JUSTIFICATIONS = gql`
         justificationType {
           id
           name
+        }
+        attendance{
+            student{
+                id
+                person{
+                    name
+                    lastname
+                    document
+                }
+            }
         }
       }
     }

@@ -125,9 +125,6 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
       newErrors.projectName = "El nombre debe tener al menos 3 caracteres";
     }
 
-    // Eliminar campo duplicado nameProject si no es necesario
-    // o validar si es diferente a projectName
-
     if (teamData.members.length === 0) {
       newErrors.members = "Debe seleccionar al menos un miembro";
     } else if (teamData.members.length > 8) {

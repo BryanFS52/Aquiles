@@ -39,7 +39,6 @@ public class AttendanceEntity implements Serializable {
     @OneToOne(mappedBy = "attendance", cascade = CascadeType.ALL)
     private JustificationEntity justification;
 
-
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "stateAttendance_id", referencedColumnName = "id")

@@ -8,4 +8,20 @@ export interface JustificationItem {
         id: number;
         name: string;
     };
+    attendance: {
+        student: {
+            id: number;
+            person: {
+                name: string;
+                lastname: string;
+                document: string;
+            };
+            studySheet?: {
+                number: number;
+                program?: {
+                    name: string;
+                };
+            };
+        };
+    };
 }
