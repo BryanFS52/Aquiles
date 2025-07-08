@@ -54,7 +54,7 @@ public class ChecklistEntity implements Serializable {
 
     // 3.Relation (1-M) con Team
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TeamsScrumEntity> teams;
+    private List<TeamsScrum> teams;
 
     // 4.Relation (1-M) con learningOutcome
     @Column(name = "learningOutcome_id")

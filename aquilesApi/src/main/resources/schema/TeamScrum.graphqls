@@ -2,7 +2,7 @@ type StudySheet {
     id : ID
 }
 
-type TeamsScrum {
+type TeamsScrum @key(fields: "id") {
     id: ID!
     teamName: String
     projectName: String

@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.TeamsScrumDto;
-import com.api.aquilesApi.Entity.TeamsScrumEntity;
+import com.api.aquilesApi.Entity.TeamsScrum;
 import com.api.aquilesApi.Service.TeamScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
@@ -33,7 +33,7 @@ public class TeamsScrumBusiness {
     public Page<TeamsScrumDto> findAll(int page , int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<TeamsScrumEntity> teamsScrumEntityPage = teamScrumService.findAll(pageRequest);
+            Page<TeamsScrum> teamsScrumEntityPage = teamScrumService.findAll(pageRequest);
 
             List<TeamsScrumDto> teamsScrumDtoList = teamsScrumEntityPage.getContent()
                     .stream()
@@ -49,11 +49,11 @@ public class TeamsScrumBusiness {
     // Find By Id
     public TeamsScrumDto findById(Long id) {
         try {
-            TeamsScrumEntity teamsScrum = teamScrumService.getById(id);
+            TeamsScrum teamsScrum = teamScrumService.getById(id);
 
             // Configurar el mapeo manualmente si los nombres no coinciden
-            modelMapper.typeMap(TeamsScrumEntity.class, TeamsScrumDto.class)
-                    .addMapping(TeamsScrumEntity::getId, TeamsScrumDto::setId);
+            modelMapper.typeMap(TeamsScrum.class, TeamsScrumDto.class)
+                    .addMapping(TeamsScrum::getId, TeamsScrumDto::setId);
 
             return modelMapper.map(teamsScrum, TeamsScrumDto.class);
         } catch (CustomException e) {
@@ -65,8 +65,8 @@ public class TeamsScrumBusiness {
 
     public List<TeamsScrumDto> findAllByStudentId(Long studentId) {
         try {
-            List<TeamsScrumEntity> teamsScrumEntityList = teamScrumService.findAllByStudentId(studentId);
-            return teamsScrumEntityList.stream().map(
+            List<TeamsScrum> teamsScrumList = teamScrumService.findAllByStudentId(studentId);
+            return teamsScrumList.stream().map(
                     entity -> modelMapper.map(entity, TeamsScrumDto.class)).collect(Collectors.toList());
 
         } catch (Exception e){
@@ -77,8 +77,8 @@ public class TeamsScrumBusiness {
     // Add
     public TeamsScrumDto add(TeamsScrumDto teamsScrumDto) {
         try {
-            TeamsScrumEntity teamsScrumEntity = modelMapper.map(teamsScrumDto, TeamsScrumEntity.class);
-            return modelMapper.map(teamScrumService.save(teamsScrumEntity), TeamsScrumDto.class);
+            TeamsScrum teamsScrum = modelMapper.map(teamsScrumDto, TeamsScrum.class);
+            return modelMapper.map(teamScrumService.save(teamsScrum), TeamsScrumDto.class);
         } catch (Exception e) {
             throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -88,8 +88,8 @@ public class TeamsScrumBusiness {
     public void update(Long teamScrumId , TeamsScrumDto teamsScrumDto){
         try {
             teamsScrumDto.setId(teamScrumId);
-            TeamsScrumEntity teamsScrumEntity = modelMapper.map(teamsScrumDto, TeamsScrumEntity.class);
-            teamScrumService.save(teamsScrumEntity);
+            TeamsScrum teamsScrum = modelMapper.map(teamsScrumDto, TeamsScrum.class);
+            teamScrumService.save(teamsScrum);
         } catch (Exception e){
             throw new CustomException("Error Updating Team Scrum: " + e.getMessage() , HttpStatus.BAD_REQUEST);
         }
@@ -98,7 +98,7 @@ public class TeamsScrumBusiness {
     // Delete
     public void delete(Long teamScrumId){
         try {
-            TeamsScrumEntity teamsScrum = teamScrumService.getById(teamScrumId);
+            TeamsScrum teamsScrum = teamScrumService.getById(teamScrumId);
             teamScrumService.delete(teamsScrum);
         } catch (CustomException e){
             throw e;

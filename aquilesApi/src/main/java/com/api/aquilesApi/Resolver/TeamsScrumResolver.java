@@ -3,7 +3,7 @@ package com.api.aquilesApi.Resolver;
 import com.api.aquilesApi.Business.TeamsScrumBusiness;
 import com.api.aquilesApi.Dto.Student;
 import com.api.aquilesApi.Dto.TeamsScrumDto;
-import com.api.aquilesApi.Entity.TeamsScrumEntity;
+import com.api.aquilesApi.Entity.TeamsScrum;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.*;
@@ -26,7 +26,7 @@ public class TeamsScrumResolver {
     };
 
     @DgsData(parentType = "Student", field = "teamScrums")
-    public List<TeamsScrumEntity> teamsScrum(DgsDataFetchingEnvironment env) {
+    public List<TeamsScrum> teamsScrum(DgsDataFetchingEnvironment env) {
         Student student = env.getSource();
         assert student != null;
 
@@ -35,13 +35,14 @@ public class TeamsScrumResolver {
         List<TeamsScrumDto> teamsScrumDtoList = teamsScrumBusiness.findAllByStudentId(studentId);
 
         return teamsScrumDtoList.stream()
-                .map(dto -> modelMapper.map(dto, TeamsScrumEntity.class))
+                .map(dto -> modelMapper.map(dto, TeamsScrum.class))
                 .collect(Collectors.toList());
     }
 
     @DgsData(parentType = "TeamsScrum", field = "students")
     public List<Map<String, String>> studentsReference(DgsDataFetchingEnvironment env) {
         TeamsScrumDto teamsScrum = env.getSource();
+
         if (teamsScrum == null || teamsScrum.getMemberIds() == null) {
             return Collections.emptyList();
         }
@@ -52,16 +53,29 @@ public class TeamsScrumResolver {
     }
 
 
+    @DgsData(parentType = "TeamsScrum", field = "studySheet")
+    public Map<String, Object> resolveStudySheet(DgsDataFetchingEnvironment env) {
+        TeamsScrumDto teamsScrum = env.getSource();
 
-    @DgsEntityFetcher(name = "TeamsScrum")
-    public TeamsScrumEntity teamScrum(Map<String, Object> values) {
-        String id = (String) values.get("id");
-        Long attendanceId = id != null ? Long.valueOf(id) : null;
-        return modelMapper.map( teamsScrumBusiness.findById(attendanceId), TeamsScrumEntity.class);
+        if (teamsScrum == null || teamsScrum.getStudySheetId() == null) {
+            return null;
+        }
+
+        return Map.of("id", teamsScrum.getStudySheetId().toString());
     }
 
+    @DgsEntityFetcher(name = "TeamsScrum")
+    public TeamsScrumDto teamScrum(Map<String, Object> values) {
+        try {
+            Long id = values.get("id") != null ? Long.valueOf((String) values.get("id")) : null;
+            return teamsScrumBusiness.findById(id);
+        } catch (CustomException e) {
+            System.out.println("TeamsScrum no encontrado: " + e.getMessage());
+            return null;
+        }
+    }
 
-@DgsQuery
+    @DgsQuery
     public Map<String , Object> allTeamsScrums(@InputArgument Integer page, @InputArgument Integer size){
         try {
             Page<TeamsScrumDto> teamsScrumDtoPage = teamsScrumBusiness.findAll(page, size);
