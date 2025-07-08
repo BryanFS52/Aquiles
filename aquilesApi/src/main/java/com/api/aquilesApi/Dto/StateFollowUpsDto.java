@@ -8,8 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class StateFollow_upsDto {
-    private Long stateFollowUpId;
-    @NotNull(message = "El estado es obligatorio")
-    private String status;
+public class StateFollowUpsDto {
+    private Long id;
+
+    @NotNull(message = "El nombre es oblogatorio")
+    private String name;
 }
