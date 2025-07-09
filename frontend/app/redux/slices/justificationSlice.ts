@@ -1,5 +1,6 @@
-import { client, clientLAN } from '@lib/apollo-client'
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { client, clientLAN } from '@lib/apollo-client';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ReactNode } from 'react';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_JUSTIFICATIONS, GET_JUSTIFICATION_BY_ID, ADD_JUSTIFICATION, UPDATE_JUSTIFICATION, DELETE_JUSTIFICATION } from '@graphql/justificationsGraph'
 import { JustificationItem } from '@type/slices/justification'
@@ -18,7 +19,7 @@ import {
 } from '@graphql/generated'
 
 // Tipos para el estado extendido
-interface TransformedJustificationItem {
+export interface TransformedJustificationItem {
     tipoNovedad: ReactNode
     id: number;
     programa: string;
@@ -122,6 +123,7 @@ const transformGraphQLToJustificationItem = (graphqlData: any): JustificationIte
 // Función para transformar datos al formato del componente
 const transformToComponentFormat = (justifications: JustificationItem[]): TransformedJustificationItem[] => {
     return justifications.map((j) => ({
+        tipoNovedad: j.justificationType?.name || "Sin tipo",
         id: j.id,
         programa: j.justificationType?.name || "Sin programa",
         ficha: j.justificationType?.id ? j.justificationType.id.toString() : "Sin ficha",

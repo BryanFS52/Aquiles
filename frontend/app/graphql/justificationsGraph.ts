@@ -25,42 +25,42 @@ export const GET_ALL_JUSTIFICATIONS = gql`
   }
 `;
 
-export const GET_JUSTIFICATIONS_BY_STUDENT = gql`
-  query GetAllJustificationsByStudent($studentId: Long!) {
-    allJustificationsByStudent(studentId: $studentId) {
-      code
-      message
-      data {
-        id
-        description
-        justificationFile
-        justificationDate
-        state
-        justificationType {
-          id
-          name
-        }
-      }
-    }
-  }
-`;
+// export const GET_JUSTIFICATIONS_BY_STUDENT = gql`
+//   query GetAllJustificationsByStudent($studentId: Long!) {
+//     allJustificationsByStudent(studentId: $studentId) {
+//       code
+//       message
+//       data {
+//         id
+//         description
+//         justificationFile
+//         justificationDate
+//         state
+//         justificationType {
+//           id
+//           name
+//         }
+//       }
+//     }
+//   }
+// `;
 
 export const GET_JUSTIFICATION_BY_ID = gql`
   query GetJustificationById($id: Long!) {
     justificationById(id: $id) {
       code
       message
-      date
       data {
         id
         description
         justificationFile
         justificationDate
         state
-        justificationType {
+        justificationTypeId {
           id
           name
         }
+      date
       }
     }
   }

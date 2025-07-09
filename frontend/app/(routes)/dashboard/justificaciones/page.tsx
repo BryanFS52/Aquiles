@@ -11,15 +11,15 @@ import {
   goToPreviousPage,
   goToNextPage,
   formatErrorMessage,
-  downloadBase64File,
   generateFileName,
-  setLocalCurrentPage
+  setLocalCurrentPage,
+  downloadBase64File
 } from '@slice/justificationSlice';
 import JustificationTable from "@/components/features/justification/justificationsTable";
-
+import {AppDispatch, RootState} from '@/redux/store'
 
 export default function JustificacionesInstructor() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const {
     filteredData,
     loading,
@@ -33,7 +33,7 @@ export default function JustificacionesInstructor() {
 
 
   useEffect(() => {
-    dispatch(fetchJustifications({ page: localCurrentPage, size: itemsPerPage }));
+    dispatch(fetchJustifications({ page: 0, size: itemsPerPage }));
   }, [dispatch, localCurrentPage, itemsPerPage]);
 
   const handleFilterChange = (filterType: string, value: string) => {

@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useUser } from '@context/UserContext';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
 import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
-import { fetchJustifications } from '@slice/justificationSlice';
+import { fetchJustifications, generateFileName } from '@slice/justificationSlice';
 import type { AppDispatch, RootState } from '@/redux/store'
 import type { FormDataState } from '@slice/justificationSlice';
 import type { AttendanceItem } from '@type/slices/attendance';
@@ -24,6 +24,7 @@ import {
   updateJustificationTypeId,
   addJustification,
   validateForm,
+  downloadBase64File,
   setSubmitting,
   setCurrentAttendance
 } from '@slice/justificationSlice';
@@ -62,7 +63,7 @@ export default function JustificacionAprendiz() {
     useSelector((state: RootState) => state.justificationType);
   const { data: attendancesData, loading: loadingAttendances, error: errorAttendances
   } = useSelector((state: RootState) => state.attendances.studentAttendances);
-  const { data: justificationsData, loading: loadingJustifications } =
+  const { transformedData: justificationsData, loading: loadingJustifications } =
     useSelector((state: RootState) => state.justification);
   const { loading: loadingJustification, error: errorJustification, form } =
     useSelector((state: RootState) => state.justification);
@@ -258,6 +259,14 @@ export default function JustificacionAprendiz() {
     });
   };
 
+    const handleDownloadFile = (justificacion:any) => {
+      if (justificacion.archivoAdjunto) {
+        const mimeType = justificacion.archivoMime || "application/octet-stream";
+        const fileName = generateFileName(justificacion.id, mimeType);
+        downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
+      }
+    };
+
   const absences = attendancesData || [];
   return (
     <div className="h-auto">
@@ -410,11 +419,9 @@ export default function JustificacionAprendiz() {
           )}
               <div className="pl-2">
                 <JustificationsHistorical
-                  justifications={justificationsData}
+                  data={justificationsData}
                   loading={loadingJustifications}
-                  studentAttendances={{ data: attendancesData }}
-                  attendancesLoading={loadingAttendances}
-                  justificationTypes={justificationTypesData || []}
+                  handleDownloadFile={handleDownloadFile}
                 />
               </div>
         </AnimatePresence>

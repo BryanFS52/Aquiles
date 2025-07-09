@@ -61,12 +61,16 @@ export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
     allAttendancesByStudentId(id: $id) {
       data {
         id
-        attendanceDate
-        attendanceState {
+        justification {
           id
-          status
+          description
+          justificationFile
+          justificationDate
+          justificationTypeId {
+            id
+            name
+          }
         }
-        justification
       }
     }
   }
