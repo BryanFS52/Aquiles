@@ -145,7 +145,7 @@ export default function JustificacionAprendiz() {
         description: form.formData.descripcion,
         justificationFile: base64Ref.current,
         justificationDate: new Date().toISOString().split('T')[0],
-        justificationTypeId: { id: form.formData.justificationTypeId.id },
+        justificationType: { id: form.formData.justificationTypeId.id },
         attendance: { id: currentAttendance?.id },
         state: false,
       };

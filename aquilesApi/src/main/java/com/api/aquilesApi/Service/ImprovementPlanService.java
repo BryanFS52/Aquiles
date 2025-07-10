@@ -1,6 +1,6 @@
 package com.api.aquilesApi.Service;
 
-import com.api.aquilesApi.Entity.ImprovementPlanEntity;
+import com.api.aquilesApi.Entity.ImprovementPlan;
 import com.api.aquilesApi.Repository.ImprovementPlanRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ImprovementPlanService implements Idao<ImprovementPlanEntity, Long> {
+public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
     private final ImprovementPlanRepository improvementPlanRepository;
 
     public ImprovementPlanService(ImprovementPlanRepository improvementPlanRepository) {
@@ -18,33 +18,33 @@ public class ImprovementPlanService implements Idao<ImprovementPlanEntity, Long>
     }
 
     @Override
-    public Page<ImprovementPlanEntity> findAll(PageRequest pageRequest) {
+    public Page<ImprovementPlan> findAll(PageRequest pageRequest) {
         return improvementPlanRepository.findAll(pageRequest);
     }
 
     @Override
-    public ImprovementPlanEntity getById(Long id) {
+    public ImprovementPlan getById(Long id) {
         return improvementPlanRepository.findById(id).orElseThrow(() ->
                 new CustomException("Attendance Type with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
     @Override
-    public void update(ImprovementPlanEntity entity) {
+    public void update(ImprovementPlan entity) {
         this.improvementPlanRepository.save(entity);
     }
 
     @Override
-    public ImprovementPlanEntity save(ImprovementPlanEntity entity) {
+    public ImprovementPlan save(ImprovementPlan entity) {
         return improvementPlanRepository.save(entity);
     }
 
     @Override
-    public void delete(ImprovementPlanEntity entity) {
+    public void delete(ImprovementPlan entity) {
         this.improvementPlanRepository.delete(entity);
     }
 
     @Override
-    public void create(ImprovementPlanEntity entity) {
+    public void create(ImprovementPlan entity) {
         this.improvementPlanRepository.save(entity);
     }
 }

@@ -10,7 +10,8 @@ import java.util.List;
 
 @Repository
 public interface TeamScrumRepository extends JpaRepository<TeamsScrum, Long> {
+
     @Query("SELECT t FROM TeamsScrum t JOIN t.memberIds m WHERE m = :memberId")
     List<TeamsScrum> findByMemberId(@Param("memberId") Long memberId);
-
+    List<TeamsScrum> findByStudySheetId(Long studySheetId);
 }

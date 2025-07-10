@@ -1,6 +1,6 @@
 package com.api.aquilesApi.Service;
 
-import com.api.aquilesApi.Entity.JuriesEntity;
+import com.api.aquilesApi.Entity.Juries;
 import com.api.aquilesApi.Repository.JuriesRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
-public class JuriesService implements Idao<JuriesEntity , Long> {
+public class JuriesService implements Idao<Juries, Long> {
     private final JuriesRepository juriesRepository;
 
     public JuriesService(JuriesRepository juriesRepository) {
@@ -18,33 +18,33 @@ public class JuriesService implements Idao<JuriesEntity , Long> {
     }
 
     @Override
-    public Page<JuriesEntity> findAll(PageRequest pageRequest) {
+    public Page<Juries> findAll(PageRequest pageRequest) {
         return juriesRepository.findAll(pageRequest);
     }
 
     @Override
-    public JuriesEntity getById(Long id) {
+    public Juries getById(Long id) {
         return juriesRepository.findById(id).orElseThrow(() ->
                 new CustomException("Jury with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
     @Override
-    public void update(JuriesEntity entity) {
+    public void update(Juries entity) {
         this.juriesRepository.save(entity);
     }
 
     @Override
-    public JuriesEntity save(JuriesEntity entity) {
+    public Juries save(Juries entity) {
         return juriesRepository.save(entity);
     }
 
     @Override
-    public void delete(JuriesEntity entity) {
+    public void delete(Juries entity) {
         this.juriesRepository.delete(entity);
     }
 
     @Override
-    public void create(JuriesEntity entity) {
+    public void create(Juries entity) {
         this.juriesRepository.save(entity);
     }
 }

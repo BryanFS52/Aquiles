@@ -33,6 +33,9 @@ public class TeamScrumService implements Idao<TeamsScrum, Long> {
     public List<TeamsScrum> findAllByStudentId(Long studentId) {
         return teamsScrumRepository.findByMemberId(studentId);
     }
+    public List<TeamsScrum> findByStudySheetId(Long studySheetId) {
+        return teamsScrumRepository.findByStudySheetId(studySheetId);
+    }
 
     @Override
     public void update(TeamsScrum entity) {
@@ -53,4 +56,5 @@ public class TeamScrumService implements Idao<TeamsScrum, Long> {
     public void create(TeamsScrum entity) {
         this.teamsScrumRepository.save(entity);
     }
+
 }

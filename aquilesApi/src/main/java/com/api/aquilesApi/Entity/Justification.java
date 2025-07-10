@@ -15,7 +15,7 @@ import java.util.Base64;
 @NoArgsConstructor
 @Entity
 @Table(name = "justification")
-public class JustificationEntity implements Serializable {
+public class Justification implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,7 +25,6 @@ public class JustificationEntity implements Serializable {
     @Column(name = "description")
     private String description;
 
-    @Lob
     @Column(name = "justification_file", nullable = false)
     private byte[] justificationFile;
 
@@ -38,17 +37,17 @@ public class JustificationEntity implements Serializable {
     // Relations
     // 1.Relation (1-1) con notifications
     @OneToOne(mappedBy = "justification")
-    private NotificationsEntity notification;
+    private Notifications notification;
 
     // 2.Relation (M-1) con justificationType
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "justification_type_id", nullable = true)
-    private JustificationTypeEntity justificationTypeId;
+    private JustificationType justificationTypeId;
 
     // 3. Relation (1-1) con attendance
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "attendance_id", referencedColumnName = "id")
-    private AttendanceEntity attendance;
+    private Attendance attendance;
 
     public String getJustificationFile() {
         return Base64.getEncoder().encodeToString(justificationFile);

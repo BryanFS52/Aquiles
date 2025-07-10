@@ -20,7 +20,6 @@ export const GET_TEAMS_SCRUMS = gql`
             person{
                 name
                 lastname
-                document
             }
         }
       }

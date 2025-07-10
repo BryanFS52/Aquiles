@@ -4,7 +4,7 @@ import com.api.aquilesApi.Business.AttendancesBusiness;
 import com.api.aquilesApi.Dto.AttendancesDto;
 import com.api.aquilesApi.Dto.QRCodePayloadDto;
 import com.api.aquilesApi.Dto.Student;
-import com.api.aquilesApi.Entity.AttendanceEntity;
+import com.api.aquilesApi.Entity.Attendance;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.api.aquilesApi.Utilities.QRCode.QrCodeGenerator;
 import com.netflix.graphql.dgs.*;
@@ -51,7 +51,7 @@ public class AttendancesResolver {
     }
 
     @DgsData(parentType = "Student", field = "attendances")
-    public List<AttendanceEntity> getAttendances(DgsDataFetchingEnvironment env) {
+    public List<Attendance> getAttendances(DgsDataFetchingEnvironment env) {
         Student student = env.getSource();
         assert student != null;
 
@@ -60,7 +60,7 @@ public class AttendancesResolver {
         List<AttendancesDto> attendancesDtoList = attendancesBusiness.findAllByStudentId(studentId);
 
         return attendancesDtoList.stream()
-                .map(dto -> modelMapper.map(dto, AttendanceEntity.class))
+                .map(dto -> modelMapper.map(dto, Attendance.class))
                 .collect(Collectors.toList());
     }
 

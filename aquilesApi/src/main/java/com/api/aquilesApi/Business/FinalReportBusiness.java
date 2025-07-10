@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.FinalReportDto;
-import com.api.aquilesApi.Entity.FinalReportEntity;
+import com.api.aquilesApi.Entity.FinalReport;
 import com.api.aquilesApi.Service.FinalReportService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
@@ -27,7 +27,7 @@ public class FinalReportBusiness {
     public Page<FinalReportDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<FinalReportEntity> finalreportEntityPage = finalReportService.findAll(pageRequest);
+            Page<FinalReport> finalreportEntityPage = finalReportService.findAll(pageRequest);
 
             System.out.println("Total Attendances: " + finalreportEntityPage.getTotalElements());
 
@@ -44,7 +44,7 @@ public class FinalReportBusiness {
     // Find By Id
     public FinalReportDto findById(Long id) {
         try {
-            FinalReportEntity finalReport = finalReportService.getById(id);
+            FinalReport finalReport = finalReportService.getById(id);
             return modelMapper.map(finalReport, FinalReportDto.class);
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada
@@ -60,10 +60,10 @@ public class FinalReportBusiness {
 
                 byte[] signatureBytes = java.util.Base64.getDecoder().decode(finalreportDto.getSignature());
 
-            FinalReportEntity finalReportEntity = modelMapper.map(finalreportDto, FinalReportEntity.class);
-            finalReportEntity.setFirma(signatureBytes);
+            FinalReport finalReport = modelMapper.map(finalreportDto, FinalReport.class);
+            finalReport.setFirma(signatureBytes);
 
-            return modelMapper.map(finalReportService.save(finalReportEntity), FinalReportDto.class);
+            return modelMapper.map(finalReportService.save(finalReport), FinalReportDto.class);
         }catch ( Exception e){
             throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);
         }
@@ -73,7 +73,7 @@ public class FinalReportBusiness {
     public void update(Long finalReportId, FinalReportDto finalreportDto) {
         try {
             finalreportDto.setId(finalReportId);
-            FinalReportEntity attendance = modelMapper.map( finalreportDto, FinalReportEntity.class);
+            FinalReport attendance = modelMapper.map( finalreportDto, FinalReport.class);
             finalReportService.save(attendance);
         } catch (Exception e) {
             throw new CustomException("Error Updating finalReport: " + e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -83,7 +83,7 @@ public class FinalReportBusiness {
     // Delete
     public void delete(Long finalReportId) {
         try {
-            FinalReportEntity finalReport = finalReportService.getById(finalReportId);
+            FinalReport finalReport = finalReportService.getById(finalReportId);
             finalReportService.delete(finalReport);
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada

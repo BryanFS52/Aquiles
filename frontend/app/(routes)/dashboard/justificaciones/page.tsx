@@ -37,7 +37,7 @@ export default function JustificacionesInstructor() {
   console.log(filteredData)
 
   useEffect(() => {
-    dispatch(fetchJustifications({ page: localCurrentPage, size: itemsPerPage }));
+    dispatch(fetchJustifications({ page: 0, size: itemsPerPage }));
   }, [dispatch, localCurrentPage, itemsPerPage]);
 
   const handleFilterChange = (filterType: string, value: string) => {
@@ -46,7 +46,7 @@ export default function JustificacionesInstructor() {
   };
 
   const handleRefresh = () => {
-    dispatch(fetchJustifications({ page: localCurrentPage, size: itemsPerPage }));
+    dispatch(fetchJustifications({ page: 0, size: itemsPerPage }));
   };
 
   const handlePreviousPage = () => {

@@ -33,7 +33,7 @@ input JustificationDto {
     justificationDate: String
     state: Boolean
     attendance: AttendancesDto
-    justificationTypeId: JustificationTypeDto
+    justificationType: JustificationTypeDto
 }
 
 extend type Query {

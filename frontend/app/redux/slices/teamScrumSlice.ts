@@ -56,6 +56,7 @@ export const fetchTeamScrumById = createAsyncThunk<GetTeamScrumByIdQuery['teamSc
     }
 );
 
+
 export const addTeamScrum = createAsyncThunk<AddTeamScrumMutation['addTeamScrum'], AddTeamScrumMutationVariables['input'],
     { rejectValue: { code: string; message: string } }
 >(

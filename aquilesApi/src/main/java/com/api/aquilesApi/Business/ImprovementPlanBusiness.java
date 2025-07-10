@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.ImprovementPlanDto;
-import com.api.aquilesApi.Entity.ImprovementPlanEntity;
+import com.api.aquilesApi.Entity.ImprovementPlan;
 import com.api.aquilesApi.Service.ImprovementPlanService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
@@ -27,7 +27,7 @@ public class ImprovementPlanBusiness {
     public Page<ImprovementPlanDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<ImprovementPlanEntity> improvementPlanPage = improvementPlanService.findAll(pageRequest);
+            Page<ImprovementPlan> improvementPlanPage = improvementPlanService.findAll(pageRequest);
 
             System.out.println("Total Attendances: " + improvementPlanPage.getTotalElements());
 
@@ -44,7 +44,7 @@ public class ImprovementPlanBusiness {
     // Find By Id
     public ImprovementPlanDto findById(Long id) {
         try {
-            ImprovementPlanEntity improvementPlan = improvementPlanService.getById(id);
+            ImprovementPlan improvementPlan = improvementPlanService.getById(id);
             return modelMapper.map(improvementPlan, ImprovementPlanDto.class);
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada
@@ -56,8 +56,8 @@ public class ImprovementPlanBusiness {
     // Add
     public ImprovementPlanDto add(ImprovementPlanDto improvementplanDto) {
         try {
-            ImprovementPlanEntity improvementPlanEntity = modelMapper.map(improvementplanDto, ImprovementPlanEntity.class);
-            return modelMapper.map(improvementPlanService.save(improvementPlanEntity), ImprovementPlanDto.class);
+            ImprovementPlan improvementPlan = modelMapper.map(improvementplanDto, ImprovementPlan.class);
+            return modelMapper.map(improvementPlanService.save(improvementPlan), ImprovementPlanDto.class);
         }catch ( Exception e){
             throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);
         }
@@ -67,7 +67,7 @@ public class ImprovementPlanBusiness {
     public void update(Long id, ImprovementPlanDto improvementplanDto) {
         try {
             improvementplanDto.setId(id);
-            ImprovementPlanEntity improvementPlan = modelMapper.map( improvementplanDto, ImprovementPlanEntity.class);
+            ImprovementPlan improvementPlan = modelMapper.map( improvementplanDto, ImprovementPlan.class);
             improvementPlanService.save(improvementPlan);
         } catch (Exception e) {
             throw new CustomException("Error Updating Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -77,7 +77,7 @@ public class ImprovementPlanBusiness {
     // Delete
     public void delete(Long id) {
         try {
-            ImprovementPlanEntity improvementPlan = improvementPlanService.getById(id);
+            ImprovementPlan improvementPlan = improvementPlanService.getById(id);
             improvementPlanService.delete(improvementPlan);
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada

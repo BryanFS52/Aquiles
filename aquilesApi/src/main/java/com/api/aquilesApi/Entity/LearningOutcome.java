@@ -4,24 +4,21 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.io.Serializable;
 
-@NoArgsConstructor
-@Entity
 @Getter
 @Setter
-@Table(name = "juries")
-public class JuriesEntity implements Serializable {
+@NoArgsConstructor
+@Entity
+public class LearningOutcome implements Serializable {
+//    (Model)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // Relations
-    // 1.Relation (M-M) con Checklist
-    /*
-    @ManyToMany(mappedBy = "juries")
-    private Set<ChecklistEntity> checklists;
-
-     */
+    // 1.Relation (M-1) con checklist
+    @ManyToOne
+    @JoinColumn(name = "checklist_id", nullable = false)
+    private Checklist checklist;
 }

@@ -17,7 +17,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "attendances")
-public class AttendanceEntity implements Serializable {
+public class Attendance implements Serializable {
     @Transient
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -37,7 +37,7 @@ public class AttendanceEntity implements Serializable {
     // Relations
     // Relation (1-1) con justification
     @OneToOne(mappedBy = "attendance", cascade = CascadeType.ALL)
-    private JustificationEntity justification;
+    private Justification justification;
 
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -46,7 +46,7 @@ public class AttendanceEntity implements Serializable {
 
     // 3.Relation (M-M) con notifications
     @ManyToMany(mappedBy = "attendances")
-    private Set<NotificationsEntity> notifications;
+    private Set<Notifications> notifications;
 
     public void setAttendanceDate(String attendanceDate) throws ParseException {
         this.attendanceDate = formatter.parse(attendanceDate);

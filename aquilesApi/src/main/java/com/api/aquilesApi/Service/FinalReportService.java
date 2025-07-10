@@ -1,6 +1,6 @@
 package com.api.aquilesApi.Service;
 
-import com.api.aquilesApi.Entity.FinalReportEntity;
+import com.api.aquilesApi.Entity.FinalReport;
 import com.api.aquilesApi.Repository.FinalReportRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FinalReportService implements Idao<FinalReportEntity, Long> {
+public class FinalReportService implements Idao<FinalReport, Long> {
 
     private final FinalReportRepository finalReportRepository;
 
@@ -19,35 +19,35 @@ public class FinalReportService implements Idao<FinalReportEntity, Long> {
     }
 
     @Override
-    public Page<FinalReportEntity> findAll(PageRequest pageRequest) {
+    public Page<FinalReport> findAll(PageRequest pageRequest) {
         return finalReportRepository.findAll(pageRequest);
     }
 
 
     @Override
-    public FinalReportEntity getById(Long id) {
+    public FinalReport getById(Long id) {
         return finalReportRepository.findById(id).orElseThrow(() ->
                 new CustomException("FinalReport Type with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
 
     @Override
-    public void update(FinalReportEntity entity) {
+    public void update(FinalReport entity) {
         this.finalReportRepository.save(entity);
     }
 
     @Override
-    public FinalReportEntity save(FinalReportEntity entity) {
+    public FinalReport save(FinalReport entity) {
         return finalReportRepository.save(entity);
     }
 
     @Override
-    public void delete(FinalReportEntity entity) {
+    public void delete(FinalReport entity) {
         this.finalReportRepository.delete(entity);
     }
 
     @Override
-    public void create(FinalReportEntity entity) {
+    public void create(FinalReport entity) {
         this.finalReportRepository.save(entity);
     }
 }

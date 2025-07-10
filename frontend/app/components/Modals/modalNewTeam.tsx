@@ -1,25 +1,54 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Select from 'react-select';
+import Select, { MultiValue, ActionMeta } from 'react-select';
 import studentService from "@services/olympo/studentService";
+import { AddTeamScrumMutationVariables, Student, TeamsScrumDto } from "@/graphql/generated";
 
-const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
-  const [teamData, setTeamData] = useState({
-    nameTeamScrum: "",
+// Interfaces and Types
+interface StudentOption {
+  value: string;
+  label: string;
+  id: string;
+  fullName: string;
+}
+
+interface FormErrors {
+  teamName?: string | null;
+  projectName?: string | null;
+  members?: string | null;
+}
+
+type CreateTeamData = AddTeamScrumMutationVariables["input"];
+
+interface ModalNewProjectProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onCreate: (data: CreateTeamData) => Promise<boolean>;
+  studySheetId: number;
+}
+
+
+const ModalNewProject: React.FC<ModalNewProjectProps> = ({
+  isOpen,
+  onClose,
+  onCreate,
+  studySheetId
+}) => {
+  const [teamData, setTeamData] = useState<Partial<TeamsScrumDto>>({
+    teamName: "",
     projectName: "",
-    nameProject: "",
-    members: []
+    memberIds: []
   });
-  const [errors, setErrors] = useState({});
-  const [modalTransition, setModalTransition] = useState(false);
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [modalTransition, setModalTransition] = useState<boolean>(false);
+  const [students, setStudents] = useState<StudentOption[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // Configuración de estilos para react-select
   const selectStyles = {
-    control: (provided, state) => ({
+    control: (provided: any, state: any) => ({
       ...provided,
       borderColor: errors.members ? '#ef4444' : state.isFocused ? '#3b82f6' : '#d1d5db',
       borderWidth: '2px',
@@ -30,18 +59,18 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
       minHeight: '44px',
       borderRadius: '6px'
     }),
-    multiValue: (provided) => ({
+    multiValue: (provided: any) => ({
       ...provided,
       backgroundColor: '#dbeafe',
       borderRadius: '20px'
     }),
-    multiValueLabel: (provided) => ({
+    multiValueLabel: (provided: any) => ({
       ...provided,
       color: '#1e40af',
       fontWeight: '500',
       fontSize: '14px'
     }),
-    multiValueRemove: (provided) => ({
+    multiValueRemove: (provided: any) => ({
       ...provided,
       color: '#3b82f6',
       ':hover': {
@@ -50,12 +79,12 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
       },
       borderRadius: '0 20px 20px 0'
     }),
-    placeholder: (provided) => ({
+    placeholder: (provided: any) => ({
       ...provided,
       color: '#9ca3af',
       fontSize: '14px'
     }),
-    option: (provided, state) => ({
+    option: (provided: any, state: any) => ({
       ...provided,
       backgroundColor: state.isSelected
         ? '#3b82f6'
@@ -82,15 +111,15 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
     }
   }, [isOpen]);
 
-  const fetchStudents = async () => {
+  const fetchStudents = async (): Promise<void> => {
     setLoading(true);
     try {
       const res = await studentService.getStudentList();
-      const studentOptions = res.data.map((s) => ({
-        value: s.id,
-        label: `${s.person.name} ${s.person.lastname}`,
-        id: s.id,
-        fullName: `${s.person.name} ${s.person.lastname}`
+      const studentOptions: StudentOption[] = (res.data as Student[]).map((s: Student) => ({
+        value: s.id!,
+        label: `${s.person?.name} ${s.person?.lastname}`,
+        id: s.id!,
+        fullName: `${s.person?.name} ${s.person?.lastname}`
       }));
       setStudents(studentOptions);
     } catch (err) {
@@ -100,34 +129,33 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
     }
   };
 
-  const resetForm = () => {
+  const resetForm = (): void => {
     setTeamData({
-      nameTeamScrum: "",
+      teamName: "",
       projectName: "",
-      nameProject: "",
-      members: []
+      memberIds: []
     });
     setErrors({});
   };
 
-  const validateForm = () => {
-    const newErrors = {};
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
 
-    if (!teamData.nameTeamScrum.trim()) {
-      newErrors.nameTeamScrum = "El nombre del Team Scrum es obligatorio";
-    } else if (teamData.nameTeamScrum.trim().length < 3) {
-      newErrors.nameTeamScrum = "El nombre debe tener al menos 3 caracteres";
+    if (!teamData.teamName?.trim()) {
+      newErrors.teamName = "El nombre del Team Scrum es obligatorio";
+    } else if (teamData.teamName.trim().length < 3) {
+      newErrors.teamName = "El nombre debe tener al menos 3 caracteres";
     }
 
-    if (!teamData.projectName.trim()) {
+    if (!teamData.projectName?.trim()) {
       newErrors.projectName = "El nombre del proyecto es obligatorio";
     } else if (teamData.projectName.trim().length < 3) {
       newErrors.projectName = "El nombre debe tener al menos 3 caracteres";
     }
 
-    if (teamData.members.length === 0) {
+    if (!teamData.memberIds || teamData.memberIds.length === 0) {
       newErrors.members = "Debe seleccionar al menos un miembro";
-    } else if (teamData.members.length > 8) {
+    } else if (teamData.memberIds.length > 8) {
       newErrors.members = "No puede seleccionar más de 8 miembros";
     }
 
@@ -135,14 +163,14 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: keyof TeamsScrumDto, value: string): void => {
     setTeamData(prev => ({
       ...prev,
       [field]: value
     }));
 
     // Limpiar error específico cuando el usuario empiece a escribir
-    if (errors[field]) {
+    if (errors[field as keyof FormErrors]) {
       setErrors(prev => ({
         ...prev,
         [field]: null
@@ -150,11 +178,14 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
     }
   };
 
-  const handleMembersChange = (selectedOptions) => {
-    const members = selectedOptions ? selectedOptions.map(option => option.fullName) : [];
+  const handleMembersChange = (
+    selectedOptions: MultiValue<StudentOption>,
+    actionMeta: ActionMeta<StudentOption>
+  ): void => {
+    const memberIds = selectedOptions.map(option => option.id);
     setTeamData(prev => ({
       ...prev,
-      members
+      memberIds: memberIds
     }));
 
     // Limpiar error de members
@@ -166,29 +197,34 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
     }
   };
 
-  const handleCreateTeam = async () => {
-    if (!validateForm()) {
-      return;
-    }
+  const handleCreateTeam = async (): Promise<void> => {
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
     try {
-      await onCreate({
-        nameTeamScrum: teamData.nameTeamScrum.trim(),
-        projectName: teamData.projectName.trim(),
-        nameProject: teamData.nameProject.trim(),
-        members: teamData.members,
+      const success = await onCreate({
+        teamName: teamData.teamName!.trim(),
+        projectName: teamData.projectName!.trim(),
+        studySheetId: studySheetId,
+        memberIds: teamData.memberIds?.map(id => parseInt(id, 10)),
+        description: "",
+        objectives: "",
+        problem: "",
+        projectJustification: "",
       });
-      handleClose();
+
+      if (success) {
+        handleClose();
+      }
     } catch (error) {
       console.error("Error creating team:", error);
-      // Aquí podrías mostrar un mensaje de error
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleClose = () => {
+
+  const handleClose = (): void => {
     if (isSubmitting) return; // Prevenir cierre durante envío
 
     setModalTransition(false);
@@ -198,15 +234,15 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
   };
 
   // Prevenir cierre al hacer clic en el contenido del modal
-  const handleModalContentClick = (e) => {
+  const handleModalContentClick = (e: React.MouseEvent<HTMLDivElement>): void => {
     e.stopPropagation();
   };
 
   if (!isOpen) return null;
 
-  const selectedMembers = students.filter(student =>
-    teamData.members.includes(student.fullName)
-  );
+  const selectedMembers = teamData.memberIds
+    ? students.filter(s => teamData.memberIds!.includes(s.id))
+    : [];
 
   return (
     <div
@@ -248,16 +284,16 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
               <input
                 type="text"
                 placeholder="Ej: Team Alpha, Desarrolladores Frontend..."
-                value={teamData.nameTeamScrum}
-                onChange={(e) => handleInputChange('nameTeamScrum', e.target.value)}
-                className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${errors.nameTeamScrum
+                value={teamData.teamName || ''}
+                onChange={(e) => handleInputChange('teamName', e.target.value)}
+                className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${errors.teamName
                   ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-300'
                   }`}
                 disabled={isSubmitting}
               />
-              {errors.nameTeamScrum && (
-                <p className="text-red-500 text-xs mt-1">{errors.nameTeamScrum}</p>
+              {errors.teamName && (
+                <p className="text-red-500 text-xs mt-1">{errors.teamName}</p>
               )}
             </div>
 
@@ -269,7 +305,7 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
               <input
                 type="text"
                 placeholder="Ej: Sistema de Gestión, App Mobile..."
-                value={teamData.projectName}
+                value={teamData.projectName || ''}
                 onChange={(e) => handleInputChange('projectName', e.target.value)}
                 className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${errors.projectName
                   ? 'border-red-500 focus:ring-red-500'
@@ -287,7 +323,7 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Miembros del Team *
                 <span className="text-gray-500 font-normal text-xs">
-                  ({teamData.members.length}/8)
+                  ({teamData.memberIds?.length || 0}/4)
                 </span>
               </label>
               <Select
@@ -309,7 +345,7 @@ const ModalNewProject = ({ isOpen, onClose, onCreate }) => {
                 <p className="text-red-500 text-xs mt-1">{errors.members}</p>
               )}
               <p className="text-gray-500 text-xs mt-1">
-                Selecciona entre 1 y 8 miembros para el equipo
+                Selecciona entre 1 y 4 miembros para el equipo
               </p>
             </div>
           </div>

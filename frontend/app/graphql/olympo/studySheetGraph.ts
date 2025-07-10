@@ -41,6 +41,30 @@ export const GET_STUDY_SHEETS = gql`
     }
 `;
 
+export const GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID = gql`
+    query GetStudySheetWithTeamScrumById($id: Long) {
+    studySheetById(id: $id) {
+    data {
+      id
+      number
+      teamsScrum {
+        id
+        teamName
+        projectName
+        students {
+          id
+          person {
+            name
+            lastname
+            document
+          }
+        }
+      }
+    }
+  }
+}
+`;
+
 export const GET_STUDY_SHEET_BY_ID = gql`
     query GetStudySheetById($id: Long!) {
         studySheetById(id: $id) {

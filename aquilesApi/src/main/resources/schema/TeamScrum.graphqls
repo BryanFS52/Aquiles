@@ -1,5 +1,6 @@
-type StudySheet {
-    id : ID
+type StudySheet @key(fields: "id") @extends {
+    id : ID @external
+    teamsScrum : [TeamsScrum]
 }
 
 type TeamsScrum @key(fields: "id") {

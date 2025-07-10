@@ -11,6 +11,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +28,7 @@ public class TeamsScrumBusiness {
         this.util = util;
     }
 
-    // Validación de objecto
+    // Validation object
 
 
     // Find All
@@ -63,6 +65,7 @@ public class TeamsScrumBusiness {
         }
     }
 
+    // find by StudentId
     public List<TeamsScrumDto> findAllByStudentId(Long studentId) {
         try {
             List<TeamsScrum> teamsScrumList = teamScrumService.findAllByStudentId(studentId);
@@ -105,5 +108,30 @@ public class TeamsScrumBusiness {
         } catch (Exception e){
             throw new CustomException("Error Deleting Team Scrum:" + e.getMessage() , HttpStatus.BAD_REQUEST);
         }
+    }
+
+    public List<TeamsScrumDto> findAllByStudySheetId(Long studySheetId) {
+        System.out.println("🔍 Buscando equipos por studySheetId: " + studySheetId);
+
+        List<TeamsScrum> entities = teamScrumService.findByStudySheetId(studySheetId);
+        System.out.println("📦 Equipos encontrados: " + (entities != null ? entities.size() : "null"));
+
+        if (entities != null) {
+            for (TeamsScrum entity : entities) {
+                System.out.println("➡️  Entidad encontrada: " + entity);
+            }
+        }
+
+        List<TeamsScrumDto> dtos = new ArrayList<>();
+        if (entities != null) {
+            for (TeamsScrum entity : entities) {
+                TeamsScrumDto dto = modelMapper.map(entity, TeamsScrumDto.class);
+                System.out.println("✅ DTO mapeado: " + dto);
+                dtos.add(dto);
+            }
+        }
+
+        System.out.println("🔚 Cantidad de DTOs devueltos: " + dtos.size());
+        return dtos;
     }
 }

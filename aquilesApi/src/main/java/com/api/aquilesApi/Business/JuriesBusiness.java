@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.JuriesDto;
-import com.api.aquilesApi.Entity.JuriesEntity;
+import com.api.aquilesApi.Entity.Juries;
 import com.api.aquilesApi.Service.JuriesService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
@@ -25,7 +25,7 @@ public class JuriesBusiness {
     public Page<JuriesDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<JuriesEntity> juriesEntityPage = juriesService.findAll(pageRequest);
+            Page<Juries> juriesEntityPage = juriesService.findAll(pageRequest);
 
             System.out.println("Total Juries: " + juriesEntityPage.getTotalElements());
 
@@ -42,7 +42,7 @@ public class JuriesBusiness {
     // Find By Id
     public JuriesDto findById(Long id) {
         try {
-            JuriesEntity juries = juriesService.getById(id);
+            Juries juries = juriesService.getById(id);
             return modelMapper.map(juries, JuriesDto.class);
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada
@@ -54,8 +54,8 @@ public class JuriesBusiness {
     // Add
     public JuriesDto add(JuriesDto juriesDto) {
         try {
-            JuriesEntity juriesEntity = modelMapper.map(juriesDto, JuriesEntity.class);
-            return modelMapper.map(juriesService.save(juriesEntity), JuriesDto.class);
+            Juries juries = modelMapper.map(juriesDto, Juries.class);
+            return modelMapper.map(juriesService.save(juries), JuriesDto.class);
         }catch ( Exception e){
             throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);
         }
@@ -65,7 +65,7 @@ public class JuriesBusiness {
     public void update(Long juriesId, JuriesDto juriesDto) {
         try {
             juriesDto.setId(juriesId);
-            JuriesEntity juries = modelMapper.map( juriesDto, JuriesEntity.class);
+            Juries juries = modelMapper.map( juriesDto, Juries.class);
             juriesService.save(juries);
         } catch (Exception e) {
             throw new CustomException("Error Updating Juries: " + e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -75,7 +75,7 @@ public class JuriesBusiness {
     // Delete
     public void delete(Long juriesId) {
         try {
-            JuriesEntity juries = juriesService.getById(juriesId);
+            Juries juries = juriesService.getById(juriesId);
             juriesService.delete(juries);
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada
