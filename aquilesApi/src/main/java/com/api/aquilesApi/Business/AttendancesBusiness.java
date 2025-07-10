@@ -1,8 +1,8 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.AttendancesDto;
-import com.api.aquilesApi.Entity.AttendanceState;
 import com.api.aquilesApi.Entity.AttendanceEntity;
+import com.api.aquilesApi.Entity.AttendanceState;
 import com.api.aquilesApi.Service.AttendancesService;
 import com.api.aquilesApi.Service.StateAttendanceService;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -14,9 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -65,14 +62,6 @@ public class AttendancesBusiness {
         return attendancesDTO;
 
          */
-    }
-    private Date convertToDate(String dateString) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        try {
-            return dateFormat.parse(dateString);
-        } catch (ParseException e) {
-            throw new CustomException("Invalid date format: " + dateString, HttpStatus.BAD_REQUEST);
-        }
     }
 
     // Find All

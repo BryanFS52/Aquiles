@@ -63,6 +63,17 @@ public class TeamsScrumBusiness {
         }
     }
 
+    public List<TeamsScrumDto> findAllByStudentId(Long studentId) {
+        try {
+            List<TeamsScrumEntity> teamsScrumEntityList = teamScrumService.findAllByStudentId(studentId);
+            return teamsScrumEntityList.stream().map(
+                    entity -> modelMapper.map(entity, TeamsScrumDto.class)).collect(Collectors.toList());
+
+        } catch (Exception e){
+            throw new CustomException("Error Getting Team Scrum By Id: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // Add
     public TeamsScrumDto add(TeamsScrumDto teamsScrumDto) {
         try {

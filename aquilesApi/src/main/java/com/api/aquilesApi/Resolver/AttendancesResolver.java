@@ -2,17 +2,16 @@ package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.AttendancesBusiness;
 import com.api.aquilesApi.Dto.AttendancesDto;
-import com.api.aquilesApi.Dto.QRCodePayload;
+import com.api.aquilesApi.Dto.QRCodePayloadDto;
 import com.api.aquilesApi.Dto.Student;
 import com.api.aquilesApi.Entity.AttendanceEntity;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
-import com.api.aquilesApi.Utilities.QrCodeGenerator;
+import com.api.aquilesApi.Utilities.QRCode.QrCodeGenerator;
 import com.netflix.graphql.dgs.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,7 @@ public class AttendancesResolver {
         this.qrCodeGenerator = qrCodeGenerator;
     }
 
-    // Olympo
+    // Olympus
     @DgsEntityFetcher(name = "Student")
     public Student getStudent(Map<String, Object> values) {
         System.out.println("Resolviendo entidad Student con valores: " + values);
@@ -79,6 +78,7 @@ public class AttendancesResolver {
         if(attendancesDto.getStudentId() == null) return null;
         return Map.of("id", attendancesDto.getStudentId().toString());
     }
+
 
     @DgsQuery
     public Map<String, Object> allAttendancesByStudentId(@InputArgument Long id, @InputArgument Long stateId) {
@@ -185,13 +185,13 @@ public class AttendancesResolver {
     @Value("${frontend.url}")
     private String frontendUrl;
     @DgsMutation
-    public QRCodePayload generateQRCode() throws Exception {
+    public QRCodePayloadDto generateQRCode() throws Exception {
         String sessionId = UUID.randomUUID().toString();
         String qrUrl = frontendUrl + "/FormularioQRAsistencia?session=" + sessionId;
 
         byte[] qrCode = qrCodeGenerator.generateQRCodeImage(qrUrl);
         String qrCodeBase64 = Base64.getEncoder().encodeToString(qrCode);
 
-        return new QRCodePayload(sessionId, qrCodeBase64, qrUrl);
+        return new QRCodePayloadDto(sessionId, qrCodeBase64, qrUrl);
     }
 }

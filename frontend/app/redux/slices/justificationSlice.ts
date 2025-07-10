@@ -1,6 +1,5 @@
-import { client, clientLAN } from '@lib/apollo-client';
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ReactNode } from 'react';
+import { client, clientLAN } from '@lib/apollo-client'
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_JUSTIFICATIONS, GET_JUSTIFICATION_BY_ID, ADD_JUSTIFICATION, UPDATE_JUSTIFICATION, DELETE_JUSTIFICATION } from '@graphql/justificationsGraph'
 import { JustificationItem } from '@type/slices/justification'
@@ -113,26 +112,47 @@ const transformGraphQLToJustificationItem = (graphqlData: any): JustificationIte
         justificationDate: graphqlData.justificationDate,
         justificationFile: graphqlData.justificationFile,
         state: graphqlData.state,
-        justificationType: graphqlData.justificationType ? {
-            id: graphqlData.justificationType.id,
-            name: graphqlData.justificationType.name
-        } : { id: 0, name: '' }
+        justificationType: graphqlData.justificationType
+            ? {
+                id: graphqlData.justificationType.id,
+                name: graphqlData.justificationType.name
+            }
+            : { id: 0, name: '' },
+        attendance: {
+            student: {
+                id: graphqlData.attendance?.student?.id ?? 0,
+                person: {
+                    name: graphqlData.attendance?.student?.person?.name ?? '',
+                    lastname: graphqlData.attendance?.student?.person?.lastname ?? '',
+                    document: graphqlData.attendance?.student?.person?.document ?? ''
+                }
+            }
+        }
     };
 };
 
 // Función para transformar datos al formato del componente
 const transformToComponentFormat = (justifications: JustificationItem[]): TransformedJustificationItem[] => {
-    return justifications.map((j) => ({
-        tipoNovedad: j.justificationType?.name || "Sin tipo",
-        id: j.id,
-        programa: j.justificationType?.name || "Sin programa",
-        ficha: j.justificationType?.id ? j.justificationType.id.toString() : "Sin ficha",
-        fecha: new Date(j.justificationDate).toLocaleDateString("es-CO"),
-        estado: j.state ? "Activo" : "Inactivo",
-        archivoAdjunto: j.justificationFile,
-        archivoMime: getMimeTypeFromBase64(j.justificationFile),
-    }));
+    return justifications.map((j) => {
+        const student = j.attendance?.student;
+        const person = student?.person;
+        const studySheet = student?.studySheet;
+        const program = studySheet?.program;
+
+        return {
+            id: j.id,
+            programa: program?.name || "Sin programa",
+            ficha: studySheet?.number?.toString() || "Sin ficha",
+            fecha: new Date(j.justificationDate).toLocaleDateString("es-CO"),
+            estado: j.state ? "Activo" : "Inactivo",
+            archivoAdjunto: j.justificationFile,
+            archivoMime: getMimeTypeFromBase64(j.justificationFile),
+            documento: person?.document || '',
+            aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim()
+        };
+    });
 };
+
 
 // Función para filtrar datos
 const filterJustifications = (
@@ -379,7 +399,7 @@ const initialState: JustificationState = {
         selectedFiltro: "",
         searchTerm: ""
     },
-    localCurrentPage: 1,
+    localCurrentPage: 0,
     itemsPerPage: 6,
     form: {
         showForm: false,

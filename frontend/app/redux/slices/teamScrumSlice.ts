@@ -1,4 +1,4 @@
-import { client } from '@lib/apollo-client';
+import { client, clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GET_TEAMS_SCRUMS, GET_TEAM_SCRUM_BY_ID, ADD_TEAM_SCRUM, UPDATE_TEAM_SCRUM, DELETE_TEAM_SCRUM, } from '@graphql/teamsScrumGraph';
 import { TeamScrumItem } from '@type/slices/teamScrum'
@@ -20,7 +20,15 @@ import {
 const transformGraphQLToTeamScrumItem = (graphqlData: any): TeamScrumItem => {
     return {
         id: graphqlData.teamScrum?.id || graphqlData.id,
-        name: graphqlData.teamScrum?.name || graphqlData.name
+        teamName: graphqlData.teamScrum?.teamName || graphqlData.teamName,
+        projectName: graphqlData.projectName,
+        problem: graphqlData.problem,
+        objectives: graphqlData.objectives,
+        description: graphqlData.description,
+        projectJustification: graphqlData.projectJustification,
+        checklist: graphqlData.checklist,
+        studySheet: graphqlData.studySheet,
+        students: graphqlData.students || [],
     };
 };
 
@@ -28,7 +36,7 @@ const transformGraphQLToTeamScrumItem = (graphqlData: any): TeamScrumItem => {
 export const fetchTeamsScrums = createAsyncThunk<GetTeamsScrumsQuery['allTeamsScrums'], GetTeamsScrumsQueryVariables>(
     'teamScrum/fetchAll',
     async ({ page, size }) => {
-        const { data } = await client.query<GetTeamsScrumsQuery, GetTeamsScrumsQueryVariables>({
+        const { data } = await clientLAN.query<GetTeamsScrumsQuery, GetTeamsScrumsQueryVariables>({
             query: GET_TEAMS_SCRUMS,
             variables: { page, size },
             fetchPolicy: 'no-cache',
@@ -40,7 +48,7 @@ export const fetchTeamsScrums = createAsyncThunk<GetTeamsScrumsQuery['allTeamsSc
 export const fetchTeamScrumById = createAsyncThunk<GetTeamScrumByIdQuery['teamScrumById'], GetTeamScrumByIdQueryVariables>(
     'teamScrum/fetchById',
     async ({ id }) => {
-        const { data } = await client.query<GetTeamScrumByIdQuery, GetTeamScrumByIdQueryVariables>({
+        const { data } = await clientLAN.query<GetTeamScrumByIdQuery, GetTeamScrumByIdQueryVariables>({
             query: GET_TEAM_SCRUM_BY_ID,
             variables: { id },
         });

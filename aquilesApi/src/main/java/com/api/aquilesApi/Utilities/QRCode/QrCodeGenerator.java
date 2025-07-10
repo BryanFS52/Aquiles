@@ -1,4 +1,4 @@
-package com.api.aquilesApi.Utilities;
+package com.api.aquilesApi.Utilities.QRCode;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;

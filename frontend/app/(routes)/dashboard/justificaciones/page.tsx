@@ -2,9 +2,11 @@
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { GrAttachment } from "react-icons/gr";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFilters from "@components/features/justification/justificationsFilter";
+import type { AppDispatch } from "@/redux/store";
 import {
   fetchJustifications,
   setFilterOptions,
@@ -29,8 +31,9 @@ export default function JustificacionesInstructor() {
     localCurrentPage,
     filterOptions,
     itemsPerPage
-  } = useSelector((state:any) => state.justification);
+  } = useSelector((state: any) => state.justification);
 
+  console.log(filteredData)
 
   useEffect(() => {
     dispatch(fetchJustifications({ page: 0, size: itemsPerPage }));
@@ -53,7 +56,7 @@ export default function JustificacionesInstructor() {
     dispatch(goToNextPage());
   };
 
-  const handleDownloadFile = (justificacion:any) => {
+  const handleDownloadFile = (justificacion: any) => {
     if (justificacion.archivoAdjunto) {
       const mimeType = justificacion.archivoMime || "application/octet-stream";
       const fileName = generateFileName(justificacion.id, mimeType);
@@ -87,10 +90,59 @@ export default function JustificacionesInstructor() {
       {/* Table */}
       {!loading && !errorMessage && (
         <>
-        <JustificationTable
-          filteredData={filteredData}
-          handleDownloadFile={handleDownloadFile}
-        />
+          <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+            <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
+              <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700 text-black dark:text-white">
+                <tr>
+                  <th className="px-6 py-4 font-medium">Programa</th>
+                  <th className="px-6 py-4 font-medium">Ficha</th>
+                  <th className="px-6 py-4 font-medium">Foto</th>
+                  <th className="px-6 py-4 font-medium">Documento</th>
+                  <th className="px-6 py-4 font-medium">Aprendiz</th>
+                  <th className="px-6 py-4 font-medium">Fecha de Justificación</th>
+                  <th className="px-6 py-4 font-medium">Archivo Adjunto</th>
+                  <th className="px-6 py-4 font-medium">Estado</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {filteredData.map((justificacion: any) => (
+                  <tr key={justificacion.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{justificacion.programa}</td>
+                    <td className="px-6 py-4">{justificacion.ficha}</td>
+                    <td className="px-6 py-4">
+                      <Image
+                        src={persona}
+                        alt="Persona"
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    </td>
+                    <td className="px-6 py-4">{justificacion.documento}</td>
+                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{justificacion.aprendiz}</td>
+                    <td className="px-6 py-4">{justificacion.fecha}</td>
+                    <td className="px-6 py-4">
+                      {justificacion.archivoAdjunto ? (
+                        <GrAttachment
+                          title={`Descargar archivo (${justificacion.archivoMime || "desconocido"})`}
+                          className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
+                          onClick={() => handleDownloadFile(justificacion)}
+                        />
+                      ) : (
+                        <span className="text-gray-400 dark:text-gray-500">No hay archivo</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${justificacion.estado === "Activo"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                        : "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                        }`}>
+                        {justificacion.estado}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {/* Pagination */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">

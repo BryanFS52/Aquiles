@@ -1,6 +1,6 @@
 import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { GET_STUDY_SHEETS, GET_STUDY_SHEET_BY_ID } from '@graphql/olympo/studySheetGraph'
+import { GET_STUDY_SHEETS, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER } from '@graphql/olympo/studySheetGraph'
 import { createInitialPaginatedState } from '@type/slices/common/generic';
 import { StudySheetItem } from '@type/slices/olympo/studySheet'
 import {
@@ -8,6 +8,8 @@ import {
     GetStudySheetsQueryVariables,
     GetStudySheetByIdQuery,
     GetStudySheetByIdQueryVariables,
+    StudySheetByTeacherQuery,
+    StudySheetByTeacherQueryVariables
 } from '@graphql/generated';
 
 // Función para transformar datos de GraphQL a StudySheetItem
@@ -57,7 +59,6 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheetIt
             }
             : null,
 
-        // 👇 Agrega esto para que los estudiantes vengan incluidos si están presentes
         students: graphqlData.students?.filter((s: any) => s !== null).map((student: any) => ({
             id: student.id,
             person: {
@@ -66,9 +67,12 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheetIt
                 name: student.person.name,
                 lastname: student.person.lastname,
                 email: student.person.email,
-                phone: student.person.phone
+                phone: student.person.phone,
+                blood_type: student.person.blood_type,
+                date_birth: student.person.date_birth,
             },
-        })) ?? [],
+        }))
+
     };
 };
 
@@ -95,6 +99,18 @@ export const fetchStudySheetById = createAsyncThunk<GetStudySheetByIdQuery['stud
             fetchPolicy: 'no-cache',
         });
         return data.studySheetById;
+    }
+);
+
+export const fetchStudySheetByTeacher = createAsyncThunk<StudySheetByTeacherQuery['allStudySheets'], StudySheetByTeacherQueryVariables>(
+    'studySheet/fetchByTeacher',
+    async ({ IdTeacher, page, size }) => {
+        const { data } = await clientLAN.query<StudySheetByTeacherQuery, StudySheetByTeacherQueryVariables>({
+            query: GET_STUDY_SHEET_BY_TEACHER,
+            variables: { IdTeacher, page, size },
+            fetchPolicy: 'no-cache',
+        })
+        return data.allStudySheets;
     }
 );
 
@@ -133,7 +149,7 @@ const studySheetSlice = createSlice({
                 state.loading = false;
             });
 
-        // Fetch Study Sheet by ID
+        // Fetch StudySheetbyID
         builder
             .addCase(fetchStudySheetById.pending, (state) => {
                 state.loading = true;
@@ -146,6 +162,35 @@ const studySheetSlice = createSlice({
             })
             .addCase(fetchStudySheetById.rejected, (state, action) => {
                 state.error = action.error.message ?? 'Error fetching study sheet by ID';
+                state.loading = false;
+            });
+
+        // Fetch StudySheetbyTeacher
+        builder
+            .addCase(fetchStudySheetByTeacher.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchStudySheetByTeacher.fulfilled, (state, action) => {
+                const payload = action.payload;
+                if (payload?.data) {
+                    state.data = payload.data
+                        .filter((item): item is NonNullable<typeof item> => item !== null)
+                        .map(transformGraphQLToStudySheetItem);
+                    state.totalItems = payload.totalItems ?? 0;
+                    state.totalPages = payload.totalPages ?? 0;
+                    state.currentPage = payload.currentPage ?? 0;
+                } else {
+                    // fallback en caso de payload vacío
+                    state.data = [];
+                    state.totalItems = 0;
+                    state.totalPages = 0;
+                    state.currentPage = 0;
+                }
+                state.loading = false;
+            })
+            .addCase(fetchStudySheetByTeacher.rejected, (state, action) => {
+                state.error = action.error.message ?? 'Error fetching study sheets by teacher';
                 state.loading = false;
             });
     }

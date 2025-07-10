@@ -14,7 +14,6 @@ interface LayoutContentProps {
 
 const LayoutContent: React.FC<LayoutContentProps> = ({ children }) => {
     const user = useUser();
-
     return (
         <Provider store={store}>
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">

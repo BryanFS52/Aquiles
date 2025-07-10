@@ -18,11 +18,11 @@ public class TeamsScrumEntity implements Serializable {
     private Long id;
 
     // Columns
-    @Column(name = "name_team", nullable = false, length = 100)
-    private String nameTeam;
+    @Column(name = "team_name", nullable = false, length = 100)
+    private String teamName;
 
-    @Column(name = "name_project", nullable = false, length = 100)
-    private String nameProject;
+    @Column(name = "project_name", nullable = false, length = 100)
+    private String projectName;
 
     @Column(name = "problem", nullable = false, length = 255)
     private String problem;
@@ -33,8 +33,8 @@ public class TeamsScrumEntity implements Serializable {
     @Column(name = "description", nullable = false, length = 255)
     private String description;
 
-    @Column(name = "justification", nullable = false, length = 255)
-    private String justification;
+    @Column(name = "project_justification", nullable = false, length = 255)
+    private String projectJustification;
 
     // Relations
     // 1.Relation (M-1) con Checklist
@@ -42,8 +42,11 @@ public class TeamsScrumEntity implements Serializable {
     @JoinColumn(name = "checklist_id", nullable = true)
     private ChecklistEntity checklist;
 
+    // 2. Relation (M-1) con studySheet
+    @Column(name = "studySheet_id")
+    private Long studySheetId;
+
     // 3. Relation (M-M) con apprentice
-    // Guardas solo los IDs de los usuarios
     @ElementCollection
     @CollectionTable(
             name = "team_scrum_members",

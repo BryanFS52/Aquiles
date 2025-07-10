@@ -1,11 +1,18 @@
+type StudySheet {
+    id : ID
+}
+
 type TeamsScrum {
     id: ID!
-    name: String
+    teamName: String
+    projectName: String
     problem: String
     objectives: String
     description: String
-    justification: String
+    projectJustification: String
     checklist: Checklist
+    studySheet : StudySheet
+    students : [Student]
 }
 
 type TeamsScrumPage {
@@ -26,12 +33,15 @@ type TeamsScrumPageId {
 }
 
 input TeamsScrumDto {
-    name: String!
+    teamName: String!
+    projectName: String!
     problem: String!
     objectives: String!
     description: String!
-    justification: String!
+    projectJustification: String!
     checklist: ChecklistDto
+    studySheetId: Long
+    memberIds: [Long]
 }
 
 extend type Query {

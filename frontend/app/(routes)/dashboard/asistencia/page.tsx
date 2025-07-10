@@ -1,35 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/redux/store'
 import { BsPersonCircle } from "react-icons/bs";
-import { fetchStudySheetById } from '@slice/olympo/studySheetSlice';
 import TableAttendance from "@components/features/attendance/tableAttendance";
 import PageTitle from "@components/UI/pageTitle";
 import AttendanceFooter from "@components/features/attendance/attendanceFooter";
 
 export default function Attendance() {
-    const dispatch = useDispatch<AppDispatch>();
     const { data: studySheets, loading, error } = useSelector(
         (state: RootState) => state.studySheet
     );
 
-    // Get the first study sheet from the data array (since fetchById returns array with single item)
     const studySheet = studySheets.length > 0 ? studySheets[0] : undefined;
     const students = studySheet?.students?.filter((s) => s.person.state === true) || [];
-
-    useEffect(() => {
-        const fetchStudySheet = async () => {
-            try {
-                await dispatch(fetchStudySheetById({ id: "1" })).unwrap();
-            } catch (error) {
-                console.error("Error al obtener ficha:", error);
-            }
-        };
-
-        fetchStudySheet();
-    }, [dispatch]);
 
     const activeStudents = students.length;
     const withdrawnStudents = 0;

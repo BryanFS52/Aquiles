@@ -2,17 +2,26 @@ import { gql } from "@apollo/client";
 
 // Queries and Mutations for TeamsScrum
 export const GET_TEAMS_SCRUMS = gql`
-  query GetTeamsScrums($page: Int, $size: Int) {
+    query GetTeamsScrums($page: Int, $size: Int) {
     allTeamsScrums(page: $page, size: $size) {
       date
       code
       message
       data {
         id
-        name
-        checklist {
-          id
-          remarks
+        teamName
+        projectName
+        problem
+        objectives
+        description
+        projectJustification
+        students{
+            id
+            person{
+                name
+                lastname
+                document
+            }
         }
       }
       currentPage
@@ -24,21 +33,35 @@ export const GET_TEAMS_SCRUMS = gql`
 
 export const GET_TEAM_SCRUM_BY_ID = gql`
   query GetTeamScrumById($id: Long!) {
-    teamScrumById(id: $id) {
-      date
-      code
-      message
-      data {
-        id
-        name
-        
-        checklist {
-          id
-          remarks
-        }
+  teamScrumById(id: $id) {
+    code
+    message
+    date
+    data {
+      id
+      teamName
+      projectName
+      problem
+      objectives
+      description
+      projectJustification
+      checklist {
+        state
       }
+      studySheet {
+        id
+      }
+      students{
+            id
+            person{
+                name
+                lastname
+                document
+            }
+        }
     }
   }
+}
 `;
 
 export const ADD_TEAM_SCRUM = gql`
