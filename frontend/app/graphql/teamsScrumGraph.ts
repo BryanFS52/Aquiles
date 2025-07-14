@@ -44,20 +44,6 @@ export const GET_TEAM_SCRUM_BY_ID = gql`
       objectives
       description
       projectJustification
-      checklist {
-        state
-      }
-      studySheet {
-        id
-      }
-      students{
-            id
-            person{
-                name
-                lastname
-                document
-            }
-        }
     }
   }
 }

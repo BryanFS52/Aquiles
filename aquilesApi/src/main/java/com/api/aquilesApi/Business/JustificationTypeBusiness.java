@@ -14,13 +14,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class JustificationTypeBusiness {
     private final JustificationTypeService justificationTypeService;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
-    public JustificationTypeBusiness(JustificationTypeService justificationTypeService) {
+    public JustificationTypeBusiness(JustificationTypeService justificationTypeService, ModelMapper modelMapper) {
         this.justificationTypeService = justificationTypeService;
+        this.modelMapper = modelMapper;
     }
 
-    // Validación Objeto
+    // Validation object
 
 
     // Find All

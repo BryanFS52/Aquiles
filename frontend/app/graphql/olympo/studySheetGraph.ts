@@ -138,3 +138,24 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
   }
 }
 `;
+
+export const GET_STUDY_SHEET_WITH_STUDENTS = gql`
+query GetStudySheetWithStudents($id: Long!) {
+  studySheetById(id: $id) {
+    data {
+      id
+      number
+      students {
+        id
+        state
+        person {
+          name
+          lastname
+        }
+      }
+    }
+    code
+    message
+  }
+}
+`;

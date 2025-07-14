@@ -4,20 +4,29 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchStudySheetWithTeamScrum } from "@slice/olympo/studySheetSlice";
-import { addTeamScrum, deleteTeamScrum } from "@slice/teamScrumSlice";
-import {
-    AddTeamScrumMutationVariables,
-} from "@/graphql/generated";
+import { addTeamScrum, deleteTeamScrum, updateTeamScrum } from "@slice/teamScrumSlice";
+import { AddTeamScrumMutationVariables } from "@/graphql/generated";
 import { toast } from "react-toastify";
 import { useParams } from "next/navigation";
 import PageTitle from "@components/UI/pageTitle";
 import { TeamScrumItem } from "@type/slices/teamScrum";
 import { FaTrashAlt, FaUsers, FaCode, FaEye } from "react-icons/fa";
 import { MdAddCircle, MdInfo, MdGroup } from "react-icons/md";
-import ModalNewProject from "@/components/Modals/modalNewTeam";
+import ModalNewProject from "@components/Modals/modalNewTeam";
 import ModalComponent from "@components/Modals/modalComponent";
 import ModalAddInformation from "@components/Modals/modalAddInformation";
+import ModalTeamInformation from "@components/Modals/modalTeamScrumInfo";
+import { useLoader } from "@/context/LoaderContext";
 import ModalEliminarTeam from "@components/Modals/modalEliminarTeam";
+
+interface TeamInfoData {
+    projectName: string;
+    teamName: string;
+    description: string;
+    objectives: string;
+    problem: string;
+    projectJustification: string;
+}
 
 export default function TeamScrumDetailsPage() {
     const dispatch = useDispatch<AppDispatch>();
@@ -27,14 +36,17 @@ export default function TeamScrumDetailsPage() {
     const { data, loading: studySheetLoading } = useSelector(
         (state: RootState) => state.studySheet
     );
+    const { showLoader, hideLoader } = useLoader();
 
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [openAgregarInfo, setOpenAgregarInfo] = useState<boolean>(false);
     const [confirmModalOpen, setConfirmModalOpen] = useState<boolean>(false);
     const [openAddInfoModal, setOpenAddInfoModal] = useState<boolean>(false);
+    const [openTeamInfoModal, setOpenTeamInfoModal] = useState<boolean>(false);
 
     const [teamToDelete, setTeamToDelete] = useState<TeamScrumItem | null>(null);
     const [selectedTeam, setSelectedTeam] = useState<TeamScrumItem | null>(null);
+    const [selectedTeamForInfo, setSelectedTeamForInfo] = useState<TeamScrumItem | null>(null);
 
     useEffect(() => {
         if (studySheetId) {
@@ -42,10 +54,19 @@ export default function TeamScrumDetailsPage() {
         }
     }, [dispatch, studySheetId]);
 
+    useEffect(() => {
+        if (studySheetLoading) {
+            showLoader();
+        } else {
+            hideLoader();
+        }
+    }, [studySheetLoading, showLoader, hideLoader]);
+
     const studySheet = data?.[0] ?? null;
 
     const teams: TeamScrumItem[] =
         (studySheet?.teamsScrum as TeamScrumItem[]) ?? [];
+
 
     // Modal handlers
     const handleOpenModal = () => setModalOpen(true);
@@ -64,6 +85,16 @@ export default function TeamScrumDetailsPage() {
     const handleOpenAddInfoModal = () => setOpenAddInfoModal(true);
     const handleCloseAddInfoModal = () => setOpenAddInfoModal(false);
 
+    const handleOpenTeamInfoModal = (team: TeamScrumItem) => {
+        setSelectedTeamForInfo(team);
+        setOpenTeamInfoModal(true);
+    };
+
+    const handleCloseTeamInfoModal = () => {
+        setSelectedTeamForInfo(null);
+        setOpenTeamInfoModal(false);
+    };
+
     const handleOpenConfirmModal = (team: TeamScrumItem) => {
         setTeamToDelete(team);
         setConfirmModalOpen(true);
@@ -79,6 +110,45 @@ export default function TeamScrumDetailsPage() {
             handleDisableTeamScrum(teamToDelete.id, teamToDelete.teamName);
         }
         handleCloseConfirmModal();
+    };
+
+    const handleSaveTeamInfo = async (teamId: string, data: TeamInfoData): Promise<boolean> => {
+        try {
+            const res = await dispatch(updateTeamScrum({
+                id: teamId,
+                input: {
+                    projectName: data.projectName,
+                    teamName: data.teamName,
+                    description: data.description,
+                    objectives: data.objectives,
+                    problem: data.problem,
+                    projectJustification: data.projectJustification
+                }
+            }));
+
+            if (updateTeamScrum.rejected.match(res)) {
+                const message =
+                    res.payload?.message ||
+                    res.error?.message ||
+                    "Error desconocido al actualizar la información del equipo";
+                toast.error(`Error al actualizar: ${message}`);
+                return false;
+            }
+
+            toast.success("Información del equipo actualizada exitosamente");
+
+            // Refrescar los datos
+            if (studySheetId) {
+                dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
+            }
+
+            return true;
+        } catch (e: any) {
+            toast.error(
+                `Excepción no controlada: ${e?.message || "Error desconocido"}`
+            );
+            return false;
+        }
     };
 
     const handleAddTeamScrum = async (
@@ -159,6 +229,12 @@ export default function TeamScrumDetailsPage() {
                     onClose={handleCloseConfirmModal}
                     onConfirm={handleConfirmDelete}
                 />
+                <ModalTeamInformation
+                    isOpen={openTeamInfoModal}
+                    onClose={handleCloseTeamInfoModal}
+                    team={selectedTeamForInfo}
+                    onSave={handleSaveTeamInfo}
+                />
 
                 <div className="mt-8">
                     <button
@@ -169,14 +245,7 @@ export default function TeamScrumDetailsPage() {
                         <span>Crear Nuevo Equipo</span>
                     </button>
 
-                    {studySheetLoading ? (
-                        <div className="flex items-center justify-center py-20">
-                            <div className="flex flex-col items-center space-y-4">
-                                <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-                                <p className="text-grayText font-medium">Cargando equipos...</p>
-                            </div>
-                        </div>
-                    ) : teams.length === 0 ? (
+                    {teams.length === 0 ? (
                         <div className="bg-white dark:bg-shadowBlue rounded-xl p-12 text-center border border-lightGray dark:border-darkGreen">
                             <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <MdGroup className="w-8 h-8 text-grayText" />
@@ -268,9 +337,9 @@ export default function TeamScrumDetailsPage() {
                                         {/* Actions */}
                                         <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-600">
                                             <button
-                                                onClick={() => handleOpenAgregarInfo(team)}
+                                                onClick={() => handleOpenTeamInfoModal(team)}
                                                 className="flex items-center gap-2 text-primary dark:text-lightGreen hover:text-lightGreen dark:hover:text-primary transition-colors duration-300 p-2 rounded-lg hover:bg-primary/10 dark:hover:bg-lightGreen/10"
-                                                title="Agregar información"
+                                                title="Información del equipo"
                                             >
                                                 <MdInfo className="text-xl" />
                                                 <span className="text-sm font-medium">Info</span>

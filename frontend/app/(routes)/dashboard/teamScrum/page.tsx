@@ -7,6 +7,7 @@ import { fetchStudySheets } from "@slice/olympo/studySheetSlice";
 import { StudySheetItem } from "@/types/slices/olympo/studySheet";
 import PageTitle from "@components/UI/pageTitle";
 import Link from "next/link";
+import { useLoader } from "@/context/LoaderContext";
 
 export default function StudySheetsPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -15,24 +16,40 @@ export default function StudySheetsPage() {
     loading: studySheetLoading,
     error,
   } = useSelector((state: RootState) => state.studySheet);
+  const { showLoader, hideLoader } = useLoader();
 
   useEffect(() => {
-    dispatch(fetchStudySheets({ page: 0, size: 100 }));
+    dispatch(fetchStudySheets({ page: 0, size: 5 }));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (studySheetLoading) {
+      showLoader();
+    } else {
+      hideLoader();
+    }
+  }, [studySheetLoading, showLoader, hideLoader]);
+
+  // Función para formatear fechas
+  const formatDate = (dateString?: string): string => {
+    if (!dateString) return "Fecha no disponible";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "Fecha inválida";
+
+    return date.toLocaleDateString('es-CO', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+
 
   return (
     <div>
       <PageTitle>Fichas</PageTitle>
 
       <div className="mt-8">
-        {studySheetLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="flex flex-col items-center space-y-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-              <p className="text-grayText font-medium">Cargando fichas...</p>
-            </div>
-          </div>
-        ) : error ? (
+        {error ? (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 text-center">
             <div className="w-12 h-12 bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,7 +112,7 @@ export default function StudySheetsPage() {
                           <span className="text-sm font-medium text-grayText">Proyecto</span>
                         </div>
                         <p className="font-semibold text-primary dark:text-lightGreen text-lg">
-                          {sheet.trainingProject?.program?.name ?? "No especificado"}
+                          {sheet.trainingProject?.name ?? "No especificado"}
                         </p>
                       </div>
 
@@ -114,11 +131,41 @@ export default function StudySheetsPage() {
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-between py-2">
-                          <span className="text-sm text-grayText font-medium">Trimestres</span>
+                        <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                          <span className="text-sm text-grayText font-medium">Trimestre</span>
                           <span className="text-sm text-darkGray dark:text-lightGray font-semibold">
                             {sheet.quarter?.length ?? 0}
                           </span>
+                        </div>
+
+                        {/* Fechas lectivas */}
+                        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 space-y-2">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Período Lectivo</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <span className="text-xs text-gray-600 dark:text-gray-400">Inicio:</span>
+                              <span className="text-xs font-semibold text-green-700 dark:text-green-400">
+                                {formatDate(sheet.startLective)}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <span className="text-xs text-gray-600 dark:text-gray-400">Fin:</span>
+                              <span className="text-xs font-semibold text-red-700 dark:text-red-400">
+                                {formatDate(sheet.endLective)}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>

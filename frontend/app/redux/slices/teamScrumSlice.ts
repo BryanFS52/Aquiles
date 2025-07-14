@@ -15,20 +15,23 @@ import {
     DeleteTeamScrumMutation,
     DeleteTeamScrumMutationVariables
 } from '@graphql/generated'
+import { teams } from '@/data/checklistData';
 
 // Función para transformar datos de GraphQL a TeamScrumItem
 const transformGraphQLToTeamScrumItem = (graphqlData: any): TeamScrumItem => {
+    // El objeto de datos real puede estar en la raíz o anidado en 'teamScrum'
+    const teamData = graphqlData.teamScrum || graphqlData;
     return {
-        id: graphqlData.teamScrum?.id || graphqlData.id,
-        teamName: graphqlData.teamScrum?.teamName || graphqlData.teamName,
-        projectName: graphqlData.projectName,
-        problem: graphqlData.problem,
-        objectives: graphqlData.objectives,
-        description: graphqlData.description,
-        projectJustification: graphqlData.projectJustification,
-        checklist: graphqlData.checklist,
-        studySheet: graphqlData.studySheet,
-        students: graphqlData.students || [],
+        id: teamData.id,
+        teamName: teamData.teamName,
+        projectName: teamData.projectName,
+        problem: teamData.problem,
+        objectives: teamData.objectives,
+        description: teamData.description,
+        projectJustification: teamData.projectJustification,
+        checklist: teamData.checklist,
+        studySheet: teamData.studySheet,
+        students: teamData.students || [],
     };
 };
 
@@ -45,16 +48,29 @@ export const fetchTeamsScrums = createAsyncThunk<GetTeamsScrumsQuery['allTeamsSc
     }
 );
 
-export const fetchTeamScrumById = createAsyncThunk<GetTeamScrumByIdQuery['teamScrumById'], GetTeamScrumByIdQueryVariables>(
+export const fetchTeamScrumById = createAsyncThunk<GetTeamScrumByIdQuery['teamScrumById'], GetTeamScrumByIdQueryVariables,
+    { rejectValue: { code: string; message: string } }
+>(
     'teamScrum/fetchById',
-    async ({ id }) => {
-        const { data } = await clientLAN.query<GetTeamScrumByIdQuery, GetTeamScrumByIdQueryVariables>({
-            query: GET_TEAM_SCRUM_BY_ID,
-            variables: { id },
-        });
-        return data.teamScrumById;
+    async ({ id }, { rejectWithValue }) => {
+        try {
+            console.log("ID recibido:", id);
+
+            const { data } = await clientLAN.query<GetTeamScrumByIdQuery, GetTeamScrumByIdQueryVariables>({
+                query: GET_TEAM_SCRUM_BY_ID,
+                variables: { id },
+            });
+
+            console.log(data)
+
+            return data.teamScrumById;
+        } catch (error: any) {
+            console.error("Apollo error:", error);
+            return rejectWithValue({ code: '500', message: error.message });
+        }
     }
 );
+
 
 
 export const addTeamScrum = createAsyncThunk<AddTeamScrumMutation['addTeamScrum'], AddTeamScrumMutationVariables['input'],
@@ -124,7 +140,14 @@ export const deleteTeamScrum = createAsyncThunk<string, string,
     }
 );
 
-const initialState = createInitialPaginatedState<TeamScrumItem>();
+interface ExtendedTeamScrumState extends ReturnType<typeof createInitialPaginatedState<TeamScrumItem>> {
+    dataForTeamScrumById: TeamScrumItem | null;
+}
+
+const initialState: ExtendedTeamScrumState = {
+    ...createInitialPaginatedState<TeamScrumItem>(),
+    dataForTeamScrumById: null
+};
 const teamScrumSlice = createSlice({
     name: 'teamScrum',
     initialState,
@@ -160,7 +183,7 @@ const teamScrumSlice = createSlice({
             })
             .addCase(fetchTeamScrumById.fulfilled, (state, action: PayloadAction<GetTeamScrumByIdQuery['teamScrumById']>) => {
                 if (action.payload) {
-                    state.data = [action.payload as any];
+                    state.dataForTeamScrumById = transformGraphQLToTeamScrumItem(action.payload.data);
                 }
                 state.loading = false;
             })

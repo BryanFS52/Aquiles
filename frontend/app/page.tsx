@@ -3,6 +3,7 @@
 import React, { useState, useCallback, ChangeEvent, FormEvent } from 'react';
 import { ApolloProvider } from '@apollo/client';
 import { client } from '@lib/apollo-client';
+import { useLoader } from '@context/LoaderContext';
 import { HiLockClosed } from "react-icons/hi";
 import { BsPersonCircle } from "react-icons/bs";
 import { HiMiniIdentification } from "react-icons/hi2";
@@ -179,6 +180,7 @@ const Alert: React.FC<AlertProps> = ({ type = "error", message, onClose }) => {
 };
 
 const Login: React.FC = () => {
+  const { showLoader, hideLoader } = useLoader();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({
     documentType: '',
@@ -258,7 +260,7 @@ const Login: React.FC = () => {
       return;
     }
 
-    setIsLoading(true);
+    showLoader();
     setAlertMessage('');
 
     try {
@@ -321,7 +323,7 @@ const Login: React.FC = () => {
 
       showAlert(errorMessage);
     } finally {
-      setIsLoading(false);
+      hideLoader();
     }
   };
 
@@ -439,23 +441,9 @@ const Login: React.FC = () => {
               {/* Botón de submit */}
               <button
                 type="submit"
-                disabled={isLoading}
-                className={`font-inter font-semibold w-full p-3 text-white rounded-md transition-all duration-300 ${isLoading
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-[#0e324d] hover:bg-[#01b001] hover:shadow-lg transform hover:scale-[1.02]'
-                  }`}
+                className={`font-inter font-semibold w-full p-3 text-white rounded-md transition-all duration-300 bg-[#0e324d] hover:bg-[#01b001] hover:shadow-lg transform hover:scale-[1.02]`}
               >
-                {isLoading ? (
-                  <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Iniciando sesión...
-                  </span>
-                ) : (
-                  'Iniciar Sesión'
-                )}
+                Iniciar Sesión
               </button>
             </form>
           </div>

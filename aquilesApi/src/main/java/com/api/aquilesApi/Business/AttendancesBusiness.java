@@ -23,17 +23,16 @@ public class AttendancesBusiness {
 
     private final AttendancesService attendancesService;
     private final StateAttendanceService stateAttendanceService;
-    private final Util util;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
 
-    public AttendancesBusiness(AttendancesService attendancesService, StateAttendanceService stateAttendanceService, Util util) {
+    public AttendancesBusiness(AttendancesService attendancesService, StateAttendanceService stateAttendanceService, Util util, ModelMapper modelMapper) {
         this.attendancesService = attendancesService;
         this.stateAttendanceService = stateAttendanceService;
-        this.util = util;
+        this.modelMapper = modelMapper;
     }
 
-    // Validación Objeto
+    // Validation object
     private void validationObject(Map<String, Object> json, AttendancesDto attendancesDTO) {
         /*
         // Extrae datos del objeto JSON

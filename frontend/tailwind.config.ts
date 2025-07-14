@@ -34,7 +34,7 @@ const config: Config = {
         'darkGreen': '#007832',
         'darkBackground': '#dfdddd',
         'white': '#ffffff',
-        'grayText': '#9ca3af', // text-gray-400 ≈ #9ca3af
+        'grayText': '#9ca3af',
       },
       keyframes: {
         showContent: {

@@ -21,46 +21,44 @@ import java.util.stream.Collectors;
 public class StateAttendancesBusiness {
     private final StateAttendanceService stateAttendanceService;
     private final Util util;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
-    public StateAttendancesBusiness(StateAttendanceService stateAttendanceService, Util util) {
+    public StateAttendancesBusiness(StateAttendanceService stateAttendanceService, Util util, ModelMapper modelMapper) {
         this.stateAttendanceService = stateAttendanceService;
         this.util = util;
+        this.modelMapper = modelMapper;
     }
 
-    // Validación Objeto
+    // Validation object
     private AttendanceStateDto validationObject(Map<String, Object> json, AttendanceStateDto attendanceStateDto) {
         // Extrae datos del objeto JSON
         JSONObject dataObject = util.getData(json);
 
         // Asigna el valor del JSON al DTO
         attendanceStateDto.setId(dataObject.getLong("stateAttendanceId"));
-        attendanceStateDto.setStatus(dataObject.getString("status"));// Asegúrate de que el nombre del campo coincide con el JSON
-
+        attendanceStateDto.setStatus(dataObject.getString("status"));
 
         return attendanceStateDto;
     }
 
-    // Metodo Para Obtener Todos Los Estados De Asistencia
+    // Find all
     public Page<AttendanceStateDto> findAll(int page , int size){
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
             Page<AttendanceState> stateAttendanceEntityPage = this.stateAttendanceService.findAll(pageRequest);
 
-            // Convertir las entidades a DTOs
             List<AttendanceStateDto> attendanceStateDtoList = stateAttendanceEntityPage.getContent()
                     .stream()
                     .map(entity -> modelMapper.map(entity, AttendanceStateDto.class))
                     .collect(Collectors.toList());
 
-            // Crear Una Nueva Pagina Con Los Dtos
             return new PageImpl<>(attendanceStateDtoList, pageRequest , stateAttendanceEntityPage.getTotalElements());
         }  catch (Exception e){
             throw new CustomException("Error retrieving State Attendance" , HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // Metodo Para Obtener Los Estados Por Id
+    // Find By Id
     public AttendanceStateDto findById(Long id){
         try {
             AttendanceState stateAttendance = this.stateAttendanceService.getById(id);
@@ -72,7 +70,7 @@ public class StateAttendancesBusiness {
         }
     }
 
-    // Metodo Para Crear-Add Nuevo Estado
+    // Add
     public AttendanceStateDto add(AttendanceStateDto attendanceStateDto){
         try {
             AttendanceState attendanceState = modelMapper.map(attendanceStateDto, AttendanceState.class);
@@ -82,7 +80,7 @@ public class StateAttendancesBusiness {
         }
     }
 
-    // Metodo Para Editar - Actualizar Un Estado de Asistencia
+    // Update
     public void update(Long stateAttendanceId, AttendanceStateDto attendanceStateDto) {
         try {
            attendanceStateDto.setId(stateAttendanceId);
@@ -93,7 +91,7 @@ public class StateAttendancesBusiness {
         }
     }
 
-    //  Metodo Para Eliminar Un Estado De Asistencia
+    // Delete
     public void delete (Long stateAttendanceId){
         try {
             AttendanceState stateAttendance = stateAttendanceService.getById(stateAttendanceId);
@@ -104,5 +102,4 @@ public class StateAttendancesBusiness {
             throw new CustomException("Error Deleting State Attendance : " + e.getMessage() , HttpStatus.BAD_REQUEST);
         }
     }
-
 }

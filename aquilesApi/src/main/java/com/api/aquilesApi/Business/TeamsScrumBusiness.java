@@ -4,7 +4,6 @@ import com.api.aquilesApi.Dto.TeamsScrumDto;
 import com.api.aquilesApi.Entity.TeamsScrum;
 import com.api.aquilesApi.Service.TeamScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
-import com.api.aquilesApi.Utilities.Util;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,15 +19,20 @@ import java.util.stream.Collectors;
 public class TeamsScrumBusiness {
 
     private final TeamScrumService teamScrumService;
-    private final Util util;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper ;
 
-    public TeamsScrumBusiness(TeamScrumService teamScrumService, Util util) {
+    public TeamsScrumBusiness(TeamScrumService teamScrumService, ModelMapper modelMapper) {
         this.teamScrumService = teamScrumService;
-        this.util = util;
+        this.modelMapper = modelMapper;
     }
 
     // Validation object
+    public void Validation( TeamsScrumDto teamsScrumDto ) throws CustomException {
+        boolean studentResult = teamScrumService.existsByStudySheetIdAndMemberIds(teamsScrumDto.getStudySheetId(), teamsScrumDto.getMemberIds());
+        if (studentResult) {
+            throw new CustomException("Some of the selected students are already assigned to a Team Scrum within this study sheet.", HttpStatus.CONFLICT);
+        }
+    }
 
 
     // Find All
@@ -52,20 +56,18 @@ public class TeamsScrumBusiness {
     public TeamsScrumDto findById(Long id) {
         try {
             TeamsScrum teamsScrum = teamScrumService.getById(id);
-
-            // Configurar el mapeo manualmente si los nombres no coinciden
             modelMapper.typeMap(TeamsScrum.class, TeamsScrumDto.class)
                     .addMapping(TeamsScrum::getId, TeamsScrumDto::setId);
 
             return modelMapper.map(teamsScrum, TeamsScrumDto.class);
         } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
+            throw e;
         } catch (Exception e) {
             throw new CustomException("Error Getting Team Scrum By Id: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    // find by StudentId
+    // Find By StudentId
     public List<TeamsScrumDto> findAllByStudentId(Long studentId) {
         try {
             List<TeamsScrum> teamsScrumList = teamScrumService.findAllByStudentId(studentId);
@@ -80,6 +82,7 @@ public class TeamsScrumBusiness {
     // Add
     public TeamsScrumDto add(TeamsScrumDto teamsScrumDto) {
         try {
+            Validation(teamsScrumDto);
             TeamsScrum teamsScrum = modelMapper.map(teamsScrumDto, TeamsScrum.class);
             return modelMapper.map(teamScrumService.save(teamsScrum), TeamsScrumDto.class);
         } catch (Exception e) {
@@ -91,7 +94,10 @@ public class TeamsScrumBusiness {
     public void update(Long teamScrumId , TeamsScrumDto teamsScrumDto){
         try {
             teamsScrumDto.setId(teamScrumId);
-            TeamsScrum teamsScrum = modelMapper.map(teamsScrumDto, TeamsScrum.class);
+            Validation(teamsScrumDto);
+
+            TeamsScrum teamsScrum = teamScrumService.getById(teamScrumId);
+            modelMapper.map(teamsScrumDto, teamsScrum);
             teamScrumService.save(teamsScrum);
         } catch (Exception e){
             throw new CustomException("Error Updating Team Scrum: " + e.getMessage() , HttpStatus.BAD_REQUEST);
@@ -110,6 +116,7 @@ public class TeamsScrumBusiness {
         }
     }
 
+    // Find By StudySheetId
     public List<TeamsScrumDto> findAllByStudySheetId(Long studySheetId) {
         System.out.println("🔍 Buscando equipos por studySheetId: " + studySheetId);
 

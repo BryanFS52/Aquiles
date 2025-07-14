@@ -11,7 +11,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Entity
 public class LearningOutcome implements Serializable {
-//    (Model)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -24,7 +24,7 @@ public class Item implements Serializable {
     @Column(name = "indicator", nullable = false, length = 100)
     private String indicator;
 
-    //Relations
+    // Relations
     // 1. Relation (M-1) con itemType
     @ManyToOne
     @JoinColumn(name = "item_type_id", nullable = false)

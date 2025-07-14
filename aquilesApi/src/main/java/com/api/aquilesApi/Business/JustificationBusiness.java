@@ -20,14 +20,15 @@ public class JustificationBusiness {
     private final JustificationService justificationService;
     private final AttendancesService attendancesService;
     private final JustificationTypeService justificationTypeService;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
-    public JustificationBusiness(JustificationService justificationService, AttendancesService attendancesService, JustificationTypeService justificationTypeService) {
+    public JustificationBusiness(JustificationService justificationService, AttendancesService attendancesService, JustificationTypeService justificationTypeService, ModelMapper modelMapper) {
         this.justificationService = justificationService;
         this.attendancesService = attendancesService;
         this.justificationTypeService = justificationTypeService;
+        this.modelMapper = modelMapper;
     }
-    // Validación Objeto
+    // Validation Object
 
 
     // Find All
@@ -40,10 +41,8 @@ public class JustificationBusiness {
             System.out.println("Total Justifications: " + justificationEntityPage);
             return justificationEntityPage.map(entity -> modelMapper.map(entity, JustificationDto.class));
         } catch (DataAccessException e) {
-            // Manejo específico para errores de acceso a datos
             throw new CustomException("Error retrieving justifications due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            // Manejo genérico para cualquier otra excepción
             throw new CustomException("An unexpected error occurred while retrieving justifications.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -54,7 +53,7 @@ public class JustificationBusiness {
             Justification justification = justificationService.getById(id);
             return modelMapper.map(justification, JustificationDto.class);
         } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
+            throw e;
         } catch (Exception e) {
             throw new CustomException("Error Getting Justification: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -80,7 +79,6 @@ public class JustificationBusiness {
     }
 
     // Update
-    
     public void update(Long id, JustificationDto justificationDto) {
         try {
             justificationDto.setId(id);

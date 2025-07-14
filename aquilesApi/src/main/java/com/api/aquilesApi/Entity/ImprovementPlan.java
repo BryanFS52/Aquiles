@@ -17,7 +17,7 @@ public class ImprovementPlan implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //Columns
+    // Columns
     @Column(name = "city", nullable = false, length = 55)
     private String city;
 

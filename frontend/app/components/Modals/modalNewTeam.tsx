@@ -2,8 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Select, { MultiValue, ActionMeta } from 'react-select';
-import studentService from "@services/olympo/studentService";
-import { AddTeamScrumMutationVariables, Student, TeamsScrumDto } from "@/graphql/generated";
+import { AddTeamScrumMutationVariables, TeamsScrumDto } from "@/graphql/generated";
+import { fetchStudySheetWithStudents } from '@slice/olympo/studySheetSlice';
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { useMemo } from "react";
 
 // Interfaces and Types
 interface StudentOption {
@@ -26,27 +29,50 @@ interface ModalNewProjectProps {
   onClose: () => void;
   onCreate: (data: CreateTeamData) => Promise<boolean>;
   studySheetId: number;
+  existingTeams?: TeamsScrumDto[];
 }
 
-
-const ModalNewProject: React.FC<ModalNewProjectProps> = ({
+const ModalNewTeam: React.FC<ModalNewProjectProps> = ({
   isOpen,
   onClose,
   onCreate,
-  studySheetId
+  studySheetId,
+  existingTeams = []
 }) => {
   const [teamData, setTeamData] = useState<Partial<TeamsScrumDto>>({
     teamName: "",
     projectName: "",
     memberIds: []
   });
+  const dispatch = useDispatch<AppDispatch>();
   const [errors, setErrors] = useState<FormErrors>({});
   const [modalTransition, setModalTransition] = useState<boolean>(false);
-  const [students, setStudents] = useState<StudentOption[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Configuración de estilos para react-select
+  // Redux selectors
+  const rawStudents = useSelector((state: RootState) => state.studySheet.dataForStudents);
+  console.log(rawStudents)
+  const studentsForThisSheet = useMemo(() => rawStudents[studySheetId] ?? [], [rawStudents, studySheetId]);
+
+  // Transformar estudiantes en opciones de select
+  const studentOptions: StudentOption[] = studentsForThisSheet
+    .map(student => ({
+      id: student.id,
+      value: student.id,
+      label: `${student.person.name} ${student.person.lastname}`,
+      fullName: `${student.person.name} ${student.person.lastname}`
+    }));
+
+  console.log(studentOptions)
+
+  // Traer estudiantes al montar el modal
+  useEffect(() => {
+    if (studySheetId) {
+      dispatch(fetchStudySheetWithStudents({ id: studySheetId }));
+    }
+  }, [dispatch, studySheetId]);
+
+  // Estilos para Select
   const selectStyles = {
     control: (provided: any, state: any) => ({
       ...provided,
@@ -95,86 +121,85 @@ const ModalNewProject: React.FC<ModalNewProjectProps> = ({
       ':active': {
         backgroundColor: '#3b82f6'
       }
+    }),
+    menuPortal: (provided: any) => ({
+      ...provided,
+      zIndex: 9999
     })
   };
 
+  // Scroll lock para el modal
   useEffect(() => {
     if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.top = '0';
       setModalTransition(true);
-      fetchStudents();
     } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
       setModalTransition(false);
-      // Reset form when modal closes
-      setTimeout(() => {
-        resetForm();
-      }, 300);
+      setTimeout(() => resetForm(), 300);
     }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+    };
   }, [isOpen]);
 
-  const fetchStudents = async (): Promise<void> => {
-    setLoading(true);
-    try {
-      const res = await studentService.getStudentList();
-      const studentOptions: StudentOption[] = (res.data as Student[]).map((s: Student) => ({
-        value: s.id!,
-        label: `${s.person?.name} ${s.person?.lastname}`,
-        id: s.id!,
-        fullName: `${s.person?.name} ${s.person?.lastname}`
-      }));
-      setStudents(studentOptions);
-    } catch (err) {
-      console.error("Error fetching students:", err);
-    } finally {
-      setLoading(false);
+  // Cerrar modal con Escape
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen && !isSubmitting) {
+        handleClose();
+      }
+    };
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('keydown', preventScrollKeys);
     }
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', preventScrollKeys);
+    };
+  }, [isOpen, isSubmitting]);
+
+  const preventScrollKeys = (e: KeyboardEvent) => {
+    const keys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', 'Space'];
+    if (keys.includes(e.key)) e.preventDefault();
   };
 
   const resetForm = (): void => {
-    setTeamData({
-      teamName: "",
-      projectName: "",
-      memberIds: []
-    });
+    setTeamData({ teamName: "", projectName: "", memberIds: [] });
     setErrors({});
   };
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
+    if (!teamData.teamName?.trim()) newErrors.teamName = "El nombre del Team Scrum es obligatorio";
+    else if (teamData.teamName.trim().length < 3) newErrors.teamName = "Debe tener al menos 3 caracteres";
 
-    if (!teamData.teamName?.trim()) {
-      newErrors.teamName = "El nombre del Team Scrum es obligatorio";
-    } else if (teamData.teamName.trim().length < 3) {
-      newErrors.teamName = "El nombre debe tener al menos 3 caracteres";
-    }
+    if (!teamData.projectName?.trim()) newErrors.projectName = "El nombre del proyecto es obligatorio";
+    else if (teamData.projectName.trim().length < 3) newErrors.projectName = "Debe tener al menos 3 caracteres";
 
-    if (!teamData.projectName?.trim()) {
-      newErrors.projectName = "El nombre del proyecto es obligatorio";
-    } else if (teamData.projectName.trim().length < 3) {
-      newErrors.projectName = "El nombre debe tener al menos 3 caracteres";
-    }
-
-    if (!teamData.memberIds || teamData.memberIds.length === 0) {
+    if (!teamData.memberIds || teamData.memberIds.length === 0)
       newErrors.members = "Debe seleccionar al menos un miembro";
-    } else if (teamData.memberIds.length > 8) {
-      newErrors.members = "No puede seleccionar más de 8 miembros";
-    }
+    else if (teamData.memberIds.length > 4)
+      newErrors.members = "No puede seleccionar más de 4 miembros";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleInputChange = (field: keyof TeamsScrumDto, value: string): void => {
-    setTeamData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-
-    // Limpiar error específico cuando el usuario empiece a escribir
+    setTeamData(prev => ({ ...prev, [field]: value }));
     if (errors[field as keyof FormErrors]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: null
-      }));
+      setErrors(prev => ({ ...prev, [field]: null }));
     }
   };
 
@@ -183,39 +208,28 @@ const ModalNewProject: React.FC<ModalNewProjectProps> = ({
     actionMeta: ActionMeta<StudentOption>
   ): void => {
     const memberIds = selectedOptions.map(option => option.id);
-    setTeamData(prev => ({
-      ...prev,
-      memberIds: memberIds
-    }));
-
-    // Limpiar error de members
+    if (memberIds.length > 4) return;
+    setTeamData(prev => ({ ...prev, memberIds }));
     if (errors.members) {
-      setErrors(prev => ({
-        ...prev,
-        members: null
-      }));
+      setErrors(prev => ({ ...prev, members: null }));
     }
   };
 
   const handleCreateTeam = async (): Promise<void> => {
     if (!validateForm()) return;
-
     setIsSubmitting(true);
     try {
       const success = await onCreate({
         teamName: teamData.teamName!.trim(),
         projectName: teamData.projectName!.trim(),
-        studySheetId: studySheetId,
+        studySheetId,
         memberIds: teamData.memberIds?.map(id => parseInt(id, 10)),
         description: "",
         objectives: "",
         problem: "",
         projectJustification: "",
       });
-
-      if (success) {
-        handleClose();
-      }
+      if (success) handleClose();
     } catch (error) {
       console.error("Error creating team:", error);
     } finally {
@@ -223,47 +237,60 @@ const ModalNewProject: React.FC<ModalNewProjectProps> = ({
     }
   };
 
-
   const handleClose = (): void => {
-    if (isSubmitting) return; // Prevenir cierre durante envío
-
+    if (isSubmitting) return;
     setModalTransition(false);
-    setTimeout(() => {
-      onClose();
-    }, 300);
+    setTimeout(() => onClose(), 300);
   };
 
-  // Prevenir cierre al hacer clic en el contenido del modal
   const handleModalContentClick = (e: React.MouseEvent<HTMLDivElement>): void => {
+    e.stopPropagation();
+  };
+
+  const handleModalScroll = (e: React.WheelEvent<HTMLDivElement>): void => {
     e.stopPropagation();
   };
 
   if (!isOpen) return null;
 
+  // Selección de miembros actuales
   const selectedMembers = teamData.memberIds
-    ? students.filter(s => teamData.memberIds!.includes(s.id))
+    ? studentOptions.filter(s => teamData.memberIds!.includes(s.id))
     : [];
+
+  console.log(selectedMembers)
+
+  // Valor de carga (ajusta si tienes un loading real desde el slice)
+  const currentLoading = false;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black bg-opacity-50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden p-4"
       onClick={handleClose}
+      style={{
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+      }}
     >
       <div
         className={`relative w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl transition-all duration-300 transform ${modalTransition ? "scale-100 opacity-100" : "scale-95 opacity-0"
           }`}
         onClick={handleModalContentClick}
+        onWheel={handleModalScroll}
+        style={{
+          maxHeight: '90vh',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
+        }}
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200 bg-white rounded-t-xl">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">
-              Nuevo Team Scrum
-            </h2>
+            <h2 className="text-xl font-bold text-gray-900">Nuevo Team Scrum</h2>
             <button
               onClick={handleClose}
               disabled={isSubmitting}
-              className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+              className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
               aria-label="Cerrar modal"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -274,7 +301,7 @@ const ModalNewProject: React.FC<ModalNewProjectProps> = ({
         </div>
 
         {/* Body */}
-        <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
+        <div className="px-6 py-4 max-h-[60vh] overflow-y-auto bg-white">
           <div className="space-y-4">
             {/* Nombre del Team Scrum */}
             <div>
@@ -328,31 +355,44 @@ const ModalNewProject: React.FC<ModalNewProjectProps> = ({
               </label>
               <Select
                 isMulti
-                options={students}
+                options={studentOptions}
                 value={selectedMembers}
                 onChange={handleMembersChange}
                 styles={selectStyles}
                 placeholder="Buscar y seleccionar miembros..."
-                noOptionsMessage={() => loading ? "Cargando..." : "No se encontraron estudiantes"}
-                isLoading={loading}
-                isDisabled={isSubmitting}
+                isOptionDisabled={() => (teamData.memberIds?.length || 0) >= 4}
+                noOptionsMessage={() =>
+                  currentLoading
+                    ? "Cargando estudiantes..."
+                    : studentOptions.length === 0
+                      ? "No hay estudiantes disponibles"
+                      : "No se encontraron estudiantes"
+                }
+                isLoading={currentLoading}
+                isDisabled={isSubmitting || currentLoading}
                 closeMenuOnSelect={false}
                 hideSelectedOptions={false}
                 maxMenuHeight={200}
                 menuPlacement="auto"
+                menuPortalTarget={document.body}
+                menuPosition="fixed"
               />
+
               {errors.members && (
                 <p className="text-red-500 text-xs mt-1">{errors.members}</p>
               )}
               <p className="text-gray-500 text-xs mt-1">
-                Selecciona entre 1 y 4 miembros para el equipo
+                {studentOptions.length === 0 && !currentLoading
+                  ? "No hay estudiantes disponibles para asignar"
+                  : "Selecciona entre 1 y 4 miembros para el equipo"}
               </p>
+
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+        <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3 bg-white rounded-b-xl">
           <button
             onClick={handleClose}
             disabled={isSubmitting}
@@ -362,14 +402,14 @@ const ModalNewProject: React.FC<ModalNewProjectProps> = ({
           </button>
           <button
             onClick={handleCreateTeam}
-            disabled={isSubmitting}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+            disabled={isSubmitting || currentLoading}
+            className="px-4 py-2 text-sm font-medium rounded-md text-white bg-gradient-to-r from-primary to-lightGreen hover:from-primary/90 hover:to-lightGreen/90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
           >
             {isSubmitting ? (
               <>
                 <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
                 Creando...
               </>
@@ -383,4 +423,4 @@ const ModalNewProject: React.FC<ModalNewProjectProps> = ({
   );
 };
 
-export default ModalNewProject;
+export default ModalNewTeam;

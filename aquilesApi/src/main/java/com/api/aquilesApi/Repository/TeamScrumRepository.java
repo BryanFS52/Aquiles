@@ -14,4 +14,13 @@ public interface TeamScrumRepository extends JpaRepository<TeamsScrum, Long> {
     @Query("SELECT t FROM TeamsScrum t JOIN t.memberIds m WHERE m = :memberId")
     List<TeamsScrum> findByMemberId(@Param("memberId") Long memberId);
     List<TeamsScrum> findByStudySheetId(Long studySheetId);
+
+    @Query(value = """
+    SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END
+    FROM team_scrum_members tm
+    JOIN teams_scrum ts ON ts.id = tm.team_id
+    WHERE ts.study_sheet_id = :studySheetId
+    AND tm.user_id IN (:memberIds)
+""", nativeQuery = true)
+    boolean existsByStudySheetIdAndMemberIds(@Param("studySheetId") Long studySheetId, @Param("memberIds") List<Long> memberIds);
 }

@@ -24,16 +24,16 @@
         @Column(name = "project_name", nullable = false, length = 100)
         private String projectName;
 
-        @Column(name = "problem", nullable = false, length = 255)
+        @Column(name = "problem", nullable = false, length = 1000)
         private String problem;
 
-        @Column(name = "objectives", nullable = false, length = 255)
+        @Column(name = "objectives", nullable = false, length = 1000)
         private String objectives;
 
-        @Column(name = "description", nullable = false, length = 255)
+        @Column(name = "description", nullable = false, length = 1000)
         private String description;
 
-        @Column(name = "project_justification", nullable = false, length = 255)
+        @Column(name = "project_justification", nullable = false, length = 1000)
         private String projectJustification;
 
         // Relations

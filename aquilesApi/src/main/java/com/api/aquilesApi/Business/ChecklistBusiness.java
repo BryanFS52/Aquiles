@@ -15,10 +15,11 @@ import org.springframework.stereotype.Component;
 public class ChecklistBusiness {
 
     private final ChecklistService checklistService;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
-    public ChecklistBusiness(ChecklistService checklistService, JuriesRepository juriesRepository) {
+    public ChecklistBusiness(ChecklistService checklistService, JuriesRepository juriesRepository, ModelMapper modelMapper) {
         this.checklistService = checklistService;
+        this.modelMapper = modelMapper;
     }
 
     // Validation object

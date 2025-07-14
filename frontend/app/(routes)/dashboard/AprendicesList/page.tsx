@@ -10,12 +10,12 @@ import ModalCorreo from "@components/Modals/modalCorreo";
 export default function AprendicesList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState(null);
-    const [students, setStudents] = useState([]); // Inicializa la lista de estudiantes
+    const [students, setStudents] = useState([]);
 
     useEffect(() => {
         const fetchStudents = async () => {
             try {
-                const studentsData = await getAllApprentices(); // Obtén la lista de aprendices del servicio
+                const studentsData = await getAllApprentices();
                 setStudents(studentsData);
             } catch (error) {
                 console.error('Error al obtener la lista de aprendices:', error);
@@ -52,15 +52,6 @@ export default function AprendicesList() {
 
     const handleSaveAttendance = async () => {
         try {
-            // const attendanceData = students.map(student => ({
-            //     documentNumber: student.documentNumber,
-            //     isPresent: student.isPresent,
-            //     date: student.date,
-            // }));
-
-            // Llama a la función para guardar la asistencia aquí (actualizarAttendance debe estar definida en otro lugar)
-            // TODO: Implementar o importar la función updateAttendance
-            // await updateAttendance(attendanceData);
             toast.success('Asistencia guardada correctamente');
         } catch (error) {
             console.error('Error al guardar la asistencia:', error);

@@ -14,10 +14,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class FinalReportBusiness {
     private final FinalReportService finalReportService;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
-    public FinalReportBusiness(FinalReportService finalReportService) {
+    public FinalReportBusiness(FinalReportService finalReportService, ModelMapper modelMapper) {
         this.finalReportService = finalReportService;
+        this.modelMapper = modelMapper;
     }
 
     // Validation object
@@ -33,10 +34,8 @@ public class FinalReportBusiness {
 
             return finalreportEntityPage.map(entity -> modelMapper.map(entity, FinalReportDto.class));
         } catch (DataAccessException e) {
-            // Manejo específico para errores de acceso a datos
             throw new CustomException("Error retrieving finalReport due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            // Manejo genérico para cualquier otra excepción
             throw new CustomException("An unexpected error occurred while retrieving finalReport.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -47,7 +46,7 @@ public class FinalReportBusiness {
             FinalReport finalReport = finalReportService.getById(id);
             return modelMapper.map(finalReport, FinalReportDto.class);
         } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
+            throw e;
         } catch (Exception e) {
             throw new CustomException("Error Getting finalReport: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -86,7 +85,7 @@ public class FinalReportBusiness {
             FinalReport finalReport = finalReportService.getById(finalReportId);
             finalReportService.delete(finalReport);
         } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
+            throw e;
         } catch (Exception e) {
             throw new CustomException("Error Deleting finalReport: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }

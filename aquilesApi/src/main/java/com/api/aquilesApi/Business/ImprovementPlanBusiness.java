@@ -14,13 +14,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class ImprovementPlanBusiness {
     private final ImprovementPlanService improvementPlanService;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
-    public ImprovementPlanBusiness(ImprovementPlanService improvementPlanService) {
+    public ImprovementPlanBusiness(ImprovementPlanService improvementPlanService, ModelMapper modelMapper) {
         this.improvementPlanService = improvementPlanService;
+        this.modelMapper = modelMapper;
     }
 
-    // Validación Objeto
+    // Validation object
 
 
     // Find All
@@ -33,10 +34,8 @@ public class ImprovementPlanBusiness {
 
             return improvementPlanPage.map(entity -> modelMapper.map(entity, ImprovementPlanDto.class));
         } catch (DataAccessException e) {
-            // Manejo específico para errores de acceso a datos
             throw new CustomException("Error retrieving improvemenPlan due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            // Manejo genérico para cualquier otra excepción
             throw new CustomException("An unexpected error occurred while retrieving improvemenPlan.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -47,7 +46,7 @@ public class ImprovementPlanBusiness {
             ImprovementPlan improvementPlan = improvementPlanService.getById(id);
             return modelMapper.map(improvementPlan, ImprovementPlanDto.class);
         } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
+            throw e;
         } catch (Exception e) {
             throw new CustomException("Error Getting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -80,7 +79,7 @@ public class ImprovementPlanBusiness {
             ImprovementPlan improvementPlan = improvementPlanService.getById(id);
             improvementPlanService.delete(improvementPlan);
         } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
+            throw e;
         } catch (Exception e) {
             throw new CustomException("Error Deleting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }

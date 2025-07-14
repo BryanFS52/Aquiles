@@ -62,5 +62,4 @@ public class Justification implements Serializable {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
         this.justificationDate = LocalDate.parse(justificationDateString);
     }
-
 }
