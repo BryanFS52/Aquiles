@@ -4,17 +4,16 @@ import { BsQrCode } from "react-icons/bs";
 import { FaClipboardList } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { motion } from "framer-motion";
-import { useRouter } from 'next/navigation';
 import { StudySheetItem, Student } from '@type/slices/olympo/studySheet';
 import ModalQR from "@components/Modals/modalQR";
 
 
 interface TableAttendanceProps {
     studySheetData?: StudySheetItem;
+    onNavigate: () => void;
 }
 
-const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData }) => {
-    const router = useRouter();
+const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNavigate }) => {
     const [modalQROpen, setModalQROpen] = useState<boolean>(false);
     const [alertVisible, setAlertVisible] = useState<boolean>(false);
     const [currentTrimester, setCurrentTrimester] = useState<number>(1);
@@ -85,7 +84,7 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData }) => 
                         </button>
 
                         <button
-                            onClick={() => router.push('/dashboard/asistenciaManual')}
+                            onClick={onNavigate}
                             className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl shadow bg-gradient-to-r from-lime-400 to-lime-600 text-black hover:bg-lightGreen whitespace-nowrap"
                         >
                             <span className="hidden xs:inline">Asistencia</span> Manual <FaClipboardList className="w-3 h-3 sm:w-4 sm:h-4" />

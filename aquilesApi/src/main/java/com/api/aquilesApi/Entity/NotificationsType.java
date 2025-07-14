@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Entity
 @NoArgsConstructor
 @Table(name = "notifications_type")
-public class NotificationsTypeEntity implements Serializable {
+public class NotificationsType implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,5 +27,5 @@ public class NotificationsTypeEntity implements Serializable {
     // Relations
     // 1.Relation (1-1) con notifications
     @OneToOne(mappedBy = "type")
-    private NotificationsEntity notification;
+    private Notifications notification;
 }

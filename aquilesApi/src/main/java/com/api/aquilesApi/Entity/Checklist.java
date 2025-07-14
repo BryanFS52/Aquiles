@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "checklist")
-public class ChecklistEntity implements Serializable {
+public class Checklist implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -45,16 +45,16 @@ public class ChecklistEntity implements Serializable {
 
     // 1.Relation (1-M) con item
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ItemEntity> items;
+    private List<Item> items;
 
     // 2.Relation (1-1) con evaluations
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "evaluation_id", referencedColumnName = "id")
-    private EvaluationsEntity evaluation;
+    private Evaluations evaluation;
 
     // 3.Relation (1-M) con Team
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TeamsScrumEntity> teams;
+    private List<TeamsScrum> teams;
 
     // 4.Relation (1-M) con learningOutcome
     @Column(name = "learningOutcome_id")

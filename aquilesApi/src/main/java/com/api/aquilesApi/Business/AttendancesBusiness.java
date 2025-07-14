@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.AttendancesDto;
-import com.api.aquilesApi.Entity.AttendanceEntity;
+import com.api.aquilesApi.Entity.Attendance;
 import com.api.aquilesApi.Entity.AttendanceState;
 import com.api.aquilesApi.Service.AttendancesService;
 import com.api.aquilesApi.Service.StateAttendanceService;
@@ -23,17 +23,16 @@ public class AttendancesBusiness {
 
     private final AttendancesService attendancesService;
     private final StateAttendanceService stateAttendanceService;
-    private final Util util;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
 
-    public AttendancesBusiness(AttendancesService attendancesService, StateAttendanceService stateAttendanceService, Util util) {
+    public AttendancesBusiness(AttendancesService attendancesService, StateAttendanceService stateAttendanceService, Util util, ModelMapper modelMapper) {
         this.attendancesService = attendancesService;
         this.stateAttendanceService = stateAttendanceService;
-        this.util = util;
+        this.modelMapper = modelMapper;
     }
 
-    // Validación Objeto
+    // Validation object
     private void validationObject(Map<String, Object> json, AttendancesDto attendancesDTO) {
         /*
         // Extrae datos del objeto JSON
@@ -68,7 +67,7 @@ public class AttendancesBusiness {
     public Page<AttendancesDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<AttendanceEntity> attendancesEntityPage = attendancesService.findAll(pageRequest);
+            Page<Attendance> attendancesEntityPage = attendancesService.findAll(pageRequest);
 
             System.out.println("Total Attendances: " + attendancesEntityPage.getTotalElements());
 
@@ -85,7 +84,7 @@ public class AttendancesBusiness {
     // Find By Id
     public AttendancesDto findById(Long id) {
         try {
-            AttendanceEntity attendances = attendancesService.getById(id);
+            Attendance attendances = attendancesService.getById(id);
             return modelMapper.map(attendances, AttendancesDto.class);
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada
@@ -96,9 +95,9 @@ public class AttendancesBusiness {
 
     public List<AttendancesDto> findAllByStudentId(Long studentId) {
         try {
-            List<AttendanceEntity> attendanceEntityList =  attendancesService.findAllByStudentId(studentId);
-            System.out.println("Total Attendances: " + attendanceEntityList.size());
-            return attendanceEntityList.stream().map(entity -> modelMapper.map(entity, AttendancesDto.class)).collect(Collectors.toList());
+            List<Attendance> attendanceList =  attendancesService.findAllByStudentId(studentId);
+            System.out.println("Total Attendances: " + attendanceList.size());
+            return attendanceList.stream().map(entity -> modelMapper.map(entity, AttendancesDto.class)).collect(Collectors.toList());
         } catch (Exception e) {
             throw new CustomException("error " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -106,8 +105,8 @@ public class AttendancesBusiness {
 
     public List<AttendancesDto> findAllByStudentId(Long studentId, Long idState) {
         try {
-            List<AttendanceEntity> attendanceEntityList =  attendancesService.findAllByStudentId(studentId, idState);
-            return attendanceEntityList.stream().map(entity -> modelMapper.map(entity, AttendancesDto.class)).collect(Collectors.toList());
+            List<Attendance> attendanceList =  attendancesService.findAllByStudentId(studentId, idState);
+            return attendanceList.stream().map(entity -> modelMapper.map(entity, AttendancesDto.class)).collect(Collectors.toList());
         } catch (Exception e) {
             throw new CustomException("error " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -117,12 +116,12 @@ public class AttendancesBusiness {
     public AttendancesDto add(AttendancesDto attendancesDto) {
         try {
             System.out.println(attendancesDto);
-            AttendanceEntity attendanceEntity = new AttendanceEntity();
-            attendanceEntity.setAttendanceDate(attendancesDto.getAttendanceDate());
+            Attendance attendance = new Attendance();
+            attendance.setAttendanceDate(attendancesDto.getAttendanceDate());
             AttendanceState attendanceState = stateAttendanceService.getById(attendancesDto.getAttendanceState().getId());
-            attendanceEntity.setAttendanceState(attendanceState);
-            attendanceEntity.setStudentId(attendancesDto.getStudentId());
-            return modelMapper.map(attendancesService.save(attendanceEntity), AttendancesDto.class);
+            attendance.setAttendanceState(attendanceState);
+            attendance.setStudentId(attendancesDto.getStudentId());
+            return modelMapper.map(attendancesService.save(attendance), AttendancesDto.class);
         }catch ( Exception e){
             throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);
         }
@@ -132,7 +131,7 @@ public class AttendancesBusiness {
     public void update(Long attendanceId, AttendancesDto attendancesDto) {
         try {
             attendancesDto.setId(attendanceId);
-            AttendanceEntity attendance = modelMapper.map( attendancesDto, AttendanceEntity.class);
+            Attendance attendance = modelMapper.map( attendancesDto, Attendance.class);
             attendancesService.save(attendance);
         } catch (Exception e) {
             throw new CustomException("Error Updating Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -142,7 +141,7 @@ public class AttendancesBusiness {
     // Delete
     public void delete(Long attendanceId) {
         try {
-            AttendanceEntity attendances = attendancesService.getById(attendanceId);
+            Attendance attendances = attendancesService.getById(attendanceId);
             attendancesService.delete(attendances);
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada

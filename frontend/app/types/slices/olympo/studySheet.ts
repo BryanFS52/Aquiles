@@ -1,3 +1,5 @@
+import { TeamScrumItem } from "../teamScrum";
+
 export interface Person {
     id: string;
     document: string;
@@ -54,4 +56,5 @@ export interface StudySheetItem {
     } | null;
 
     students: Student[];
+    teamsScrum?: TeamScrumItem[];
 }

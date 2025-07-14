@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Setter
 @Entity
 @Table(name = "apprentice_regulations")
-public class ApprenticeRegulationsEntity implements Serializable {
+public class    ApprenticeRegulations implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,5 +34,5 @@ public class ApprenticeRegulationsEntity implements Serializable {
     // 1. Relation (1-1) con notifications
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "notification_id", referencedColumnName = "id")
-    private NotificationsEntity notification;
+    private Notifications notification;
 }

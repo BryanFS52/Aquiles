@@ -14,7 +14,7 @@ import java.util.Date;
 @Setter
 @Entity
 @Table(name = "final_report")
-public class FinalReportEntity implements Serializable {
+public class FinalReport implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -51,5 +51,5 @@ public class FinalReportEntity implements Serializable {
     // Relations
     // 1.Relation (1-1) con notifications
     @OneToOne(mappedBy = "finalReport")
-    private NotificationsEntity notification;
+    private Notifications notification;
 }

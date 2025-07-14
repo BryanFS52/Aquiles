@@ -12,12 +12,12 @@ import java.util.Date;
 @Setter
 @Entity
 @Table(name = "improvement_plan")
-public class ImprovementPlanEntity implements Serializable {
+public class ImprovementPlan implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //Columns
+    // Columns
     @Column(name = "city", nullable = false, length = 55)
     private String city;
 
@@ -36,5 +36,5 @@ public class ImprovementPlanEntity implements Serializable {
     // Relations
     // 1.Relation (1-1) con Notifications
     @OneToOne(mappedBy = "improvementPlan")
-    private NotificationsEntity notification;
+    private Notifications notification;
 }

@@ -1,6 +1,6 @@
 package com.api.aquilesApi.Service;
 
-import com.api.aquilesApi.Entity.AttendanceEntity;
+import com.api.aquilesApi.Entity.Attendance;
 import com.api.aquilesApi.Repository.AttendancesRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class AttendancesService implements Idao<AttendanceEntity, Long> {
+public class AttendancesService implements Idao<Attendance, Long> {
 
     private final AttendancesRepository attendancesRepository;
 
@@ -21,40 +21,40 @@ public class AttendancesService implements Idao<AttendanceEntity, Long> {
     }
 
     @Override
-    public Page<AttendanceEntity> findAll(PageRequest pageRequest) {
+    public Page<Attendance> findAll(PageRequest pageRequest) {
         return attendancesRepository.findAll(pageRequest);
     }
 
     @Override
-    public AttendanceEntity getById(Long id) {
+    public Attendance getById(Long id) {
         return attendancesRepository.findById(id).orElseThrow(() ->
                 new CustomException("Attendance Type with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
     @Override
-    public void update(AttendanceEntity entity) {
+    public void update(Attendance entity) {
         this.attendancesRepository.save(entity);
     }
 
     @Override
-    public AttendanceEntity save(AttendanceEntity entity) {
+    public Attendance save(Attendance entity) {
         return attendancesRepository.save(entity);
     }
 
     @Override
-    public void delete(AttendanceEntity entity) {
+    public void delete(Attendance entity) {
         this.attendancesRepository.delete(entity);
     }
 
     @Override
-    public void create(AttendanceEntity entity) {
+    public void create(Attendance entity) {
         this.attendancesRepository.save(entity);
     }
 
-    public List<AttendanceEntity> findAllByStudentId(Long studentId) {
+    public List<Attendance> findAllByStudentId(Long studentId) {
         return attendancesRepository.findAllByStudentId(studentId);
     }
-    public List<AttendanceEntity> findAllByStudentId(Long studentId, Long attendanceState) {
+    public List<Attendance> findAllByStudentId(Long studentId, Long attendanceState) {
         return attendancesRepository.findByStudentIdAndOrAttendanceStateId(studentId, attendanceState);
     }
 }

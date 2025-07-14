@@ -23,6 +23,6 @@ public class AttendanceState implements Serializable {
 
     // Relations
     @OneToMany(mappedBy = "attendanceState" ,cascade = CascadeType.ALL ,  fetch = FetchType.LAZY)
-    private List<AttendanceEntity> attendancesEntityList;
+    private List<Attendance> attendancesEntityList;
 
 }

@@ -1,13 +1,19 @@
 "use client";
 
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/redux/store'
+import { useRouter } from 'next/navigation';
 import { BsPersonCircle } from "react-icons/bs";
 import TableAttendance from "@components/features/attendance/tableAttendance";
 import PageTitle from "@components/UI/pageTitle";
 import AttendanceFooter from "@components/features/attendance/attendanceFooter";
+import { useLoader } from '@/context/LoaderContext';
 
 export default function Attendance() {
+    const router = useRouter();
+    const { showLoader, hideLoader } = useLoader();
+    const [isTransitioning, setIsTransitioning] = useState(false);
     const { data: studySheets, loading, error } = useSelector(
         (state: RootState) => state.studySheet
     );
@@ -18,18 +24,18 @@ export default function Attendance() {
     const activeStudents = students.length;
     const withdrawnStudents = 0;
 
-    if (loading) {
-        return (
-            <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-                <PageTitle>Lista de asistencia</PageTitle>
-                <div className="flex items-center justify-center h-32 sm:h-64">
-                    <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base text-center">
-                        Cargando Lista de asistencia...
-                    </p>
-                </div>
-            </div>
-        );
-    }
+    const handleNavigate = () => {
+        setIsTransitioning(true);
+        router.push('/dashboard/asistenciaManual');
+    };
+
+    useEffect(() => {
+        if (loading || isTransitioning) {
+            showLoader();
+        } else {
+            hideLoader();
+        }
+    }, [loading, isTransitioning, showLoader, hideLoader]);
 
     if (error) {
         return (
@@ -156,7 +162,7 @@ export default function Attendance() {
             {/* Tabla de asistencia */}
             <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <TableAttendance studySheetData={studySheet} />
+                    <TableAttendance studySheetData={studySheet} onNavigate={handleNavigate} />
                 </div>
             </div>
 

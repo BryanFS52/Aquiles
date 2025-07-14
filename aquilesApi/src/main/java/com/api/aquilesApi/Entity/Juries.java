@@ -7,17 +7,21 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
-@Getter
-@Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "Follow_ups")
-public class FollowUpsEntity implements Serializable {
+@Getter
+@Setter
+@Table(name = "juries")
+public class Juries implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
-    private String name;
     // Relations
+    // 1.Relation (M-M) con Checklist
+    /*
+    @ManyToMany(mappedBy = "juries")
+    private Set<Checklist> checklists;
+
+     */
 }

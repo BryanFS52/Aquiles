@@ -24,7 +24,7 @@ public class JustificationDto {
     private Boolean state;
 
     // Relations
-    private JustificationTypeDto justificationTypeId;
+    private JustificationTypeDto justificationType;
     private AttendancesDto attendance;
     private Long notificationId;
 }

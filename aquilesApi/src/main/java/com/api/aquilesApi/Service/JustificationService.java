@@ -1,6 +1,6 @@
 package com.api.aquilesApi.Service;
 
-import com.api.aquilesApi.Entity.JustificationEntity;
+import com.api.aquilesApi.Entity.Justification;
 import com.api.aquilesApi.Repository.JustificationRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
-public class JustificationService implements Idao<JustificationEntity, Long> {
+public class JustificationService implements Idao<Justification, Long> {
 
     private final JustificationRepository justificationRepository;
 
@@ -19,35 +19,35 @@ public class JustificationService implements Idao<JustificationEntity, Long> {
     }
 
     @Override
-    public Page<JustificationEntity> findAll(PageRequest pageRequest) {
+    public Page<Justification> findAll(PageRequest pageRequest) {
         return justificationRepository.findAll(pageRequest);
     }
 
 
     @Override
-    public JustificationEntity getById(Long id) {
+    public Justification getById(Long id) {
         return justificationRepository.findById(id).orElseThrow(() ->
                 new CustomException("Justification Type with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
     @Override
-    public void create(JustificationEntity entity) {
+    public void create(Justification entity) {
         this.justificationRepository.save(entity);
     }
 
     @Override
-    public void update(JustificationEntity entity) {
+    public void update(Justification entity) {
         this.justificationRepository.save(entity);
     }
 
     @Override
-    public JustificationEntity save(JustificationEntity entity) {
+    public Justification save(Justification entity) {
         return justificationRepository.save(entity);
     }
 
 
     @Override
-    public void delete(JustificationEntity entity) {
+    public void delete(Justification entity) {
         this.justificationRepository.delete(entity);
     }
 }

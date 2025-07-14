@@ -13,7 +13,8 @@ import { CourseInfoSection } from "@components/features/attendance/attendanceMan
 import { AttendanceControls } from "@components/features/attendance/attendanceManual/attendanceControls"
 import { StudentList } from "@components/features/attendance/attendanceManual/studentList"
 import { AttendanceHistory } from "@components/features/attendance/attendanceManual/attendanceHistory"
-import { LoadingState, ErrorState, EmptyStudentsState } from "@components/features/attendance/attendanceManual/state"
+import { ErrorState, EmptyStudentsState } from "@components/features/attendance/attendanceManual/state"
+import { useLoader } from "@context/LoaderContext"
 import type {
     AttendanceHistory as AttendanceHistoryType,
     AttendanceStats,
@@ -24,6 +25,7 @@ import type {
 const AttendanceManualPage: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>()
     const { data: studySheet, loading, error } = useSelector((state: any) => state.studySheet)
+    const { showLoader, hideLoader } = useLoader()
 
     const studySheetObj = Array.isArray(studySheet) ? studySheet[0] : studySheet
     const students = studySheetObj?.students || []
@@ -41,6 +43,14 @@ const AttendanceManualPage: React.FC = () => {
             dispatch(fetchStudySheetById({ id: 1 }))
         }
     }, [studySheet, dispatch])
+
+    useEffect(() => {
+        if (loading) {
+            showLoader()
+        } else {
+            hideLoader()
+        }
+    }, [loading, showLoader, hideLoader])
 
     useEffect(() => {
         if (students.length > 0) {
@@ -156,7 +166,6 @@ const AttendanceManualPage: React.FC = () => {
     const stats = getAttendanceStats()
     const attendancePercentage = getAttendancePercentage(stats)
 
-    if (loading) return <LoadingState />
     if (error) return <ErrorState error={error} />
     if (!students.length) return <EmptyStudentsState />
 

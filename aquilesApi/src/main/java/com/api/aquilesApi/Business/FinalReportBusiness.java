@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.FinalReportDto;
-import com.api.aquilesApi.Entity.FinalReportEntity;
+import com.api.aquilesApi.Entity.FinalReport;
 import com.api.aquilesApi.Service.FinalReportService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
@@ -14,10 +14,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class FinalReportBusiness {
     private final FinalReportService finalReportService;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
-    public FinalReportBusiness(FinalReportService finalReportService) {
+    public FinalReportBusiness(FinalReportService finalReportService, ModelMapper modelMapper) {
         this.finalReportService = finalReportService;
+        this.modelMapper = modelMapper;
     }
 
     // Validation object
@@ -27,16 +28,14 @@ public class FinalReportBusiness {
     public Page<FinalReportDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<FinalReportEntity> finalreportEntityPage = finalReportService.findAll(pageRequest);
+            Page<FinalReport> finalreportEntityPage = finalReportService.findAll(pageRequest);
 
             System.out.println("Total Attendances: " + finalreportEntityPage.getTotalElements());
 
             return finalreportEntityPage.map(entity -> modelMapper.map(entity, FinalReportDto.class));
         } catch (DataAccessException e) {
-            // Manejo específico para errores de acceso a datos
             throw new CustomException("Error retrieving finalReport due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            // Manejo genérico para cualquier otra excepción
             throw new CustomException("An unexpected error occurred while retrieving finalReport.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -44,10 +43,10 @@ public class FinalReportBusiness {
     // Find By Id
     public FinalReportDto findById(Long id) {
         try {
-            FinalReportEntity finalReport = finalReportService.getById(id);
+            FinalReport finalReport = finalReportService.getById(id);
             return modelMapper.map(finalReport, FinalReportDto.class);
         } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
+            throw e;
         } catch (Exception e) {
             throw new CustomException("Error Getting finalReport: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -60,10 +59,10 @@ public class FinalReportBusiness {
 
                 byte[] signatureBytes = java.util.Base64.getDecoder().decode(finalreportDto.getSignature());
 
-            FinalReportEntity finalReportEntity = modelMapper.map(finalreportDto, FinalReportEntity.class);
-            finalReportEntity.setFirma(signatureBytes);
+            FinalReport finalReport = modelMapper.map(finalreportDto, FinalReport.class);
+            finalReport.setFirma(signatureBytes);
 
-            return modelMapper.map(finalReportService.save(finalReportEntity), FinalReportDto.class);
+            return modelMapper.map(finalReportService.save(finalReport), FinalReportDto.class);
         }catch ( Exception e){
             throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);
         }
@@ -73,7 +72,7 @@ public class FinalReportBusiness {
     public void update(Long finalReportId, FinalReportDto finalreportDto) {
         try {
             finalreportDto.setId(finalReportId);
-            FinalReportEntity attendance = modelMapper.map( finalreportDto, FinalReportEntity.class);
+            FinalReport attendance = modelMapper.map( finalreportDto, FinalReport.class);
             finalReportService.save(attendance);
         } catch (Exception e) {
             throw new CustomException("Error Updating finalReport: " + e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -83,10 +82,10 @@ public class FinalReportBusiness {
     // Delete
     public void delete(Long finalReportId) {
         try {
-            FinalReportEntity finalReport = finalReportService.getById(finalReportId);
+            FinalReport finalReport = finalReportService.getById(finalReportId);
             finalReportService.delete(finalReport);
         } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
+            throw e;
         } catch (Exception e) {
             throw new CustomException("Error Deleting finalReport: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }

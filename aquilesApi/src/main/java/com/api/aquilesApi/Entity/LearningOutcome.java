@@ -10,8 +10,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @Entity
-public class LearningOutcomeEntity implements Serializable {
-//    (Model)
+public class LearningOutcome implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,5 +19,5 @@ public class LearningOutcomeEntity implements Serializable {
     // 1.Relation (M-1) con checklist
     @ManyToOne
     @JoinColumn(name = "checklist_id", nullable = false)
-    private ChecklistEntity checklist;
+    private Checklist checklist;
 }

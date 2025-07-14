@@ -12,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Entity
 @Table(name = "items")
-public class ItemEntity implements Serializable {
+public class Item implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,15 +24,15 @@ public class ItemEntity implements Serializable {
     @Column(name = "indicator", nullable = false, length = 100)
     private String indicator;
 
-    //Relations
+    // Relations
     // 1. Relation (M-1) con itemType
     @ManyToOne
     @JoinColumn(name = "item_type_id", nullable = false)
-    private ItemTypeEntity itemType;
+    private ItemType itemType;
 
     // 2. Relation (M-1) con checklist
     @ManyToOne
     @JoinColumn(name = "checklist_id", nullable = false)
-    private ChecklistEntity checklist;
+    private Checklist checklist;
 
 }

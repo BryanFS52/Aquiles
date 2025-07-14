@@ -18,7 +18,7 @@ import {
   downloadBase64File
 } from '@slice/justificationSlice';
 import JustificationTable from "@/components/features/justification/justificationsTable";
-import {AppDispatch, RootState} from '@/redux/store'
+import { AppDispatch, RootState } from '@/redux/store'
 
 export default function JustificacionesInstructor() {
   const dispatch = useDispatch<AppDispatch>();
@@ -45,7 +45,7 @@ export default function JustificacionesInstructor() {
   };
 
   const handleRefresh = () => {
-    dispatch(fetchJustifications({ page: localCurrentPage, size: itemsPerPage }));
+    dispatch(fetchJustifications({ page: 0, size: itemsPerPage }));
   };
 
   const handlePreviousPage = () => {

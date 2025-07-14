@@ -1,6 +1,7 @@
 import { Inter } from 'next/font/google';
 import '@/globals.css';
 import { Metadata } from 'next';
+import { LoaderProvider } from '@context/LoaderContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,7 +21,9 @@ export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
     return (
         <html lang="es">
             <body className={`bg-white text-black font-sans ${inter.className}`}>
-                {children}
+                <LoaderProvider>
+                    {children}
+                </LoaderProvider>
             </body>
         </html>
     );

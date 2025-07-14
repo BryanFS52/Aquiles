@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.JustificationTypeDto;
-import com.api.aquilesApi.Entity.JustificationTypeEntity;
+import com.api.aquilesApi.Entity.JustificationType;
 import com.api.aquilesApi.Service.JustificationTypeService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
@@ -14,20 +14,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class JustificationTypeBusiness {
     private final JustificationTypeService justificationTypeService;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
-    public JustificationTypeBusiness(JustificationTypeService justificationTypeService) {
+    public JustificationTypeBusiness(JustificationTypeService justificationTypeService, ModelMapper modelMapper) {
         this.justificationTypeService = justificationTypeService;
+        this.modelMapper = modelMapper;
     }
 
-    // Validación Objeto
+    // Validation object
 
 
     // Find All
     public Page<JustificationTypeDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<JustificationTypeEntity> justificationtypeEntityPage = justificationTypeService.findAll(pageRequest);
+            Page<JustificationType> justificationtypeEntityPage = justificationTypeService.findAll(pageRequest);
 
             System.out.println("Total Justifications Type: " + justificationtypeEntityPage.getTotalElements());
 
@@ -44,7 +45,7 @@ public class JustificationTypeBusiness {
     // Find By Id
     public JustificationTypeDto findById(Long id) {
         try {
-            JustificationTypeEntity justificationType = justificationTypeService.getById(id);
+            JustificationType justificationType = justificationTypeService.getById(id);
             return modelMapper.map(justificationType, JustificationTypeDto.class);
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada
@@ -56,8 +57,8 @@ public class JustificationTypeBusiness {
     // Add
     public JustificationTypeDto add(JustificationTypeDto justificationtypeDto) {
         try {
-            JustificationTypeEntity justificationtypeEntity = modelMapper.map(justificationtypeDto, JustificationTypeEntity.class);
-            return modelMapper.map(justificationTypeService.save(justificationtypeEntity), JustificationTypeDto.class);
+            JustificationType justificationtype = modelMapper.map(justificationtypeDto, JustificationType.class);
+            return modelMapper.map(justificationTypeService.save(justificationtype), JustificationTypeDto.class);
         }catch ( Exception e){
             throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);
         }
@@ -67,7 +68,7 @@ public class JustificationTypeBusiness {
     public void update(Long id, JustificationTypeDto justificationtypeDto) {
         try {
             justificationtypeDto.setId(id);
-            JustificationTypeEntity justificationType = modelMapper.map( justificationtypeDto, JustificationTypeEntity.class);
+            JustificationType justificationType = modelMapper.map( justificationtypeDto, JustificationType.class);
             justificationTypeService.save(justificationType);
         } catch (Exception e) {
             throw new CustomException("Error Updating JustificationType: " + e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -77,7 +78,7 @@ public class JustificationTypeBusiness {
     // Delete
     public void delete(Long id) {
         try {
-            JustificationTypeEntity justificationType = justificationTypeService.getById(id);
+            JustificationType justificationType = justificationTypeService.getById(id);
             justificationTypeService.delete(justificationType);
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada

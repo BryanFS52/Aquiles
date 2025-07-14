@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.ChecklistDto;
-import com.api.aquilesApi.Entity.ChecklistEntity;
+import com.api.aquilesApi.Entity.Checklist;
 import com.api.aquilesApi.Repository.JuriesRepository;
 import com.api.aquilesApi.Service.ChecklistService;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -15,10 +15,11 @@ import org.springframework.stereotype.Component;
 public class ChecklistBusiness {
 
     private final ChecklistService checklistService;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
-    public ChecklistBusiness(ChecklistService checklistService, JuriesRepository juriesRepository) {
+    public ChecklistBusiness(ChecklistService checklistService, JuriesRepository juriesRepository, ModelMapper modelMapper) {
         this.checklistService = checklistService;
+        this.modelMapper = modelMapper;
     }
 
     // Validation object
@@ -27,7 +28,7 @@ public class ChecklistBusiness {
     public Page<ChecklistDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<ChecklistEntity> checklistEntityPage = checklistService.findAll(pageRequest);
+            Page<Checklist> checklistEntityPage = checklistService.findAll(pageRequest);
 
             System.out.println("Total Checklist: " + checklistEntityPage.getTotalElements());
 
@@ -44,7 +45,7 @@ public class ChecklistBusiness {
     // Find By Id
     public ChecklistDto findById(Long id) {
         try {
-            ChecklistEntity checklist = checklistService.getById(id);
+            Checklist checklist = checklistService.getById(id);
             return modelMapper.map(checklist, ChecklistDto.class);
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada
@@ -56,8 +57,8 @@ public class ChecklistBusiness {
     // Add
     public ChecklistDto add(ChecklistDto checklistDto) {
         try {
-            ChecklistEntity checklistEntity = modelMapper.map(checklistDto, ChecklistEntity.class);
-            return modelMapper.map(checklistService.save(checklistEntity), ChecklistDto.class);
+            Checklist checklist = modelMapper.map(checklistDto, Checklist.class);
+            return modelMapper.map(checklistService.save(checklist), ChecklistDto.class);
         }catch ( Exception e){
             throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);
         }
@@ -67,7 +68,7 @@ public class ChecklistBusiness {
     public void update(Long attendanceId, ChecklistDto checklistDto) {
         try {
             checklistDto.setId(attendanceId);
-            ChecklistEntity attendance = modelMapper.map( checklistDto, ChecklistEntity.class);
+            Checklist attendance = modelMapper.map( checklistDto, Checklist.class);
             checklistService.save(attendance);
         } catch (Exception e) {
             throw new CustomException("Error Updating Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -77,7 +78,7 @@ public class ChecklistBusiness {
     // Delete
     public void delete(Long attendanceId) {
         try {
-            ChecklistEntity checklist = checklistService.getById(attendanceId);
+            Checklist checklist = checklistService.getById(attendanceId);
             checklistService.delete(checklist);
         } catch (CustomException e) {
             throw e; // Lanzar la excepción personalizada

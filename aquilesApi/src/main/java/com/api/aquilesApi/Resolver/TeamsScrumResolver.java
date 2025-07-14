@@ -2,8 +2,9 @@ package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.TeamsScrumBusiness;
 import com.api.aquilesApi.Dto.Student;
+import com.api.aquilesApi.Dto.StudySheet;
 import com.api.aquilesApi.Dto.TeamsScrumDto;
-import com.api.aquilesApi.Entity.TeamsScrumEntity;
+import com.api.aquilesApi.Entity.TeamsScrum;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.*;
@@ -25,24 +26,76 @@ public class TeamsScrumResolver {
         this.teamsScrumBusiness = teamsScrumBusiness;
     };
 
+    @DgsEntityFetcher(name = "StudySheet")
+    public StudySheet studySheetReference(Map<String, Object> values) {
+        System.out.println("→ Resolviendo entidad federada StudySheet con values: " + values);
+        String idStr = (String) values.get("id");
+        Long id  = Long.parseLong(idStr);
+        return new StudySheet(id);
+    }
+
+
+
+    @DgsEntityFetcher(name = "TeamsScrum")
+    public TeamsScrum teamScrum(Map<String, Object> values) {
+        try {
+            System.out.println(values);
+            Long id = values.get("id") != null ? Long.valueOf((String) values.get("id")) : null;
+            TeamsScrumDto dto = teamsScrumBusiness.findById(id);
+            return modelMapper.map(dto, TeamsScrum.class);
+        } catch (CustomException e) {
+            System.out.println("TeamsScrum no encontrado: " + e.getMessage());
+            return null;
+        }
+    }
+
+    @DgsData(parentType = "StudySheet", field = "teamsScrum")
+    public List<TeamsScrum> teamScrums(DgsDataFetchingEnvironment dfe) {
+        StudySheet studySheet = dfe.getSource();
+        Long studySheetId = studySheet.getId();
+
+        List<TeamsScrumDto> dtos = teamsScrumBusiness.findAllByStudySheetId(studySheetId);
+        System.out.println("StudySheet ID: " + studySheetId + " → TeamsScrums encontrados: " + dtos.size());
+
+        return dtos.stream()
+                .map(dto -> modelMapper.map(dto, TeamsScrum.class))
+                .collect(Collectors.toList());
+    }
+
+
+
     @DgsData(parentType = "Student", field = "teamScrums")
-    public List<TeamsScrumEntity> teamsScrum(DgsDataFetchingEnvironment env) {
+    public List<TeamsScrum> teamsScrum(DgsDataFetchingEnvironment env) {
         Student student = env.getSource();
         assert student != null;
 
         Long studentId = student.getId();
 
         List<TeamsScrumDto> teamsScrumDtoList = teamsScrumBusiness.findAllByStudentId(studentId);
+        System.out.println("Student ID: " + studentId + " → TeamsScrums encontrados: " + teamsScrumDtoList.size());
 
         return teamsScrumDtoList.stream()
-                .map(dto -> modelMapper.map(dto, TeamsScrumEntity.class))
+                .map(dto -> modelMapper.map(dto, TeamsScrum.class))
                 .collect(Collectors.toList());
     }
 
+    // Aquí agregué explícitamente el 'field = "teamScrums"'
+
     @DgsData(parentType = "TeamsScrum", field = "students")
     public List<Map<String, String>> studentsReference(DgsDataFetchingEnvironment env) {
-        TeamsScrumDto teamsScrum = env.getSource();
-        if (teamsScrum == null || teamsScrum.getMemberIds() == null) {
+        Object source = env.getSource();
+        TeamsScrum teamsScrum;
+
+        if (source instanceof TeamsScrumDto) {
+            teamsScrum = modelMapper.map((TeamsScrumDto) source, TeamsScrum.class);
+        } else if (source instanceof TeamsScrum) {
+            teamsScrum = (TeamsScrum) source;
+        } else {
+            System.out.println("Tipo de source inesperado: " + source.getClass());
+            return Collections.emptyList();
+        }
+
+        if (teamsScrum.getMemberIds() == null) {
             return Collections.emptyList();
         }
 
@@ -51,17 +104,26 @@ public class TeamsScrumResolver {
                 .collect(Collectors.toList());
     }
 
+    @DgsData(parentType = "TeamsScrum", field = "studySheet")
+    public Map<String, Object> resolveStudySheet(DgsDataFetchingEnvironment env) {
+        Object source = env.getSource();
+        System.out.println("Source class: " + source.getClass());
 
+        TeamsScrum teamsScrum;
+        if (source instanceof TeamsScrumDto) {
+            teamsScrum = modelMapper.map((TeamsScrumDto) source, TeamsScrum.class);
+        } else {
+            teamsScrum = (TeamsScrum) source;
+        }
 
-    @DgsEntityFetcher(name = "TeamsScrum")
-    public TeamsScrumEntity teamScrum(Map<String, Object> values) {
-        String id = (String) values.get("id");
-        Long attendanceId = id != null ? Long.valueOf(id) : null;
-        return modelMapper.map( teamsScrumBusiness.findById(attendanceId), TeamsScrumEntity.class);
+        if (teamsScrum == null || teamsScrum.getStudySheetId() == null) {
+            return null;
+        }
+
+        return Map.of("id", teamsScrum.getStudySheetId().toString());
     }
 
-
-@DgsQuery
+    @DgsQuery
     public Map<String , Object> allTeamsScrums(@InputArgument Integer page, @InputArgument Integer size){
         try {
             Page<TeamsScrumDto> teamsScrumDtoPage = teamsScrumBusiness.findAll(page, size);

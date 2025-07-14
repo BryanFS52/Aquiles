@@ -13,7 +13,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "justification_types")
-public class JustificationTypeEntity implements Serializable {
+public class JustificationType implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,5 +28,5 @@ public class JustificationTypeEntity implements Serializable {
     // Relations
     // 1. Relation (1-M) con justification
     @OneToMany(mappedBy = "justificationTypeId")
-    private Set<JustificationEntity> justificationSet;
+    private Set<Justification> justificationSet;
 }
