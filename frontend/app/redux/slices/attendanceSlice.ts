@@ -1,6 +1,6 @@
 import { client, clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph';
+import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph';
 import { AttendanceItem } from '@type/slices/attendance';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import {
@@ -59,10 +59,10 @@ export const fetchAttendancesByStudent = createAsyncThunk<
     async ({ id, stateId }, { rejectWithValue }) => {
         try {
             const { data } = await clientLAN.query<
-                AllAttendancesByStudentIdQuery,
-                AllAttendancesByStudentIdQueryVariables
+            AllAttendancesByStudentIdQuery,
+            AllAttendancesByStudentIdQueryVariables
             >({
-                query: GET_ATTENDANCES_BY_STUDENT,
+                query: GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT, // Assuming this query can also fetch attendances by student ID
                 variables: { id, stateId },
                 fetchPolicy: 'no-cache',
             });

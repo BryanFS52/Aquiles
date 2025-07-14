@@ -16,6 +16,7 @@ import {
     DeleteJustificationMutation,
     DeleteJustificationMutationVariables
 } from '@graphql/generated'
+import { ReactNode  } from 'react'
 
 // Tipos para el estado extendido
 export interface TransformedJustificationItem {
@@ -141,10 +142,11 @@ const transformToComponentFormat = (justifications: JustificationItem[]): Transf
 
         return {
             id: j.id,
+            tipoNovedad: j.justificationType?.id || "", // <-- debe ser el id, no el nombre
             programa: program?.name || "Sin programa",
             ficha: studySheet?.number?.toString() || "Sin ficha",
             fecha: new Date(j.justificationDate).toLocaleDateString("es-CO"),
-            estado: j.state ? "Activo" : "Inactivo",
+            estado: j.state ? "Aprobada" : "Pendiente", // O ajusta según tu lógica de estado
             archivoAdjunto: j.justificationFile,
             archivoMime: getMimeTypeFromBase64(j.justificationFile),
             documento: person?.document || '',

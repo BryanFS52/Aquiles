@@ -45,7 +45,6 @@ export const GET_ATTENDANCES_BY_STUDENT = gql`
   }
 `;
 
-
 export const ADD_ATTENDANCE = gql`
   mutation AddAttendance($input: AttendancesDto!) {
     addAttendance(input: $input) {
@@ -66,7 +65,7 @@ export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
           description
           justificationFile
           justificationDate
-          justificationTypeId {
+          justificationType {
             id
             name
           }
@@ -75,25 +74,6 @@ export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
     }
   }
 `;
-
-// export const GET_JUSTIFICATION_BY_ID = gql`
-//   query GetJustificationById($id: Long!){
-//   justificationById(id: $id ){
-//     data {
-//       id
-//       name
-//       description
-//       justificationDate
-//       state
-//       justificationType {
-//         name
-//       }
-//       justificacionFile
-//     }
-//     code
-//     message
-//   }
-// }`
 
 export const UPDATE_ATTENDANCE = gql`
   mutation UpdateAttendance($id: Long!, $input: AttendancesDto!) {
