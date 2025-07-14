@@ -2,27 +2,35 @@ package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.ChecklistDto;
 import com.api.aquilesApi.Entity.Checklist;
+import com.api.aquilesApi.Entity.Evaluations;
 import com.api.aquilesApi.Repository.JuriesRepository;
 import com.api.aquilesApi.Service.ChecklistService;
+import com.api.aquilesApi.Service.EvaluationsService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-@Component
+import org.springframework.stereotype.Service;
+
+@Service // <<-- cambiado de @Component a @Service
 public class ChecklistBusiness {
 
     private final ChecklistService checklistService;
     private final ModelMapper modelMapper;
+    private final EvaluationsService EvaluationsService;
 
-    public ChecklistBusiness(ChecklistService checklistService, JuriesRepository juriesRepository, ModelMapper modelMapper) {
+    public ChecklistBusiness(
+            ChecklistService checklistService,
+            JuriesRepository juriesRepository,
+            ModelMapper modelMapper,
+            EvaluationsService evaluationService // <<-- inyección correcta
+    ) {
         this.checklistService = checklistService;
         this.modelMapper = modelMapper;
+        this.EvaluationsService = evaluationService;
     }
-
-    // Validation object
 
     // Find All
     public Page<ChecklistDto> findAll(int page, int size) {
@@ -34,10 +42,8 @@ public class ChecklistBusiness {
 
             return checklistEntityPage.map(entity -> modelMapper.map(entity, ChecklistDto.class));
         } catch (DataAccessException e) {
-            // Manejo específico para errores de acceso a datos
             throw new CustomException("Error retrieving checklist due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            // Manejo genérico para cualquier otra excepción
             throw new CustomException("An unexpected error occurred while retrieving checklist.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -48,7 +54,7 @@ public class ChecklistBusiness {
             Checklist checklist = checklistService.getById(id);
             return modelMapper.map(checklist, ChecklistDto.class);
         } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
+            throw e;
         } catch (Exception e) {
             throw new CustomException("Error Getting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -57,21 +63,33 @@ public class ChecklistBusiness {
     // Add
     public ChecklistDto add(ChecklistDto checklistDto) {
         try {
+            // Paso 1: mapear campos simples
             Checklist checklist = modelMapper.map(checklistDto, Checklist.class);
-            return modelMapper.map(checklistService.save(checklist), ChecklistDto.class);
-        }catch ( Exception e){
-            throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);
+    
+            // Paso 2: asignar manualmente la entidad Evaluations si se proporciona un ID
+            if (checklistDto.getEvaluations() != null) {
+                Evaluations eval = EvaluationsService.findById(checklistDto.getEvaluations());
+                checklist.setEvaluation(eval);
+            }
+    
+            // Paso 3: guardar y retornar
+            Checklist saved = checklistService.save(checklist);
+            return modelMapper.map(saved, ChecklistDto.class);
+        } catch (Exception e) {
+            throw new CustomException("Error creating checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+    
+    
 
     // Update
-    public void update(Long attendanceId, ChecklistDto checklistDto) {
+    public void update(Long checklistId, ChecklistDto checklistDto) {
         try {
-            checklistDto.setId(attendanceId);
-            Checklist attendance = modelMapper.map( checklistDto, Checklist.class);
-            checklistService.save(attendance);
+            checklistDto.setId(checklistId);
+            Checklist checklist = modelMapper.map(checklistDto, Checklist.class);
+            checklistService.save(checklist);
         } catch (Exception e) {
-            throw new CustomException("Error Updating Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Error Updating Checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -81,7 +99,7 @@ public class ChecklistBusiness {
             Checklist checklist = checklistService.getById(attendanceId);
             checklistService.delete(checklist);
         } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
+            throw e;
         } catch (Exception e) {
             throw new CustomException("Error Deleting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }

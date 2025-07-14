@@ -28,18 +28,22 @@ public class ChecklistDto {
     @NotNull(message = "El criterio de evaluación es obligatorio")
     private boolean evaluationCriteria;
 
-    @NotNull(message = "El historial del checklist es obligatorio")
-    @Size(max = 255, message = "El historial del checklist no puede exceder los 255 caracteres")
-    private String checklistHistory;
+
 
     // Relations
     @NotNull(message = "Los jurados asociados son obligatorios")
-    private Set<Long> associatedJuriesIds;
+    private Set<Long> associatedJuries;
 
     private ItemDto item;
 
-    private EvaluationsDto evaluations;
+    private Long evaluations;
 
     private TeamsScrumDto teamsScrum;
 
+    private Long studySheets;
+
+                                
 }
+
+
+    

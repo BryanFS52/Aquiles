@@ -4,7 +4,8 @@ type Checklist {
     remarks: String
     instructorSignature: String
     evaluationCriteria: Boolean
-    checklistHistory: String
+    studySheets: Long 
+    evaluations: Long
     associatedJuries: [Juries]
 }
 
@@ -30,13 +31,17 @@ input ChecklistDto {
     remarks: String!
     instructorSignature: String!
     evaluationCriteria: Boolean!
-    checklistHistory: String!
+    studySheets: Long 
+    evaluations: Long
     associatedJuries: [ID!]!
 }
+
+
 
 extend type Query {
     allChecklists(page: Int, size: Int): ChecklistPage
     checklistById(id: Long!): ChecklistPageId
+    Response(code: String, message: String, Date: String): Response
 }
 
 extend type Mutation {
