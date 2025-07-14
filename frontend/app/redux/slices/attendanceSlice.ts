@@ -1,6 +1,6 @@
 import { client, clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph';
+import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph';
 import { AttendanceItem } from '@type/slices/attendance';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import {
@@ -13,7 +13,7 @@ import {
     DeleteAttendanceMutation,
     DeleteAttendanceMutationVariables,
     AllAttendancesByStudentIdQuery,
-    AllAttendancesByStudentIdQueryVariables
+    AllAttendancesByStudentIdQueryVariables,
 } from '@graphql/generated';
 
 const transformGraphQLToAttendanceItem = (graphqlData: any): AttendanceItem => {
@@ -77,6 +77,25 @@ export const fetchAttendancesByStudent = createAsyncThunk<
         } catch (error) {
             console.error("Error al obtener asistencias por estudiante", error);
             return rejectWithValue({ message: (error as Error).message || 'Unknown error' });
+        }
+    }
+);
+
+export const fetchAttendancesAndJustificationsByStudent = createAsyncThunk<
+    any, // Reemplazar con el tipo correcto una vez generado
+    { id: number }
+>(
+    'attendance/fetchWithJustifications',
+    async ({ id }, { rejectWithValue }) => {
+        try {
+            const { data } = await clientLAN.query({
+                query: GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT,
+                variables: { id },
+                fetchPolicy: 'no-cache',
+            });
+            return data.allAttendancesByStudentId.data;
+        } catch (error) {
+            return rejectWithValue({ message: (error as Error).message });
         }
     }
 );
@@ -157,6 +176,8 @@ const initialState = {
         error: null as string | null,
         showForm: false,
     },
+    justifications: [] as any[],
+    justificationsLoading: false,
 };
 
 const attendanceSlice = createSlice({
@@ -200,6 +221,19 @@ const attendanceSlice = createSlice({
             .addCase(fetchAttendancesByStudent.rejected, (state, action) => {
                 state.studentAttendances.loading = false;
                 state.studentAttendances.error = (action.payload as RejectedPayload)?.message ?? action.error.message ?? 'Error al cargar asistencias del estudiante';
+            })
+            .addCase(fetchAttendancesAndJustificationsByStudent.pending, (state) => {
+                state.justificationsLoading = true;
+            })
+            .addCase(fetchAttendancesAndJustificationsByStudent.fulfilled, (state, action) => {
+                const justifications = action.payload
+                    .filter((j: any) => j !== null);
+                state.justifications = justifications;
+                state.loading = false;
+            })
+            .addCase(fetchAttendancesAndJustificationsByStudent.rejected, (state, action) => {
+                state.error = (action.payload as RejectedPayload)?.message ?? 'Error fetching justifications';
+                state.loading = false;
             })
             .addCase(addAttendance.fulfilled, (state, action: PayloadAction<AddAttendanceMutation['addAttendance']>) => {
                 if (action.payload && action.payload.id) {

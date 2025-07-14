@@ -1,4 +1,4 @@
-import { client } from '@lib/apollo-client'
+import { client,clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { GET_ALL_ATTENDANCES_STATE, ADD_ATTENDANCE_STATE, UPDATE_ATTENDANCE_STATE, DELETE_ATTENDANCE_STATE } from '@graphql/attendanceStateGraph'
 import { AttendanceStateItem } from '@type/slices/attendanceState'
@@ -25,7 +25,7 @@ const transformGraphQLToAttendanceStateItem = (graphqlData: any): AttendanceStat
 export const fetchAttendanceState = createAsyncThunk<GetStateAttendanceQuery['allStateAttendances'], GetStateAttendanceQueryVariables>(
     'attedanceState/fetchAll',
     async ({ page, size }) => {
-        const { data } = await client.query<GetStateAttendanceQuery, GetStateAttendanceQueryVariables>({
+        const { data } = await clientLAN.query<GetStateAttendanceQuery, GetStateAttendanceQueryVariables>({
             query: GET_ALL_ATTENDANCES_STATE,
             variables: { page, size },
             fetchPolicy: 'no-cache'
@@ -40,7 +40,7 @@ export const addAttendanceState = createAsyncThunk<AddStateAttendanceMutation['a
     'attendanceState/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<AddStateAttendanceMutation, AddStateAttendanceMutationVariables>({
+            const { data } = await clientLAN.mutate<AddStateAttendanceMutation, AddStateAttendanceMutationVariables>({
                 mutation: ADD_ATTENDANCE_STATE,
                 variables: { input }
             });
@@ -63,7 +63,7 @@ export const updateAttendanceState = createAsyncThunk<UpdateStateAttendanceMutat
     'attendanceState/update',
     async ({ id, input }, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<UpdateStateAttendanceMutation, UpdateStateAttendanceMutationVariables>({
+            const { data } = await clientLAN.mutate<UpdateStateAttendanceMutation, UpdateStateAttendanceMutationVariables>({
                 mutation: UPDATE_ATTENDANCE_STATE,
                 variables: { id, input },
             });
@@ -86,7 +86,7 @@ export const deleteAttendanceState = createAsyncThunk<string, string,
     'attendanceState/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<DeleteStateAttendanceMutation, DeleteStateAttendanceMutationVariables>({
+            const { data } = await clientLAN.mutate<DeleteStateAttendanceMutation, DeleteStateAttendanceMutationVariables>({
                 mutation: DELETE_ATTENDANCE_STATE,
                 variables: { id },
             });

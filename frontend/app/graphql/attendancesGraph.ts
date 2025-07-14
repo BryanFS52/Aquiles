@@ -56,6 +56,44 @@ export const ADD_ATTENDANCE = gql`
   }
 `;
 
+export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
+  query GetAttendancesAndJustificationsByStudent($id: Long!) {
+    allAttendancesByStudentId(id: $id) {
+      data {
+        id
+        justification {
+          id
+          description
+          justificationFile
+          justificationDate
+          justificationTypeId {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+// export const GET_JUSTIFICATION_BY_ID = gql`
+//   query GetJustificationById($id: Long!){
+//   justificationById(id: $id ){
+//     data {
+//       id
+//       name
+//       description
+//       justificationDate
+//       state
+//       justificationType {
+//         name
+//       }
+//       justificacionFile
+//     }
+//     code
+//     message
+//   }
+// }`
 
 export const UPDATE_ATTENDANCE = gql`
   mutation UpdateAttendance($id: Long!, $input: AttendancesDto!) {

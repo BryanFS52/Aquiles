@@ -1,12 +1,14 @@
 "use client";
 
-import { useRef, useEffect, useState, ChangeEvent, FormEvent } from "react";
+import { useRef, useEffect, ChangeEvent, FormEvent, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoPeople } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from 'react-redux';
+import { useUser } from '@context/UserContext';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
 import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
+import { fetchJustifications, generateFileName } from '@slice/justificationSlice';
 import type { AppDispatch, RootState } from '@/redux/store'
 import type { FormDataState } from '@slice/justificationSlice';
 import type { AttendanceItem } from '@type/slices/attendance';
@@ -22,6 +24,7 @@ import {
   updateJustificationTypeId,
   addJustification,
   validateForm,
+  downloadBase64File,
   setSubmitting,
   setCurrentAttendance
 } from '@slice/justificationSlice';
@@ -30,12 +33,25 @@ import {
   FaRegListAlt,
   FaCheckCircle,
 } from "react-icons/fa";
+import JustificationsHistorical from "@/components/features/justification/justificationsHistorical";
+
+
+// const sessions = {
+//   "1": {
+//     componentName: "Nombre del Componente",
+//     date: "01/09/2024",
+//     time: "10:00 AM",
+//     sheet: "Ficha 12345",
+//     instructors: ["Instructor 1", "Instructor 2"],
+//   },
+// };
 
 export default function JustificacionAprendiz() {
   const fileRef = useRef<File | null>(null);
   const base64Ref = useRef<string>("");
   const formRef = useRef<HTMLDivElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
+  const { user } = useUser();
 
   // Estado local para controlar la carga del modal
   const [shouldLoadModal, setShouldLoadModal] = useState(false);
@@ -47,6 +63,8 @@ export default function JustificacionAprendiz() {
     useSelector((state: RootState) => state.justificationType);
   const { data: attendancesData, loading: loadingAttendances, error: errorAttendances
   } = useSelector((state: RootState) => state.attendances.studentAttendances);
+  const { transformedData: justificationsData, loading: loadingJustifications } =
+    useSelector((state: RootState) => state.justification);
   const { loading: loadingJustification, error: errorJustification, form } =
     useSelector((state: RootState) => state.justification);
   const currentAttendance = useSelector(
@@ -55,8 +73,11 @@ export default function JustificacionAprendiz() {
 
 
   useEffect(() => {
-    dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-    dispatch(fetchAttendancesByStudent({ id: 1, stateId: 2 }));
+    // if (user?.id) {
+      dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
+      dispatch(fetchAttendancesByStudent({ id: 1, stateId: 2 }));
+      dispatch(fetchJustifications({ page: 0, size: 10 }));
+    // }
   }, [dispatch]);
 
   // Efecto para sincronizar el estado local con el estado global
@@ -71,7 +92,14 @@ export default function JustificacionAprendiz() {
     }
   }, [form.showForm, shouldLoadModal]);
 
-  if (loadingJustificationTypes || loadingAttendances) return <p>Cargando...</p>;
+  if (loadingJustificationTypes || loadingAttendances || loadingJustifications) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary"></div>
+        <span className="ml-4 text-xl font-semibold text-black dark:text-white">Cargando datos...</span>
+      </div>
+    );
+  }
   if (errorJustificationTypes || errorAttendances) return <p>Error cargando datos</p>;
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -153,6 +181,7 @@ export default function JustificacionAprendiz() {
       await dispatch(addJustification(formDataWithFile)).unwrap();
 
       toast.success("¡Tu justificación ha sido enviada exitosamente!");
+      dispatch(fetchJustifications({ page: 0, size: 10 }));
       dispatch(resetForm());
       fileRef.current = null;
       base64Ref.current = "";
@@ -162,7 +191,15 @@ export default function JustificacionAprendiz() {
       }, 200);
     } catch (error: any) {
       console.error("Error al enviar justificación:", error);
-      toast.error(error.message || "Error inesperado al enviar la justificación.");
+      const errorString = JSON.stringify(error);
+      let toastMessage = "Error inesperado al enviar la justificación.";
+
+      if (errorString.includes('duplicate key value violates unique constraint')) {
+        toastMessage = "Esta asistencia ya ha sido justificada.";
+      } else if (error?.message) {
+        toastMessage = error.message;
+      }
+      toast.error(toastMessage);
     } finally {
       dispatch(setSubmitting(false));
     }
@@ -222,15 +259,22 @@ export default function JustificacionAprendiz() {
     });
   };
 
-  const absences = attendancesData || [];
+    const handleDownloadFile = (justificacion:any) => {
+      if (justificacion.archivoAdjunto) {
+        const mimeType = justificacion.archivoMime || "application/octet-stream";
+        const fileName = generateFileName(justificacion.id, mimeType);
+        downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
+      }
+    };
 
+  const absences = attendancesData || [];
   return (
-    <div className="w-full h-full">
+    <div className="h-auto">
       <div ref={topRef} className="mb-6">
         <PageTitle>Justificaciones</PageTitle>
       </div>
 
-      <div className="mb-8 lg:w-1/2">
+      <div className="grid grid-cols-1 lg:grid-cols-2">
 
         <AnimatePresence mode="wait">
           {!form.showForm && !shouldLoadModal && (
@@ -329,9 +373,9 @@ export default function JustificacionAprendiz() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -30, scale: 0.95 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="bg-white rounded-xl shadow-2xl p-8 border border-gray-100"
+              className="bg-white rounded-xl shadow-2xl p-6 border border-gray-100"
             >
-              <div className="mb-6">
+              <div className="">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
                     <div className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 p-3 rounded-full shadow-lg">
@@ -354,26 +398,35 @@ export default function JustificacionAprendiz() {
                   </button>
                 </div>
               </div>
-
-              <JustificationFormComponent
-                form={form}
-                justificationTypesData={justificationTypesData}
-                loadingJustificationTypes={loadingJustificationTypes}
-                loadingJustification={loadingJustification}
-                handleSave={handleSave}
-                handleCancel={handleCancel}
-                handleInputChange={handleInputChange}
-                handleTextInputChange={handleTextInputChange}
-                handleNumericInputChange={handleNumericInputChange}
-                handleFileChange={handleFileChange}
-                updateJustificationTypeId={(value) => dispatch(updateJustificationTypeId(value))}
-                fileRef={fileRef}
-                fileInputRefPrev={fileInputRefPrev}
-              />
+              <div className="p-3">
+                <JustificationFormComponent
+                  form={form}
+                  justificationTypesData={justificationTypesData}
+                  loadingJustificationTypes={loadingJustificationTypes}
+                  loadingJustification={loadingJustification}
+                  handleSave={handleSave}
+                  handleCancel={handleCancel}
+                  handleInputChange={handleInputChange}
+                  handleTextInputChange={handleTextInputChange}
+                  handleNumericInputChange={handleNumericInputChange}
+                  handleFileChange={handleFileChange}
+                  updateJustificationTypeId={(value) => dispatch(updateJustificationTypeId(value))}
+                  fileRef={fileRef}
+                  fileInputRefPrev={fileInputRefPrev}
+                />
+              </div>
             </motion.div>
           )}
+              <div className="pl-2">
+                <JustificationsHistorical
+                  data={justificationsData}
+                  loading={loadingJustifications}
+                  handleDownloadFile={handleDownloadFile}
+                />
+              </div>
         </AnimatePresence>
       </div>
+
     </div>
   );
 }

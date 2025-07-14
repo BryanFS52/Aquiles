@@ -3,7 +3,7 @@ export interface JustificationItem {
     description: string;
     justificationFile: string;
     justificationDate: string;
-    state: string;
+    state: boolean;
     justificationType?: {
         id: number;
         name: string;
