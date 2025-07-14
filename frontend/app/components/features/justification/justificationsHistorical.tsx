@@ -4,18 +4,28 @@ import { motion } from "framer-motion";
 import { FaCheckCircle, FaClock, FaFileAlt, FaRegFileAlt } from "react-icons/fa";
 import { TransformedJustificationItem } from "@slice/justificationSlice";
 import { GrAttachment } from "react-icons/gr";
+import { MdHistory } from "react-icons/md";
 
-interface JustificationsHistoricalProps {
+interface JustificationType {
+  id: string;
+  name: string;
+}
+
+interface Props {
   data: TransformedJustificationItem[];
+  justificationTypesData: JustificationType[];
+    loadingJustificationTypes: boolean;
   loading: boolean;
   handleDownloadFile: (justificacion: TransformedJustificationItem) => void;
 }
 
 export default function JustificationsHistorical({
   data,
+  justificationTypesData,
+  loadingJustificationTypes,
   loading,
   handleDownloadFile,
-}: JustificationsHistoricalProps) {
+}: Props) {
   const getStatusColor = (estado: string) => {
     return estado === "Aprobada"
       ? "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30"
@@ -36,15 +46,22 @@ export default function JustificationsHistorical({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 50 }}
       transition={{ duration: 0.5 }}
-      className="w-auto max-w-4xl bg-white dark:bg-shadowBlue p-6 lg:p-8 rounded-xl shadow-sm border border-lightGray dark:border-darkGray h-auto"
+      className="w-auto max-w-4xl bg-white dark:bg-[#002033] rounded-xl shadow-sm border border-white dark:border-[#002033] h-auto"
     >
-      <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100 h-auto">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-black dark:text-white mb-2">
-            Historial de Justificaciones
-          </h2>
+      <div className="h-auto">
+        <div className="flex items-center mb-6">
+          <div className="p-3 bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 rounded-full shadow-lg">
+            <MdHistory className="text-2xl text-white" />
+          </div>
+          <div className="ml-4">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+              Historial de Justificaciones
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
+              Historico de tus justificaciones
+            </p>
+          </div>
         </div>
-
         <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
           <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
             <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700 text-black dark:text-white">
@@ -91,9 +108,12 @@ export default function JustificationsHistorical({
                 </tr>
               ) : (
                 data.map(
-                  (justification: TransformedJustificationItem, index: number) => (
+                  (
+                    justification: TransformedJustificationItem,
+                    index: number
+                  ) => (
                     <motion.tr
-                      key={justification.id}
+                      key={justification.id ?? `row-${index}`}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -101,11 +121,17 @@ export default function JustificationsHistorical({
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center">
-                          {justification.tipoNovedad}
+                          {loadingJustificationTypes
+                            ? "Cargando..."
+                            : justificationTypesData?.find(
+                                (type) => type.id === justification.tipoNovedad
+                              )?.name || "No especificado"}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center">{justification.fecha}</div>
+                        <div className="flex items-center">
+                          {justification.fecha}
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
@@ -132,9 +158,7 @@ export default function JustificationsHistorical({
                             )}`}
                           >
                             {getStatusIcon(justification.estado)}
-                            <span className="ml-1">
-                              {justification.estado}
-                            </span>
+                            <span className="ml-1">{justification.estado}</span>
                           </span>
                         </div>
                       </td>
