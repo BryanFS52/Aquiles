@@ -105,4 +105,15 @@ public class ChecklistResolver {
             );
         }
     }
+
+//Export Document
+    @DgsQuery
+public String exportChecklistToPdf(@InputArgument Long id) {
+    return checklistBusiness.exportChecklistPdf(id);
+}
+
+@DgsQuery
+public String exportChecklistToExcel(@InputArgument Long id) {
+    return checklistBusiness.exportChecklistExcel(id);
+}
 }

@@ -42,6 +42,8 @@ extend type Query {
     allChecklists(page: Int, size: Int): ChecklistPage
     checklistById(id: Long!): ChecklistPageId
     Response(code: String, message: String, Date: String): Response
+    exportChecklistToPdf(id: Long!): String
+    exportChecklistToExcel(id: Long!): String
 }
 
 extend type Mutation {
