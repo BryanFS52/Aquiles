@@ -61,4 +61,6 @@ public class TeamScrumService implements Idao<TeamsScrum, Long> {
     public boolean existsByStudySheetIdAndMemberIds(Long studySheetId, List<TeamScrumMemberId> memberIds) {
         return teamsScrumRepository.existsByStudySheetIdAndMemberIds(studySheetId, memberIds);
     }
+
+
 }

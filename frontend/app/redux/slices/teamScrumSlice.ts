@@ -15,7 +15,6 @@ import {
     DeleteTeamScrumMutation,
     DeleteTeamScrumMutationVariables
 } from '@graphql/generated'
-import { teams } from '@/data/checklistData';
 
 // Función para transformar datos de GraphQL a TeamsScrum
 const transformGraphQLToTeamScrumItem = (graphqlData: any): TeamsScrum => {
@@ -53,14 +52,10 @@ export const fetchTeamScrumById = createAsyncThunk<GetTeamScrumByIdQuery['teamSc
     'teamScrum/fetchById',
     async ({ id }, { rejectWithValue }) => {
         try {
-            console.log("ID recibido:", id);
-
             const { data } = await clientLAN.query<GetTeamScrumByIdQuery, GetTeamScrumByIdQueryVariables>({
                 query: GET_TEAM_SCRUM_BY_ID,
                 variables: { id },
             });
-
-            console.log(data)
 
             return data.teamScrumById;
         } catch (error: any) {
@@ -132,7 +127,7 @@ export const deleteTeamScrum = createAsyncThunk<string, string,
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
             }
 
-            return id; // Devolvemos solo el ID borrado para actualizar el estado
+            return id;
         } catch (error: any) {
             return rejectWithValue({ code: '500', message: error.message });
         }

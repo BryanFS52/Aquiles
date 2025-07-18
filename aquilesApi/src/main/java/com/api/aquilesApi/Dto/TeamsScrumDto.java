@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TeamsScrumDto {
+public class    TeamsScrumDto {
 
     private Long id;
     // @NotNull(message = "El nombre es obligatorio")

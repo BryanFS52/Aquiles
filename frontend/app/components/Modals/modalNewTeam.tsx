@@ -56,13 +56,13 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
 
   // Transformar estudiantes en opciones de select
   const studentOptions: StudentOption[] = studentsForThisSheet
+    .filter(student => !!student.id)
     .map(student => ({
-      id: student.id,
-      value: student.id,
-      label: `${student.person.name} ${student.person.lastname}`,
-      fullName: `${student.person.name} ${student.person.lastname}`
+      id: student.id!,
+      value: student.id!,
+      label: `${student.person?.name ?? ''} ${student.person?.lastname ?? ''}`,
+      fullName: `${student.person?.name ?? ''} ${student.person?.lastname ?? ''}`
     }));
-
   console.log(studentOptions)
 
   // Traer estudiantes al montar el modal

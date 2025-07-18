@@ -90,7 +90,11 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet =
             projectJustification: team.projectJustification,
             checklist: team.checklist,
             studySheet: team.studySheet,
-            students: team.students || [],
+            students: team.students?.map((student: any) => ({
+                id: student.id,
+                person: student.person,
+                profiles: student.profiles || [],
+            })) || [],
         })) || []
 
     };
@@ -196,6 +200,7 @@ const studySheetSlice = createSlice({
                     state.currentPage = 0;
                 }
                 state.loading = false;
+                console.log(fetchStudySheets)
             })
             .addCase(fetchStudySheets.rejected, (state, action) => {
                 state.error = action.error.message ?? 'Error fetching study sheets';

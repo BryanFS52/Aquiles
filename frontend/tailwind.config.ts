@@ -35,6 +35,7 @@ const config: Config = {
         'darkBackground': '#dfdddd',
         'white': '#ffffff',
         'grayText': '#9ca3af',
+        'black': '#000000',
       },
       keyframes: {
         showContent: {

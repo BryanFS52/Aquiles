@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { MdClose, MdInfo, MdDescription, MdFlag, MdReportProblem, MdFormatAlignJustify } from "react-icons/md";
 import { FaSave, FaTimes } from "react-icons/fa";
-import { TeamScrumItem } from "@type/slices/teamScrum";
+import { TeamsScrum } from "@graphql/generated";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchTeamScrumById } from '@slice/teamScrumSlice'
@@ -11,7 +11,7 @@ import { fetchTeamScrumById } from '@slice/teamScrumSlice'
 interface ModalTeamInformationProps {
     isOpen: boolean;
     onClose: () => void;
-    team: TeamScrumItem | null;
+    team: TeamsScrum | null;
     onSave: (teamId: string, data: TeamInfoData) => Promise<boolean>;
 }
 

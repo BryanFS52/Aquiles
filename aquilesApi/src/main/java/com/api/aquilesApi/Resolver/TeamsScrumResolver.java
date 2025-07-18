@@ -61,10 +61,10 @@ public class TeamsScrumResolver {
     @DgsData(parentType = "StudySheet", field = "teamsScrum")
     public List<TeamsScrum> teamScrums(DgsDataFetchingEnvironment dfe) {
         StudySheet studySheet = dfe.getSource();
+        assert studySheet != null;
         Long studySheetId = studySheet.getId();
 
         List<TeamsScrumDto> dtos = teamsScrumBusiness.findAllByStudySheetId(studySheetId);
-        System.out.println("StudySheet ID: " + studySheetId + " → TeamsScrums encontrados: " + dtos.size());
 
         return dtos.stream()
                 .map(dto -> modelMapper.map(dto, TeamsScrum.class))
@@ -75,11 +75,9 @@ public class TeamsScrumResolver {
     public List<TeamsScrum> teamsScrum(DgsDataFetchingEnvironment env) {
         Student student = env.getSource();
         assert student != null;
-
         Long studentId = student.getId();
 
         List<TeamsScrumDto> teamsScrumDtoList = teamsScrumBusiness.findAllByStudentId(studentId);
-        System.out.println("Student ID: " + studentId + " → TeamsScrums encontrados: " + teamsScrumDtoList.size());
 
         return teamsScrumDtoList.stream()
                 .map(dto -> modelMapper.map(dto, TeamsScrum.class))
@@ -94,9 +92,7 @@ public class TeamsScrumResolver {
 
         if (source instanceof Map<?, ?> map && map.containsKey("id")) {
             studentId = Long.parseLong(map.get("id").toString());
-            System.out.println("Resolviendo profiles para studentId = " + studentId);
         } else {
-            System.out.println("Tipo de source inesperado: " + source.getClass());
             return Collections.emptyList();
         }
 
@@ -108,31 +104,6 @@ public class TeamsScrumResolver {
                 .map(member -> Map.of("id", member.getProfileId()))
                 .collect(Collectors.toList());
 
-    }
-
-    @DgsData(parentType = "TeamsScrum", field = "students")
-    public List<Map<String, String>> studentsReference(DgsDataFetchingEnvironment env) {
-        Object source = env.getSource();
-        TeamsScrum teamsScrum;
-
-        if (source instanceof TeamsScrumDto) {
-            teamsScrum = modelMapper.map((TeamsScrumDto) source, TeamsScrum.class);
-        } else if (source instanceof TeamsScrum) {
-            teamsScrum = (TeamsScrum) source;
-        } else {
-            System.out.println("Tipo de source inesperado: " + source.getClass());
-            return Collections.emptyList();
-        }
-
-        if (teamsScrum.getMemberIds() == null || teamsScrum.getMemberIds().isEmpty()) {
-            System.out.println("No hay miembros en el team.");
-            return Collections.emptyList();
-        }
-
-        return teamsScrum.getMemberIds().stream()
-                .map(member -> Map.of(
-                        "id", member.getStudentId().toString()))
-                .collect(Collectors.toList());
     }
 
     @DgsData(parentType = "TeamsScrum", field = "studySheet")

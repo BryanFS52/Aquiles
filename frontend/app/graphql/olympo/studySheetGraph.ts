@@ -52,6 +52,13 @@ export const GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID = gql`
             name
             lastname
             document
+            email
+          }
+          profiles{
+            name
+            description
+            isActive
+            isUnique
           }
         }
       }
