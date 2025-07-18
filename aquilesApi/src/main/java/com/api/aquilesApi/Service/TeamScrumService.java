@@ -1,5 +1,6 @@
 package com.api.aquilesApi.Service;
 
+import com.api.aquilesApi.Dto.TeamScrumMemberId;
 import com.api.aquilesApi.Entity.TeamsScrum;
 import com.api.aquilesApi.Repository.TeamScrumRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
@@ -31,7 +32,7 @@ public class TeamScrumService implements Idao<TeamsScrum, Long> {
     }
 
     public List<TeamsScrum> findAllByStudentId(Long studentId) {
-        return teamsScrumRepository.findByMemberId(studentId);
+        return teamsScrumRepository.findByMemberIds_StudentId(studentId);
     }
     public List<TeamsScrum> findByStudySheetId(Long studySheetId) {
         return teamsScrumRepository.findByStudySheetId(studySheetId);
@@ -57,8 +58,7 @@ public class TeamScrumService implements Idao<TeamsScrum, Long> {
         this.teamsScrumRepository.save(entity);
     }
 
-    public boolean existsByStudySheetIdAndMemberIds(Long studySheetId, List <Long> memberId) {
-        return  teamsScrumRepository.existsByStudySheetIdAndMemberIds(studySheetId,memberId);
+    public boolean existsByStudySheetIdAndMemberIds(Long studySheetId, List<TeamScrumMemberId> memberIds) {
+        return teamsScrumRepository.existsByStudySheetIdAndMemberIds(studySheetId, memberIds);
     }
-
 }

@@ -1,6 +1,6 @@
 package com.api.aquilesApi.Service;
 
-import com.api.aquilesApi.Entity.FollowUpsEntity;
+import com.api.aquilesApi.Entity.FollowUps;
 import com.api.aquilesApi.Repository.FollowUpRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FollowUpService implements Idao<FollowUpsEntity, Long> {
+public class FollowUpService implements Idao<FollowUps, Long> {
 
     private final FollowUpRepository followUpRepository;
 
@@ -20,30 +20,30 @@ public class FollowUpService implements Idao<FollowUpsEntity, Long> {
 
     // Service Find All
     @Override
-    public Page<FollowUpsEntity> findAll(PageRequest pageRequest) {
+    public Page<FollowUps> findAll(PageRequest pageRequest) {
         return  followUpRepository. findAll(pageRequest);
     }
 
     // Service Find By ID
     @Override
-    public FollowUpsEntity getById(Long id) {
+    public FollowUps getById(Long id) {
         return followUpRepository.findById(id).orElseThrow(() ->
                 new CustomException("FollowUp whit id " + id + "not fund", HttpStatus.NO_CONTENT));
     }
 
     // Service Create
     @Override
-    public void create(FollowUpsEntity entity) {this.followUpRepository.save(entity);}
+    public void create(FollowUps entity) {this.followUpRepository.save(entity);}
 
     // Service Update
     @Override
-    public void update(FollowUpsEntity entity) { this.followUpRepository.save(entity);}
+    public void update(FollowUps entity) { this.followUpRepository.save(entity);}
 
     // Service Save
     @Override
-    public FollowUpsEntity save(FollowUpsEntity entity) {return followUpRepository.save(entity);}
+    public FollowUps save(FollowUps entity) {return followUpRepository.save(entity);}
 
     // Service Delete/Deactivate
     @Override
-    public void delete(FollowUpsEntity entity) {this.followUpRepository.delete(entity);}
+    public void delete(FollowUps entity) {this.followUpRepository.delete(entity);}
 }

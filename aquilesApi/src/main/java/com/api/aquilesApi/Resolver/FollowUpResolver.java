@@ -1,3 +1,4 @@
+/*
 package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.FollowUpBusiness;
@@ -73,3 +74,4 @@ public class FollowUpResolver {
         }
     }
 }
+ */

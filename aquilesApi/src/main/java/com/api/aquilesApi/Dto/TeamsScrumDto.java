@@ -33,5 +33,5 @@ public class TeamsScrumDto {
     // Relations
     private ChecklistDto checklist;
     private Long studySheetId;
-    private List<Long> memberIds;
+    private List<TeamScrumMemberId>  memberIds;
 }   

@@ -1,12 +1,11 @@
 import { client } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { GenerateQRItem } from '@type/slices/generateQr';
 import { GENERATE_QR_CODE } from '@graphql/generateQrGraph';
 import { RejectedPayload } from '@type/slices/common/generic';
-import { GenerateQrCodeMutation, GenerateQrCodeMutationVariables } from '@graphql/generated';
+import { QrCodePayload, GenerateQrCodeMutation, GenerateQrCodeMutationVariables } from '@graphql/generated';
 
 interface GenerateQRState {
-    data: GenerateQRItem | null;
+    data: QrCodePayload | null;
     loading: boolean;
     error: { code?: string; message?: string } | null;
 }
@@ -17,7 +16,7 @@ const initialState: GenerateQRState = {
     error: null,
 };
 
-export const transformGraphQLToGenerateQRItem = (graphqlData: any): GenerateQRItem => {
+export const transformGraphQLToGenerateQRItem = (graphqlData: any): QrCodePayload => {
     return {
         sessionId: graphqlData.sessionId,
         qrCodeBase64: graphqlData.qrCodeBase64,

@@ -1,5 +1,6 @@
 package com.api.aquilesApi.Repository;
 
+import com.api.aquilesApi.Dto.TeamScrumMemberId;
 import com.api.aquilesApi.Entity.TeamsScrum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,8 +12,9 @@ import java.util.List;
 @Repository
 public interface TeamScrumRepository extends JpaRepository<TeamsScrum, Long> {
 
-    @Query("SELECT t FROM TeamsScrum t JOIN t.memberIds m WHERE m = :memberId")
-    List<TeamsScrum> findByMemberId(@Param("memberId") Long memberId);
+    @Query("SELECT t FROM TeamsScrum t JOIN t.memberIds m WHERE m.studentId = :studentId")
+    List<TeamsScrum> findByMemberIds_StudentId(@Param("studentId") Long studentId);
+
     List<TeamsScrum> findByStudySheetId(Long studySheetId);
 
     @Query(value = """
@@ -20,7 +22,8 @@ public interface TeamScrumRepository extends JpaRepository<TeamsScrum, Long> {
     FROM team_scrum_members tm
     JOIN teams_scrum ts ON ts.id = tm.team_id
     WHERE ts.study_sheet_id = :studySheetId
-    AND tm.user_id IN (:memberIds)
+    AND tm.student_id IN (:memberIds)
 """, nativeQuery = true)
-    boolean existsByStudySheetIdAndMemberIds(@Param("studySheetId") Long studySheetId, @Param("memberIds") List<Long> memberIds);
+    boolean existsByStudySheetIdAndMemberIds(@Param("studySheetId") Long studySheetId, @Param("memberIds") List<TeamScrumMemberId> memberIds);
+
 }

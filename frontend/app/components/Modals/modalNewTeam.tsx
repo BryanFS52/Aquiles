@@ -24,7 +24,7 @@ interface FormErrors {
 
 type CreateTeamData = AddTeamScrumMutationVariables["input"];
 
-interface ModalNewProjectProps {
+interface ModalNewTeamProps {
   isOpen: boolean;
   onClose: () => void;
   onCreate: (data: CreateTeamData) => Promise<boolean>;
@@ -32,7 +32,7 @@ interface ModalNewProjectProps {
   existingTeams?: TeamsScrumDto[];
 }
 
-const ModalNewTeam: React.FC<ModalNewProjectProps> = ({
+const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
   isOpen,
   onClose,
   onCreate,
@@ -207,7 +207,7 @@ const ModalNewTeam: React.FC<ModalNewProjectProps> = ({
     selectedOptions: MultiValue<StudentOption>,
     actionMeta: ActionMeta<StudentOption>
   ): void => {
-    const memberIds = selectedOptions.map(option => option.id);
+    const memberIds = selectedOptions.map(option => ({ studentId: parseInt(option.id, 10) }));
     if (memberIds.length > 4) return;
     setTeamData(prev => ({ ...prev, memberIds }));
     if (errors.members) {
@@ -223,7 +223,7 @@ const ModalNewTeam: React.FC<ModalNewProjectProps> = ({
         teamName: teamData.teamName!.trim(),
         projectName: teamData.projectName!.trim(),
         studySheetId,
-        memberIds: teamData.memberIds?.map(id => parseInt(id, 10)),
+        memberIds: teamData.memberIds,
         description: "",
         objectives: "",
         problem: "",
@@ -255,7 +255,7 @@ const ModalNewTeam: React.FC<ModalNewProjectProps> = ({
 
   // Selección de miembros actuales
   const selectedMembers = teamData.memberIds
-    ? studentOptions.filter(s => teamData.memberIds!.includes(s.id))
+    ? studentOptions.filter(s => teamData.memberIds!.some(m => m && m.studentId === parseInt(s.id, 10)))
     : [];
 
   console.log(selectedMembers)

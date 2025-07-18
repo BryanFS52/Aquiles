@@ -1,15 +1,12 @@
 import React from "react";
 import { FaCheck } from "react-icons/fa";
 import { TbLetterJ, TbLetterR, TbLetterX } from "react-icons/tb";
+import { StudySheet } from "@/graphql/generated";
 
 interface LegendItemProps {
     label: string;
     icon: React.ComponentType<{ className?: string }>;
     color: string;
-}
-
-interface StudySheet {
-    number: string | number;
 }
 
 interface AttendanceFooterProps {

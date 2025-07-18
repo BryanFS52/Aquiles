@@ -15,22 +15,17 @@ export const GET_STUDY_SHEETS = gql`
                 endLective
                 state
                 offer {
-                    id
                     name
                 }
                 journey {
-                    id
                     name
                 }
                 quarter {
-                    id
                     name {
                     number
-                    extension
                     }
                 }
                 trainingProject {
-                    id
                     name
                 }
             }

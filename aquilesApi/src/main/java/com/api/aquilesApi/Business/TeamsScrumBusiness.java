@@ -19,20 +19,24 @@ import java.util.stream.Collectors;
 public class TeamsScrumBusiness {
 
     private final TeamScrumService teamScrumService;
-    private final ModelMapper modelMapper ;
+    private final ModelMapper modelMapper;
 
     public TeamsScrumBusiness(TeamScrumService teamScrumService, ModelMapper modelMapper) {
         this.teamScrumService = teamScrumService;
         this.modelMapper = modelMapper;
     }
 
-    // Validation object
-    public void Validation( TeamsScrumDto teamsScrumDto ) throws CustomException {
-        boolean studentResult = teamScrumService.existsByStudySheetIdAndMemberIds(teamsScrumDto.getStudySheetId(), teamsScrumDto.getMemberIds());
-        if (studentResult) {
-            throw new CustomException("Some of the selected students are already assigned to a Team Scrum within this study sheet.", HttpStatus.CONFLICT);
+        // Validation object
+        public void Validation( TeamsScrumDto teamsScrumDto ) throws CustomException {
+            // Validation max 4 members
+            if (teamsScrumDto.getMemberIds() != null && teamsScrumDto.getMemberIds().size() > 4) {
+                throw new CustomException("A Team Scrum can have a maximum of 4 members.", HttpStatus.BAD_REQUEST);
+            }
+            boolean studentResult = teamScrumService.existsByStudySheetIdAndMemberIds(teamsScrumDto.getStudySheetId(), teamsScrumDto.getMemberIds());
+            if (studentResult) {
+                throw new CustomException("Some of the selected students are already assigned to a Team Scrum within this study sheet.", HttpStatus.CONFLICT);
+            }
         }
-    }
 
 
     // Find All
@@ -52,7 +56,7 @@ public class TeamsScrumBusiness {
         }
     }
 
-    // Find By Id
+    // Find ById
     public TeamsScrumDto findById(Long id) {
         try {
             TeamsScrum teamsScrum = teamScrumService.getById(id);
@@ -70,6 +74,7 @@ public class TeamsScrumBusiness {
     // Find By StudentId
     public List<TeamsScrumDto> findAllByStudentId(Long studentId) {
         try {
+            System.out.println(studentId);
             List<TeamsScrum> teamsScrumList = teamScrumService.findAllByStudentId(studentId);
             return teamsScrumList.stream().map(
                     entity -> modelMapper.map(entity, TeamsScrumDto.class)).collect(Collectors.toList());
@@ -82,9 +87,11 @@ public class TeamsScrumBusiness {
     // Add
     public TeamsScrumDto add(TeamsScrumDto teamsScrumDto) {
         try {
-            Validation(teamsScrumDto);
+
             TeamsScrum teamsScrum = modelMapper.map(teamsScrumDto, TeamsScrum.class);
+
             return modelMapper.map(teamScrumService.save(teamsScrum), TeamsScrumDto.class);
+
         } catch (Exception e) {
             throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

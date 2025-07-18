@@ -1,9 +1,9 @@
-import { client, clientLAN } from '@lib/apollo-client';
+import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GET_TEAMS_SCRUMS, GET_TEAM_SCRUM_BY_ID, ADD_TEAM_SCRUM, UPDATE_TEAM_SCRUM, DELETE_TEAM_SCRUM, } from '@graphql/teamsScrumGraph';
-import { TeamScrumItem } from '@type/slices/teamScrum'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import {
+    TeamsScrum,
     GetTeamsScrumsQuery,
     GetTeamsScrumsQueryVariables,
     GetTeamScrumByIdQuery,
@@ -17,9 +17,8 @@ import {
 } from '@graphql/generated'
 import { teams } from '@/data/checklistData';
 
-// Función para transformar datos de GraphQL a TeamScrumItem
-const transformGraphQLToTeamScrumItem = (graphqlData: any): TeamScrumItem => {
-    // El objeto de datos real puede estar en la raíz o anidado en 'teamScrum'
+// Función para transformar datos de GraphQL a TeamsScrum
+const transformGraphQLToTeamScrumItem = (graphqlData: any): TeamsScrum => {
     const teamData = graphqlData.teamScrum || graphqlData;
     return {
         id: teamData.id,
@@ -79,7 +78,7 @@ export const addTeamScrum = createAsyncThunk<AddTeamScrumMutation['addTeamScrum'
     'teamScrum/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<AddTeamScrumMutation, AddTeamScrumMutationVariables>({
+            const { data } = await clientLAN.mutate<AddTeamScrumMutation, AddTeamScrumMutationVariables>({
                 mutation: ADD_TEAM_SCRUM,
                 variables: { input }
             });
@@ -101,7 +100,7 @@ export const updateTeamScrum = createAsyncThunk<UpdateTeamScrumMutation['updateT
     'teamScrum/update',
     async ({ id, input }, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<UpdateTeamScrumMutation, UpdateTeamScrumMutationVariables>({
+            const { data } = await clientLAN.mutate<UpdateTeamScrumMutation, UpdateTeamScrumMutationVariables>({
                 mutation: UPDATE_TEAM_SCRUM,
                 variables: { id, input },
             });
@@ -124,7 +123,7 @@ export const deleteTeamScrum = createAsyncThunk<string, string,
     'teamScrum/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<DeleteTeamScrumMutation, DeleteTeamScrumMutationVariables>({
+            const { data } = await clientLAN.mutate<DeleteTeamScrumMutation, DeleteTeamScrumMutationVariables>({
                 mutation: DELETE_TEAM_SCRUM,
                 variables: { id },
             });
@@ -140,12 +139,12 @@ export const deleteTeamScrum = createAsyncThunk<string, string,
     }
 );
 
-interface ExtendedTeamScrumState extends ReturnType<typeof createInitialPaginatedState<TeamScrumItem>> {
-    dataForTeamScrumById: TeamScrumItem | null;
+interface ExtendedTeamScrumState extends ReturnType<typeof createInitialPaginatedState<TeamsScrum>> {
+    dataForTeamScrumById: TeamsScrum | null;
 }
 
 const initialState: ExtendedTeamScrumState = {
-    ...createInitialPaginatedState<TeamScrumItem>(),
+    ...createInitialPaginatedState<TeamsScrum>(),
     dataForTeamScrumById: null
 };
 const teamScrumSlice = createSlice({

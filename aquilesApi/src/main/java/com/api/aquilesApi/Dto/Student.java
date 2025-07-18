@@ -15,10 +15,10 @@ public class Student implements Serializable {
 
     private Long id;
 
+
     private Boolean state;
 
     private Date createdAt;
 
     private Date updatedAt;
-
 }

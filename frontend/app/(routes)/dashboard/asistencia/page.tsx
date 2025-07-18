@@ -19,7 +19,10 @@ export default function Attendance() {
     );
 
     const studySheet = studySheets.length > 0 ? studySheets[0] : undefined;
-    const students = studySheet?.students?.filter((s) => s.person.state === true) || [];
+    const students = studySheet?.students?.filter(
+        (s) => s?.person?.state === true
+    ) || [];
+
 
     const activeStudents = students.length;
     const withdrawnStudents = 0;

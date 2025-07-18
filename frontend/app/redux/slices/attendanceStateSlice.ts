@@ -1,9 +1,9 @@
-import { client,clientLAN } from '@lib/apollo-client'
+import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { GET_ALL_ATTENDANCES_STATE, ADD_ATTENDANCE_STATE, UPDATE_ATTENDANCE_STATE, DELETE_ATTENDANCE_STATE } from '@graphql/attendanceStateGraph'
-import { AttendanceStateItem } from '@type/slices/attendanceState'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import {
+    AttendanceState,
     GetStateAttendanceQuery,
     GetStateAttendanceQueryVariables,
     AddStateAttendanceMutation,
@@ -14,10 +14,9 @@ import {
     DeleteStateAttendanceMutationVariables
 } from '@graphql/generated'
 
-const transformGraphQLToAttendanceStateItem = (graphqlData: any): AttendanceStateItem => {
+const transformGraphQLToAttendanceStateItem = (graphqlData: any): AttendanceState => {
     return {
         id: graphqlData.id || graphqlData.id,
-        name: graphqlData.name,
         status: graphqlData.status
     };
 };
@@ -105,7 +104,7 @@ export const deleteAttendanceState = createAsyncThunk<string, string,
 );
 
 
-const initialState = createInitialPaginatedState<AttendanceStateItem>();
+const initialState = createInitialPaginatedState<AttendanceState>();
 const attendanceStateSlice = createSlice({
     name: 'attendanceState',
     initialState,
@@ -151,7 +150,7 @@ const attendanceStateSlice = createSlice({
                 if (action.payload) {
                     // Transforma el payload y actualiza el elemento correspondiente
                     const updatedAttendanceState = transformGraphQLToAttendanceStateItem(action.payload);
-                    const index = state.data.findIndex((attendanceState: AttendanceStateItem) => attendanceState.id === updatedAttendanceState.id);
+                    const index = state.data.findIndex((attendanceState: AttendanceState) => attendanceState.id === updatedAttendanceState.id);
                     if (index !== -1) {
                         state.data[index] = updatedAttendanceState;
                     }
@@ -166,7 +165,7 @@ const attendanceStateSlice = createSlice({
             // deleteAttendanceState
             .addCase(deleteAttendanceState.fulfilled, (state, action: PayloadAction<string>) => {
                 if (action.payload) {
-                    state.data = state.data.filter((attendanceState: AttendanceStateItem) => attendanceState.id !== action.payload);
+                    state.data = state.data.filter((attendanceState: AttendanceState) => attendanceState.id !== action.payload);
                 }
                 state.error = null;
             })

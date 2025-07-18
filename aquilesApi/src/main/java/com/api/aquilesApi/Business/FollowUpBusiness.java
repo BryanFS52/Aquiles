@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.StateFollowUpsDto;
-import com.api.aquilesApi.Entity.FollowUpsEntity;
+import com.api.aquilesApi.Entity.FollowUps;
 import com.api.aquilesApi.Service.FollowUpService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.springframework.dao.DataAccessException;
@@ -26,11 +26,11 @@ public class FollowUpBusiness {
     public Page<StateFollowUpsDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<FollowUpsEntity> followUpsEntityPage = followUpService.findAll(pageRequest);
+            Page<FollowUps> followUpsPage = followUpService.findAll(pageRequest);
 
-            System.out.println("Total FollowUps: " + followUpsEntityPage.getTotalElements());
-            System.out.println("Total FollowUps: " + followUpsEntityPage);
-            return followUpsEntityPage.map(entity -> modelMapper.map(entity, StateFollowUpsDto.class));
+            System.out.println("Total FollowUps: " + followUpsPage.getTotalElements());
+            System.out.println("Total FollowUps: " + followUpsPage);
+            return followUpsPage.map(entity -> modelMapper.map(entity, StateFollowUpsDto.class));
         } catch (DataAccessException e) {
             throw new CustomException("Error retrieving followUps due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
@@ -41,7 +41,7 @@ public class FollowUpBusiness {
     // Find By ID
     public StateFollowUpsDto findById(Long id) {
         try {
-            FollowUpsEntity followUps = followUpService.getById(id);
+            FollowUps followUps = followUpService.getById(id);
             return modelMapper.map(followUps, StateFollowUpsDto.class);
         } catch (CustomException e) {
             throw e; //Exception Custom
@@ -53,9 +53,9 @@ public class FollowUpBusiness {
     // Add
     public StateFollowUpsDto add(StateFollowUpsDto stateFollowUpsDto) {
         try {
-            FollowUpsEntity followUpsEntity = new FollowUpsEntity();
-            followUpsEntity.setName(stateFollowUpsDto.getName());
-            return modelMapper.map(followUpService.save(followUpsEntity), StateFollowUpsDto.class);
+            FollowUps followUps = new FollowUps();
+            followUps.setName(stateFollowUpsDto.getName());
+            return modelMapper.map(followUpService.save(followUps), StateFollowUpsDto.class);
         } catch (Exception e) {
             throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

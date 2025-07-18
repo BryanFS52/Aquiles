@@ -1,6 +1,7 @@
 package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.TeamsScrumBusiness;
+import com.api.aquilesApi.Dto.Profile;
 import com.api.aquilesApi.Dto.Student;
 import com.api.aquilesApi.Dto.StudySheet;
 import com.api.aquilesApi.Dto.TeamsScrumDto;
@@ -20,11 +21,21 @@ import java.util.stream.Collectors;
 public class TeamsScrumResolver {
 
     private final TeamsScrumBusiness teamsScrumBusiness;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
-    public TeamsScrumResolver(TeamsScrumBusiness teamsScrumBusiness) {
+    public TeamsScrumResolver(TeamsScrumBusiness teamsScrumBusiness, ModelMapper modelMapper) {
         this.teamsScrumBusiness = teamsScrumBusiness;
+        this.modelMapper = modelMapper;
     };
+
+    @DgsEntityFetcher(name = "Profile")
+    public Profile getProfile(Map<String, Object> values) {
+        String id = (String) values.get("id");
+        if (id == null) return null;
+        Profile profile = new Profile();
+        profile.setId(id);
+        return profile;
+    }
 
     @DgsEntityFetcher(name = "StudySheet")
     public StudySheet studySheetReference(Map<String, Object> values) {
@@ -33,8 +44,6 @@ public class TeamsScrumResolver {
         Long id  = Long.parseLong(idStr);
         return new StudySheet(id);
     }
-
-
 
     @DgsEntityFetcher(name = "TeamsScrum")
     public TeamsScrum teamScrum(Map<String, Object> values) {
@@ -62,8 +71,6 @@ public class TeamsScrumResolver {
                 .collect(Collectors.toList());
     }
 
-
-
     @DgsData(parentType = "Student", field = "teamScrums")
     public List<TeamsScrum> teamsScrum(DgsDataFetchingEnvironment env) {
         Student student = env.getSource();
@@ -79,7 +86,29 @@ public class TeamsScrumResolver {
                 .collect(Collectors.toList());
     }
 
-    // Aquí agregué explícitamente el 'field = "teamScrums"'
+    @DgsData(parentType = "Student", field = "profiles")
+    public List<Map<String, String>> profilesReference(DgsDataFetchingEnvironment env) {
+        Object source = env.getSource();
+
+        Long studentId;
+
+        if (source instanceof Map<?, ?> map && map.containsKey("id")) {
+            studentId = Long.parseLong(map.get("id").toString());
+            System.out.println("Resolviendo profiles para studentId = " + studentId);
+        } else {
+            System.out.println("Tipo de source inesperado: " + source.getClass());
+            return Collections.emptyList();
+        }
+
+        List<TeamsScrumDto> teamsScrumDtoList = teamsScrumBusiness.findAllByStudentId(studentId);
+
+        return teamsScrumDtoList.stream()
+                .flatMap(dto -> dto.getMemberIds().stream())
+                .filter(member -> member.getProfileId() != null)
+                .map(member -> Map.of("id", member.getProfileId()))
+                .collect(Collectors.toList());
+
+    }
 
     @DgsData(parentType = "TeamsScrum", field = "students")
     public List<Map<String, String>> studentsReference(DgsDataFetchingEnvironment env) {
@@ -95,18 +124,21 @@ public class TeamsScrumResolver {
             return Collections.emptyList();
         }
 
-        if (teamsScrum.getMemberIds() == null) {
+        if (teamsScrum.getMemberIds() == null || teamsScrum.getMemberIds().isEmpty()) {
+            System.out.println("No hay miembros en el team.");
             return Collections.emptyList();
         }
 
         return teamsScrum.getMemberIds().stream()
-                .map(id -> Map.of("id", id.toString()))
+                .map(member -> Map.of(
+                        "id", member.getStudentId().toString()))
                 .collect(Collectors.toList());
     }
 
     @DgsData(parentType = "TeamsScrum", field = "studySheet")
     public Map<String, Object> resolveStudySheet(DgsDataFetchingEnvironment env) {
         Object source = env.getSource();
+        assert source != null;
         System.out.println("Source class: " + source.getClass());
 
         TeamsScrum teamsScrum;

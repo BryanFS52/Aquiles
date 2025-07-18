@@ -101,7 +101,7 @@ export default function JustificationsHistorical({
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center">
-                          {justification.tipoNovedad}
+                          {justification.justificationType}
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -111,9 +111,8 @@ export default function JustificationsHistorical({
                         <div className="flex items-center space-x-2">
                           {justification.archivoAdjunto ? (
                             <GrAttachment
-                              title={`Descargar archivo (${
-                                justification.archivoMime || "desconocido"
-                              })`}
+                              title={`Descargar archivo (${justification.archivoMime || "desconocido"
+                                })`}
                               className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
                               onClick={() => handleDownloadFile(justification)}
                             />

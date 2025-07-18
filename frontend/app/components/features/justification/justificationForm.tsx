@@ -1,10 +1,6 @@
 import { motion } from "framer-motion";
 import { ChangeEvent, FormEvent, RefObject } from "react";
-
-interface JustificationType {
-    id: string;
-    name: string;
-}
+import { JustificationType } from "@/graphql/generated";
 
 interface Props {
     form: any;

@@ -11,7 +11,7 @@ import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
 import { fetchJustifications, generateFileName } from '@slice/justificationSlice';
 import type { AppDispatch, RootState } from '@/redux/store'
 import type { FormDataState } from '@slice/justificationSlice';
-import type { AttendanceItem } from '@type/slices/attendance';
+import { Attendance } from "@/graphql/generated";
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFormComponent from '@components/features/justification/justificationForm';
 
@@ -73,11 +73,9 @@ export default function JustificacionAprendiz() {
 
 
   useEffect(() => {
-    // if (user?.id) {
-      dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-      dispatch(fetchAttendancesByStudent({ id: 1, stateId: 2 }));
-      dispatch(fetchJustifications({ page: 0, size: 10 }));
-    // }
+    dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
+    dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 }));
+    dispatch(fetchJustifications({ page: 0, size: 10 }));
   }, [dispatch]);
 
   // Efecto para sincronizar el estado local con el estado global
@@ -259,13 +257,13 @@ export default function JustificacionAprendiz() {
     });
   };
 
-    const handleDownloadFile = (justificacion:any) => {
-      if (justificacion.archivoAdjunto) {
-        const mimeType = justificacion.archivoMime || "application/octet-stream";
-        const fileName = generateFileName(justificacion.id, mimeType);
-        downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
-      }
-    };
+  const handleDownloadFile = (justificacion: any) => {
+    if (justificacion.archivoAdjunto) {
+      const mimeType = justificacion.archivoMime || "application/octet-stream";
+      const fileName = generateFileName(justificacion.id, mimeType);
+      downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
+    }
+  };
 
   const absences = attendancesData || [];
   return (
@@ -303,7 +301,7 @@ export default function JustificacionAprendiz() {
               {absences.length > 0 && (
                 <div className="mb-6 ">
                   <div className="max-h-80 overflow-y-auto pr-2 space-y-4">
-                    {absences.map((attendance: AttendanceItem, index) => (
+                    {absences.map((attendance: Attendance, index) => (
                       <motion.div
                         key={attendance.id}
                         initial={{ opacity: 0, x: -20 }}
@@ -319,7 +317,7 @@ export default function JustificacionAprendiz() {
                             </div>
                             <div className="ml-4">
                               <div className="font-semibold text-gray-800 text-lg">
-                                {formatDate(attendance.attendanceDate)}
+                                {formatDate(attendance.attendanceDate ?? '')}
                               </div>
                               <div className="text-sm text-red-600 font-medium">
                                 Estado: {attendance.attendanceState?.status || 'Ausente'}
@@ -417,13 +415,13 @@ export default function JustificacionAprendiz() {
               </div>
             </motion.div>
           )}
-              <div className="pl-2">
-                <JustificationsHistorical
-                  data={justificationsData}
-                  loading={loadingJustifications}
-                  handleDownloadFile={handleDownloadFile}
-                />
-              </div>
+          <div className="pl-2">
+            <JustificationsHistorical
+              data={justificationsData}
+              loading={loadingJustifications}
+              handleDownloadFile={handleDownloadFile}
+            />
+          </div>
         </AnimatePresence>
       </div>
 

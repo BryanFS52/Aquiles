@@ -1,12 +1,11 @@
 import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { GET_PROGRAMS } from '@graphql/olympo/programGraph';
-import { ProgramItem } from '@type/slices/olympo/program';
 import { createInitialPaginatedState } from '@type/slices/common/generic';
-import { GetProgramsQuery, GetProgramsQueryVariables } from '@graphql/generated'
+import { Program, GetProgramsQuery, GetProgramsQueryVariables } from '@graphql/generated'
 
-// Función para transformar datos de GraphQL a ProgramItem
-export const transformGraphQLToProgramItem = (graphqlData: any): ProgramItem => {
+// Función para transformar datos de GraphQL a Program
+export const transformGraphQLToProgramItem = (graphqlData: any): Program => {
     return {
         id: graphqlData.id,
         name: graphqlData.name,
@@ -40,7 +39,7 @@ export const fetchPrograms = createAsyncThunk<GetProgramsQuery['allPrograms'], G
     }
 );
 
-const initialState = createInitialPaginatedState<ProgramItem>();
+const initialState = createInitialPaginatedState<Program>();
 const programSlice = createSlice({
     name: 'program',
     initialState,

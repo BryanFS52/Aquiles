@@ -1,7 +1,12 @@
     package com.api.aquilesApi.Entity;
 
+    import com.api.aquilesApi.Dto.TeamScrumMemberId;
     import jakarta.persistence.*;
-    import lombok.*;
+    import lombok.AllArgsConstructor;
+    import lombok.Getter;
+    import lombok.NoArgsConstructor;
+    import lombok.Setter;
+
     import java.io.Serializable;
     import java.util.ArrayList;
     import java.util.List;
@@ -52,6 +57,5 @@
                 name = "team_scrum_members",
                 joinColumns = @JoinColumn(name = "team_id")
         )
-        @Column(name = "user_id")
-        private List<Long> memberIds = new ArrayList<>();
+        private List<TeamScrumMemberId> memberIds = new ArrayList<>();
     }

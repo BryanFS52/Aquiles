@@ -1,9 +1,9 @@
 import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { JustificationTypeItem } from '@type/slices/justificationType'
 import { GenericPaginatedState, createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_JUSTIFICATION_TYPES, GET_JUSTIFICATION_TYPE_BY_ID, ADD_JUSTIFICATION_TYPE, UPDATE_JUSTIFICATION_TYPE, DELETE_JUSTIFICATION_TYPE, } from '@graphql/justificationTypeGraph';
 import {
+    JustificationType,
     GetAllJustificationTypesQuery,
     GetAllJustificationTypesQueryVariables,
     GetJustificationTypeByIdQuery,
@@ -16,12 +16,12 @@ import {
     DeleteJustificationTypeMutationVariables
 } from '@graphql/generated'
 
-type LocalJustificationState = GenericPaginatedState<JustificationTypeItem> & {
-    selected?: JustificationTypeItem | null;
+type LocalJustificationState = GenericPaginatedState<JustificationType> & {
+    selected?: JustificationType | null;
 };
 
-// Función para transformar datos de GraphQL a JustificationTypeItem
-export const transformGraphQLToJustificationTypeItem = (data: any): JustificationTypeItem => {
+// Función para transformar datos de GraphQL a JustificationType
+export const transformGraphQLToJustificationTypeItem = (data: any): JustificationType => {
     return {
         id: data.id,
         name: data.name,
@@ -121,7 +121,7 @@ export const deleteJustificationType = createAsyncThunk<string, string,
 );
 
 const initialState: LocalJustificationState = {
-    ...createInitialPaginatedState<JustificationTypeItem>(),
+    ...createInitialPaginatedState<JustificationType>(),
     selected: null,
 };
 const justificationTypeSlice = createSlice({

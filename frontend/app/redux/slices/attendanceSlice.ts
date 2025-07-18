@@ -1,9 +1,9 @@
-import { client, clientLAN } from '@lib/apollo-client';
+import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph';
-import { AttendanceItem } from '@type/slices/attendance';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import {
+    Attendance,
     GetAttendancesQuery,
     GetAttendancesQueryVariables,
     AddAttendanceMutation,
@@ -16,7 +16,7 @@ import {
     AllAttendancesByStudentIdQueryVariables,
 } from '@graphql/generated';
 
-const transformGraphQLToAttendanceItem = (graphqlData: any): AttendanceItem => {
+const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
     return {
         id: graphqlData.id,
         attendanceDate: graphqlData.attendanceDate,
@@ -52,7 +52,7 @@ export const fetchAttendances = createAsyncThunk<
 );
 
 export const fetchAttendancesByStudent = createAsyncThunk<
-    AttendanceItem[],
+    Attendance[],
     AllAttendancesByStudentIdQueryVariables
 >(
     'attendance/fetchByStudent',
@@ -169,9 +169,9 @@ export const deleteAttendance = createAsyncThunk<string, string,
 );
 
 const initialState = {
-    ...createInitialPaginatedState<AttendanceItem>(),
+    ...createInitialPaginatedState<Attendance>(),
     studentAttendances: {
-        data: [] as AttendanceItem[],
+        data: [] as Attendance[],
         loading: false,
         error: null as string | null,
         showForm: false,
@@ -212,7 +212,7 @@ const attendanceSlice = createSlice({
             })
             .addCase(fetchAttendancesByStudent.fulfilled, (
                 state,
-                action: PayloadAction<AttendanceItem[]>
+                action: PayloadAction<Attendance[]>
             ) => {
                 state.studentAttendances.data = action.payload;
                 state.studentAttendances.loading = false;
@@ -250,7 +250,7 @@ const attendanceSlice = createSlice({
             .addCase(updateAttendance.fulfilled, (state, action: PayloadAction<UpdateAttendanceMutation['updateAttendance']>) => {
                 if (action.payload && action.payload.id) {
                     const updatedAttendance = transformGraphQLToAttendanceItem(action.payload);
-                    const index = state.data.findIndex((attendance: AttendanceItem) => attendance.id === updatedAttendance.id);
+                    const index = state.data.findIndex((attendance: Attendance) => attendance.id === updatedAttendance.id);
                     if (index !== -1) {
                         state.data[index] = updatedAttendance;
                     }
@@ -264,7 +264,7 @@ const attendanceSlice = createSlice({
             })
             .addCase(deleteAttendance.fulfilled, (state, action: PayloadAction<string>) => {
                 if (action.payload) {
-                    state.data = state.data.filter((attendance: AttendanceItem) => attendance.id !== action.payload);
+                    state.data = state.data.filter((attendance: Attendance) => attendance.id !== action.payload);
                 }
                 state.error = null;
             })

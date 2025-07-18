@@ -2,10 +2,10 @@ import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { GET_STUDY_SHEETS, GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER, GET_STUDY_SHEET_WITH_STUDENTS } from '@graphql/olympo/studySheetGraph'
 import { createInitialPaginatedState } from '@type/slices/common/generic';
-import { StudySheetItem } from '@type/slices/olympo/studySheet'
-import { Student } from '@type/slices/olympo/studySheet';
-import { TeamScrumItem } from "@/types/slices/teamScrum";
 import {
+    StudySheet,
+    TeamsScrum,
+    Student,
     GetStudySheetsQuery,
     GetStudySheetsQueryVariables,
     GetStudySheetWithTeamScrumByIdQuery,
@@ -18,8 +18,8 @@ import {
     GetStudySheetWithStudentsQueryVariables
 } from '@graphql/generated';
 
-// Función para transformar datos de GraphQL a StudySheetItem
-export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheetItem => {
+// Función para transformar datos de GraphQL a StudySheet
+export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet => {
     return {
         id: graphqlData.id,
         number: graphqlData.number,
@@ -157,13 +157,13 @@ export const fetchStudySheetWithStudents = createAsyncThunk<GetStudySheetWithStu
     }
 );
 
-interface ExtendedStudySheetState extends ReturnType<typeof createInitialPaginatedState<StudySheetItem>> {
+interface ExtendedStudySheetState extends ReturnType<typeof createInitialPaginatedState<StudySheet>> {
     dataForStudents: Record<string, Student[]>,
-    dataForTeamScrums: TeamScrumItem[]
+    dataForTeamScrums: TeamsScrum[]
 }
 
 const initialState: ExtendedStudySheetState = {
-    ...createInitialPaginatedState<StudySheetItem>(),
+    ...createInitialPaginatedState<StudySheet>(),
     dataForStudents: {},
     dataForTeamScrums: [],
 };
@@ -271,24 +271,27 @@ const studySheetSlice = createSlice({
             })
             .addCase(fetchStudySheetWithStudents.fulfilled, (state, action) => {
                 const item = action.payload;
-                console.log(action.payload)
+                console.log(action.payload);
+
                 if (item) {
                     const transformed = transformGraphQLToStudySheetItem(item.data);
                     const sheetId = transformed.id;
 
-                    // Actualiza sólo esa ficha si ya existe
-                    const existingIndex = state.data.findIndex(s => s.id === sheetId);
-                    if (existingIndex !== -1) {
-                        state.data[existingIndex] = transformed;
-                    } else {
-                        state.data.push(transformed);
+                    if (sheetId != null) {
+                        const existingIndex = state.data.findIndex(s => s.id === sheetId);
+                        if (existingIndex !== -1) {
+                            state.data[existingIndex] = transformed;
+                        } else {
+                            state.data.push(transformed);
+                        }
+
+                        // Filtra los null antes de asignar
+                        state.dataForStudents[sheetId] = (transformed.students ?? []).filter(Boolean) as Student[];
+
+                        console.log(state.dataForStudents);
                     }
-
-                    // Guarda los estudiantes por ficha
-                    state.dataForStudents[sheetId] = transformed.students ?? [];
-
-                    console.log(state.dataForStudents)
                 }
+
                 state.loading = false;
             })
             .addCase(fetchStudySheetWithStudents.rejected, (state, action) => {

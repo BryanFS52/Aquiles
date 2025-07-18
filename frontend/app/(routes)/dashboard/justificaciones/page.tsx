@@ -3,9 +3,10 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import PageTitle from "@components/UI/pageTitle";
+import { AppDispatch } from "@/redux/store";
+import PageTitle from "@/components/UI/pageTitle";
 import JustificationFilters from "@components/features/justification/justificationsFilter";
-import type { AppDispatch } from "@/redux/store";
+import JustificationTable from "@/components/features/justification/justificationsTable";
 import {
   fetchJustifications,
   setFilterOptions,
@@ -16,8 +17,7 @@ import {
   setLocalCurrentPage,
   downloadBase64File
 } from '@slice/justificationSlice';
-import JustificationTable from "@/components/features/justification/justificationsTable";
-import { AppDispatch, RootState } from '@/redux/store'
+
 
 export default function JustificacionesInstructor() {
   const dispatch = useDispatch<AppDispatch>();

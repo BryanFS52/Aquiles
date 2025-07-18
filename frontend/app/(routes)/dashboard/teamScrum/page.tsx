@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchStudySheets } from "@slice/olympo/studySheetSlice";
-import { StudySheetItem } from "@/types/slices/olympo/studySheet";
-import PageTitle from "@components/UI/pageTitle";
+import { StudySheet } from "@graphql/generated";
+import PageTitle from "@/components/UI/pageTitle";
 import Link from "next/link";
 import { useLoader } from "@/context/LoaderContext";
 
@@ -46,7 +46,7 @@ export default function StudySheetsPage() {
 
   return (
     <div>
-      <PageTitle>Fichas</PageTitle>
+      <PageTitle>Teams Scrum</PageTitle>
 
       <div className="mt-8">
         {error ? (
@@ -73,7 +73,7 @@ export default function StudySheetsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3 gap-8">
-            {(studySheets as StudySheetItem[]).map((sheet) => (
+            {(studySheets as StudySheet[]).map((sheet) => (
               <Link
                 key={sheet.id}
                 href={`/dashboard/teamScrum/${sheet.id}`}
@@ -151,7 +151,7 @@ export default function StudySheetsPage() {
                               </svg>
                               <span className="text-xs text-gray-600 dark:text-gray-400">Inicio:</span>
                               <span className="text-xs font-semibold text-green-700 dark:text-green-400">
-                                {formatDate(sheet.startLective)}
+                                {formatDate(sheet.startLective ?? 'N/A')}
                               </span>
                             </div>
                           </div>
@@ -162,7 +162,7 @@ export default function StudySheetsPage() {
                               </svg>
                               <span className="text-xs text-gray-600 dark:text-gray-400">Fin:</span>
                               <span className="text-xs font-semibold text-red-700 dark:text-red-400">
-                                {formatDate(sheet.endLective)}
+                                {formatDate(sheet.endLective ?? 'N/A')}
                               </span>
                             </div>
                           </div>

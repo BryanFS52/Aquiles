@@ -47,7 +47,6 @@ public class ChecklistService implements Idao<Checklist, Long> {
 
     @Override
     public void create(Checklist entity) {
-        // Al crear la entidad, también necesitamos manejar las relaciones como en el método `save`
         save(entity);
     }
 }

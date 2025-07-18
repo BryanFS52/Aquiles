@@ -8,16 +8,17 @@ import { addTeamScrum, deleteTeamScrum, updateTeamScrum } from "@slice/teamScrum
 import { AddTeamScrumMutationVariables } from "@/graphql/generated";
 import { toast } from "react-toastify";
 import { useParams } from "next/navigation";
-import PageTitle from "@components/UI/pageTitle";
-import { TeamScrumItem } from "@type/slices/teamScrum";
+import PageTitle from "@/components/UI/pageTitle";
+import { TeamsScrum } from "@graphql/generated";
 import { FaTrashAlt, FaUsers, FaCode, FaEye } from "react-icons/fa";
 import { MdAddCircle, MdInfo, MdGroup } from "react-icons/md";
-import ModalNewProject from "@components/Modals/modalNewTeam";
+import ModalNewTeam from "@components/Modals/modalNewTeam";
 import ModalComponent from "@components/Modals/modalComponent";
 import ModalAddInformation from "@components/Modals/modalAddInformation";
 import ModalTeamInformation from "@components/Modals/modalTeamScrumInfo";
 import { useLoader } from "@/context/LoaderContext";
 import ModalEliminarTeam from "@components/Modals/modalEliminarTeam";
+import { TeamHistoryModal } from "@components/Modals/modalComposition";
 
 interface TeamInfoData {
     projectName: string;
@@ -43,10 +44,11 @@ export default function TeamScrumDetailsPage() {
     const [confirmModalOpen, setConfirmModalOpen] = useState<boolean>(false);
     const [openAddInfoModal, setOpenAddInfoModal] = useState<boolean>(false);
     const [openTeamInfoModal, setOpenTeamInfoModal] = useState<boolean>(false);
+    const [isHistoryModalOpen, setIsHistoryModalOpen] = useState<boolean>(false);
 
-    const [teamToDelete, setTeamToDelete] = useState<TeamScrumItem | null>(null);
-    const [selectedTeam, setSelectedTeam] = useState<TeamScrumItem | null>(null);
-    const [selectedTeamForInfo, setSelectedTeamForInfo] = useState<TeamScrumItem | null>(null);
+    const [teamToDelete, setTeamToDelete] = useState<TeamsScrum | null>(null);
+    const [, setSelectedTeam] = useState<TeamsScrum | null>(null);
+    const [selectedTeamForInfo, setSelectedTeamForInfo] = useState<TeamsScrum | null>(null);
 
     useEffect(() => {
         if (studySheetId) {
@@ -64,15 +66,15 @@ export default function TeamScrumDetailsPage() {
 
     const studySheet = data?.[0] ?? null;
 
-    const teams: TeamScrumItem[] =
-        (studySheet?.teamsScrum as TeamScrumItem[]) ?? [];
+    const teams: TeamsScrum[] =
+        (studySheet?.teamsScrum as TeamsScrum[]) ?? [];
 
 
     // Modal handlers
     const handleOpenModal = () => setModalOpen(true);
     const handleCloseModal = () => setModalOpen(false);
 
-    const handleOpenAgregarInfo = (team: TeamScrumItem) => {
+    const handleOpenAgregarInfo = (team: TeamsScrum) => {
         setSelectedTeam(team);
         setOpenAgregarInfo(true);
     };
@@ -85,7 +87,10 @@ export default function TeamScrumDetailsPage() {
     const handleOpenAddInfoModal = () => setOpenAddInfoModal(true);
     const handleCloseAddInfoModal = () => setOpenAddInfoModal(false);
 
-    const handleOpenTeamInfoModal = (team: TeamScrumItem) => {
+    const handleOpenHistoryModal = () => setIsHistoryModalOpen(true);
+    const handleCloseHistoryModal = () => setIsHistoryModalOpen(false);
+
+    const handleOpenTeamInfoModal = (team: TeamsScrum) => {
         setSelectedTeamForInfo(team);
         setOpenTeamInfoModal(true);
     };
@@ -95,7 +100,7 @@ export default function TeamScrumDetailsPage() {
         setOpenTeamInfoModal(false);
     };
 
-    const handleOpenConfirmModal = (team: TeamScrumItem) => {
+    const handleOpenConfirmModal = (team: TeamsScrum) => {
         setTeamToDelete(team);
         setConfirmModalOpen(true);
     };
@@ -107,7 +112,7 @@ export default function TeamScrumDetailsPage() {
 
     const handleConfirmDelete = () => {
         if (teamToDelete) {
-            handleDisableTeamScrum(teamToDelete.id, teamToDelete.teamName);
+            handleDisableTeamScrum(teamToDelete.id, teamToDelete.teamName ?? "Sin nombre");
         }
         handleCloseConfirmModal();
     };
@@ -135,7 +140,7 @@ export default function TeamScrumDetailsPage() {
                 return false;
             }
 
-            toast.success("Información del equipo actualizada exitosamente");
+            toast.success("Información del team scrum actualizada exitosamente");
 
             // Refrescar los datos
             if (studySheetId) {
@@ -155,6 +160,16 @@ export default function TeamScrumDetailsPage() {
         input: AddTeamScrumMutationVariables["input"]
     ) => {
         try {
+            if (!input.memberIds || input.memberIds.length === 0) {
+                toast.warning("Debes seleccionar al menos un miembro para el equipo");
+                return false;
+            }
+
+            if (input.memberIds.length > 4) {
+                toast.warning("Un equipo Scrum no puede tener más de 4 miembros");
+                return false;
+            }
+
             const res = await dispatch(addTeamScrum(input));
             if (addTeamScrum.rejected.match(res)) {
                 const message =
@@ -164,6 +179,7 @@ export default function TeamScrumDetailsPage() {
                 toast.error(`Error al registrar el team scrum: ${message}`);
                 return false;
             }
+
             toast.success("Team scrum registrado exitosamente");
             if (studySheetId) {
                 dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
@@ -176,6 +192,8 @@ export default function TeamScrumDetailsPage() {
             return false;
         }
     };
+
+
 
     const handleDisableTeamScrum = async (teamId: string, teamName: string) => {
         try {
@@ -210,7 +228,7 @@ export default function TeamScrumDetailsPage() {
                 </PageTitle>
 
                 {/* Modales */}
-                <ModalNewProject
+                <ModalNewTeam
                     isOpen={modalOpen}
                     onClose={handleCloseModal}
                     onCreate={handleAddTeamScrum}
@@ -234,6 +252,10 @@ export default function TeamScrumDetailsPage() {
                     onClose={handleCloseTeamInfoModal}
                     team={selectedTeamForInfo}
                     onSave={handleSaveTeamInfo}
+                />
+                <TeamHistoryModal
+                    isOpen={isHistoryModalOpen}
+                    onClose={handleCloseHistoryModal}
                 />
 
                 <div className="mt-8">
@@ -355,7 +377,7 @@ export default function TeamScrumDetailsPage() {
                                                 </button>
 
                                                 <button
-                                                    onClick={handleOpenAddInfoModal}
+                                                    onClick={handleOpenHistoryModal}
                                                     className="flex items-center gap-2 text-white bg-gradient-to-r from-primary to-lightGreen hover:from-primary/90 hover:to-lightGreen/90 px-4 py-2 rounded-lg hover:-translate-y-0.5 text-sm font-medium transition-all duration-300 transform"
                                                 >
                                                     <FaEye className="text-sm" />
