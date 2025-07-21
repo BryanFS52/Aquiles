@@ -1,23 +1,33 @@
 package com.api.aquilesApi.Resolver;
+
 import com.api.aquilesApi.Business.ChecklistBusiness;
 import com.api.aquilesApi.Dto.ChecklistDto;
+import com.api.aquilesApi.Entity.ChecklistHistory;
+import com.api.aquilesApi.Service.ChecklistHistoryService;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
-import com.netflix.graphql.dgs.DgsComponent;
-import com.netflix.graphql.dgs.DgsQuery;
+import com.netflix.graphql.dgs.*;
+
 import org.springframework.data.domain.Page;
-import com.netflix.graphql.dgs.InputArgument;
-import com.netflix.graphql.dgs.DgsMutation;
 import org.springframework.http.HttpStatus;
+
+import java.util.List;
 import java.util.Map;
 
 @DgsComponent
 public class ChecklistResolver {
+
     private final ChecklistBusiness checklistBusiness;
-    public ChecklistResolver(ChecklistBusiness checklistBusiness) {
+    private final ChecklistHistoryService checklistHistoryService;
+
+    public ChecklistResolver(
+        ChecklistBusiness checklistBusiness,
+        ChecklistHistoryService checklistHistoryService
+    ) {
         this.checklistBusiness = checklistBusiness;
+        this.checklistHistoryService = checklistHistoryService;
     }
 
-    // FindAll Checklist (GraphQL)
+    // FindAll Checklist
     @DgsQuery
     public Map<String, Object> allChecklists(@InputArgument Integer page, @InputArgument Integer size) {
         try {
@@ -36,7 +46,7 @@ public class ChecklistResolver {
         }
     }
 
-    // FindById Checklist (GraphQL)
+    // FindById Checklist
     @DgsQuery
     public Map<String, Object> checklistById(@InputArgument Long id) {
         try {
@@ -53,7 +63,7 @@ public class ChecklistResolver {
         }
     }
 
-    // Add a new Checklist (GraphQL)
+    // Add
     @DgsMutation
     public Map<String, Object> addChecklist(@InputArgument(name = "input") ChecklistDto checklistDto) {
         try {
@@ -63,32 +73,31 @@ public class ChecklistResolver {
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
             );
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error adding Checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
 
-    // Update Checklist (GraphQL)
+    // Update
     @DgsMutation
-    public Map<String, Object> updateChecklist(@InputArgument Long id, @InputArgument (name = "input")ChecklistDto checklistDto) {
+    public Map<String, Object> updateChecklist(@InputArgument Long id, @InputArgument(name = "input") ChecklistDto checklistDto) {
         try {
-            checklistBusiness.update(id, checklistDto );
+            checklistBusiness.update(id, checklistDto);
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error updating Checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
 
-    // Delete Checklist (GraphQL)
+    // Delete
     @DgsMutation
     public Map<String, Object> deleteChecklist(@InputArgument Long id) {
         try {
@@ -98,22 +107,32 @@ public class ChecklistResolver {
                     ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error deleting Checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
 
-//Export Document
+    // Export PDF
     @DgsQuery
-public String exportChecklistToPdf(@InputArgument Long id) {
-    return checklistBusiness.exportChecklistPdf(id);
-}
+    public String exportChecklistToPdf(@InputArgument Long id) {
+        return checklistBusiness.exportChecklistPdf(id);
+    }
 
-@DgsQuery
-public String exportChecklistToExcel(@InputArgument Long id) {
-    return checklistBusiness.exportChecklistExcel(id);
-}
+    // Export Excel
+    @DgsQuery
+    public String exportChecklistToExcel(@InputArgument Long id) {
+        return checklistBusiness.exportChecklistExcel(id);
+    }
+
+    // ✅ History Query
+    @DgsQuery
+    public List<ChecklistHistory> checklistHistoryById(@InputArgument String checklistId) {
+        System.out.println("🔍 Buscando historial para checklistId: " + checklistId);
+        Long id = Long.parseLong(checklistId);
+        List<ChecklistHistory> result = checklistHistoryService.findHistoryByChecklistId(id);
+        System.out.println("📊 Encontrados " + result.size() + " registros de historial");
+        return result;
+    }
 }

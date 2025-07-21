@@ -21,6 +21,8 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://jitpack.io' }
+	maven { url "https://repo.spring.io/milestone" }
 }
 ext {
 	set('netflixDgsVersion', "10.1.2")
@@ -47,6 +49,8 @@ dependencies {
 	implementation 'com.google.zxing:core:3.5.0'
 	implementation 'com.google.zxing:javase:3.5.0'
 	// Reports XLS or PDF
+	implementation 'net.sf.jasperreports:jasperreports:6.20.0'
+	implementation 'com.lowagie:itext:2.1.7' // Explicitly adding iText
 	implementation 'org.apache.poi:poi:5.2.3' // Para formatos XLS (HSSF)
 	implementation 'org.apache.poi:poi-ooxml:5.2.3' // Para formatos XLSX (XSSF)
 	implementation 'org.apache.pdfbox:pdfbox:2.0.28' // Usa la versión más reciente
