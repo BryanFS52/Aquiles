@@ -318,6 +318,39 @@ export const updateJustification = createAsyncThunk<UpdateJustificationMutation[
     }
 );
 
+// Nueva función para cambiar el estado de una justificación
+export const updateJustificationStatus = createAsyncThunk<
+    UpdateJustificationMutation['updateJustification'],
+    { id: string; status: string },
+    { rejectValue: { code: string; message: string } }
+>(
+    'justifications/updateStatus',
+    async ({ id, status }, { rejectWithValue }) => {
+        try {
+            // Convertir el estado del string a boolean
+            const state = status === "Aceptado";
+
+            const input: UpdateJustificationMutationVariables['input'] = {
+                state
+            };
+
+            const { data } = await clientLAN.mutate<UpdateJustificationMutation, UpdateJustificationMutationVariables>({
+                mutation: UPDATE_JUSTIFICATION,
+                variables: { id: parseInt(id), input },
+            });
+
+            const res = data?.updateJustification;
+            if (!res || res.code !== '200') {
+                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Error al actualizar el estado' });
+            }
+
+            return res;
+        } catch (error: any) {
+            return rejectWithValue({ code: '500', message: error.message });
+        }
+    }
+);
+
 export const deleteJustification = createAsyncThunk<string, string,
     { rejectValue: { code: string; message: string } }
 >(
@@ -571,6 +604,16 @@ const justificationSlice = createSlice({
                 state.error = null;
             })
             .addCase(updateJustification.rejected, (state, action) => {
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
+                state.error = { code, message };
+            })
+            // updateJustificationStatus - nuevo
+            .addCase(updateJustificationStatus.fulfilled, (state, action: PayloadAction<UpdateJustificationMutation['updateJustification']>) => {
+                // Refrescar los datos después de actualizar el estado
+                state.error = null;
+            })
+            .addCase(updateJustificationStatus.rejected, (state, action) => {
                 const payload = action.payload as RejectedPayload;
                 const { code, message } = payload || {};
                 state.error = { code, message };

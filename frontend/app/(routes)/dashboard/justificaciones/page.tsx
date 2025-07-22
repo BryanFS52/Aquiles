@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { GrAttachment } from "react-icons/gr";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { AppDispatch } from "@/redux/store";
 import PageTitle from "@components/UI/pageTitle";
@@ -16,8 +17,10 @@ import {
   formatErrorMessage,
   generateFileName,
   setLocalCurrentPage,
-  downloadBase64File
+  downloadBase64File,
+  updateJustificationStatus
 } from '@slice/justificationSlice';
+import JustificationTable from "@/components/features/justification/justificationsTable";
 
 export default function JustificacionesInstructor() {
   const dispatch = useDispatch<AppDispatch>();
@@ -61,6 +64,17 @@ export default function JustificacionesInstructor() {
     }
   };
 
+  const handleStatusChange = (justificacionId: string, newStatus: string) => {
+    dispatch(updateJustificationStatus({ id: justificacionId, status: newStatus }))
+      .then(() => {
+        // Refrescar los datos después de actualizar el estado
+        dispatch(fetchJustifications({ page: localCurrentPage - 1, size: itemsPerPage }));
+      })
+      .catch((error) => {
+        console.error("Error al actualizar el estado:", error);
+      });
+  };
+
   const errorMessage = formatErrorMessage(error);
   const canGoNext = localCurrentPage < totalPages;
   const canGoPrevious = localCurrentPage > 1;
@@ -92,6 +106,7 @@ export default function JustificacionesInstructor() {
           <JustificationTable
             filteredData={filteredData}
             handleDownloadFile={handleDownloadFile}
+            handleStatusChange={handleStatusChange}
           />
 
           {/* Pagination */}

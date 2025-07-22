@@ -19,5 +19,13 @@ public class FollowUps implements Serializable {
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "description")
+    private String description;
+
     // Relations
+    // Relation (1-1) whit attendance
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name="attendance_id", referencedColumnName = "id")
+    private Attendance attendance;
 }

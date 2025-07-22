@@ -14,6 +14,14 @@ export const GET_ALL_ATTENDANCES = gql`
           id
           status
         }
+        student {
+          id
+          person {
+            name
+            lastname
+            document
+          }
+        }
       }
       currentPage
       totalPages
@@ -45,7 +53,6 @@ export const GET_ATTENDANCES_BY_STUDENT = gql`
   }
 `;
 
-
 export const ADD_ATTENDANCE = gql`
   mutation AddAttendance($input: AttendancesDto!) {
     addAttendance(input: $input) {
@@ -66,6 +73,7 @@ export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
           description
           justificationFile
           justificationDate
+          justificationType {
           justificationType {
             id
             name
