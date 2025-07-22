@@ -20,8 +20,11 @@ const FichasInstructor: React.FC = () => {
   const router = useRouter();
   const { showLoader, hideLoader } = useLoader();
 
-  const { data: fichasData, loading } = useSelector((state: any) => state.studySheet);
-  const fichas = fichasData?.allStudySheets?.data || fichasData?.data || fichasData || [];
+  const { data, loading, error } = useSelector((state: any) => state.studySheet);
+  const fichas = data || [];
+
+  console.log('Redux state:', { data, loading, error });
+  console.log('Fichas to render:', fichas);
 
   useEffect(() => {
     dispatch(fetchStudySheetByTeacher({ IdTeacher: 1, page: 0, size: 5 }));
@@ -81,14 +84,14 @@ const FichasInstructor: React.FC = () => {
                     </div>
                     <p className="text-black dark:text-white text-lg font-bold mt-2">Aprendices</p>
                     <p className="text-2xl font-semibold text-black dark:text-white">
-                      {studySheet.students?.length || 0}
+                      {studySheet.studentStudySheets?.length || 0}
                     </p>
                   </div>
 
                   <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 text-center md:text-left">
                     <FichaInfo label="Número de Ficha" value={studySheet.number} />
                     <FichaInfo label="Jornada" value={studySheet.journey?.name} />
-                    <FichaInfo label="Programa" value={studySheet.program?.name} />
+                    <FichaInfo label="Programa" value={studySheet.trainingProject?.program?.name} />
                     <FichaInfo label="Inicio Etapa Lectiva" value={studySheet.startLective} />
                     <FichaInfo label="Fin Etapa Lectiva" value={studySheet.endLective} />
                     <FichaInfo label="Estado" value={studySheet.state ? 'Activo' : 'Inactivo'} />
@@ -125,7 +128,7 @@ const FichasInstructor: React.FC = () => {
             <ApprenticeModal
               isOpen={isModalOpen}
               onClose={closeModal}
-              students={selectedFicha?.students || []}
+              students={selectedFicha?.studentStudySheets || []}
             />
           </div>
         </div>

@@ -38,7 +38,7 @@ public class studentsTeamScrumData {
 
         return teamsScrum.getMemberIds().stream()
                 .map(member -> Map.of(
-                        "id", member.getStudentId().toString()))
+                        "id"    , member.getStudentId().toString()))
                 .collect(Collectors.toList());
     }
 }

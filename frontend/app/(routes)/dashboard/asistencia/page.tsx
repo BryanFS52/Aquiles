@@ -19,13 +19,17 @@ export default function Attendance() {
     );
 
     const studySheet = studySheets.length > 0 ? studySheets[0] : undefined;
-    const students = studySheet?.students?.filter(
-        (s) => s?.person?.state === true
+    const students = (studySheet?.studentStudySheets as any[])?.filter(
+        (s: any) => s?.state === "Activo"
     ) || [];
 
+    console.log('Asistencia - studySheet:', studySheet);
+    console.log('Asistencia - students:', students);
 
     const activeStudents = students.length;
-    const withdrawnStudents = 0;
+    const withdrawnStudents = (studySheet?.studentStudySheets as any[])?.filter(
+        (s: any) => s?.state !== "Activo"
+    )?.length || 0;
 
     const handleNavigate = () => {
         setIsTransitioning(true);

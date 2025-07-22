@@ -59,26 +59,26 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet =
                 program: graphqlData.trainingProject.program
                     ? {
                         id: graphqlData.trainingProject.program.id,
-                        name: graphqlData.trainingProject.program.name
+                        name: graphqlData.trainingProject.program.name,
                     }
-                    : null
+                    : null,
             }
             : null,
 
-        students: graphqlData.students?.filter((s: any) => s !== null).map((student: any) => ({
-            id: student.id,
-            state: student.state,
+        studentStudySheets: graphqlData.studentStudySheets?.filter((s: any) => s !== null).map((ss: any) => ({
+            id: ss.student?.id,
+            state: ss.studentStyudySheetState?.name, // Usando el campo mal escrito del backend
             person: {
-                id: student.person.id,
-                document: student.person.document,
-                name: student.person.name,
-                lastname: student.person.lastname,
-                email: student.person.email,
-                phone: student.person.phone,
-                blood_type: student.person.blood_type,
-                date_birth: student.person.date_birth,
+                id: ss.student?.person?.id,
+                document: ss.student?.person?.document,
+                name: ss.student?.person?.name,
+                lastname: ss.student?.person?.lastname,
+                email: ss.student?.person?.email,
+                phone: ss.student?.person?.phone,
+                blood_type: ss.student?.person?.blood_type,
+                date_birth: ss.student?.person?.date_birth,
             },
-        })),
+        })) || [],
 
         teamsScrum: graphqlData.teamsScrum?.filter((t: any) => t !== null).map((team: any) => ({
             id: team.id,
@@ -95,10 +95,10 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet =
                 person: student.person,
                 profiles: student.profiles || [],
             })) || [],
-        })) || []
-
+        })) || [],
     };
 };
+
 
 export const fetchStudySheets = createAsyncThunk<GetStudySheetsQuery['allStudySheets'], GetStudySheetsQueryVariables>(
     'studySheet/fetchAll',
@@ -185,13 +185,19 @@ const studySheetSlice = createSlice({
             })
             .addCase(fetchStudySheets.fulfilled, (state, action) => {
                 const payload = action.payload;
+                console.log('Payload fetchStudySheets:', payload);
+
                 if (payload?.data) {
-                    state.data = payload.data
+                    const transformedData = payload.data
                         .filter((item): item is NonNullable<typeof item> => item !== null)
                         .map(transformGraphQLToStudySheetItem);
+
+                    state.data = transformedData;
                     state.totalItems = payload.totalItems ?? 0;
                     state.totalPages = payload.totalPages ?? 0;
                     state.currentPage = payload.currentPage ?? 0;
+
+                    console.log('Transformed data fetchStudySheets:', transformedData);
                 } else {
                     // fallback en caso de payload vacío
                     state.data = [];
@@ -200,7 +206,6 @@ const studySheetSlice = createSlice({
                     state.currentPage = 0;
                 }
                 state.loading = false;
-                console.log(fetchStudySheets)
             })
             .addCase(fetchStudySheets.rejected, (state, action) => {
                 state.error = action.error.message ?? 'Error fetching study sheets';
@@ -247,13 +252,19 @@ const studySheetSlice = createSlice({
             })
             .addCase(fetchStudySheetByTeacher.fulfilled, (state, action) => {
                 const payload = action.payload;
+                console.log('Payload fetchStudySheetByTeacher:', payload);
+
                 if (payload?.data) {
-                    state.data = payload.data
+                    const transformedData = payload.data
                         .filter((item): item is NonNullable<typeof item> => item !== null)
                         .map(transformGraphQLToStudySheetItem);
+
+                    state.data = transformedData;
                     state.totalItems = payload.totalItems ?? 0;
                     state.totalPages = payload.totalPages ?? 0;
                     state.currentPage = payload.currentPage ?? 0;
+
+                    console.log('Transformed data:', transformedData);
                 } else {
                     // fallback en caso de payload vacío
                     state.data = [];
@@ -291,7 +302,7 @@ const studySheetSlice = createSlice({
                         }
 
                         // Filtra los null antes de asignar
-                        state.dataForStudents[sheetId] = (transformed.students ?? []).filter(Boolean) as Student[];
+                        state.dataForStudents[sheetId] = (transformed.studentStudySheets ?? []).filter(Boolean) as Student[];
 
                         console.log(state.dataForStudents);
                     }
