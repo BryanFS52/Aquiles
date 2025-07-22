@@ -13,4 +13,10 @@ public class StateFollowUpsDto {
 
     @NotNull(message = "El nombre es oblogatorio")
     private String name;
+
+    @NotNull(message = "La descripcion es obligatoria")
+    private String description;
+
+    //Relations
+    private AttendancesDto attendances;
 }
