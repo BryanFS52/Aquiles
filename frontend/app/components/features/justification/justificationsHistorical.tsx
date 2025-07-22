@@ -1,31 +1,21 @@
-"use client";
+"use client"
 
 import { motion } from "framer-motion";
 import { FaCheckCircle, FaClock, FaFileAlt, FaRegFileAlt } from "react-icons/fa";
-import { TransformedJustificationItem } from "@slice/justificationSlice";
 import { GrAttachment } from "react-icons/gr";
 import { MdHistory } from "react-icons/md";
-
-interface JustificationType {
-  id: string;
-  name: string;
-}
-
-interface Props {
+import { TransformedJustificationItem } from "@slice/justificationSlice";
+interface JustificationsHistoricalProps {
   data: TransformedJustificationItem[];
-  justificationTypesData: JustificationType[];
-    loadingJustificationTypes: boolean;
   loading: boolean;
   handleDownloadFile: (justificacion: TransformedJustificationItem) => void;
 }
 
 export default function JustificationsHistorical({
   data,
-  justificationTypesData,
-  loadingJustificationTypes,
   loading,
   handleDownloadFile,
-}: Props) {
+}: JustificationsHistoricalProps) {
   const getStatusColor = (estado: string) => {
     return estado === "Aprobada"
       ? "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30"
@@ -39,7 +29,6 @@ export default function JustificationsHistorical({
       <FaClock className="w-4 h-4" />
     );
   };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -67,14 +56,13 @@ export default function JustificationsHistorical({
             <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700 text-black dark:text-white">
               <tr>
                 <th className="px-6 py-4 font-medium">Tipo de Novedad</th>
-                <th className="px-6 py-4 font-medium">
-                  Fecha de Justificacion
-                </th>
+                <th className="px-6 py-4 font-medium">Fecha de Justificacion</th>
                 <th className="px-6 py-4 font-medium">Archivo</th>
                 <th className="px-6 py-4 font-medium">Estado</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              
               {loading ? (
                 <tr>
                   <td
@@ -89,7 +77,7 @@ export default function JustificationsHistorical({
                     </div>
                   </td>
                 </tr>
-              ) : data.length === 0 ? (
+              ) : !data || data.length === 0 ? (
                 <tr>
                   <td
                     colSpan={4}
@@ -108,12 +96,9 @@ export default function JustificationsHistorical({
                 </tr>
               ) : (
                 data.map(
-                  (
-                    justification: TransformedJustificationItem,
-                    index: number
-                  ) => (
+                  (justification: TransformedJustificationItem, index: number) => (
                     <motion.tr
-                      key={justification.id ?? `row-${index}`}
+                      key={justification.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -121,25 +106,18 @@ export default function JustificationsHistorical({
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center">
-                          {loadingJustificationTypes
-                            ? "Cargando..."
-                            : justificationTypesData?.find(
-                                (type) => type.id === justification.tipoNovedad
-                              )?.name || "No especificado"}
+                          {justification.justificationType}
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          {justification.fecha}
-                        </div>
+                        <div className="flex items-center">{justification.fecha}</div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
                           {justification.archivoAdjunto ? (
                             <GrAttachment
-                              title={`Descargar archivo (${
-                                justification.archivoMime || "desconocido"
-                              })`}
+                              title={`Descargar archivo (${justification.archivoMime || "desconocido"
+                                })`}
                               className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
                               onClick={() => handleDownloadFile(justification)}
                             />
@@ -158,7 +136,9 @@ export default function JustificationsHistorical({
                             )}`}
                           >
                             {getStatusIcon(justification.estado)}
-                            <span className="ml-1">{justification.estado}</span>
+                            <span className="ml-1">
+                              {justification.estado}
+                            </span>
                           </span>
                         </div>
                       </td>

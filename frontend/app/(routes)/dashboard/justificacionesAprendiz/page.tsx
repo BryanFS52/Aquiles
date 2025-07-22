@@ -9,9 +9,10 @@ import { useUser } from '@context/UserContext';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
 import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
 import {
-  fetchJustificationById,
+  fetchJustifications,
   generateFileName,
 } from "@slice/justificationSlice";
+
 import type { AppDispatch, RootState } from "@/redux/store";
 import type { FormDataState } from "@slice/justificationSlice";
 import type { AttendanceItem } from "@type/slices/attendance";
@@ -83,14 +84,11 @@ export default function JustificacionAprendiz() {
   );
 
   useEffect(() => {
-    // if (user?.id) {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-    dispatch(fetchAttendancesByStudent({ id: 1, stateId: 2 }));
-    dispatch(fetchJustificationById({ id: 1 }));
-    // }
+    dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 }));
+    dispatch(fetchJustifications({ page: 0, size: 10 }));
   }, [dispatch]);
 
-  // Efecto para sincronizar el estado local con el estado global
   useEffect(() => {
     if (form.showForm && !shouldLoadModal) {
       const timer = setTimeout(() => {
@@ -206,7 +204,7 @@ export default function JustificacionAprendiz() {
       await dispatch(addJustification(formDataWithFile)).unwrap();
 
       toast.success("¡Tu justificación ha sido enviada exitosamente!");
-      dispatch(fetchJustificationById({ id: 1 }));
+      dispatch(fetchJustifications({ page: 0, size: 10 }));
       dispatch(resetForm());
       fileRef.current = null;
       base64Ref.current = "";
@@ -467,17 +465,15 @@ export default function JustificacionAprendiz() {
             className="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 dark:border-gray-800 dark:bg-[#002033] "
           >
             <div className="">
-              <JustificationsHistorical
-                data={justificationsData}
-                justificationTypesData={justificationTypesData}
-                loadingJustificationTypes={loadingJustificationTypes}
-                loading={loadingJustifications}
-                handleDownloadFile={handleDownloadFile}
-              />
+            <JustificationsHistorical
+              data={justificationsData}
+              loading={loadingJustifications}
+              handleDownloadFile={handleDownloadFile}
+            />
             </div>
           </motion.div>
         </AnimatePresence>
-      </div>
     </div>
-  );
+  </div>
+);
 }
