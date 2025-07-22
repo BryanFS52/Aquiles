@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IoPeople } from "react-icons/io5";
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
 import { fetchStudySheetByTeacher, fetchStudySheetById } from '@slice/olympo/studySheetSlice';
-import ApprenticeModal from '@components/Modals/apprenticeModal';
-import PageTitle from '@components/UI/pageTitle';
 import { useRouter } from 'next/navigation';
 import { useLoader } from '@/context/LoaderContext';
+import ApprenticeModal from '@components/Modals/apprenticeModal';
+import PageTitle from '@components/UI/pageTitle';
+import EmptyState from "@components/UI/emptyState";
+
 
 const FichasInstructor: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -50,13 +52,7 @@ const FichasInstructor: React.FC = () => {
   };
 
   if (!loading && (!fichas || fichas.length === 0)) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-center">
-        <div>
-          <p className="text-lg text-gray-600 dark:text-gray-300">No se encontraron fichas...</p>
-        </div>
-      </div>
-    );
+    return <EmptyState message="No se encontraron fichas disponibles." />;
   }
 
   return (

@@ -6,14 +6,18 @@ import { IoPeople } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from 'react-redux';
 import { useUser } from '@context/UserContext';
+import { useLoader } from '@/context/LoaderContext';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
 import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
 import { fetchJustifications, generateFileName } from '@slice/justificationSlice';
-import type { AppDispatch, RootState } from '@/redux/store'
-import type { FormDataState } from '@slice/justificationSlice';
+import { AppDispatch, RootState } from '@/redux/store'
+import { FormDataState } from '@slice/justificationSlice';
 import { Attendance } from "@/graphql/generated";
+import { FaCalendarDay, FaRegListAlt, FaCheckCircle } from "react-icons/fa";
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFormComponent from '@components/features/justification/justificationForm';
+import JustificationsHistorical from "@components/features/justification/justificationsHistorical";
+import EmptyState from "@components/UI/emptyState";
 
 import {
   showForm,
@@ -28,23 +32,7 @@ import {
   setSubmitting,
   setCurrentAttendance
 } from '@slice/justificationSlice';
-import {
-  FaCalendarDay,
-  FaRegListAlt,
-  FaCheckCircle,
-} from "react-icons/fa";
-import JustificationsHistorical from "@/components/features/justification/justificationsHistorical";
 
-
-// const sessions = {
-//   "1": {
-//     componentName: "Nombre del Componente",
-//     date: "01/09/2024",
-//     time: "10:00 AM",
-//     sheet: "Ficha 12345",
-//     instructors: ["Instructor 1", "Instructor 2"],
-//   },
-// };
 
 export default function JustificacionAprendiz() {
   const fileRef = useRef<File | null>(null);
@@ -52,6 +40,7 @@ export default function JustificacionAprendiz() {
   const formRef = useRef<HTMLDivElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
+  const { showLoader, hideLoader } = useLoader();
 
   // Estado local para controlar la carga del modal
   const [shouldLoadModal, setShouldLoadModal] = useState(false);
@@ -78,6 +67,15 @@ export default function JustificacionAprendiz() {
     dispatch(fetchJustifications({ page: 0, size: 10 }));
   }, [dispatch]);
 
+  useEffect(() => {
+    const isLoading = loadingJustificationTypes || loadingAttendances || loadingJustifications || loadingJustification;
+    if (isLoading) {
+      showLoader();
+    } else {
+      hideLoader();
+    }
+  }, [loadingJustificationTypes, loadingAttendances, loadingJustifications, loadingJustification, showLoader, hideLoader]);
+
   // Efecto para sincronizar el estado local con el estado global
   useEffect(() => {
     if (form.showForm && !shouldLoadModal) {
@@ -90,15 +88,10 @@ export default function JustificacionAprendiz() {
     }
   }, [form.showForm, shouldLoadModal]);
 
-  if (loadingJustificationTypes || loadingAttendances || loadingJustifications) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary"></div>
-        <span className="ml-4 text-xl font-semibold text-black dark:text-white">Cargando datos...</span>
-      </div>
-    );
+  if (errorJustificationTypes || errorAttendances) {
+    return <EmptyState message="Error al cargar datos. Intenta nuevamente más tarde." />;
   }
-  if (errorJustificationTypes || errorAttendances) return <p>Error cargando datos</p>;
+
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -232,10 +225,7 @@ export default function JustificacionAprendiz() {
 
         dispatch(updateFormField({ field: 'notificationId', value: attendanceId }));
 
-        // 🔥 ESTO ES LO QUE FALTABA
         dispatch(setCurrentAttendance(currentAttendance));
-
-        // Esperar a que Redux actualice el estado antes de mostrar el form
         setTimeout(() => {
           dispatch(showForm());
           formRef.current?.scrollIntoView({ behavior: 'smooth' });

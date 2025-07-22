@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
-import Loader from '@/components/UI/Loader';
+import Loader from '@/components/UI/loader';
 
 interface LoaderContextType {
     showLoader: () => void;

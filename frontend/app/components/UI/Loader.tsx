@@ -34,14 +34,26 @@ const Loader = () => {
             <div className="relative w-24 h-24 rounded-full overflow-hidden animate-pulse-gentle shadow-xl shadow-slate-700/40 backdrop-blur-sm border border-slate-600/50">
               {" "}
               {/* Increased from w-20 h-20 */}
-              <Image
-                src="/img/LogoAquilesWhite.png"
-                alt="Spartan Helmet Logo"
-                fill
-                style={{ objectFit: "contain", filter: "invert(1)" }}
-                priority // Load immediately for loader
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
+              <div className="dark:hidden">
+                <Image
+                  src="/img/LogoAquilesWhite.png"
+                  alt="Spartan Helmet Logo"
+                  fill
+                  style={{ objectFit: "contain", filter: "invert(1)" }}
+                  priority // Load immediately for loader
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
+              <div className="hidden dark:block">
+                <Image
+                  src="/img/LogoAquilesWhite.png"
+                  alt="Spartan Helmet Logo"
+                  fill
+                  style={{ objectFit: "contain" }}
+                  priority // Load immediately for loader
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
               {/* Soft inner glow for the logo (now subtle on black) */}
               <div className="absolute inset-0 bg-gradient-to-br from-gray-800/15 to-transparent rounded-full animate-ping-soft opacity-40"></div>
             </div>
