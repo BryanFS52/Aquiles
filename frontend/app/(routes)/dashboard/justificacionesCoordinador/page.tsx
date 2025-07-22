@@ -14,6 +14,7 @@ import {
   setLocalCurrentPage,
   downloadBase64File,
   generateFileName,
+  updateJustificationStatus,
 } from '@slice/justificationSlice';
 import JustificationTable from "@/components/features/justification/justificationsTable";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -62,6 +63,17 @@ export default function JustificacionesCoordinator() {
     }
   };
 
+  const handleStatusChange = (justificacionId: string, newStatus: string) => {
+    dispatch(updateJustificationStatus({ id: justificacionId, status: newStatus }))
+      .then(() => {
+        // Refrescar los datos después de actualizar el estado
+        dispatch(fetchJustifications({ page: localCurrentPage - 1, size: itemsPerPage }));
+      })
+      .catch((error) => {
+        console.error("Error al actualizar el estado:", error);
+      });
+  };
+
   const errorMessage = formatErrorMessage(error);
   const canGoNext = localCurrentPage < totalPages;
   const canGoPrevious = localCurrentPage > 1;
@@ -91,6 +103,7 @@ export default function JustificacionesCoordinator() {
         <JustificationTable
           filteredData={filteredData}
           handleDownloadFile={handleDownloadFile}
+          handleStatusChange={handleStatusChange}
         />
 
           {/* Pagination */}

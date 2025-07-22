@@ -14,6 +14,14 @@ export const GET_ALL_ATTENDANCES = gql`
           id
           status
         }
+        student {
+          id
+          person {
+            name
+            lastname
+            document
+          }
+        }
       }
       currentPage
       totalPages
