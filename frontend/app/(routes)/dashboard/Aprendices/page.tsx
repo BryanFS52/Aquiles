@@ -2,9 +2,9 @@
 
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react'
 import { toast } from 'react-toastify'
-import PageTitle from '@components/UI/pageTitle'
+import PageTitle from '@/components/UI/pageTitle'
 
-import { Apprentice, NewApprentice } from '@/types/aprendices'
+import { Apprentice, NewApprentice } from '@/types/slices/aprendices'
 function ListaApprentices() {
   const [apprentices, setApprentices] = useState<Apprentice[]>([])
   const [searchTerm, setSearchTerm] = useState<string>('')

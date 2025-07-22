@@ -2,16 +2,16 @@ import { clientLAN } from "@lib/apollo-client";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import { GET_All_STUDENTS, GET_STUDENT_LIST } from '@graphql/olympo/studentsGraph';
-import { StudentItem } from '@type/slices/olympo/student';
 import {
+    Student,
     GetStudentsQuery,
     GetStudentsQueryVariables,
     GetStudentListQuery,
     GetStudentListQueryVariables
 } from '@graphql/generated'
 
-// Función para transformar datos de GraphQL a StudentItem
-export const transformGraphQLToStudentItem = (graphqlData: any): StudentItem => {
+// Función para transformar datos de GraphQL a Student
+export const transformGraphQLToStudentItem = (graphqlData: any): Student => {
     return {
         id: graphqlData.id,
         state: graphqlData.state,
@@ -56,7 +56,7 @@ export const fetchStudentList = createAsyncThunk<GetStudentListQuery['allStudent
     }
 );
 
-const initialState = createInitialPaginatedState<StudentItem>();
+const initialState = createInitialPaginatedState<Student>();
 const studentSlice = createSlice({
     name: 'student',
     initialState,

@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface AttendancesRepository extends JpaRepository<Attendance, Long> {
 
+    // Finds attendances by studentId and/or attendanceStateId, ignoring null filters.
     List<Attendance> findAllByStudentId(Long studentId);
     @Query("""
     SELECT a FROM Attendance a
@@ -21,7 +22,4 @@ public interface AttendancesRepository extends JpaRepository<Attendance, Long> {
             @Param("studentId") Long studentId,
             @Param("attendanceStateId") Long attendanceStateId
     );
-
-
-
 }

@@ -23,7 +23,6 @@ public class JustificationService implements Idao<Justification, Long> {
         return justificationRepository.findAll(pageRequest);
     }
 
-
     @Override
     public Justification getById(Long id) {
         return justificationRepository.findById(id).orElseThrow(() ->
@@ -44,7 +43,6 @@ public class JustificationService implements Idao<Justification, Long> {
     public Justification save(Justification entity) {
         return justificationRepository.save(entity);
     }
-
 
     @Override
     public void delete(Justification entity) {

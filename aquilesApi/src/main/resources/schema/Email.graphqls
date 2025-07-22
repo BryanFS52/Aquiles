@@ -1,0 +1,9 @@
+input EmailRequest {
+    email: String!
+    subject: String!
+    htmlContent: String!
+}
+
+extend type Mutation {
+    sendNotification(emailRequest: EmailRequest!): String
+}

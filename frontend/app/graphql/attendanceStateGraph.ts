@@ -2,48 +2,48 @@ import { gql } from "@apollo/client";
 
 // Queries and Mutations for Attendance State
 export const GET_ALL_ATTENDANCES_STATE = gql`
-  query GetStateAttendance($page: Int, $size: Int) {
-    allStateAttendances(page: $page, size: $size) {
-      code
-      date
-      message
-      totalPages
-      totalItems
-      currentPage
-      data {
-        id
-        status
+    query GetStateAttendance($page: Int, $size: Int) {
+      allStateAttendances(page: $page, size: $size) {
+        code
+        date
+        message
+        totalPages
+        totalItems
+        currentPage
+        data {
+          id
+          status
+        }
       }
     }
-  }
-`;
+  `;
 
 export const ADD_ATTENDANCE_STATE = gql`
-  mutation AddStateAttendance($input: AttendanceStateDto!) {
-    addStateAttendance(input: $input) {
-      code
-      message
-      id
+    mutation AddStateAttendance($input: AttendanceStateDto!) {
+      addStateAttendance(input: $input) {
+        code
+        message
+        id
+      }
     }
-  }
-`;
+  `;
 
 export const UPDATE_ATTENDANCE_STATE = gql`
-  mutation UpdateStateAttendance($id: Long!, $input: AttendanceStateDto!) {
-    updateStateAttendance(id: $id, input: $input) {
-      code
-      message
-      id
+    mutation UpdateStateAttendance($id: Long!, $input: AttendanceStateDto!) {
+      updateStateAttendance(id: $id, input: $input) {
+        code
+        message
+        id
+      }
     }
-  }
-`;
+  `;
 
 export const DELETE_ATTENDANCE_STATE = gql`
-  mutation DeleteStateAttendance($id: Long!) {
-    deleteStateAttendance(id: $id) {
-      code
-      message
-      id
+    mutation DeleteStateAttendance($id: Long!) {
+      deleteStateAttendance(id: $id) {
+        code
+        message
+        id
+      }
     }
-  }
-`;
+  `;

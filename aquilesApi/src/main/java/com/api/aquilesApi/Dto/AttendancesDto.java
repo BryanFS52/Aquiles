@@ -9,13 +9,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AttendancesDto {
-    private Long id;
-    private String attendanceDate;
-    private Long studentId;
-    private Long studySheetQuarter;
 
-    //Relations
+    private Long id;
+    // @NotNull(message = "")
+    private String attendanceDate;
+
+    // @NotNull(message = "")
+    private Long studentId;
+
+    // @NotNull(message = "")
+    private Long studySheetQuarter;
     private JustificationDto justification;
+
+    // @NotNull(message = "")
     private AttendanceStateDto attendanceState;
     private StateFollowUpsDto followUps;
 }

@@ -8,15 +8,15 @@ import { addTeamScrum, deleteTeamScrum, updateTeamScrum } from "@slice/teamScrum
 import { AddTeamScrumMutationVariables } from "@/graphql/generated";
 import { toast } from "react-toastify";
 import { useParams } from "next/navigation";
-import PageTitle from "@components/UI/pageTitle";
-import { TeamScrumItem } from "@type/slices/teamScrum";
 import { FaTrashAlt, FaUsers, FaCode, FaEye } from "react-icons/fa";
+import { TeamsScrum } from "@graphql/generated";
 import { MdAddCircle, MdInfo, MdGroup } from "react-icons/md";
-import ModalNewProject from "@components/Modals/modalNewTeam";
-import ModalComponent from "@components/Modals/modalComponent";
+import { useLoader } from "@context/LoaderContext";
+import { TeamHistoryModal } from "@components/Modals/modalComposition";
+import PageTitle from "@/components/UI/pageTitle";
+import ModalNewTeam from "@components/Modals/modalNewTeam";
 import ModalAddInformation from "@components/Modals/modalAddInformation";
 import ModalTeamInformation from "@components/Modals/modalTeamScrumInfo";
-import { useLoader } from "@/context/LoaderContext";
 import ModalEliminarTeam from "@components/Modals/modalEliminarTeam";
 
 interface TeamInfoData {
@@ -39,14 +39,15 @@ export default function TeamScrumDetailsPage() {
     const { showLoader, hideLoader } = useLoader();
 
     const [modalOpen, setModalOpen] = useState<boolean>(false);
-    const [openAgregarInfo, setOpenAgregarInfo] = useState<boolean>(false);
+    const [, setOpenAgregarInfo] = useState<boolean>(false);
     const [confirmModalOpen, setConfirmModalOpen] = useState<boolean>(false);
     const [openAddInfoModal, setOpenAddInfoModal] = useState<boolean>(false);
     const [openTeamInfoModal, setOpenTeamInfoModal] = useState<boolean>(false);
-
-    const [teamToDelete, setTeamToDelete] = useState<TeamScrumItem | null>(null);
-    const [selectedTeam, setSelectedTeam] = useState<TeamScrumItem | null>(null);
-    const [selectedTeamForInfo, setSelectedTeamForInfo] = useState<TeamScrumItem | null>(null);
+    const [isHistoryModalOpen, setIsHistoryModalOpen] = useState<boolean>(false);
+    const [teamToDelete, setTeamToDelete] = useState<TeamsScrum | null>(null);
+    const [, setSelectedTeam] = useState<TeamsScrum | null>(null);
+    const [selectedTeamForInfo, setSelectedTeamForInfo] = useState<TeamsScrum | null>(null);
+    const [selectedTeamForHistory, setSelectedTeamForHistory] = useState<TeamsScrum | null>(null);
 
     useEffect(() => {
         if (studySheetId) {
@@ -64,15 +65,15 @@ export default function TeamScrumDetailsPage() {
 
     const studySheet = data?.[0] ?? null;
 
-    const teams: TeamScrumItem[] =
-        (studySheet?.teamsScrum as TeamScrumItem[]) ?? [];
+    const teams: TeamsScrum[] =
+        (studySheet?.teamsScrum as TeamsScrum[]) ?? [];
 
 
     // Modal handlers
     const handleOpenModal = () => setModalOpen(true);
     const handleCloseModal = () => setModalOpen(false);
 
-    const handleOpenAgregarInfo = (team: TeamScrumItem) => {
+    const handleOpenAgregarInfo = (team: TeamsScrum) => {
         setSelectedTeam(team);
         setOpenAgregarInfo(true);
     };
@@ -82,10 +83,18 @@ export default function TeamScrumDetailsPage() {
         setOpenAgregarInfo(false);
     };
 
-    const handleOpenAddInfoModal = () => setOpenAddInfoModal(true);
     const handleCloseAddInfoModal = () => setOpenAddInfoModal(false);
 
-    const handleOpenTeamInfoModal = (team: TeamScrumItem) => {
+    const handleOpenHistoryModal = (team: TeamsScrum) => {
+        setSelectedTeamForHistory(team);
+        setIsHistoryModalOpen(true);
+    };
+    const handleCloseHistoryModal = () => {
+        setSelectedTeamForHistory(null);
+        setIsHistoryModalOpen(false);
+    };
+
+    const handleOpenTeamInfoModal = (team: TeamsScrum) => {
         setSelectedTeamForInfo(team);
         setOpenTeamInfoModal(true);
     };
@@ -95,7 +104,7 @@ export default function TeamScrumDetailsPage() {
         setOpenTeamInfoModal(false);
     };
 
-    const handleOpenConfirmModal = (team: TeamScrumItem) => {
+    const handleOpenConfirmModal = (team: TeamsScrum) => {
         setTeamToDelete(team);
         setConfirmModalOpen(true);
     };
@@ -107,7 +116,7 @@ export default function TeamScrumDetailsPage() {
 
     const handleConfirmDelete = () => {
         if (teamToDelete) {
-            handleDisableTeamScrum(teamToDelete.id, teamToDelete.teamName);
+            handleDisableTeamScrum(teamToDelete.id, teamToDelete.teamName ?? "Sin nombre");
         }
         handleCloseConfirmModal();
     };
@@ -135,9 +144,8 @@ export default function TeamScrumDetailsPage() {
                 return false;
             }
 
-            toast.success("Información del equipo actualizada exitosamente");
+            toast.success("Información del team scrum actualizada exitosamente");
 
-            // Refrescar los datos
             if (studySheetId) {
                 dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
             }
@@ -155,6 +163,16 @@ export default function TeamScrumDetailsPage() {
         input: AddTeamScrumMutationVariables["input"]
     ) => {
         try {
+            if (!input.memberIds || input.memberIds.length === 0) {
+                toast.warning("Debes seleccionar al menos un miembro para el equipo");
+                return false;
+            }
+
+            if (input.memberIds.length > 4) {
+                toast.warning("Un equipo Scrum no puede tener más de 4 miembros");
+                return false;
+            }
+
             const res = await dispatch(addTeamScrum(input));
             if (addTeamScrum.rejected.match(res)) {
                 const message =
@@ -164,6 +182,7 @@ export default function TeamScrumDetailsPage() {
                 toast.error(`Error al registrar el team scrum: ${message}`);
                 return false;
             }
+
             toast.success("Team scrum registrado exitosamente");
             if (studySheetId) {
                 dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
@@ -176,6 +195,7 @@ export default function TeamScrumDetailsPage() {
             return false;
         }
     };
+
 
     const handleDisableTeamScrum = async (teamId: string, teamName: string) => {
         try {
@@ -210,7 +230,7 @@ export default function TeamScrumDetailsPage() {
                 </PageTitle>
 
                 {/* Modales */}
-                <ModalNewProject
+                <ModalNewTeam
                     isOpen={modalOpen}
                     onClose={handleCloseModal}
                     onCreate={handleAddTeamScrum}
@@ -219,10 +239,6 @@ export default function TeamScrumDetailsPage() {
                 <ModalAddInformation
                     isOpen={openAddInfoModal}
                     onClose={handleCloseAddInfoModal}
-                />
-                <ModalComponent
-                    isOpen={openAgregarInfo}
-                    onClose={handleCloseAgregarInfo}
                 />
                 <ModalEliminarTeam
                     isOpen={confirmModalOpen}
@@ -235,25 +251,30 @@ export default function TeamScrumDetailsPage() {
                     team={selectedTeamForInfo}
                     onSave={handleSaveTeamInfo}
                 />
+                <TeamHistoryModal
+                    isOpen={isHistoryModalOpen}
+                    onClose={handleCloseHistoryModal}
+                    teamData={selectedTeamForHistory}
+                />
 
                 <div className="mt-8">
                     <button
                         onClick={handleOpenModal}
-                        className="flex items-center gap-3 text-white bg-gradient-to-r from-primary to-lightGreen hover:from-primary/90 hover:to-lightGreen/90 px-6 py-3 rounded-xl hover:-translate-y-1 mb-8 font-semibold transition-all duration-300 transform"
+                        className="flex items-center gap-3 text-white bg-gradient-to-r from-primary to-lightGreen hover:from-primary/90 hover:to-lightGreen/90 dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90 px-6 py-3 rounded-xl hover:-translate-y-1 mb-8 font-semibold transition-all duration-300 transform"
                     >
                         <MdAddCircle className="text-2xl" />
                         <span>Crear Nuevo Equipo</span>
                     </button>
 
                     {teams.length === 0 ? (
-                        <div className="bg-white dark:bg-shadowBlue rounded-xl p-12 text-center border border-lightGray dark:border-darkGreen">
+                        <div className="bg-white dark:bg-shadowBlue rounded-xl p-12 text-center border border-lightGray dark:border-grayText">
                             <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <MdGroup className="w-8 h-8 text-grayText" />
+                                <MdGroup className="w-8 h-8 text-grayText dark:text-lightGray" />
                             </div>
-                            <h3 className="text-xl font-semibold text-darkGray dark:text-lightGray mb-2">
+                            <h3 className="text-xl font-semibold text-darkGray dark:text-white mb-2">
                                 No hay equipos de Scrum disponibles
                             </h3>
-                            <p className="text-grayText">
+                            <p className="text-grayText dark:text-white">
                                 Aún no se han creado equipos para esta ficha.
                             </p>
                         </div>
@@ -262,10 +283,10 @@ export default function TeamScrumDetailsPage() {
                             {teams.map((team) => (
                                 <div
                                     key={team.id}
-                                    className="group relative bg-white dark:bg-shadowBlue rounded-2xl overflow-hidden border border-lightGray dark:border-darkGreen transform hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300"
+                                    className="group relative bg-white dark:bg-shadowBlue rounded-2xl overflow-hidden border border-lightGray dark:border-grayText hover:bg-black/5 dark:hover:bg-white/10 transform hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300"
                                 >
                                     {/* Gradient Header */}
-                                    <div className="h-24 bg-gradient-to-br from-primary via-lightGreen to-darkGreen relative overflow-hidden">
+                                    <div className="h-24 bg-gradient-to-br from-primary via-lightGreen to-darkGreen dark:from-secondary dark:to-darkBlue relative overflow-hidden">
                                         <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent"></div>
                                         <div className="absolute top-4 right-4">
                                             <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
@@ -278,24 +299,24 @@ export default function TeamScrumDetailsPage() {
                                     {/* Content */}
                                     <div className="p-6 relative -mt-4">
                                         {/* Team Avatar */}
-                                        <div className="w-16 h-16 bg-gradient-to-br from-primary to-lightGreen rounded-full flex items-center justify-center mb-4 mx-auto">
+                                        <div className="w-16 h-16 bg-gradient-to-br from-primary to-lightGreen dark:from-secondary dark:to-darkBlue rounded-full flex items-center justify-center mb-4 mx-auto">
                                             <FaUsers className="text-white text-xl" />
                                         </div>
 
                                         {/* Team Name */}
-                                        <h2 className="text-2xl font-bold text-center text-secondary dark:text-white mb-2 group-hover:text-primary dark:group-hover:text-lightGreen transition-colors">
+                                        <h2 className="text-2xl font-bold text-center text-black dark:text-white mb-2 group-hover:text-black dark:group-hover:text-white transition-colors">
                                             {team.teamName}
                                         </h2>
 
                                         {/* Team ID */}
-                                        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 mb-4">
+                                        <div className="bg-gray-50 dark:bg-shadowBlue/50 rounded-lg p-3 mb-4">
                                             <div className="flex items-center space-x-2 mb-1">
-                                                <div className="w-2 h-2 bg-primary rounded-full"></div>
-                                                <span className="text-xs font-medium text-grayText uppercase tracking-wide">
+                                                <div className="w-2 h-2 bg-primary dark:bg-darkBlue rounded-full"></div>
+                                                <span className="text-xs font-medium text-grayText dark:text-white uppercase tracking-wide">
                                                     Team ID
                                                 </span>
                                             </div>
-                                            <p className="text-sm font-mono text-darkGray dark:text-lightGray bg-white dark:bg-gray-700 px-2 py-1 rounded">
+                                            <p className="text-sm font-mono text-black dark:text-white bg-white dark:bg-shadowBlue px-2 py-1 rounded">
                                                 {team.id}
                                             </p>
                                         </div>
@@ -305,12 +326,12 @@ export default function TeamScrumDetailsPage() {
                                             <div className="mb-6">
                                                 <div className="flex items-center justify-between mb-3">
                                                     <div className="flex items-center space-x-2">
-                                                        <MdGroup className="text-primary dark:text-lightGreen" />
-                                                        <h3 className="text-sm font-semibold text-grayText">
+                                                        <MdGroup className="text-black dark:text-darkBlue" />
+                                                        <h3 className="text-sm font-semibold text-black dark:text-white">
                                                             Miembros del equipo
                                                         </h3>
                                                     </div>
-                                                    <span className="bg-primary/10 text-primary dark:bg-lightGreen/10 dark:text-lightGreen text-xs font-semibold px-2 py-1 rounded-full">
+                                                    <span className="bg-gray-200 text-black dark:bg-darkBlue/20 dark:text-darkBlue text-xs font-semibold px-2 py-1 rounded-full">
                                                         {team.students.length}
                                                     </span>
                                                 </div>
@@ -318,14 +339,14 @@ export default function TeamScrumDetailsPage() {
                                                     {team.students.map((student, index) => (
                                                         <div
                                                             key={index}
-                                                            className="flex items-center space-x-3 p-2 bg-gray-50 dark:bg-gray-800/30 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                                                            className="flex items-center space-x-3 p-2 bg-gray-50 dark:bg-shadowBlue/30 rounded-lg hover:bg-gray-100 dark:hover:bg-darkBlue/50 transition-colors"
                                                         >
-                                                            <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-lightGreen/20 rounded-full flex items-center justify-center">
-                                                                <span className="text-xs font-semibold text-primary dark:text-lightGreen">
+                                                            <div className="w-8 h-8 bg-gradient-to-br from-primary/20 to-lightGreen/20 dark:from-secondary/20 dark:to-darkBlue/20 rounded-full flex items-center justify-center">
+                                                                <span className="text-xs font-semibold text-black dark:text-darkBlue">
                                                                     {(student?.person?.name ?? `E${index + 1}`).charAt(0)}
                                                                 </span>
                                                             </div>
-                                                            <span className="text-sm text-darkGray dark:text-lightGray">
+                                                            <span className="text-sm text-black dark:text-white">
                                                                 {student?.person?.name ?? `Estudiante ${index + 1}`}
                                                             </span>
                                                         </div>
@@ -335,10 +356,10 @@ export default function TeamScrumDetailsPage() {
                                         )}
 
                                         {/* Actions */}
-                                        <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-600">
+                                        <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
                                             <button
                                                 onClick={() => handleOpenTeamInfoModal(team)}
-                                                className="flex items-center gap-2 text-primary dark:text-lightGreen hover:text-lightGreen dark:hover:text-primary transition-colors duration-300 p-2 rounded-lg hover:bg-primary/10 dark:hover:bg-lightGreen/10"
+                                                className="flex items-center gap-2 text-black dark:text-darkBlue hover:text-black dark:hover:text-white transition-colors duration-300 p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-darkBlue/10"
                                                 title="Información del equipo"
                                             >
                                                 <MdInfo className="text-xl" />
@@ -355,8 +376,8 @@ export default function TeamScrumDetailsPage() {
                                                 </button>
 
                                                 <button
-                                                    onClick={handleOpenAddInfoModal}
-                                                    className="flex items-center gap-2 text-white bg-gradient-to-r from-primary to-lightGreen hover:from-primary/90 hover:to-lightGreen/90 px-4 py-2 rounded-lg hover:-translate-y-0.5 text-sm font-medium transition-all duration-300 transform"
+                                                    onClick={() => handleOpenHistoryModal(team)}
+                                                    className="flex items-center gap-2 text-black dark:text-white bg-gradient-to-r from-primary to-lightGreen hover:from-primary/90 hover:to-lightGreen/90 dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90 px-4 py-2 rounded-lg hover:-translate-y-0.5 text-sm font-medium transition-all duration-300 transform"
                                                 >
                                                     <FaEye className="text-sm" />
                                                     Ver Más
@@ -366,7 +387,7 @@ export default function TeamScrumDetailsPage() {
                                     </div>
 
                                     {/* Hover overlay */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-lightGreen/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-lightGreen/5 dark:from-secondary/10 dark:to-darkBlue/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                                 </div>
                             ))}
                         </div>

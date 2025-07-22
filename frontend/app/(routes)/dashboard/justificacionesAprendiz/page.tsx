@@ -6,6 +6,7 @@ import { IoPeople } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from 'react-redux';
 import { useUser } from '@context/UserContext';
+import { useLoader } from '@/context/LoaderContext';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
 import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
 import {
@@ -53,6 +54,7 @@ export default function JustificacionAprendiz() {
 
   const topRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
+  const { showLoader, hideLoader } = useLoader();
 
   // Estado local para controlar la carga del modal
   const [shouldLoadModal, setShouldLoadModal] = useState(false);
@@ -84,6 +86,9 @@ export default function JustificacionAprendiz() {
   );
 
   useEffect(() => {
+    dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
+    dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 }));
+    dispatch(fetchJustifications({ page: 0, size: 10 }));
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
     dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 }));
     dispatch(fetchJustifications({ page: 0, size: 10 }));
@@ -274,8 +279,6 @@ export default function JustificacionAprendiz() {
 
         // 🔥 ESTO ES LO QUE FALTABA
         dispatch(setCurrentAttendance(currentAttendance));
-
-        // Esperar a que Redux actualice el estado antes de mostrar el form
         setTimeout(() => {
           dispatch(showForm());
           formRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -295,6 +298,13 @@ export default function JustificacionAprendiz() {
     });
   };
 
+  const handleDownloadFile = (justificacion: any) => {
+    if (justificacion.archivoAdjunto) {
+      const mimeType = justificacion.archivoMime || "application/octet-stream";
+      const fileName = generateFileName(justificacion.id, mimeType);
+      downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
+    }
+  };
   const handleDownloadFile = (justificacion: any) => {
     if (justificacion.archivoAdjunto) {
       const mimeType = justificacion.archivoMime || "application/octet-stream";
@@ -338,7 +348,7 @@ export default function JustificacionAprendiz() {
               {absences.length > 0 && (
                 <div className="mb-6 ">
                   <div className="max-h-80 overflow-y-auto pr-2 space-y-4">
-                    {absences.map((attendance: AttendanceItem, index) => (
+                    {absences.map((attendance: Attendance, index) => (
                       <motion.div
                         key={attendance.id}
                         initial={{ opacity: 0, x: -20 }}
@@ -354,7 +364,7 @@ export default function JustificacionAprendiz() {
                             </div>
                             <div className="ml-4">
                               <div className="font-semibold text-gray-800 text-lg">
-                                {formatDate(attendance.attendanceDate)}
+                                {formatDate(attendance.attendanceDate ?? '')}
                               </div>
                               <div className="text-sm text-red-600 font-medium">
                                 Estado:{" "}

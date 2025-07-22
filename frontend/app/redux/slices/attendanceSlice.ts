@@ -1,9 +1,9 @@
-import { client, clientLAN } from '@lib/apollo-client';
+import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph';
-import { AttendanceItem } from '@type/slices/attendance';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import {
+    Attendance,
     Attendance,
     GetAttendancesQuery,
     GetAttendancesQueryVariables,
@@ -139,7 +139,7 @@ export const fetchAttendances = createAsyncThunk<
 );
 // AttendancesByStudent
 export const fetchAttendancesByStudent = createAsyncThunk<
-    AttendanceItem[],
+    Attendance[],
     AllAttendancesByStudentIdQueryVariables
 >(
     'attendance/fetchByStudent',
@@ -318,7 +318,7 @@ const attendanceSlice = createSlice({
             })
             .addCase(fetchAttendancesByStudent.fulfilled, (
                 state,
-                action: PayloadAction<AttendanceItem[]>
+                action: PayloadAction<Attendance[]>
             ) => {
                 state.studentAttendances.data = action.payload;
                 state.studentAttendances.loading = false;
@@ -354,7 +354,7 @@ const attendanceSlice = createSlice({
             .addCase(updateAttendance.fulfilled, (state, action: PayloadAction<UpdateAttendanceMutation['updateAttendance']>) => {
                 if (action.payload && action.payload.id) {
                     const updatedAttendance = transformGraphQLToAttendanceItem(action.payload);
-                    const index = state.data.findIndex((attendance: AttendanceItem) => attendance.id === updatedAttendance.id);
+                    const index = state.data.findIndex((attendance: Attendance) => attendance.id === updatedAttendance.id);
                     if (index !== -1) {
                         state.data[index] = updatedAttendance;
                     }
@@ -368,7 +368,7 @@ const attendanceSlice = createSlice({
             })
             .addCase(deleteAttendance.fulfilled, (state, action: PayloadAction<string>) => {
                 if (action.payload) {
-                    state.data = state.data.filter((attendance: AttendanceItem) => attendance.id !== action.payload);
+                    state.data = state.data.filter((attendance: Attendance) => attendance.id !== action.payload);
                 }
                 state.error = null;
             })

@@ -29,7 +29,9 @@ public class JustificationBusiness {
         this.modelMapper = modelMapper;
     }
     // Validation Object
+    public void ValidationObject(JustificationDto justificationDto) throws  CustomException {
 
+    }
 
     // Find All
     public Page<JustificationDto> findAll(int page, int size) {
@@ -81,9 +83,24 @@ public class JustificationBusiness {
     // Update
     public void update(Long id, JustificationDto justificationDto) {
         try {
-            justificationDto.setId(id);
-            Justification attendance = modelMapper.map( justificationDto, Justification.class);
-            justificationService.save(attendance);
+            Justification justification = new Justification();
+            justification.setId(id);
+            justification.setJustificationDate(justificationDto.getJustificationDate());
+            justification.setDescription(justificationDto.getDescription());
+            justification.setJustificationFile(justificationDto.getJustificationFile());
+            justification.setState(justificationDto.getState());
+
+            if (justificationDto.getAttendance() != null) {
+                Attendance attendance = attendancesService.getById(justificationDto.getAttendance().getId());
+                justification.setAttendance(attendance);
+            }
+
+            if (justificationDto.getJustificationType() != null) {
+                JustificationType justificationType = justificationTypeService.getById(justificationDto.getJustificationType().getId());
+                justification.setJustificationTypeId(justificationType);
+            }
+
+            justificationService.save(justification);
         } catch (Exception e) {
             throw new CustomException("Error Updating Justification: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }

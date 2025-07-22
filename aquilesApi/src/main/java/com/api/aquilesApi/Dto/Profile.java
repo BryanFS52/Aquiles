@@ -1,14 +1,14 @@
 package com.api.aquilesApi.Dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.io.Serializable;
-
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class Student implements Serializable {
-    private Long id;
+public class Profile {
+    private String id;
 }

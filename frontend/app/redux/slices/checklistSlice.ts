@@ -1,9 +1,9 @@
-import { client } from '@lib/apollo-client'
+import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { ChecklistItem } from '@type/slices/checklist'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_CHECKLISTS, GET_CHECKLIST_BY_ID, ADD_CHECKLIST, UPDATE_CHECKLIST, DELETE_CHECKLIST } from '@graphql/checklistGraph'
 import {
+    Checklist,
     GetAllChecklistsQuery,
     GetAllChecklistsQueryVariables,
     GetChecklistByIdQuery,
@@ -16,11 +16,10 @@ import {
     DeleteChecklistMutationVariables
 } from '@graphql/generated'
 
-// Función para transformar datos de GraphQL a ChecklistItem
-const transformGraphQLToChecklistItem = (graphqlData: any): ChecklistItem => {
+// Función para transformar datos de GraphQL a Checklist
+const transformGraphQLToChecklistItem = (graphqlData: any): Checklist => {
     return {
         id: graphqlData.id,
-        stateChecklist: graphqlData.state,
         remarks: graphqlData.remarks,
         instructorSignature: graphqlData.instructorSignature,
         evaluationCriteria: graphqlData.evaluationCriteria,
@@ -32,7 +31,7 @@ const transformGraphQLToChecklistItem = (graphqlData: any): ChecklistItem => {
 export const fetchChecklists = createAsyncThunk<GetAllChecklistsQuery['allChecklists'], GetAllChecklistsQueryVariables>(
     'checklist/fetchAll',
     async ({ page, size }) => {
-        const { data } = await client.query<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>({
+        const { data } = await clientLAN.query<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>({
             query: GET_ALL_CHECKLISTS,
             variables: { page, size },
             fetchPolicy: 'no-cache',
@@ -44,7 +43,7 @@ export const fetchChecklists = createAsyncThunk<GetAllChecklistsQuery['allCheckl
 export const fetchChecklistById = createAsyncThunk<GetChecklistByIdQuery['checklistById'], GetChecklistByIdQueryVariables>(
     'checklist/fetchById',
     async ({ id }) => {
-        const { data } = await client.query<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>({
+        const { data } = await clientLAN.query<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>({
             query: GET_CHECKLIST_BY_ID,
             variables: { id },
         });
@@ -58,7 +57,7 @@ export const addChecklist = createAsyncThunk<AddChecklistMutation['addChecklist'
     'checklist/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<AddChecklistMutation, AddChecklistMutationVariables>({
+            const { data } = await clientLAN.mutate<AddChecklistMutation, AddChecklistMutationVariables>({
                 mutation: ADD_CHECKLIST,
                 variables: { input }
             });
@@ -80,7 +79,7 @@ export const updateChecklist = createAsyncThunk<UpdateChecklistMutation['updateC
     'checklist/update',
     async ({ id, input }, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<UpdateChecklistMutation, UpdateChecklistMutationVariables>({
+            const { data } = await clientLAN.mutate<UpdateChecklistMutation, UpdateChecklistMutationVariables>({
                 mutation: UPDATE_CHECKLIST,
                 variables: { id, input },
             });
@@ -103,7 +102,7 @@ export const deleteChecklist = createAsyncThunk<string, string,
     'checklist/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<DeleteChecklistMutation, DeleteChecklistMutationVariables>({
+            const { data } = await clientLAN.mutate<DeleteChecklistMutation, DeleteChecklistMutationVariables>({
                 mutation: DELETE_CHECKLIST,
                 variables: { id },
             });
@@ -120,7 +119,7 @@ export const deleteChecklist = createAsyncThunk<string, string,
     }
 );
 
-const initialState = createInitialPaginatedState<ChecklistItem>();
+const initialState = createInitialPaginatedState<Checklist>();
 const checklistSlice = createSlice({
     name: 'checklist',
     initialState,
@@ -182,7 +181,7 @@ const checklistSlice = createSlice({
                 if (action.payload) {
                     // Transforma el payload y actualiza el elemento correspondiente
                     const updatedChecklist = transformGraphQLToChecklistItem(action.payload);
-                    const index = state.data.findIndex((checklist: ChecklistItem) => checklist.id === updatedChecklist.id);
+                    const index = state.data.findIndex((checklist: Checklist) => checklist.id === updatedChecklist.id);
                     if (index !== -1) {
                         state.data[index] = updatedChecklist;
                     }
@@ -197,7 +196,7 @@ const checklistSlice = createSlice({
             // deleteChecklist
             .addCase(deleteChecklist.fulfilled, (state, action: PayloadAction<string>) => {
                 if (action.payload) {
-                    state.data = state.data.filter((checklist: ChecklistItem) => checklist.id !== action.payload);
+                    state.data = state.data.filter((checklist: Checklist) => checklist.id !== action.payload);
                 }
                 state.error = null;
             })

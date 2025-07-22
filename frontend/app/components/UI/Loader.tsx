@@ -1,146 +1,232 @@
-"use client";
+"use client"
 
-import React from 'react';
+import Image from "next/image"
 
 const Loader = () => {
-    return (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-shadowBlue via-darkBlue to-secondary backdrop-blur-md">
-            {/* Animated background particles */}
-            <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse top-1/4 left-1/4"></div>
-                <div className="absolute w-80 h-80 bg-lightGreen/10 rounded-full blur-3xl animate-pulse top-3/4 right-1/4 animation-delay-2000"></div>
-                <div className="absolute w-64 h-64 bg-darkGreen/10 rounded-full blur-3xl animate-pulse bottom-1/4 left-1/2 animation-delay-1000"></div>
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center backdrop-blur-md overflow-hidden">
+      {/* Subtle, abstract background with floating geometric shapes */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Very subtle, slow-pulsating radial gradient for depth */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/5 to-gray-800/5 animate-radial-pulse-subtle"></div>
+
+        {/* Small, slow-moving, abstract geometric fragments (squares/rectangles with rounded corners) */}
+        <div className="absolute w-16 h-16 bg-slate-700/3 rounded-xl blur-sm animate-fragment-move-1 top-1/4 left-1/4 rotate-45"></div>
+        <div className="absolute w-14 h-14 bg-gray-600/3 rounded-xl blur-sm animate-fragment-move-2 top-3/4 right-1/4 -rotate-30"></div>
+        <div className="absolute w-20 h-20 bg-slate-800/3 rounded-xl blur-sm animate-fragment-move-3 bottom-1/4 left-1/2 rotate-60"></div>
+        <div className="absolute w-12 h-12 bg-gray-700/3 rounded-xl blur-sm animate-fragment-move-4 top-1/2 left-1/6 -rotate-15"></div>
+        <div className="absolute w-16 h-16 bg-slate-600/3 rounded-xl blur-sm animate-fragment-move-5 bottom-1/6 right-1/6 rotate-75"></div>
+      </div>
+
+      {/* Main elegant content */}
+      <div className="relative z-10 flex flex-col items-center">
+        {/* Central element with logo and elegant rings - NOW SLIGHTLY LARGER */}
+        <div className="relative w-40 h-40 mb-8">
+          {" "}
+          {/* Increased from w-32 h-32 */}
+          {/* Outer elegant ring */}
+          <div className="absolute inset-0 border-2 border-transparent border-t-slate-700/80 border-r-slate-600/60 rounded-full animate-spin-elegant shadow-lg shadow-slate-700/30"></div>
+          {/* Inner elegant ring */}
+          <div className="absolute inset-5 border-2 border-transparent border-t-gray-600/90 border-l-gray-500/70 rounded-full animate-spin-reverse-elegant animation-delay-1500 shadow-md shadow-gray-600/25"></div>{" "}
+          {/* Adjusted inset */}
+          {/* Logo in the center - black and prominent */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="relative w-24 h-24 rounded-full overflow-hidden animate-pulse-gentle shadow-xl shadow-slate-700/40 backdrop-blur-sm border border-slate-600/50">
+              {" "}
+              {/* Increased from w-20 h-20 */}
+              <div className="dark:hidden">
+                <Image
+                  src="/img/LogoAquilesWhite.png"
+                  alt="Spartan Helmet Logo"
+                  fill
+                  style={{ objectFit: "contain", filter: "invert(1)" }}
+                  priority // Load immediately for loader
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
+              <div className="hidden dark:block">
+                <Image
+                  src="/img/LogoAquilesWhite.png"
+                  alt="Spartan Helmet Logo"
+                  fill
+                  style={{ objectFit: "contain" }}
+                  priority // Load immediately for loader
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
+              {/* Soft inner glow for the logo (now subtle on black) */}
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-800/15 to-transparent rounded-full animate-ping-soft opacity-40"></div>
             </div>
-
-            {/* SENA Logo-inspired animation */}
-            <div className="relative z-10 flex flex-col items-center">
-                {/* Main rotating rings with SENA colors */}
-                <div className="relative w-40 h-40 mb-8">
-                    {/* Outer ring - Primary green */}
-                    <div className="absolute inset-0 border-4 border-transparent border-t-primary border-r-primary/70 rounded-full animate-spin shadow-lg shadow-primary/30"></div>
-
-                    {/* Middle ring - Light green */}
-                    <div className="absolute inset-3 border-4 border-transparent border-t-lightGreen border-l-lightGreen/70 rounded-full animate-spin animation-delay-500 [animation-direction:reverse] shadow-lg shadow-lightGreen/30"></div>
-
-                    {/* Inner ring - Dark green */}
-                    <div className="absolute inset-6 border-3 border-transparent border-t-darkGreen border-b-darkGreen/70 rounded-full animate-spin animation-delay-1000 shadow-lg shadow-darkGreen/30"></div>
-
-                    {/* Center SENA-inspired orb */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-20 h-20 bg-gradient-to-br from-primary via-lightGreen to-darkGreen rounded-full animate-pulse shadow-2xl shadow-primary/50 relative overflow-hidden">
-                            {/* Inner glow effect */}
-                            <div className="absolute inset-2 bg-gradient-to-br from-primary-light to-lightGreen rounded-full animate-ping opacity-40"></div>
-
-                            {/* SENA-style center dot */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-8 h-8 bg-white rounded-full shadow-lg animate-pulse"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Floating institutional elements */}
-                <div className="flex items-center space-x-4 mb-8">
-                    <div className="w-3 h-3 bg-primary rounded-full animate-bounce shadow-lg shadow-primary/50 [animation-delay:-0.4s]"></div>
-                    <div className="w-4 h-4 bg-lightGreen rounded-full animate-bounce shadow-lg shadow-lightGreen/50 [animation-delay:-0.2s]"></div>
-                    <div className="w-5 h-5 bg-gradient-to-r from-primary to-lightGreen rounded-full animate-bounce shadow-lg shadow-primary/50"></div>
-                    <div className="w-4 h-4 bg-darkGreen rounded-full animate-bounce shadow-lg shadow-darkGreen/50 [animation-delay:-0.3s]"></div>
-                    <div className="w-3 h-3 bg-primary-light rounded-full animate-bounce shadow-lg shadow-primary/50 [animation-delay:-0.5s]"></div>
-                </div>
-
-                {/* SENA-themed loading text */}
-                <div className="text-center mb-6">
-                    <h2 className="text-4xl font-bold bg-gradient-to-r from-primary via-lightGreen to-darkGreen bg-clip-text text-transparent animate-pulse mb-2 font-kiwi-marumaru">
-                        SENA
-                    </h2>
-                    <p className="text-lightGray text-xl font-medium animate-pulse font-inter">
-                        Cargando tu experiencia educativa...
-                    </p>
-                </div>
-
-                {/* Institutional progress indicators */}
-                <div className="flex space-x-2 mb-6">
-                    <div className="w-16 h-2 bg-shadowBlue/30 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-primary to-lightGreen rounded-full animate-pulse transform origin-left scale-x-75 animation-delay-0"></div>
-                    </div>
-                    <div className="w-16 h-2 bg-shadowBlue/30 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-lightGreen to-darkGreen rounded-full animate-pulse transform origin-left scale-x-50 animation-delay-500"></div>
-                    </div>
-                    <div className="w-16 h-2 bg-shadowBlue/30 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-darkGreen to-primary rounded-full animate-pulse transform origin-left scale-x-25 animation-delay-1000"></div>
-                    </div>
-                </div>
-
-                {/* Inspirational SENA message */}
-                <div className="text-center">
-                    <p className="text-grayText text-sm font-inter opacity-80 animate-pulse">
-                        "Conocimiento en tecnología para todos"
-                    </p>
-                </div>
-
-                {/* Decorative elements */}
-                <div className="absolute -top-20 -left-20 w-32 h-32 border-2 border-primary/20 rounded-full animate-spin animation-delay-2000"></div>
-                <div className="absolute -bottom-20 -right-20 w-24 h-24 border-2 border-lightGreen/20 rounded-full animate-spin [animation-direction:reverse] animation-delay-1500"></div>
-            </div>
-
-            <style jsx>{`
-                @keyframes spin {
-                    to { transform: rotate(360deg); }
-                }
-                
-                .animation-delay-0 {
-                    animation-delay: 0s;
-                }
-                
-                .animation-delay-500 {
-                    animation-delay: 0.5s;
-                }
-                
-                .animation-delay-1000 {
-                    animation-delay: 1s;
-                }
-                
-                .animation-delay-1500 {
-                    animation-delay: 1.5s;
-                }
-                
-                .animation-delay-2000 {
-                    animation-delay: 2s;
-                }
-                
-                .animate-spin {
-                    animation: spin 3s linear infinite;
-                }
-                
-                @keyframes float {
-                    0%, 100% { transform: translateY(0px); }
-                    50% { transform: translateY(-15px); }
-                }
-                
-                .animate-float {
-                    animation: float 2.5s ease-in-out infinite;
-                }
-                
-                @keyframes shimmer {
-                    0% { transform: translateX(-100%); }
-                    100% { transform: translateX(100%); }
-                }
-                
-                .animate-shimmer {
-                    animation: shimmer 2s ease-in-out infinite;
-                }
-                
-                @keyframes scale-pulse {
-                    0%, 100% { transform: scale(1); }
-                    50% { transform: scale(1.05); }
-                }
-                
-                .animate-scale-pulse {
-                    animation: scale-pulse 2s ease-in-out infinite;
-                }
-            `}</style>
+          </div>
+          {/* Subtle orbiting elements */}
+          <div className="absolute inset-0 animate-orbit-slow">
+            <div className="absolute -top-0.5 left-1/2 w-2 h-2 bg-slate-500/80 rounded-full shadow-md shadow-slate-500/40 transform -translate-x-1/2"></div>{" "}
+            {/* Increased size */}
+          </div>
+          <div className="absolute inset-0 animate-orbit-reverse-slow animation-delay-2500">
+            <div className="absolute top-1/2 -right-0.5 w-1.5 h-1.5 bg-gray-500/80 rounded-full shadow-md shadow-gray-500/40 transform -translate-y-1/2"></div>{" "}
+            {/* Increased size */}
+          </div>
         </div>
-    );
-};
 
-export default Loader;
+        {/* Minimal floating elements */}
+        <div className="flex items-center space-x-3 mb-8">
+          {" "}
+          {/* Increased space-x and mb */}
+          <div className="w-1.5 h-1.5 bg-slate-600/80 rounded-full animate-bounce-soft shadow-lg shadow-slate-600/40 animation-delay-0"></div>{" "}
+          {/* Increased size */}
+          <div className="w-2 h-2 bg-gray-500/85 rounded-full animate-bounce-soft shadow-lg shadow-gray-500/40 animation-delay-300"></div>{" "}
+          {/* Increased size */}
+          <div className="w-3 h-3 bg-gradient-to-r from-slate-600/80 to-gray-500/80 rounded-full animate-bounce-soft shadow-xl shadow-slate-600/50 animation-delay-600"></div>{" "}
+          {/* Increased size */}
+          <div className="w-2 h-2 bg-slate-700/85 rounded-full animate-bounce-soft shadow-lg shadow-slate-700/40 animation-delay-900"></div>{" "}
+          {/* Increased size */}
+          <div className="w-1.5 h-1.5 bg-gray-600/80 rounded-full animate-bounce-soft shadow-lg shadow-gray-600/40 animation-delay-1200"></div>{" "}
+          {/* Increased size */}
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes spin-elegant {
+          to { transform: rotate(360deg); }
+        }
+        
+        @keyframes spin-reverse-elegant {
+          to { transform: rotate(-360deg); }
+        }
+        
+        @keyframes orbit-slow {
+          to { transform: rotate(360deg); }
+        }
+        
+        @keyframes orbit-reverse-slow {
+          to { transform: rotate(-360deg); }
+        }
+        
+        @keyframes radial-pulse-subtle {
+          0%, 100% { opacity: 0.05; }
+          50% { opacity: 0.08; }
+        }
+
+        @keyframes fragment-move-1 {
+          0%, 100% { transform: translate(0, 0) rotate(45deg); opacity: 0.3; }
+          25% { transform: translate(20px, -30px) rotate(60deg); opacity: 0.5; }
+          50% { transform: translate(0, -60px) rotate(75deg); opacity: 0.3; }
+          75% { transform: translate(-20px, -30px) rotate(60deg); opacity: 0.5; }
+        }
+        @keyframes fragment-move-2 {
+          0%, 100% { transform: translate(0, 0) rotate(-30deg); opacity: 0.3; }
+          25% { transform: translate(-20px, 30px) rotate(-45deg); opacity: 0.5; }
+          50% { transform: translate(0, 60px) rotate(-60deg); opacity: 0.3; }
+          75% { transform: translate(20px, 30px) rotate(-45deg); opacity: 0.5; }
+        }
+        @keyframes fragment-move-3 {
+          0%, 100% { transform: translate(0, 0) rotate(60deg); opacity: 0.3; }
+          25% { transform: translate(30px, 20px) rotate(75deg); opacity: 0.5; }
+          50% { transform: translate(60px, 0) rotate(90deg); opacity: 0.3; }
+          75% { transform: translate(30px, -20px) rotate(75deg); opacity: 0.5; }
+        }
+        @keyframes fragment-move-4 {
+          0%, 100% { transform: translate(0, 0) rotate(-15deg); opacity: 0.3; }
+          25% { transform: translate(-30px, -20px) rotate(-30deg); opacity: 0.5; }
+          50% { transform: translate(-60px, 0) rotate(-45deg); opacity: 0.3; }
+          75% { transform: translate(-30px, 20px) rotate(-30deg); opacity: 0.5; }
+        }
+        @keyframes fragment-move-5 {
+          0%, 100% { transform: translate(0, 0) rotate(75deg); opacity: 0.3; }
+          25% { transform: translate(20px, -30px) rotate(90deg); opacity: 0.5; }
+          50% { transform: translate(0, -60px) rotate(105deg); opacity: 0.3; }
+          75% { transform: translate(-20px, -30px) rotate(90deg); opacity: 0.5; }
+        }
+        
+        @keyframes bounce-soft {
+          0%, 100% { 
+            transform: translateY(0px) scale(1);
+            opacity: 0.7;
+          }
+          50% { 
+            transform: translateY(-10px) scale(1.05);
+            opacity: 1;
+          }
+        }
+        
+        @keyframes pulse-gentle {
+          0%, 100% { 
+            opacity: 0.9;
+            transform: scale(1);
+            box-shadow: 0 15px 30px -8px rgba(71, 85, 105, 0.4);
+          }
+          50% { 
+            opacity: 1;
+            transform: scale(1.03);
+            box-shadow: 0 15px 30px -8px rgba(71, 85, 105, 0.6);
+          }
+        }
+        
+        @keyframes ping-soft {
+          75%, 100% {
+            transform: scale(1.5);
+            opacity: 0;
+          }
+        }
+        
+        .animate-spin-elegant {
+          animation: spin-elegant 6s linear infinite;
+        }
+        
+        .animate-spin-reverse-elegant {
+          animation: spin-reverse-elegant 5s linear infinite;
+        }
+        
+        .animate-orbit-slow {
+          animation: orbit-slow 8s linear infinite;
+        }
+        
+        .animate-orbit-reverse-slow {
+          animation: orbit-reverse-slow 7s linear infinite;
+        }
+        
+        .animate-radial-pulse-subtle {
+          animation: radial-pulse-subtle 10s ease-in-out infinite alternate;
+        }
+
+        .animate-fragment-move-1 { animation: fragment-move-1 15s ease-in-out infinite; }
+        .animate-fragment-move-2 { animation: fragment-move-2 17s ease-in-out infinite 2s; }
+        .animate-fragment-move-3 { animation: fragment-move-3 16s ease-in-out infinite 4s; }
+        .animate-fragment-move-4 { animation: fragment-move-4 18s ease-in-out infinite 1s; }
+        .animate-fragment-move-5 { animation: fragment-move-5 19s ease-in-out infinite 3s; }
+        
+        .animate-bounce-soft {
+          animation: bounce-soft 2.5s ease-in-out infinite;
+        }
+        
+        .animate-pulse-gentle {
+          animation: pulse-gentle 4s ease-in-out infinite;
+        }
+        
+        .animate-ping-soft {
+          animation: ping-soft 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        
+        .animation-delay-0 { animation-delay: 0s; }
+        .animation-delay-300 { animation-delay: 0.3s; }
+        .animation-delay-600 { animation-delay: 0.6s; }
+        .animation-delay-900 { animation-delay: 0.9s; }
+        .animation-delay-1200 { animation-delay: 1.2s; }
+        .animation-delay-1500 { animation-delay: 1.5s; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-2500 { animation-delay: 2.5s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+        
+        .inset-5 {
+          top: 1.25rem;
+          right: 1.25rem;
+          bottom: 1.25rem;
+          left: 1.25rem;
+        }
+      `}</style>
+    </div>
+  )
+}
+
+export default Loader

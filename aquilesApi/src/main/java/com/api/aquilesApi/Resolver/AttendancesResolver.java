@@ -22,18 +22,17 @@ import java.util.stream.Collectors;
 public class AttendancesResolver {
     private final AttendancesBusiness attendancesBusiness;
     private final QrCodeGenerator qrCodeGenerator;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
-    public AttendancesResolver(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator ) {
+    public AttendancesResolver(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator, ModelMapper modelMapper) {
         this.attendancesBusiness = attendancesBusiness;
         this.qrCodeGenerator = qrCodeGenerator;
+        this.modelMapper = modelMapper;
     }
 
     // Olympus
     @DgsEntityFetcher(name = "Student")
     public Student getStudent(Map<String, Object> values) {
-        System.out.println("Resolviendo entidad Student con valores: " + values);
-
         Long id = null;
         if (values.get("id") instanceof String) {
             id = Long.valueOf((String) values.get("id"));
@@ -50,6 +49,13 @@ public class AttendancesResolver {
         return student;
     }
 
+    @DgsEntityFetcher(name = "Attendance")
+    public AttendancesDto getAttendance(Map<String, Object> values) {
+        String id = (String) values.get("id");
+        Long attendanceId = id != null ? Long.valueOf(id) : null;
+        return attendancesBusiness.findById(attendanceId);
+    }
+
     @DgsData(parentType = "Student", field = "attendances")
     public List<Attendance> getAttendances(DgsDataFetchingEnvironment env) {
         Student student = env.getSource();
@@ -64,13 +70,6 @@ public class AttendancesResolver {
                 .collect(Collectors.toList());
     }
 
-    @DgsEntityFetcher(name = "Attendance")
-    public AttendancesDto getAttendance(Map<String, Object> values) {
-        String id = (String) values.get("id");
-        Long attendanceId = id != null ? Long.valueOf(id) : null;
-        return attendancesBusiness.findById(attendanceId);
-    }
-
     @DgsData(parentType = "Attendance", field = "student")
     public Map<String, Object> studentReference(DgsDataFetchingEnvironment env) {
         AttendancesDto attendancesDto = env.getSource();
@@ -78,7 +77,6 @@ public class AttendancesResolver {
         if(attendancesDto.getStudentId() == null) return null;
         return Map.of("id", attendancesDto.getStudentId().toString());
     }
-
 
     @DgsQuery
     public Map<String, Object> allAttendancesByStudentId(@InputArgument Long id, @InputArgument Long stateId) {

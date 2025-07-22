@@ -8,6 +8,7 @@ import studySheetReducer from "@slice/olympo/studySheetSlice";
 import teamScrumReducer from "@slice/teamScrumSlice"
 import attendancesReducer from "@slice/attendanceSlice"
 import attendanceStateReducer from "@slice/attendanceStateSlice"
+import profileReducer from "@slice/atlas/profileSlice";
 
 const store = configureStore({
     reducer: {
@@ -19,7 +20,8 @@ const store = configureStore({
         studySheet: studySheetReducer,
         teamScrum: teamScrumReducer,
         attendances: attendancesReducer,
-        attendanceState: attendanceStateReducer
+        attendanceState: attendanceStateReducer,
+        profile: profileReducer
     }
 });
 

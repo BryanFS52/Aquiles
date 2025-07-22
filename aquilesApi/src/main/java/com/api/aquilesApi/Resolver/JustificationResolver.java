@@ -20,7 +20,6 @@ public class JustificationResolver {
         this.justificationBusiness = justificationBusiness;
     }
 
-
     // FindAll Justifications (GraphQL)
     @DgsQuery
     public Map<String, Object> allJustifications(@InputArgument Integer page, @InputArgument Integer size) {

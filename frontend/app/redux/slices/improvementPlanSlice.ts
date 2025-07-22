@@ -1,9 +1,9 @@
-import { client } from '@/lib/apollo-client'
+import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_IMPROVEMENT_PLANS, GET_IMPROVEMENT_PLAN_BY_ID, ADD_IMPROVEMENT_PLAN, UPDATE_IMPROVEMENT_PLAN, DELETE_IMPROVEMENT_PLAN } from '@graphql/improvementPlanGraph'
-import { ImprovementPlanItem } from '@type/slices/improvementPlan'
 import {
+    ImprovementPlan,
     GetAllImprovementPlansQuery,
     GetAllImprovementPlansQueryVariables,
     GetImprovementPlanByIdQuery,
@@ -16,8 +16,8 @@ import {
     DeleteImprovementPlanMutationVariables
 } from '@graphql/generated'
 
-// Función para transformar datos de GraphQL a ImprovementPlanItem
-const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPlanItem => {
+// Función para transformar datos de GraphQL a ImprovementPlan
+const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPlan => {
     return {
         id: graphqlData.id,
         city: graphqlData.city,
@@ -31,7 +31,7 @@ const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPla
 export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], GetAllImprovementPlansQueryVariables>(
     'improvementPlan/fetchAll',
     async ({ page, size }) => {
-        const { data } = await client.query<GetAllImprovementPlansQuery, GetAllImprovementPlansQueryVariables>({
+        const { data } = await clientLAN.query<GetAllImprovementPlansQuery, GetAllImprovementPlansQueryVariables>({
             query: GET_ALL_IMPROVEMENT_PLANS,
             variables: { page, size },
             fetchPolicy: 'no-cache',
@@ -43,7 +43,7 @@ export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuer
 export const fetchImprovementPlanById = createAsyncThunk<GetImprovementPlanByIdQuery['improvementPlanById'], GetImprovementPlanByIdQueryVariables>(
     'improvementPlan/fetchById',
     async ({ id }) => {
-        const { data } = await client.query<GetImprovementPlanByIdQuery, GetImprovementPlanByIdQueryVariables>({
+        const { data } = await clientLAN.query<GetImprovementPlanByIdQuery, GetImprovementPlanByIdQueryVariables>({
             query: GET_IMPROVEMENT_PLAN_BY_ID,
             variables: { id },
         });
@@ -57,7 +57,7 @@ export const addImprovementPlan = createAsyncThunk<AddImprovementPlanMutation['a
     'improvementPlan/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<AddImprovementPlanMutation, AddImprovementPlanMutationVariables>({
+            const { data } = await clientLAN.mutate<AddImprovementPlanMutation, AddImprovementPlanMutationVariables>({
                 mutation: ADD_IMPROVEMENT_PLAN,
                 variables: { input }
             });
@@ -79,7 +79,7 @@ export const updateImprovementPlan = createAsyncThunk<UpdateImprovementPlanMutat
     'improvementPlan/update',
     async ({ id, input }, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<UpdateImprovementPlanMutation, UpdateImprovementPlanMutationVariables>({
+            const { data } = await clientLAN.mutate<UpdateImprovementPlanMutation, UpdateImprovementPlanMutationVariables>({
                 mutation: UPDATE_IMPROVEMENT_PLAN,
                 variables: { id, input },
             });
@@ -101,7 +101,7 @@ export const deleteImprovementPlan = createAsyncThunk<string, string,
     'checklist/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<DeleteImprovementPlanMutation, DeleteImprovementPlanMutationVariables>({
+            const { data } = await clientLAN.mutate<DeleteImprovementPlanMutation, DeleteImprovementPlanMutationVariables>({
                 mutation: DELETE_IMPROVEMENT_PLAN,
                 variables: { id },
             });
@@ -118,7 +118,7 @@ export const deleteImprovementPlan = createAsyncThunk<string, string,
     }
 );
 
-const initialState = createInitialPaginatedState<ImprovementPlanItem>();
+const initialState = createInitialPaginatedState<ImprovementPlan>();
 const improvementPlanSlice = createSlice({
     name: 'improvementPlan',
     initialState,
@@ -177,7 +177,7 @@ const improvementPlanSlice = createSlice({
             .addCase(updateImprovementPlan.fulfilled, (state, action: PayloadAction<any>) => {
                 if (action.payload) {
                     const updatedItem = transformGraphQLToImprovementPlanItem(action.payload);
-                    const index = state.data.findIndex((item: ImprovementPlanItem) => item.id === updatedItem.id);
+                    const index = state.data.findIndex((item: ImprovementPlan) => item.id === updatedItem.id);
                     if (index !== -1) {
                         state.data[index] = updatedItem;
                     }
@@ -192,7 +192,7 @@ const improvementPlanSlice = createSlice({
             // deleteImprovementPlan
             .addCase(deleteImprovementPlan.fulfilled, (state, action: PayloadAction<string>) => {
                 if (action.payload) {
-                    state.data = state.data.filter((item: ImprovementPlanItem) => item.id !== action.payload);
+                    state.data = state.data.filter((item: ImprovementPlan) => item.id !== action.payload);
                 }
                 state.error = null;
             })

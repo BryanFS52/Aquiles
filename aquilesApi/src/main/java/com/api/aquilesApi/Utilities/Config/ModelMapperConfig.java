@@ -1,4 +1,4 @@
-package com.api.aquilesApi.Utilities.config;
+package com.api.aquilesApi.Utilities.Config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

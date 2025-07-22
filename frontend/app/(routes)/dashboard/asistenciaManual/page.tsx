@@ -28,7 +28,11 @@ const AttendanceManualPage: React.FC = () => {
     const { showLoader, hideLoader } = useLoader()
 
     const studySheetObj = Array.isArray(studySheet) ? studySheet[0] : studySheet
-    const students = studySheetObj?.students || []
+    const students = studySheetObj?.studentStudySheets || []
+
+    console.log('AsistenciaManual - studySheetObj:', studySheetObj);
+    console.log('AsistenciaManual - students:', students);
+    console.log('AsistenciaManual - students length:', students.length);
 
     const [attendance, setAttendance] = useState<Record<string | number, AttendanceStatus>>({})
     const [searchTerm, setSearchTerm] = useState<string>("")
@@ -38,10 +42,9 @@ const AttendanceManualPage: React.FC = () => {
     const [attendanceHistory, setAttendanceHistory] = useState<AttendanceHistoryType[]>([])
 
     useEffect(() => {
-        console.log(studySheet)
-        if (Array.isArray(studySheet) && studySheet.length === 0) {
-            dispatch(fetchStudySheetById({ id: 1 }))
-        }
+        console.log('AsistenciaManual - studySheet:', studySheet)
+        // Si no hay datos o el array está vacío, no necesariamente hacer fetch
+        // La data debería venir desde la página anterior
     }, [studySheet, dispatch])
 
     useEffect(() => {
@@ -72,10 +75,10 @@ const AttendanceManualPage: React.FC = () => {
         if (!students.length) return []
 
         let filtered = students.filter((student: any) => {
-            const person = student.person || {}
-            const name = person.name || ""
-            const lastname = person.lastname || ""
-            const document = person.document || ""
+            const person = student?.person || {}
+            const name = person?.name || ""
+            const lastname = person?.lastname || ""
+            const document = person?.document || ""
 
             return (
                 name.toLowerCase().includes(searchTerm.toLowerCase()) ||

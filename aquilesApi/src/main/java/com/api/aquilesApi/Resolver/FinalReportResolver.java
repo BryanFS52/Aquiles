@@ -59,24 +59,21 @@ public class FinalReportResolver {
     @DgsMutation
     public Map<String, Object> addFinalReport(@InputArgument( name = "input") FinalReportDto finalreportDto) {
         try {
-            // Convertir la firma base64 a byte[]
+            // Converted the base64 signature to byte[]
             if (finalreportDto.getSignature() != null && !finalreportDto.getSignature().isEmpty()) {
-                // Decodificar la firma desde base64
+                // Decode the signature from base64
                 byte[] signatureBytes = java.util.Base64.getDecoder().decode(finalreportDto.getSignature());
                 finalreportDto.setSignature(new String(signatureBytes));
             } else {
                 throw new IllegalArgumentException("Signature is required");
             }
-            // Llamar al servicio para agregar el reporte final
             FinalReportDto finalreportDto1 = finalReportBusiness.add(finalreportDto);
-            // Respuesta exitosa
             return ResponseHttpApi.responseHttpAction(
                     finalreportDto1.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
             );
         } catch (Exception e) {
-            // Manejo de errores
             return ResponseHttpApi.responseHttpError(
                     "Error adding finalReport: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );

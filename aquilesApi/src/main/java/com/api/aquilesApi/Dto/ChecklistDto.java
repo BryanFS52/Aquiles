@@ -33,13 +33,9 @@ public class ChecklistDto {
     private String checklistHistory;
 
     // Relations
-    @NotNull(message = "Los jurados asociados son obligatorios")
     private Set<Long> associatedJuriesIds;
-
     private ItemDto item;
-
     private EvaluationsDto evaluations;
-
     private TeamsScrumDto teamsScrum;
 
 }
