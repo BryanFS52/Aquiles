@@ -4,7 +4,6 @@ import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_JU
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import {
     Attendance,
-    Attendance,
     GetAttendancesQuery,
     GetAttendancesQueryVariables,
     AddAttendanceMutation,

@@ -16,7 +16,7 @@ import {
 
 import type { AppDispatch, RootState } from "@/redux/store";
 import type { FormDataState } from "@slice/justificationSlice";
-import type { AttendanceItem } from "@type/slices/attendance";
+import { Attendance } from "@graphql/generated";
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFormComponent from "@components/features/justification/justificationForm";
 
@@ -86,9 +86,6 @@ export default function JustificacionAprendiz() {
   );
 
   useEffect(() => {
-    dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-    dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 }));
-    dispatch(fetchJustifications({ page: 0, size: 10 }));
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
     dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 }));
     dispatch(fetchJustifications({ page: 0, size: 10 }));
@@ -298,13 +295,6 @@ export default function JustificacionAprendiz() {
     });
   };
 
-  const handleDownloadFile = (justificacion: any) => {
-    if (justificacion.archivoAdjunto) {
-      const mimeType = justificacion.archivoMime || "application/octet-stream";
-      const fileName = generateFileName(justificacion.id, mimeType);
-      downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
-    }
-  };
   const handleDownloadFile = (justificacion: any) => {
     if (justificacion.archivoAdjunto) {
       const mimeType = justificacion.archivoMime || "application/octet-stream";

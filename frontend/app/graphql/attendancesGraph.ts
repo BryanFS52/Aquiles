@@ -74,7 +74,6 @@ export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
           justificationFile
           justificationDate
           justificationType {
-          justificationType {
             id
             name
           }

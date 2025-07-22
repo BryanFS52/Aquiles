@@ -20,7 +20,6 @@ import {
   downloadBase64File,
   updateJustificationStatus
 } from '@slice/justificationSlice';
-import JustificationTable from "@/components/features/justification/justificationsTable";
 
 export default function JustificacionesInstructor() {
   const dispatch = useDispatch<AppDispatch>();

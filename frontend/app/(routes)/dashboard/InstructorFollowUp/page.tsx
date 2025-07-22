@@ -6,9 +6,9 @@ import { fetchAttendances, formatErrorMessage } from "@/redux/slices/attendanceS
 import { AppDispatch, RootState } from "@/redux/store";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AttendanceItem } from "@/types/slices/attendance";
+import { Attendance } from "@graphql/generated";
 
-const processAndSummarizeAttendances = (attendances: AttendanceItem[]) => {
+const processAndSummarizeAttendances = (attendances: Attendance[]) => {
     if (!attendances) return [];
 
     const absences = attendances.filter(
@@ -20,7 +20,7 @@ const processAndSummarizeAttendances = (attendances: AttendanceItem[]) => {
         if (!studentId) return acc;
 
         if (!acc[studentId]) {
-            const person = absence.student.person;
+            const person = absence.student?.person;
             acc[studentId] = {
                 id: studentId,
                 documento: person?.document || '',

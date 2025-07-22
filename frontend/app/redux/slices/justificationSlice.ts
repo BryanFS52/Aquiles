@@ -1,11 +1,8 @@
 import { clientLAN } from '@lib/apollo-client'
-import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_JUSTIFICATIONS, GET_JUSTIFICATION_BY_ID, ADD_JUSTIFICATION, UPDATE_JUSTIFICATION, DELETE_JUSTIFICATION } from '@graphql/justificationsGraph'
 import {
-    Attendance,
-    Justification,
     Attendance,
     Justification,
     GetAllJustificationsQuery,
@@ -26,7 +23,6 @@ export interface TransformedJustificationItem {
     ficha: string;
     fecha: string;
     estado: string;
-    justificationType: string;
     justificationType: string;
     archivoAdjunto: string;
     archivoMime: string;
@@ -53,11 +49,9 @@ interface JustificationFormState {
     formData: FormDataState;
     validationErrors: string[];
     currentAttendance: Attendance | null;
-    currentAttendance: Attendance | null;
 }
 
 interface JustificationState extends ReturnType<typeof createInitialPaginatedState> {
-    data: Justification[];
     data: Justification[];
     transformedData: TransformedJustificationItem[];
     filteredData: TransformedJustificationItem[];
@@ -105,8 +99,6 @@ const getExtensionFromMime = (mimeType: string): string => {
 
 // Función para transformar datos de GraphQL a Justification
 const transformGraphQLToJustificationItem = (graphqlData: any): Justification => {
-// Función para transformar datos de GraphQL a Justification
-const transformGraphQLToJustificationItem = (graphqlData: any): Justification => {
     return {
         id: graphqlData.justificationId || graphqlData.id,
         description: graphqlData.description,
@@ -114,14 +106,12 @@ const transformGraphQLToJustificationItem = (graphqlData: any): Justification =>
         justificationFile: graphqlData.justificationFile,
         state: graphqlData.state,
         justificationType: graphqlData.justificationType ?? ''
-        justificationType: graphqlData.justificationType ?? ''
             ? {
                 id: graphqlData.justificationType.id,
                 name: graphqlData.justificationType.name
             }
             : { id: 0, name: '' },
         attendance: {
-            id: graphqlData.attendance?.id ?? 0,
             id: graphqlData.attendance?.id ?? 0,
             student: {
                 id: graphqlData.attendance?.student?.id ?? 0,
@@ -137,23 +127,16 @@ const transformGraphQLToJustificationItem = (graphqlData: any): Justification =>
 
 // Función para transformar datos al formato del componente
 const transformToComponentFormat = (justifications: Justification[]): TransformedJustificationItem[] => {
-const transformToComponentFormat = (justifications: Justification[]): TransformedJustificationItem[] => {
     return justifications.map((j) => {
         const student = j.attendance?.student;
         const person = student?.person;
         const studySheet = student?.studySheets?.[0];
-        const studySheet = student?.studySheets?.[0];
 
         return {
             id: Number(j.id),
-            id: Number(j.id),
             ficha: studySheet?.number?.toString() || "Sin ficha",
             fecha: j.justificationDate ? new Date(j.justificationDate).toLocaleDateString("es-CO") : "Sin fecha",
-            fecha: j.justificationDate ? new Date(j.justificationDate).toLocaleDateString("es-CO") : "Sin fecha",
             estado: j.state ? "Activo" : "Inactivo",
-            justificationType: j.justificationType?.name ?? "Sin tipo",
-            archivoAdjunto: j.justificationFile ?? "",
-            archivoMime: getMimeTypeFromBase64(j.justificationFile ?? ""),
             justificationType: j.justificationType?.name ?? "Sin tipo",
             archivoAdjunto: j.justificationFile ?? "",
             archivoMime: getMimeTypeFromBase64(j.justificationFile ?? ""),
@@ -278,14 +261,6 @@ export const fetchJustifications = createAsyncThunk<GetAllJustificationsQuery['a
         return data.allJustifications;
     }
 );
-        const { data } = await clientLAN.query<GetAllJustificationsQuery, GetAllJustificationsQueryVariables>({
-            query: GET_ALL_JUSTIFICATIONS,
-            variables: { page, size },
-            fetchPolicy: 'no-cache',
-        });
-        return data.allJustifications;
-    }
-);
 
 export const fetchJustificationById = createAsyncThunk<GetJustificationByIdQuery['justificationById'], GetJustificationByIdQueryVariables>(
     'justifications/fetchById',
@@ -297,28 +272,6 @@ export const fetchJustificationById = createAsyncThunk<GetJustificationByIdQuery
         return data.justificationById;
     }
 );
-export const fetchJustificationById = createAsyncThunk<GetJustificationByIdQuery['justificationById'], GetJustificationByIdQueryVariables>(
-    'justifications/fetchById',
-    async ({ id }) => {
-        const { data } = await clientLAN.query<GetJustificationByIdQuery, GetJustificationByIdQueryVariables>({
-            query: GET_JUSTIFICATION_BY_ID,
-            variables: { id },
-        });
-        return data.justificationById;
-    }
-);
-
-export const addJustification = createAsyncThunk<AddJustificationMutation['addJustification'], AddJustificationMutationVariables['input'],
-    { rejectValue: { code: string; message: string } }
->(
-    'justifications/add',
-    async (input, { rejectWithValue }) => {
-        try {
-            const { data } = await clientLAN.mutate<AddJustificationMutation, AddJustificationMutationVariables>({
-                mutation: ADD_JUSTIFICATION,
-                variables: { input }
-            });
-            const res = data?.addJustification;
 export const addJustification = createAsyncThunk<AddJustificationMutation['addJustification'], AddJustificationMutationVariables['input'],
     { rejectValue: { code: string; message: string } }
 >(
@@ -340,15 +293,6 @@ export const addJustification = createAsyncThunk<AddJustificationMutation['addJu
         }
     }
 );
-            if (!res || res.code !== '200') {
-                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
-            }
-            return res;
-        } catch (error: any) {
-            return rejectWithValue({ code: '500', message: error.message });
-        }
-    }
-);
 
 export const updateJustification = createAsyncThunk<UpdateJustificationMutation['updateJustification'], UpdateJustificationMutationVariables,
     { rejectValue: { code: string; message: string } }
@@ -360,21 +304,7 @@ export const updateJustification = createAsyncThunk<UpdateJustificationMutation[
                 mutation: UPDATE_JUSTIFICATION,
                 variables: { id, input },
             });
-export const updateJustification = createAsyncThunk<UpdateJustificationMutation['updateJustification'], UpdateJustificationMutationVariables,
-    { rejectValue: { code: string; message: string } }
->(
-    'justifications/update',
-    async ({ id, input }, { rejectWithValue }) => {
-        try {
-            const { data } = await clientLAN.mutate<UpdateJustificationMutation, UpdateJustificationMutationVariables>({
-                mutation: UPDATE_JUSTIFICATION,
-                variables: { id, input },
-            });
 
-            const res = data?.updateJustification;
-            if (!res || res.code !== '200') {
-                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
-            }
             const res = data?.updateJustification;
             if (!res || res.code !== '200') {
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
@@ -430,32 +360,12 @@ export const deleteJustification = createAsyncThunk<string, string,
                 mutation: DELETE_JUSTIFICATION,
                 variables: { id },
             });
-export const deleteJustification = createAsyncThunk<string, string,
-    { rejectValue: { code: string; message: string } }
->(
-    'justifications/delete',
-    async (id, { rejectWithValue }) => {
-        try {
-            const { data } = await clientLAN.mutate<DeleteJustificationMutation, DeleteJustificationMutationVariables>({
-                mutation: DELETE_JUSTIFICATION,
-                variables: { id },
-            });
 
             const res = data?.deleteJustification;
             if (!res || res.code !== '200') {
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
             }
-            const res = data?.deleteJustification;
-            if (!res || res.code !== '200') {
-                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
-            }
 
-            return id;
-        } catch (error: any) {
-            return rejectWithValue({ code: '500', message: error.message });
-        }
-    }
-);
             return id;
         } catch (error: any) {
             return rejectWithValue({ code: '500', message: error.message });
@@ -472,35 +382,12 @@ export const processFile = createAsyncThunk<
     'justifications/processFile',
     async (file, { rejectWithValue }) => {
         try {
-            // Validar tipo de archivo
-            if (!validateFileType(file)) {
-                return rejectWithValue('Solo se permiten archivos PDF, JPG o PNG');
-            }
-// Nuevo thunk para procesar archivo
-export const processFile = createAsyncThunk<
-    { file: File; base64: string },
-    File,
-    { rejectValue: string }
->(
-    'justifications/processFile',
-    async (file, { rejectWithValue }) => {
-        try {
-            // Validar tipo de archivo
-            if (!validateFileType(file)) {
-                return rejectWithValue('Solo se permiten archivos PDF, JPG o PNG');
-            }
 
             // Validar tamaño de archivo
             if (!validateFileSize(file)) {
                 return rejectWithValue('El archivo es demasiado grande. Máximo permitido: 5MB');
             }
-            // Validar tamaño de archivo
-            if (!validateFileSize(file)) {
-                return rejectWithValue('El archivo es demasiado grande. Máximo permitido: 5MB');
-            }
 
-            // Leer archivo como base64
-            const base64 = await readFileAsBase64(file);
             // Leer archivo como base64
             const base64 = await readFileAsBase64(file);
 
@@ -510,23 +397,6 @@ export const processFile = createAsyncThunk<
         }
     }
 );
-            return { file, base64 };
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Error al procesar el archivo');
-        }
-    }
-);
-
-// Estado inicial con formulario
-const initialFormData: FormDataState = {
-    justificationTypeId: { id: "" },
-    numeroDocumento: "",
-    nombreAprendiz: "",
-    descripcion: "",
-    justificacionFile: null,
-    justificacionFileBase64: "",
-    notificationId: "123456",
-};
 // Estado inicial con formulario
 const initialFormData: FormDataState = {
     justificationTypeId: { id: "" },
@@ -556,34 +426,7 @@ const initialState: JustificationState = {
         currentAttendance: null,
     }
 };
-const initialState: JustificationState = {
-    ...createInitialPaginatedState<Justification>(),
-    transformedData: [],
-    filteredData: [],
-    filterOptions: {
-        selectedFiltro: "",
-        searchTerm: ""
-    },
-    localCurrentPage: 0,
-    itemsPerPage: 6,
-    form: {
-        showForm: false,
-        isSubmitting: false,
-        formData: initialFormData,
-        validationErrors: [],
-        currentAttendance: null,
-    }
-};
 
-const justificationSlice = createSlice({
-    name: 'justifications',
-    initialState,
-    reducers: {
-        // Reducers existentes para filtros
-        setFilterOptions: (state, action: PayloadAction<Partial<FilterOptions>>) => {
-            state.filterOptions = { ...state.filterOptions, ...action.payload };
-            state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-        },
 const justificationSlice = createSlice({
     name: 'justifications',
     initialState,
@@ -598,14 +441,7 @@ const justificationSlice = createSlice({
             state.filterOptions = { selectedFiltro: "", searchTerm: "" };
             state.filteredData = state.transformedData;
         },
-        clearFilters: (state) => {
-            state.filterOptions = { selectedFiltro: "", searchTerm: "" };
-            state.filteredData = state.transformedData;
-        },
 
-        setLocalCurrentPage: (state, action: PayloadAction<number>) => {
-            state.localCurrentPage = action.payload;
-        },
         setLocalCurrentPage: (state, action: PayloadAction<number>) => {
             state.localCurrentPage = action.payload;
         },
@@ -613,14 +449,7 @@ const justificationSlice = createSlice({
         goToPreviousPage: (state) => {
             state.localCurrentPage = Math.max(state.localCurrentPage - 1, 1);
         },
-        goToPreviousPage: (state) => {
-            state.localCurrentPage = Math.max(state.localCurrentPage - 1, 1);
-        },
 
-        goToNextPage: (state) => {
-            const maxPages = state.totalPages || 1;
-            state.localCurrentPage = Math.min(state.localCurrentPage + 1, maxPages);
-        },
         goToNextPage: (state) => {
             const maxPages = state.totalPages || 1;
             state.localCurrentPage = Math.min(state.localCurrentPage + 1, maxPages);
@@ -632,17 +461,7 @@ const justificationSlice = createSlice({
         setCurrentAttendance: (state, action: PayloadAction<Attendance>) => {
             state.form.currentAttendance = action.payload;
         },
-        setItemsPerPage: (state, action: PayloadAction<number>) => {
-            state.itemsPerPage = action.payload;
-        },
-        setCurrentAttendance: (state, action: PayloadAction<Attendance>) => {
-            state.form.currentAttendance = action.payload;
-        },
 
-        // Nuevos reducers para el formulario
-        showForm: (state) => {
-            state.form.showForm = true;
-        },
         // Nuevos reducers para el formulario
         showForm: (state) => {
             state.form.showForm = true;
@@ -651,16 +470,7 @@ const justificationSlice = createSlice({
         hideForm: (state) => {
             state.form.showForm = false;
         },
-        hideForm: (state) => {
-            state.form.showForm = false;
-        },
 
-        resetForm: (state) => {
-            state.form.showForm = false;
-            state.form.formData = initialFormData;
-            state.form.validationErrors = [];
-            state.form.isSubmitting = false;
-        },
         resetForm: (state) => {
             state.form.showForm = false;
             state.form.formData = initialFormData;
@@ -672,16 +482,7 @@ const justificationSlice = createSlice({
             const { field, value } = action.payload;
             (state.form.formData as any)[field] = value;
         },
-        updateFormField: (state, action: PayloadAction<{ field: keyof FormDataState; value: any }>) => {
-            const { field, value } = action.payload;
-            (state.form.formData as any)[field] = value;
-        },
 
-        updateNumericField: (state, action: PayloadAction<{ field: string; value: string }>) => {
-            const { field, value } = action.payload;
-            const cleanedValue = cleanNumericInput(value);
-            (state.form.formData as any)[field] = cleanedValue;
-        },
         updateNumericField: (state, action: PayloadAction<{ field: string; value: string }>) => {
             const { field, value } = action.payload;
             const cleanedValue = cleanNumericInput(value);
@@ -693,15 +494,7 @@ const justificationSlice = createSlice({
             const cleanedValue = cleanTextInput(value);
             (state.form.formData as any)[field] = cleanedValue;
         },
-        updateTextField: (state, action: PayloadAction<{ field: string; value: string }>) => {
-            const { field, value } = action.payload;
-            const cleanedValue = cleanTextInput(value);
-            (state.form.formData as any)[field] = cleanedValue;
-        },
 
-        updateJustificationTypeId: (state, action: PayloadAction<string>) => {
-            state.form.formData.justificationTypeId.id = action.payload;
-        },
         updateJustificationTypeId: (state, action: PayloadAction<string>) => {
             state.form.formData.justificationTypeId.id = action.payload;
         },
@@ -709,20 +502,11 @@ const justificationSlice = createSlice({
         setValidationErrors: (state, action: PayloadAction<string[]>) => {
             state.form.validationErrors = action.payload;
         },
-        setValidationErrors: (state, action: PayloadAction<string[]>) => {
-            state.form.validationErrors = action.payload;
-        },
 
         clearValidationErrors: (state) => {
             state.form.validationErrors = [];
         },
-        clearValidationErrors: (state) => {
-            state.form.validationErrors = [];
-        },
 
-        setSubmitting: (state, action: PayloadAction<boolean>) => {
-            state.form.isSubmitting = action.payload;
-        },
         setSubmitting: (state, action: PayloadAction<boolean>) => {
             state.form.isSubmitting = action.payload;
         },
@@ -742,66 +526,10 @@ const justificationSlice = createSlice({
                     state.data = action.payload.data
                         .filter((item): item is NonNullable<typeof item> => item !== null)
                         .map(transformGraphQLToJustificationItem);
-        validateForm: (state) => {
-            state.form.validationErrors = validateFormData(state.form.formData);
-        }
-    },
-    extraReducers: (builder) => {
-        builder
-            // fetchJustifications - existente
-            .addCase(fetchJustifications.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchJustifications.fulfilled, (state, action: PayloadAction<GetAllJustificationsQuery['allJustifications']>) => {
-                if (action.payload?.data) {
-                    state.data = action.payload.data
-                        .filter((item): item is NonNullable<typeof item> => item !== null)
-                        .map(transformGraphQLToJustificationItem);
 
                     state.transformedData = transformToComponentFormat(state.data);
                     state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-                    state.transformedData = transformToComponentFormat(state.data);
-                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
 
-                    state.totalItems = action.payload.totalItems ?? 0;
-                    state.totalPages = action.payload.totalPages ?? 0;
-                    state.currentPage = action.payload.currentPage ?? 0;
-                }
-                state.loading = false;
-            })
-            .addCase(fetchJustifications.rejected, (state, action) => {
-                state.error = action.error.message || 'Error fetching justifications';
-                state.loading = false;
-            })
-            // fetchJustificationById - existente
-            .addCase(fetchJustificationById.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchJustificationById.fulfilled, (state, action: PayloadAction<GetJustificationByIdQuery['justificationById']>) => {
-                if (action.payload) {
-                    state.data = [transformGraphQLToJustificationItem(action.payload)];
-                    state.transformedData = transformToComponentFormat(state.data);
-                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-                }
-                state.loading = false;
-            })
-            .addCase(fetchJustificationById.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                const { code, message } = payload || {};
-                state.error = { code, message };
-                state.loading = false;
-            })
-            // addJustification - modificado para resetear formulario
-            .addCase(addJustification.pending, (state) => {
-                state.form.isSubmitting = true;
-                state.form.validationErrors = [];
-            })
-            .addCase(addJustification.fulfilled, (state, action: PayloadAction<AddJustificationMutation['addJustification']>) => {
-                if (action.payload) {
-                    const newJustification = transformGraphQLToJustificationItem(action.payload);
-                    state.data.push(newJustification);
-                    state.transformedData = transformToComponentFormat(state.data);
-                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                     state.totalItems = action.payload.totalItems ?? 0;
                     state.totalPages = action.payload.totalPages ?? 0;
                     state.currentPage = action.payload.currentPage ?? 0;
@@ -921,26 +649,5 @@ export const {
     validateForm,
     setCurrentAttendance,
 } = justificationSlice.actions;
-export const {
-    setFilterOptions,
-    clearFilters,
-    setLocalCurrentPage,
-    goToPreviousPage,
-    goToNextPage,
-    setItemsPerPage,
-    showForm,
-    hideForm,
-    resetForm,
-    updateFormField,
-    updateNumericField,
-    updateTextField,
-    updateJustificationTypeId,
-    setValidationErrors,
-    clearValidationErrors,
-    setSubmitting,
-    validateForm,
-    setCurrentAttendance,
-} = justificationSlice.actions;
 
-export default justificationSlice.reducer;
 export default justificationSlice.reducer;
