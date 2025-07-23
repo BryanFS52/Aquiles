@@ -12,12 +12,14 @@ import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
 import {
   fetchJustifications,
   generateFileName,
+  formatErrorMessage,
 } from "@slice/justificationSlice";
 
 import type { AppDispatch, RootState } from "@/redux/store";
 import type { FormDataState } from "@slice/justificationSlice";
 import { Attendance } from "@graphql/generated";
 import PageTitle from "@components/UI/pageTitle";
+import EmptyState from "@components/UI/emptyState";
 import JustificationFormComponent from "@components/features/justification/justificationForm";
 
 import {
@@ -102,6 +104,9 @@ export default function JustificacionAprendiz() {
     }
   }, [form.showForm, shouldLoadModal]);
 
+  // Formatear mensajes de error
+  const errorMessage = formatErrorMessage(errorJustification || errorJustificationTypes || errorAttendances);
+
   if (
     loadingJustificationTypes ||
     loadingAttendances ||
@@ -116,8 +121,17 @@ export default function JustificacionAprendiz() {
       </div>
     );
   }
-  if (errorJustificationTypes || errorAttendances)
-    return <p>Error cargando datos</p>;
+
+  if (errorMessage) {
+    return (
+      <div className="h-auto">
+        <div ref={topRef} className="mb-6">
+          <PageTitle>Justificaciones</PageTitle>
+        </div>
+        <EmptyState message={errorMessage} />
+      </div>
+    );
+  }
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -309,7 +323,7 @@ export default function JustificacionAprendiz() {
       <div ref={topRef} className="mb-6">
         <PageTitle>Justificaciones</PageTitle>
       </div>
-
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 ">
         <AnimatePresence mode="wait">
           {!form.showForm && !shouldLoadModal && (

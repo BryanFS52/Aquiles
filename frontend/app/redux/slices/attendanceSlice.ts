@@ -25,28 +25,28 @@ export interface TransformedAttendanceItem {
     id: string;
     // programa: string;
     // ficha: string;
-    fecha: string;
+    // fecha: string;
     estado: string;
     documento: string;
     aprendiz: string;
 }
 
 interface StudentAttendances {
-    data: AttendanceItem[];
+    data: Attendance[];
     loading: boolean;
     error: string | null;
     showForm: boolean;
 }
 interface AttendanceState extends ReturnType<typeof createInitialPaginatedState>{
     studentAttendances: StudentAttendances;
-    data: AttendanceItem[];
+    data: Attendance[];
     transformedData: TransformedAttendanceItem[];
     filteredData: TransformedAttendanceItem[];
     filterOptions: FilterOptions;
     justifications: any[];
     justificationsLoading: boolean;
 }
-const transformToComponentFormat = (attendances: AttendanceItem[]): TransformedAttendanceItem[] => {
+const transformToComponentFormat = (attendances: Attendance[]): TransformedAttendanceItem[] => {
     return attendances.map((a) => {
         const student = a.student;
         const person = student?.person;
@@ -55,7 +55,7 @@ const transformToComponentFormat = (attendances: AttendanceItem[]): TransformedA
             id: a.id,
             // programa: "Sin programa", // Dato no disponible en AttendanceItem
             // ficha: "Sin ficha", // Dato no disponible en AttendanceItem
-            fecha: new Date(a.attendanceDate).toLocaleDateString("es-CO"),
+            // fecha: new Date(a.attendanceDate).toLocaleDateString("es-CO"),
             estado: a.attendanceState?.status || "Sin estado",
             documento: person?.document || '',
             aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim()
@@ -75,7 +75,7 @@ const filterAttendances = (
         return data.filter((j) =>
             // j.programa.toLowerCase().includes(searchTerm.toLowerCase()) ||
             // j.ficha.toString().includes(searchTerm) ||
-            j.fecha.includes(searchTerm) ||
+            // j.fecha.includes(searchTerm) ||
             j.estado.toLowerCase().includes(searchTerm.toLowerCase())
         );
     }
@@ -86,8 +86,8 @@ const filterAttendances = (
             //     return j.programa.toLowerCase().includes(searchTerm.toLowerCase());
             // case "ficha":
             //     return j.ficha.toString().includes(searchTerm);
-            case "fecha":
-                return j.fecha.includes(searchTerm);
+            // case "fecha":
+            //     return j.fecha.includes(searchTerm);
             case "estado":
                 return j.estado.toLowerCase().includes(searchTerm.toLowerCase());
             default:
@@ -95,7 +95,7 @@ const filterAttendances = (
         }
     });
 };
-const transformGraphQLToAttendanceItem = (graphqlData: any): AttendanceItem => {
+const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
     return {
         id: graphqlData.id,
         attendanceDate: graphqlData.attendanceDate,
@@ -255,7 +255,7 @@ export const deleteAttendance = createAsyncThunk<string, string,
 );
 
 const initialState: AttendanceState = {
-    ...createInitialPaginatedState<AttendanceItem>(),
+    ...createInitialPaginatedState<Attendance>(),
     studentAttendances: {
         data: [],
         loading: false,
