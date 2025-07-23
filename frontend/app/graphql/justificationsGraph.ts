@@ -47,11 +47,13 @@ export const GET_JUSTIFICATION_BY_ID = gql`
         justificationDate
         state
         justificationType {
+        justificationType {
           id
           name
         }
       }
     }
+  }
   }
 `;
 

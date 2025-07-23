@@ -93,10 +93,10 @@ export default function StudySheetsPage() {
                   <div className="bg-gray-50 dark:bg-shadowBlue/50 rounded-lg p-4">
                     <div className="flex items-center space-x-2 mb-2">
                       <div className="w-2 h-2 bg-primary dark:bg-lightGreen rounded-full"></div>
-                      <span className="text-sm font-medium text-grayText dark:text-white">Proyecto</span>
+                      <span className="text-sm font-medium text-grayText dark:text-white">Programa</span>
                     </div>
                     <p className="font-semibold text-black dark:text-white text-lg">
-                      {sheet.trainingProject?.name ?? "No especificado"}
+                      {sheet.trainingProject?.program?.name ?? "No especificado"}
                     </p>
                   </div>
 
@@ -118,9 +118,20 @@ export default function StudySheetsPage() {
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                       <span className="text-sm text-grayText dark:text-white font-medium">Trimestre</span>
                       <span className="text-sm text-black dark:text-white font-semibold">
-                        {sheet.quarter?.length ?? 0}
+                        {(() => {
+                          if (!sheet.quarter || sheet.quarter.length === 0) {
+                            return "Sin trimestre";
+                          }
+
+                          const lastQuarter = [...sheet.quarter]
+                            .filter(q => q?.name?.number !== undefined)
+                            .sort((a, b) => (b?.name?.number ?? 0) - (a?.name?.number ?? 0))[0];
+
+                          return `${lastQuarter?.name?.extension} ${lastQuarter?.name?.number}`;
+                        })()}
                       </span>
                     </div>
+
 
                     <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 space-y-2">
                       <div className="flex items-center space-x-2 mb-2">

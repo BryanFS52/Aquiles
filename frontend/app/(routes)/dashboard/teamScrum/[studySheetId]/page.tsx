@@ -13,6 +13,7 @@ import { TeamsScrum } from "@graphql/generated";
 import { MdAddCircle, MdInfo, MdGroup } from "react-icons/md";
 import { useLoader } from "@context/LoaderContext";
 import { TeamHistoryModal } from "@components/Modals/modalComposition";
+import { fetchProfiles } from "@/redux/slices/atlas/profileSlice";
 import PageTitle from "@/components/UI/pageTitle";
 import ModalNewTeam from "@components/Modals/modalNewTeam";
 import ModalAddInformation from "@components/Modals/modalAddInformation";
@@ -36,6 +37,9 @@ export default function TeamScrumDetailsPage() {
     const { data, loading: studySheetLoading } = useSelector(
         (state: RootState) => state.studySheet
     );
+    const { data: profiles } = useSelector(
+        (state: RootState) => state.profile
+    );
     const { showLoader, hideLoader } = useLoader();
 
     const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -52,6 +56,7 @@ export default function TeamScrumDetailsPage() {
     useEffect(() => {
         if (studySheetId) {
             dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
+            dispatch(fetchProfiles({ page: 0, size: 10 }));
         }
     }, [dispatch, studySheetId]);
 
@@ -112,6 +117,17 @@ export default function TeamScrumDetailsPage() {
     const handleCloseConfirmModal = () => {
         setTeamToDelete(null);
         setConfirmModalOpen(false);
+    };
+
+    // Handler para asignar perfiles (solo para visualización)
+    const handleProfileAssign = (studentId: string, profile: any) => {
+        console.log(`Visualizando asignación: Perfil ${profile.name} para estudiante ${studentId}`);
+        console.log('Perfil seleccionado:', profile);
+        toast.info(`Rol "${profile.name}" seleccionado para este estudiante`, {
+            position: "top-right",
+            autoClose: 2000,
+        });
+        // Solo para mostrar la selección - aquí iría la lógica real de asignación
     };
 
     const handleConfirmDelete = () => {
@@ -255,6 +271,8 @@ export default function TeamScrumDetailsPage() {
                     isOpen={isHistoryModalOpen}
                     onClose={handleCloseHistoryModal}
                     teamData={selectedTeamForHistory}
+                    profiles={profiles || []}
+                    onSelectProfile={handleProfileAssign}
                 />
 
                 <div className="mt-8">

@@ -32,7 +32,7 @@ input JustificationDto {
     justificationFile: String
     justificationDate: String
     state: Boolean
-    attendance: AttendancesDto
+    attendance: AttendanceDto
     justificationType: JustificationTypeDto
 }
 

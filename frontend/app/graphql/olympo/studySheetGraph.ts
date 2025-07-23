@@ -22,11 +22,16 @@ export const GET_STUDY_SHEETS = gql`
                 }
                 quarter {
                     name {
+                      extension
                     number
                     }
                 }
                 trainingProject {
                     name
+                    program {
+                        id
+                        name
+                    }
                 }
             }
             currentPage
@@ -104,7 +109,7 @@ export const GET_STUDY_SHEET_BY_ID = gql`
               phone
             }
           }
-          studentStyudySheetState {
+          studentStudySheetState {
 
             id
             name
@@ -151,7 +156,7 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
               date_birth
             }
           }
-          studentStyudySheetState {
+          studentStudySheetState {
             id
             name
           }
@@ -181,7 +186,7 @@ export const GET_STUDY_SHEET_WITH_STUDENTS = gql`
               lastname
             }
           }
-          studentStyudySheetState {
+          studentStudySheetState {
             id
             name
           }

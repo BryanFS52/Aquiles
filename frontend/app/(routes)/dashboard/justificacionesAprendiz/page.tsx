@@ -49,6 +49,16 @@ import { MdHistory } from "react-icons/md";
 //   },
 // };
 
+// const sessions = {
+//   "1": {
+//     componentName: "Nombre del Componente",
+//     date: "01/09/2024",
+//     time: "10:00 AM",
+//     sheet: "Ficha 12345",
+//     instructors: ["Instructor 1", "Instructor 2"],
+//   },
+// };
+
 export default function JustificacionAprendiz() {
   const fileRef = useRef<File | null>(null);
   const base64Ref = useRef<string>("");
@@ -289,6 +299,7 @@ export default function JustificacionAprendiz() {
         );
 
         // 🔥 ESTO ES LO QUE FALTABA
+        // 🔥 ESTO ES LO QUE FALTABA
         dispatch(setCurrentAttendance(currentAttendance));
         setTimeout(() => {
           dispatch(showForm());
@@ -487,7 +498,7 @@ export default function JustificacionAprendiz() {
             </div>
           </motion.div>
         </AnimatePresence>
+      </div>
     </div>
-  </div>
-);
+  );
 }

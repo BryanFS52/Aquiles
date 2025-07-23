@@ -28,6 +28,7 @@ public class JustificationBusiness {
         this.justificationTypeService = justificationTypeService;
         this.modelMapper = modelMapper;
     }
+
     // Validation Object
     public void ValidationObject(JustificationDto justificationDto) throws  CustomException {
 
@@ -39,8 +40,6 @@ public class JustificationBusiness {
             PageRequest pageRequest = PageRequest.of(page, size);
             Page<Justification> justificationEntityPage = justificationService.findAll(pageRequest);
 
-            System.out.println("Total Justifications: " + justificationEntityPage.getTotalElements());
-            System.out.println("Total Justifications: " + justificationEntityPage);
             return justificationEntityPage.map(entity -> modelMapper.map(entity, JustificationDto.class));
         } catch (DataAccessException e) {
             throw new CustomException("Error retrieving justifications due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

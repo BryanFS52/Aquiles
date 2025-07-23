@@ -1,6 +1,5 @@
 package com.api.aquilesApi.Dto;
 
-import com.api.aquilesApi.Entity.FollowUps;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +21,4 @@ public class AttendancesDto {
     private JustificationDto justification;
 
     // @NotNull(message = "")
-    private AttendanceStateDto attendanceState;
-    private StateFollowUpsDto followUps;
-}
+    private AttendanceStateDto attendanceState;}

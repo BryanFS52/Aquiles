@@ -319,7 +319,7 @@ export const updateJustification = createAsyncThunk<UpdateJustificationMutation[
 
 // Nueva función para cambiar el estado de una justificación
 export const updateJustificationStatus = createAsyncThunk<
-    UpdateJustificationMutation['updateJustification'], 
+    UpdateJustificationMutation['updateJustification'],
     { id: string; status: string },
     { rejectValue: { code: string; message: string } }
 >(
@@ -328,7 +328,7 @@ export const updateJustificationStatus = createAsyncThunk<
         try {
             // Convertir el estado del string a boolean
             const state = status === "Aceptado";
-            
+
             const input: UpdateJustificationMutationVariables['input'] = {
                 state
             };

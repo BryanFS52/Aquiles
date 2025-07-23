@@ -11,7 +11,10 @@ import com.netflix.graphql.dgs.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -79,13 +82,16 @@ public class AttendancesResolver {
     }
 
     @DgsQuery
-    public Map<String, Object> allAttendancesByStudentId(@InputArgument Long id, @InputArgument Long stateId) {
-        List<AttendancesDto> attendances = attendancesBusiness.findAllByStudentId(id, stateId);
-        return ResponseHttpApi.responseHttpFindAllList(
-                attendances,
+    public Map<String, Object> allAttendancesByStudentId(@InputArgument Long id, @InputArgument Long stateId, @InputArgument Integer page, @InputArgument Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<AttendancesDto> attendances = attendancesBusiness.findAllByFilter(id, stateId, pageable);
+        return ResponseHttpApi.responseHttpFindAll(
+                attendances.getContent(),
                 ResponseHttpApi.CODE_OK,
                 "query attendances by id ok",
-                attendances.size()
+                attendances.getSize(),
+                page,
+                attendances.getTotalPages()
         );
     }
 
@@ -93,7 +99,8 @@ public class AttendancesResolver {
     @DgsQuery
     public Map<String, Object> allAttendances(@InputArgument Integer page, @InputArgument Integer size) {
         try {
-            Page<AttendancesDto> attendancesDtoPage = attendancesBusiness.findAll(page, size);
+            Pageable pageable = PageRequest.of(page, size);
+            Page<AttendancesDto> attendancesDtoPage = attendancesBusiness.findAll(pageable);
             return ResponseHttpApi.responseHttpFindAll(
                     attendancesDtoPage.getContent(),
                     ResponseHttpApi.CODE_OK,
@@ -145,9 +152,9 @@ public class AttendancesResolver {
 
     // Update Attendance (GraphQL)
     @DgsMutation
-    public Map<String, Object> updateAttendance(@InputArgument Long id, @InputArgument ( name = "input")AttendancesDto attendancesDto) {
+    public Map<String, Object> updateAttendance(@InputArgument Long id, @InputArgument ( name = "input") AttendancesDto attendancesDto) {
         try {
-             attendancesBusiness.update(id, attendancesDto );
+             attendancesBusiness.update(id, attendancesDto);
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,

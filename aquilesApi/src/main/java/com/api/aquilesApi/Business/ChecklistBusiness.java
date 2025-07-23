@@ -23,6 +23,9 @@ public class ChecklistBusiness {
     }
 
     // Validation object
+    public void validationObject(ChecklistDto checklistDto) throws CustomException {
+
+    }
 
     // Find All
     public Page<ChecklistDto> findAll(int page, int size) {
@@ -34,10 +37,8 @@ public class ChecklistBusiness {
 
             return checklistEntityPage.map(entity -> modelMapper.map(entity, ChecklistDto.class));
         } catch (DataAccessException e) {
-            // Manejo específico para errores de acceso a datos
             throw new CustomException("Error retrieving checklist due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            // Manejo genérico para cualquier otra excepción
             throw new CustomException("An unexpected error occurred while retrieving checklist.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -47,8 +48,6 @@ public class ChecklistBusiness {
         try {
             Checklist checklist = checklistService.getById(id);
             return modelMapper.map(checklist, ChecklistDto.class);
-        } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
         } catch (Exception e) {
             throw new CustomException("Error Getting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -80,8 +79,6 @@ public class ChecklistBusiness {
         try {
             Checklist checklist = checklistService.getById(attendanceId);
             checklistService.delete(checklist);
-        } catch (CustomException e) {
-            throw e; // Lanzar la excepción personalizada
         } catch (Exception e) {
             throw new CustomException("Error Deleting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
