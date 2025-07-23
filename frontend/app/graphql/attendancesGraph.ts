@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 
 // Queries and Mutations for Attendances
+
 export const GET_ALL_ATTENDANCES = gql`
   query GetAttendances($page: Int, $size: Int) {
     allAttendances(page: $page, size: $size) {
@@ -53,16 +54,6 @@ export const GET_ATTENDANCES_BY_STUDENT = gql`
   }
 `;
 
-export const ADD_ATTENDANCE = gql`
-  mutation AddAttendance($input: AttendancesDto!) {
-    addAttendance(input: $input) {
-      code
-      message
-      id
-    }
-  }
-`;
-
 export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
   query GetAttendancesAndJustificationsByStudent($id: Long!) {
     allAttendancesByStudentId(id: $id) {
@@ -74,7 +65,6 @@ export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
           justificationFile
           justificationDate
           justificationType {
-          justificationType {
             id
             name
           }
@@ -84,6 +74,15 @@ export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
   }
 `;
 
+export const ADD_ATTENDANCE = gql`
+  mutation AddAttendance($input: AttendancesDto!) {
+    addAttendance(input: $input) {
+      code
+      message
+      id
+    }
+  }
+`;
 
 export const UPDATE_ATTENDANCE = gql`
   mutation UpdateAttendance($id: Long!, $input: AttendancesDto!) {
@@ -94,7 +93,6 @@ export const UPDATE_ATTENDANCE = gql`
     }
   }
 `;
-
 
 export const DELETE_ATTENDANCE = gql`
   mutation DeleteAttendance($id: Long!) {

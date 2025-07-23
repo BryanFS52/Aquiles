@@ -12,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Entity
 @Table(name = "Follow_ups")
-public class FollowUps implements Serializable {
+public class FollowUpAction implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,8 +24,6 @@ public class FollowUps implements Serializable {
     private String description;
 
     // Relations
-    // Relation (1-1) whit attendance
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name="attendance_id", referencedColumnName = "id")
-    private Attendance attendance;
+    // Relation (1-1) student
+    private Long studentId;
 }

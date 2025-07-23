@@ -11,7 +11,10 @@ import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -129,7 +132,8 @@ public class TeamsScrumResolver {
     @DgsQuery
     public Map<String , Object> allTeamsScrums(@InputArgument Integer page, @InputArgument Integer size){
         try {
-            Page<TeamsScrumDto> teamsScrumDtoPage = teamsScrumBusiness.findAll(page, size);
+            Pageable pageable = PageRequest.of(page, size);
+            Page<TeamsScrumDto> teamsScrumDtoPage = teamsScrumBusiness.findAll(pageable);
             if (!teamsScrumDtoPage.isEmpty()){
                 return ResponseHttpApi.responseHttpFindAll(
                         teamsScrumDtoPage.getContent(),

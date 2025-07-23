@@ -23,7 +23,7 @@ type AttendancePageId {
     message: String
 }
 
-input AttendancesDto {
+input AttendanceDto {
     id: ID
     attendanceDate: String
     attendanceState: AttendanceStateDto
@@ -34,11 +34,11 @@ input AttendancesDto {
 extend type Query {
     allAttendances(page: Int, size: Int): AttendancePage
     attendanceById(id: Long!): AttendancePageId
-    allAttendancesByStudentId(id: Long, stateId: Long): AttendancePage
+    allAttendancesByStudentId(id: Long, stateId: Long, page: Int, size: Int): AttendancePage
 }
 
 extend type Mutation {
-    addAttendance(input: AttendancesDto): Response
-    updateAttendance(id: Long!, input: AttendancesDto): Response
+    addAttendance(input: AttendanceDto): Response
+    updateAttendance(id: Long!, input: AttendanceDto): Response
     deleteAttendance(id: Long!): Response
 }

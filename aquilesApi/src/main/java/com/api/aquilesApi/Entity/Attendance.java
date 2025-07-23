@@ -45,8 +45,6 @@ public class Attendance implements Serializable {
     private AttendanceState attendanceState;
 
     // Relation (1-1) con followUp
-    @OneToOne(mappedBy = "attendance", cascade = CascadeType.ALL)
-    private FollowUps followUps;
 
     // 3.Relation (M-M) con notifications
     @ManyToMany(mappedBy = "attendances")

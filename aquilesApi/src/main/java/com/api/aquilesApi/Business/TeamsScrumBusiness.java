@@ -4,15 +4,17 @@ import com.api.aquilesApi.Dto.TeamsScrumDto;
 import com.api.aquilesApi.Entity.TeamsScrum;
 import com.api.aquilesApi.Service.TeamScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
+import com.api.aquilesApi.Utilities.MapStruct.TeamScrumMap;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Component
@@ -44,17 +46,12 @@ public class TeamsScrumBusiness {
     }
 
     // Find All
-    public Page<TeamsScrumDto> findAll(int page, int size) {
+    public Page<TeamsScrumDto> findAll(Pageable pageable) {
         try {
-            PageRequest pageRequest = PageRequest.of(page, size);
-            Page<TeamsScrum> teamsScrumEntityPage = teamScrumService.findAll(pageRequest);
-
-            List<TeamsScrumDto> teamsScrumDtoList = teamsScrumEntityPage.getContent()
-                    .stream()
-                    .map(entity -> modelMapper.map(entity, TeamsScrumDto.class))
-                    .collect(Collectors.toList());
-
-            return new PageImpl<>(teamsScrumDtoList, pageRequest, teamsScrumEntityPage.getTotalElements());
+            PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+            Page<TeamsScrum> teamsScrumPage = teamScrumService.findAll(pageRequest);
+            if (teamsScrumPage.isEmpty()) return Page.empty();
+            return TeamScrumMap.INSTANCE.teamScrumToTeamScrumDtoPage(teamsScrumPage);
         } catch (Exception e) {
             throw new CustomException("Error retrieving TeamScrums: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -64,12 +61,9 @@ public class TeamsScrumBusiness {
     public TeamsScrumDto findById(Long id) {
         try {
             TeamsScrum teamsScrum = teamScrumService.getById(id);
-            modelMapper.typeMap(TeamsScrum.class, TeamsScrumDto.class)
-                    .addMapping(TeamsScrum::getId, TeamsScrumDto::setId);
-
-            return modelMapper.map(teamsScrum, TeamsScrumDto.class);
-        } catch (CustomException e) {
-            throw e;
+            return TeamScrumMap.INSTANCE.teamScrumToTeamScrumDto(teamsScrum);
+        } catch (NoSuchElementException e) {
+            throw new CustomException("Attendance not found.", HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             throw new CustomException("Error Getting Team Scrum By Id: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -78,49 +72,12 @@ public class TeamsScrumBusiness {
     // Find By StudentId
     public List<TeamsScrumDto> findAllByStudentId(Long studentId) {
         try {
-            System.out.println(studentId);
             List<TeamsScrum> teamsScrumList = teamScrumService.findAllByStudentId(studentId);
             return teamsScrumList.stream()
                     .map(entity -> modelMapper.map(entity, TeamsScrumDto.class))
                     .collect(Collectors.toList());
         } catch (Exception e) {
             throw new CustomException("Error Getting Team Scrum By Id: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    // Add
-    public TeamsScrumDto add(TeamsScrumDto teamsScrumDto) {
-        try {
-            TeamsScrum teamsScrum = modelMapper.map(teamsScrumDto, TeamsScrum.class);
-            return modelMapper.map(teamScrumService.save(teamsScrum), TeamsScrumDto.class);
-        } catch (Exception e) {
-            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    // Update
-    public void update(Long teamScrumId, TeamsScrumDto teamsScrumDto) {
-        try {
-            teamsScrumDto.setId(teamScrumId);
-            validationObject(teamsScrumDto);
-
-            TeamsScrum teamsScrum = teamScrumService.getById(teamScrumId);
-            modelMapper.map(teamsScrumDto, teamsScrum);
-            teamScrumService.save(teamsScrum);
-        } catch (Exception e) {
-            throw new CustomException("Error Updating Team Scrum: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    // Delete
-    public void delete(Long teamScrumId) {
-        try {
-            TeamsScrum teamsScrum = teamScrumService.getById(teamScrumId);
-            teamScrumService.delete(teamsScrum);
-        } catch (CustomException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new CustomException("Error Deleting Team Scrum: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -138,6 +95,38 @@ public class TeamsScrumBusiness {
         return dtos;
     }
 
-    // a
+    // Add
+    public TeamsScrumDto add(TeamsScrumDto teamsScrumDto) {
+        try {
+            TeamsScrum teamsScrum = TeamScrumMap.INSTANCE.teamScrumDtoToTeamScrum(teamsScrumDto);
+            TeamsScrum saved = teamScrumService.save(teamsScrum);
+            return TeamScrumMap.INSTANCE.teamScrumToTeamScrumDto(teamsScrum);
+        } catch (Exception e) {
+            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 
+    // Update
+    public void update(Long teamScrumId, TeamsScrumDto teamsScrumDto) {
+        try {
+            validationObject(teamsScrumDto);
+            TeamsScrum teamsScrum = teamScrumService.getById(teamScrumId);
+            TeamScrumMap.INSTANCE.updateTeamScrumFromDto(teamsScrumDto, teamsScrum);
+            teamScrumService.save(teamsScrum);
+        } catch (Exception e) {
+            throw new CustomException("Error Updating Team Scrum: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Delete
+    public void delete(Long teamScrumId) {
+        try {
+            TeamsScrum teamsScrum = teamScrumService.getById(teamScrumId);
+            teamScrumService.delete(teamsScrum);
+        } catch (CustomException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new CustomException("Error Deleting Team Scrum: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }
