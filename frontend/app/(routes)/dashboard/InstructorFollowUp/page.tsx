@@ -2,13 +2,13 @@
 
 import AttendanceTable from "@/components/features/attendance/attendanceTable";
 import PageTitle from "@/components/UI/pageTitle";
-import { fetchAttendances, formatErrorMessage } from "@/redux/slices/attendanceSlice";
+import { fetchAttendances } from "@/redux/slices/attendanceSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AttendanceItem } from "@/types/slices/attendance";
+import { Attendance } from "@graphql/generated";
 
-const processAndSummarizeAttendances = (attendances: AttendanceItem[]) => {
+const processAndSummarizeAttendances = (attendances: Attendance[]) => {
     if (!attendances) return [];
 
     const absences = attendances.filter(
@@ -20,7 +20,7 @@ const processAndSummarizeAttendances = (attendances: AttendanceItem[]) => {
         if (!studentId) return acc;
 
         if (!acc[studentId]) {
-            const person = absence.student.person;
+            const person = absence?.student?.person;
             acc[studentId] = {
                 id: studentId,
                 documento: person?.document || '',
@@ -48,17 +48,11 @@ export default function InstructorFollowUp() {
     }, [dispatch]);
 
     const attendanceSummary = processAndSummarizeAttendances(allAttendances);
-    const errorMessage = formatErrorMessage(error);
 
     return (
         <div>
             <PageTitle>Seguimiento de Ausencias</PageTitle>
             <>
-                {errorMessage && (
-                    <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                        <p className="text-red-600 dark:text-red-400">{errorMessage}</p>
-                    </div>
-                )}
                 <AttendanceTable
                     data={attendanceSummary}
                     loading={loading}

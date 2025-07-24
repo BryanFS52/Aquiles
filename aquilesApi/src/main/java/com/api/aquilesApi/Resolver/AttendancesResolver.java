@@ -83,8 +83,9 @@ public class AttendancesResolver {
 
     @DgsQuery
     public Map<String, Object> allAttendancesByStudentId(@InputArgument Long id, @InputArgument Long stateId, @InputArgument Integer page, @InputArgument Integer size) {
+        try {
         Pageable pageable = PageRequest.of(page, size);
-        Page<AttendanceDto> attendances = attendancesBusiness.findAllByFilter(id, stateId, pageable);
+        Page<AttendanceDto> attendances = attendancesBusiness.findAllByStudentId(id, stateId, pageable);
         return ResponseHttpApi.responseHttpFindAll(
                 attendances.getContent(),
                 ResponseHttpApi.CODE_OK,
@@ -93,14 +94,17 @@ public class AttendancesResolver {
                 page,
                 attendances.getTotalPages()
         );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // FindAll Attendances (GraphQL)
     @DgsQuery
     public Map<String, Object> allAttendances(@InputArgument Integer page, @InputArgument Integer size) {
         try {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<AttendanceDto> attendancesDtoPage = attendancesBusiness.findAll(pageable);
+            Page<AttendanceDto> attendancesDtoPage = attendancesBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
                     attendancesDtoPage.getContent(),
                     ResponseHttpApi.CODE_OK,

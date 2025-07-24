@@ -14,9 +14,9 @@ import {
   generateFileName,
 } from "@slice/justificationSlice";
 
-import type { AppDispatch, RootState } from "@/redux/store";
-import type { FormDataState } from "@slice/justificationSlice";
-import type { AttendanceItem } from "@type/slices/attendance";
+import { AppDispatch, RootState } from "@/redux/store";
+import { FormDataState } from "@slice/justificationSlice";
+import { Attendance } from "@graphql/generated";
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFormComponent from "@components/features/justification/justificationForm";
 
@@ -35,17 +35,7 @@ import {
 } from "@slice/justificationSlice";
 import { FaCalendarDay, FaRegListAlt, FaCheckCircle } from "react-icons/fa";
 import JustificationsHistorical from "@/components/features/justification/justificationsHistorical";
-import { MdHistory } from "react-icons/md";
 
-// const sessions = {
-//   "1": {
-//     componentName: "Nombre del Componente",
-//     date: "01/09/2024",
-//     time: "10:00 AM",
-//     sheet: "Ficha 12345",
-//     instructors: ["Instructor 1", "Instructor 2"],
-//   },
-// };
 
 export default function JustificacionAprendiz() {
   const fileRef = useRef<File | null>(null);

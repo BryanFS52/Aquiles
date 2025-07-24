@@ -11,8 +11,6 @@ import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
 import java.util.Collections;
@@ -128,12 +126,33 @@ public class TeamsScrumResolver {
 
         return Map.of("id", teamsScrum.getStudySheetId().toString());
     }
+/*
+    @DgsData(parentType = "TeamScrum", field = "processMethodology")
+    public Map<String, Object> resolveProcessMethodology(DgsDataFetchingEnvironment env) {
+        Object source = env.getSource();
+        assert source != null;
+        System.out.println("Source class: " + source.getClass());
+
+        TeamsScrum teamsScrum;
+        if (source instanceof TeamsScrumDto) {
+            teamsScrum = modelMapper.map((TeamsScrumDto) source, TeamsScrum.class);
+        } else {
+            teamsScrum = (TeamsScrum) source;
+        }
+
+        if (teamsScrum == null || teamsScrum.getProcessMethodologyId() == null) {
+            return null;
+        }
+
+        return Map.of("id", teamsScrum.getProcessMethodologyId().toString());
+    }
+
+ */
 
     @DgsQuery
     public Map<String , Object> allTeamsScrums(@InputArgument Integer page, @InputArgument Integer size){
         try {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<TeamsScrumDto> teamsScrumDtoPage = teamsScrumBusiness.findAll(pageable);
+            Page<TeamsScrumDto> teamsScrumDtoPage = teamsScrumBusiness.findAll(page, size);
             if (!teamsScrumDtoPage.isEmpty()){
                 return ResponseHttpApi.responseHttpFindAll(
                         teamsScrumDtoPage.getContent(),

@@ -4,7 +4,6 @@ import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_JU
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import {
     Attendance,
-    Attendance,
     GetAttendancesQuery,
     GetAttendancesQueryVariables,
     AddAttendanceMutation,
@@ -36,13 +35,6 @@ const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
     };
 };
 
-// Función para formatear mensaje de error
-export const formatErrorMessage = (error: any): string | null => {
-    if (!error) return null;
-    if (typeof error === 'string') return error;
-    if (error.message) return error.message;
-    return 'Error desconocido';
-};
 
 export const fetchAttendances = createAsyncThunk<
     GetAttendancesQuery['allAttendances'],
@@ -58,7 +50,7 @@ export const fetchAttendances = createAsyncThunk<
         return data.allAttendances;
     }
 );
-// AttendancesByStudent
+
 export const fetchAttendancesByStudent = createAsyncThunk<
     Attendance[],
     AllAttendancesByStudentIdQueryVariables
@@ -181,32 +173,17 @@ const initialState = {
     studentAttendances: {
         data: [] as Attendance[],
         loading: false,
-        error: null,
+        error: null as string | null,
         showForm: false,
     },
-    transformedData: [],
-    filteredData: [],
-    filterOptions: {
-        selectedFiltro: "",
-        searchTerm: ""
-    },
-    justifications: [],
+    justifications: [] as any[],
     justificationsLoading: false,
 };
 
 const attendanceSlice = createSlice({
     name: 'attendance',
     initialState,
-    reducers: {
-        setFilterOptions: (state, action: PayloadAction<Partial<FilterOptions>>) => {
-            state.filterOptions = { ...state.filterOptions, ...action.payload };
-            state.filteredData = filterAttendances(state.transformedData, state.filterOptions);
-        },
-        clearFilters: (state) => {
-            state.filterOptions = { selectedFiltro: "", searchTerm: "" };
-            state.filteredData = state.transformedData;
-        },
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder
             .addCase(fetchAttendances.pending, (state) => {
@@ -219,8 +196,6 @@ const attendanceSlice = createSlice({
                     state.data = payload.data
                         .filter((item): item is NonNullable<typeof item> => item !== null)
                         .map(transformGraphQLToAttendanceItem);
-                    state.transformedData = transformToComponentFormat(state.data);
-                    state.filteredData = filterAttendances(state.transformedData, state.filterOptions);
                     state.totalItems = payload.totalItems ?? 0;
                     state.totalPages = payload.totalPages ?? 0;
                     state.currentPage = payload.currentPage ?? 0;
@@ -231,8 +206,6 @@ const attendanceSlice = createSlice({
                 state.error = action.error.message || 'Error fetching attendances';
                 state.loading = false;
             })
-
-            // attendanceByStudent
             .addCase(fetchAttendancesByStudent.pending, (state) => {
                 state.studentAttendances.loading = true;
                 state.studentAttendances.error = null;
@@ -249,7 +222,9 @@ const attendanceSlice = createSlice({
                 state.studentAttendances.loading = false;
                 state.studentAttendances.error = (action.payload as RejectedPayload)?.message ?? action.error.message ?? 'Error al cargar asistencias del estudiante';
             })
-
+            .addCase(fetchAttendancesAndJustificationsByStudent.pending, (state) => {
+                state.justificationsLoading = true;
+            })
             .addCase(fetchAttendancesAndJustificationsByStudent.fulfilled, (state, action) => {
                 const justifications = action.payload
                     .filter((j: any) => j !== null);
@@ -301,6 +276,6 @@ const attendanceSlice = createSlice({
     }
 });
 
-export const { setFilterOptions, clearFilters } = attendanceSlice.actions;
+export const { } = attendanceSlice.actions;
 
 export default attendanceSlice.reducer;

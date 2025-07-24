@@ -58,4 +58,5 @@
                 joinColumns = @JoinColumn(name = "team_id")
         )
         private List<TeamScrumMemberId> memberIds = new ArrayList<>();
+        private Long processMethodologyId;
     }

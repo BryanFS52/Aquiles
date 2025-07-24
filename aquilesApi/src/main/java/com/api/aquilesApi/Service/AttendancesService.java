@@ -6,6 +6,7 @@ import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +56,7 @@ public class AttendancesService implements Idao<Attendance, Long> {
         return attendancesRepository.findAllByStudentId(studentId);
     }
 
-    public Page<Attendance> findAllByFilter(Long studentId, Long attendanceState, PageRequest  pageRequest) {
-        return attendancesRepository.findByStudentIdAndOrAttendanceStateId(studentId, attendanceState, pageRequest);
+        public Page<Attendance> findAllByFilter(Long studentId, Long attendanceState, Pageable pageable) {
+            return attendancesRepository.findByStudentIdAndOrAttendanceStateId(studentId, attendanceState, pageable);
+        }
     }
-}

@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TeamScrumMemberId {
+public class    TeamScrumMemberId {
     @Column(name = "student_id", nullable = false)
     private Long studentId;
 

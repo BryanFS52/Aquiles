@@ -177,6 +177,14 @@ export const GET_STUDY_SHEET_WITH_STUDENTS = gql`
       data {
         id
         number
+        journey{
+            name
+        }
+        trainingProject{
+            program{
+                name
+            }
+        }
         studentStudySheets {
           id
           student {
@@ -184,6 +192,7 @@ export const GET_STUDY_SHEET_WITH_STUDENTS = gql`
             person {
               name
               lastname
+              email
             }
           }
           studentStudySheetState {

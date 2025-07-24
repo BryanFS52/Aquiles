@@ -18,11 +18,6 @@ export const GET_All_STUDENTS = gql`
                     email
                     address
                 }
-                studySheets {
-                    id
-                    number
-                    state
-                }
             }
             currentPage
             totalPages
