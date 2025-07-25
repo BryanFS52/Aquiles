@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class    TeamsScrumDto {
+public class TeamsScrumDto {
 
     private Long id;
     // @NotNull(message = "El nombre es obligatorio")
@@ -33,6 +33,6 @@ public class    TeamsScrumDto {
     // Relations
     private ChecklistDto checklist;
     private Long studySheetId;
-    private List<TeamScrumMemberId>  memberIds;
+    private List<TeamScrumMemberIdDto>  memberIds;
     private Long processMethodologyId;
 }   

@@ -1,4 +1,4 @@
-package com.api.aquilesApi.Dto;
+package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

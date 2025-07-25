@@ -1,6 +1,7 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.TeamsScrumDto;
+import com.api.aquilesApi.Entity.TeamScrumMemberId;
 import com.api.aquilesApi.Entity.TeamsScrum;
 import com.api.aquilesApi.Service.TeamScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,9 +35,16 @@ public class TeamsScrumBusiness {
             throw new CustomException("A Team Scrum can have a maximum of 4 members.", HttpStatus.BAD_REQUEST);
         }
 
+        // Validation
+        List<TeamScrumMemberId> memberIdList = teamsScrumDto.getMemberIds()
+                .stream()
+                .map(dto -> new TeamScrumMemberId(dto.getStudentId(), dto.getProfileId()))
+                .collect(Collectors.toList());
+
+
         boolean studentResult = teamScrumService.existsByStudySheetIdAndMemberIds(
                 teamsScrumDto.getStudySheetId(),
-                teamsScrumDto.getMemberIds()
+                memberIdList
         );
 
         if (studentResult) {
@@ -105,12 +114,28 @@ public class TeamsScrumBusiness {
             validationObject(teamsScrumDto);
 
             TeamsScrum teamsScrum = teamScrumService.getById(teamScrumId);
+
+            // Mapea campos básicos
             modelMapper.map(teamsScrumDto, teamsScrum);
+
+            // Validación explícita de memberIds
+            if (teamsScrumDto.getMemberIds() != null) {
+                List<TeamScrumMemberId> memberIds = teamsScrumDto.getMemberIds()
+                        .stream()
+                        .map(dto -> new TeamScrumMemberId(dto.getStudentId(), dto.getProfileId()))
+                        .collect(Collectors.toList());
+
+                teamsScrum.setMemberIds(memberIds);
+            } else {
+                teamsScrum.setMemberIds(Collections.emptyList());
+            }
+
             teamScrumService.save(teamsScrum);
         } catch (Exception e) {
             throw new CustomException("Error Updating Team Scrum: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
 
     // Delete
     public void delete(Long teamScrumId) {

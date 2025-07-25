@@ -1,12 +1,10 @@
     package com.api.aquilesApi.Entity;
 
-    import com.api.aquilesApi.Dto.TeamScrumMemberId;
     import jakarta.persistence.*;
     import lombok.AllArgsConstructor;
     import lombok.Getter;
     import lombok.NoArgsConstructor;
     import lombok.Setter;
-
     import java.io.Serializable;
     import java.util.ArrayList;
     import java.util.List;
@@ -42,7 +40,7 @@
         private String projectJustification;
 
         // Relations
-        // 1.Relation (M-1) con Checklist
+        // 1. Relation (M-1) con Checklist
         @ManyToOne
         @JoinColumn(name = "checklist_id", nullable = true)
         private Checklist checklist;

@@ -27,7 +27,7 @@ const FichasInstructor: React.FC = () => {
   console.log('Fichas to render:', fichas);
 
   useEffect(() => {
-    dispatch(fetchStudySheetByTeacher({ IdTeacher: 1, page: 0, size: 5 }));
+    dispatch(fetchStudySheetByTeacher({ idTeacher: 1, page: 0, size: 5 }));
   }, [dispatch]);
 
   useEffect(() => {

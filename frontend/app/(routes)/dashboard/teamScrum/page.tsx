@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { fetchStudySheets } from "@slice/olympo/studySheetSlice";
+import { fetchStudySheetByTeacher, fetchStudySheetByTeacherIdWithTeamScrum } from "@slice/olympo/studySheetSlice";
 import { StudySheet } from "@graphql/generated";
 import { useLoader } from "@context/LoaderContext";
 import PageTitle from "@components/UI/pageTitle";
@@ -20,7 +20,7 @@ export default function StudySheetsPage() {
   const { showLoader, hideLoader } = useLoader();
 
   useEffect(() => {
-    dispatch(fetchStudySheets({ page: 0, size: 5 }));
+    dispatch(fetchStudySheetByTeacherIdWithTeamScrum({ idTeacher: 1, page: 0, size: 5 }));
   }, [dispatch]);
 
   useEffect(() => {

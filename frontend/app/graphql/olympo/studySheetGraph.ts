@@ -122,8 +122,8 @@ export const GET_STUDY_SHEET_BY_ID = gql`
 
 
 export const GET_STUDY_SHEET_BY_TEACHER = gql`
-  query studySheetByTeacher($IdTeacher: Long, $page: Int, $size: Int) {
-    allStudySheets(page: $page, size: $size, idTeacher: $IdTeacher) {
+  query studySheetByTeacher($idTeacher: Long, $page: Int, $size: Int) {
+    allStudySheets(page: $page, size: $size, idTeacher: $idTeacher) {
       date
       code
       message
@@ -133,20 +133,28 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
         startLective
         endLective
         state
+        offer {
+          name
+        }
         journey {
           name
+        }
+        quarter {
+          name {
+            extension
+            number
+          }
         }
         trainingProject {
           name
           program {
-            id
             name
           }
         }
         studentStudySheets {
+          id
           student {
             person {
-              id
               document
               name
               lastname
@@ -157,7 +165,6 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
             }
           }
           studentStudySheetState {
-            id
             name
           }
         }
@@ -168,6 +175,7 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
     }
   }
 `;
+
 
 export const GET_STUDY_SHEET_WITH_STUDENTS = gql`
   query GetStudySheetWithStudents($id: Long!) {
@@ -205,3 +213,43 @@ export const GET_STUDY_SHEET_WITH_STUDENTS = gql`
   }
 `;
 
+export const GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM = gql`
+query studySheetByTeacherIdWithTeamScrum($idTeacher: Long, $page: Int, $size: Int) {
+    allStudySheets(page: $page, size: $size, idTeacher: $idTeacher) {
+      date
+      code
+      message
+      data {
+        id
+        number
+        startLective
+        endLective
+        state
+        journey {
+          name
+        }
+        trainingProject {
+          name
+          program {
+            name
+          }
+        }
+        teamsScrum{
+            id
+            teamName
+            students{
+                id
+                person{
+                    lastname
+                    name
+                    document
+                }
+            }
+        }
+      }
+      currentPage
+      totalPages
+      totalItems
+    }
+  }
+`;

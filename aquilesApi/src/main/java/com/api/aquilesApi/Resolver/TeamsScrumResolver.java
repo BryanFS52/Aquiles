@@ -88,7 +88,6 @@ public class TeamsScrumResolver {
     @DgsData(parentType = "Student", field = "profiles")
     public List<Map<String, String>> profilesReference(DgsDataFetchingEnvironment env) {
         Object source = env.getSource();
-
         Long studentId;
 
         if (source instanceof Map<?, ?> map && map.containsKey("id")) {
@@ -101,11 +100,11 @@ public class TeamsScrumResolver {
 
         return teamsScrumDtoList.stream()
                 .flatMap(dto -> dto.getMemberIds().stream())
-                .filter(member -> member.getProfileId() != null)
+                .filter(member -> member.getProfileId() != null && !member.getProfileId().isBlank())
                 .map(member -> Map.of("id", member.getProfileId()))
                 .collect(Collectors.toList());
-
     }
+
 
     @DgsData(parentType = "TeamsScrum", field = "studySheet")
     public Map<String, Object> resolveStudySheet(DgsDataFetchingEnvironment env) {

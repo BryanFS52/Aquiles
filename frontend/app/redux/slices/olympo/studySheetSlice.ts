@@ -1,6 +1,6 @@
 import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { GET_STUDY_SHEETS, GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER, GET_STUDY_SHEET_WITH_STUDENTS } from '@graphql/olympo/studySheetGraph'
+import { GET_STUDY_SHEETS, GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER, GET_STUDY_SHEET_WITH_STUDENTS, GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM } from '@graphql/olympo/studySheetGraph'
 import { createInitialPaginatedState } from '@type/slices/common/generic';
 import {
     StudySheet,
@@ -15,7 +15,9 @@ import {
     StudySheetByTeacherQuery,
     StudySheetByTeacherQueryVariables,
     GetStudySheetWithStudentsQuery,
-    GetStudySheetWithStudentsQueryVariables
+    GetStudySheetWithStudentsQueryVariables,
+    StudySheetByTeacherIdWithTeamScrumQuery,
+    StudySheetByTeacherIdWithTeamScrumQueryVariables
 } from '@graphql/generated';
 
 // Función para transformar datos de GraphQL a StudySheet
@@ -67,7 +69,7 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet =
 
         studentStudySheets: graphqlData.studentStudySheets?.filter((s: any) => s !== null).map((ss: any) => ({
             id: ss.student?.id,
-            state: ss.studentStyudySheetState?.name, // Usando el campo mal escrito del backend
+            state: ss.studentStyudySheetState?.name,
             person: {
                 id: ss.student?.person?.id,
                 document: ss.student?.person?.document,
@@ -112,6 +114,7 @@ export const fetchStudySheets = createAsyncThunk<GetStudySheetsQuery['allStudySh
     }
 );
 
+
 export const fetchStudySheetWithTeamScrum = createAsyncThunk<GetStudySheetWithTeamScrumByIdQuery['studySheetById'], GetStudySheetWithTeamScrumByIdQueryVariables>(
     'studySheet/fetchTeamScrum',
     async ({ id }) => {
@@ -138,10 +141,10 @@ export const fetchStudySheetById = createAsyncThunk<GetStudySheetByIdQuery['stud
 
 export const fetchStudySheetByTeacher = createAsyncThunk<StudySheetByTeacherQuery['allStudySheets'], StudySheetByTeacherQueryVariables>(
     'studySheet/fetchByTeacher',
-    async ({ IdTeacher, page, size }) => {
+    async ({ idTeacher, page, size }) => {
         const { data } = await clientLAN.query<StudySheetByTeacherQuery, StudySheetByTeacherQueryVariables>({
             query: GET_STUDY_SHEET_BY_TEACHER,
-            variables: { IdTeacher, page, size },
+            variables: { idTeacher, page, size },
             fetchPolicy: 'no-cache',
         })
         return data.allStudySheets;
@@ -161,7 +164,19 @@ export const fetchStudySheetWithStudents = createAsyncThunk<GetStudySheetWithStu
     }
 );
 
-interface ExtendedStudySheetState extends ReturnType<typeof createInitialPaginatedState<StudySheet>> {
+export const fetchStudySheetByTeacherIdWithTeamScrum = createAsyncThunk<StudySheetByTeacherIdWithTeamScrumQuery['allStudySheets'], StudySheetByTeacherIdWithTeamScrumQueryVariables>(
+    'studySheet/fetchByTeacherIdWithTeamScrum',
+    async ({ idTeacher, page, size }) => {
+        const { data } = await clientLAN.query<StudySheetByTeacherIdWithTeamScrumQuery, StudySheetByTeacherIdWithTeamScrumQueryVariables>({
+            query: GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM,
+            variables: { idTeacher, page, size },
+            fetchPolicy: 'no-cache',
+        });
+        return data.allStudySheets;
+    }
+);
+
+interface ExtendedStudySheetState extends ReturnType<typeof createInitialPaginatedState < StudySheet >> {
     dataForStudents: Record<string, Student[]>,
     dataForTeamScrums: TeamsScrum[]
 }
@@ -252,7 +267,7 @@ const studySheetSlice = createSlice({
             })
             .addCase(fetchStudySheetByTeacher.fulfilled, (state, action) => {
                 const payload = action.payload;
-                console.log('Payload fetchStudySheetByTeacher:', payload);
+                console.log('Payload fetchStudySheetByTeacher:33333333333333333333333333333333', payload);
 
                 if (payload?.data) {
                     const transformedData = payload.data
@@ -315,6 +330,35 @@ const studySheetSlice = createSlice({
                 state.loading = false;
             });
 
+        // Fetch StudySheet by Teacher ID with TeamScrum
+        builder
+            .addCase(fetchStudySheetByTeacherIdWithTeamScrum.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchStudySheetByTeacherIdWithTeamScrum.fulfilled, (state, action) => {
+                const payload = action.payload;
+                if (payload?.data) {
+                    const transformedData = payload.data
+                        .filter((item): item is NonNullable<typeof item> => item !== null)
+                        .map(transformGraphQLToStudySheetItem);
+
+                    state.data = transformedData;
+                    state.totalItems = payload.totalItems ?? 0;
+                    state.totalPages = payload.totalPages ?? 0;
+                    state.currentPage = payload.currentPage ?? 0;
+                } else {
+                    state.data = [];
+                    state.totalItems = 0;
+                    state.totalPages = 0;
+                    state.currentPage = 0;
+                }
+                state.loading = false;
+            })
+            .addCase(fetchStudySheetByTeacherIdWithTeamScrum.rejected, (state, action) => {
+                state.error = action.error.message ?? 'Error fetching study sheets by teacher with team scrum';
+                state.loading = false;
+            });
     }
 });
 
