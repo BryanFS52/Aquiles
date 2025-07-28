@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { fetchStudySheetWithTeamScrum, fetchStudySheetByTeacherIdWithTeamScrum } from "@slice/olympo/studySheetSlice";
+import { fetchStudySheetWithTeamScrum } from "@slice/olympo/studySheetSlice";
 import { addTeamScrum, deleteTeamScrum, updateTeamScrum } from "@slice/teamScrumSlice";
 import { AddTeamScrumMutationVariables } from "@/graphql/generated";
 import { toast } from "react-toastify";

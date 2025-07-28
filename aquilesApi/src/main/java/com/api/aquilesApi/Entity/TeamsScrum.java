@@ -17,7 +17,6 @@ import java.util.List;
 @Entity
 @Table(name = "teams_scrum")
 public class TeamsScrum implements Serializable {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -42,7 +41,6 @@ public class TeamsScrum implements Serializable {
     private String projectJustification;
 
     // Relations
-
     // 1. Relation (M-1) con Checklist
     @ManyToOne
     @JoinColumn(name = "checklist_id", nullable = true)

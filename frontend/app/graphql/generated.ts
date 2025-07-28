@@ -4237,7 +4237,7 @@ export type StudySheetByTeacherIdWithTeamScrumQueryVariables = Exact<{
 }>;
 
 
-export type StudySheetByTeacherIdWithTeamScrumQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ number?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, journey?: { name?: string | null } | null, trainingProject?: { name?: string | null, program?: { name?: string | null } | null } | null, teamsScrum?: Array<{ teamName?: string | null, students?: Array<{ person?: { lastname?: string | null, name?: string | null, document?: string | null } | null } | null> | null } | null> | null } | null> | null } | null };
+export type StudySheetByTeacherIdWithTeamScrumQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, journey?: { name?: string | null } | null, trainingProject?: { name?: string | null, program?: { name?: string | null } | null } | null, teamsScrum?: Array<{ id: string, teamName?: string | null, students?: Array<{ id?: string | null, person?: { lastname?: string | null, name?: string | null, document?: string | null } | null } | null> | null } | null> | null } | null> | null } | null };
 
 export type GetTeamsScrumsQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -6250,6 +6250,7 @@ export const StudySheetByTeacherIdWithTeamScrumDocument = gql`
     code
     message
     data {
+      id
       number
       startLective
       endLective
@@ -6264,8 +6265,10 @@ export const StudySheetByTeacherIdWithTeamScrumDocument = gql`
         }
       }
       teamsScrum {
+        id
         teamName
         students {
+          id
           person {
             lastname
             name

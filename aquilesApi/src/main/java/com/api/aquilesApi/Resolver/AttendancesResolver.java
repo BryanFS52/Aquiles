@@ -84,16 +84,20 @@ public class AttendancesResolver {
     @DgsQuery
     public Map<String, Object> allAttendancesByStudentId(@InputArgument Long id, @InputArgument Long stateId, @InputArgument Integer page, @InputArgument Integer size) {
         try {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<AttendanceDto> attendances = attendancesBusiness.findAllByStudentId(id, stateId, pageable);
-        return ResponseHttpApi.responseHttpFindAll(
-                attendances.getContent(),
-                ResponseHttpApi.CODE_OK,
-                "query attendances by id ok",
-                attendances.getSize(),
-                page,
-                attendances.getTotalPages()
-        );
+            int safePage = (page != null) ? page : 0;
+            int safeSize = (size != null) ? size : 10;
+
+            Pageable pageable = PageRequest.of(safePage, safeSize);
+            Page<AttendanceDto> attendances = attendancesBusiness.findAllByStudentId(id, stateId, pageable);
+
+            return ResponseHttpApi.responseHttpFindAll(
+                    attendances.getContent(),
+                    ResponseHttpApi.CODE_OK,
+                    "query attendances by id ok",
+                    attendances.getSize(),
+                    safePage,
+                    attendances.getTotalPages()
+            );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

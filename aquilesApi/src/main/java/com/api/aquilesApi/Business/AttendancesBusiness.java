@@ -4,14 +4,10 @@ import com.api.aquilesApi.Dto.AttendanceDto;
 import com.api.aquilesApi.Dto.TeamsScrumDto;
 import com.api.aquilesApi.Entity.Attendance;
 import com.api.aquilesApi.Entity.AttendanceState;
-import com.api.aquilesApi.Grpc.Service.DesertionGrpcService;
 import com.api.aquilesApi.Service.AttendancesService;
 import com.api.aquilesApi.Service.StateAttendanceService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Util;
-import com.api.aquilesApi.proto.DesertionRequest;
-import com.api.aquilesApi.proto.DesertionResponse;
-import io.grpc.StatusRuntimeException;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -21,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -29,19 +24,16 @@ public class AttendancesBusiness {
 
     private final AttendancesService attendancesService;
     private final StateAttendanceService stateAttendanceService;
-    private final DesertionGrpcService desertionGrpcService;
     private final ModelMapper modelMapper;
 
     public AttendancesBusiness(
             AttendancesService attendancesService,
             StateAttendanceService stateAttendanceService,
             Util util,
-            DesertionGrpcService desertionGrpcService,
             ModelMapper modelMapper
     ) {
         this.attendancesService = attendancesService;
         this.stateAttendanceService = stateAttendanceService;
-        this.desertionGrpcService = desertionGrpcService;
         this.modelMapper = modelMapper;
     }
 
@@ -50,29 +42,6 @@ public class AttendancesBusiness {
 
     }
 
-    // Check if a student meets absence criteria and notify if needed
-    private void validateAbsencesAndNotify(Long studentId) {
-        List<Attendance> attendances = attendancesService.getSortedByStudent(studentId);
-
-        int consecutive = 0;
-        int intermittent = 0;
-
-        for (Attendance a : attendances) {
-            boolean isAbsence = a.getAttendanceState().getStatus().equalsIgnoreCase("Falta");
-
-            if (isAbsence) {
-                consecutive++;
-                intermittent++;
-            } else {
-                consecutive = 0;
-            }
-
-            if (consecutive >= 3 || intermittent >= 5) {
-                // notify through subscription or refetch
-                break;
-            }
-        }
-    }
 
     // Get all attendances (paginated)
     public Page<AttendanceDto> findAll(int page, int size) {
@@ -157,28 +126,6 @@ public class AttendancesBusiness {
             throw e;
         } catch (Exception e) {
             throw new CustomException("Error Deleting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    // Notify (themis) desertion process via gRPC
-    public void notifyDesertionProcess(Long studentId, String reason, Long teacherId) {
-        try {
-            if (studentId == null || teacherId == null || reason == null || reason.isBlank()) {
-                throw new IllegalArgumentException("Invalid parameters for the attrition process.");
-            }
-
-            DesertionResponse response = desertionGrpcService.notifyDesertion(studentId, reason, teacherId);
-
-            if (!response.getSuccess()) {
-                throw new CustomException("The desertion service returned failure: " + response.getMessage(),
-                        HttpStatus.BAD_REQUEST);
-            }
-
-        } catch (StatusRuntimeException e) {
-            throw new CustomException("gRPC communication error: " + e.getStatus().getDescription(),
-                    HttpStatus.SERVICE_UNAVAILABLE);
-        } catch (Exception e) {
-            throw new CustomException("Error starting the desertion process: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

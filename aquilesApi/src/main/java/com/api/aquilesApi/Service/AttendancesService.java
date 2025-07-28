@@ -67,9 +67,4 @@ public class AttendancesService implements Idao<Attendance, Long> {
     public Page<Attendance> findAllByFilter(Long studentId, Long attendanceState, Pageable pageable) {
         return attendancesRepository.findByStudentIdAndOrAttendanceStateId(studentId, attendanceState, pageable);
     }
-
-    // Get attendances for a student sorted by date (ascending)
-    public List<Attendance> getSortedByStudent(Long studentId) {
-        return attendancesRepository.findByStudentIdOrderByAttendanceDateAsc(studentId);
-    }
 }
