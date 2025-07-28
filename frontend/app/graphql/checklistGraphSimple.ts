@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
-// Queries and Mutations for Checklist
-export const GET_ALL_CHECKLISTS = gql`
+// Queries simplificadas para Checklist (sin campos problemáticos)
+export const GET_ALL_CHECKLISTS_SIMPLE = gql`
   query GetAllChecklists($page: Int, $size: Int) {
     allChecklists(page: $page, size: $size) {
       date
@@ -16,10 +16,14 @@ export const GET_ALL_CHECKLISTS = gql`
         remarks
         instructorSignature
         evaluationCriteria
-        trimester
-        component
         studySheets
         evaluations
+        items {
+          id
+          code
+          indicator
+          active
+        }
         associatedJuries {
           id
         }
@@ -28,9 +32,7 @@ export const GET_ALL_CHECKLISTS = gql`
   }
 `;
 
-
-
-export const GET_CHECKLIST_BY_ID = gql`
+export const GET_CHECKLIST_BY_ID_SIMPLE = gql`
   query GetChecklistById($id: Long!) {
     checklistById(id: $id) {
       code
@@ -42,10 +44,14 @@ export const GET_CHECKLIST_BY_ID = gql`
         remarks
         instructorSignature
         evaluationCriteria
-        trimester
-        component
         studySheets
         evaluations
+        items {
+          id
+          code
+          indicator
+          active
+        }
         associatedJuries {
           id
         }
@@ -54,8 +60,7 @@ export const GET_CHECKLIST_BY_ID = gql`
   }
 `;
 
-
-export const ADD_CHECKLIST = gql`
+export const ADD_CHECKLIST_SIMPLE = gql`
   mutation AddChecklist($input: ChecklistDto!) {
     addChecklist(input: $input) {
       code
@@ -65,7 +70,7 @@ export const ADD_CHECKLIST = gql`
   }
 `;
 
-export const UPDATE_CHECKLIST = gql`
+export const UPDATE_CHECKLIST_SIMPLE = gql`
   mutation UpdateChecklist($id: Long!, $input: ChecklistDto!) {
     updateChecklist(id: $id, input: $input) {
       code
@@ -75,9 +80,19 @@ export const UPDATE_CHECKLIST = gql`
   }
 `;
 
-export const DELETE_CHECKLIST = gql`
+export const DELETE_CHECKLIST_SIMPLE = gql`
   mutation DeleteChecklist($id: Long!) {
     deleteChecklist(id: $id) {
+      code
+      message
+      id
+    }
+  }
+`;
+
+export const UPDATE_ITEM_STATUS = gql`
+  mutation UpdateItemStatus($itemId: Long!, $active: Boolean!) {
+    updateItemStatus(itemId: $itemId, active: $active) {
       code
       message
       id

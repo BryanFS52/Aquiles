@@ -1,11 +1,11 @@
 import { client } from '@/lib/apollo-client';
 import {
-  GET_ALL_CHECKLISTS,
-  GET_CHECKLIST_BY_ID,
-  ADD_CHECKLIST,
-  UPDATE_CHECKLIST,
-  DELETE_CHECKLIST,
-} from '@graphql/checklistGraph';
+  GET_ALL_CHECKLISTS_SIMPLE as GET_ALL_CHECKLISTS,
+  GET_CHECKLIST_BY_ID_SIMPLE as GET_CHECKLIST_BY_ID,
+  ADD_CHECKLIST_SIMPLE as ADD_CHECKLIST,
+  UPDATE_CHECKLIST_SIMPLE as UPDATE_CHECKLIST,
+  DELETE_CHECKLIST_SIMPLE as DELETE_CHECKLIST,
+} from '@graphql/checklistGraphSimple';
 
 export const fetchAllChecklists = async (page, size) => {
   const { data } = await client.query({
