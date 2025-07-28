@@ -44,6 +44,12 @@ public class Checklist implements Serializable {
     @Column(name = "evaluations")
     private Long evaluations;
 
+    @Column(name = "trimester", length = 50)
+    private String trimester;
+
+    @Column(name = "component", length = 100)
+    private String component;
+
     // Relations
 
     // 1.Relation (1-M) con item

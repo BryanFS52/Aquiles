@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -28,6 +29,11 @@ public class ChecklistDto {
     @NotNull(message = "El criterio de evaluación es obligatorio")
     private boolean evaluationCriteria;
 
+    @NotNull(message = "El trimestre es obligatorio")
+    private String trimester;
+
+    private String component;
+
 
 
     // Relations
@@ -42,8 +48,5 @@ public class ChecklistDto {
 
     private Long studySheets;
 
-                                
+    private List<ItemDto> items;
 }
-
-
-    
