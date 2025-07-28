@@ -28,8 +28,8 @@ public class TeamsScrumBusiness {
         this.modelMapper = modelMapper;
     }
 
-    // Validation object
-    public void validationObject(TeamsScrumDto teamsScrumDto) throws CustomException {
+    // Validation Object
+    private void validationObject(TeamsScrumDto teamsScrumDto) throws CustomException {
         // Validation max 4 members
         if (teamsScrumDto.getMemberIds() != null && teamsScrumDto.getMemberIds().size() > 4) {
             throw new CustomException("A Team Scrum can have a maximum of 4 members.", HttpStatus.BAD_REQUEST);

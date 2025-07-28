@@ -1,60 +1,64 @@
-    package com.api.aquilesApi.Entity;
+package com.api.aquilesApi.Entity;
 
-    import jakarta.persistence.*;
-    import lombok.AllArgsConstructor;
-    import lombok.Getter;
-    import lombok.NoArgsConstructor;
-    import lombok.Setter;
-    import java.io.Serializable;
-    import java.util.ArrayList;
-    import java.util.List;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Getter
-    @Setter
-    @Entity
-    @Table(name = "teams_scrum")
-    public class TeamsScrum implements Serializable {
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-        // Columns
-        @Column(name = "team_name", nullable = false, length = 100)
-        private String teamName;
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Entity
+@Table(name = "teams_scrum")
+public class TeamsScrum implements Serializable {
 
-        @Column(name = "project_name", nullable = false, length = 100)
-        private String projectName;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-        @Column(name = "problem", nullable = false, length = 1000)
-        private String problem;
+    // Columns
+    @Column(name = "team_name", nullable = false, length = 100)
+    private String teamName;
 
-        @Column(name = "objectives", nullable = false, length = 1000)
-        private String objectives;
+    @Column(name = "project_name", nullable = false, length = 100)
+    private String projectName;
 
-        @Column(name = "description", nullable = false, length = 1000)
-        private String description;
+    @Column(name = "problem", nullable = false, length = 1000)
+    private String problem;
 
-        @Column(name = "project_justification", nullable = false, length = 1000)
-        private String projectJustification;
+    @Column(name = "objectives", nullable = false, length = 1000)
+    private String objectives;
 
-        // Relations
-        // 1. Relation (M-1) con Checklist
-        @ManyToOne
-        @JoinColumn(name = "checklist_id", nullable = true)
-        private Checklist checklist;
+    @Column(name = "description", nullable = false, length = 1000)
+    private String description;
 
-        // 2. Relation (M-1) con studySheet
-        @Column(name = "study_sheet_id")
-        private Long studySheetId;
+    @Column(name = "project_justification", nullable = false, length = 1000)
+    private String projectJustification;
 
-        // 3. Relation (M-M) con apprentice
-        @ElementCollection
-        @CollectionTable(
-                name = "team_scrum_members",
-                joinColumns = @JoinColumn(name = "team_id")
-        )
-        private List<TeamScrumMemberId> memberIds = new ArrayList<>();
-        private Long processMethodologyId;
-    }
+    // Relations
+
+    // 1. Relation (M-1) con Checklist
+    @ManyToOne
+    @JoinColumn(name = "checklist_id", nullable = true)
+    private Checklist checklist;
+
+    // 2. Relation (M-1) con studySheet
+    @Column(name = "study_sheet_id")
+    private Long studySheetId;
+
+    // 3. Relation (M-M) con apprentice
+    @ElementCollection
+    @CollectionTable(
+            name = "team_scrum_members",
+            joinColumns = @JoinColumn(name = "team_id")
+    )
+    private List<TeamScrumMemberId> memberIds = new ArrayList<>();
+
+    private Long processMethodologyId;
+}

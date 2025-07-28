@@ -43,7 +43,7 @@ public class StateAttendanceResolver {
             }
         } catch (Exception e){
             return  ResponseHttpApi.responseHttpError(
-                    "Error getting State Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error getting StateAttendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -58,7 +58,7 @@ public class StateAttendanceResolver {
                     "Successfully Completed");
         } catch (Exception e){
             return  ResponseHttpApi.responseHttpError(
-                    "Error getting State Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error getting StateAttendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -74,10 +74,9 @@ public class StateAttendanceResolver {
             );
         }    catch (Exception e) {
             return  ResponseHttpApi.responseHttpError(
-                    "Error adding  State Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error adding StateAttendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     // Update StateAttendance (GraphQL)
     @DgsMutation
@@ -91,7 +90,7 @@ public class StateAttendanceResolver {
             );
         } catch (Exception e) {
             return  ResponseHttpApi.responseHttpError(
-                    "Error State Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error StateAttendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -107,7 +106,7 @@ public class StateAttendanceResolver {
             );
         } catch (Exception e) {
             return  ResponseHttpApi.responseHttpError(
-                    "Error State Attendance : " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error StateAttendance : " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }

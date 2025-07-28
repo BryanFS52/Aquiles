@@ -25,4 +25,5 @@ public interface AttendancesRepository extends JpaRepository<Attendance, Long> {
             @Param("attendanceStateId") Long attendanceStateId,
             Pageable pageable
     );
+    List<Attendance> findByStudentIdOrderByAttendanceDateAsc(Long studentId);
 }

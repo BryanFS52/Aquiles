@@ -40,7 +40,7 @@ public class TeamsScrumResolver {
 
     @DgsEntityFetcher(name = "StudySheet")
     public StudySheet studySheetReference(Map<String, Object> values) {
-        System.out.println("→ Resolviendo entidad federada StudySheet con values: " + values);
+        System.out.println("→ Solving Federated Entity StudySheet with Values: " + values);
         String idStr = (String) values.get("id");
         Long id  = Long.parseLong(idStr);
         return new StudySheet(id);
@@ -54,7 +54,7 @@ public class TeamsScrumResolver {
             TeamsScrumDto dto = teamsScrumBusiness.findById(id);
             return modelMapper.map(dto, TeamsScrum.class);
         } catch (CustomException e) {
-            System.out.println("TeamsScrum no encontrado: " + e.getMessage());
+            System.out.println("TeamsScrum not found: " + e.getMessage());
             return null;
         }
     }
@@ -171,7 +171,7 @@ public class TeamsScrumResolver {
             }
         } catch (Exception e){
             return ResponseHttpApi.responseHttpError(
-                    "Error retrieving Teams Scrums: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error retrieving TeamsScrums: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -186,7 +186,7 @@ public class TeamsScrumResolver {
                     "Successfully Completed");
         } catch (Exception e){
             return ResponseHttpApi.responseHttpError(
-                    "Error getting Team Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error getting TeamScrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -204,7 +204,7 @@ public class TeamsScrumResolver {
                     e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e){
             return ResponseHttpApi.responseHttpError(
-                    "Error adding Team Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error adding TeamScrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -220,7 +220,7 @@ public class TeamsScrumResolver {
             );
         } catch (Exception e){
             return ResponseHttpApi.responseHttpError(
-                    "Error updating Team Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error updating TeamScrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

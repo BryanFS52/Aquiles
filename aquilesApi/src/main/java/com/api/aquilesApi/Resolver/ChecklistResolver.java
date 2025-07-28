@@ -80,8 +80,7 @@ public class ChecklistResolver {
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error updating Checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
