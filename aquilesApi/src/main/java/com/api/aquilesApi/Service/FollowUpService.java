@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Service;
 
-import com.api.aquilesApi.Entity.FollowUps;
-import com.api.aquilesApi.Repository.FollowUpRepository;
+import com.api.aquilesApi.Entity.FollowUpAction;
+import com.api.aquilesApi.Repository.FollowUpActionRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.springframework.data.domain.Page;
@@ -10,40 +10,40 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FollowUpService implements Idao<FollowUps, Long> {
+public class FollowUpService implements Idao<FollowUpAction, Long> {
 
-    private final FollowUpRepository followUpRepository;
+    private final FollowUpActionRepository followUpRepository;
 
-    public FollowUpService(FollowUpRepository followUpRepository) {
+    public FollowUpService(FollowUpActionRepository followUpRepository) {
         this.followUpRepository = followUpRepository;
     }
 
     // Service Find All
     @Override
-    public Page<FollowUps> findAll(PageRequest pageRequest) {
+    public Page<FollowUpAction> findAll(PageRequest pageRequest) {
         return  followUpRepository.findAll(pageRequest);
     }
 
     // Service Find By ID
     @Override
-    public FollowUps getById(Long id) {
+    public FollowUpAction getById(Long id) {
         return followUpRepository.findById(id).orElseThrow(() ->
                 new CustomException("FollowUp whit id " + id + "not fund", HttpStatus.NO_CONTENT));
     }
 
     // Service Create
     @Override
-    public void create(FollowUps entity) {this.followUpRepository.save(entity);}
+    public void create(FollowUpAction entity) {this.followUpRepository.save(entity);}
 
     // Service Update
     @Override
-    public void update(FollowUps entity) { this.followUpRepository.save(entity);}
+    public void update(FollowUpAction entity) { this.followUpRepository.save(entity);}
 
     // Service Save
     @Override
-    public FollowUps save(FollowUps entity) {return followUpRepository.save(entity);}
+    public FollowUpAction save(FollowUpAction entity) {return followUpRepository.save(entity);}
 
     // Service Delete/Deactivate
     @Override
-    public void delete(FollowUps entity) {this.followUpRepository.delete(entity);}
+    public void delete(FollowUpAction entity) {this.followUpRepository.delete(entity);}
 }

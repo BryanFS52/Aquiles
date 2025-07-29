@@ -187,7 +187,7 @@ export default function JustificacionAprendiz() {
       const formDataWithFile = {
         description: form.formData.descripcion,
         justificationFile: base64Ref.current,
-        justificationDate: new Date().toISOString().split("T")[0],
+        justificationDate: new Date().toLocaleDateString('en-CA'), // Formato YYYY-MM-DD en zona local
         justificationType: { id: form.formData.justificationTypeId.id },
         attendance: { id: currentAttendance?.id },
         state: false,
@@ -277,7 +277,9 @@ export default function JustificacionAprendiz() {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    // Parsear la fecha asumiendo que viene en formato YYYY-MM-DD y es local
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day); // month - 1 porque los meses van de 0-11
     return date.toLocaleDateString("es-CO", {
       year: "numeric",
       month: "long",

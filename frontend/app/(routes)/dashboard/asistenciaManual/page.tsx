@@ -36,7 +36,7 @@ const AttendanceManualPage: React.FC = () => {
 
     const [attendance, setAttendance] = useState<Record<string | number, AttendanceStatus>>({})
     const [searchTerm, setSearchTerm] = useState<string>("")
-    const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split("T")[0])
+    const [selectedDate, setSelectedDate] = useState<string>(new Date().toLocaleDateString('en-CA'))
     const [selectedFilter, setSelectedFilter] = useState<FilterOption>("todos")
     const [selectedStudent, setSelectedStudent] = useState<string | number | null>(null)
     const [attendanceHistory, setAttendanceHistory] = useState<AttendanceHistoryType[]>([])
