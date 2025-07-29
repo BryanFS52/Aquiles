@@ -6,14 +6,19 @@ import { IoPeople } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from 'react-redux';
 import { useUser } from '@context/UserContext';
+import { useLoader } from '@/context/LoaderContext';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
 import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
-import { fetchJustifications, generateFileName } from '@slice/justificationSlice';
-import type { AppDispatch, RootState } from '@/redux/store'
-import type { FormDataState } from '@slice/justificationSlice';
-import type { AttendanceItem } from '@type/slices/attendance';
+import {
+  fetchJustifications,
+  generateFileName,
+} from "@slice/justificationSlice";
+
+import { AppDispatch, RootState } from "@/redux/store";
+import { FormDataState } from "@slice/justificationSlice";
+import { Attendance } from "@graphql/generated";
 import PageTitle from "@components/UI/pageTitle";
-import JustificationFormComponent from '@components/features/justification/justificationForm';
+import JustificationFormComponent from "@components/features/justification/justificationForm";
 
 import {
   showForm,
@@ -26,32 +31,20 @@ import {
   validateForm,
   downloadBase64File,
   setSubmitting,
-  setCurrentAttendance
-} from '@slice/justificationSlice';
-import {
-  FaCalendarDay,
-  FaRegListAlt,
-  FaCheckCircle,
-} from "react-icons/fa";
+  setCurrentAttendance,
+} from "@slice/justificationSlice";
+import { FaCalendarDay, FaRegListAlt, FaCheckCircle } from "react-icons/fa";
 import JustificationsHistorical from "@/components/features/justification/justificationsHistorical";
 
-
-// const sessions = {
-//   "1": {
-//     componentName: "Nombre del Componente",
-//     date: "01/09/2024",
-//     time: "10:00 AM",
-//     sheet: "Ficha 12345",
-//     instructors: ["Instructor 1", "Instructor 2"],
-//   },
-// };
 
 export default function JustificacionAprendiz() {
   const fileRef = useRef<File | null>(null);
   const base64Ref = useRef<string>("");
   const formRef = useRef<HTMLDivElement>(null);
+
   const topRef = useRef<HTMLDivElement>(null);
   const { user } = useUser();
+  const { showLoader, hideLoader } = useLoader();
 
   // Estado local para controlar la carga del modal
   const [shouldLoadModal, setShouldLoadModal] = useState(false);
@@ -59,28 +52,35 @@ export default function JustificacionAprendiz() {
   const dispatch = useDispatch<AppDispatch>();
   const fileInputRefPrev = useRef<HTMLInputElement>(null);
 
-  const { data: justificationTypesData, loading: loadingJustificationTypes, error: errorJustificationTypes } =
-    useSelector((state: RootState) => state.justificationType);
-  const { data: attendancesData, loading: loadingAttendances, error: errorAttendances
+  const {
+    data: justificationTypesData,
+    loading: loadingJustificationTypes,
+    error: errorJustificationTypes,
+  } = useSelector((state: RootState) => state.justificationType);
+  const {
+    data: attendancesData,
+    loading: loadingAttendances,
+    error: errorAttendances,
   } = useSelector((state: RootState) => state.attendances.studentAttendances);
-  const { transformedData: justificationsData, loading: loadingJustifications } =
-    useSelector((state: RootState) => state.justification);
-  const { loading: loadingJustification, error: errorJustification, form } =
-    useSelector((state: RootState) => state.justification);
+  const {
+    transformedData: justificationsData,
+    loading: loadingJustifications,
+  } = useSelector((state: RootState) => state.justification);
+  const {
+    loading: loadingJustification,
+    error: errorJustification,
+    form,
+  } = useSelector((state: RootState) => state.justification);
   const currentAttendance = useSelector(
     (state: RootState) => state.justification.form.currentAttendance
   );
 
-
   useEffect(() => {
-    // if (user?.id) {
-      dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-      dispatch(fetchAttendancesByStudent({ id: 1, stateId: 2 }));
-      dispatch(fetchJustifications({ page: 0, size: 10 }));
-    // }
+    dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
+    dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 }));
+    dispatch(fetchJustifications({ page: 0, size: 10 }));
   }, [dispatch]);
 
-  // Efecto para sincronizar el estado local con el estado global
   useEffect(() => {
     if (form.showForm && !shouldLoadModal) {
       const timer = setTimeout(() => {
@@ -92,23 +92,34 @@ export default function JustificacionAprendiz() {
     }
   }, [form.showForm, shouldLoadModal]);
 
-  if (loadingJustificationTypes || loadingAttendances || loadingJustifications) {
+  if (
+    loadingJustificationTypes ||
+    loadingAttendances ||
+    loadingJustifications
+  ) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary"></div>
-        <span className="ml-4 text-xl font-semibold text-black dark:text-white">Cargando datos...</span>
+        <span className="ml-4 text-xl font-semibold text-black dark:text-white">
+          Cargando datos...
+        </span>
       </div>
     );
   }
-  if (errorJustificationTypes || errorAttendances) return <p>Error cargando datos</p>;
+  if (errorJustificationTypes || errorAttendances)
+    return <p>Error cargando datos</p>;
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     dispatch(updateFormField({ field: name as keyof FormDataState, value }));
   };
 
   const handleNumericInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    dispatch(updateNumericField({ field: e.target.name, value: e.target.value }));
+    dispatch(
+      updateNumericField({ field: e.target.name, value: e.target.value })
+    );
   };
 
   const handleTextInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -119,7 +130,7 @@ export default function JustificacionAprendiz() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+    const validTypes = ["image/jpeg", "image/png", "application/pdf"];
     const maxSize = 5 * 1024 * 1024;
 
     if (!validTypes.includes(file.type)) {
@@ -137,7 +148,7 @@ export default function JustificacionAprendiz() {
         const reader = new FileReader();
         reader.onloadend = () => {
           const result = reader.result as string;
-          const base64 = result.split(',')[1];
+          const base64 = result.split(",")[1];
           resolve(base64);
         };
         reader.onerror = () => reject("Error al leer el archivo.");
@@ -148,7 +159,11 @@ export default function JustificacionAprendiz() {
       base64Ref.current = base64;
       toast.success("Archivo procesado correctamente.");
     } catch (error) {
-      toast.error(typeof error === "string" ? error : "Error inesperado al procesar el archivo.");
+      toast.error(
+        typeof error === "string"
+          ? error
+          : "Error inesperado al procesar el archivo."
+      );
     }
   };
 
@@ -157,7 +172,7 @@ export default function JustificacionAprendiz() {
     dispatch(validateForm());
 
     if (form.validationErrors.length > 0) {
-      form.validationErrors.forEach(error => toast.error(error));
+      form.validationErrors.forEach((error) => toast.error(error));
       return;
     }
 
@@ -172,7 +187,7 @@ export default function JustificacionAprendiz() {
       const formDataWithFile = {
         description: form.formData.descripcion,
         justificationFile: base64Ref.current,
-        justificationDate: new Date().toISOString().split('T')[0],
+        justificationDate: new Date().toISOString().split("T")[0],
         justificationType: { id: form.formData.justificationTypeId.id },
         attendance: { id: currentAttendance?.id },
         state: false,
@@ -187,14 +202,16 @@ export default function JustificacionAprendiz() {
       base64Ref.current = "";
 
       setTimeout(() => {
-        topRef.current?.scrollIntoView({ behavior: 'smooth' });
+        topRef.current?.scrollIntoView({ behavior: "smooth" });
       }, 200);
     } catch (error: any) {
       console.error("Error al enviar justificación:", error);
       const errorString = JSON.stringify(error);
       let toastMessage = "Error inesperado al enviar la justificación.";
 
-      if (errorString.includes('duplicate key value violates unique constraint')) {
+      if (
+        errorString.includes("duplicate key value violates unique constraint")
+      ) {
         toastMessage = "Esta asistencia ya ha sido justificada.";
       } else if (error?.message) {
         toastMessage = error.message;
@@ -213,34 +230,45 @@ export default function JustificacionAprendiz() {
     toast.info("Formulario cancelado");
 
     setTimeout(() => {
-      topRef.current?.scrollIntoView({ behavior: 'smooth' });
+      topRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 200);
   };
-
 
   const handleShowForm = (attendanceId?: string) => {
     console.log("🟡 handleShowForm llamado con ID:", attendanceId);
     if (attendanceId && attendancesData) {
-      const currentAttendance = attendancesData.find((a) => a.id === attendanceId);
+      const currentAttendance = attendancesData.find(
+        (a) => a.id === attendanceId
+      );
       console.log("📄 currentAttendance encontrada:", currentAttendance);
 
       if (currentAttendance) {
         const person = currentAttendance.student?.person;
 
         if (person?.document && person?.name && person?.lastname) {
-          dispatch(updateFormField({ field: 'numeroDocumento', value: person.document }));
-          dispatch(updateFormField({ field: 'nombreAprendiz', value: `${person.name} ${person.lastname}` }));
+          dispatch(
+            updateFormField({
+              field: "numeroDocumento",
+              value: person.document,
+            })
+          );
+          dispatch(
+            updateFormField({
+              field: "nombreAprendiz",
+              value: `${person.name} ${person.lastname}`,
+            })
+          );
         }
 
-        dispatch(updateFormField({ field: 'notificationId', value: attendanceId }));
+        dispatch(
+          updateFormField({ field: "notificationId", value: attendanceId })
+        );
 
         // 🔥 ESTO ES LO QUE FALTABA
         dispatch(setCurrentAttendance(currentAttendance));
-
-        // Esperar a que Redux actualice el estado antes de mostrar el form
         setTimeout(() => {
           dispatch(showForm());
-          formRef.current?.scrollIntoView({ behavior: 'smooth' });
+          formRef.current?.scrollIntoView({ behavior: "smooth" });
         }, 10);
       } else {
         console.warn("No se encontró la asistencia con ID:", attendanceId);
@@ -248,24 +276,22 @@ export default function JustificacionAprendiz() {
     }
   };
 
-
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-CO', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return date.toLocaleDateString("es-CO", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
-    const handleDownloadFile = (justificacion:any) => {
-      if (justificacion.archivoAdjunto) {
-        const mimeType = justificacion.archivoMime || "application/octet-stream";
-        const fileName = generateFileName(justificacion.id, mimeType);
-        downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
-      }
-    };
+  const handleDownloadFile = (justificacion: any) => {
+    if (justificacion.archivoAdjunto) {
+      const mimeType = justificacion.archivoMime || "application/octet-stream";
+      const fileName = generateFileName(justificacion.id, mimeType);
+      downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
+    }
+  };
 
   const absences = attendancesData || [];
   return (
@@ -274,8 +300,7 @@ export default function JustificacionAprendiz() {
         <PageTitle>Justificaciones</PageTitle>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2">
-
+      <div className="grid grid-cols-1 lg:grid-cols-2 ">
         <AnimatePresence mode="wait">
           {!form.showForm && !shouldLoadModal && (
             <motion.div
@@ -284,17 +309,17 @@ export default function JustificacionAprendiz() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.4 }}
-              className="bg-white rounded-xl shadow-lg p-8 border border-gray-100"
+              className="bg-white dark:bg-[#002033] rounded-xl shadow-lg p-8 border border-gray-100 dark:border-gray-800"
             >
-              <div className="flex items-center mb-6">
+              <div className="flex items-center mb-6 ">
                 <div className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 p-3 rounded-full shadow-lg">
                   <IoPeople className="text-2xl text-white" />
                 </div>
-                <div className="ml-4">
-                  <h2 className="text-2xl font-bold text-gray-800">
+                <div className="ml-4 ">
+                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
                     Ausencias Registradas
                   </h2>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-600 text-sm dark:text-gray-400">
                     Gestiona tus justificaciones de ausencias
                   </p>
                 </div>
@@ -303,13 +328,13 @@ export default function JustificacionAprendiz() {
               {absences.length > 0 && (
                 <div className="mb-6 ">
                   <div className="max-h-80 overflow-y-auto pr-2 space-y-4">
-                    {absences.map((attendance: AttendanceItem, index) => (
+                    {absences.map((attendance: Attendance, index) => (
                       <motion.div
                         key={attendance.id}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="group hover:shadow-md transition-all duration-300 p-4 bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-xl relative overflow-hidden"
+                        className="group hover:shadow-md transition-all duration-300 p-4 bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 dark:bg-gradient-to-r dark:from-red-300 dark:to-orange-100 dark:border-red-800 rounded-xl relative overflow-hidden"
                       >
                         <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         <div className="relative flex items-center justify-between">
@@ -319,10 +344,12 @@ export default function JustificacionAprendiz() {
                             </div>
                             <div className="ml-4">
                               <div className="font-semibold text-gray-800 text-lg">
-                                {formatDate(attendance.attendanceDate)}
+                                {formatDate(attendance.attendanceDate ?? '')}
                               </div>
                               <div className="text-sm text-red-600 font-medium">
-                                Estado: {attendance.attendanceState?.status || 'Ausente'}
+                                Estado:{" "}
+                                {attendance.attendanceState?.status ||
+                                  "Ausente"}
                               </div>
                             </div>
                           </div>
@@ -351,13 +378,13 @@ export default function JustificacionAprendiz() {
                       <FaCheckCircle className="text-6xl text-white" />
                     </div>
                   </motion.div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-3">
+                  <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-3">
                     ¡Excelente asistencia!
                   </h3>
-                  <p className="text-gray-600 text-lg">
+                  <p className="text-gray-600 dark:text-gray-300 text-lg">
                     No tienes ausencias pendientes por justificar.
                   </p>
-                  <p className="text-gray-500 text-sm mt-2">
+                  <p className="text-gray-500 dark:text-gray-300 text-sm mt-2">
                     Continúa manteniendo tu buen récord de asistencia.
                   </p>
                 </div>
@@ -373,7 +400,7 @@ export default function JustificacionAprendiz() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -30, scale: 0.95 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="bg-white rounded-xl shadow-2xl p-6 border border-gray-100"
+              className="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 dark:border-gray-800 dark:bg-[#002033] "
             >
               <div className="">
                 <div className="flex items-center justify-between">
@@ -382,23 +409,23 @@ export default function JustificacionAprendiz() {
                       <FaRegListAlt className="text-2xl text-white" />
                     </div>
                     <div className="ml-4">
-                      <h2 className="text-2xl font-bold text-gray-800">
+                      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
                         Formulario de Justificación
                       </h2>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">
                         Completa los datos para justificar tu ausencia
                       </p>
                     </div>
                   </div>
                   <button
                     onClick={handleCancel}
-                    className="text-gray-400 hover:text-gray-600 text-2xl transition-colors duration-200 hover:bg-gray-100 p-2 rounded-full"
+                    className="text-gray-400 dark:hover:text-gray-100 hover:text-gray-600 text-2xl transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full"
                   >
                     ×
                   </button>
                 </div>
               </div>
-              <div className="p-3">
+              <div className="">
                 <JustificationFormComponent
                   form={form}
                   justificationTypesData={justificationTypesData}
@@ -410,23 +437,33 @@ export default function JustificacionAprendiz() {
                   handleTextInputChange={handleTextInputChange}
                   handleNumericInputChange={handleNumericInputChange}
                   handleFileChange={handleFileChange}
-                  updateJustificationTypeId={(value) => dispatch(updateJustificationTypeId(value))}
+                  updateJustificationTypeId={(value) =>
+                    dispatch(updateJustificationTypeId(value))
+                  }
                   fileRef={fileRef}
                   fileInputRefPrev={fileInputRefPrev}
                 />
               </div>
             </motion.div>
           )}
-              <div className="pl-2">
-                <JustificationsHistorical
-                  data={justificationsData}
-                  loading={loadingJustifications}
-                  handleDownloadFile={handleDownloadFile}
-                />
-              </div>
+          <motion.div
+            key="justification-history"
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -30, scale: 0.95 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 dark:border-gray-800 dark:bg-[#002033] "
+          >
+            <div className="">
+              <JustificationsHistorical
+                data={justificationsData}
+                loading={loadingJustifications}
+                handleDownloadFile={handleDownloadFile}
+              />
+            </div>
+          </motion.div>
         </AnimatePresence>
       </div>
-
     </div>
   );
 }

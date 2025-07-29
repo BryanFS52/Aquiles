@@ -8,9 +8,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class StateFollowUpsDto {
+public class FollowUpActionDto {
     private Long id;
 
     @NotNull(message = "El nombre es oblogatorio")
     private String name;
+
+    @NotNull(message = "La descripcion es obligatoria")
+    private String description;
+
+    // Relations
+    private Long studentId;
 }

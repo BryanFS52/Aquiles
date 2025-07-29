@@ -24,7 +24,7 @@ interface FormErrors {
 
 type CreateTeamData = AddTeamScrumMutationVariables["input"];
 
-interface ModalNewProjectProps {
+interface ModalNewTeamProps {
   isOpen: boolean;
   onClose: () => void;
   onCreate: (data: CreateTeamData) => Promise<boolean>;
@@ -32,7 +32,7 @@ interface ModalNewProjectProps {
   existingTeams?: TeamsScrumDto[];
 }
 
-const ModalNewTeam: React.FC<ModalNewProjectProps> = ({
+const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
   isOpen,
   onClose,
   onCreate,
@@ -56,13 +56,13 @@ const ModalNewTeam: React.FC<ModalNewProjectProps> = ({
 
   // Transformar estudiantes en opciones de select
   const studentOptions: StudentOption[] = studentsForThisSheet
+    .filter(student => !!student.id)
     .map(student => ({
-      id: student.id,
-      value: student.id,
-      label: `${student.person.name} ${student.person.lastname}`,
-      fullName: `${student.person.name} ${student.person.lastname}`
+      id: student.id!,
+      value: student.id!,
+      label: `${student.person?.name ?? ''} ${student.person?.lastname ?? ''}`,
+      fullName: `${student.person?.name ?? ''} ${student.person?.lastname ?? ''}`
     }));
-
   console.log(studentOptions)
 
   // Traer estudiantes al montar el modal
@@ -207,7 +207,7 @@ const ModalNewTeam: React.FC<ModalNewProjectProps> = ({
     selectedOptions: MultiValue<StudentOption>,
     actionMeta: ActionMeta<StudentOption>
   ): void => {
-    const memberIds = selectedOptions.map(option => option.id);
+    const memberIds = selectedOptions.map(option => ({ studentId: parseInt(option.id, 10) }));
     if (memberIds.length > 4) return;
     setTeamData(prev => ({ ...prev, memberIds }));
     if (errors.members) {
@@ -223,7 +223,7 @@ const ModalNewTeam: React.FC<ModalNewProjectProps> = ({
         teamName: teamData.teamName!.trim(),
         projectName: teamData.projectName!.trim(),
         studySheetId,
-        memberIds: teamData.memberIds?.map(id => parseInt(id, 10)),
+        memberIds: teamData.memberIds,
         description: "",
         objectives: "",
         problem: "",
@@ -255,7 +255,7 @@ const ModalNewTeam: React.FC<ModalNewProjectProps> = ({
 
   // Selección de miembros actuales
   const selectedMembers = teamData.memberIds
-    ? studentOptions.filter(s => teamData.memberIds!.includes(s.id))
+    ? studentOptions.filter(s => teamData.memberIds!.some(m => m && m.studentId === parseInt(s.id, 10)))
     : [];
 
   console.log(selectedMembers)
@@ -303,6 +303,26 @@ const ModalNewTeam: React.FC<ModalNewProjectProps> = ({
         {/* Body */}
         <div className="px-6 py-4 max-h-[60vh] overflow-y-auto bg-white">
           <div className="space-y-4">
+
+            {/* Marcos de trabajo */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Marco de trabajo *
+              </label>
+              <select
+                name="marcosDeTrabajo"
+                id="marcosDeTrabajo"
+                required
+                className="w-full px-3 py-2 border-2 border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:opacity-50"
+                disabled={isSubmitting}
+                defaultValue=""
+              >
+                <option value="" disabled>Selecciona un marco de trabajo...</option>
+                <option value="scrum">Scrum</option>
+                <option value="kanban">Kanban</option>
+                <option value="xp">Extreme Programming (XP)</option>
+              </select>
+            </div>
             {/* Nombre del Team Scrum */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -310,6 +330,7 @@ const ModalNewTeam: React.FC<ModalNewProjectProps> = ({
               </label>
               <input
                 type="text"
+                required
                 placeholder="Ej: Team Alpha, Desarrolladores Frontend..."
                 value={teamData.teamName || ''}
                 onChange={(e) => handleInputChange('teamName', e.target.value)}
@@ -331,6 +352,7 @@ const ModalNewTeam: React.FC<ModalNewProjectProps> = ({
               </label>
               <input
                 type="text"
+                required
                 placeholder="Ej: Sistema de Gestión, App Mobile..."
                 value={teamData.projectName || ''}
                 onChange={(e) => handleInputChange('projectName', e.target.value)}
@@ -373,6 +395,7 @@ const ModalNewTeam: React.FC<ModalNewProjectProps> = ({
                 closeMenuOnSelect={false}
                 hideSelectedOptions={false}
                 maxMenuHeight={200}
+                required
                 menuPlacement="auto"
                 menuPortalTarget={document.body}
                 menuPosition="fixed"

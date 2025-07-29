@@ -44,6 +44,7 @@ public class Attendance implements Serializable {
     @JoinColumn(name = "stateAttendance_id", referencedColumnName = "id")
     private AttendanceState attendanceState;
 
+
     // 3.Relation (M-M) con notifications
     @ManyToMany(mappedBy = "attendances")
     private Set<Notifications> notifications;

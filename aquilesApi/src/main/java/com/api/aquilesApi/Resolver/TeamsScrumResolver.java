@@ -1,6 +1,7 @@
 package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.TeamsScrumBusiness;
+import com.api.aquilesApi.Dto.Profile;
 import com.api.aquilesApi.Dto.Student;
 import com.api.aquilesApi.Dto.StudySheet;
 import com.api.aquilesApi.Dto.TeamsScrumDto;
@@ -11,6 +12,7 @@ import com.netflix.graphql.dgs.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -20,21 +22,29 @@ import java.util.stream.Collectors;
 public class TeamsScrumResolver {
 
     private final TeamsScrumBusiness teamsScrumBusiness;
-    private final ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
-    public TeamsScrumResolver(TeamsScrumBusiness teamsScrumBusiness) {
+    public TeamsScrumResolver(TeamsScrumBusiness teamsScrumBusiness, ModelMapper modelMapper) {
         this.teamsScrumBusiness = teamsScrumBusiness;
+        this.modelMapper = modelMapper;
     };
+
+    @DgsEntityFetcher(name = "Profile")
+    public Profile getProfile(Map<String, Object> values) {
+        String id = (String) values.get("id");
+        if (id == null) return null;
+        Profile profile = new Profile();
+        profile.setId(id);
+        return profile;
+    }
 
     @DgsEntityFetcher(name = "StudySheet")
     public StudySheet studySheetReference(Map<String, Object> values) {
-        System.out.println("→ Resolviendo entidad federada StudySheet con values: " + values);
+        System.out.println("→ Solving Federated Entity StudySheet with Values: " + values);
         String idStr = (String) values.get("id");
         Long id  = Long.parseLong(idStr);
         return new StudySheet(id);
     }
-
-
 
     @DgsEntityFetcher(name = "TeamsScrum")
     public TeamsScrum teamScrum(Map<String, Object> values) {
@@ -44,7 +54,7 @@ public class TeamsScrumResolver {
             TeamsScrumDto dto = teamsScrumBusiness.findById(id);
             return modelMapper.map(dto, TeamsScrum.class);
         } catch (CustomException e) {
-            System.out.println("TeamsScrum no encontrado: " + e.getMessage());
+            System.out.println("TeamsScrum not found: " + e.getMessage());
             return null;
         }
     }
@@ -52,61 +62,54 @@ public class TeamsScrumResolver {
     @DgsData(parentType = "StudySheet", field = "teamsScrum")
     public List<TeamsScrum> teamScrums(DgsDataFetchingEnvironment dfe) {
         StudySheet studySheet = dfe.getSource();
+        assert studySheet != null;
         Long studySheetId = studySheet.getId();
 
         List<TeamsScrumDto> dtos = teamsScrumBusiness.findAllByStudySheetId(studySheetId);
-        System.out.println("StudySheet ID: " + studySheetId + " → TeamsScrums encontrados: " + dtos.size());
 
         return dtos.stream()
                 .map(dto -> modelMapper.map(dto, TeamsScrum.class))
                 .collect(Collectors.toList());
     }
 
-
-
     @DgsData(parentType = "Student", field = "teamScrums")
     public List<TeamsScrum> teamsScrum(DgsDataFetchingEnvironment env) {
         Student student = env.getSource();
         assert student != null;
-
         Long studentId = student.getId();
 
         List<TeamsScrumDto> teamsScrumDtoList = teamsScrumBusiness.findAllByStudentId(studentId);
-        System.out.println("Student ID: " + studentId + " → TeamsScrums encontrados: " + teamsScrumDtoList.size());
 
         return teamsScrumDtoList.stream()
                 .map(dto -> modelMapper.map(dto, TeamsScrum.class))
                 .collect(Collectors.toList());
     }
 
-    // Aquí agregué explícitamente el 'field = "teamScrums"'
-
-    @DgsData(parentType = "TeamsScrum", field = "students")
-    public List<Map<String, String>> studentsReference(DgsDataFetchingEnvironment env) {
+    @DgsData(parentType = "Student", field = "profiles")
+    public List<Map<String, String>> profilesReference(DgsDataFetchingEnvironment env) {
         Object source = env.getSource();
-        TeamsScrum teamsScrum;
+        Long studentId;
 
-        if (source instanceof TeamsScrumDto) {
-            teamsScrum = modelMapper.map((TeamsScrumDto) source, TeamsScrum.class);
-        } else if (source instanceof TeamsScrum) {
-            teamsScrum = (TeamsScrum) source;
+        if (source instanceof Map<?, ?> map && map.containsKey("id")) {
+            studentId = Long.parseLong(map.get("id").toString());
         } else {
-            System.out.println("Tipo de source inesperado: " + source.getClass());
             return Collections.emptyList();
         }
 
-        if (teamsScrum.getMemberIds() == null) {
-            return Collections.emptyList();
-        }
+        List<TeamsScrumDto> teamsScrumDtoList = teamsScrumBusiness.findAllByStudentId(studentId);
 
-        return teamsScrum.getMemberIds().stream()
-                .map(id -> Map.of("id", id.toString()))
+        return teamsScrumDtoList.stream()
+                .flatMap(dto -> dto.getMemberIds().stream())
+                .filter(member -> member.getProfileId() != null && !member.getProfileId().isBlank())
+                .map(member -> Map.of("id", member.getProfileId()))
                 .collect(Collectors.toList());
     }
+
 
     @DgsData(parentType = "TeamsScrum", field = "studySheet")
     public Map<String, Object> resolveStudySheet(DgsDataFetchingEnvironment env) {
         Object source = env.getSource();
+        assert source != null;
         System.out.println("Source class: " + source.getClass());
 
         TeamsScrum teamsScrum;
@@ -122,6 +125,28 @@ public class TeamsScrumResolver {
 
         return Map.of("id", teamsScrum.getStudySheetId().toString());
     }
+/*
+    @DgsData(parentType = "TeamScrum", field = "processMethodology")
+    public Map<String, Object> resolveProcessMethodology(DgsDataFetchingEnvironment env) {
+        Object source = env.getSource();
+        assert source != null;
+        System.out.println("Source class: " + source.getClass());
+
+        TeamsScrum teamsScrum;
+        if (source instanceof TeamsScrumDto) {
+            teamsScrum = modelMapper.map((TeamsScrumDto) source, TeamsScrum.class);
+        } else {
+            teamsScrum = (TeamsScrum) source;
+        }
+
+        if (teamsScrum == null || teamsScrum.getProcessMethodologyId() == null) {
+            return null;
+        }
+
+        return Map.of("id", teamsScrum.getProcessMethodologyId().toString());
+    }
+
+ */
 
     @DgsQuery
     public Map<String , Object> allTeamsScrums(@InputArgument Integer page, @InputArgument Integer size){
@@ -146,7 +171,7 @@ public class TeamsScrumResolver {
             }
         } catch (Exception e){
             return ResponseHttpApi.responseHttpError(
-                    "Error retrieving Teams Scrums: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error retrieving TeamsScrums: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -161,7 +186,7 @@ public class TeamsScrumResolver {
                     "Successfully Completed");
         } catch (Exception e){
             return ResponseHttpApi.responseHttpError(
-                    "Error getting Team Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error getting TeamScrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -179,7 +204,7 @@ public class TeamsScrumResolver {
                     e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e){
             return ResponseHttpApi.responseHttpError(
-                    "Error adding Team Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error adding TeamScrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -195,7 +220,7 @@ public class TeamsScrumResolver {
             );
         } catch (Exception e){
             return ResponseHttpApi.responseHttpError(
-                    "Error updating Team Scrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error updating TeamScrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -1,10 +1,6 @@
 import { motion } from "framer-motion";
 import { ChangeEvent, FormEvent, RefObject } from "react";
-
-interface JustificationType {
-    id: string;
-    name: string;
-}
+import { JustificationType } from "@/graphql/generated";
 
 interface Props {
     form: any;
@@ -44,7 +40,7 @@ export default function JustificationFormComponent({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
             transition={{ duration: 0.5 }}
-            className="w-auto max-w-4xl bg-white dark:bg-shadowBlue p-6 lg:p-8 rounded-xl shadow-sm border border-lightGray dark:border-darkGray h-auto"
+            className="w-auto max-w-4xl bg-white dark:bg-[#002033] p-6 lg:p-8 rounded-xl shadow-sm border border-white dark:border-[#002033] h-auto"
         >
             {/* <h2 className="text-xl font-semibold mb-6 text-black dark:text-white">
                 Formulario de Justificación
@@ -61,7 +57,7 @@ export default function JustificationFormComponent({
                             name="numeroDocumento"
                             value={form.formData.numeroDocumento}
                             onChange={handleNumericInputChange}
-                            className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen"
+                            className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-[#002033] text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen"
                             placeholder="123456789"
                             required
                             inputMode="numeric"
@@ -78,7 +74,7 @@ export default function JustificationFormComponent({
                             name="nombreAprendiz"
                             value={form.formData.nombreAprendiz}
                             onChange={handleTextInputChange}
-                            className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen"
+                            className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-[#002033] text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen"
                             placeholder="Juan Pérez"
                             required
                         />
@@ -93,7 +89,7 @@ export default function JustificationFormComponent({
                         name="descripcion"
                         value={form.formData.descripcion}
                         onChange={handleInputChange}
-                        className="min-h-24 border border-lightGray dark:border-darkGray rounded-lg p-4 bg-white dark:bg-shadowBlue text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen resize-vertical"
+                        className="min-h-24 border border-lightGray dark:border-darkGray rounded-lg p-4 bg-white dark:bg-[#002033] text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen resize-vertical"
                         placeholder="Motivo de la justificación"
                         required
                     />
@@ -112,7 +108,7 @@ export default function JustificationFormComponent({
                         aria-label="Tipo De Novedad"
                         value={form.formData.justificationTypeId.id}
                         onChange={(e) => updateJustificationTypeId(e.target.value)}
-                        className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-shadowBlue text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen"
+                        className="h-11 border border-lightGray dark:border-darkGray rounded-lg px-4 bg-white dark:bg-[#002033] text-black dark:text-white focus:border-black dark:focus:border-lightGreen focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-lightGreen"
                         disabled={loadingJustificationTypes}
                         required
                     >

@@ -20,8 +20,6 @@ public class Justification implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-
     @Column(name = "description")
     private String description;
 

@@ -1,17 +1,34 @@
 'use client';
 
-import React from 'react';
-import { UserContext } from '@context/UserContext';
-import { UserContextType } from '@context/UserContext'
+import React, { useState } from 'react';
+import { UserContext, User, UserContextType } from '@context/UserContext';
 import LayoutContent from './layoutComponent';
-
 
 interface ClientLayoutWrapperProps {
     children: React.ReactNode;
-    userContextValue: UserContextType;
+    initialUserData: User;
 }
 
-const ClientLayoutWrapper: React.FC<ClientLayoutWrapperProps> = ({ children, userContextValue }) => {
+const ClientLayoutWrapper: React.FC<ClientLayoutWrapperProps> = ({ children, initialUserData }) => {
+    const [user, setUser] = useState<User | null>(initialUserData);
+
+    const login = (userData: User) => {
+        setUser(userData);
+    };
+
+    const logout = () => {
+        setUser(null);
+    };
+
+    const userContextValue: UserContextType = {
+        user,
+        setUser,
+        isAuthenticated: user !== null,
+        role: (user?.role as "Aprendiz" | "Instructor" | "Coordinador") || "Aprendiz",
+        login,
+        logout
+    };
+
     return (
         <UserContext.Provider value={userContextValue}>
             <LayoutContent>

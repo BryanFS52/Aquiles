@@ -116,7 +116,6 @@ function ApprenticeCard({ person }: { person: Person }) {
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             {person.name} {person.lastname}
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">ID: {person.id}</p>
         </div>
         <span className={`text-white px-2 py-1 text-sm rounded ${statusColor[person.status ?? 'Activo']}`}>
           {person.status ?? 'Activo'}

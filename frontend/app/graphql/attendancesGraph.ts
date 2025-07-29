@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 
 // Queries and Mutations for Attendances
+
 export const GET_ALL_ATTENDANCES = gql`
   query GetAttendances($page: Int, $size: Int) {
     allAttendances(page: $page, size: $size) {
@@ -13,6 +14,14 @@ export const GET_ALL_ATTENDANCES = gql`
         attendanceState {
           id
           status
+        }
+        student {
+          id
+          person {
+            name
+            lastname
+            document
+          }
         }
       }
       currentPage
@@ -45,17 +54,6 @@ export const GET_ATTENDANCES_BY_STUDENT = gql`
   }
 `;
 
-
-export const ADD_ATTENDANCE = gql`
-  mutation AddAttendance($input: AttendancesDto!) {
-    addAttendance(input: $input) {
-      code
-      message
-      id
-    }
-  }
-`;
-
 export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
   query GetAttendancesAndJustificationsByStudent($id: Long!) {
     allAttendancesByStudentId(id: $id) {
@@ -66,7 +64,7 @@ export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
           description
           justificationFile
           justificationDate
-          justificationTypeId {
+          justificationType {
             id
             name
           }
@@ -76,28 +74,9 @@ export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
   }
 `;
 
-// export const GET_JUSTIFICATION_BY_ID = gql`
-//   query GetJustificationById($id: Long!){
-//   justificationById(id: $id ){
-//     data {
-//       id
-//       name
-//       description
-//       justificationDate
-//       state
-//       justificationType {
-//         name
-//       }
-//       justificacionFile
-//     }
-//     code
-//     message
-//   }
-// }`
-
-export const UPDATE_ATTENDANCE = gql`
-  mutation UpdateAttendance($id: Long!, $input: AttendancesDto!) {
-    updateAttendance(id: $id, input: $input) {
+export const ADD_ATTENDANCE = gql`
+  mutation AddAttendance($input: AttendanceDto!) {
+    addAttendance(input: $input) {
       code
       message
       id
@@ -105,6 +84,15 @@ export const UPDATE_ATTENDANCE = gql`
   }
 `;
 
+export const UPDATE_ATTENDANCE = gql`
+  mutation UpdateAttendance($id: Long!, $input: AttendanceDto!) {
+    updateAttendance(id: $id, input: $input) {
+      code
+      message
+      id
+    }
+  }
+`;
 
 export const DELETE_ATTENDANCE = gql`
   mutation DeleteAttendance($id: Long!) {

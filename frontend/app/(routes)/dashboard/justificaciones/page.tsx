@@ -2,10 +2,13 @@
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { GrAttachment } from "react-icons/gr";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import { AppDispatch } from "@/redux/store";
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFilters from "@components/features/justification/justificationsFilter";
-import type { AppDispatch } from "@/redux/store";
+import JustificationTable from "@components/features/justification/justificationsTable";
+import EmptyState from "@components/UI/emptyState";
 import {
   fetchJustifications,
   setFilterOptions,
@@ -14,10 +17,9 @@ import {
   formatErrorMessage,
   generateFileName,
   setLocalCurrentPage,
-  downloadBase64File
+  downloadBase64File,
+  updateJustificationStatus
 } from '@slice/justificationSlice';
-import JustificationTable from "@/components/features/justification/justificationsTable";
-import { AppDispatch, RootState } from '@/redux/store'
 
 export default function JustificacionesInstructor() {
   const dispatch = useDispatch<AppDispatch>();
@@ -31,8 +33,6 @@ export default function JustificacionesInstructor() {
     filterOptions,
     itemsPerPage
   } = useSelector((state: any) => state.justification);
-
-  console.log(filteredData)
 
   useEffect(() => {
     dispatch(fetchJustifications({ page: 0, size: itemsPerPage }));
@@ -63,9 +63,24 @@ export default function JustificacionesInstructor() {
     }
   };
 
+  const handleStatusChange = (justificacionId: string, newStatus: string) => {
+    dispatch(updateJustificationStatus({ id: justificacionId, status: newStatus }))
+      .then(() => {
+        // Refrescar los datos después de actualizar el estado
+        dispatch(fetchJustifications({ page: localCurrentPage - 1, size: itemsPerPage }));
+      })
+      .catch((error) => {
+        console.error("Error al actualizar el estado:", error);
+      });
+  };
+
   const errorMessage = formatErrorMessage(error);
   const canGoNext = localCurrentPage < totalPages;
   const canGoPrevious = localCurrentPage > 1;
+
+  if (!loading && !errorMessage && (!filteredData || filteredData.length === 0)) {
+    return <EmptyState message="No se encontraron justificaciones disponibles." />;
+  }
 
   return (
     <div className="space-y-6">
@@ -81,9 +96,7 @@ export default function JustificacionesInstructor() {
 
       {/* Error Message */}
       {errorMessage && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-red-600 dark:text-red-400">{errorMessage}</p>
-        </div>
+        <EmptyState message={errorMessage} />
       )}
 
       {/* Table */}
@@ -92,6 +105,7 @@ export default function JustificacionesInstructor() {
           <JustificationTable
             filteredData={filteredData}
             handleDownloadFile={handleDownloadFile}
+            handleStatusChange={handleStatusChange}
           />
 
           {/* Pagination */}

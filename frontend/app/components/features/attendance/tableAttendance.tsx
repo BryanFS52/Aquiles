@@ -4,12 +4,12 @@ import { BsQrCode } from "react-icons/bs";
 import { FaClipboardList } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { motion } from "framer-motion";
-import { StudySheetItem, Student } from '@type/slices/olympo/studySheet';
+import { StudySheet, Student } from '@/graphql/generated';
 import ModalQR from "@components/Modals/modalQR";
 
 
 interface TableAttendanceProps {
-    studySheetData?: StudySheetItem;
+    studySheetData?: StudySheet;
     onNavigate: () => void;
 }
 
@@ -18,12 +18,14 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
     const [alertVisible, setAlertVisible] = useState<boolean>(false);
     const [currentTrimester, setCurrentTrimester] = useState<number>(1);
     const [searchTerm, setSearchTerm] = useState<string>("");
-    const [filteredStudents, setFilteredStudents] = useState<Student[]>(studySheetData?.students || []);
+    const [filteredStudents, setFilteredStudents] = useState<any>(studySheetData?.studentStudySheets || []);
 
-    console.log(studySheetData);
+    console.log('studySheetData:', studySheetData);
+    console.log('studentStudySheets:', studySheetData?.studentStudySheets);
+    console.log('filteredStudents:', filteredStudents);
 
     useEffect(() => {
-        setFilteredStudents(studySheetData?.students || []);
+        setFilteredStudents(studySheetData?.studentStudySheets || []);
     }, [studySheetData]);
 
     const handleAttendanceClick = (): void => setAlertVisible(true);
@@ -45,11 +47,14 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         setSearchTerm(e.target.value);
-        const filtered = studySheetData?.students?.filter(student =>
-            student.person.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
-            student.person.lastname.toLowerCase().includes(e.target.value.toLowerCase()) ||
-            student.person.document.toLowerCase().includes(e.target.value.toLowerCase())
-        ) || [];
+        const filtered = (studySheetData?.studentStudySheets as any[])?.filter((student: any) => {
+            if (!student || !student.person) return false;
+            return (
+                student.person.name?.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                student.person.lastname?.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                student.person.document?.toLowerCase().includes(e.target.value.toLowerCase())
+            );
+        }) || [];
         setFilteredStudents(filtered);
     };
 
@@ -176,16 +181,16 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-lightGray">
-                                {filteredStudents?.map((student) => (
+                                {filteredStudents?.map((student: any) => (
                                     <tr key={student.id} className="hover:bg-gray-50">
                                         <td className="px-1 sm:px-2 py-1.5 sm:py-2 border border-lightGray text-xs sm:text-sm">
-                                            <div className="truncate" title={student.person.document}>
-                                                {student.person.document}
+                                            <div className="truncate" title={student.person?.document || 'N/A'}>
+                                                {student.person?.document || 'N/A'}
                                             </div>
                                         </td>
                                         <td className="px-1 sm:px-2 py-1.5 sm:py-2 border border-lightGray text-xs sm:text-sm">
-                                            <div className="truncate" title={`${student.person.name} ${student.person.lastname}`}>
-                                                {student.person.name} {student.person.lastname}
+                                            <div className="truncate" title={`${student.person?.name || ''} ${student.person?.lastname || ''}`}>
+                                                {student.person?.name || 'N/A'} {student.person?.lastname || ''}
                                             </div>
                                         </td>
                                         {[...Array(4)].map((_, weekIndex) => (

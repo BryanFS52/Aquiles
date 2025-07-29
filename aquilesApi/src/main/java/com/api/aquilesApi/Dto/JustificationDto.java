@@ -25,6 +25,6 @@ public class JustificationDto {
 
     // Relations
     private JustificationTypeDto justificationType;
-    private AttendancesDto attendance;
+    private AttendanceDto attendance;
     private Long notificationId;
 }

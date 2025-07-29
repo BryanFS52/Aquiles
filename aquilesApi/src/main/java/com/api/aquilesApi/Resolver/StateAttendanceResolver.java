@@ -19,6 +19,7 @@ public class StateAttendanceResolver {
         this.stateAttendancesBusiness = stateAttendancesBusiness;
     }
 
+    // FindAll StateAttendance (GraphQL)
     @DgsQuery
     public Map<String , Object> allStateAttendances (@InputArgument Integer page, @InputArgument Integer size) {
         try {
@@ -42,11 +43,11 @@ public class StateAttendanceResolver {
             }
         } catch (Exception e){
             return  ResponseHttpApi.responseHttpError(
-                    "Error getting State Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error getting StateAttendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    //End-Point Para Traer Un Estado Por Id
+    // FindById StateAttendance (GraphQL)
     @DgsQuery
     public Map<String , Object> stateAttendanceById(@InputArgument Long id){
         try {
@@ -57,11 +58,11 @@ public class StateAttendanceResolver {
                     "Successfully Completed");
         } catch (Exception e){
             return  ResponseHttpApi.responseHttpError(
-                    "Error getting State Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error getting StateAttendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // Metodo Para Crear-Add Un Estado De Asistencia
+    // Add StateAttendance (GraphQL)
     @DgsMutation
     public Map<String , Object> addStateAttendance(@InputArgument(name = "input") AttendanceStateDto attendanceStateDto){
         try {
@@ -73,12 +74,11 @@ public class StateAttendanceResolver {
             );
         }    catch (Exception e) {
             return  ResponseHttpApi.responseHttpError(
-                    "Error adding  State Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error adding StateAttendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-
-    // Metodo Para Actualizar Un Estado De Asistencia
+    // Update StateAttendance (GraphQL)
     @DgsMutation
     public Map<String, Object> updateStateAttendance(@InputArgument Long id, @InputArgument(name = "input") AttendanceStateDto attendanceStateDto) {
         try {
@@ -90,11 +90,11 @@ public class StateAttendanceResolver {
             );
         } catch (Exception e) {
             return  ResponseHttpApi.responseHttpError(
-                    "Error State Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error StateAttendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // Metodo Para Eliminar Un Estado Asistencia
+    // Delete StateAttendance (GraphQL)
     @DgsMutation
     public Map<String, Object> deleteStateAttendance(@InputArgument Long id) {
         try {
@@ -106,7 +106,7 @@ public class StateAttendanceResolver {
             );
         } catch (Exception e) {
             return  ResponseHttpApi.responseHttpError(
-                    "Error State Attendance : " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error StateAttendance : " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }

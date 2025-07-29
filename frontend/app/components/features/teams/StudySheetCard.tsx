@@ -1,10 +1,10 @@
 import React from 'react';
-import { StudySheetItem, Student } from '@type/slices/olympo/studySheet';
+import { StudySheet, Student } from '@graphql/generated';
 import { FaBook, FaCalendarAlt, FaUsers, FaInfoCircle, FaEye } from 'react-icons/fa';
 import Link from 'next/link';
 
 interface StudySheetCardProps {
-    studySheet: StudySheetItem;
+    studySheet: StudySheet;
 }
 
 const StudySheetCard: React.FC<StudySheetCardProps> = ({ studySheet }) => {
@@ -44,7 +44,7 @@ const StudySheetCard: React.FC<StudySheetCardProps> = ({ studySheet }) => {
                 <div className="flex items-center gap-3">
                     <FaUsers className="text-lg text-[#40b003]" />
                     <p>
-                        <span className="font-semibold">Estudiantes:</span> {students.length}
+                        <span className="font-semibold">Estudiantes:</span> {students?.length ?? ''}
                     </p>
                 </div>
             </div>

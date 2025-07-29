@@ -23,13 +23,11 @@ public class FinalReportService implements Idao<FinalReport, Long> {
         return finalReportRepository.findAll(pageRequest);
     }
 
-
     @Override
     public FinalReport getById(Long id) {
         return finalReportRepository.findById(id).orElseThrow(() ->
                 new CustomException("FinalReport Type with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
-
 
     @Override
     public void update(FinalReport entity) {

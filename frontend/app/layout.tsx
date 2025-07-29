@@ -6,7 +6,7 @@ import { LoaderProvider } from '@context/LoaderContext';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-    title: 'AquilesApp',
+    title: 'Aquiles',
     icons: {
         icon: "/img/Logo-sena-green.png"
     },

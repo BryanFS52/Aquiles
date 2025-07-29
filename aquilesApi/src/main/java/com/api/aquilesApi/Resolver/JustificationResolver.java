@@ -20,7 +20,6 @@ public class JustificationResolver {
         this.justificationBusiness = justificationBusiness;
     }
 
-
     // FindAll Justifications (GraphQL)
     @DgsQuery
     public Map<String, Object> allJustifications(@InputArgument Integer page, @InputArgument Integer size) {
@@ -84,8 +83,7 @@ public class JustificationResolver {
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error updating Justification: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
@@ -102,8 +100,7 @@ public class JustificationResolver {
                     ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error deleting Justification: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );

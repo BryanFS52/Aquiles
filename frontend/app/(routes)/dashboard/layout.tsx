@@ -1,23 +1,28 @@
-// layout.js (servidor)
+// layout.tsx (servidor)
 import { Inter } from 'next/font/google';
 import ClientLayoutWrapper from './ClientLayoutWrapper';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const inter = Inter({ subsets: ['latin'] });
-const user = {
-  rol: 'instructor',
-  nombre: 'Carlos Rodríguez',
+
+const initialUserData = {
+  id: 2,
+  name: 'Carlos Rodríguez',
   email: 'carlos.rodriguez@empresa.com',
-  id: 2
+  role: 'Instructor'
 };
 
-export default function RootLayout({ children }) {
+interface RootLayoutProps {
+  children: React.ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="es">
       <body className={`bg-white text-black font-sans ${inter.className}`}>
         <ToastContainer />
-        <ClientLayoutWrapper userContextValue={user}>
+        <ClientLayoutWrapper initialUserData={initialUserData}>
           {children}
         </ClientLayoutWrapper>
       </body>

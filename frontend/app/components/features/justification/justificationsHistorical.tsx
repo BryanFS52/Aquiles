@@ -1,10 +1,10 @@
-"use client";
+"use client"
 
 import { motion } from "framer-motion";
 import { FaCheckCircle, FaClock, FaFileAlt, FaRegFileAlt } from "react-icons/fa";
-import { TransformedJustificationItem } from "@slice/justificationSlice";
 import { GrAttachment } from "react-icons/gr";
-
+import { MdHistory } from "react-icons/md";
+import { TransformedJustificationItem } from "@slice/justificationSlice";
 interface JustificationsHistoricalProps {
   data: TransformedJustificationItem[];
   loading: boolean;
@@ -29,35 +29,40 @@ export default function JustificationsHistorical({
       <FaClock className="w-4 h-4" />
     );
   };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 50 }}
       transition={{ duration: 0.5 }}
-      className="w-auto max-w-4xl bg-white dark:bg-shadowBlue p-6 lg:p-8 rounded-xl shadow-sm border border-lightGray dark:border-darkGray h-auto"
+      className="w-auto max-w-4xl bg-white dark:bg-[#002033] rounded-xl shadow-sm border border-white dark:border-[#002033] h-auto"
     >
-      <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100 h-auto">
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-black dark:text-white mb-2">
-            Historial de Justificaciones
-          </h2>
+      <div className="h-auto">
+        <div className="flex items-center mb-6">
+          <div className="p-3 bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 rounded-full shadow-lg">
+            <MdHistory className="text-2xl text-white" />
+          </div>
+          <div className="ml-4">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+              Historial de Justificaciones
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
+              Historico de tus justificaciones
+            </p>
+          </div>
         </div>
-
         <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
           <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
             <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700 text-black dark:text-white">
               <tr>
                 <th className="px-6 py-4 font-medium">Tipo de Novedad</th>
-                <th className="px-6 py-4 font-medium">
-                  Fecha de Justificacion
-                </th>
+                <th className="px-6 py-4 font-medium">Fecha de Justificacion</th>
                 <th className="px-6 py-4 font-medium">Archivo</th>
                 <th className="px-6 py-4 font-medium">Estado</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              
               {loading ? (
                 <tr>
                   <td
@@ -72,7 +77,7 @@ export default function JustificationsHistorical({
                     </div>
                   </td>
                 </tr>
-              ) : data.length === 0 ? (
+              ) : !data || data.length === 0 ? (
                 <tr>
                   <td
                     colSpan={4}
@@ -101,7 +106,7 @@ export default function JustificationsHistorical({
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center">
-                          {justification.tipoNovedad}
+                          {justification.justificationType}
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -111,9 +116,8 @@ export default function JustificationsHistorical({
                         <div className="flex items-center space-x-2">
                           {justification.archivoAdjunto ? (
                             <GrAttachment
-                              title={`Descargar archivo (${
-                                justification.archivoMime || "desconocido"
-                              })`}
+                              title={`Descargar archivo (${justification.archivoMime || "desconocido"
+                                })`}
                               className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
                               onClick={() => handleDownloadFile(justification)}
                             />

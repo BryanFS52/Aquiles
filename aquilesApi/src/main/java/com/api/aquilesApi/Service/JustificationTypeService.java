@@ -22,7 +22,6 @@ public class JustificationTypeService implements Idao<JustificationType, Long> {
         return justificationTypeRepository.findAll(pageRequest);
     }
 
-
     @Override
     public JustificationType getById(Long id) {
         return justificationTypeRepository.findById(id).orElseThrow(() ->
@@ -43,7 +42,6 @@ public class JustificationTypeService implements Idao<JustificationType, Long> {
     public JustificationType save(JustificationType entity) {
         return justificationTypeRepository.save(entity);
     }
-
 
     @Override
     public void delete(JustificationType entity) {

@@ -3,15 +3,14 @@
 import { useState, useEffect } from "react";
 import { MdClose, MdInfo, MdDescription, MdFlag, MdReportProblem, MdFormatAlignJustify } from "react-icons/md";
 import { FaSave, FaTimes } from "react-icons/fa";
-import { TeamScrumItem } from "@type/slices/teamScrum";
+import { TeamsScrum } from "@graphql/generated";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchTeamScrumById } from '@slice/teamScrumSlice'
-
 interface ModalTeamInformationProps {
     isOpen: boolean;
     onClose: () => void;
-    team: TeamScrumItem | null;
+    team: TeamsScrum | null;
     onSave: (teamId: string, data: TeamInfoData) => Promise<boolean>;
 }
 
@@ -22,6 +21,7 @@ interface TeamInfoData {
     objectives: string;
     problem: string;
     projectJustification: string;
+    memberIds: { studentId: number; profileId: string }[];
 }
 
 export default function ModalTeamInformation({
@@ -32,58 +32,70 @@ export default function ModalTeamInformation({
 }: ModalTeamInformationProps) {
     const [formData, setFormData] = useState<TeamInfoData>({
         projectName: String(team?.projectName || ""),
-        teamName: String(team?.teamName) || "",
+        teamName: String(team?.teamName || ""),
         description: String(team?.description || ""),
         objectives: String(team?.objectives || ""),
         problem: String(team?.problem || ""),
-        projectJustification: String(team?.projectJustification || "")
+        projectJustification: String(team?.projectJustification || ""),
+        memberIds:
+            team?.students?.map((student: any) => ({
+                studentId: student.id,
+                profileId: student.profiles?.[0]?.id || "",
+            })) || [],
     });
+
 
     const dispatch = useDispatch<AppDispatch>();
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<Partial<TeamInfoData>>({});
     const teamScrumData = useSelector((state: RootState) => state.teamScrum.dataForTeamScrumById);
 
-    // Efecto para bloquear/desbloquear el scroll del fondo
     useEffect(() => {
         if (isOpen) {
-            // Bloquear scroll cuando se abre el modal
             document.body.style.overflow = 'hidden';
         } else {
-            // Restaurar scroll cuando se cierra el modal
             document.body.style.overflow = 'unset';
         }
 
-        // Cleanup: restaurar scroll cuando el componente se desmonta
         return () => {
             document.body.style.overflow = 'unset';
         };
     }, [isOpen]);
 
+    // Efecto para resetear el estado del formulario cuando el equipo cambia
     useEffect(() => {
-        if (team?.id) {
+        if (team) {
+            setFormData({
+                projectName: String(team.projectName || ""),
+                teamName: String(team.teamName || ""),
+                description: String(team.description || ""),
+                objectives: String(team.objectives || ""),
+                problem: String(team.problem || ""),
+                projectJustification: String(team.projectJustification || ""),
+                memberIds:
+                    team.students?.map((student: any) => ({
+                        studentId: student.id,
+                        profileId: student.profiles?.[0]?.id || "",
+                    })) || [],
+            });
             dispatch(fetchTeamScrumById({ id: team.id }));
         }
-    }, [dispatch, team?.id]);
+    }, [team, dispatch]);
 
-    // Imprime los datos para depuración
-    console.log(teamScrumData)
-
-    // Actualizar formData cuando cambie el team o se carguen nuevos datos
+    // Efecto para actualizar el formulario con datos más frescos si llegan
     useEffect(() => {
-        const data = teamScrumData || team;
-
-        if (data) {
-            setFormData({
-                projectName: String(data.projectName || ""),
-                teamName: String(data.teamName || ""),
-                description: String(data.description || ""),
-                objectives: String(data.objectives || ""),
-                problem: String(data.problem || ""),
-                projectJustification: String(data.projectJustification || "")
-            });
+        if (teamScrumData && teamScrumData.id === team?.id) {
+            setFormData(prev => ({
+                ...prev,
+                projectName: String(teamScrumData.projectName || ""),
+                teamName: String(teamScrumData.teamName || ""),
+                description: String(teamScrumData.description || ""),
+                objectives: String(teamScrumData.objectives || ""),
+                problem: String(teamScrumData.problem || ""),
+                projectJustification: String(teamScrumData.projectJustification || ""),
+            }));
         }
-    }, [team, teamScrumData]);
+    }, [teamScrumData, team?.id]);
 
     const handleInputChange = (field: keyof TeamInfoData, value: string) => {
         setFormData(prev => ({
@@ -91,7 +103,6 @@ export default function ModalTeamInformation({
             [field]: value
         }));
 
-        // Limpiar error del campo cuando el usuario empiece a escribir
         if (errors[field]) {
             setErrors(prev => ({
                 ...prev,

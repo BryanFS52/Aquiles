@@ -15,23 +15,23 @@ export const GET_STUDY_SHEETS = gql`
                 endLective
                 state
                 offer {
-                    id
                     name
                 }
                 journey {
-                    id
                     name
                 }
                 quarter {
-                    id
                     name {
+                      extension
                     number
-                    extension
                     }
                 }
                 trainingProject {
-                    id
                     name
+                    program {
+                        id
+                        name
+                    }
                 }
             }
             currentPage
@@ -57,6 +57,13 @@ export const GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID = gql`
             name
             lastname
             document
+            email
+          }
+          profiles{
+            name
+            description
+            isActive
+            isUnique
           }
         }
       }
@@ -66,96 +73,183 @@ export const GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID = gql`
 `;
 
 export const GET_STUDY_SHEET_BY_ID = gql`
-    query GetStudySheetById($id: Long!) {
-        studySheetById(id: $id) {
-            code
-            message
-            data {
+  query GetStudySheetById($id: Long!) {
+    studySheetById(id: $id) {
+      code
+      message
+      data {
+        id
+        number
+        numberStudents
+        quarter {
+          id
+          name {
+            number
+            extension
+          }
+        }
+        trainingProject {
+          id
+          name
+          program {
+            id
+            name
+          }
+        }
+        studentStudySheets {
+          id
+          student {
+            id
+            person {
+              id
+              document
+              name
+              lastname
+              email
+              phone
+            }
+          }
+          studentStudySheetState {
+
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+
+export const GET_STUDY_SHEET_BY_TEACHER = gql`
+  query studySheetByTeacher($idTeacher: Long, $page: Int, $size: Int) {
+    allStudySheets(page: $page, size: $size, idTeacher: $idTeacher) {
+      date
+      code
+      message
+      data {
+        id
+        number
+        startLective
+        endLective
+        state
+        offer {
+          name
+        }
+        journey {
+          name
+        }
+        quarter {
+          name {
+            extension
+            number
+          }
+        }
+        trainingProject {
+          name
+          program {
+            name
+          }
+        }
+        studentStudySheets {
+          id
+          student {
+            person {
+              document
+              name
+              lastname
+              phone
+              email
+              blood_type
+              date_birth
+            }
+          }
+          studentStudySheetState {
+            name
+          }
+        }
+      }
+      currentPage
+      totalPages
+      totalItems
+    }
+  }
+`;
+
+
+export const GET_STUDY_SHEET_WITH_STUDENTS = gql`
+  query GetStudySheetWithStudents($id: Long!) {
+    studySheetById(id: $id) {
+      code
+      message
+      data {
+        id
+        number
+        journey{
+            name
+        }
+        trainingProject{
+            program{
+                name
+            }
+        }
+        studentStudySheets {
+          id
+          student {
+            id
+            person {
+              name
+              lastname
+              email
+            }
+          }
+          studentStudySheetState {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM = gql`
+query studySheetByTeacherIdWithTeamScrum($idTeacher: Long, $page: Int, $size: Int) {
+    allStudySheets(page: $page, size: $size, idTeacher: $idTeacher) {
+      date
+      code
+      message
+      data {
+        id
+        number
+        startLective
+        endLective
+        state
+        journey {
+          name
+        }
+        trainingProject {
+          name
+          program {
+            name
+          }
+        }
+        teamsScrum{
+            id
+            teamName
+            students{
                 id
-                number
-                numberStudents
-                quarter {
-                    id
-                    name {
-                        number
-                        extension
-                    }
-                }
-                trainingProject {
-                    id
+                person{
+                    lastname
                     name
-                    program{
-                        id
-                        name
-                    }
-                }
-                students {
-                    id
-                    person { 
-                        id 
-                        document
-                        name
-                        lastname
-                        email
-                        phone
-                    }
+                    document
                 }
             }
         }
-    }
-`;
-
-export const GET_STUDY_SHEET_BY_TEACHER = gql`
-  query studySheetByTeacher($IdTeacher: Long, $page: Int, $size: Int) {
-  allStudySheets(page: $page, size: $size, idTeacher: $IdTeacher) {
-    date
-    code
-    message
-    data {
-      id
-      number
-      startLective
-      endLective
-      state
-      journey{
-        name
       }
-      students {
-        person {
-          id
-          name
-          lastname
-          phone
-          email
-          blood_type
-          date_birth
-        }
-      }
+      currentPage
+      totalPages
+      totalItems
     }
-    currentPage
-    totalPages
-    totalItems
   }
-}
-`;
-
-export const GET_STUDY_SHEET_WITH_STUDENTS = gql`
-query GetStudySheetWithStudents($id: Long!) {
-  studySheetById(id: $id) {
-    data {
-      id
-      number
-      students {
-        id
-        state
-        person {
-          name
-          lastname
-        }
-      }
-    }
-    code
-    message
-  }
-}
 `;

@@ -20,17 +20,17 @@ export function CourseInfoSection({ studySheet, }: CourseInfoSectionProps) {
                         <GraduationCap className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                         <div>
                             <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                {studySheet?.trainingProject.program.name || "ADSO"} - Ficha {studySheet?.number || "2758438"}
+                                {studySheet?.trainingProject?.program?.name || "ADSO"} - Ficha {studySheet?.number || "2758438"}
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {studySheet?.description || "Análisis y Desarrollo de Software"}
+                                {studySheet?.trainingProject?.name || "Análisis y Desarrollo de Software"}
                             </p>
                         </div>
                     </div>
                     <div className="flex items-center space-x-3">
                         <Users className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                         <div>
-                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{studySheet.numberStudents} Estudiantes</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{studySheet?.numberStudents || 0} Estudiantes</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">Matriculados</p>
                         </div>
                     </div>

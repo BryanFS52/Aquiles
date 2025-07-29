@@ -14,6 +14,7 @@ type TeamsScrum @key(fields: "id") {
     checklist: Checklist
     studySheet : StudySheet
     students : [Student]
+    processMethodologyId: Long
 }
 
 type TeamsScrumPage {
@@ -33,6 +34,12 @@ type TeamsScrumPageId {
     message: String
 }
 
+input TeamScrumMemberId {
+    id : Long
+    studentId : Long
+    profileId : String
+}
+
 input TeamsScrumDto {
     teamName: String!
     projectName: String!
@@ -42,7 +49,8 @@ input TeamsScrumDto {
     projectJustification: String!
     checklist: ChecklistDto
     studySheetId: Long
-    memberIds: [Long]
+    memberIds: [TeamScrumMemberId]
+    processMethodologyId: Long
 }
 
 extend type Query {
