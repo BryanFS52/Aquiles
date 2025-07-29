@@ -92,13 +92,13 @@ public class AttendancesBusiness {
     }
 
     // Add new attendance
-    public AttendanceDto add(AttendanceDto attendancesDto) {
+    public AttendanceDto add(AttendanceDto attendanceDto) {
         try {
             Attendance attendance = new Attendance();
-            attendance.setAttendanceDate(attendancesDto.getAttendanceDate());
-            AttendanceState attendanceState = stateAttendanceService.getById(attendancesDto.getAttendanceState().getId());
+            attendance.setAttendanceDate(attendanceDto.getAttendanceDate());
+            AttendanceState attendanceState = stateAttendanceService.getById(attendanceDto.getAttendanceState().getId());
             attendance.setAttendanceState(attendanceState);
-            attendance.setStudentId(attendancesDto.getStudentId());
+            attendance.setStudentId(attendanceDto.getStudentId());
 
             return modelMapper.map(attendancesService.save(attendance), AttendanceDto.class);
         } catch (Exception e) {
@@ -107,10 +107,10 @@ public class AttendancesBusiness {
     }
 
     // Update existing attendance
-    public void update(Long attendanceId, AttendanceDto attendancesDto) {
+    public void update(Long attendanceId, AttendanceDto attendanceDto) {
         try {
-            attendancesDto.setId(attendanceId);
-            Attendance attendance = modelMapper.map(attendancesDto, Attendance.class);
+            attendanceDto.setId(attendanceId);
+            Attendance attendance = modelMapper.map(attendanceDto, Attendance.class);
             attendancesService.save(attendance);
         } catch (Exception e) {
             throw new CustomException("Error Updating Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);

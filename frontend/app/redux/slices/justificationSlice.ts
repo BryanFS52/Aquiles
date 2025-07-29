@@ -130,11 +130,11 @@ const transformToComponentFormat = (justifications: Justification[]): Transforme
     return justifications.map((j) => {
         const student = j.attendance?.student;
         const person = student?.person;
-        const studySheet = student?.studySheets?.[0];
+        const studySheet = student?.studentStudySheets?.[0];
 
         return {
             id: Number(j.id),
-            ficha: studySheet?.number?.toString() || "Sin ficha",
+            ficha: studySheet?.studySheet?.toString() || "Sin ficha",
             fecha: j.justificationDate ? new Date(j.justificationDate).toLocaleDateString("es-CO") : "Sin fecha",
             estado: j.state ? "Activo" : "Inactivo",
             justificationType: j.justificationType?.name ?? "Sin tipo",
@@ -272,6 +272,7 @@ export const fetchJustificationById = createAsyncThunk<GetJustificationByIdQuery
         return data.justificationById;
     }
 );
+
 export const addJustification = createAsyncThunk<AddJustificationMutation['addJustification'], AddJustificationMutationVariables['input'],
     { rejectValue: { code: string; message: string } }
 >(
@@ -382,6 +383,10 @@ export const processFile = createAsyncThunk<
     'justifications/processFile',
     async (file, { rejectWithValue }) => {
         try {
+            // Validar tipo de archivo
+            if (!validateFileType(file)) {
+                return rejectWithValue('Solo se permiten archivos PDF, JPG o PNG');
+            }
 
             // Validar tamaño de archivo
             if (!validateFileSize(file)) {
@@ -397,6 +402,7 @@ export const processFile = createAsyncThunk<
         }
     }
 );
+
 // Estado inicial con formulario
 const initialFormData: FormDataState = {
     justificationTypeId: { id: "" },

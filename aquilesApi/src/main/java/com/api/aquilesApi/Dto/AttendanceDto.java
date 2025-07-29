@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttendancesDto {
+public class AttendanceDto {
 
     private Long id;
     // @NotNull(message = "")

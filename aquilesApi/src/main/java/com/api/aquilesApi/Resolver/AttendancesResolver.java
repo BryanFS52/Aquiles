@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.AttendancesBusiness;
-import com.api.aquilesApi.Dto.AttendancesDto;
+import com.api.aquilesApi.Dto.AttendanceDto;
 import com.api.aquilesApi.Dto.QRCodePayloadDto;
 import com.api.aquilesApi.Dto.Student;
 import com.api.aquilesApi.Entity.Attendance;
@@ -53,7 +53,7 @@ public class AttendancesResolver {
     }
 
     @DgsEntityFetcher(name = "Attendance")
-    public AttendancesDto getAttendance(Map<String, Object> values) {
+    public AttendanceDto getAttendance(Map<String, Object> values) {
         String id = (String) values.get("id");
         Long attendanceId = id != null ? Long.valueOf(id) : null;
         return attendancesBusiness.findById(attendanceId);
@@ -66,19 +66,19 @@ public class AttendancesResolver {
 
         Long studentId = student.getId();
 
-        List<AttendancesDto> attendancesDtoList = attendancesBusiness.findAllByStudentId(studentId);
+        List<AttendanceDto> attendanceDtoList = attendancesBusiness.findAllByStudentId(studentId);
 
-        return attendancesDtoList.stream()
+        return attendanceDtoList.stream()
                 .map(dto -> modelMapper.map(dto, Attendance.class))
                 .collect(Collectors.toList());
     }
 
     @DgsData(parentType = "Attendance", field = "student")
     public Map<String, Object> studentReference(DgsDataFetchingEnvironment env) {
-        AttendancesDto attendancesDto = env.getSource();
-        assert attendancesDto != null;
-        if(attendancesDto.getStudentId() == null) return null;
-        return Map.of("id", attendancesDto.getStudentId().toString());
+        AttendanceDto attendanceDto = env.getSource();
+        assert attendanceDto != null;
+        if(attendanceDto.getStudentId() == null) return null;
+        return Map.of("id", attendanceDto.getStudentId().toString());
     }
 
     @DgsQuery
@@ -127,9 +127,9 @@ public class AttendancesResolver {
     @DgsQuery
     public Map<String, Object> attendanceById(@InputArgument Long id) {
         try {
-            AttendancesDto attendancesDto = attendancesBusiness.findById(id);
+            AttendanceDto attendanceDto = attendancesBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
-                    attendancesDto,
+                    attendanceDto,
                     ResponseHttpApi.CODE_OK,
                     "Query by id ok"
             );
@@ -142,12 +142,12 @@ public class AttendancesResolver {
 
     // Add a new Attendance (GraphQL)
     @DgsMutation
-    public Map<String, Object> addAttendance(@InputArgument(name = "input") AttendancesDto attendancesDto) {
+    public Map<String, Object> addAttendance(@InputArgument(name = "input") AttendanceDto attendanceDto) {
         try {
-            System.out.println(attendancesDto);
-            AttendancesDto attendancesDto1 = attendancesBusiness.add(attendancesDto);
+            System.out.println(attendanceDto);
+            AttendanceDto attendanceDto1 = attendancesBusiness.add(attendanceDto);
             return ResponseHttpApi.responseHttpAction(
-                    attendancesDto1.getId(),
+                    attendanceDto1.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
             );
@@ -160,9 +160,9 @@ public class AttendancesResolver {
 
     // Update Attendance (GraphQL)
     @DgsMutation
-    public Map<String, Object> updateAttendance(@InputArgument Long id, @InputArgument ( name = "input") AttendancesDto attendancesDto) {
+    public Map<String, Object> updateAttendance(@InputArgument Long id, @InputArgument ( name = "input") AttendanceDto attendanceDto) {
         try {
-             attendancesBusiness.update(id, attendancesDto);
+             attendancesBusiness.update(id, attendanceDto);
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
