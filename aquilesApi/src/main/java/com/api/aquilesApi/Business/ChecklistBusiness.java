@@ -1,31 +1,45 @@
 package com.api.aquilesApi.Business;
 
+import java.nio.charset.StandardCharsets;
 import com.api.aquilesApi.Dto.ChecklistDto;
 import com.api.aquilesApi.Entity.Checklist;
+import com.api.aquilesApi.Entity.Evaluations;
 import com.api.aquilesApi.Repository.JuriesRepository;
+import com.api.aquilesApi.Service.ChecklistExportService;
 import com.api.aquilesApi.Service.ChecklistService;
+import com.api.aquilesApi.Service.ChecklistHistoryService; 
+import com.api.aquilesApi.Service.EvaluationsService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-@Component
+import org.springframework.stereotype.Service;
+
+@Service
 public class ChecklistBusiness {
 
     private final ChecklistService checklistService;
     private final ModelMapper modelMapper;
+    private final EvaluationsService EvaluationsService;
+    private final ChecklistExportService exportService;
+    private final ChecklistHistoryService checklistHistoryService; // ⭐ AGREGAR ESTA LÍNEA
 
-    public ChecklistBusiness(ChecklistService checklistService, JuriesRepository juriesRepository, ModelMapper modelMapper) {
+    public ChecklistBusiness(
+            ChecklistService checklistService,
+            JuriesRepository juriesRepository,
+            ModelMapper modelMapper,
+            EvaluationsService evaluationService,
+            ChecklistExportService exportService,
+            ChecklistHistoryService checklistHistoryService // ⭐ AGREGAR ESTE PARÁMETRO
+    ) {
         this.checklistService = checklistService;
         this.modelMapper = modelMapper;
-    }
-
-    // Validation object
-    public void validationObject(ChecklistDto checklistDto) throws CustomException {
-
-    }
+        this.EvaluationsService = evaluationService;
+        this.exportService = exportService;
+        this.checklistHistoryService = checklistHistoryService; // ⭐ AGREGAR ESTA ASIGNACIÓN
+    }   
 
     // Find All
     public Page<ChecklistDto> findAll(int page, int size) {
@@ -48,6 +62,8 @@ public class ChecklistBusiness {
         try {
             Checklist checklist = checklistService.getById(id);
             return modelMapper.map(checklist, ChecklistDto.class);
+        } catch (CustomException e) {
+            throw e;
         } catch (Exception e) {
             throw new CustomException("Error Getting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -56,31 +72,127 @@ public class ChecklistBusiness {
     // Add
     public ChecklistDto add(ChecklistDto checklistDto) {
         try {
+            // Paso 1: mapear campos simples
             Checklist checklist = modelMapper.map(checklistDto, Checklist.class);
-            return modelMapper.map(checklistService.save(checklist), ChecklistDto.class);
-        }catch ( Exception e){
-            throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);
+
+            // 🔧 Conversión manual del String a byte[] para instructorSignature
+            if (checklistDto.getInstructorSignature() != null) {
+                checklist.setInstructorSignature(
+                    checklistDto.getInstructorSignature().getBytes(java.nio.charset.StandardCharsets.UTF_8)
+                );
+            }
+
+            // Paso 2: asignar manualmente la entidad Evaluations si se proporciona un ID
+            if (checklistDto.getEvaluations() != null) {
+                Evaluations eval = EvaluationsService.findById(checklistDto.getEvaluations());
+                checklist.setEvaluation(eval);
+            }
+
+            // Paso 3: guardar
+            Checklist saved = checklistService.save(checklist);
+            
+            // ⭐ GUARDAR HISTORIAL DE CREACIÓN
+            checklistHistoryService.guardarHistorial(
+                "Checklist creado", 
+                null, 
+                saved, 
+                "Sistema" // Puedes cambiar esto por el usuario actual
+            );
+            
+            return modelMapper.map(saved, ChecklistDto.class);
+        } catch (Exception e) {
+            throw new CustomException("Error creating checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     // Update
-    public void update(Long attendanceId, ChecklistDto checklistDto) {
+    public void update(Long checklistId, ChecklistDto checklistDto) {
         try {
-            checklistDto.setId(attendanceId);
-            Checklist attendance = modelMapper.map( checklistDto, Checklist.class);
-            checklistService.save(attendance);
+            // ⭐ OBTENER EL ESTADO ANTES DE LA ACTUALIZACIÓN
+            Checklist checklistAntes = checklistService.getById(checklistId);
+            
+            // Crear una copia del estado anterior para el historial
+            Checklist estadoAnterior = new Checklist();
+            estadoAnterior.setId(checklistAntes.getId());
+            estadoAnterior.setState(checklistAntes.getState());
+            estadoAnterior.setRemarks(checklistAntes.getRemarks());
+            estadoAnterior.setStudySheets(checklistAntes.getStudySheets());
+            estadoAnterior.setEvaluationCriteria(checklistAntes.isEvaluationCriteria());
+            estadoAnterior.setInstructorSignature(checklistAntes.getInstructorSignature());
+            estadoAnterior.setDateAssigned(checklistAntes.getDateAssigned());
+            estadoAnterior.setEvaluation(checklistAntes.getEvaluation());
+            estadoAnterior.setLearningOutcome(checklistAntes.getLearningOutcome());
+
+            // Aplicar los cambios
+            checklistAntes.setState(checklistDto.getState());
+            checklistAntes.setRemarks(checklistDto.getRemarks());
+            checklistAntes.setStudySheets(checklistDto.getStudySheets());
+            checklistAntes.setEvaluationCriteria(checklistDto.isEvaluationCriteria());
+
+            if (checklistDto.getInstructorSignature() != null) {
+                checklistAntes.setInstructorSignature(
+                    checklistDto.getInstructorSignature().getBytes(StandardCharsets.UTF_8)
+                );
+            }
+
+            // ✅ Modificar la evaluación ya existente asociada al checklist
+            Evaluations eval = checklistAntes.getEvaluation();
+            if (eval != null) {
+                eval.setValueJudgment("Nuevo juicio de valor");
+                eval.setObservations("Observaciones actualizadas");
+                // Modifica aquí lo que necesites
+            }
+
+            // Guardar los cambios
+            Checklist checklistActualizado = checklistService.save(checklistAntes);
+
+            // ⭐ GUARDAR HISTORIAL DE ACTUALIZACIÓN
+            checklistHistoryService.guardarHistorial(
+                "Checklist actualizado", 
+                estadoAnterior, 
+                checklistActualizado, 
+                "Sistema" // Puedes cambiar esto por el usuario actual
+            );
+
         } catch (Exception e) {
-            throw new CustomException("Error Updating Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Error Updating Checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     // Delete
     public void delete(Long attendanceId) {
         try {
-            Checklist checklist = checklistService.getById(attendanceId);
-            checklistService.delete(checklist);
+            // ⭐ OBTENER EL CHECKLIST ANTES DE ELIMINARLO
+            Checklist checklistAntes = checklistService.getById(attendanceId);
+            
+            // Eliminar el checklist
+            checklistService.delete(checklistAntes);
+            
+            // ⭐ GUARDAR HISTORIAL DE ELIMINACIÓN
+            checklistHistoryService.guardarHistorial(
+                "Checklist eliminado", 
+                checklistAntes, 
+                null, 
+                "Sistema" // Puedes cambiar esto por el usuario actual
+            );
+            
+        } catch (CustomException e) {
+            throw e;
         } catch (Exception e) {
             throw new CustomException("Error Deleting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    // Export documents
+    // Export PDF
+    public String exportChecklistPdf(Long checklistId) {
+        Checklist checklist = checklistService.getById(checklistId);
+        return exportService.exportPdfBase64(checklist);
+    }
+
+    // Export Excel
+    public String exportChecklistExcel(Long checklistId) {
+        Checklist checklist = checklistService.getById(checklistId);
+        return exportService.exportExcelBase64(checklist);
     }
 }

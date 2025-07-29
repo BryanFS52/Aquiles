@@ -24,4 +24,5 @@ public class EvaluationsDto {
     private String valueJudgment;
 
     // Relations
+    private Long checklistId;
 }

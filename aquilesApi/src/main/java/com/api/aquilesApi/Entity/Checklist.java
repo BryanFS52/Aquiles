@@ -38,8 +38,11 @@ public class Checklist implements Serializable {
     @Column(name = "date_assigned", length = 30)
     private Date dateAssigned;
 
-    @Column(name = "checklist_history", nullable = false)
-    private String checklistHistory;
+    @Column(name = "study_sheets")
+    private Long studySheets;
+
+    @Column(name = "evaluations")
+    private Long evaluations;
 
     // Relations
 

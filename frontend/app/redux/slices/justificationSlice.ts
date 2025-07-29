@@ -261,6 +261,14 @@ export const fetchJustifications = createAsyncThunk<GetAllJustificationsQuery['a
         return data.allJustifications;
     }
 );
+const { data } = await clientLAN.query<GetAllJustificationsQuery, GetAllJustificationsQueryVariables>({
+    query: GET_ALL_JUSTIFICATIONS,
+    variables: { page, size },
+    fetchPolicy: 'no-cache',
+});
+return data.allJustifications;
+    }
+);
 
 export const fetchJustificationById = createAsyncThunk<GetJustificationByIdQuery['justificationById'], GetJustificationByIdQueryVariables>(
     'justifications/fetchById',
@@ -294,6 +302,15 @@ export const addJustification = createAsyncThunk<AddJustificationMutation['addJu
         }
     }
 );
+if (!res || res.code !== '200') {
+    return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
+}
+return res;
+        } catch (error: any) {
+    return rejectWithValue({ code: '500', message: error.message });
+}
+    }
+);
 
 export const updateJustification = createAsyncThunk<UpdateJustificationMutation['updateJustification'], UpdateJustificationMutationVariables,
     { rejectValue: { code: string; message: string } }
@@ -306,6 +323,10 @@ export const updateJustification = createAsyncThunk<UpdateJustificationMutation[
                 variables: { id, input },
             });
 
+            const res = data?.updateJustification;
+            if (!res || res.code !== '200') {
+                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
+            }
             const res = data?.updateJustification;
             if (!res || res.code !== '200') {
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
@@ -366,11 +387,21 @@ export const deleteJustification = createAsyncThunk<string, string,
             if (!res || res.code !== '200') {
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
             }
+            const res = data?.deleteJustification;
+            if (!res || res.code !== '200') {
+                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
+            }
 
             return id;
         } catch (error: any) {
             return rejectWithValue({ code: '500', message: error.message });
         }
+    }
+);
+return id;
+        } catch (error: any) {
+    return rejectWithValue({ code: '500', message: error.message });
+}
     }
 );
 
@@ -387,15 +418,40 @@ export const processFile = createAsyncThunk<
             if (!validateFileType(file)) {
                 return rejectWithValue('Solo se permiten archivos PDF, JPG o PNG');
             }
+            // Nuevo thunk para procesar archivo
+            export const processFile = createAsyncThunk<
+                { file: File; base64: string },
+                File,
+                { rejectValue: string }
+            >(
+                'justifications/processFile',
+                async (file, { rejectWithValue }) => {
+                    try {
+                        // Validar tipo de archivo
+                        if (!validateFileType(file)) {
+                            return rejectWithValue('Solo se permiten archivos PDF, JPG o PNG');
+                        }
 
-            // Validar tamaño de archivo
-            if (!validateFileSize(file)) {
-                return rejectWithValue('El archivo es demasiado grande. Máximo permitido: 5MB');
-            }
+                        // Validar tamaño de archivo
+                        if (!validateFileSize(file)) {
+                            return rejectWithValue('El archivo es demasiado grande. Máximo permitido: 5MB');
+                        }
+                        // Validar tamaño de archivo
+                        if (!validateFileSize(file)) {
+                            return rejectWithValue('El archivo es demasiado grande. Máximo permitido: 5MB');
+                        }
 
-            // Leer archivo como base64
-            const base64 = await readFileAsBase64(file);
+                        // Leer archivo como base64
+                        const base64 = await readFileAsBase64(file);
+                        // Leer archivo como base64
+                        const base64 = await readFileAsBase64(file);
 
+                        return { file, base64 };
+                    } catch (error: any) {
+                        return rejectWithValue(error.message || 'Error al procesar el archivo');
+                    }
+                }
+            );
             return { file, base64 };
         } catch (error: any) {
             return rejectWithValue(error.message || 'Error al procesar el archivo');
@@ -403,6 +459,16 @@ export const processFile = createAsyncThunk<
     }
 );
 
+// Estado inicial con formulario
+const initialFormData: FormDataState = {
+    justificationTypeId: { id: "" },
+    numeroDocumento: "",
+    nombreAprendiz: "",
+    descripcion: "",
+    justificacionFile: null,
+    justificacionFileBase64: "",
+    notificationId: "123456",
+};
 // Estado inicial con formulario
 const initialFormData: FormDataState = {
     justificationTypeId: { id: "" },
@@ -442,218 +508,357 @@ const justificationSlice = createSlice({
             state.filterOptions = { ...state.filterOptions, ...action.payload };
             state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
         },
-
-        clearFilters: (state) => {
-            state.filterOptions = { selectedFiltro: "", searchTerm: "" };
-            state.filteredData = state.transformedData;
-        },
-
-        setLocalCurrentPage: (state, action: PayloadAction<number>) => {
-            state.localCurrentPage = action.payload;
-        },
-
-        goToPreviousPage: (state) => {
-            state.localCurrentPage = Math.max(state.localCurrentPage - 1, 1);
-        },
-
-        goToNextPage: (state) => {
-            const maxPages = state.totalPages || 1;
-            state.localCurrentPage = Math.min(state.localCurrentPage + 1, maxPages);
-        },
-
-        setItemsPerPage: (state, action: PayloadAction<number>) => {
-            state.itemsPerPage = action.payload;
-        },
-        setCurrentAttendance: (state, action: PayloadAction<Attendance>) => {
-            state.form.currentAttendance = action.payload;
-        },
-
-        // Nuevos reducers para el formulario
-        showForm: (state) => {
-            state.form.showForm = true;
-        },
-
-        hideForm: (state) => {
-            state.form.showForm = false;
-        },
-
-        resetForm: (state) => {
-            state.form.showForm = false;
-            state.form.formData = initialFormData;
-            state.form.validationErrors = [];
-            state.form.isSubmitting = false;
-        },
-
-        updateFormField: (state, action: PayloadAction<{ field: keyof FormDataState; value: any }>) => {
-            const { field, value } = action.payload;
-            (state.form.formData as any)[field] = value;
-        },
-
-        updateNumericField: (state, action: PayloadAction<{ field: string; value: string }>) => {
-            const { field, value } = action.payload;
-            const cleanedValue = cleanNumericInput(value);
-            (state.form.formData as any)[field] = cleanedValue;
-        },
-
-        updateTextField: (state, action: PayloadAction<{ field: string; value: string }>) => {
-            const { field, value } = action.payload;
-            const cleanedValue = cleanTextInput(value);
-            (state.form.formData as any)[field] = cleanedValue;
-        },
-
-        updateJustificationTypeId: (state, action: PayloadAction<string>) => {
-            state.form.formData.justificationTypeId.id = action.payload;
-        },
-
-        setValidationErrors: (state, action: PayloadAction<string[]>) => {
-            state.form.validationErrors = action.payload;
-        },
-
-        clearValidationErrors: (state) => {
-            state.form.validationErrors = [];
-        },
-
-        setSubmitting: (state, action: PayloadAction<boolean>) => {
-            state.form.isSubmitting = action.payload;
-        },
-
-        validateForm: (state) => {
-            state.form.validationErrors = validateFormData(state.form.formData);
-        }
-    },
-    extraReducers: (builder) => {
-        builder
-            // fetchJustifications - existente
-            .addCase(fetchJustifications.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchJustifications.fulfilled, (state, action: PayloadAction<GetAllJustificationsQuery['allJustifications']>) => {
-                if (action.payload?.data) {
-                    state.data = action.payload.data
-                        .filter((item): item is NonNullable<typeof item> => item !== null)
-                        .map(transformGraphQLToJustificationItem);
-
-                    state.transformedData = transformToComponentFormat(state.data);
+        const justificationSlice = createSlice({
+            name: 'justifications',
+            initialState,
+            reducers: {
+                // Reducers existentes para filtros
+                setFilterOptions: (state, action: PayloadAction<Partial<FilterOptions>>) => {
+                    state.filterOptions = { ...state.filterOptions, ...action.payload };
                     state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+                },
 
-                    state.totalItems = action.payload.totalItems ?? 0;
-                    state.totalPages = action.payload.totalPages ?? 0;
-                    state.currentPage = action.payload.currentPage ?? 0;
-                }
-                state.loading = false;
-            })
-            .addCase(fetchJustifications.rejected, (state, action) => {
-                state.error = action.error.message || 'Error fetching justifications';
-                state.loading = false;
-            })
-            // fetchJustificationById - existente
-            .addCase(fetchJustificationById.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchJustificationById.fulfilled, (state, action: PayloadAction<GetJustificationByIdQuery['justificationById']>) => {
-                if (action.payload) {
-                    state.data = [transformGraphQLToJustificationItem(action.payload)];
-                    state.transformedData = transformToComponentFormat(state.data);
-                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-                }
-                state.loading = false;
-            })
-            .addCase(fetchJustificationById.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                const { code, message } = payload || {};
-                state.error = { code, message };
-                state.loading = false;
-            })
-            // addJustification - modificado para resetear formulario
-            .addCase(addJustification.pending, (state) => {
-                state.form.isSubmitting = true;
-                state.form.validationErrors = [];
-            })
-            .addCase(addJustification.fulfilled, (state, action: PayloadAction<AddJustificationMutation['addJustification']>) => {
-                if (action.payload) {
-                    const newJustification = transformGraphQLToJustificationItem(action.payload);
-                    state.data.push(newJustification);
-                    state.transformedData = transformToComponentFormat(state.data);
-                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+                clearFilters: (state) => {
+                    state.filterOptions = { selectedFiltro: "", searchTerm: "" };
+                    state.filteredData = state.transformedData;
+                },
+                clearFilters: (state) => {
+                    state.filterOptions = { selectedFiltro: "", searchTerm: "" };
+                    state.filteredData = state.transformedData;
+                },
 
-                    // Resetear formulario después de éxito
+                setLocalCurrentPage: (state, action: PayloadAction<number>) => {
+                    state.localCurrentPage = action.payload;
+                },
+                setLocalCurrentPage: (state, action: PayloadAction<number>) => {
+                    state.localCurrentPage = action.payload;
+                },
+
+                goToPreviousPage: (state) => {
+                    state.localCurrentPage = Math.max(state.localCurrentPage - 1, 1);
+                },
+                goToPreviousPage: (state) => {
+                    state.localCurrentPage = Math.max(state.localCurrentPage - 1, 1);
+                },
+
+                goToNextPage: (state) => {
+                    const maxPages = state.totalPages || 1;
+                    state.localCurrentPage = Math.min(state.localCurrentPage + 1, maxPages);
+                },
+                goToNextPage: (state) => {
+                    const maxPages = state.totalPages || 1;
+                    state.localCurrentPage = Math.min(state.localCurrentPage + 1, maxPages);
+                },
+
+                setItemsPerPage: (state, action: PayloadAction<number>) => {
+                    state.itemsPerPage = action.payload;
+                },
+                setCurrentAttendance: (state, action: PayloadAction<Attendance>) => {
+                    state.form.currentAttendance = action.payload;
+                },
+
+                // Nuevos reducers para el formulario
+                showForm: (state) => {
+                    state.form.showForm = true;
+                },
+                // Nuevos reducers para el formulario
+                showForm: (state) => {
+                    state.form.showForm = true;
+                },
+
+                hideForm: (state) => {
+                    state.form.showForm = false;
+                },
+                hideForm: (state) => {
+                    state.form.showForm = false;
+                },
+
+                resetForm: (state) => {
                     state.form.showForm = false;
                     state.form.formData = initialFormData;
                     state.form.validationErrors = [];
-                }
-                state.form.isSubmitting = false;
-                state.error = null;
-            })
-            .addCase(addJustification.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                const { code, message } = payload || {};
-                state.error = { code, message };
-                state.form.isSubmitting = false;
-            })
-            // updateJustification - existente
-            .addCase(updateJustification.fulfilled, (state, action: PayloadAction<UpdateJustificationMutation['updateJustification']>) => {
-                if (action.payload) {
-                    const updatedJustification = transformGraphQLToJustificationItem(action.payload);
-                    const index = state.data.findIndex((justification: Justification) => justification.id === updatedJustification.id);
-                    if (index !== -1) {
-                        state.data[index] = updatedJustification;
-                        state.transformedData = transformToComponentFormat(state.data);
-                        state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-                    }
-                }
-                state.error = null;
-            })
-            .addCase(updateJustification.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                const { code, message } = payload || {};
-                state.error = { code, message };
-            })
-            // updateJustificationStatus - nuevo
-            .addCase(updateJustificationStatus.fulfilled, (state, action: PayloadAction<UpdateJustificationMutation['updateJustification']>) => {
-                // Refrescar los datos después de actualizar el estado
-                state.error = null;
-            })
-            .addCase(updateJustificationStatus.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                const { code, message } = payload || {};
-                state.error = { code, message };
-            })
-            // deleteJustification - existente
-            .addCase(deleteJustification.fulfilled, (state, action: PayloadAction<string>) => {
-                if (action.payload) {
-                    state.data = state.data.filter((justification) => justification.id !== String(action.payload));
-                    state.transformedData = transformToComponentFormat(state.data);
-                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-                }
-                state.error = null;
-            })
-            .addCase(deleteJustification.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                const { code, message } = payload || {};
-                state.error = { code, message };
-            })
-    }
-});
+                    state.form.isSubmitting = false;
+                },
+                resetForm: (state) => {
+                    state.form.showForm = false;
+                    state.form.formData = initialFormData;
+                    state.form.validationErrors = [];
+                    state.form.isSubmitting = false;
+                },
 
-export const {
-    setFilterOptions,
-    clearFilters,
-    setLocalCurrentPage,
-    goToPreviousPage,
-    goToNextPage,
-    setItemsPerPage,
-    showForm,
-    hideForm,
-    resetForm,
-    updateFormField,
-    updateNumericField,
-    updateTextField,
-    updateJustificationTypeId,
-    setValidationErrors,
-    clearValidationErrors,
-    setSubmitting,
-    validateForm,
-    setCurrentAttendance,
-} = justificationSlice.actions;
+                updateFormField: (state, action: PayloadAction<{ field: keyof FormDataState; value: any }>) => {
+                    const { field, value } = action.payload;
+                    (state.form.formData as any)[field] = value;
+                },
+                updateFormField: (state, action: PayloadAction<{ field: keyof FormDataState; value: any }>) => {
+                    const { field, value } = action.payload;
+                    (state.form.formData as any)[field] = value;
+                },
 
-export default justificationSlice.reducer;
+                updateNumericField: (state, action: PayloadAction<{ field: string; value: string }>) => {
+                    const { field, value } = action.payload;
+                    const cleanedValue = cleanNumericInput(value);
+                    (state.form.formData as any)[field] = cleanedValue;
+                },
+                updateNumericField: (state, action: PayloadAction<{ field: string; value: string }>) => {
+                    const { field, value } = action.payload;
+                    const cleanedValue = cleanNumericInput(value);
+                    (state.form.formData as any)[field] = cleanedValue;
+                },
+
+                updateTextField: (state, action: PayloadAction<{ field: string; value: string }>) => {
+                    const { field, value } = action.payload;
+                    const cleanedValue = cleanTextInput(value);
+                    (state.form.formData as any)[field] = cleanedValue;
+                },
+                updateTextField: (state, action: PayloadAction<{ field: string; value: string }>) => {
+                    const { field, value } = action.payload;
+                    const cleanedValue = cleanTextInput(value);
+                    (state.form.formData as any)[field] = cleanedValue;
+                },
+
+                updateJustificationTypeId: (state, action: PayloadAction<string>) => {
+                    state.form.formData.justificationTypeId.id = action.payload;
+                },
+                updateJustificationTypeId: (state, action: PayloadAction<string>) => {
+                    state.form.formData.justificationTypeId.id = action.payload;
+                },
+
+                setValidationErrors: (state, action: PayloadAction<string[]>) => {
+                    state.form.validationErrors = action.payload;
+                },
+                setValidationErrors: (state, action: PayloadAction<string[]>) => {
+                    state.form.validationErrors = action.payload;
+                },
+
+                clearValidationErrors: (state) => {
+                    state.form.validationErrors = [];
+                },
+                clearValidationErrors: (state) => {
+                    state.form.validationErrors = [];
+                },
+
+                setSubmitting: (state, action: PayloadAction<boolean>) => {
+                    state.form.isSubmitting = action.payload;
+                },
+                setSubmitting: (state, action: PayloadAction<boolean>) => {
+                    state.form.isSubmitting = action.payload;
+                },
+
+                validateForm: (state) => {
+                    state.form.validationErrors = validateFormData(state.form.formData);
+                }
+            },
+            extraReducers: (builder) => {
+                builder
+                    // fetchJustifications - existente
+                    .addCase(fetchJustifications.pending, (state) => {
+                        state.loading = true;
+                    })
+                    .addCase(fetchJustifications.fulfilled, (state, action: PayloadAction<GetAllJustificationsQuery['allJustifications']>) => {
+                        if (action.payload?.data) {
+                            state.data = action.payload.data
+                                .filter((item): item is NonNullable<typeof item> => item !== null)
+                                .map(transformGraphQLToJustificationItem);
+                            validateForm: (state) => {
+                                state.form.validationErrors = validateFormData(state.form.formData);
+                            }
+                        },
+                        extraReducers: (builder) => {
+                            builder
+                                // fetchJustifications - existente
+                                .addCase(fetchJustifications.pending, (state) => {
+                                    state.loading = true;
+                                })
+                                .addCase(fetchJustifications.fulfilled, (state, action: PayloadAction<GetAllJustificationsQuery['allJustifications']>) => {
+                                    if (action.payload?.data) {
+                                        state.data = action.payload.data
+                                            .filter((item): item is NonNullable<typeof item> => item !== null)
+                                            .map(transformGraphQLToJustificationItem);
+
+                                        state.transformedData = transformToComponentFormat(state.data);
+                                        state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+                                        state.transformedData = transformToComponentFormat(state.data);
+                                        state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+
+                                        state.totalItems = action.payload.totalItems ?? 0;
+                                        state.totalPages = action.payload.totalPages ?? 0;
+                                        state.currentPage = action.payload.currentPage ?? 0;
+                                    }
+                                    state.loading = false;
+                                })
+                                .addCase(fetchJustifications.rejected, (state, action) => {
+                                    state.error = action.error.message || 'Error fetching justifications';
+                                    state.loading = false;
+                                })
+                                // fetchJustificationById - existente
+                                .addCase(fetchJustificationById.pending, (state) => {
+                                    state.loading = true;
+                                })
+                                .addCase(fetchJustificationById.fulfilled, (state, action: PayloadAction<GetJustificationByIdQuery['justificationById']>) => {
+                                    if (action.payload) {
+                                        state.data = [transformGraphQLToJustificationItem(action.payload)];
+                                        state.transformedData = transformToComponentFormat(state.data);
+                                        state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+                                    }
+                                    state.loading = false;
+                                })
+                                .addCase(fetchJustificationById.rejected, (state, action) => {
+                                    const payload = action.payload as RejectedPayload;
+                                    const { code, message } = payload || {};
+                                    state.error = { code, message };
+                                    state.loading = false;
+                                })
+                                // addJustification - modificado para resetear formulario
+                                .addCase(addJustification.pending, (state) => {
+                                    state.form.isSubmitting = true;
+                                    state.form.validationErrors = [];
+                                })
+                                .addCase(addJustification.fulfilled, (state, action: PayloadAction<AddJustificationMutation['addJustification']>) => {
+                                    if (action.payload) {
+                                        const newJustification = transformGraphQLToJustificationItem(action.payload);
+                                        state.data.push(newJustification);
+                                        state.transformedData = transformToComponentFormat(state.data);
+                                        state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+                                        state.totalItems = action.payload.totalItems ?? 0;
+                                        state.totalPages = action.payload.totalPages ?? 0;
+                                        state.currentPage = action.payload.currentPage ?? 0;
+                                    }
+                                    state.loading = false;
+                                })
+                                .addCase(fetchJustifications.rejected, (state, action) => {
+                                    state.error = action.error.message || 'Error fetching justifications';
+                                    state.loading = false;
+                                })
+                                // fetchJustificationById - existente
+                                .addCase(fetchJustificationById.pending, (state) => {
+                                    state.loading = true;
+                                })
+                                .addCase(fetchJustificationById.fulfilled, (state, action: PayloadAction<GetJustificationByIdQuery['justificationById']>) => {
+                                    if (action.payload) {
+                                        state.data = [transformGraphQLToJustificationItem(action.payload)];
+                                        state.transformedData = transformToComponentFormat(state.data);
+                                        state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+                                    }
+                                    state.loading = false;
+                                })
+                                .addCase(fetchJustificationById.rejected, (state, action) => {
+                                    const payload = action.payload as RejectedPayload;
+                                    const { code, message } = payload || {};
+                                    state.error = { code, message };
+                                    state.loading = false;
+                                })
+                                // addJustification - modificado para resetear formulario
+                                .addCase(addJustification.pending, (state) => {
+                                    state.form.isSubmitting = true;
+                                    state.form.validationErrors = [];
+                                })
+                                .addCase(addJustification.fulfilled, (state, action: PayloadAction<AddJustificationMutation['addJustification']>) => {
+                                    if (action.payload) {
+                                        const newJustification = transformGraphQLToJustificationItem(action.payload);
+                                        state.data.push(newJustification);
+                                        state.transformedData = transformToComponentFormat(state.data);
+                                        state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+
+                                        // Resetear formulario después de éxito
+                                        state.form.showForm = false;
+                                        state.form.formData = initialFormData;
+                                        state.form.validationErrors = [];
+                                    }
+                                    state.form.isSubmitting = false;
+                                    state.error = null;
+                                })
+                                .addCase(addJustification.rejected, (state, action) => {
+                                    const payload = action.payload as RejectedPayload;
+                                    const { code, message } = payload || {};
+                                    state.error = { code, message };
+                                    state.form.isSubmitting = false;
+                                })
+                                // updateJustification - existente
+                                .addCase(updateJustification.fulfilled, (state, action: PayloadAction<UpdateJustificationMutation['updateJustification']>) => {
+                                    if (action.payload) {
+                                        const updatedJustification = transformGraphQLToJustificationItem(action.payload);
+                                        const index = state.data.findIndex((justification: Justification) => justification.id === updatedJustification.id);
+                                        if (index !== -1) {
+                                            state.data[index] = updatedJustification;
+                                            state.transformedData = transformToComponentFormat(state.data);
+                                            state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+                                        }
+                                    }
+                                    state.error = null;
+                                })
+                                .addCase(updateJustification.rejected, (state, action) => {
+                                    const payload = action.payload as RejectedPayload;
+                                    const { code, message } = payload || {};
+                                    state.error = { code, message };
+                                })
+                                // updateJustificationStatus - nuevo
+                                .addCase(updateJustificationStatus.fulfilled, (state, action: PayloadAction<UpdateJustificationMutation['updateJustification']>) => {
+                                    // Refrescar los datos después de actualizar el estado
+                                    state.error = null;
+                                })
+                                .addCase(updateJustificationStatus.rejected, (state, action) => {
+                                    const payload = action.payload as RejectedPayload;
+                                    const { code, message } = payload || {};
+                                    state.error = { code, message };
+                                })
+                                // deleteJustification - existente
+                                .addCase(deleteJustification.fulfilled, (state, action: PayloadAction<string>) => {
+                                    if (action.payload) {
+                                        state.data = state.data.filter((justification) => justification.id !== String(action.payload));
+                                        state.transformedData = transformToComponentFormat(state.data);
+                                        state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+                                    }
+                                    state.error = null;
+                                })
+                                .addCase(deleteJustification.rejected, (state, action) => {
+                                    const payload = action.payload as RejectedPayload;
+                                    const { code, message } = payload || {};
+                                    state.error = { code, message };
+                                })
+                        }
+                    });
+
+                export const {
+                    setFilterOptions,
+                    clearFilters,
+                    setLocalCurrentPage,
+                    goToPreviousPage,
+                    goToNextPage,
+                    setItemsPerPage,
+                    showForm,
+                    hideForm,
+                    resetForm,
+                    updateFormField,
+                    updateNumericField,
+                    updateTextField,
+                    updateJustificationTypeId,
+                    setValidationErrors,
+                    clearValidationErrors,
+                    setSubmitting,
+                    validateForm,
+                    setCurrentAttendance,
+                } = justificationSlice.actions;
+                export const {
+                    setFilterOptions,
+                    clearFilters,
+                    setLocalCurrentPage,
+                    goToPreviousPage,
+                    goToNextPage,
+                    setItemsPerPage,
+                    showForm,
+                    hideForm,
+                    resetForm,
+                    updateFormField,
+                    updateNumericField,
+                    updateTextField,
+                    updateJustificationTypeId,
+                    setValidationErrors,
+                    clearValidationErrors,
+                    setSubmitting,
+                    validateForm,
+                    setCurrentAttendance,
+                } = justificationSlice.actions;
+
+                export default justificationSlice.reducer;
+                export default justificationSlice.reducer;
