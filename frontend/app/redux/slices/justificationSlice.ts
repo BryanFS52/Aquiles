@@ -134,7 +134,7 @@ const transformToComponentFormat = (justifications: Justification[]): Transforme
 
         return {
             id: Number(j.id),
-            ficha: studySheet?.studySheet?.toString() || "Sin ficha",
+            ficha: studySheet?.studentStudySheetState?.toString() || "Sin ficha",
             fecha: j.justificationDate ? new Date(j.justificationDate).toLocaleDateString("es-CO") : "Sin fecha",
             estado: j.state ? "Activo" : "Inactivo",
             justificationType: j.justificationType?.name ?? "Sin tipo",

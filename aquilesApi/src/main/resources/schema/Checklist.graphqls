@@ -1,11 +1,21 @@
+type Item {
+    id: ID!
+    code: String!
+    indicator: String!
+    active: Boolean!
+}
+
 type Checklist {
     id: ID!
     state: Boolean
     remarks: String
+    trimester: String
+    component: String
     instructorSignature: String
     evaluationCriteria: Boolean
-    studySheets: Long 
+    studySheets: Long
     evaluations: Long
+    items: [Item]
     associatedJuries: [Juries]
 }
 
@@ -26,29 +36,34 @@ type ChecklistPageId {
     message: String
 }
 
+input ItemDto {
+    code: String!
+    indicator: String!
+    active: Boolean!
+}
+
 input ChecklistDto {
     state: Boolean!
     remarks: String!
+    trimester: String!
+    component: String
     instructorSignature: String!
     evaluationCriteria: Boolean!
-    studySheets: Long 
+    studySheets: Long
     evaluations: Long
+    items: [ItemDto]
     associatedJuries: [ID!]!
 }
 
-
-
 type ChecklistHistory {
-  id: ID
-  checklistId: ID
-  actions: String
-  teacher: String
-  date: String
-  dateBefore: String
-  dateAfter: String
+    id: ID
+    checklistId: ID
+    actions: String
+    teacher: String
+    date: String
+    dateBefore: String
+    dateAfter: String
 }
-
-
 
 extend type Query {
     allChecklists(page: Int, size: Int): ChecklistPage
@@ -63,4 +78,5 @@ extend type Mutation {
     addChecklist(input: ChecklistDto): Response
     updateChecklist(id: Long!, input: ChecklistDto): Response
     deleteChecklist(id: Long!): Response
+    updateItemStatus(itemId: Long!, active: Boolean!): Response
 }
