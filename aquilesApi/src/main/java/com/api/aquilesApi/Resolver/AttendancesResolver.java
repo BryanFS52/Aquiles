@@ -83,24 +83,32 @@ public class AttendancesResolver {
 
     @DgsQuery
     public Map<String, Object> allAttendancesByStudentId(@InputArgument Long id, @InputArgument Long stateId, @InputArgument Integer page, @InputArgument Integer size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<AttendancesDto> attendances = attendancesBusiness.findAllByFilter(id, stateId, pageable);
-        return ResponseHttpApi.responseHttpFindAll(
-                attendances.getContent(),
-                ResponseHttpApi.CODE_OK,
-                "query attendances by id ok",
-                attendances.getSize(),
-                page,
-                attendances.getTotalPages()
-        );
+        try {
+            int safePage = (page != null) ? page : 0;
+            int safeSize = (size != null) ? size : 10;
+
+            Pageable pageable = PageRequest.of(safePage, safeSize);
+            Page<AttendanceDto> attendances = attendancesBusiness.findAllByStudentId(id, stateId, pageable);
+
+            return ResponseHttpApi.responseHttpFindAll(
+                    attendances.getContent(),
+                    ResponseHttpApi.CODE_OK,
+                    "query attendances by id ok",
+                    attendances.getSize(),
+                    safePage,
+                    attendances.getTotalPages()
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // FindAll Attendances (GraphQL)
     @DgsQuery
     public Map<String, Object> allAttendances(@InputArgument Integer page, @InputArgument Integer size) {
         try {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<AttendancesDto> attendancesDtoPage = attendancesBusiness.findAll(pageable);
+            Page<AttendanceDto> attendancesDtoPage = attendancesBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
                     attendancesDtoPage.getContent(),
                     ResponseHttpApi.CODE_OK,
@@ -111,7 +119,7 @@ public class AttendancesResolver {
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -127,7 +135,7 @@ public class AttendancesResolver {
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error retrieving Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
@@ -145,7 +153,7 @@ public class AttendancesResolver {
             );
         }catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error adding attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error adding Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
@@ -163,7 +171,7 @@ public class AttendancesResolver {
         }
         catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error updating attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error updating Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
@@ -181,7 +189,7 @@ public class AttendancesResolver {
         }
         catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error deleting attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error deleting Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }

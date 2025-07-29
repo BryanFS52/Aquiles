@@ -100,8 +100,7 @@ public class JuriesResolver {
                     ResponseHttpApi.CODE_OK,
                     "Delete ok"
             );
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error deleting Jury: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );

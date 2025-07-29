@@ -34,7 +34,7 @@ public class FollowUpActionResolver {
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error retriving FollowUpAction: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error retrieving FollowUpAction: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

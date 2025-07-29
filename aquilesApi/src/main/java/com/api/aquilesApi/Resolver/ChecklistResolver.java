@@ -32,7 +32,7 @@ public class ChecklistResolver {
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error retrieving checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -80,8 +80,7 @@ public class ChecklistResolver {
                     ResponseHttpApi.CODE_OK,
                     "Update ok"
             );
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error updating Checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );

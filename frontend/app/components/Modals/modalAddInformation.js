@@ -94,8 +94,6 @@ const ModalAddInformation = ({ isOpen, onClose }) => {
           </div>
         </div>
       )}
-
-      {/* Modal detalle proyecto */}
     </>
   );
 };

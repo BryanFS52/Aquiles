@@ -303,6 +303,26 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
         {/* Body */}
         <div className="px-6 py-4 max-h-[60vh] overflow-y-auto bg-white">
           <div className="space-y-4">
+
+            {/* Marcos de trabajo */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Marco de trabajo *
+              </label>
+              <select
+                name="marcosDeTrabajo"
+                id="marcosDeTrabajo"
+                required
+                className="w-full px-3 py-2 border-2 border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:opacity-50"
+                disabled={isSubmitting}
+                defaultValue=""
+              >
+                <option value="" disabled>Selecciona un marco de trabajo...</option>
+                <option value="scrum">Scrum</option>
+                <option value="kanban">Kanban</option>
+                <option value="xp">Extreme Programming (XP)</option>
+              </select>
+            </div>
             {/* Nombre del Team Scrum */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -310,6 +330,7 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
               </label>
               <input
                 type="text"
+                required
                 placeholder="Ej: Team Alpha, Desarrolladores Frontend..."
                 value={teamData.teamName || ''}
                 onChange={(e) => handleInputChange('teamName', e.target.value)}
@@ -331,6 +352,7 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
               </label>
               <input
                 type="text"
+                required
                 placeholder="Ej: Sistema de Gestión, App Mobile..."
                 value={teamData.projectName || ''}
                 onChange={(e) => handleInputChange('projectName', e.target.value)}
@@ -373,6 +395,7 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
                 closeMenuOnSelect={false}
                 hideSelectedOptions={false}
                 maxMenuHeight={200}
+                required
                 menuPlacement="auto"
                 menuPortalTarget={document.body}
                 menuPosition="fixed"

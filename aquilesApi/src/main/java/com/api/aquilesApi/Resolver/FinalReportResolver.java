@@ -67,9 +67,9 @@ public class FinalReportResolver {
             } else {
                 throw new IllegalArgumentException("Signature is required");
             }
-            FinalReportDto finalreportDto1 = finalReportBusiness.add(finalreportDto);
+            FinalReportDto finalReportDto1 = finalReportBusiness.add(finalreportDto);
             return ResponseHttpApi.responseHttpAction(
-                    finalreportDto1.getId(),
+                    finalReportDto1.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
             );

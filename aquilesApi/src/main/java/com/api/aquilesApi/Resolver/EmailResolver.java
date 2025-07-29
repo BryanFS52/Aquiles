@@ -24,10 +24,10 @@ public class EmailResolver {
                     emailRequest.getSubject(),
                     emailRequest.getHtmlContent()
             );
-            return "Correo enviado con éxito";
+            return "Mail sent successfully";
         } catch (MessagingException e) {
             e.printStackTrace();
-            return "Error al enviar el correo";
+            return "Error send mail";
         }
     }
 }

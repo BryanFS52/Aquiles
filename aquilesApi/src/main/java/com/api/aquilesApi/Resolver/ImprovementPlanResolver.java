@@ -34,7 +34,7 @@ public class ImprovementPlanResolver {
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error retrieving improvementPlans: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -50,7 +50,7 @@ public class ImprovementPlanResolver {
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error retrieving improvementPlan: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }

@@ -20,13 +20,14 @@ import ModalAddInformation from "@components/Modals/modalAddInformation";
 import ModalTeamInformation from "@components/Modals/modalTeamScrumInfo";
 import ModalEliminarTeam from "@components/Modals/modalEliminarTeam";
 
-interface TeamInfoData {
+export interface TeamInfoData {
     projectName: string;
     teamName: string;
     description: string;
     objectives: string;
     problem: string;
     projectJustification: string;
+    memberIds: { studentId: number; profileId: string }[];
 }
 
 export default function TeamScrumDetailsPage() {
@@ -69,6 +70,8 @@ export default function TeamScrumDetailsPage() {
     }, [studySheetLoading, showLoader, hideLoader]);
 
     const studySheet = data?.[0] ?? null;
+
+    console.log('Study Sheet Data:', studySheet);
 
     const teams: TeamsScrum[] =
         (studySheet?.teamsScrum as TeamsScrum[]) ?? [];
@@ -127,7 +130,6 @@ export default function TeamScrumDetailsPage() {
             position: "top-right",
             autoClose: 2000,
         });
-        // Solo para mostrar la selección - aquí iría la lógica real de asignación
     };
 
     const handleConfirmDelete = () => {
@@ -147,7 +149,11 @@ export default function TeamScrumDetailsPage() {
                     description: data.description,
                     objectives: data.objectives,
                     problem: data.problem,
-                    projectJustification: data.projectJustification
+                    projectJustification: data.projectJustification,
+                    memberIds: data.memberIds.map(member => ({
+                        studentId: member.studentId,
+                        profileId: member.profileId
+                    }))
                 }
             }));
 
@@ -161,10 +167,6 @@ export default function TeamScrumDetailsPage() {
             }
 
             toast.success("Información del team scrum actualizada exitosamente");
-
-            if (studySheetId) {
-                dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
-            }
 
             return true;
         } catch (e: any) {
@@ -200,9 +202,11 @@ export default function TeamScrumDetailsPage() {
             }
 
             toast.success("Team scrum registrado exitosamente");
+
             if (studySheetId) {
                 dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
             }
+
             return true;
         } catch (e: any) {
             toast.error(

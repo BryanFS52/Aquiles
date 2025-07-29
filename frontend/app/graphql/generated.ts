@@ -19,6 +19,7 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
   JSON: { input: any; output: any; }
   Long: { input: any; output: any; }
+  Upload: { input: any; output: any; }
 };
 
 export type Administrative = {
@@ -81,6 +82,14 @@ export type Attendance = {
   student?: Maybe<Student>;
 };
 
+export type AttendanceDto = {
+  attendanceDate?: InputMaybe<Scalars['String']['input']>;
+  attendanceState?: InputMaybe<AttendanceStateDto>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  studentId?: InputMaybe<Scalars['Long']['input']>;
+  studySheetQuarter?: InputMaybe<Scalars['Long']['input']>;
+};
+
 export type AttendancePage = {
   code?: Maybe<Scalars['String']['output']>;
   currentPage?: Maybe<Scalars['Int']['output']>;
@@ -123,14 +132,6 @@ export type AttendanceStatePageId = {
   data?: Maybe<AttendanceState>;
   date?: Maybe<Scalars['String']['output']>;
   message?: Maybe<Scalars['String']['output']>;
-};
-
-export type AttendancesDto = {
-  attendanceDate?: InputMaybe<Scalars['String']['input']>;
-  attendanceState?: InputMaybe<AttendanceStateDto>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  studentId?: InputMaybe<Scalars['Long']['input']>;
-  studySheetQuarter?: InputMaybe<Scalars['Long']['input']>;
 };
 
 export type ChangeLog = {
@@ -774,6 +775,37 @@ export type FloorPage = {
   totalPages?: Maybe<Scalars['Int']['output']>;
 };
 
+export type FollowUpAction = {
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+  student?: Maybe<Scalars['Long']['output']>;
+};
+
+export type FollowUpActionDto = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  studentId?: InputMaybe<Scalars['Long']['input']>;
+};
+
+export type FollowUpActionPage = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<FollowUpAction>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type FollowUpActionPageId = {
+  code?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<FollowUpAction>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+};
+
 export type Headquarter = {
   address?: Maybe<Scalars['String']['output']>;
   floors?: Maybe<Array<Maybe<Floor>>>;
@@ -933,7 +965,7 @@ export type Justification = {
 };
 
 export type JustificationDto = {
-  attendance?: InputMaybe<AttendancesDto>;
+  attendance?: InputMaybe<AttendanceDto>;
   description?: InputMaybe<Scalars['String']['input']>;
   justificationDate?: InputMaybe<Scalars['String']['input']>;
   justificationFile?: InputMaybe<Scalars['String']['input']>;
@@ -1064,6 +1096,20 @@ export type LearningOutcomePage = {
   totalPages?: Maybe<Scalars['Int']['output']>;
 };
 
+export type LoginRequestDto = {
+  document: Scalars['Long']['input'];
+  idDocumentType: Scalars['Long']['input'];
+  password: Scalars['String']['input'];
+};
+
+export type LoginResponseDto = {
+  code?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  refreshToken?: Maybe<Scalars['String']['output']>;
+  token?: Maybe<Scalars['String']['output']>;
+  user?: Maybe<User>;
+};
+
 export type MacroRegion = {
   description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
@@ -1103,6 +1149,8 @@ export type MethodologyPage = {
 };
 
 export type Mutation = {
+  AddFollowUpAction?: Maybe<Response>;
+  UpdateFollowUpAction?: Maybe<Response>;
   addAdministrative?: Maybe<Response>;
   addAdministrativeType?: Maybe<Response>;
   addAttendance?: Maybe<Response>;
@@ -1133,17 +1181,21 @@ export type Mutation = {
   addMacroRegion?: Maybe<Response>;
   addMethodology?: Maybe<StringResponse>;
   addOffer?: Maybe<Response>;
+  addPermission?: Maybe<Response>;
   addPerson?: Maybe<Response>;
   addPhase?: Maybe<Response>;
+  addProcess?: Maybe<ProcessResponse>;
+  addProcessDetail?: Maybe<ResponseList>;
   addProcessMethodology?: Maybe<StringResponse>;
-  addProcessProject?: Maybe<StringResponse>;
   addProfile?: Maybe<StringResponse>;
   addProfileAssignment?: Maybe<StringResponse>;
   addProgram?: Maybe<Response>;
+  addProject?: Maybe<Response>;
   addProjectActivity?: Maybe<Response>;
   addQuarter?: Maybe<Response>;
   addRegion?: Maybe<Response>;
   addRelation?: Maybe<StringResponse>;
+  addRole?: Maybe<Response>;
   addStateAttendance?: Maybe<Response>;
   addStudent?: Maybe<Response>;
   addStudentStudySheetState?: Maybe<Response>;
@@ -1156,6 +1208,7 @@ export type Mutation = {
   addTrainingCenter?: Maybe<Response>;
   addTrainingLevel?: Maybe<Response>;
   addTrainingProject?: Maybe<Response>;
+  addUser?: Maybe<Response>;
   addWorkItem?: Maybe<StringResponse>;
   addWorkItemType?: Maybe<StringResponse>;
   deleteAdministrative?: Maybe<Response>;
@@ -1185,12 +1238,17 @@ export type Mutation = {
   deleteLearningOutcome?: Maybe<Response>;
   deleteMacroRegion?: Maybe<Scalars['String']['output']>;
   deleteOffer?: Maybe<Response>;
+  deletePermission?: Maybe<Response>;
   deletePerson?: Maybe<Response>;
   deletePhase?: Maybe<Response>;
+  deleteProcess?: Maybe<Response>;
+  deleteProcessDetail?: Maybe<Response>;
   deleteProgram?: Maybe<Response>;
+  deleteProject?: Maybe<Response>;
   deleteProjectActivity?: Maybe<Response>;
   deleteQuarter?: Maybe<Response>;
   deleteRegion?: Maybe<Response>;
+  deleteRole?: Maybe<Response>;
   deleteStateAttendance?: Maybe<Response>;
   deleteStudent?: Maybe<Response>;
   deleteStudentStudySheetState?: Maybe<Response>;
@@ -1202,7 +1260,13 @@ export type Mutation = {
   deleteTrainingCenter?: Maybe<Response>;
   deleteTrainingLevel?: Maybe<Response>;
   deleteTrainingProject?: Maybe<Response>;
+  deleteUser?: Maybe<Response>;
+  forgotPassword?: Maybe<Response>;
   generateQRCode?: Maybe<QrCodePayload>;
+  login?: Maybe<LoginResponseDto>;
+  logout?: Maybe<LoginResponseDto>;
+  refreshToken?: Maybe<LoginResponseDto>;
+  saveMassivePersons?: Maybe<ResponseMassive>;
   sendNotification?: Maybe<Scalars['String']['output']>;
   updateAdministrative?: Maybe<Response>;
   updateAdministrativeType?: Maybe<Response>;
@@ -1234,17 +1298,22 @@ export type Mutation = {
   updateMacroRegion?: Maybe<Response>;
   updateMethodology?: Maybe<StringResponse>;
   updateOffer?: Maybe<Response>;
+  updatePassword?: Maybe<UpdatePasswordResponse>;
+  updatePermission?: Maybe<Response>;
   updatePerson?: Maybe<Response>;
   updatePhase?: Maybe<Response>;
+  updateProcess?: Maybe<Response>;
+  updateProcessDetail?: Maybe<Response>;
   updateProcessMethodology?: Maybe<StringResponse>;
-  updateProcessProject?: Maybe<StringResponse>;
   updateProfile?: Maybe<StringResponse>;
   updateProfileAssignment?: Maybe<StringResponse>;
   updateProgram?: Maybe<Response>;
+  updateProject?: Maybe<Response>;
   updateProjectActivity?: Maybe<Response>;
   updateQuarter?: Maybe<Response>;
   updateRegion?: Maybe<Response>;
   updateRelation?: Maybe<StringResponse>;
+  updateRole?: Maybe<Response>;
   updateStateAttendance?: Maybe<Response>;
   updateStudent?: Maybe<Response>;
   updateStudentStudySheetState?: Maybe<Response>;
@@ -1256,8 +1325,20 @@ export type Mutation = {
   updateTrainingCenter?: Maybe<Response>;
   updateTrainingLevel?: Maybe<Response>;
   updateTrainingProject?: Maybe<Response>;
+  updateUser?: Maybe<Response>;
   updateWorkItem?: Maybe<StringResponse>;
   updateWorkItemType?: Maybe<StringResponse>;
+};
+
+
+export type MutationAddFollowUpActionArgs = {
+  input?: InputMaybe<FollowUpActionDto>;
+};
+
+
+export type MutationUpdateFollowUpActionArgs = {
+  id: Scalars['Long']['input'];
+  input?: InputMaybe<FollowUpActionDto>;
 };
 
 
@@ -1272,7 +1353,7 @@ export type MutationAddAdministrativeTypeArgs = {
 
 
 export type MutationAddAttendanceArgs = {
-  input?: InputMaybe<AttendancesDto>;
+  input?: InputMaybe<AttendanceDto>;
 };
 
 
@@ -1411,6 +1492,11 @@ export type MutationAddOfferArgs = {
 };
 
 
+export type MutationAddPermissionArgs = {
+  input?: InputMaybe<Array<InputMaybe<PermissionDto>>>;
+};
+
+
 export type MutationAddPersonArgs = {
   input?: InputMaybe<PersonDto>;
 };
@@ -1421,13 +1507,18 @@ export type MutationAddPhaseArgs = {
 };
 
 
-export type MutationAddProcessMethodologyArgs = {
-  input?: InputMaybe<ProcessMethodologyDto>;
+export type MutationAddProcessArgs = {
+  input?: InputMaybe<ProcessDto>;
 };
 
 
-export type MutationAddProcessProjectArgs = {
-  input?: InputMaybe<ProcessProjectDto>;
+export type MutationAddProcessDetailArgs = {
+  input?: InputMaybe<Array<InputMaybe<ProcessDetailDto>>>;
+};
+
+
+export type MutationAddProcessMethodologyArgs = {
+  input?: InputMaybe<ProcessMethodologyDto>;
 };
 
 
@@ -1443,6 +1534,11 @@ export type MutationAddProfileAssignmentArgs = {
 
 export type MutationAddProgramArgs = {
   input?: InputMaybe<ProgramDto>;
+};
+
+
+export type MutationAddProjectArgs = {
+  input?: InputMaybe<ProjectDto>;
 };
 
 
@@ -1463,6 +1559,11 @@ export type MutationAddRegionArgs = {
 
 export type MutationAddRelationArgs = {
   input?: InputMaybe<RelationDto>;
+};
+
+
+export type MutationAddRoleArgs = {
+  input?: InputMaybe<RoleDto>;
 };
 
 
@@ -1525,6 +1626,11 @@ export type MutationAddTrainingLevelArgs = {
 
 export type MutationAddTrainingProjectArgs = {
   input?: InputMaybe<TrainingProjectDto>;
+};
+
+
+export type MutationAddUserArgs = {
+  input?: InputMaybe<UserDto>;
 };
 
 
@@ -1673,6 +1779,11 @@ export type MutationDeleteOfferArgs = {
 };
 
 
+export type MutationDeletePermissionArgs = {
+  id?: InputMaybe<Scalars['Long']['input']>;
+};
+
+
 export type MutationDeletePersonArgs = {
   id?: InputMaybe<Scalars['Long']['input']>;
 };
@@ -1683,8 +1794,23 @@ export type MutationDeletePhaseArgs = {
 };
 
 
+export type MutationDeleteProcessArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
+export type MutationDeleteProcessDetailArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
 export type MutationDeleteProgramArgs = {
   id?: InputMaybe<Scalars['Long']['input']>;
+};
+
+
+export type MutationDeleteProjectArgs = {
+  id: Scalars['Long']['input'];
 };
 
 
@@ -1699,6 +1825,11 @@ export type MutationDeleteQuarterArgs = {
 
 
 export type MutationDeleteRegionArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
+export type MutationDeleteRoleArgs = {
   id: Scalars['Long']['input'];
 };
 
@@ -1758,6 +1889,37 @@ export type MutationDeleteTrainingProjectArgs = {
 };
 
 
+export type MutationDeleteUserArgs = {
+  id?: InputMaybe<Scalars['Long']['input']>;
+};
+
+
+export type MutationForgotPasswordArgs = {
+  document: Scalars['Long']['input'];
+};
+
+
+export type MutationLoginArgs = {
+  input: LoginRequestDto;
+};
+
+
+export type MutationLogoutArgs = {
+  idUser?: InputMaybe<Scalars['Long']['input']>;
+  token?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationRefreshTokenArgs = {
+  refreshTokenInput: Scalars['String']['input'];
+};
+
+
+export type MutationSaveMassivePersonsArgs = {
+  file?: InputMaybe<Scalars['Upload']['input']>;
+};
+
+
 export type MutationSendNotificationArgs = {
   emailRequest: EmailRequest;
 };
@@ -1777,7 +1939,7 @@ export type MutationUpdateAdministrativeTypeArgs = {
 
 export type MutationUpdateAttendanceArgs = {
   id: Scalars['Long']['input'];
-  input?: InputMaybe<AttendancesDto>;
+  input?: InputMaybe<AttendanceDto>;
 };
 
 
@@ -1943,6 +2105,17 @@ export type MutationUpdateOfferArgs = {
 };
 
 
+export type MutationUpdatePasswordArgs = {
+  input: UpdatePasswordInputDto;
+};
+
+
+export type MutationUpdatePermissionArgs = {
+  id?: InputMaybe<Scalars['Long']['input']>;
+  input?: InputMaybe<PermissionDto>;
+};
+
+
 export type MutationUpdatePersonArgs = {
   id?: InputMaybe<Scalars['Long']['input']>;
   input?: InputMaybe<PersonDto>;
@@ -1955,15 +2128,21 @@ export type MutationUpdatePhaseArgs = {
 };
 
 
-export type MutationUpdateProcessMethodologyArgs = {
-  id: Scalars['String']['input'];
-  input?: InputMaybe<ProcessMethodologyDto>;
+export type MutationUpdateProcessArgs = {
+  id: Scalars['Long']['input'];
+  input?: InputMaybe<ProcessDto>;
 };
 
 
-export type MutationUpdateProcessProjectArgs = {
+export type MutationUpdateProcessDetailArgs = {
+  id: Scalars['Long']['input'];
+  input?: InputMaybe<ProcessDetailDto>;
+};
+
+
+export type MutationUpdateProcessMethodologyArgs = {
   id: Scalars['String']['input'];
-  input?: InputMaybe<ProcessProjectDto>;
+  input?: InputMaybe<ProcessMethodologyDto>;
 };
 
 
@@ -1982,6 +2161,12 @@ export type MutationUpdateProfileAssignmentArgs = {
 export type MutationUpdateProgramArgs = {
   id?: InputMaybe<Scalars['Long']['input']>;
   input?: InputMaybe<ProgramDto>;
+};
+
+
+export type MutationUpdateProjectArgs = {
+  id: Scalars['Long']['input'];
+  input?: InputMaybe<ProjectDto>;
 };
 
 
@@ -2006,6 +2191,12 @@ export type MutationUpdateRegionArgs = {
 export type MutationUpdateRelationArgs = {
   id: Scalars['String']['input'];
   input?: InputMaybe<RelationDto>;
+};
+
+
+export type MutationUpdateRoleArgs = {
+  id: Scalars['Long']['input'];
+  input?: InputMaybe<RoleDto>;
 };
 
 
@@ -2075,6 +2266,12 @@ export type MutationUpdateTrainingProjectArgs = {
 };
 
 
+export type MutationUpdateUserArgs = {
+  id?: InputMaybe<Scalars['Long']['input']>;
+  input?: InputMaybe<UserDto>;
+};
+
+
 export type MutationUpdateWorkItemArgs = {
   id: Scalars['String']['input'];
   input?: InputMaybe<WorkItemDto>;
@@ -2132,6 +2329,34 @@ export type PageResponseTownshipDto = {
   code?: Maybe<Scalars['String']['output']>;
   currentPage?: Maybe<Scalars['Int']['output']>;
   data?: Maybe<Array<Maybe<Township>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type Permission = {
+  createdAt?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  processDetail?: Maybe<ProcessDetail>;
+  state?: Maybe<Scalars['Boolean']['output']>;
+  updatedAt?: Maybe<Scalars['String']['output']>;
+  user?: Maybe<User>;
+};
+
+export type PermissionDto = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  processDetail?: InputMaybe<ProcessDetailDto>;
+  processDetailId?: InputMaybe<Scalars['ID']['input']>;
+  state?: InputMaybe<Scalars['Boolean']['input']>;
+  user?: InputMaybe<UserDto>;
+  userId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type PermissionPage = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<Permission>>>;
   date?: Maybe<Scalars['String']['output']>;
   message?: Maybe<Scalars['String']['output']>;
   totalItems?: Maybe<Scalars['Int']['output']>;
@@ -2212,9 +2437,50 @@ export type PhasesPage = {
   totalPages?: Maybe<Scalars['Int']['output']>;
 };
 
+export type Process = {
+  description?: Maybe<Scalars['String']['output']>;
+  functionName?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  processDetail?: Maybe<Array<Maybe<ProcessDetail>>>;
+  state?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type ProcessDto = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  functionName?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  state?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type ProcessDetail = {
+  id?: Maybe<Scalars['ID']['output']>;
+  process?: Maybe<Process>;
+  project?: Maybe<Project>;
+  roles?: Maybe<Array<Maybe<Role>>>;
+  state?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type ProcessDetailDto = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  process?: InputMaybe<ProcessDto>;
+  project?: InputMaybe<ProjectDto>;
+  state?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type ProcessDetailPage = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<ProcessDetail>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
 export type ProcessMethodology = {
   description?: Maybe<Scalars['String']['output']>;
-  fichaId?: Maybe<Scalars['Long']['output']>;
   id: Scalars['ID']['output'];
   isActive?: Maybe<Scalars['Boolean']['output']>;
   methodology?: Maybe<Methodology>;
@@ -2224,7 +2490,6 @@ export type ProcessMethodology = {
 
 export type ProcessMethodologyDto = {
   description?: InputMaybe<Scalars['String']['input']>;
-  fichaId?: InputMaybe<Scalars['Long']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   methodology?: InputMaybe<MethodologyDto>;
@@ -2242,26 +2507,20 @@ export type ProcessMethodologyPage = {
   totalPages?: Maybe<Scalars['Int']['output']>;
 };
 
-export type ProcessProject = {
-  id: Scalars['ID']['output'];
-  process?: Maybe<ProcessMethodology>;
-  teamScrumId?: Maybe<Scalars['Long']['output']>;
-};
-
-export type ProcessProjectDto = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-  process?: InputMaybe<ProcessMethodologyDto>;
-  teamScrumId?: InputMaybe<Scalars['Long']['input']>;
-};
-
-export type ProcessProjectPage = {
+export type ProcessPage = {
   code?: Maybe<Scalars['String']['output']>;
   currentPage?: Maybe<Scalars['Int']['output']>;
-  data?: Maybe<Array<Maybe<ProcessProject>>>;
+  data?: Maybe<Array<Maybe<Process>>>;
   date?: Maybe<Scalars['String']['output']>;
   message?: Maybe<Scalars['String']['output']>;
   totalItems?: Maybe<Scalars['Int']['output']>;
   totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ProcessResponse = {
+  code?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
 };
 
 export type ProcessSettings = {
@@ -2375,6 +2634,14 @@ export type ProgramPage = {
   totalPages?: Maybe<Scalars['Int']['output']>;
 };
 
+export type Project = {
+  description?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  processDetail?: Maybe<ProcessDetail>;
+  state?: Maybe<Scalars['Boolean']['output']>;
+};
+
 export type ProjectActivity = {
   description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
@@ -2399,6 +2666,13 @@ export type ProjectActivityPage = {
   message?: Maybe<Scalars['String']['output']>;
   totalItems?: Maybe<Scalars['Int']['output']>;
   totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ProjectDto = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  state?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type QrCodePayload = {
@@ -2438,6 +2712,8 @@ export type QuarterPage = {
 };
 
 export type Query = {
+  AllFollowUpsAction?: Maybe<FollowUpActionPage>;
+  FollowUpActionById?: Maybe<FollowUpActionPageId>;
   ProfileById?: Maybe<ProfileById>;
   allAdministrative?: Maybe<AdministrativePage>;
   allAdministrativeList?: Maybe<AdministrativePage>;
@@ -2493,14 +2769,18 @@ export type Query = {
   allMethodologiesList?: Maybe<MethodologyPage>;
   allOffers?: Maybe<OfferPage>;
   allOffersList?: Maybe<OfferPage>;
+  allPermissions?: Maybe<PermissionPage>;
+  allPermissionsList?: Maybe<PermissionPage>;
   allPersons?: Maybe<PersonPage>;
   allPersonsList?: Maybe<PersonPage>;
   allPhases?: Maybe<PhasesPage>;
   allPhasesList?: Maybe<PhasesPage>;
+  allProcessDetails?: Maybe<ProcessDetailPage>;
+  allProcessDetailsList?: Maybe<ProcessDetailPage>;
   allProcessMethodology?: Maybe<ProcessMethodologyPage>;
   allProcessMethodologyList?: Maybe<Array<Maybe<ProcessMethodology>>>;
-  allProcessProjects?: Maybe<ProcessProjectPage>;
-  allProcessProjectsList?: Maybe<ProcessProjectPage>;
+  allProcesses?: Maybe<ProcessPage>;
+  allProcessesList?: Maybe<ProcessPage>;
   allProfileAssignments?: Maybe<ProfileAssignmentPage>;
   allProfileAssignmentsList?: Maybe<ProfileAssignmentPage>;
   allProfileList?: Maybe<ProfilePage>;
@@ -2509,12 +2789,17 @@ export type Query = {
   allProgramsList?: Maybe<ProgramPage>;
   allProjectActivities?: Maybe<ProjectActivityPage>;
   allProjectActivitiesList?: Maybe<ProjectActivityPage>;
+  allProjects?: Maybe<ResponseProject>;
+  allProjectsByRole?: Maybe<ResponseProject>;
+  allProjectsList?: Maybe<ResponseProject>;
   allQuarters?: Maybe<QuarterPage>;
   allQuartersList?: Maybe<QuarterPage>;
   allRegions?: Maybe<PageResponseRegion>;
   allRegionsList?: Maybe<PageResponseRegion>;
   allRelationList?: Maybe<RelationPage>;
   allRelations?: Maybe<RelationPage>;
+  allRoles?: Maybe<ResponseRole>;
+  allRolesList?: Maybe<ResponseRole>;
   allStateAttendances?: Maybe<AttendanceStatePage>;
   allStudentList?: Maybe<StudentPage>;
   allStudentStudySheetState?: Maybe<StudentStudySheetStatePage>;
@@ -2535,6 +2820,8 @@ export type Query = {
   allTrainingLevels?: Maybe<TrainingLevelPage>;
   allTrainingProjects?: Maybe<TrainingProjectPage>;
   allTrainingProjectsList?: Maybe<TrainingProjectPage>;
+  allUserList?: Maybe<UserPage>;
+  allUsers?: Maybe<UserPage>;
   allWorkItemTypes?: Maybe<WorkItemTypePage>;
   allWorkItemTypesList?: Maybe<WorkItemTypePage>;
   allWorkItems?: Maybe<WorkItemPage>;
@@ -2550,6 +2837,18 @@ export type Query = {
   stateAttendanceById?: Maybe<AttendanceStatePageId>;
   studySheetById?: Maybe<StudySheetById>;
   teamScrumById?: Maybe<TeamsScrumPageId>;
+  userById?: Maybe<UserByIdResponse>;
+};
+
+
+export type QueryAllFollowUpsActionArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryFollowUpActionByIdArgs = {
+  id: Scalars['Long']['input'];
 };
 
 
@@ -2580,6 +2879,8 @@ export type QueryAllAttendancesArgs = {
 
 export type QueryAllAttendancesByStudentIdArgs = {
   id?: InputMaybe<Scalars['Long']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
   stateId?: InputMaybe<Scalars['Long']['input']>;
 };
 
@@ -2777,6 +3078,13 @@ export type QueryAllOffersArgs = {
 };
 
 
+export type QueryAllPermissionsArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
 export type QueryAllPersonsArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -2792,14 +3100,23 @@ export type QueryAllPhasesArgs = {
 };
 
 
+export type QueryAllProcessDetailsArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  processName?: InputMaybe<Scalars['String']['input']>;
+  projectId?: InputMaybe<Array<InputMaybe<Scalars['Long']['input']>>>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryAllProcessMethodologyArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
-export type QueryAllProcessProjectsArgs = {
+export type QueryAllProcessesArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
+  processName?: InputMaybe<Scalars['String']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
 };
 
@@ -2833,6 +3150,18 @@ export type QueryAllProjectActivitiesArgs = {
 };
 
 
+export type QueryAllProjectsArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  projectName?: InputMaybe<Scalars['String']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAllProjectsByRoleArgs = {
+  role?: InputMaybe<Array<InputMaybe<Scalars['Long']['input']>>>;
+};
+
+
 export type QueryAllQuartersArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   quarterName?: InputMaybe<Scalars['String']['input']>;
@@ -2850,6 +3179,13 @@ export type QueryAllRegionsArgs = {
 
 export type QueryAllRelationsArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAllRolesArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  roleName?: InputMaybe<Scalars['String']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
 };
 
@@ -2936,6 +3272,13 @@ export type QueryAllTrainingProjectsArgs = {
 };
 
 
+export type QueryAllUsersArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  userName?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type QueryAllWorkItemTypesArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
@@ -3003,6 +3346,11 @@ export type QueryTeamScrumByIdArgs = {
   id: Scalars['Long']['input'];
 };
 
+
+export type QueryUserByIdArgs = {
+  id?: InputMaybe<Scalars['Long']['input']>;
+};
+
 export type Region = {
   description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
@@ -3061,11 +3409,54 @@ export type ResponseDocumentType = {
   totalPages?: Maybe<Scalars['Int']['output']>;
 };
 
+export type ResponseList = {
+  code?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Array<Maybe<Scalars['Long']['output']>>>;
+  message?: Maybe<Scalars['String']['output']>;
+};
+
 export type ResponseMassive = {
   code?: Maybe<Scalars['String']['output']>;
   data?: Maybe<Array<Maybe<Person>>>;
   date?: Maybe<Scalars['String']['output']>;
   message?: Maybe<Scalars['String']['output']>;
+};
+
+export type ResponseProject = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<Project>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ResponseRole = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<Role>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type Role = {
+  description?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  projects?: Maybe<Array<Maybe<Project>>>;
+  state?: Maybe<Scalars['Boolean']['output']>;
+  user?: Maybe<Array<Maybe<User>>>;
+};
+
+export type RoleDto = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  projects?: InputMaybe<Array<InputMaybe<ProjectDto>>>;
+  state?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type StringResponse = {
@@ -3080,7 +3471,7 @@ export type Student = {
   person?: Maybe<Person>;
   profiles?: Maybe<Array<Maybe<Profile>>>;
   state?: Maybe<Scalars['Boolean']['output']>;
-  studySheets?: Maybe<Array<Maybe<StudySheet>>>;
+  studentStudySheets?: Maybe<Array<Maybe<StudentStudySheet>>>;
   teamScrums?: Maybe<Array<Maybe<TeamsScrum>>>;
 };
 
@@ -3088,7 +3479,7 @@ export type StudentDto = {
   id?: InputMaybe<Scalars['ID']['input']>;
   person?: InputMaybe<PersonDto>;
   state?: InputMaybe<Scalars['Boolean']['input']>;
-  studySheets?: InputMaybe<Array<InputMaybe<StudySheetDto>>>;
+  studentStudySheets?: InputMaybe<Array<InputMaybe<StudentStudySheetDto>>>;
 };
 
 export type StudentPage = {
@@ -3104,14 +3495,14 @@ export type StudentPage = {
 export type StudentStudySheet = {
   id?: Maybe<Scalars['ID']['output']>;
   student?: Maybe<Student>;
-  studentStyudySheetState?: Maybe<StudentStudySheetState>;
+  studentStudySheetState?: Maybe<StudentStudySheetState>;
   studySheet?: Maybe<StudySheet>;
 };
 
 export type StudentStudySheetDto = {
   id?: InputMaybe<Scalars['ID']['input']>;
   student?: InputMaybe<StudentDto>;
-  studentStyudySheetState?: InputMaybe<StudentStudySheetStateDto>;
+  studentStudySheetState?: InputMaybe<StudentStudySheetStateDto>;
   studySheet?: InputMaybe<StudySheetDto>;
 };
 
@@ -3389,8 +3780,52 @@ export type TrainingProjectPage = {
   totalPages?: Maybe<Scalars['Int']['output']>;
 };
 
+export type UpdatePasswordInputDto = {
+  idPerson: Scalars['Long']['input'];
+  newPassword: Scalars['String']['input'];
+  token: Scalars['String']['input'];
+};
+
+export type UpdatePasswordResponse = {
+  code?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+};
+
 export type User = {
+  id?: Maybe<Scalars['ID']['output']>;
   idPerson?: Maybe<Scalars['ID']['output']>;
+  person?: Maybe<Person>;
+  processDetails?: Maybe<Array<Maybe<ProcessDetail>>>;
+  roles?: Maybe<Array<Maybe<Role>>>;
+  state?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type UserByIdResponse = {
+  code?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<User>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+};
+
+export type UserDto = {
+  acronym?: InputMaybe<Scalars['String']['input']>;
+  document?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  idPerson?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
+  processDetails?: InputMaybe<Array<InputMaybe<ProcessDetailDto>>>;
+  roles?: InputMaybe<Array<InputMaybe<RoleDto>>>;
+  state?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type UserPage = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<User>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
 };
 
 export type WorkItem = {
@@ -3537,7 +3972,7 @@ export type GetAttendancesQueryVariables = Exact<{
 }>;
 
 
-export type GetAttendancesQuery = { allAttendances?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id: string, attendanceDate?: string | null, attendanceState?: { id?: string | null, status?: string | null } | null } | null> | null } | null };
+export type GetAttendancesQuery = { allAttendances?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id: string, attendanceDate?: string | null, attendanceState?: { id?: string | null, status?: string | null } | null, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null } | null> | null } | null };
 
 export type AllAttendancesByStudentIdQueryVariables = Exact<{
   id?: InputMaybe<Scalars['Long']['input']>;
@@ -3547,13 +3982,6 @@ export type AllAttendancesByStudentIdQueryVariables = Exact<{
 
 export type AllAttendancesByStudentIdQuery = { allAttendancesByStudentId?: { data?: Array<{ id: string, attendanceDate?: string | null, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, attendanceState?: { id?: string | null, status?: string | null } | null } | null> | null } | null };
 
-export type AddAttendanceMutationVariables = Exact<{
-  input: AttendancesDto;
-}>;
-
-
-export type AddAttendanceMutation = { addAttendance?: { code?: string | null, message?: string | null, id?: any | null } | null };
-
 export type GetAttendancesAndJustificationsByStudentQueryVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
@@ -3561,9 +3989,16 @@ export type GetAttendancesAndJustificationsByStudentQueryVariables = Exact<{
 
 export type GetAttendancesAndJustificationsByStudentQuery = { allAttendancesByStudentId?: { data?: Array<{ id: string, justification?: { id: string, description?: string | null, justificationFile?: string | null, justificationDate?: string | null, justificationType?: { id: string, name?: string | null } | null } | null } | null> | null } | null };
 
+export type AddAttendanceMutationVariables = Exact<{
+  input: AttendanceDto;
+}>;
+
+
+export type AddAttendanceMutation = { addAttendance?: { code?: string | null, message?: string | null, id?: any | null } | null };
+
 export type UpdateAttendanceMutationVariables = Exact<{
   id: Scalars['Long']['input'];
-  input: AttendancesDto;
+  input: AttendanceDto;
 }>;
 
 
@@ -3698,7 +4133,7 @@ export type GetAllJustificationsQueryVariables = Exact<{
 }>;
 
 
-export type GetAllJustificationsQuery = { allJustifications?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, description?: string | null, justificationFile?: string | null, justificationDate?: string | null, state?: boolean | null, justificationType?: { id: string, name?: string | null } | null, attendance?: { student?: { id?: string | null, studySheets?: Array<{ number?: number | null } | null> | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null } | null } | null> | null } | null };
+export type GetAllJustificationsQuery = { allJustifications?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, description?: string | null, justificationFile?: string | null, justificationDate?: string | null, state?: boolean | null, justificationType?: { id: string, name?: string | null } | null, attendance?: { student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null } | null } | null> | null } | null };
 
 export type GetJustificationByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
@@ -3748,7 +4183,7 @@ export type GetStudentsQueryVariables = Exact<{
 }>;
 
 
-export type GetStudentsQuery = { allStudents?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, state?: boolean | null, person?: { id?: string | null, document?: string | null, name?: string | null, lastname?: string | null, phone?: string | null, email?: string | null, address?: string | null } | null, studySheets?: Array<{ id?: string | null, number?: number | null, state?: boolean | null } | null> | null } | null> | null } | null };
+export type GetStudentsQuery = { allStudents?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, state?: boolean | null, person?: { id?: string | null, document?: string | null, name?: string | null, lastname?: string | null, phone?: string | null, email?: string | null, address?: string | null } | null } | null> | null } | null };
 
 export type GetStudentListQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3763,7 +4198,7 @@ export type GetStudySheetsQueryVariables = Exact<{
 }>;
 
 
-export type GetStudySheetsQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, numberStudents?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, offer?: { name?: string | null } | null, journey?: { name?: string | null } | null, quarter?: Array<{ name?: { number?: number | null } | null } | null> | null, trainingProject?: { name?: string | null } | null } | null> | null } | null };
+export type GetStudySheetsQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, numberStudents?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, offer?: { name?: string | null } | null, journey?: { name?: string | null } | null, quarter?: Array<{ name?: { extension?: string | null, number?: number | null } | null } | null> | null, trainingProject?: { name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
 
 export type GetStudySheetWithTeamScrumByIdQueryVariables = Exact<{
   id?: InputMaybe<Scalars['Long']['input']>;
@@ -3777,23 +4212,32 @@ export type GetStudySheetByIdQueryVariables = Exact<{
 }>;
 
 
-export type GetStudySheetByIdQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, number?: number | null, numberStudents?: number | null, quarter?: Array<{ id?: string | null, name?: { number?: number | null, extension?: string | null } | null } | null> | null, trainingProject?: { id?: string | null, name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null, studentStudySheets?: Array<{ id?: string | null, student?: { id?: string | null, person?: { id?: string | null, document?: string | null, name?: string | null, lastname?: string | null, email?: string | null, phone?: string | null } | null } | null, studentStyudySheetState?: { id?: string | null, name?: string | null } | null } | null> | null } | null } | null };
+export type GetStudySheetByIdQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, number?: number | null, numberStudents?: number | null, quarter?: Array<{ id?: string | null, name?: { number?: number | null, extension?: string | null } | null } | null> | null, trainingProject?: { id?: string | null, name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null, studentStudySheets?: Array<{ id?: string | null, student?: { id?: string | null, person?: { id?: string | null, document?: string | null, name?: string | null, lastname?: string | null, email?: string | null, phone?: string | null } | null } | null, studentStudySheetState?: { id?: string | null, name?: string | null } | null } | null> | null } | null } | null };
 
 export type StudySheetByTeacherQueryVariables = Exact<{
-  IdTeacher?: InputMaybe<Scalars['Long']['input']>;
+  idTeacher?: InputMaybe<Scalars['Long']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
-export type StudySheetByTeacherQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, journey?: { name?: string | null } | null, studentStudySheets?: Array<{ student?: { person?: { id?: string | null, name?: string | null, lastname?: string | null, phone?: string | null, email?: string | null, blood_type?: string | null, date_birth?: string | null } | null } | null } | null> | null } | null> | null } | null };
+export type StudySheetByTeacherQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, offer?: { name?: string | null } | null, journey?: { name?: string | null } | null, quarter?: Array<{ name?: { extension?: string | null, number?: number | null } | null } | null> | null, trainingProject?: { name?: string | null, program?: { name?: string | null } | null } | null, studentStudySheets?: Array<{ id?: string | null, student?: { person?: { document?: string | null, name?: string | null, lastname?: string | null, phone?: string | null, email?: string | null, blood_type?: string | null, date_birth?: string | null } | null } | null, studentStudySheetState?: { name?: string | null } | null } | null> | null } | null> | null } | null };
 
 export type GetStudySheetWithStudentsQueryVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
 
 
-export type GetStudySheetWithStudentsQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, number?: number | null, studentStudySheets?: Array<{ id?: string | null, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null } | null } | null, studentStyudySheetState?: { id?: string | null, name?: string | null } | null } | null> | null } | null } | null };
+export type GetStudySheetWithStudentsQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, number?: number | null, journey?: { name?: string | null } | null, trainingProject?: { program?: { name?: string | null } | null } | null, studentStudySheets?: Array<{ id?: string | null, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, email?: string | null } | null } | null, studentStudySheetState?: { id?: string | null, name?: string | null } | null } | null> | null } | null } | null };
+
+export type StudySheetByTeacherIdWithTeamScrumQueryVariables = Exact<{
+  idTeacher?: InputMaybe<Scalars['Long']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type StudySheetByTeacherIdWithTeamScrumQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, journey?: { name?: string | null } | null, trainingProject?: { name?: string | null, program?: { name?: string | null } | null } | null, teamsScrum?: Array<{ id: string, teamName?: string | null, students?: Array<{ id?: string | null, person?: { lastname?: string | null, name?: string | null, document?: string | null } | null } | null> | null } | null> | null } | null> | null } | null };
 
 export type GetTeamsScrumsQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -4098,6 +4542,14 @@ export const GetAttendancesDocument = gql`
         id
         status
       }
+      student {
+        id
+        person {
+          name
+          lastname
+          document
+        }
+      }
     }
     currentPage
     totalPages
@@ -4195,41 +4647,6 @@ export type AllAttendancesByStudentIdQueryHookResult = ReturnType<typeof useAllA
 export type AllAttendancesByStudentIdLazyQueryHookResult = ReturnType<typeof useAllAttendancesByStudentIdLazyQuery>;
 export type AllAttendancesByStudentIdSuspenseQueryHookResult = ReturnType<typeof useAllAttendancesByStudentIdSuspenseQuery>;
 export type AllAttendancesByStudentIdQueryResult = Apollo.QueryResult<AllAttendancesByStudentIdQuery, AllAttendancesByStudentIdQueryVariables>;
-export const AddAttendanceDocument = gql`
-    mutation AddAttendance($input: AttendancesDto!) {
-  addAttendance(input: $input) {
-    code
-    message
-    id
-  }
-}
-    `;
-export type AddAttendanceMutationFn = Apollo.MutationFunction<AddAttendanceMutation, AddAttendanceMutationVariables>;
-
-/**
- * __useAddAttendanceMutation__
- *
- * To run a mutation, you first call `useAddAttendanceMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useAddAttendanceMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [addAttendanceMutation, { data, loading, error }] = useAddAttendanceMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useAddAttendanceMutation(baseOptions?: Apollo.MutationHookOptions<AddAttendanceMutation, AddAttendanceMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddAttendanceMutation, AddAttendanceMutationVariables>(AddAttendanceDocument, options);
-      }
-export type AddAttendanceMutationHookResult = ReturnType<typeof useAddAttendanceMutation>;
-export type AddAttendanceMutationResult = Apollo.MutationResult<AddAttendanceMutation>;
-export type AddAttendanceMutationOptions = Apollo.BaseMutationOptions<AddAttendanceMutation, AddAttendanceMutationVariables>;
 export const GetAttendancesAndJustificationsByStudentDocument = gql`
     query GetAttendancesAndJustificationsByStudent($id: Long!) {
   allAttendancesByStudentId(id: $id) {
@@ -4282,8 +4699,43 @@ export type GetAttendancesAndJustificationsByStudentQueryHookResult = ReturnType
 export type GetAttendancesAndJustificationsByStudentLazyQueryHookResult = ReturnType<typeof useGetAttendancesAndJustificationsByStudentLazyQuery>;
 export type GetAttendancesAndJustificationsByStudentSuspenseQueryHookResult = ReturnType<typeof useGetAttendancesAndJustificationsByStudentSuspenseQuery>;
 export type GetAttendancesAndJustificationsByStudentQueryResult = Apollo.QueryResult<GetAttendancesAndJustificationsByStudentQuery, GetAttendancesAndJustificationsByStudentQueryVariables>;
+export const AddAttendanceDocument = gql`
+    mutation AddAttendance($input: AttendanceDto!) {
+  addAttendance(input: $input) {
+    code
+    message
+    id
+  }
+}
+    `;
+export type AddAttendanceMutationFn = Apollo.MutationFunction<AddAttendanceMutation, AddAttendanceMutationVariables>;
+
+/**
+ * __useAddAttendanceMutation__
+ *
+ * To run a mutation, you first call `useAddAttendanceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddAttendanceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addAttendanceMutation, { data, loading, error }] = useAddAttendanceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAddAttendanceMutation(baseOptions?: Apollo.MutationHookOptions<AddAttendanceMutation, AddAttendanceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddAttendanceMutation, AddAttendanceMutationVariables>(AddAttendanceDocument, options);
+      }
+export type AddAttendanceMutationHookResult = ReturnType<typeof useAddAttendanceMutation>;
+export type AddAttendanceMutationResult = Apollo.MutationResult<AddAttendanceMutation>;
+export type AddAttendanceMutationOptions = Apollo.BaseMutationOptions<AddAttendanceMutation, AddAttendanceMutationVariables>;
 export const UpdateAttendanceDocument = gql`
-    mutation UpdateAttendance($id: Long!, $input: AttendancesDto!) {
+    mutation UpdateAttendance($id: Long!, $input: AttendanceDto!) {
   updateAttendance(id: $id, input: $input) {
     code
     message
@@ -5035,9 +5487,6 @@ export const GetAllJustificationsDocument = gql`
       }
       attendance {
         student {
-          studySheets {
-            number
-          }
           id
           person {
             name
@@ -5326,11 +5775,6 @@ export const GetStudentsDocument = gql`
         email
         address
       }
-      studySheets {
-        id
-        number
-        state
-      }
     }
     currentPage
     totalPages
@@ -5446,11 +5890,16 @@ export const GetStudySheetsDocument = gql`
       }
       quarter {
         name {
+          extension
           number
         }
       }
       trainingProject {
         name
+        program {
+          id
+          name
+        }
       }
     }
     currentPage
@@ -5595,7 +6044,7 @@ export const GetStudySheetByIdDocument = gql`
             phone
           }
         }
-        studentStyudySheetState {
+        studentStudySheetState {
           id
           name
         }
@@ -5638,8 +6087,8 @@ export type GetStudySheetByIdLazyQueryHookResult = ReturnType<typeof useGetStudy
 export type GetStudySheetByIdSuspenseQueryHookResult = ReturnType<typeof useGetStudySheetByIdSuspenseQuery>;
 export type GetStudySheetByIdQueryResult = Apollo.QueryResult<GetStudySheetByIdQuery, GetStudySheetByIdQueryVariables>;
 export const StudySheetByTeacherDocument = gql`
-    query studySheetByTeacher($IdTeacher: Long, $page: Int, $size: Int) {
-  allStudySheets(page: $page, size: $size, idTeacher: $IdTeacher) {
+    query studySheetByTeacher($idTeacher: Long, $page: Int, $size: Int) {
+  allStudySheets(page: $page, size: $size, idTeacher: $idTeacher) {
     date
     code
     message
@@ -5649,13 +6098,29 @@ export const StudySheetByTeacherDocument = gql`
       startLective
       endLective
       state
+      offer {
+        name
+      }
       journey {
         name
       }
+      quarter {
+        name {
+          extension
+          number
+        }
+      }
+      trainingProject {
+        name
+        program {
+          name
+        }
+      }
       studentStudySheets {
+        id
         student {
           person {
-            id
+            document
             name
             lastname
             phone
@@ -5663,6 +6128,9 @@ export const StudySheetByTeacherDocument = gql`
             blood_type
             date_birth
           }
+        }
+        studentStudySheetState {
+          name
         }
       }
     }
@@ -5685,7 +6153,7 @@ export const StudySheetByTeacherDocument = gql`
  * @example
  * const { data, loading, error } = useStudySheetByTeacherQuery({
  *   variables: {
- *      IdTeacher: // value for 'IdTeacher'
+ *      idTeacher: // value for 'idTeacher'
  *      page: // value for 'page'
  *      size: // value for 'size'
  *   },
@@ -5715,6 +6183,14 @@ export const GetStudySheetWithStudentsDocument = gql`
     data {
       id
       number
+      journey {
+        name
+      }
+      trainingProject {
+        program {
+          name
+        }
+      }
       studentStudySheets {
         id
         student {
@@ -5722,9 +6198,10 @@ export const GetStudySheetWithStudentsDocument = gql`
           person {
             name
             lastname
+            email
           }
         }
-        studentStyudySheetState {
+        studentStudySheetState {
           id
           name
         }
@@ -5766,6 +6243,81 @@ export type GetStudySheetWithStudentsQueryHookResult = ReturnType<typeof useGetS
 export type GetStudySheetWithStudentsLazyQueryHookResult = ReturnType<typeof useGetStudySheetWithStudentsLazyQuery>;
 export type GetStudySheetWithStudentsSuspenseQueryHookResult = ReturnType<typeof useGetStudySheetWithStudentsSuspenseQuery>;
 export type GetStudySheetWithStudentsQueryResult = Apollo.QueryResult<GetStudySheetWithStudentsQuery, GetStudySheetWithStudentsQueryVariables>;
+export const StudySheetByTeacherIdWithTeamScrumDocument = gql`
+    query studySheetByTeacherIdWithTeamScrum($idTeacher: Long, $page: Int, $size: Int) {
+  allStudySheets(page: $page, size: $size, idTeacher: $idTeacher) {
+    date
+    code
+    message
+    data {
+      id
+      number
+      startLective
+      endLective
+      state
+      journey {
+        name
+      }
+      trainingProject {
+        name
+        program {
+          name
+        }
+      }
+      teamsScrum {
+        id
+        teamName
+        students {
+          id
+          person {
+            lastname
+            name
+            document
+          }
+        }
+      }
+    }
+    currentPage
+    totalPages
+    totalItems
+  }
+}
+    `;
+
+/**
+ * __useStudySheetByTeacherIdWithTeamScrumQuery__
+ *
+ * To run a query within a React component, call `useStudySheetByTeacherIdWithTeamScrumQuery` and pass it any options that fit your needs.
+ * When your component renders, `useStudySheetByTeacherIdWithTeamScrumQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useStudySheetByTeacherIdWithTeamScrumQuery({
+ *   variables: {
+ *      idTeacher: // value for 'idTeacher'
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useStudySheetByTeacherIdWithTeamScrumQuery(baseOptions?: Apollo.QueryHookOptions<StudySheetByTeacherIdWithTeamScrumQuery, StudySheetByTeacherIdWithTeamScrumQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<StudySheetByTeacherIdWithTeamScrumQuery, StudySheetByTeacherIdWithTeamScrumQueryVariables>(StudySheetByTeacherIdWithTeamScrumDocument, options);
+      }
+export function useStudySheetByTeacherIdWithTeamScrumLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<StudySheetByTeacherIdWithTeamScrumQuery, StudySheetByTeacherIdWithTeamScrumQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<StudySheetByTeacherIdWithTeamScrumQuery, StudySheetByTeacherIdWithTeamScrumQueryVariables>(StudySheetByTeacherIdWithTeamScrumDocument, options);
+        }
+export function useStudySheetByTeacherIdWithTeamScrumSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<StudySheetByTeacherIdWithTeamScrumQuery, StudySheetByTeacherIdWithTeamScrumQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<StudySheetByTeacherIdWithTeamScrumQuery, StudySheetByTeacherIdWithTeamScrumQueryVariables>(StudySheetByTeacherIdWithTeamScrumDocument, options);
+        }
+export type StudySheetByTeacherIdWithTeamScrumQueryHookResult = ReturnType<typeof useStudySheetByTeacherIdWithTeamScrumQuery>;
+export type StudySheetByTeacherIdWithTeamScrumLazyQueryHookResult = ReturnType<typeof useStudySheetByTeacherIdWithTeamScrumLazyQuery>;
+export type StudySheetByTeacherIdWithTeamScrumSuspenseQueryHookResult = ReturnType<typeof useStudySheetByTeacherIdWithTeamScrumSuspenseQuery>;
+export type StudySheetByTeacherIdWithTeamScrumQueryResult = Apollo.QueryResult<StudySheetByTeacherIdWithTeamScrumQuery, StudySheetByTeacherIdWithTeamScrumQueryVariables>;
 export const GetTeamsScrumsDocument = gql`
     query GetTeamsScrums($page: Int, $size: Int) {
   allTeamsScrums(page: $page, size: $size) {

@@ -3,7 +3,6 @@ type StudySheet @key(fields: "id") @extends {
     teamsScrum : [TeamsScrum]
 }
 
-
 type TeamsScrum @key(fields: "id") {
     id: ID!
     teamName: String
@@ -15,6 +14,7 @@ type TeamsScrum @key(fields: "id") {
     checklist: Checklist
     studySheet : StudySheet
     students : [Student]
+    processMethodologyId: Long
 }
 
 type TeamsScrumPage {
@@ -50,6 +50,7 @@ input TeamsScrumDto {
     checklist: ChecklistDto
     studySheetId: Long
     memberIds: [TeamScrumMemberId]
+    processMethodologyId: Long
 }
 
 extend type Query {

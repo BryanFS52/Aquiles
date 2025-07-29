@@ -122,8 +122,100 @@ export const GET_STUDY_SHEET_BY_ID = gql`
 
 
 export const GET_STUDY_SHEET_BY_TEACHER = gql`
-  query studySheetByTeacher($IdTeacher: Long, $page: Int, $size: Int) {
-    allStudySheets(page: $page, size: $size, idTeacher: $IdTeacher) {
+  query studySheetByTeacher($idTeacher: Long, $page: Int, $size: Int) {
+    allStudySheets(page: $page, size: $size, idTeacher: $idTeacher) {
+      date
+      code
+      message
+      data {
+        id
+        number
+        startLective
+        endLective
+        state
+        offer {
+          name
+        }
+        journey {
+          name
+        }
+        quarter {
+          name {
+            extension
+            number
+          }
+        }
+        trainingProject {
+          name
+          program {
+            name
+          }
+        }
+        studentStudySheets {
+          id
+          student {
+            person {
+              document
+              name
+              lastname
+              phone
+              email
+              blood_type
+              date_birth
+            }
+          }
+          studentStudySheetState {
+            name
+          }
+        }
+      }
+      currentPage
+      totalPages
+      totalItems
+    }
+  }
+`;
+
+
+export const GET_STUDY_SHEET_WITH_STUDENTS = gql`
+  query GetStudySheetWithStudents($id: Long!) {
+    studySheetById(id: $id) {
+      code
+      message
+      data {
+        id
+        number
+        journey{
+            name
+        }
+        trainingProject{
+            program{
+                name
+            }
+        }
+        studentStudySheets {
+          id
+          student {
+            id
+            person {
+              name
+              lastname
+              email
+            }
+          }
+          studentStudySheetState {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM = gql`
+query studySheetByTeacherIdWithTeamScrum($idTeacher: Long, $page: Int, $size: Int) {
+    allStudySheets(page: $page, size: $size, idTeacher: $idTeacher) {
       date
       code
       message
@@ -139,27 +231,20 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
         trainingProject {
           name
           program {
-            id
             name
           }
         }
-        studentStudySheets {
-          student {
-            person {
-              id
-              document
-              name
-              lastname
-              phone
-              email
-              blood_type
-              date_birth
-            }
-          }
-          studentStudySheetState {
+        teamsScrum{
             id
-            name
-          }
+            teamName
+            students{
+                id
+                person{
+                    lastname
+                    name
+                    document
+                }
+            }
         }
       }
       currentPage
@@ -168,31 +253,3 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
     }
   }
 `;
-
-export const GET_STUDY_SHEET_WITH_STUDENTS = gql`
-  query GetStudySheetWithStudents($id: Long!) {
-    studySheetById(id: $id) {
-      code
-      message
-      data {
-        id
-        number
-        studentStudySheets {
-          id
-          student {
-            id
-            person {
-              name
-              lastname
-            }
-          }
-          studentStudySheetState {
-            id
-            name
-          }
-        }
-      }
-    }
-  }
-`;
-
