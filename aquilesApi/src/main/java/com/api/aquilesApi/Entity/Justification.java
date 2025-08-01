@@ -26,6 +26,9 @@ public class Justification implements Serializable {
     @Column(name = "justification_file", nullable = false)
     private byte[] justificationFile;
 
+    @Column(name = "absence_date", nullable = false)
+    private LocalDate absenceDate;
+
     @Column(name = "justification_date", nullable = false)
     private LocalDate justificationDate;
 
@@ -47,6 +50,11 @@ public class Justification implements Serializable {
     @JoinColumn(name = "attendance_id", referencedColumnName = "id")
     private Attendance attendance;
 
+    // 4. Relation (M-1) con justificationStatus
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "justification_status_id", referencedColumnName = "id")
+    private JustificationStatus justificationStatus;
+
     public String getJustificationFile() {
         return Base64.getEncoder().encodeToString(justificationFile);
     }
@@ -55,9 +63,31 @@ public class Justification implements Serializable {
         this.justificationFile = Base64.getDecoder().decode(justificationFile);
     }
 
-    public void setJustificationDate(String justificationDateString) {
+    public void setAbsenceDate(String absenceDateString) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+        this.absenceDate = LocalDate.parse(absenceDateString);
+    }
+
+    public void setJustificationDate(String justificationDateString){
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
         this.justificationDate = LocalDate.parse(justificationDateString);
+    }
+
+    // ✅ Método para obtener fecha formateada para mostrar
+    public String getFormattedJustificationDate() {
+        if (this.justificationDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return this.justificationDate.format(formatter);
+        }
+        return null;
+    }
+
+    public String getFormattedAbsenceDate() {
+        if (this.absenceDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return this.absenceDate.format(formatter);
+        }
+        return null;
     }
 }

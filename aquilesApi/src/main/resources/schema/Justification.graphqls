@@ -3,6 +3,7 @@ type Justification {
     name: String
     description: String
     justificationFile: String
+    absenceDate: String
     justificationDate: String
     state: Boolean
     attendance: Attendance
@@ -30,6 +31,7 @@ input JustificationDto {
     studentId: Long
     description: String
     justificationFile: String
+    absenceDate: String
     justificationDate: String
     state: Boolean
     attendance: AttendanceDto

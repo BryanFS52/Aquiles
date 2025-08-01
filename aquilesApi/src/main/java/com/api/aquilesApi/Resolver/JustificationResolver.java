@@ -60,15 +60,31 @@ public class JustificationResolver {
     @DgsMutation
     public Map<String, Object> addJustification(@InputArgument(name = "input") JustificationDto justificationDto) {
         try {
-            JustificationDto justificationDto1 = justificationBusiness.add(justificationDto);
+            // ✅ Log para debugging
+            System.out.println("📤 Recibiendo justificación:");
+            System.out.println("- Descripción: " + justificationDto.getDescription());
+            System.out.println("- Fecha de ausencia recibida: " + justificationDto.getAbsenceDate());
+            System.out.println("- Fecha de justificación recibida: " + justificationDto.getJustificationDate());
+            
+            JustificationDto result = justificationBusiness.add(justificationDto);
+            
+            System.out.println("✅ Justificación creada:");
+            System.out.println("- ID: " + result.getId());
+            System.out.println("- Fecha de ausencia guardada: " + result.getAbsenceDate());
+            System.out.println("- Fecha de justificación guardada: " + result.getJustificationDate());
+            
             return ResponseHttpApi.responseHttpAction(
-                    justificationDto1.getId(),
+                    result.getId(),
                     ResponseHttpApi.CODE_OK,
-                    "Add ok"
+                    "Justificación agregada exitosamente"
             );
-        }catch (Exception e) {
+        } catch (Exception e) {
+            System.err.println("❌ Error al agregar justificación: " + e.getMessage());
+            e.printStackTrace();
+            
             return ResponseHttpApi.responseHttpError(
-                    "Error adding Justification: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error adding Justification: " + e.getMessage(), 
+                    HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }

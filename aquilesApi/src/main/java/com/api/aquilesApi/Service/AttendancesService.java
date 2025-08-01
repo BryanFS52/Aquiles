@@ -24,6 +24,7 @@ public class AttendancesService implements Idao<Attendance, Long> {
     // Get all attendances paginated
     @Override
     public Page<Attendance> findAll(PageRequest pageRequest) {
+
         return attendancesRepository.findAll(pageRequest);
     }
 
