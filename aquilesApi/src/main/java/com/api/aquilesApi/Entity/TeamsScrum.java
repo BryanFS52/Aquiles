@@ -58,5 +58,6 @@ public class TeamsScrum implements Serializable {
     )
     private List<TeamScrumMemberId> memberIds = new ArrayList<>();
 
-    private Long processMethodologyId;
+    @Column(name = "process_methodology_id", nullable = true)
+    private String processMethodologyId;
 }

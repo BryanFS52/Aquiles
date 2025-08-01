@@ -1,5 +1,6 @@
 package com.api.aquilesApi.Business;
 
+import com.api.aquilesApi.Dto.TeamScrumMemberIdDto;
 import com.api.aquilesApi.Dto.TeamsScrumDto;
 import com.api.aquilesApi.Entity.TeamScrumMemberId;
 import com.api.aquilesApi.Entity.TeamsScrum;
@@ -100,6 +101,7 @@ public class TeamsScrumBusiness {
     // Add
     public TeamsScrumDto add(TeamsScrumDto teamsScrumDto) {
         try {
+            validationObject(teamsScrumDto);
             TeamsScrum teamsScrum = modelMapper.map(teamsScrumDto, TeamsScrum.class);
             return modelMapper.map(teamScrumService.save(teamsScrum), TeamsScrumDto.class);
         } catch (Exception e) {
@@ -135,6 +137,33 @@ public class TeamsScrumBusiness {
             throw new CustomException("Error Updating Team Scrum: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    public List<TeamScrumMemberIdDto> addProfileToStudent(TeamsScrumDto teamScrumMemberIds) {
+        try {
+            // 1️⃣ Obtienes la entidad actual
+            TeamsScrum teamsScrum = teamScrumService.getById(teamScrumMemberIds.getId());
+
+            // 2️⃣ Actualizas los profileId en los miembros existentes
+            for (TeamScrumMemberIdDto dto : teamScrumMemberIds.getMemberIds()) {
+                teamsScrum.getMemberIds().stream()
+                        .filter(m -> m.getStudentId().equals(dto.getStudentId()))
+                        .findFirst()
+                        .ifPresent(m -> m.setProfileId(dto.getProfileId()));
+            }
+
+            // 3️⃣ Guardas la entidad (Hibernate detecta los cambios)
+            teamScrumService.save(teamsScrum);
+
+            // 4️⃣ Retornas los miembros ya actualizados como DTOs
+            return teamsScrum.getMemberIds().stream()
+                    .map(m -> modelMapper.map(m, TeamScrumMemberIdDto.class))
+                    .collect(Collectors.toList()); // ✅ Lista mutable
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CustomException("Error Adding Profile to Student: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
 
 
     // Delete

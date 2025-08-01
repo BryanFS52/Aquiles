@@ -8,7 +8,7 @@ interface StudySheetCardProps {
 }
 
 const StudySheetCard: React.FC<StudySheetCardProps> = ({ studySheet }) => {
-    const { number, startLective, endLective, journey, students, state } = studySheet;
+    const { number, startLective, endLective, journey, studentStudySheets, state } = studySheet;
 
     return (
         <div className="bg-white dark:bg-[#003044] rounded-2xl shadow-lg overflow-hidden p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300 ease-in-out">
@@ -44,7 +44,7 @@ const StudySheetCard: React.FC<StudySheetCardProps> = ({ studySheet }) => {
                 <div className="flex items-center gap-3">
                     <FaUsers className="text-lg text-[#40b003]" />
                     <p>
-                        <span className="font-semibold">Estudiantes:</span> {students?.length ?? ''}
+                        <span className="font-semibold">Estudiantes:</span> {studentStudySheets?.length ?? ''}
                     </p>
                 </div>
             </div>

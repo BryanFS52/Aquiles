@@ -23,7 +23,6 @@ const transformGraphQLToChecklistItem = (graphqlData: any): Checklist => {
         remarks: graphqlData.remarks,
         instructorSignature: graphqlData.instructorSignature,
         evaluationCriteria: graphqlData.evaluationCriteria,
-        checklistHistory: graphqlData.checklistHistory,
         associatedJuries: graphqlData.associatedJuries
     };
 };

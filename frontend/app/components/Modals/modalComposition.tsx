@@ -98,8 +98,8 @@ const ProfileSelector = ({
                                 >
                                     <div className="flex items-center space-x-2">
                                         <div className={`w-3 h-3 rounded-full ${profile.name === 'Managment' ? 'bg-purple-500' :
-                                                profile.name === 'Dev Front' ? 'bg-blue-500' :
-                                                    profile.name === 'Dev Back' ? 'bg-green-500' : 'bg-gray-500'
+                                            profile.name === 'Dev Front' ? 'bg-blue-500' :
+                                                profile.name === 'Dev Back' ? 'bg-green-500' : 'bg-gray-500'
                                             }`}></div>
                                         <span className="font-medium">{profile.name}</span>
                                     </div>
@@ -119,7 +119,6 @@ const HierarchyNode = ({
     member,
     role,
     isManager = false,
-    level = 0,
     profiles = [],
     onSelectProfile,
     selectedRole
@@ -204,8 +203,8 @@ const HierarchyNode = ({
                                     }
                                 }}
                                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${selectedRole
-                                        ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
-                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     }`}
                                 disabled={!selectedRole}
                             >
@@ -393,21 +392,21 @@ const TeamHierarchy = ({
     )
 }
 
-interface TeamHistoryModalProps {
+interface ModalCompositionProps {
     isOpen: boolean
     onClose: () => void
     teamData: TeamsScrum | null
-    profiles?: Profile[]
     onSelectProfile?: (studentId: string, profile: Profile) => void
+    profiles: Profile[]
 }
 
-export const TeamHistoryModal = ({
+export const ModalComposition = ({
     isOpen,
     onClose,
     teamData,
-    profiles = [],
-    onSelectProfile
-}: TeamHistoryModalProps) => {
+    onSelectProfile,
+    profiles
+}: ModalCompositionProps) => {
     const [selectedRole, setSelectedRole] = useState<Profile | null>(null)
 
     const teamStats = useMemo(() => {
@@ -434,7 +433,7 @@ export const TeamHistoryModal = ({
             {/* Header */}
             <header className="flex items-center justify-between p-6 border-b bg-gray-50">
                 <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-blue-600 rounded-lg">
+                    <div className="p-2 bg-lime-500 rounded-lg">
                         <GitBranch className="w-6 h-6 text-white" />
                     </div>
                     <div>
@@ -489,17 +488,17 @@ export const TeamHistoryModal = ({
                             <div
                                 key={profile.id}
                                 className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${profile.name === 'Managment'
-                                        ? 'bg-purple-100 text-purple-800 border-purple-200'
-                                        : profile.name === 'Dev Front'
-                                            ? 'bg-blue-100 text-blue-800 border-blue-200'
-                                            : profile.name === 'Dev Back'
-                                                ? 'bg-green-100 text-green-800 border-green-200'
-                                                : 'bg-gray-100 text-gray-800 border-gray-200'
+                                    ? 'bg-purple-100 text-purple-800 border-purple-200'
+                                    : profile.name === 'Dev Front'
+                                        ? 'bg-blue-100 text-blue-800 border-blue-200'
+                                        : profile.name === 'Dev Back'
+                                            ? 'bg-green-100 text-green-800 border-green-200'
+                                            : 'bg-gray-100 text-gray-800 border-gray-200'
                                     }`}
                             >
                                 <div className={`w-2 h-2 rounded-full mr-2 ${profile.name === 'Managment' ? 'bg-purple-500' :
-                                        profile.name === 'Dev Front' ? 'bg-blue-500' :
-                                            profile.name === 'Dev Back' ? 'bg-green-500' : 'bg-gray-500'
+                                    profile.name === 'Dev Front' ? 'bg-blue-500' :
+                                        profile.name === 'Dev Back' ? 'bg-green-500' : 'bg-gray-500'
                                     }`}></div>
                                 {profile.name}
                                 <span className="ml-2 text-xs opacity-75">({profile.description})</span>
@@ -525,8 +524,8 @@ export const TeamHistoryModal = ({
                                     key={profile.id}
                                     onClick={() => setSelectedRole(profile)}
                                     className={`p-3 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md ${selectedRole?.id === profile.id
-                                            ? 'border-solid shadow-lg ring-2 ring-offset-2'
-                                            : 'border-dashed'
+                                        ? 'border-solid shadow-lg ring-2 ring-offset-2'
+                                        : 'border-dashed'
                                         } ${profile.name === 'Managment'
                                             ? `border-purple-300 bg-purple-50 hover:bg-purple-100 ${selectedRole?.id === profile.id ? 'ring-purple-500' : ''}`
                                             : profile.name === 'Dev Front'
@@ -539,8 +538,8 @@ export const TeamHistoryModal = ({
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-3">
                                             <div className={`w-4 h-4 rounded-full ${profile.name === 'Managment' ? 'bg-purple-500' :
-                                                    profile.name === 'Dev Front' ? 'bg-blue-500' :
-                                                        profile.name === 'Dev Back' ? 'bg-green-500' : 'bg-gray-500'
+                                                profile.name === 'Dev Front' ? 'bg-blue-500' :
+                                                    profile.name === 'Dev Back' ? 'bg-green-500' : 'bg-gray-500'
                                                 }`}></div>
                                             <div>
                                                 <h4 className="font-semibold text-gray-800">{profile.name}</h4>

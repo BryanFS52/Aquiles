@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Select, { MultiValue, ActionMeta } from 'react-select';
-import { AddTeamScrumMutationVariables, TeamsScrumDto } from "@/graphql/generated";
+import Select, { MultiValue } from 'react-select';
+import { AddTeamScrumMutationVariables, ProcessMethodology, TeamsScrumDto } from "@/graphql/generated";
 import { fetchStudySheetWithStudents } from '@slice/olympo/studySheetSlice';
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -20,6 +20,7 @@ interface FormErrors {
   teamName?: string | null;
   projectName?: string | null;
   members?: string | null;
+  processMethodologyId?: string | null;
 }
 
 type CreateTeamData = AddTeamScrumMutationVariables["input"];
@@ -30,6 +31,7 @@ interface ModalNewTeamProps {
   onCreate: (data: CreateTeamData) => Promise<boolean>;
   studySheetId: number;
   existingTeams?: TeamsScrumDto[];
+  processMethodologies: ProcessMethodology[];
 }
 
 const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
@@ -37,12 +39,13 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
   onClose,
   onCreate,
   studySheetId,
-  existingTeams = []
+  processMethodologies = []
 }) => {
-  const [teamData, setTeamData] = useState<Partial<TeamsScrumDto>>({
+  const [teamData, setTeamData] = useState<Partial<TeamsScrumDto & { processMethodologyId: string }>>({
     teamName: "",
     projectName: "",
-    memberIds: []
+    memberIds: [],
+    processMethodologyId: ""
   });
   const dispatch = useDispatch<AppDispatch>();
   const [errors, setErrors] = useState<FormErrors>({});
@@ -54,7 +57,6 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
   console.log(rawStudents)
   const studentsForThisSheet = useMemo(() => rawStudents[studySheetId] ?? [], [rawStudents, studySheetId]);
 
-  // Transformar estudiantes en opciones de select
   const studentOptions: StudentOption[] = studentsForThisSheet
     .filter(student => !!student.id)
     .map(student => ({
@@ -175,7 +177,7 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
   };
 
   const resetForm = (): void => {
-    setTeamData({ teamName: "", projectName: "", memberIds: [] });
+    setTeamData({ teamName: "", projectName: "", memberIds: [], processMethodologyId: "" });
     setErrors({});
   };
 
@@ -187,6 +189,8 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
     if (!teamData.projectName?.trim()) newErrors.projectName = "El nombre del proyecto es obligatorio";
     else if (teamData.projectName.trim().length < 3) newErrors.projectName = "Debe tener al menos 3 caracteres";
 
+    if (!teamData.processMethodologyId) newErrors.processMethodologyId = "Debe seleccionar un marco de trabajo";
+
     if (!teamData.memberIds || teamData.memberIds.length === 0)
       newErrors.members = "Debe seleccionar al menos un miembro";
     else if (teamData.memberIds.length > 4)
@@ -196,16 +200,16 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (field: keyof TeamsScrumDto, value: string): void => {
-    setTeamData(prev => ({ ...prev, [field]: value }));
-    if (errors[field as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [field]: null }));
-    }
+  const handleInputChange = (field: keyof typeof teamData, value: any) => {
+    setTeamData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
+
 
   const handleMembersChange = (
     selectedOptions: MultiValue<StudentOption>,
-    actionMeta: ActionMeta<StudentOption>
   ): void => {
     const memberIds = selectedOptions.map(option => ({ studentId: parseInt(option.id, 10) }));
     if (memberIds.length > 4) return;
@@ -220,6 +224,7 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
     setIsSubmitting(true);
     try {
       const success = await onCreate({
+        processMethodologyId: teamData.processMethodologyId!.trim(),
         teamName: teamData.teamName!.trim(),
         projectName: teamData.projectName!.trim(),
         studySheetId,
@@ -229,6 +234,7 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
         problem: "",
         projectJustification: "",
       });
+      console.log("📤 Enviando datos:", teamData);
       if (success) handleClose();
     } catch (error) {
       console.error("Error creating team:", error);
@@ -253,14 +259,9 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
 
   if (!isOpen) return null;
 
-  // Selección de miembros actuales
   const selectedMembers = teamData.memberIds
     ? studentOptions.filter(s => teamData.memberIds!.some(m => m && m.studentId === parseInt(s.id, 10)))
     : [];
-
-  console.log(selectedMembers)
-
-  // Valor de carga (ajusta si tienes un loading real desde el slice)
   const currentLoading = false;
 
   return (
@@ -310,18 +311,25 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
                 Marco de trabajo *
               </label>
               <select
-                name="marcosDeTrabajo"
-                id="marcosDeTrabajo"
+                name="processMethodologyId"
+                id="processMethodologyId"
                 required
-                className="w-full px-3 py-2 border-2 border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:opacity-50"
+                value={teamData.processMethodologyId || ''}
+                onChange={(e) => handleInputChange('processMethodologyId', e.target.value)}
+                className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:opacity-50 ${errors.processMethodologyId ? 'border-red-500' : 'border-gray-300'}`}
                 disabled={isSubmitting}
-                defaultValue=""
               >
                 <option value="" disabled>Selecciona un marco de trabajo...</option>
-                <option value="scrum">Scrum</option>
-                <option value="kanban">Kanban</option>
-                <option value="xp">Extreme Programming (XP)</option>
+                {processMethodologies.map((methodology) => (
+                  <option key={methodology.id ?? crypto.randomUUID()} value={methodology.id ?? ""}>
+                    {methodology.name}
+                  </option>
+                ))}
+
               </select>
+              {errors.processMethodologyId && (
+                <p className="text-red-500 text-xs mt-1">{errors.processMethodologyId}</p>
+              )}
             </div>
             {/* Nombre del Team Scrum */}
             <div>

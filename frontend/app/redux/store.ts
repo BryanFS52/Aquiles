@@ -9,6 +9,7 @@ import teamScrumReducer from "@slice/teamScrumSlice"
 import attendancesReducer from "@slice/attendanceSlice"
 import attendanceStateReducer from "@slice/attendanceStateSlice"
 import profileReducer from "@slice/atlas/profileSlice";
+import processMethodologiesReducer from "@slice/atlas/processMethodologiesSlice";
 
 const store = configureStore({
     reducer: {
@@ -21,7 +22,8 @@ const store = configureStore({
         teamScrum: teamScrumReducer,
         attendances: attendancesReducer,
         attendanceState: attendanceStateReducer,
-        profile: profileReducer
+        profile: profileReducer,
+        processMethodologies: processMethodologiesReducer
     }
 });
 

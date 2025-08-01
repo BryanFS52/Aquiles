@@ -1,10 +1,7 @@
 package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.TeamsScrumBusiness;
-import com.api.aquilesApi.Dto.Profile;
-import com.api.aquilesApi.Dto.Student;
-import com.api.aquilesApi.Dto.StudySheet;
-import com.api.aquilesApi.Dto.TeamsScrumDto;
+import com.api.aquilesApi.Dto.*;
 import com.api.aquilesApi.Entity.TeamsScrum;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
@@ -99,12 +96,14 @@ public class TeamsScrumResolver {
         List<TeamsScrumDto> teamsScrumDtoList = teamsScrumBusiness.findAllByStudentId(studentId);
 
         return teamsScrumDtoList.stream()
-                .flatMap(dto -> dto.getMemberIds().stream())
+                .filter(teamDto -> teamDto.getMemberIds().stream()
+                        .anyMatch(s -> s.getStudentId().equals(studentId))) // Solo equipos donde esté el estudiante
+                .flatMap(teamDto -> teamDto.getMemberIds().stream())
                 .filter(member -> member.getProfileId() != null && !member.getProfileId().isBlank())
                 .map(member -> Map.of("id", member.getProfileId()))
                 .collect(Collectors.toList());
-    }
 
+    }
 
     @DgsData(parentType = "TeamsScrum", field = "studySheet")
     public Map<String, Object> resolveStudySheet(DgsDataFetchingEnvironment env) {
@@ -125,28 +124,19 @@ public class TeamsScrumResolver {
 
         return Map.of("id", teamsScrum.getStudySheetId().toString());
     }
-/*
-    @DgsData(parentType = "TeamScrum", field = "processMethodology")
-    public Map<String, Object> resolveProcessMethodology(DgsDataFetchingEnvironment env) {
-        Object source = env.getSource();
-        assert source != null;
-        System.out.println("Source class: " + source.getClass());
 
-        TeamsScrum teamsScrum;
-        if (source instanceof TeamsScrumDto) {
-            teamsScrum = modelMapper.map((TeamsScrumDto) source, TeamsScrum.class);
-        } else {
-            teamsScrum = (TeamsScrum) source;
-        }
+    @DgsData(parentType = "TeamsScrum", field = "processMethodology")
+    public Map<String, Object> resolveProcessMethodology(DgsDataFetchingEnvironment env) {
+        TeamsScrum teamsScrum = (env.getSource() instanceof TeamsScrumDto)
+                ? modelMapper.map(env.getSource(), TeamsScrum.class)
+                : (TeamsScrum) env.getSource();
 
         if (teamsScrum == null || teamsScrum.getProcessMethodologyId() == null) {
             return null;
         }
 
-        return Map.of("id", teamsScrum.getProcessMethodologyId().toString());
+        return Map.of("id", teamsScrum.getProcessMethodologyId());
     }
-
- */
 
     @DgsQuery
     public Map<String , Object> allTeamsScrums(@InputArgument Integer page, @InputArgument Integer size){
@@ -205,6 +195,20 @@ public class TeamsScrumResolver {
         } catch (Exception e){
             return ResponseHttpApi.responseHttpError(
                     "Error adding TeamScrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DgsMutation
+    public Map<String, Object> addProfileToStudent(@InputArgument(name = "input") TeamsScrumDto teamsScrumDto) {
+        try {
+            List<TeamScrumMemberIdDto> updatedTeamsScrum = teamsScrumBusiness.addProfileToStudent(teamsScrumDto);
+            return ResponseHttpApi.responseHttpMultiAction(
+                    updatedTeamsScrum,
+                    ResponseHttpApi.CODE_OK,
+                    "Profile added to Student successfully");
+        } catch (CustomException e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error adding Profile to Student: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

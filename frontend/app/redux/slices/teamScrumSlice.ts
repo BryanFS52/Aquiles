@@ -18,7 +18,7 @@ import {
 
 // Función para transformar datos de GraphQL a TeamsScrum
 const transformGraphQLToTeamScrumItem = (graphqlData: any): TeamsScrum => {
-    const teamData = graphqlData.teamScrum || graphqlData;
+    const teamData = graphqlData?.teamScrum || graphqlData;
     return {
         id: teamData.id,
         teamName: teamData.teamName,

@@ -51,6 +51,10 @@ export const GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID = gql`
         id
         teamName
         projectName
+        processMethodology{
+          id
+          name
+        }
         students {
           id
           person {
