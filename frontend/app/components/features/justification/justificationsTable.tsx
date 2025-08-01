@@ -1,9 +1,10 @@
 "use client"
 
 import Image from "next/image";
+import { useSelector } from "react-redux";
 import { GrAttachment } from "react-icons/gr";
 import persona from "@public/img/persona.jpg";
-import { Check, X } from "lucide-react";
+import { RootState } from "@/redux/store";
 
 // Recibe props para reutilizar la tabla y evitar dependencias globales
 interface JustificationTableProps {
@@ -17,6 +18,50 @@ export default function JustificationTable({
   handleDownloadFile,
   handleStatusChange,
 }: JustificationTableProps) {
+  // Obtener los estados de justificación del store
+  const { justificationStatuses, loading: loadingStatuses } = useSelector(
+    (state: RootState) => state.justificationStatus
+  );
+
+  const handleSelectChange = (justificacionId: string, event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newStatusId = event.target.value;
+    console.log("🔄 handleSelectChange llamado:", {
+      justificacionId,
+      newStatusId,
+      justificationStatuses
+    });
+    if (newStatusId) {
+      handleStatusChange(justificacionId, newStatusId);
+    }
+  };
+
+  // Función para obtener el nombre del estado basado en el valor actual
+  const getCurrentStatusName = (justificacion: any) => {
+    // Usar directamente el campo estado que ya está mapeado correctamente
+    const statusName = justificacion.estado || "Desconocido";
+    console.log("🔍 getCurrentStatusName para ID:", justificacion.id, {
+      estado: justificacion.estado,
+      state: justificacion.state,
+      statusName
+    });
+    return statusName;
+  };
+
+  // Función para obtener el valor actual para el select
+  const getCurrentSelectValue = (justificacion: any) => {
+    // Usar el campo estado para buscar el ID correspondiente
+    const matchingStatus = justificationStatuses.find(s => 
+      s.name.toLowerCase() === (justificacion.estado || "").toLowerCase()
+    );
+    const selectValue = matchingStatus ? matchingStatus.id : "";
+    console.log("🔍 getCurrentSelectValue para ID:", justificacion.id, {
+      estado: justificacion.estado,
+      matchingStatus,
+      selectValue
+    });
+    return selectValue;
+  };
+
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
       <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
@@ -27,7 +72,8 @@ export default function JustificationTable({
             <th className="px-6 py-4 font-medium">Foto</th>
             <th className="px-6 py-4 font-medium">Documento</th>
             <th className="px-6 py-4 font-medium">Aprendiz</th>
-            <th className="px-6 py-4 font-medium">Fecha de Justificación</th>
+            <th className="px-6 py-4 font-medium">Fecha de ausencia</th>
+            <th className="px-6 py-4 font-medium">Fecha de justificacion</th>
             <th className="px-6 py-4 font-medium">Archivo Adjunto</th>
             <th className="px-6 py-4 font-medium">Estado</th>
             <th className="px-6 py-4 font-medium">Acciones</th>
@@ -54,7 +100,8 @@ export default function JustificationTable({
               <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                 {justificacion.aprendiz}
               </td>
-              <td className="px-6 py-4">{justificacion.fecha}</td>
+              <td className="px-6 py-4">{justificacion.absenceDate}</td>
+              <td className="px-6 py-4">{justificacion.justificationDate}</td>
               <td className="px-6 py-4">
                 {justificacion.archivoAdjunto ? (
                   <GrAttachment
@@ -71,40 +118,39 @@ export default function JustificationTable({
               <td className="px-6 py-4">
                 <span
                   className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    justificacion.estado === "Activo"
+                    getCurrentStatusName(justificacion) === "Activo" || getCurrentStatusName(justificacion) === "Aceptado"
                       ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
-                      : "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                      : getCurrentStatusName(justificacion) === "Denegado" || getCurrentStatusName(justificacion) === "Rechazado"
+                      ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                      : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
                   }`}
                 >
-                  {justificacion.estado}
+                  {getCurrentStatusName(justificacion)}
                 </span>
               </td>
               <td className="px-6 py-4">
                 <div className="flex space-x-2">
-                  <button
-                    onClick={() => handleStatusChange(justificacion.id, "Aceptado")}
-                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 ${
-                      justificacion.estado === "Aceptado"
-                        ? "bg-green-500 text-white cursor-default"
-                        : "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40"
-                    }`}
-                    disabled={justificacion.estado === "Aceptado"}
-                    title="Aceptar justificación"
+                  <select
+                    value={getCurrentSelectValue(justificacion)}
+                    onChange={(e) => handleSelectChange(justificacion.id, e)}
+                    disabled={loadingStatuses}
+                    title="Cambiar estado de la justificación"
+                    className="px-3 py-2 text-xs font-medium bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200 min-w-[120px]"
                   >
-                    <Check className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange(justificacion.id, "Denegado")}
-                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 ${
-                      justificacion.estado === "Denegado"
-                        ? "bg-red-500 text-white cursor-default"
-                        : "bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
-                    }`}
-                    disabled={justificacion.estado === "Denegado"}
-                    title="Denegar justificación"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+                    <option value="">Seleccionar estado...</option>
+                    {justificationStatuses
+                      .filter(status => status.state) // Solo mostrar estados activos
+                      .map((status) => (
+                        <option key={status.id} value={status.id}>
+                          {status.name}
+                        </option>
+                      ))}
+                  </select>
+                  {loadingStatuses && (
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      Cargando...
+                    </span>
+                  )}
                 </div>
               </td>
             </tr>

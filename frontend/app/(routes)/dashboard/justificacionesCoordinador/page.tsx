@@ -16,6 +16,7 @@ import {
   generateFileName,
   updateJustificationStatus,
 } from '@slice/justificationSlice';
+import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
 import JustificationTable from "@/components/features/justification/justificationsTable";
 import { AppDispatch, RootState } from "@/redux/store";
 
@@ -31,11 +32,18 @@ export default function JustificacionesCoordinator() {
     localCurrentPage,
     filterOptions,
     itemsPerPage
-  } = useSelector((state:any) => state.justification);
+  } = useSelector((state: RootState) => state.justification);
+
+  // Obtener los estados de justificación para mapear IDs a nombres
+  const { justificationStatuses } = useSelector(
+    (state: RootState) => state.justificationStatus
+  );
 
 
   useEffect(() => {
     dispatch(fetchJustifications({ page: 0, size: itemsPerPage }));
+    // Cargar los estados de justificación
+    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
   }, [dispatch, localCurrentPage, itemsPerPage]);
 
   const handleFilterChange = (filterType: string, value: string) => {
@@ -63,14 +71,50 @@ export default function JustificacionesCoordinator() {
     }
   };
 
-  const handleStatusChange = (justificacionId: string, newStatus: string) => {
-    dispatch(updateJustificationStatus({ id: justificacionId, status: newStatus }))
-      .then(() => {
-        // Refrescar los datos después de actualizar el estado
-        dispatch(fetchJustifications({ page: localCurrentPage - 1, size: itemsPerPage }));
+  const handleStatusChange = (justificacionId: string, newStatusId: string) => {
+    // Encontrar el nombre del estado basado en el ID
+    const status = justificationStatuses.find(s => s.id === newStatusId);
+    const statusName = status ? status.name : newStatusId;
+    
+    // Para mantener compatibilidad con el backend actual, mapear a estados específicos
+    // que el backend espera basado en el campo boolean 'state'
+    let mappedStatus = statusName;
+    
+    // Si el estado contiene palabras que indican aprobación, mapear a "Activo" (state = true)
+    if (statusName.toLowerCase().includes('aprobad') || 
+        statusName.toLowerCase().includes('aceptad') || 
+        statusName.toLowerCase().includes('activ')) {
+      mappedStatus = "Activo";
+    } 
+    // Si el estado contiene palabras que indican rechazo, mapear a "Inactivo" (state = false)
+    else if (statusName.toLowerCase().includes('rechazad') || 
+             statusName.toLowerCase().includes('denegad') || 
+             statusName.toLowerCase().includes('inactiv')) {
+      mappedStatus = "Inactivo";
+    }
+    
+    // El backend usa un campo boolean 'state', por lo que convertimos:
+    // "Activo" -> state = true, "Inactivo" -> state = false
+    const booleanState = mappedStatus === "Activo";
+    
+    console.log("🔄 Cambiando estado de justificación (Coordinador):", {
+      id: justificacionId,
+      statusName,
+      mappedStatus,
+      booleanState
+    });
+    
+    // Ahora el estado se actualiza inmediatamente en el slice, no necesitamos refresh
+    dispatch(updateJustificationStatus({ id: justificacionId, status: booleanState.toString() }))
+      .then((result) => {
+        if (updateJustificationStatus.fulfilled.match(result)) {
+          console.log("✅ Estado actualizado exitosamente");
+        } else {
+          console.error("❌ Error al actualizar el estado:", result.payload);
+        }
       })
       .catch((error) => {
-        console.error("Error al actualizar el estado:", error);
+        console.error("❌ Error inesperado al actualizar el estado:", error);
       });
   };
 

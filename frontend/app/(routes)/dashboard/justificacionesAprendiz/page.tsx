@@ -40,43 +40,53 @@ import JustificationsHistorical from "@/components/features/justification/justif
 
 
 export default function JustificacionAprendiz() {
+  // ✅ TODOS LOS HOOKS DEBEN IR AL INICIO
   const fileRef = useRef<File | null>(null);
   const base64Ref = useRef<string>("");
   const formRef = useRef<HTMLDivElement>(null);
-
   const topRef = useRef<HTMLDivElement>(null);
-  const { user } = useUser();
-  const { showLoader, hideLoader } = useLoader();
-
-  // Estado local para controlar la carga del modal
-  const [shouldLoadModal, setShouldLoadModal] = useState(false);
-
-  const dispatch = useDispatch<AppDispatch>();
   const fileInputRefPrev = useRef<HTMLInputElement>(null);
 
+  const { user } = useUser();
+  const { showLoader, hideLoader } = useLoader();
+  
+  const [shouldLoadModal, setShouldLoadModal] = useState(false);
+  
+  const dispatch = useDispatch<AppDispatch>();
+
+  // ✅ Todos los useSelector al inicio
   const {
     data: justificationTypesData,
     loading: loadingJustificationTypes,
     error: errorJustificationTypes,
   } = useSelector((state: RootState) => state.justificationType);
+  
   const {
     data: attendancesData,
     loading: loadingAttendances,
     error: errorAttendances,
   } = useSelector((state: RootState) => state.attendances.studentAttendances);
+  
   const {
     transformedData: justificationsData,
     loading: loadingJustifications,
   } = useSelector((state: RootState) => state.justification);
+  
   const {
     loading: loadingJustification,
     error: errorJustification,
     form,
   } = useSelector((state: RootState) => state.justification);
+  
   const currentAttendance = useSelector(
     (state: RootState) => state.justification.form.currentAttendance
   );
+  
+  const originalJustificationsData = useSelector(
+    (state: RootState) => state.justification.data
+  );
 
+  // ✅ Todos los useEffect al inicio
   useEffect(() => {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
     dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 }));
@@ -94,46 +104,73 @@ export default function JustificacionAprendiz() {
     }
   }, [form.showForm, shouldLoadModal]);
 
-  // Formatear mensajes de error
-  const errorMessage = formatErrorMessage(errorJustification || errorJustificationTypes || errorAttendances);
+  useEffect(() => {
+    if (justificationsData && attendancesData) {
+      console.log("🐛 DEBUG - Justificaciones transformadas:", justificationsData);
+      console.log("🐛 DEBUG - Asistencias:", attendancesData);
+      console.log("🐛 DEBUG - Datos originales de justificaciones:", originalJustificationsData);
+      
+      // ✅ Verificar si la asistencia actual del formulario ya está justificada
+      if (form.showForm && currentAttendance && originalJustificationsData) {
+        const isCurrentJustified = originalJustificationsData.some(
+          justification => justification.attendance?.id === currentAttendance.id
+        );
+        
+        if (isCurrentJustified) {
+          console.log("🔒 Ocultando formulario: asistencia ya justificada");
+          dispatch(resetForm());
+          fileRef.current = null;
+          base64Ref.current = "";
+          setShouldLoadModal(false);
+          toast.info("Esta asistencia ya ha sido justificada.");
+        }
+      }
+    }
+  }, [justificationsData, attendancesData, originalJustificationsData, form.showForm, currentAttendance, dispatch]);
 
-  if (
-    loadingJustificationTypes ||
-    loadingAttendances ||
-    loadingJustifications
-  ) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary"></div>
-        <span className="ml-4 text-xl font-semibold text-black dark:text-white">
-          Cargando datos...
-        </span>
-      </div>
+  // ✅ Definir todas las funciones después de los hooks
+  const formatDate = (dateString: string) => {
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return date.toLocaleDateString("es-CO", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const getUnexcusedAbsences = () => {
+    if (!attendancesData || !originalJustificationsData) return attendancesData || [];
+    
+    console.log("📊 Justificaciones originales:", originalJustificationsData);
+    console.log("📋 Datos de asistencias:", attendancesData);
+    
+    const justifiedAttendanceIds = new Set(
+      originalJustificationsData
+        .filter(justification => justification.attendance?.id)
+        .map(justification => justification.attendance?.id?.toString())
+        .filter(id => id !== undefined) as string[]
     );
-  }
 
-  if (errorMessage) {
-    return (
-      <div className="h-auto">
-        <div ref={topRef} className="mb-6">
-          <PageTitle>Justificaciones</PageTitle>
-        </div>
-        <EmptyState message={errorMessage} />
-      </div>
-    );
-  }
+    console.log("🔍 IDs de asistencias justificadas:", Array.from(justifiedAttendanceIds));
 
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+    const unexcusedAbsences = attendancesData.filter(attendance => {
+      const isJustified = justifiedAttendanceIds.has(attendance.id);
+      console.log(`📝 Asistencia ${attendance.id}: ${isJustified ? 'JUSTIFICADA' : 'NO JUSTIFICADA'}`);
+      return !isJustified;
+    });
+
+    console.log("✅ Ausencias sin justificar:", unexcusedAbsences);
+    return unexcusedAbsences;
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     dispatch(updateFormField({ field: name as keyof FormDataState, value }));
   };
 
   const handleNumericInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    dispatch(
-      updateNumericField({ field: e.target.name, value: e.target.value })
-    );
+    dispatch(updateNumericField({ field: e.target.name, value: e.target.value }));
   };
 
   const handleTextInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -195,41 +232,90 @@ export default function JustificacionAprendiz() {
       return;
     }
 
+    if (!currentAttendance?.attendanceDate) {
+      toast.error("No se pudo obtener la fecha de ausencia.");
+      return;
+    }
+
+    // ✅ Verificar si la asistencia ya está justificada antes de enviar
+    const isAlreadyJustified = originalJustificationsData?.some(
+      justification => justification.attendance?.id === currentAttendance.id
+    );
+
+    if (isAlreadyJustified) {
+      toast.error("Esta asistencia ya ha sido justificada anteriormente.");
+      handleCancel(); // Ocultar formulario inmediatamente
+      return;
+    }
+
     dispatch(setSubmitting(true));
 
     try {
       const formDataWithFile = {
         description: form.formData.descripcion,
         justificationFile: base64Ref.current,
-        justificationDate: new Date().toLocaleDateString('en-CA'), // Formato YYYY-MM-DD en zona local
+        absenceDate: currentAttendance.attendanceDate,
+        justificationDate: new Date().toISOString().split('T')[0],
         justificationType: { id: form.formData.justificationTypeId.id },
-        attendance: { id: currentAttendance?.id },
+        attendance: { id: currentAttendance.id },
         state: false,
       };
+
+      console.log("📤 Enviando justificación:", formDataWithFile);
 
       await dispatch(addJustification(formDataWithFile)).unwrap();
 
       toast.success("¡Tu justificación ha sido enviada exitosamente!");
-      dispatch(fetchJustifications({ page: 0, size: 10 }));
+      
+      // ✅ Actualizar datos y ocultar formulario inmediatamente después del éxito
+      await Promise.all([
+        dispatch(fetchJustifications({ page: 0, size: 10 })).unwrap(),
+        dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 })).unwrap()
+      ]);
+      
+      // ✅ Limpiar formulario y ocultarlo
       dispatch(resetForm());
       fileRef.current = null;
       base64Ref.current = "";
+      setShouldLoadModal(false);
 
       setTimeout(() => {
         topRef.current?.scrollIntoView({ behavior: "smooth" });
       }, 200);
+      
     } catch (error: any) {
       console.error("Error al enviar justificación:", error);
-      const errorString = JSON.stringify(error);
+      
       let toastMessage = "Error inesperado al enviar la justificación.";
-
-      if (
-        errorString.includes("duplicate key value violates unique constraint")
-      ) {
-        toastMessage = "Esta asistencia ya ha sido justificada.";
-      } else if (error?.message) {
-        toastMessage = error.message;
+      
+      if (error?.message) {
+        if (error.message.includes("duplicate") || error.message.includes("unique constraint")) {
+          toastMessage = "Esta asistencia ya ha sido justificada. Actualizando datos...";
+          
+          // ✅ Actualizar datos y ocultar formulario cuando hay error de duplicado
+          try {
+            await Promise.all([
+              dispatch(fetchJustifications({ page: 0, size: 10 })).unwrap(),
+              dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 })).unwrap()
+            ]);
+          } catch (refreshError) {
+            console.error("Error al actualizar datos:", refreshError);
+          }
+          
+          // ✅ Ocultar formulario en caso de duplicado
+          dispatch(resetForm());
+          fileRef.current = null;
+          base64Ref.current = "";
+          setShouldLoadModal(false);
+          
+          setTimeout(() => {
+            topRef.current?.scrollIntoView({ behavior: "smooth" });
+          }, 200);
+        } else {
+          toastMessage = error.message;
+        }
       }
+      
       toast.error(toastMessage);
     } finally {
       dispatch(setSubmitting(false));
@@ -250,37 +336,32 @@ export default function JustificacionAprendiz() {
 
   const handleShowForm = (attendanceId?: string) => {
     console.log("🟡 handleShowForm llamado con ID:", attendanceId);
+    
+    // ✅ Verificar si la asistencia ya está justificada antes de mostrar el formulario
+    const isAlreadyJustified = originalJustificationsData?.some(
+      justification => justification.attendance?.id === attendanceId
+    );
+
+    if (isAlreadyJustified) {
+      toast.info("Esta asistencia ya ha sido justificada anteriormente.");
+      return;
+    }
+
     if (attendanceId && attendancesData) {
-      const currentAttendance = attendancesData.find(
-        (a) => a.id === attendanceId
-      );
+      const currentAttendance = attendancesData.find((a) => a.id === attendanceId);
       console.log("📄 currentAttendance encontrada:", currentAttendance);
 
       if (currentAttendance) {
         const person = currentAttendance.student?.person;
 
         if (person?.document && person?.name && person?.lastname) {
-          dispatch(
-            updateFormField({
-              field: "numeroDocumento",
-              value: person.document,
-            })
-          );
-          dispatch(
-            updateFormField({
-              field: "nombreAprendiz",
-              value: `${person.name} ${person.lastname}`,
-            })
-          );
+          dispatch(updateFormField({ field: "numeroDocumento", value: person.document }));
+          dispatch(updateFormField({ field: "nombreAprendiz", value: `${person.name} ${person.lastname}` }));
         }
 
-        dispatch(
-          updateFormField({ field: "notificationId", value: attendanceId })
-        );
-
-        // 🔥 ESTO ES LO QUE FALTABA
-        // 🔥 ESTO ES LO QUE FALTABA
+        dispatch(updateFormField({ field: "notificationId", value: attendanceId }));
         dispatch(setCurrentAttendance(currentAttendance));
+        
         setTimeout(() => {
           dispatch(showForm());
           formRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -291,17 +372,6 @@ export default function JustificacionAprendiz() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    // Parsear la fecha asumiendo que viene en formato YYYY-MM-DD y es local
-    const [year, month, day] = dateString.split('-').map(Number);
-    const date = new Date(year, month - 1, day); // month - 1 porque los meses van de 0-11
-    return date.toLocaleDateString("es-CO", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
   const handleDownloadFile = (justificacion: any) => {
     if (justificacion.archivoAdjunto) {
       const mimeType = justificacion.archivoMime || "application/octet-stream";
@@ -310,7 +380,33 @@ export default function JustificacionAprendiz() {
     }
   };
 
-  const absences = attendancesData || [];
+  // ✅ Calcular valores después de todas las funciones
+  const absences = getUnexcusedAbsences();
+  const errorMessage = formatErrorMessage(errorJustification || errorJustificationTypes || errorAttendances);
+
+  // ✅ AHORA SÍ puedes hacer los returns condicionales
+  if (loadingJustificationTypes || loadingAttendances || loadingJustifications) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary"></div>
+        <span className="ml-4 text-xl font-semibold text-black dark:text-white">
+          Cargando datos...
+        </span>
+      </div>
+    );
+  }
+
+  if (errorMessage) {
+    return (
+      <div className="h-auto">
+        <div ref={topRef} className="mb-6">
+          <PageTitle>Justificaciones</PageTitle>
+        </div>
+        <EmptyState message={errorMessage} />
+      </div>
+    );
+  }
+
   return (
     <div className="h-auto">
       <div ref={topRef} className="mb-6">
@@ -365,8 +461,7 @@ export default function JustificacionAprendiz() {
                               </div>
                               <div className="text-sm text-red-600 font-medium">
                                 Estado:{" "}
-                                {attendance.attendanceState?.status ||
-                                  "Ausente"}
+                                {attendance.attendanceState?.status || "Ausente"}
                               </div>
                             </div>
                           </div>
@@ -383,6 +478,7 @@ export default function JustificacionAprendiz() {
                   </div>
                 </div>
               )}
+              
               {absences.length === 0 && (
                 <div className="text-center py-12">
                   <motion.div
@@ -399,7 +495,10 @@ export default function JustificacionAprendiz() {
                     ¡Excelente asistencia!
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300 text-lg">
-                    No tienes ausencias pendientes por justificar.
+                    {attendancesData && attendancesData.length > 0 
+                      ? "Todas tus ausencias han sido justificadas."
+                      : "No tienes ausencias pendientes por justificar."
+                    }
                   </p>
                   <p className="text-gray-500 dark:text-gray-300 text-sm mt-2">
                     Continúa manteniendo tu buen récord de asistencia.
@@ -463,6 +562,7 @@ export default function JustificacionAprendiz() {
               </div>
             </motion.div>
           )}
+          
           <motion.div
             key="justification-history"
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
@@ -472,11 +572,11 @@ export default function JustificacionAprendiz() {
             className="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 dark:border-gray-800 dark:bg-[#002033] "
           >
             <div className="">
-            <JustificationsHistorical
-              data={justificationsData}
-              loading={loadingJustifications}
-              handleDownloadFile={handleDownloadFile}
-            />
+              <JustificationsHistorical
+                data={justificationsData}
+                loading={loadingJustifications}
+                handleDownloadFile={handleDownloadFile}
+              />
             </div>
           </motion.div>
         </AnimatePresence>

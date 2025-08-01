@@ -126,6 +126,7 @@ const justificationService = {
             description: descripcion,
             justificationFile: justificationFileBase64,
             justificationTypeId,
+            absenceDate,
             justificationDate,
             justificationHistory: "tipoNovedad",
             state: true,

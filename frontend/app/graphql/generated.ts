@@ -957,6 +957,7 @@ export type Justification = {
   attendance?: Maybe<Attendance>;
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  absenceDate?: Maybe<Scalars['String']['output']>;
   justificationDate?: Maybe<Scalars['String']['output']>;
   justificationFile?: Maybe<Scalars['String']['output']>;
   justificationType?: Maybe<JustificationType>;
@@ -967,7 +968,8 @@ export type Justification = {
 export type JustificationDto = {
   attendance?: InputMaybe<AttendanceDto>;
   description?: InputMaybe<Scalars['String']['input']>;
-  justificationDate?: InputMaybe<Scalars['String']['input']>;
+  absenceDate?: InputMaybe<Scalars['String']['input']>;
+  justicationDate?: InputMaybe<Scalars['String']['input']>;
   justificationFile?: InputMaybe<Scalars['String']['input']>;
   justificationType?: InputMaybe<JustificationTypeDto>;
   state?: InputMaybe<Scalars['Boolean']['input']>;
@@ -3987,7 +3989,7 @@ export type GetAttendancesAndJustificationsByStudentQueryVariables = Exact<{
 }>;
 
 
-export type GetAttendancesAndJustificationsByStudentQuery = { allAttendancesByStudentId?: { data?: Array<{ id: string, justification?: { id: string, description?: string | null, justificationFile?: string | null, justificationDate?: string | null, justificationType?: { id: string, name?: string | null } | null } | null } | null> | null } | null };
+export type GetAttendancesAndJustificationsByStudentQuery = { allAttendancesByStudentId?: { data?: Array<{ id: string, justification?: { id: string, description?: string | null, justificationFile?: string | null, absenceDate?: string | null, justificationDate?: string| null, justificationType?: { id: string, name?: string | null } | null } | null } | null> | null } | null };
 
 export type AddAttendanceMutationVariables = Exact<{
   input: AttendanceDto;
@@ -4133,14 +4135,14 @@ export type GetAllJustificationsQueryVariables = Exact<{
 }>;
 
 
-export type GetAllJustificationsQuery = { allJustifications?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, description?: string | null, justificationFile?: string | null, justificationDate?: string | null, state?: boolean | null, justificationType?: { id: string, name?: string | null } | null, attendance?: { student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null } | null } | null> | null } | null };
+export type GetAllJustificationsQuery = { allJustifications?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, description?: string | null, justificationFile?: string | null, absenceDate?: string | null, justificationDate?: string| null, state?: boolean | null, justificationType?: { id: string, name?: string | null } | null, attendance?: { student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null } | null } | null> | null } | null };
 
 export type GetJustificationByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
 
 
-export type GetJustificationByIdQuery = { justificationById?: { code?: string | null, message?: string | null, data?: { id: string, description?: string | null, justificationFile?: string | null, justificationDate?: string | null, state?: boolean | null, justificationType?: { id: string, name?: string | null } | null } | null } | null };
+export type GetJustificationByIdQuery = { justificationById?: { code?: string | null, message?: string | null, data?: { id: string, description?: string | null, justificationFile?: string | null, absenceDate?: string | null, justificationDate?: string| null, state?: boolean | null, justificationType?: { id: string, name?: string | null } | null } | null } | null };
 
 export type AddJustificationMutationVariables = Exact<{
   input: JustificationDto;
@@ -4656,6 +4658,7 @@ export const GetAttendancesAndJustificationsByStudentDocument = gql`
         id
         description
         justificationFile
+        absenceDate
         justificationDate
         justificationType {
           id
@@ -5479,6 +5482,7 @@ export const GetAllJustificationsDocument = gql`
       id
       description
       justificationFile
+      absenceDate
       justificationDate
       state
       justificationType {
@@ -5542,6 +5546,7 @@ export const GetJustificationByIdDocument = gql`
       id
       description
       justificationFile
+      absenceDate
       justificationDate
       state
       justificationType {

@@ -17,17 +17,23 @@ export default function JustificationsHistorical({
   handleDownloadFile,
 }: JustificationsHistoricalProps) {
   const getStatusColor = (estado: string) => {
-    return estado === "Aprobada"
-      ? "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30"
-      : "text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30";
+    const estadoLower = estado.toLowerCase();
+    if (estadoLower.includes("aprobad") || estadoLower.includes("aceptad") || estadoLower.includes("activ")) {
+      return "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30";
+    } else if (estadoLower.includes("rechazad") || estadoLower.includes("denegad") || estadoLower.includes("inactiv")) {
+      return "text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30";
+    } else {
+      return "text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30";
+    }
   };
 
   const getStatusIcon = (estado: string) => {
-    return estado === "Aprobada" ? (
-      <FaCheckCircle className="w-4 h-4" />
-    ) : (
-      <FaClock className="w-4 h-4" />
-    );
+    const estadoLower = estado.toLowerCase();
+    if (estadoLower.includes("aprobad") || estadoLower.includes("aceptad") || estadoLower.includes("activ")) {
+      return <FaCheckCircle className="w-4 h-4" />;
+    } else {
+      return <FaClock className="w-4 h-4" />;
+    }
   };
   return (
     <motion.div
@@ -56,13 +62,13 @@ export default function JustificationsHistorical({
             <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700 text-black dark:text-white">
               <tr>
                 <th className="px-6 py-4 font-medium">Tipo de Novedad</th>
-                <th className="px-6 py-4 font-medium">Fecha de Justificacion</th>
+                <th className="px-6 py-4 font-medium">Fecha de Ausencia</th>
+                <th className="px-6 py-4 font-medium">Fecha de Justificación</th>
                 <th className="px-6 py-4 font-medium">Archivo</th>
                 <th className="px-6 py-4 font-medium">Estado</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              
               {loading ? (
                 <tr>
                   <td
@@ -96,7 +102,10 @@ export default function JustificationsHistorical({
                 </tr>
               ) : (
                 data.map(
-                  (justification: TransformedJustificationItem, index: number) => (
+                  (
+                    justification: TransformedJustificationItem,
+                    index: number
+                  ) => (
                     <motion.tr
                       key={justification.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -110,14 +119,22 @@ export default function JustificationsHistorical({
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center">{justification.fecha}</div>
+                        <div className="flex items-center">
+                          {justification.absenceDate}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          {justification.justificationDate}
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
                           {justification.archivoAdjunto ? (
                             <GrAttachment
-                              title={`Descargar archivo (${justification.archivoMime || "desconocido"
-                                })`}
+                              title={`Descargar archivo (${
+                                justification.archivoMime || "desconocido"
+                              })`}
                               className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
                               onClick={() => handleDownloadFile(justification)}
                             />
@@ -136,9 +153,7 @@ export default function JustificationsHistorical({
                             )}`}
                           >
                             {getStatusIcon(justification.estado)}
-                            <span className="ml-1">
-                              {justification.estado}
-                            </span>
+                            <span className="ml-1">{justification.estado}</span>
                           </span>
                         </div>
                       </td>

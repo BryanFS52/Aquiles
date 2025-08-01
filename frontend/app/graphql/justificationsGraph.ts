@@ -14,6 +14,7 @@ export const GET_ALL_JUSTIFICATIONS = gql`
         id
         description
         justificationFile
+        absenceDate
         justificationDate
         state
         justificationType {
@@ -44,11 +45,15 @@ export const GET_JUSTIFICATION_BY_ID = gql`
         id
         description
         justificationFile
+        absenceDate
         justificationDate
         state
         justificationType {
           id
           name
+        }
+        attendance {
+          id
         }
       }
     }

@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import justificationReducer from "@slice/justificationSlice";
 import justificationTypeReducer from "@slice/justificationTypeSlice";
+import justificationStatusReducer from "./slices/justificationStatusSlice";
 import checklistReducer from "@slice/checklistSlice";
 import studentReducer from "@slice/olympo/studentSlice";
 import programReducer from "@slice/olympo/programSlice";
@@ -14,6 +15,7 @@ const store = configureStore({
     reducer: {
         justification: justificationReducer,
         justificationType: justificationTypeReducer,
+        justificationStatus: justificationStatusReducer,
         checklist: checklistReducer,
         student: studentReducer,
         program: programReducer,
