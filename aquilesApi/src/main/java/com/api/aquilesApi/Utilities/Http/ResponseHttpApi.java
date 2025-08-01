@@ -59,7 +59,7 @@ public class ResponseHttpApi {
         return response;
     }
 
-    //Error
+    // Error
     public static Map<String, Object> responseHttpError(String message, HttpStatus codeMessage) {
         Map<String, Object> response = new HashMap<>();
 

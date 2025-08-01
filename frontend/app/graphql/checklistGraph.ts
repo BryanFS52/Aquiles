@@ -19,7 +19,7 @@ export const GET_ALL_CHECKLISTS = gql`
         trimester
         component
         studySheets
-        evaluations
+        evaluations 
         associatedJuries {
           id
         }

@@ -13,7 +13,6 @@ import com.api.aquilesApi.Service.ChecklistExportService;
 import com.api.aquilesApi.Service.ChecklistService;
 import com.api.aquilesApi.Service.ChecklistHistoryService; 
 import com.api.aquilesApi.Service.EvaluationsService;
-import com.api.aquilesApi.Service.ItemService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
@@ -109,8 +108,9 @@ public class ChecklistBusiness {
             // Paso 2: asignar manualmente la entidad Evaluations si se proporciona un ID válido
             if (checklistDto.getEvaluations() != null && checklistDto.getEvaluations() > 0) {
                 try {
-                    Evaluations eval = EvaluationsService.findById(checklistDto.getEvaluations());
+                    Evaluations eval = EvaluationsService.findEntityById(checklistDto.getEvaluations()); // ✅ devuelve la entidad
                     checklist.setEvaluation(eval);
+                    
                 } catch (Exception e) {
                     // Si no se encuentra la evaluación, continuar sin asignarla
                     System.out.println("Warning: Evaluation with ID " + checklistDto.getEvaluations() + " not found. Continuing without evaluation.");

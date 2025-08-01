@@ -1,4 +1,4 @@
-"""type Item {
+type Item {
     id: ID!
     code: String!
     indicator: String!
@@ -28,4 +28,3 @@ extend type Mutation {
     updateItem(id: Long!, item: ItemDto!): ItemPageId
     deleteItem(id: Long!): ItemPageId
 }
-"""

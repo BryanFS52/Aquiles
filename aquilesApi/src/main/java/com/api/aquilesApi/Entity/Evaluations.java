@@ -28,5 +28,14 @@ public class Evaluations implements Serializable {
     @Column(name = "value_judgment", nullable = false, length = 60)
     private String valueJudgment;
 
-    // Relations
+    @OneToOne(mappedBy = "evaluation")
+    private Checklist checklist;
+
+    public Checklist getChecklist() {
+        return checklist;
+    }
+
+    public void setChecklist(Checklist checklist) {
+        this.checklist = checklist;
+    }
 }
