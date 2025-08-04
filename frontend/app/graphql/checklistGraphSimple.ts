@@ -17,12 +17,16 @@ export const GET_ALL_CHECKLISTS_SIMPLE = gql`
         instructorSignature
         evaluationCriteria
         studySheets
-        evaluations
+        evaluations {
+          id
+              recommendations
+          valueJudgment
+        }
         items {
           id
           code
           indicator
-          active
+          active  
         }
         associatedJuries {
           id

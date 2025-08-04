@@ -16,15 +16,6 @@ import lombok.NoArgsConstructor;
 public class EvaluationsDto {
     private Long id;
 
-    
-    public EvaluationsDto(Long id, String observations, String recommendations, String valueJudgment, Long checklistId) {
-        this.id = id;
-        this.observations = observations;
-        this.recommendations = recommendations;
-        this.valueJudgment = valueJudgment;
-        this.checklistId = checklistId;
-    }
-    
     @NotBlank(message = "Las observaciones son obligatorias")
     @Size(max = 500, message = "Las observaciones no pueden exceder los 500 caracteres")
     private String observations;
@@ -36,19 +27,8 @@ public class EvaluationsDto {
     @Size(max = 13, message = "El juicio de valor no puede exceder los 13 caracteres")
     private String valueJudgment;
 
-    // Relations
-
-    @OneToOne
-    @JoinColumn(name = "checklist_id", referencedColumnName = "id")
     private Checklist checklist;
 
+    // Este sí debe estar en el input
     private Long checklistId;
-
-    public Long getChecklistId() {
-        return checklistId;
-    }
-
-    public void setChecklistId(Long checklistId) {
-        this.checklistId = checklistId;
-    }
 }

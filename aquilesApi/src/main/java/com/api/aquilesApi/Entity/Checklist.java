@@ -69,4 +69,14 @@ public class Checklist implements Serializable {
     @Column(name = "learningOutcome_id")
     private Long LearningOutcome;
 
+    // 5.Relation (1-M) con juries
+@OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "checklist_juries",
+            joinColumns = @JoinColumn(name = "checklist_id"),
+            inverseJoinColumns = @JoinColumn(name = "jury_id"))
+    private List<Juries> juries;
+
+    // 6.Relation (1-M) con teamsScrum
+    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamsScrum> teamsScrum;
 }

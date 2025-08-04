@@ -34,19 +34,11 @@ public class ChecklistDto {
 
     private String component;
 
-
-
     // Relations
     @NotNull(message = "Los jurados asociados son obligatorios")
     private Set<Long> associatedJuries;
-
-    private ItemDto item;
-
-    private Long evaluations;
-
+    private EvaluationsDto evaluation;
     private TeamsScrumDto teamsScrum;
-
     private Long studySheets;
-
     private List<ItemDto> items;
 }

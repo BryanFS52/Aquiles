@@ -78,9 +78,9 @@ public class EvaluationsResolver {
     @DgsMutation
     public Map<String, Object> updateEvaluation(@InputArgument("id") Long id, @InputArgument("input") EvaluationsDto input) {
         try {
-            EvaluationsDto evaluationsDto = evaluationsBusiness.update(id, input);
+            evaluationsBusiness.update(id, input);
             return ResponseHttpApi.responseHttpAction(
-                    evaluationsDto.getId(),
+                    id,
                     ResponseHttpApi.CODE_OK,
                     "Evaluation updated successfully"
             );

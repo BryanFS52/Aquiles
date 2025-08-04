@@ -13,9 +13,10 @@ type ItemPageId {
 }
 
 input ItemDto {
+    id: ID
     code: String!
     indicator: String!
-    active: Boolean!
+    active: Boolean
 }
 
 extend type Query {

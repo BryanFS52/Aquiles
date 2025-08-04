@@ -26,7 +26,7 @@ public class ChecklistBusiness {
 
     private final ChecklistService checklistService;
     private final ModelMapper modelMapper;
-    private final EvaluationsService EvaluationsService;
+    private final EvaluationsService evaluationsService;
     private final ChecklistExportService exportService;
     private final ChecklistHistoryService checklistHistoryService;
     private final ItemTypeRepository itemTypeRepository;
@@ -35,14 +35,14 @@ public class ChecklistBusiness {
             ChecklistService checklistService,
             JuriesRepository juriesRepository,
             ModelMapper modelMapper,
-            EvaluationsService evaluationService,
+            EvaluationsService evaluationService, EvaluationsService evaluationsService,
             ChecklistExportService exportService,
             ChecklistHistoryService checklistHistoryService,
             ItemTypeRepository itemTypeRepository
     ) {
         this.checklistService = checklistService;
         this.modelMapper = modelMapper;
-        this.EvaluationsService = evaluationService;
+        this.evaluationsService = evaluationsService;
         this.exportService = exportService;
         this.checklistHistoryService = checklistHistoryService;
         this.itemTypeRepository = itemTypeRepository;
@@ -106,16 +106,16 @@ public class ChecklistBusiness {
             }
 
             // Paso 2: asignar manualmente la entidad Evaluations si se proporciona un ID válido
-            if (checklistDto.getEvaluations() != null && checklistDto.getEvaluations() > 0) {
+            // Paso 2: asignar manualmente la entidad Evaluation si se proporciona un ID válido
+            if (checklistDto.getEvaluation() != null && checklistDto.getEvaluation().getId() != null) {
                 try {
-                    Evaluations eval = EvaluationsService.findEntityById(checklistDto.getEvaluations()); // ✅ devuelve la entidad
+                    Evaluations eval = evaluationsService.getById(checklistDto.getEvaluation().getId());
                     checklist.setEvaluation(eval);
-                    
                 } catch (Exception e) {
-                    // Si no se encuentra la evaluación, continuar sin asignarla
-                    System.out.println("Warning: Evaluation with ID " + checklistDto.getEvaluations() + " not found. Continuing without evaluation.");
+                    System.out.println("Warning: Evaluation with ID " + checklistDto.getEvaluation().getId() + " not found. Continuing without evaluation.");
                 }
             }
+
 
             // Paso 3: guardar el checklist primero
             Checklist saved = checklistService.save(checklist);

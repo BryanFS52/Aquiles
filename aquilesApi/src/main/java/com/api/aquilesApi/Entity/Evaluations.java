@@ -31,11 +31,4 @@ public class Evaluations implements Serializable {
     @OneToOne(mappedBy = "evaluation")
     private Checklist checklist;
 
-    public Checklist getChecklist() {
-        return checklist;
-    }
-
-    public void setChecklist(Checklist checklist) {
-        this.checklist = checklist;
-    }
 }

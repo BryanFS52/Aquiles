@@ -1,10 +1,11 @@
 type Evaluation {
     id: ID
-    observations: String!
+    observations: String
     recommendations: String
-    valueJudgment: String!
+    valueJudgment: String
     checklistId: Long
 }
+
 type EvaluationPage {
     code: String
     data: [Evaluation]
@@ -22,19 +23,21 @@ type EvaluationPageId {
     message: String
 }
 
-input EvaluationDto {
-    observations: String!
+input EvaluationInput {
+    id: ID
+    observations: String
     recommendations: String
-    valueJudgment: String!
+    valueJudgment: String
     checklistId: Long
 }
 
 extend type Query {
     allEvaluations(page: Int, size: Int): EvaluationPage
-    evaluationById(id: Long): EvaluationPageId
+    evaluationById(id: Long!): EvaluationPageId
 }
+
 extend type Mutation {
-    addEvaluation(input: EvaluationDto!): Response
-    updateEvaluation(id: Long!, input: EvaluationDto!): Response
+    addEvaluation(input: EvaluationInput!): Response
+    updateEvaluation(id: Long!, input: EvaluationInput!): Response
     deleteEvaluation(id: Long!): Response
 }
