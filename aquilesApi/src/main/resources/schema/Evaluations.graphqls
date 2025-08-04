@@ -23,8 +23,7 @@ type EvaluationPageId {
     message: String
 }
 
-input EvaluationInput {
-    id: ID
+input EvaluationDto {
     observations: String
     recommendations: String
     valueJudgment: String
@@ -37,7 +36,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    addEvaluation(input: EvaluationInput!): Response
-    updateEvaluation(id: Long!, input: EvaluationInput!): Response
+    addEvaluation(input: EvaluationDto!): Response
+    updateEvaluation(id: Long!, input: EvaluationDto!): Response
     deleteEvaluation(id: Long!): Response
 }

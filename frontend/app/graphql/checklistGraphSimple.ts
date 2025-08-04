@@ -19,7 +19,7 @@ export const GET_ALL_CHECKLISTS_SIMPLE = gql`
         studySheets
         evaluations {
           id
-              recommendations
+          recommendations
           valueJudgment
         }
         items {
@@ -49,7 +49,11 @@ export const GET_CHECKLIST_BY_ID_SIMPLE = gql`
         instructorSignature
         evaluationCriteria
         studySheets
-        evaluations
+        evaluations {
+          id
+          recommendations
+          valueJudgment
+        }
         items {
           id
           code

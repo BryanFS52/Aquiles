@@ -36,8 +36,8 @@ input ChecklistDto {
     component: String
     instructorSignature: String!
     evaluationCriteria: Boolean!
-    studySheets: Long 
-    evaluationId:Long
+    studySheets: Long
+    evaluations: [EvaluationDto]
     items: [ItemDto]
     associatedJuries: [Long]
 }
