@@ -52,11 +52,6 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate }) {
     }
   }
 
-  const handleAssignEvaluation = () => {
-    toast.info('Evaluación asignada correctamente (acción simulada).')
-    // Aquí podrías hacer una llamada real si tienes un servicio/mutación
-  }
-
   const handleIndicadorChange = (index, value) => {
     const newItems = [...items]
     newItems[index].indicador = value
@@ -86,6 +81,11 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate }) {
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
         <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl space-y-6 max-h-[90vh] overflow-y-auto">
           <h2 className="text-2xl font-semibold text-gray-800">Crear Lista de Chequeo</h2>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-blue-800 text-sm">
+              💡 <strong>Nota:</strong> Una vez creada la lista, estará disponible para asignación de evaluaciones en la vista del instructor.
+            </p>
+          </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <div>
@@ -156,18 +156,11 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate }) {
               </button>
             </div>
             <div className="space-y-2">
-            <button
-                type="button"
-                onClick={handleAssignEvaluation}
-                className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-800 transition-colors"
-              >
-                Asignar Evaluación
-              </button>
               <button
                 type="submit"
                 className="w-full bg-[#00324d] text-white py-2 rounded hover:bg-[#40b003] transition-colors"
               >
-                Crear Lista
+                Crear Lista de Chequeo
               </button>
             </div>
 

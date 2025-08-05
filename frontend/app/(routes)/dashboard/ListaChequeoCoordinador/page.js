@@ -6,11 +6,12 @@ import { toast } from "react-toastify"
 import CrearListaChequeo from "@components/Modals/modalNewChecklist"
 import PageTitle from "@components/UI/pageTitle"
 import { addChecklist, fetchAllChecklists, deleteChecklist } from "@services/checkListService"
+import { createEvaluationForChecklist } from "@services/evaluationService"
 
 export default function CoordinadorChecklistView() {
   const [modalOpen, setModalOpen] = useState(false)
   const [checklists, setChecklists] = useState([])
-  const [selectedTrimestre, setSelectedTrimestre] = useState("1")
+  const [selectedTrimestre, setSelectedTrimestre] = useState("todos")
   const [confirmModalOpen, setConfirmModalOpen] = useState(false)
   const [checklistToDelete, setChecklistToDelete] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -38,8 +39,35 @@ export default function CoordinadorChecklistView() {
   const handleCreateChecklist = async (checklistData) => {
     try {
       const response = await addChecklist(checklistData)
+      console.log("API Response:", response); // Debug log
+      
       if (response.code === "200") {
+        // La respuesta tiene el ID directamente en response.id
+        const newChecklistId = response.id;
+        
         toast.success("Lista de chequeo creada exitosamente")
+        
+        // Comentamos temporalmente la creación automática de evaluación
+        // hasta confirmar que el schema del backend lo soporte
+        /*
+        if (newChecklistId) {
+          // Crear automáticamente una evaluación para esta lista de chequeo
+          try {
+            await createEvaluationForChecklist(newChecklistId, checklistData);
+            toast.success("Lista de chequeo creada exitosamente con evaluación asignada")
+          } catch (evaluationError) {
+            console.error("Error creating evaluation:", evaluationError);
+            // Aún así mostrar éxito de la lista, pero avisar del error de evaluación
+            toast.success("Lista de chequeo creada exitosamente")
+            toast.warning("La evaluación no pudo ser creada automáticamente")
+          }
+        } else {
+          console.warn("No se pudo obtener el ID de la lista creada:", response);
+          toast.success("Lista de chequeo creada exitosamente")
+          toast.warning("No se pudo crear la evaluación automáticamente")
+        }
+        */
+        
         // Recargar la lista para mostrar el nuevo checklist
         await loadChecklists()
         setModalOpen(false)
@@ -73,6 +101,24 @@ export default function CoordinadorChecklistView() {
     }
   }
 
+  const handleToggleState = async (checklistId, currentState) => {
+    try {
+      // Aquí harías la llamada al API para actualizar el estado
+      // Por ahora simularemos el cambio de estado
+      const updatedChecklists = checklists.map(checklist =>
+        checklist.id === checklistId 
+          ? { ...checklist, state: !currentState }
+          : checklist
+      )
+      setChecklists(updatedChecklists)
+      
+      toast.success(`Lista de chequeo ${!currentState ? 'activada' : 'desactivada'} exitosamente`)
+    } catch (error) {
+      console.error("Error updating checklist state:", error)
+      toast.error("Error al actualizar el estado de la lista de chequeo")
+    }
+  }
+
   const handleCloseModal = () => setModalOpen(false)
 
   const handleOpenConfirmModal = (checklistId) => {
@@ -90,11 +136,16 @@ export default function CoordinadorChecklistView() {
     toast.info(`Asignar checklist ${checklistId}`)
   }
 
-  // Filtrar checklists por trimestre seleccionado
-  // Nota: Si trimester no está disponible, mostrar todos los checklists
-  const filteredChecklists = checklists.filter(
-    (checklist) => !checklist.trimester || checklist.trimester === selectedTrimestre
-  )
+  // Filtrar checklists por trimestre seleccionado y ordenar por ID descendente (más recientes primero)
+  // Nota: Si trimester no está disponible o se selecciona "todos", mostrar todos los checklists
+  const filteredChecklists = checklists
+    .filter((checklist) => {
+      if (selectedTrimestre === "todos") {
+        return true; // Mostrar todos los checklists
+      }
+      return !checklist.trimester || checklist.trimester === selectedTrimestre;
+    })
+    .sort((a, b) => b.id - a.id) // Ordenar por ID descendente (más recientes primero)
 
   return (
     <>
@@ -105,16 +156,20 @@ export default function CoordinadorChecklistView() {
           <label htmlFor="trimestre-select" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Filtrar por trimestre:
           </label>
-          <select
+                    <select
             id="trimestre-select"
             value={selectedTrimestre}
             onChange={(e) => setSelectedTrimestre(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00324d] dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
           >
+            <option value="todos">Todos los Trimestres</option>
             <option value="1">Primer Trimestre</option>
             <option value="2">Segundo Trimestre</option>
             <option value="3">Tercer Trimestre</option>
             <option value="4">Cuarto Trimestre</option>
+            <option value="5">Quinto Trimestre</option>
+            <option value="6">Sexto Trimestre</option>
+            <option value="7">Séptimo Trimestre</option>
           </select>
         </div>
 
@@ -132,32 +187,38 @@ export default function CoordinadorChecklistView() {
           <span className="ml-2 text-gray-600 dark:text-gray-400">Cargando listas de chequeo...</span>
         </div>
       ) : (
-        <div className="overflow-x-auto mt-4">
+        <div className="overflow-x-auto mt-4 max-h-96 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                  ID
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                  Componente
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                  Estado
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                  Observaciones
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                  Acciones
-                </th>
+                                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                    ID
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                    Trimestre
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                    Componente
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                    Estado
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                    Observaciones
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                    Acciones
+                  </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
               {filteredChecklists.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                    No hay listas de chequeo para el trimestre {selectedTrimestre}
+                  <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                    {selectedTrimestre === "todos" 
+                      ? "No hay listas de chequeo disponibles" 
+                      : `No hay listas de chequeo para el trimestre ${selectedTrimestre}`
+                    }
                   </td>
                 </tr>
               ) : (
@@ -167,13 +228,33 @@ export default function CoordinadorChecklistView() {
                       {checklist.id}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-xs font-medium">
+                        {checklist.trimester ? `${checklist.trimester}° Trimestre` : 'No especificado'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                       {checklist.component || 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
+                      <button
+                        onClick={() => handleToggleState(checklist.id, checklist.state)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                          checklist.state
+                            ? 'bg-green-600 focus:ring-green-500'
+                            : 'bg-gray-200 focus:ring-gray-500'
+                        }`}
+                        title={checklist.state ? 'Desactivar lista' : 'Activar lista'}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition duration-200 ease-in-out ${
+                            checklist.state ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                      <span className={`ml-2 text-xs font-medium ${
                         checklist.state 
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
-                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                          ? 'text-green-600 dark:text-green-400' 
+                          : 'text-gray-500 dark:text-gray-400'
                       }`}>
                         {checklist.state ? 'Activo' : 'Inactivo'}
                       </span>

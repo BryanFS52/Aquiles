@@ -14,6 +14,8 @@ export const GET_ALL_CHECKLISTS_SIMPLE = gql`
         id
         state
         remarks
+        trimester
+        component
         instructorSignature
         evaluationCriteria
         studySheets
@@ -46,6 +48,8 @@ export const GET_CHECKLIST_BY_ID_SIMPLE = gql`
         id
         state
         remarks
+        trimester
+        component
         instructorSignature
         evaluationCriteria
         studySheets
