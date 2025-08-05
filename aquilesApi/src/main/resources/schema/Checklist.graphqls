@@ -42,22 +42,12 @@ input ChecklistDto {
     associatedJuries: [Long]
 }
 
-type ChecklistHistory {
-  id: ID
-  checklistId: ID
-  actions: String
-  teacher: String
-  date: String
-  dateBefore: String
-  dateAfter: String
-}
-
 extend type Query {
     allChecklists(page: Int, size: Int): ChecklistPage
     checklistById(id: Long!): ChecklistPageId
     exportChecklistToPdf(id: Long!): String
     exportChecklistToExcel(id: Long!): String
-    checklistHistoryById(checklistId: ID!): [ChecklistHistory]
+
 }
 
 extend type Mutation {

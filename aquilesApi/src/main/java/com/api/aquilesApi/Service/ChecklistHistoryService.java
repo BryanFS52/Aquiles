@@ -1,36 +1,63 @@
 package com.api.aquilesApi.Service;
 
 import com.api.aquilesApi.Dto.ChecklistHistoryDTO;
+import com.api.aquilesApi.Entity.Checklist;
 import com.api.aquilesApi.Entity.ChecklistHistory;
 import com.api.aquilesApi.Repository.ChecklistHistoryRepository;
-import com.api.aquilesApi.Entity.Checklist;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 @Service
 public class ChecklistHistoryService {
 
-    @Autowired
-    private ChecklistHistoryRepository historyRepository;
+    private final ChecklistHistoryRepository historyRepository;
+    private final ObjectMapper objectMapper;
+    private final ModelMapper modelMapper;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    public ChecklistHistoryService(ChecklistHistoryRepository historyRepository, ObjectMapper objectMapper, ModelMapper modelMapper) {
+        this.historyRepository = historyRepository;
+        this.objectMapper = objectMapper;
+        this.modelMapper = modelMapper;
+    }
 
+    public Page<ChecklistHistory> findAll(Pageable pageable) {
+        return historyRepository.findAll(pageable);
+    }
 
-    
+    public ChecklistHistory getById(Long id) {
+        return historyRepository.findById(id).orElseThrow(() -> new RuntimeException("No existe historial con ID: " + id));
+    }
+
+    public ChecklistHistory add(ChecklistHistory checklistHistory) {
+        return historyRepository.save(checklistHistory);
+    }
+
+    public void update(ChecklistHistory checklistHistory) {
+        if (!historyRepository.existsById(checklistHistory.getId())) {
+            throw new RuntimeException("No se encontró historial con ID: " + checklistHistory.getId());
+        }
+        historyRepository.save(checklistHistory);
+    }
+
+    public void delete(ChecklistHistory checklistHistory) {
+        historyRepository.delete(checklistHistory);
+    }
+
+    public List<ChecklistHistory> findByChecklistId(Long checklistId) {
+        return historyRepository.findByChecklistId(checklistId);
+    }
+
     public void guardarHistorial(String accion, Checklist antes, Checklist despues, String teacher) {
-
-        System.out.println("🟢 Entrando a guardarHistorial() para checklist ID: " + 
-    ((despues != null) ? despues.getId() : (antes != null) ? antes.getId() : "null"));
+        System.out.println("🟢 Entrando a guardarHistorial() para checklist ID: " +
+                ((despues != null) ? despues.getId() : (antes != null) ? antes.getId() : "null"));
 
         try {
             ChecklistHistory history = new ChecklistHistory();
 
-            // Obtener el ID de la checklist
             Long checklistId = (despues != null) ? despues.getId() : (antes != null) ? antes.getId() : null;
 
             if (checklistId == null) {
@@ -38,12 +65,10 @@ public class ChecklistHistoryService {
                 return;
             }
 
-            // Asignar datos
             history.setChecklistId(checklistId);
             history.setActions(accion);
             history.setTeacher(teacher);
 
-            // Guardar estado anterior y posterior si existen
             if (antes != null) {
                 ChecklistHistoryDTO dtoAntes = convertir(antes);
                 history.setDateBefore(objectMapper.writeValueAsString(dtoAntes));
@@ -54,7 +79,6 @@ public class ChecklistHistoryService {
                 history.setDateAfter(objectMapper.writeValueAsString(dtoDespues));
             }
 
-            // Guardar historial
             historyRepository.save(history);
             System.out.println("✅ Historial guardado para checklist ID: " + checklistId);
 
@@ -74,9 +98,5 @@ public class ChecklistHistoryService {
         dto.setEvaluations(checklist.getEvaluations());
         dto.setLearningOutcome(checklist.getLearningOutcome());
         return dto;
-    }
-
-    public List<ChecklistHistory> findHistoryByChecklistId(Long checklistId) {
-        return historyRepository.findByChecklistId(checklistId);
     }
 }

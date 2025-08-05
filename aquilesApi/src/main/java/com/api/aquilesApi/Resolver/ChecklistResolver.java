@@ -132,10 +132,10 @@ public class ChecklistResolver {
 
     // ✅ History Query
     @DgsQuery
-    public List<ChecklistHistory> checklistHistoryById(@InputArgument String checklistId) {
-        System.out.println("🔍 Buscando historial para checklistId: " + checklistId);
-        Long id = Long.parseLong(checklistId);
-        List<ChecklistHistory> result = checklistHistoryService.findHistoryByChecklistId(id);
+    public List<ChecklistHistory> checklistHistoryById(@InputArgument("id") String id) {
+        System.out.println("🔍 Buscando historial para id: " + id);
+        Long checklistId = Long.parseLong(id);
+        List<ChecklistHistory> result = checklistHistoryService.findByChecklistId(checklistId);
         System.out.println("📊 Encontrados " + result.size() + " registros de historial");
         return result;
     }
