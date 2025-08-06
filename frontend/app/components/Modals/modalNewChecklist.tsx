@@ -4,21 +4,62 @@ import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { addChecklist } from '@services/checkListService'
 
-export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingData = null, isEditing = false }) {
-  const [trimestre, setTrimestre] = useState('')
-  const [componente, setComponente] = useState('')
-  const [observaciones, setObservaciones] = useState('')
-  const [items, setItems] = useState([{ indicador: '' }])
-  const [isModalOpen, setIsOpen] = useState(false)
+interface ChecklistItem {
+  id?: string
+  code?: string
+  indicator: string
+  active?: boolean
+}
+
+interface Checklist {
+  id: string
+  state: boolean
+  remarks?: string
+  trimester?: string
+  component?: string
+  items?: ChecklistItem[]
+  [key: string]: any
+}
+
+interface ModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onCreate: (checklistData: any) => Promise<void>
+  editingData?: Checklist | null
+  isEditing?: boolean
+}
+
+export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingData = null, isEditing = false }: ModalProps) {
+  const [trimestre, setTrimestre] = useState<string>('')
+  const [componente, setComponente] = useState<string>('')
+  const [observaciones, setObservaciones] = useState<string>('')
+  const [items, setItems] = useState<{ indicador: string }[]>([{ indicador: '' }])
+  const [isModalOpen, setIsOpen] = useState<boolean>(false)
 
   // Efecto para cargar datos de edición
   useEffect(() => {
-    if (isEditing && editingData) {
-      setTrimestre(editingData.trimester || '')
+    if (isOpen && isEditing && editingData) {
+      console.log("Modal received editingData:", editingData) // Debug log
+      console.log("Modal editingData type:", typeof editingData) // Debug log
+      
+      // Cargar datos existentes para edición
+      setTrimestre(editingData.trimester?.toString() || '')
       setComponente(editingData.component || '')
       setObservaciones(editingData.remarks || '')
-      // Si hay items específicos en editingData, cargarlos aquí
-      // setItems(editingData.items || [{ indicador: '' }])
+      
+      console.log("Loading items from editingData:", editingData.items) // Debug log
+      
+      // Cargar indicadores existentes si están disponibles
+      if (editingData.items && editingData.items.length > 0) {
+        const loadedItems = editingData.items.map(item => ({
+          indicador: item.indicator || ''
+        }))
+        console.log("Mapped items for modal:", loadedItems) // Debug log
+        setItems(loadedItems)
+      } else {
+        console.log("No items found, setting default item") // Debug log
+        setItems([{ indicador: '' }])
+      }
     } else {
       // Limpiar formulario para nueva creación
       setTrimestre('')
@@ -28,7 +69,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
     }
   }, [isEditing, editingData, isOpen])
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (!trimestre || !componente || items.some(i => !i.indicador)) {
@@ -45,8 +86,8 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
         evaluationCriteria: false,
         studySheets: null,
         evaluations: null,
+        associatedJuries: null,
         component: componente,
-        associatedJuries: [],
         items: items.map((item, index) => ({
           code: `IND-${index + 1}`,
           indicator: item.indicador,
@@ -54,22 +95,17 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
         }))
       }
 
-      if (onCreate) {
-        await onCreate(newChecklist)
-      } else {
-        await addChecklist(newChecklist)
-        toast.success('Lista de chequeo creada exitosamente.')
-      }
+      console.log('Modal submitting checklist data:', newChecklist); // Debug log
+      console.log('Is editing mode:', isEditing); // Debug log
 
-      resetForm()
-      if (onClose) onClose()
+      await onCreate(newChecklist)
     } catch (error) {
-      console.error('Error al crear la lista de chequeo:', error)
-      toast.error('Error al crear la lista de chequeo. Por favor, intente de nuevo.')
+      console.error('Error in modal:', error)
+      toast.error(isEditing ? 'Error al actualizar la lista de chequeo' : 'Error al crear la lista de chequeo')
     }
   }
 
-  const handleIndicadorChange = (index, value) => {
+  const handleIndicadorChange = (index: number, value: string) => {
     const newItems = [...items]
     newItems[index].indicador = value
     setItems(newItems)
@@ -79,7 +115,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
     setItems([...items, { indicador: '' }])
   }
 
-  const handleRemoveIndicador = (index) => {
+  const handleRemoveIndicador = (index: number) => {
     const newItems = items.filter((_, i) => i !== index)
     setItems(newItems)
   }

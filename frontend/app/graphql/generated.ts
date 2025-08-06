@@ -3852,14 +3852,14 @@ export type GetAllChecklistsQueryVariables = Exact<{
 }>;
 
 
-export type GetAllChecklistsQuery = { allChecklists?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: any | null } | null> | null } | null };
+export type GetAllChecklistsQuery = { allChecklists?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: any | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean } | null> | null } | null> | null } | null };
 
 export type GetChecklistByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
 
 
-export type GetChecklistByIdQuery = { checklistById?: { code?: string | null, date?: string | null, message?: string | null, data?: { id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: any | null, evaluations?: { id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null, associatedJuries?: Array<{ id: string } | null> | null } | null } | null };
+export type GetChecklistByIdQuery = { checklistById?: { code?: string | null, date?: string | null, message?: string | null, data?: { id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: any | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean } | null> | null, evaluations?: { id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null, associatedJuries?: Array<{ id: string } | null> | null } | null } | null };
 
 export type AddChecklistMutationVariables = Exact<{
   input: ChecklistDto;
@@ -3882,6 +3882,14 @@ export type DeleteChecklistMutationVariables = Exact<{
 
 
 export type DeleteChecklistMutation = { deleteChecklist?: { code?: string | null, message?: string | null, id?: any | null } | null };
+
+export type UpdateItemStatusMutationVariables = Exact<{
+  itemId: Scalars['Long']['input'];
+  active: Scalars['Boolean']['input'];
+}>;
+
+
+export type UpdateItemStatusMutation = { updateItemStatus?: { code?: string | null, message?: string | null, id?: any | null } | null };
 
 export type GetAllEvaluationsQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -4742,6 +4750,12 @@ export const GetAllChecklistsDocument = gql`
       trimester
       component
       studySheets
+      items {
+        id
+        code
+        indicator
+        active
+      }
     }
   }
 }
@@ -4795,6 +4809,12 @@ export const GetChecklistByIdDocument = gql`
       trimester
       component
       studySheets
+      items {
+        id
+        code
+        indicator
+        active
+      }
       evaluations {
         id
         observations
@@ -4948,6 +4968,42 @@ export function useDeleteChecklistMutation(baseOptions?: Apollo.MutationHookOpti
 export type DeleteChecklistMutationHookResult = ReturnType<typeof useDeleteChecklistMutation>;
 export type DeleteChecklistMutationResult = Apollo.MutationResult<DeleteChecklistMutation>;
 export type DeleteChecklistMutationOptions = Apollo.BaseMutationOptions<DeleteChecklistMutation, DeleteChecklistMutationVariables>;
+export const UpdateItemStatusDocument = gql`
+    mutation UpdateItemStatus($itemId: Long!, $active: Boolean!) {
+  updateItemStatus(itemId: $itemId, active: $active) {
+    code
+    message
+    id
+  }
+}
+    `;
+export type UpdateItemStatusMutationFn = Apollo.MutationFunction<UpdateItemStatusMutation, UpdateItemStatusMutationVariables>;
+
+/**
+ * __useUpdateItemStatusMutation__
+ *
+ * To run a mutation, you first call `useUpdateItemStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateItemStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateItemStatusMutation, { data, loading, error }] = useUpdateItemStatusMutation({
+ *   variables: {
+ *      itemId: // value for 'itemId'
+ *      active: // value for 'active'
+ *   },
+ * });
+ */
+export function useUpdateItemStatusMutation(baseOptions?: Apollo.MutationHookOptions<UpdateItemStatusMutation, UpdateItemStatusMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateItemStatusMutation, UpdateItemStatusMutationVariables>(UpdateItemStatusDocument, options);
+      }
+export type UpdateItemStatusMutationHookResult = ReturnType<typeof useUpdateItemStatusMutation>;
+export type UpdateItemStatusMutationResult = Apollo.MutationResult<UpdateItemStatusMutation>;
+export type UpdateItemStatusMutationOptions = Apollo.BaseMutationOptions<UpdateItemStatusMutation, UpdateItemStatusMutationVariables>;
 export const GetAllEvaluationsDocument = gql`
     query GetAllEvaluations($page: Int, $size: Int) {
   allEvaluations(page: $page, size: $size) {

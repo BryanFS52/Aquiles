@@ -18,6 +18,12 @@ export const GET_ALL_CHECKLISTS = gql`
         trimester
         component
         studySheets
+        items {
+          id
+          code
+          indicator
+          active
+        }
       }
     }
   }
@@ -38,6 +44,12 @@ export const GET_CHECKLIST_BY_ID = gql`
         trimester
         component
         studySheets
+        items {
+          id
+          code
+          indicator
+          active
+        }
         evaluations {
           id
           observations
@@ -84,8 +96,8 @@ export const DELETE_CHECKLIST = gql`
 `;
 
 export const UPDATE_ITEM_STATUS = gql`
-  mutation UpdateItemStatus($id: Long!, $active: Boolean!) {
-    updateItemStatus(id: $id, active: $active) {
+  mutation UpdateItemStatus($itemId: Long!, $active: Boolean!) {
+    updateItemStatus(itemId: $itemId, active: $active) {
       code
       message
       id
