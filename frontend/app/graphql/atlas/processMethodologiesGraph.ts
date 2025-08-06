@@ -8,7 +8,6 @@ export const GET_ALL_METHODOLOGIES_AND_PROFILES = gql`
       id
       name
       description
-      isActive
       methodology {
         id
         name
@@ -17,6 +16,8 @@ export const GET_ALL_METHODOLOGIES_AND_PROFILES = gql`
         id
         name
         description
+        isActive
+        isUnique
       }
     }
     currentPage

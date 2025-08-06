@@ -56,7 +56,7 @@ public class TeamsScrum implements Serializable {
             name = "team_scrum_members",
             joinColumns = @JoinColumn(name = "team_id")
     )
-    private List<TeamScrumMemberId> memberIds = new ArrayList<>();
+    private List<TeamScrumMemberId>memberIds = new ArrayList<>();
 
     @Column(name = "process_methodology_id", nullable = true)
     private String processMethodologyId;

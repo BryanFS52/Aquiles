@@ -50,6 +50,14 @@ type TeamScrumMemberIdResponse {
     profileId : String
 }
 
+input ProcessMethodologyDto{
+    teamScrumId : Long
+    studentId : Long
+    profileId : String
+    isActive : Boolean
+    isUnique : Boolean
+}
+
 input TeamsScrumDto {
     id : ID
     teamName: String
@@ -77,7 +85,7 @@ extend type Query {
 
 extend type Mutation {
     addTeamScrum(input: TeamsScrumDto!): Response
-    addProfileToStudent(input : TeamsScrumDto ) : addProfileToStudentResponse
+    addProfileToStudent(input : [ProcessMethodologyDto] ) : addProfileToStudentResponse
     updateTeamScrum(id: Long!, input: TeamsScrumDto): Response
     deleteTeamScrum(id: Long!): Response
 }

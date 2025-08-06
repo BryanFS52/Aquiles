@@ -30,10 +30,6 @@ const AttendanceManualPage: React.FC = () => {
     const studySheetObj = Array.isArray(studySheet) ? studySheet[0] : studySheet
     const students = studySheetObj?.studentStudySheets || []
 
-    console.log('AsistenciaManual - studySheetObj:', studySheetObj);
-    console.log('AsistenciaManual - students:', students);
-    console.log('AsistenciaManual - students length:', students.length);
-
     const [attendance, setAttendance] = useState<Record<string | number, AttendanceStatus>>({})
     const [searchTerm, setSearchTerm] = useState<string>("")
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toLocaleDateString('en-CA'))
@@ -42,7 +38,6 @@ const AttendanceManualPage: React.FC = () => {
     const [attendanceHistory, setAttendanceHistory] = useState<AttendanceHistoryType[]>([])
 
     useEffect(() => {
-        console.log('AsistenciaManual - studySheet:', studySheet)
         // Si no hay datos o el array está vacío, no necesariamente hacer fetch
         // La data debería venir desde la página anterior
     }, [studySheet, dispatch])

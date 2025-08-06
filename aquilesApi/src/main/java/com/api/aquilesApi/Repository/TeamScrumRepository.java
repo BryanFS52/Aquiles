@@ -1,6 +1,5 @@
 package com.api.aquilesApi.Repository;
 
-import com.api.aquilesApi.Entity.TeamScrumMemberId;
 import com.api.aquilesApi.Entity.TeamsScrum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,12 +20,11 @@ public interface TeamScrumRepository extends JpaRepository<TeamsScrum, Long> {
     SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END
     FROM TeamsScrum t JOIN t.memberIds m
     WHERE t.studySheetId = :studySheetId
-    AND m IN :memberIds
+    AND m.studentId IN :memberIds
 """)
     boolean existsByStudySheetIdAndMemberIds(
             @Param("studySheetId") Long studySheetId,
-            @Param("memberIds") List<TeamScrumMemberId> memberIds
+            @Param("memberIds") List<Long> memberIds
     );
-
 
 }

@@ -24,7 +24,6 @@ const getDayName = (date: Date): string => {
 // Función para actualizar el estado de asistencia (debes implementar esta función)
 const updateAttendanceState = async (attendanceData: AttendanceData): Promise<void> => {
     // Implementa aquí la lógica para actualizar la asistencia
-    console.log('Actualizando asistencia:', attendanceData);
 };
 
 const FormularioQr: React.FC = () => {

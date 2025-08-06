@@ -59,8 +59,22 @@ export const ADD_TEAM_SCRUM = gql`
   }
 `;
 
+export const ADD_PROFILE_TO_STUDENT = gql`
+mutation AddProfileToStudent($input: [ProcessMethodologyDto]!) {
+  addProfileToStudent(input: $input) {
+    code
+    message
+    id {
+      id
+      studentId
+      profileId
+    }
+  }
+}
+`;
+
 export const UPDATE_TEAM_SCRUM = gql`
-  mutation UpdateTeamScrum($id: Long!, $input: TeamsScrumDto!) {
+  mutation UpdateTeamScrum($id: Long!, $input: TeamsScrumDto) {
     updateTeamScrum(id: $id, input: $input) {
       code
       message

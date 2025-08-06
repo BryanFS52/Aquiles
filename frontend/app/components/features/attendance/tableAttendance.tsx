@@ -20,10 +20,6 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [filteredStudents, setFilteredStudents] = useState<any>(studySheetData?.studentStudySheets || []);
 
-    console.log('studySheetData:', studySheetData);
-    console.log('studentStudySheets:', studySheetData?.studentStudySheets);
-    console.log('filteredStudents:', filteredStudents);
-
     useEffect(() => {
         setFilteredStudents(studySheetData?.studentStudySheets || []);
     }, [studySheetData]);

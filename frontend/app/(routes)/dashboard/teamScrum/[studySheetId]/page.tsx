@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchStudySheetWithTeamScrum, clearStudySheetState } from "@slice/olympo/studySheetSlice";
-import { addTeamScrum, deleteTeamScrum, updateTeamScrum } from "@slice/teamScrumSlice";
+import { addTeamScrum, deleteTeamScrum, updateTeamScrum, addProfileToStudent } from "@slice/teamScrumSlice";
 import { AddTeamScrumMutationVariables } from "@/graphql/generated";
 import { toast } from "react-toastify";
 import { useParams } from "next/navigation";
@@ -86,7 +86,7 @@ export default function TeamScrumDetailsPage() {
         const processId =
             typeof selectedTeamForHistory.processMethodology === "object"
                 ? selectedTeamForHistory.processMethodology?.id
-                : selectedTeamForHistory.processMethodologyId ?? null;
+                : selectedTeamForHistory.processMethodology ?? null;
 
         if (!processId) {
             setScrumProfiles([]);
@@ -110,7 +110,7 @@ export default function TeamScrumDetailsPage() {
     const handleOpenHistoryModal = (team: TeamsScrum) => {
         setSelectedTeamForHistory({
             ...team,
-            processMethodologyId: team.processMethodologyId ?? null
+            processMethodology: team.processMethodology ?? null
         });
         setIsHistoryModalOpen(true);
     };
@@ -140,17 +140,58 @@ export default function TeamScrumDetailsPage() {
         setConfirmModalOpen(false);
     };
 
-    // Handler para asignar perfiles (solo para visualización)
-    const handleProfileAssign = (studentId: string, profile: any) => {
-        toast.info(`Rol "${profile.name}" seleccionado para este estudiante`, {
-            position: "top-right",
-            autoClose: 2000,
-        });
+    // Handler para asignar perfiles
+    const handleProfileAssign = async (studentId: string, profile: Profile) => {
+        try {
+            if (!profile.id) {
+                toast.error("Error: ID del perfil no válido");
+                return;
+            }
+
+            if (!selectedTeamForHistory?.id) {
+                toast.error("Error: No se ha seleccionado un equipo válido");
+                return;
+            }
+            const res = await dispatch(addProfileToStudent([
+                {
+                    teamScrumId: selectedTeamForHistory.id,
+                    studentId: parseInt(studentId),
+                    profileId: String(profile.id),
+                    isActive: true,
+                    isUnique: false
+                }
+            ]));
+
+
+            if (addProfileToStudent.rejected.match(res)) {
+                const message =
+                    res.payload?.message ||
+                    res.error?.message ||
+                    "Error desconocido al asignar el perfil";
+                toast.error(`Error al asignar perfil: ${message}`);
+                return;
+            }
+
+            // Refrescar los datos del estudio de hoja para obtener los cambios
+            await dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
+
+            toast.success(`Rol "${profile.name}" asignado exitosamente al estudiante`, {
+                position: "top-right",
+                autoClose: 3000,
+            });
+
+        } catch (error: any) {
+            toast.error(`Error inesperado: ${error?.message || "Error desconocido"}`);
+        }
     };
 
     const handleConfirmDelete = () => {
         if (teamToDelete) {
-            handleDisableTeamScrum(teamToDelete.id, teamToDelete.teamName ?? "Sin nombre");
+            handleDisableTeamScrum(
+                teamToDelete.id ?? "",
+                teamToDelete.teamName ?? "Sin nombre"
+            );
+
         }
         handleCloseConfirmModal();
     };
@@ -182,7 +223,6 @@ export default function TeamScrumDetailsPage() {
                 return false;
             }
 
-            // ✅ Refetch automático después de actualizar
             await dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
 
             toast.success("Información del team scrum actualizada exitosamente");
@@ -281,7 +321,6 @@ export default function TeamScrumDetailsPage() {
                     </div>
                 )}
 
-                {/* Contenido principal - mostrar después de la carga inicial o si ya hay datos */}
                 {!isInitialLoad && (
                     <>
                         {/* Modales */}

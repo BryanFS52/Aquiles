@@ -9,8 +9,6 @@ import {
 } from "@/graphql/generated";
 
 const transformGraphQLToProcessMethodologiesItem = (grahpqlData: any): ProcessMethodology => {
-    console.log("🔹 Transformando item crudo:", grahpqlData);
-
     const item: ProcessMethodology = {
         id: grahpqlData.id ?? grahpqlData._id ?? "",
         name: grahpqlData.name,
@@ -30,7 +28,6 @@ const transformGraphQLToProcessMethodologiesItem = (grahpqlData: any): ProcessMe
         })) || []
     };
 
-    console.log("✅ Transformado a:", item);
     return item;
 };
 
@@ -50,7 +47,6 @@ export const fetchAllProcessMethodologiesAndProfiles = createAsyncThunk<
                 fetchPolicy: 'no-cache',
             });
 
-            console.log("📥 Respuesta GraphQL:", JSON.stringify(data.allProcessMethodology, null, 2));
             return data.allProcessMethodology;
         } catch (error: any) {
             console.error("❌ Error al fetch:", error);
@@ -73,12 +69,8 @@ const processMethodologiesSlice = createSlice({
                 state.error = null;
             })
             .addCase(fetchAllProcessMethodologiesAndProfiles.fulfilled, (state, action: PayloadAction<any>) => {
-                console.log("📦 Payload recibido en fulfilled:", action.payload);
-
                 state.loading = false;
                 state.data = action.payload.data.map(transformGraphQLToProcessMethodologiesItem);
-
-                console.log("📊 Estado final data:", state.data);
 
                 state.currentPage = action.payload.currentPage;
                 state.totalPages = action.payload.totalPages;
@@ -87,7 +79,6 @@ const processMethodologiesSlice = createSlice({
             .addCase(fetchAllProcessMethodologiesAndProfiles.rejected, (state, action: PayloadAction<unknown>) => {
                 state.loading = false;
                 state.error = action.payload as RejectedPayload;
-                console.error("❌ Fetch rechazado:", action.payload);
             });
     },
 });

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Select, { MultiValue } from 'react-select';
-import { AddTeamScrumMutationVariables, ProcessMethodology, TeamsScrumDto } from "@/graphql/generated";
+import { AddTeamScrumMutationVariables, ProcessMethodology, TeamsScrumDto, Student, TeamScrumMemberId } from "@/graphql/generated";
 import { fetchStudySheetWithStudents } from '@slice/olympo/studySheetSlice';
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -14,6 +14,7 @@ interface StudentOption {
   label: string;
   id: string;
   fullName: string;
+  student: Student;
 }
 
 interface FormErrors {
@@ -41,11 +42,15 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
   studySheetId,
   processMethodologies = []
 }) => {
-  const [teamData, setTeamData] = useState<Partial<TeamsScrumDto & { processMethodologyId: string }>>({
+  const [teamData, setTeamData] = useState<Partial<TeamsScrumDto>>({
     teamName: "",
     projectName: "",
     memberIds: [],
-    processMethodologyId: ""
+    processMethodologyId: "",
+    description: "",
+    objectives: "",
+    problem: "",
+    projectJustification: ""
   });
   const dispatch = useDispatch<AppDispatch>();
   const [errors, setErrors] = useState<FormErrors>({});
@@ -54,18 +59,25 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
 
   // Redux selectors
   const rawStudents = useSelector((state: RootState) => state.studySheet.dataForStudents);
-  console.log(rawStudents)
-  const studentsForThisSheet = useMemo(() => rawStudents[studySheetId] ?? [], [rawStudents, studySheetId]);
+
+  const studentsForThisSheet = useMemo(
+    () => (rawStudents?.[String(studySheetId)] ?? []) as any[],
+    [rawStudents, studySheetId]
+  );
 
   const studentOptions: StudentOption[] = studentsForThisSheet
-    .filter(student => !!student.id)
-    .map(student => ({
-      id: student.id!,
-      value: student.id!,
-      label: `${student.person?.name ?? ''} ${student.person?.lastname ?? ''}`,
-      fullName: `${student.person?.name ?? ''} ${student.person?.lastname ?? ''}`
-    }));
-  console.log(studentOptions)
+    .filter(item => !!item.student?.id)
+    .map(item => {
+      const student = item.student!;
+      const person = student.person;
+      return {
+        id: student.id,
+        value: student.id,
+        label: `${person?.name ?? ''} ${person?.lastname ?? ''}`,
+        fullName: `${person?.name ?? ''} ${person?.lastname ?? ''}`,
+        student: student,
+      };
+    });
 
   // Traer estudiantes al montar el modal
   useEffect(() => {
@@ -177,7 +189,16 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
   };
 
   const resetForm = (): void => {
-    setTeamData({ teamName: "", projectName: "", memberIds: [], processMethodologyId: "" });
+    setTeamData({
+      teamName: "",
+      projectName: "",
+      memberIds: [],
+      processMethodologyId: "",
+      description: "",
+      objectives: "",
+      problem: "",
+      projectJustification: ""
+    });
     setErrors({});
   };
 
@@ -211,7 +232,9 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
   const handleMembersChange = (
     selectedOptions: MultiValue<StudentOption>,
   ): void => {
-    const memberIds = selectedOptions.map(option => ({ studentId: parseInt(option.id, 10) }));
+    const memberIds: TeamScrumMemberId[] = selectedOptions.map(option => ({
+      studentId: parseInt(option.id, 10)
+    }));
     if (memberIds.length > 4) return;
     setTeamData(prev => ({ ...prev, memberIds }));
     if (errors.members) {
@@ -224,20 +247,19 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
     setIsSubmitting(true);
     try {
       const success = await onCreate({
-        processMethodologyId: teamData.processMethodologyId!.trim(),
-        teamName: teamData.teamName!.trim(),
-        projectName: teamData.projectName!.trim(),
+        processMethodologyId: teamData.processMethodologyId!,
+        teamName: teamData.teamName!,
+        projectName: teamData.projectName!,
         studySheetId,
-        memberIds: teamData.memberIds,
-        description: "",
-        objectives: "",
-        problem: "",
-        projectJustification: "",
+        memberIds: teamData.memberIds!,
+        description: teamData.description!,
+        objectives: teamData.objectives!,
+        problem: teamData.problem!,
+        projectJustification: teamData.projectJustification!,
       });
-      console.log("📤 Enviando datos:", teamData);
       if (success) handleClose();
     } catch (error) {
-      console.error("Error creating team:", error);
+      // Error manejado por el slice
     } finally {
       setIsSubmitting(false);
     }

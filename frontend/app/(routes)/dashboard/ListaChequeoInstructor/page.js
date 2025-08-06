@@ -42,7 +42,6 @@ export default function InstructorChecklistView() {
     const updatedItems = items.map(item =>
       item.id === id ? { ...item, [field]: value } : item
     )
-    console.log("Updated items:", updatedItems)
   }
 
   const handleFileUpload = (event, setSignature) => {
@@ -57,7 +56,6 @@ export default function InstructorChecklistView() {
   };
 
   const handleSaveChecklist = () => {
-    console.log("Saving checklist:", { selectedTeam, items });
     toast.success("La lista de chequeo ha sido guardada exitosamente.");
   }
 

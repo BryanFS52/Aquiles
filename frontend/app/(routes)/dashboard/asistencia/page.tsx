@@ -23,9 +23,6 @@ export default function Attendance() {
         (s: any) => s?.state === "Activo"
     ) || [];
 
-    console.log('Asistencia - studySheet:', studySheet);
-    console.log('Asistencia - students:', students);
-
     const activeStudents = students.length;
     const withdrawnStudents = (studySheet?.studentStudySheets as any[])?.filter(
         (s: any) => s?.state !== "Activo"

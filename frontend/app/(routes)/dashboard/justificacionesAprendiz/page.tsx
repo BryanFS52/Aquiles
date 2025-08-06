@@ -235,12 +235,10 @@ export default function JustificacionAprendiz() {
   };
 
   const handleShowForm = (attendanceId?: string) => {
-    console.log("🟡 handleShowForm llamado con ID:", attendanceId);
     if (attendanceId && attendancesData) {
       const currentAttendance = attendancesData.find(
         (a) => a.id === attendanceId
       );
-      console.log("📄 currentAttendance encontrada:", currentAttendance);
 
       if (currentAttendance) {
         const person = currentAttendance.student?.person;

@@ -198,7 +198,6 @@ export const GET_STUDY_SHEET_WITH_STUDENTS = gql`
             }
         }
         studentStudySheets {
-          id
           student {
             id
             person {
@@ -231,6 +230,13 @@ query studySheetByTeacherIdWithTeamScrum($idTeacher: Long, $page: Int, $size: In
         state
         journey {
           name
+        }
+        quarter{
+            id
+            name{
+                extension
+                number
+            }
         }
         trainingProject {
           name
