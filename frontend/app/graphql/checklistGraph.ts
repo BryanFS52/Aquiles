@@ -16,7 +16,6 @@ export const GET_ALL_CHECKLISTS = gql`
         remarks
         instructorSignature
         evaluationCriteria
-        checklistHistory
         associatedJuries {
           id
         }
@@ -39,7 +38,6 @@ export const GET_CHECKLIST_BY_ID = gql`
         remarks
         instructorSignature
         evaluationCriteria
-        checklistHistory
         associatedJuries {
           id
         }

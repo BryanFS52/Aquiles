@@ -2,26 +2,27 @@
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { GrAttachment } from "react-icons/gr";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import { AppDispatch, RootState } from "@/redux/store";
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFilters from "@components/features/justification/justificationsFilter";
+import JustificationTable from "@components/features/justification/justificationsTable";
+import EmptyState from "@components/UI/emptyState";
 import {
   fetchJustifications,
   setFilterOptions,
   goToPreviousPage,
   goToNextPage,
   formatErrorMessage,
+  generateFileName,
   setLocalCurrentPage,
   downloadBase64File,
-  generateFileName,
-  updateJustificationStatus,
+  updateJustificationStatus
 } from '@slice/justificationSlice';
 import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
-import JustificationTable from "@/components/features/justification/justificationsTable";
-import { AppDispatch, RootState } from "@/redux/store";
 
-
-export default function JustificacionesCoordinator() {
+export default function JustificacionesInstructor() {
   const dispatch = useDispatch<AppDispatch>();
   const {
     filteredData,
@@ -39,7 +40,6 @@ export default function JustificacionesCoordinator() {
     (state: RootState) => state.justificationStatus
   );
 
-
   useEffect(() => {
     dispatch(fetchJustifications({ page: 0, size: itemsPerPage }));
     // Cargar los estados de justificación
@@ -52,7 +52,7 @@ export default function JustificacionesCoordinator() {
   };
 
   const handleRefresh = () => {
-    dispatch(fetchJustifications({ page: localCurrentPage, size: itemsPerPage }));
+    dispatch(fetchJustifications({ page: 0, size: itemsPerPage }));
   };
 
   const handlePreviousPage = () => {
@@ -63,7 +63,7 @@ export default function JustificacionesCoordinator() {
     dispatch(goToNextPage());
   };
 
-  const handleDownloadFile = (justificacion:any) => {
+  const handleDownloadFile = (justificacion: any) => {
     if (justificacion.archivoAdjunto) {
       const mimeType = justificacion.archivoMime || "application/octet-stream";
       const fileName = generateFileName(justificacion.id, mimeType);
@@ -72,7 +72,7 @@ export default function JustificacionesCoordinator() {
   };
 
   const handleStatusChange = (justificacionId: string, newStatusId: string) => {
-    console.log("🔄 Cambiando estado de justificación (Coordinador):", {
+    console.log("🔄 Cambiando estado de justificación:", {
       id: justificacionId,
       newStatusId
     });
@@ -97,6 +97,10 @@ export default function JustificacionesCoordinator() {
   const canGoNext = localCurrentPage < totalPages;
   const canGoPrevious = localCurrentPage > 1;
 
+  if (!loading && !errorMessage && (!filteredData || filteredData.length === 0)) {
+    return <EmptyState message="No se encontraron justificaciones disponibles." />;
+  }
+
   return (
     <div className="space-y-6">
       <PageTitle>Justificaciones de aprendices</PageTitle>
@@ -111,19 +115,17 @@ export default function JustificacionesCoordinator() {
 
       {/* Error Message */}
       {errorMessage && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-red-600 dark:text-red-400">{errorMessage}</p>
-        </div>
+        <EmptyState message={errorMessage} />
       )}
 
       {/* Table */}
       {!loading && !errorMessage && (
         <>
-        <JustificationTable
-          filteredData={filteredData}
-          handleDownloadFile={handleDownloadFile}
-          handleStatusChange={handleStatusChange}
-        />
+          <JustificationTable
+            filteredData={filteredData}
+            handleDownloadFile={handleDownloadFile}
+            handleStatusChange={handleStatusChange}
+          />
 
           {/* Pagination */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">

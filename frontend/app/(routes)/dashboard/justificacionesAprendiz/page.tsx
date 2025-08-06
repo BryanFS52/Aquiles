@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useUser } from '@context/UserContext';
 import { useLoader } from '@/context/LoaderContext';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
+import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
 import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
 import {
   fetchJustifications,
@@ -86,11 +87,18 @@ export default function JustificacionAprendiz() {
     (state: RootState) => state.justification.data
   );
 
+  // Obtener los estados de justificación
+  const { justificationStatuses } = useSelector(
+    (state: RootState) => state.justificationStatus
+  );
+
   // ✅ Todos los useEffect al inicio
   useEffect(() => {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
     dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 }));
     dispatch(fetchJustifications({ page: 0, size: 10 }));
+    // Cargar los estados de justificación
+    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
   }, [dispatch]);
 
   useEffect(() => {
@@ -413,7 +421,7 @@ export default function JustificacionAprendiz() {
         <PageTitle>Justificaciones</PageTitle>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 ">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <AnimatePresence mode="wait">
           {!form.showForm && !shouldLoadModal && (
             <motion.div

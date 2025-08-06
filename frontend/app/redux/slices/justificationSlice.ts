@@ -31,7 +31,8 @@ export interface TransformedJustificationItem {
     documento: string;
     aprendiz: string;
     attendanceId?: string; // ID de asistencia
-    justificationStatusId?: string; // Para futuras mejoras cuando el backend soporte relación con JustificationStatus
+    justificationStatusId?: string; // ✅ ID del justificationStatus para el select
+    justificationStatus: string; // ✅ Nombre del justificationStatus para mostrar
 }
 
 interface FilterOptions {
@@ -109,13 +110,19 @@ const transformGraphQLToJustificationItem = (graphqlData: any): Justification =>
         id: graphqlData.justificationId || graphqlData.id,
         description: graphqlData.description,
         absenceDate: graphqlData.absenceDate,
-        justificationDate: graphqlData.justificationDate, // ✅ Cambié de justicationDate a justificationDate
+        justificationDate: graphqlData.justificationDate,
         justificationFile: graphqlData.justificationFile,
         state: graphqlData.state,
-        justificationType: graphqlData.justificationType ?? ''
+        justificationType: graphqlData.justificationType
             ? {
                 id: graphqlData.justificationType.id,
                 name: graphqlData.justificationType.name
+            }
+            : { id: 0, name: '' },
+        justificationStatus: graphqlData.justificationStatus
+            ? {
+                id: graphqlData.justificationStatus.id,
+                name: graphqlData.justificationStatus.name
             }
             : { id: 0, name: '' },
         attendance: {
@@ -222,24 +229,38 @@ const transformToComponentFormat = (justifications: Justification[]): Transforme
             justificationId: j.id,
             attendanceId: j.attendance?.id,
             absenceDate: j.absenceDate,
-            justificationDate: j.justificationDate
+            justificationDate: j.justificationDate,
+            justificationStatus: j.justificationStatus,
+            state: j.state
         });
 
-        const booleanState = Boolean(j.state); // ✅ Asegurar que siempre sea boolean
+        const booleanState = Boolean(j.state);
+        
+        let estadoDisplay = "En proceso";
+        let justificationStatusId = undefined;
+        
+        if ((j as any).justificationStatus) {
+            estadoDisplay = (j as any).justificationStatus.name || "En proceso";
+            justificationStatusId = (j as any).justificationStatus.id?.toString();
+        } else {
+            estadoDisplay = "En proceso";
+        }
         
         return {
             id: Number(j.id),
             ficha: studySheet?.studentStudySheetState?.toString() || "Sin ficha",
             absenceDate: formatDateSafely(j.absenceDate),
             justificationDate: formatDateSafely(j.justificationDate),
-            estado: booleanState ? "Activo" : "Inactivo", // ✅ Cambiar para ser consistente con los nombres esperados
-            state: booleanState, // ✅ Agregar el campo state boolean para fácil acceso
+            estado: estadoDisplay,  
+            state: booleanState, 
             justificationType: j.justificationType?.name ?? "Sin tipo",
             archivoAdjunto: j.justificationFile ?? "",
             archivoMime: getMimeTypeFromBase64(j.justificationFile ?? ""),
             documento: person?.document || '',
             aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim(),
-            attendanceId: j.attendance?.id?.toString() // ✅ Verificar que esto no sea undefined
+            attendanceId: j.attendance?.id?.toString(),
+            justificationStatusId: justificationStatusId,
+            justificationStatus: estadoDisplay
         };
     });
 };
@@ -272,9 +293,7 @@ const filterJustifications = (
             case "justificationDate":
                 return j.justificationDate.includes(searchTerm);
             case "estado":
-                if (searchTerm === "true") return j.estado === "Activo";
-                if (searchTerm === "false") return j.estado === "Inactivo";
-                return true;
+                return j.estado.toLowerCase().includes(searchTerm.toLowerCase());
             default:
                 return true;
         }
@@ -422,33 +441,28 @@ export const updateJustification = createAsyncThunk<UpdateJustificationMutation[
 // Nueva función para cambiar el estado de una justificación
 export const updateJustificationStatus = createAsyncThunk<
     UpdateJustificationMutation['updateJustification'],
-    { id: string; status: string },
+    { id: string; statusId: string },
     { rejectValue: { code: string; message: string } }
 >(
     'justifications/updateStatus',
-    async ({ id, status }, { rejectWithValue, getState }) => {
+    async ({ id, statusId }, { rejectWithValue, getState }) => {
         try {
-            // Convertir el string a boolean
-            let state: boolean;
-            
-            if (status === "true" || status === "false") {
-                state = status === "true";
-            } else {
-                state = status === "Aceptado" || status === "Activo";
-            }
-
             const justificationId = parseInt(id);
+            const justificationStatusId = parseInt(statusId);
 
-            // Crear el input con solo el estado para actualizar
-            // El backend mejorado ahora preserva las relaciones existentes
+            // Crear el input con el justificationStatus para la relación real
             const input: UpdateJustificationMutationVariables['input'] = {
-                state // Solo enviar el estado, el backend preservará el resto
+                justificationStatus: {
+                    id: justificationStatusId
+                }
             } as any; // Usar any temporalmente debido a inconsistencia en tipos generados
 
-            console.log("🔄 Actualizando solo el estado de la justificación:", {
+            console.log("🔄 Actualizando justificationStatus con relación real:", {
                 id: justificationId,
-                newState: state,
-                input
+                statusId,
+                justificationStatusId,
+                input,
+                inputString: JSON.stringify(input, null, 2)
             });
 
             const { data } = await clientLAN.mutate<UpdateJustificationMutation, UpdateJustificationMutationVariables>({
@@ -746,31 +760,30 @@ const justificationSlice = createSlice({
             .addCase(updateJustificationStatus.fulfilled, (state, action) => {
                 // Actualizar el estado local inmediatamente
                 if (action.meta.arg) {
-                    const { id, status } = action.meta.arg;
+                    const { id, statusId } = action.meta.arg;
                     
                     // Convertir ambos IDs a string para comparación consistente
                     const targetId = id.toString();
                     const justificationIndex = state.data.findIndex(j => j.id.toString() === targetId);
                     
                     if (justificationIndex !== -1) {
-                        // Convertir el status a boolean
-                        const booleanState = status === "true" || status === "Activo";
-                        
                         console.log("🔄 Actualizando justificación en índice:", justificationIndex, {
                             id: targetId,
-                            statusOriginal: status,
-                            booleanState,
-                            estadoAnterior: state.data[justificationIndex].state
+                            newStatusId: statusId,
+                            estadoAnterior: (state.data[justificationIndex] as any).justificationStatus
                         });
                         
-                        // Actualizar el estado en la data original
-                        state.data[justificationIndex].state = booleanState;
+                        // ✅ Actualizar la relación justificationStatus con id y name temporal
+                        (state.data[justificationIndex] as any).justificationStatus = { 
+                            id: statusId,
+                            name: "Actualizando..." // Temporal hasta que se recarguen los datos
+                        };
                         
                         // Regenerar transformedData y filteredData
                         state.transformedData = transformToComponentFormat(state.data);
                         state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                         
-                        console.log("✅ Estado actualizado localmente para justificación:", targetId, "nuevo estado:", booleanState);
+                        console.log("✅ justificationStatus actualizado localmente para justificación:", targetId, "nuevo statusId:", statusId);
                         console.log("📋 Datos transformados actualizados:", state.transformedData.find(t => t.id.toString() === targetId));
                     } else {
                         console.warn("⚠️ No se encontró la justificación con ID:", targetId, "en la lista");

@@ -24,7 +24,7 @@ type JustificationStatusPageId {
 input JustificationStatusDto {
     id: ID
     name: String
-    status: String
+    state: Boolean
 }
 
 extend type Query {

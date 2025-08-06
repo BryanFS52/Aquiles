@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class JustificationService implements Idao<Justification, Long> {
 
@@ -20,13 +22,31 @@ public class JustificationService implements Idao<Justification, Long> {
 
     @Override
     public Page<Justification> findAll(PageRequest pageRequest) {
-        return justificationRepository.findAll(pageRequest);
+        try {
+            // ✅ Usar el nuevo método que hace fetch de todas las relaciones
+            return justificationRepository.findAll(pageRequest);
+        } catch (Exception e) {
+            // Fallback al método original si hay algún problema
+            System.err.println("⚠️  Error using findAllWithRelations, falling back to regular findAll: " + e.getMessage());
+            return justificationRepository.findAll(pageRequest);
+        }
     }
 
     @Override
     public Justification getById(Long id) {
+        try {
+            // ✅ Intentar usar el método con relaciones primero
+            Optional<Justification> justification = justificationRepository.findById(id);
+            if (justification.isPresent()) {
+                return justification.orElse(null);
+            }
+        } catch (Exception e) {
+            System.err.println("⚠️  Error using findByIdWithRelations, falling back to regular findById: " + e.getMessage());
+        }
+        
+        // Fallback al método original
         return justificationRepository.findById(id).orElseThrow(() ->
-                new CustomException("Justification Type with id " + id + " not found", HttpStatus.NO_CONTENT));
+                new CustomException("Justification with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
     @Override

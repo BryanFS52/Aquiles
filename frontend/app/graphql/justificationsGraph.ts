@@ -21,6 +21,11 @@ export const GET_ALL_JUSTIFICATIONS = gql`
           id
           name
         }
+        justificationStatus {
+          id
+          name
+          state
+        }
         attendance {
           student {
             id
@@ -51,6 +56,11 @@ export const GET_JUSTIFICATION_BY_ID = gql`
         justificationType {
           id
           name
+        }
+        justificationStatus {
+          id
+          name
+          state
         }
         attendance {
           id

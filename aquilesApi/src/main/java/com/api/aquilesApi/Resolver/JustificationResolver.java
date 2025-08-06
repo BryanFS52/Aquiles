@@ -24,13 +24,13 @@ public class JustificationResolver {
     @DgsQuery
     public Map<String, Object> allJustifications(@InputArgument Integer page, @InputArgument Integer size) {
         try {
-            Page<JustificationDto> justificationDtoPage = justificationBusiness.findAll(page , size);
+            Page<JustificationDto> justificationDtoPage = justificationBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
                     justificationDtoPage.getContent(),
                     ResponseHttpApi.CODE_OK,
                     "Query ok",
                     justificationDtoPage.getTotalPages(),
-                    page,
+                    justificationDtoPage.getNumber(),
                     (int) justificationDtoPage.getTotalElements()
             );
         } catch (Exception e) {
@@ -60,28 +60,14 @@ public class JustificationResolver {
     @DgsMutation
     public Map<String, Object> addJustification(@InputArgument(name = "input") JustificationDto justificationDto) {
         try {
-            // ✅ Log para debugging
-            System.out.println("📤 Recibiendo justificación:");
-            System.out.println("- Descripción: " + justificationDto.getDescription());
-            System.out.println("- Fecha de ausencia recibida: " + justificationDto.getAbsenceDate());
-            System.out.println("- Fecha de justificación recibida: " + justificationDto.getJustificationDate());
-            
             JustificationDto result = justificationBusiness.add(justificationDto);
-            
-            System.out.println("✅ Justificación creada:");
-            System.out.println("- ID: " + result.getId());
-            System.out.println("- Fecha de ausencia guardada: " + result.getAbsenceDate());
-            System.out.println("- Fecha de justificación guardada: " + result.getJustificationDate());
             
             return ResponseHttpApi.responseHttpAction(
                     result.getId(),
                     ResponseHttpApi.CODE_OK,
-                    "Justificación agregada exitosamente"
+                    "Add ok"
             );
         } catch (Exception e) {
-            System.err.println("❌ Error al agregar justificación: " + e.getMessage());
-            e.printStackTrace();
-            
             return ResponseHttpApi.responseHttpError(
                     "Error adding Justification: " + e.getMessage(), 
                     HttpStatus.INTERNAL_SERVER_ERROR

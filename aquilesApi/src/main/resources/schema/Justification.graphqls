@@ -8,6 +8,7 @@ type Justification {
     state: Boolean
     attendance: Attendance
     justificationType: JustificationType
+    justificationStatus: JustificationStatus
 }
 
 type JustificationPage {
@@ -36,6 +37,7 @@ input JustificationDto {
     state: Boolean
     attendance: AttendanceDto
     justificationType: JustificationTypeDto
+    justificationStatus: JustificationStatusDto
 }
 
 extend type Query {

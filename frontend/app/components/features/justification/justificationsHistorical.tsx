@@ -63,7 +63,9 @@ export default function JustificationsHistorical({
               <tr>
                 <th className="px-6 py-4 font-medium">Tipo de Novedad</th>
                 <th className="px-6 py-4 font-medium">Fecha de Ausencia</th>
-                <th className="px-6 py-4 font-medium">Fecha de Justificación</th>
+                <th className="px-6 py-4 font-medium">
+                  Fecha de Justificación
+                </th>
                 <th className="px-6 py-4 font-medium">Archivo</th>
                 <th className="px-6 py-4 font-medium">Estado</th>
               </tr>
@@ -145,15 +147,28 @@ export default function JustificationsHistorical({
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center space-x-2">
+                      <td className="w-auto">
+                        <div className="flex flex-col space-y-1 items-start">
                           <span
-                            className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                              justification.estado
+                            className={`inline-flex items-center px-2.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap ${getStatusColor(
+                              justification.estado || "En Proceso"
                             )}`}
                           >
-                            {getStatusIcon(justification.estado)}
-                            <span className="ml-1">{justification.estado}</span>
+                            {getStatusIcon(
+                              justification.estado || "En Proceso"
+                            )}
+                            <span className="ml-1">
+                              {justification.estado || "En Proceso"}
+                            </span>
+                          </span>
+                          <span
+                            className={`text-xs ${
+                              justification.state
+                                ? "text-green-600 dark:text-green-400"
+                                : "text-gray-400 dark:text-gray-500"
+                            }`}
+                          >
+                            {justification.state}
                           </span>
                         </div>
                       </td>

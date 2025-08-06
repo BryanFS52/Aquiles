@@ -42,7 +42,6 @@ export const ADD_JUSTIFICATION_STATUS = gql`
       id
       code
       message
-      date
     }
   }
 `;
@@ -54,7 +53,6 @@ export const UPDATE_JUSTIFICATION_STATUS = gql`
       id
       code
       message
-      date
     }
   }
 `;
@@ -66,7 +64,6 @@ export const DELETE_JUSTIFICATION_STATUS = gql`
       id
       code
       message
-      date
     }
   }
 `;

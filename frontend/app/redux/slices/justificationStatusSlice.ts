@@ -98,6 +98,25 @@ export const deleteJustificationStatus = createAsyncThunk(
   }
 );
 
+// Funciones helper para usar en componentes
+export const getStatusNameById = (
+  justificationStatuses: JustificationStatus[],
+  statusId?: string
+): string => {
+  if (!statusId || !justificationStatuses.length) {
+    return "En proceso";
+  }
+  
+  const status = justificationStatuses.find(s => s.id === statusId);
+  return status?.name || "En proceso";
+};
+
+export const getActiveStatuses = (
+  justificationStatuses: JustificationStatus[]
+): JustificationStatus[] => {
+  return justificationStatuses.filter(status => status.state === true);
+};
+
 // Slice
 const justificationStatusSlice = createSlice({
   name: 'justificationStatus',

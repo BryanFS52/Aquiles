@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { GrAttachment } from "react-icons/gr";
 import persona from "@public/img/persona.jpg";
 import { RootState } from "@/redux/store";
+import { getStatusNameById, getActiveStatuses } from "@/redux/slices/justificationStatusSlice";
 
 // Recibe props para reutilizar la tabla y evitar dependencias globales
 interface JustificationTableProps {
@@ -25,41 +26,28 @@ export default function JustificationTable({
 
   const handleSelectChange = (justificacionId: string, event: React.ChangeEvent<HTMLSelectElement>) => {
     const newStatusId = event.target.value;
-    console.log("🔄 handleSelectChange llamado:", {
+    console.log("🔄 Cambiando estado:", {
       justificacionId,
-      newStatusId,
-      justificationStatuses
+      newStatusId
     });
     if (newStatusId) {
       handleStatusChange(justificacionId, newStatusId);
     }
   };
 
-  // Función para obtener el nombre del estado basado en el valor actual
   const getCurrentStatusName = (justificacion: any) => {
-    // Usar directamente el campo estado que ya está mapeado correctamente
-    const statusName = justificacion.estado || "Desconocido";
-    console.log("🔍 getCurrentStatusName para ID:", justificacion.id, {
-      estado: justificacion.estado,
-      state: justificacion.state,
-      statusName
-    });
-    return statusName;
+    // ✅ Priorizar el campo justificationStatus que ya contiene el nombre correcto
+    if (justificacion.justificationStatus && justificacion.justificationStatus !== "Sin status") {
+      return justificacion.justificationStatus;
+    }
+    
+    // ✅ Fallback al campo estado que también contiene el nombre del estado
+    return justificacion.estado || "En proceso";
   };
 
-  // Función para obtener el valor actual para el select
+  // ✅ Función para obtener el valor actual para el select (justificationStatus.id)
   const getCurrentSelectValue = (justificacion: any) => {
-    // Usar el campo estado para buscar el ID correspondiente
-    const matchingStatus = justificationStatuses.find(s => 
-      s.name.toLowerCase() === (justificacion.estado || "").toLowerCase()
-    );
-    const selectValue = matchingStatus ? matchingStatus.id : "";
-    console.log("🔍 getCurrentSelectValue para ID:", justificacion.id, {
-      estado: justificacion.estado,
-      matchingStatus,
-      selectValue
-    });
-    return selectValue;
+    return justificacion.justificationStatusId || "";
   };
 
   return (
@@ -75,7 +63,7 @@ export default function JustificationTable({
             <th className="px-6 py-4 font-medium">Fecha de ausencia</th>
             <th className="px-6 py-4 font-medium">Fecha de justificacion</th>
             <th className="px-6 py-4 font-medium">Archivo Adjunto</th>
-            <th className="px-6 py-4 font-medium">Estado</th>
+            <th className="px-6 py-4 font-medium">Estado del proceso</th>
             <th className="px-6 py-4 font-medium">Acciones</th>
           </tr>
         </thead>
@@ -105,7 +93,9 @@ export default function JustificationTable({
               <td className="px-6 py-4">
                 {justificacion.archivoAdjunto ? (
                   <GrAttachment
-                    title={`Descargar archivo (${justificacion.archivoMime || "desconocido"})`}
+                    title={`Descargar archivo (${
+                      justificacion.archivoMime || "desconocido"
+                    })`}
                     className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
                     onClick={() => handleDownloadFile(justificacion)}
                   />
@@ -117,10 +107,10 @@ export default function JustificationTable({
               </td>
               <td className="px-6 py-4">
                 <span
-                  className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    getCurrentStatusName(justificacion) === "Activo" || getCurrentStatusName(justificacion) === "Aceptado"
+                  className={`inline-flex items-center px-1.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
+                    getCurrentStatusName(justificacion) === "Aceptado"
                       ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
-                      : getCurrentStatusName(justificacion) === "Denegado" || getCurrentStatusName(justificacion) === "Rechazado"
+                      : getCurrentStatusName(justificacion) === "Denegado"
                       ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
                       : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
                   }`}
@@ -138,13 +128,11 @@ export default function JustificationTable({
                     className="px-3 py-2 text-xs font-medium bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200 min-w-[120px]"
                   >
                     <option value="">Seleccionar estado...</option>
-                    {justificationStatuses
-                      .filter(status => status.state) // Solo mostrar estados activos
-                      .map((status) => (
-                        <option key={status.id} value={status.id}>
-                          {status.name}
-                        </option>
-                      ))}
+                    {getActiveStatuses(justificationStatuses).map((status) => (
+                      <option key={status.id} value={status.id}>
+                        {status.name}
+                      </option>
+                    ))}
                   </select>
                   {loadingStatuses && (
                     <span className="text-xs text-gray-500 dark:text-gray-400">

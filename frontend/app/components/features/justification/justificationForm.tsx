@@ -34,7 +34,6 @@ export default function JustificationFormComponent({
     fileInputRefPrev,
 }: Props) {
     return (
-        // Elimina el AnimatePresence y la condición form.showForm de aquí
         <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
