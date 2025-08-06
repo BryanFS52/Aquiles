@@ -12,7 +12,7 @@ const client = new ApolloClient({
 // Cliente Lan por medio de la direccion IP
 const clientLAN = new ApolloClient({
     link: new HttpLink({
-        uri: "http://10.1.171.55:4000/graphql",
+        uri: "http://localhost:4000/graphql",
     }),
     cache: new InMemoryCache({
         addTypename: false,

@@ -70,7 +70,7 @@ public class Checklist implements Serializable {
     private Long LearningOutcome;
 
     // 5.Relation (1-M) con juries
-@OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "checklist_juries",
             joinColumns = @JoinColumn(name = "checklist_id"),
             inverseJoinColumns = @JoinColumn(name = "jury_id"))

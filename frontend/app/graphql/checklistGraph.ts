@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 
-// Queries and Mutations for Checklist
 export const GET_ALL_CHECKLISTS = gql`
   query GetAllChecklists($page: Int, $size: Int) {
     allChecklists(page: $page, size: $size) {
@@ -24,8 +23,6 @@ export const GET_ALL_CHECKLISTS = gql`
   }
 `;
 
-
-
 export const GET_CHECKLIST_BY_ID = gql`
   query GetChecklistById($id: Long!) {
     checklistById(id: $id) {
@@ -41,7 +38,13 @@ export const GET_CHECKLIST_BY_ID = gql`
         trimester
         component
         studySheets
-        evaluations
+        evaluations {
+          id
+          observations
+          recommendations
+          valueJudgment
+          checklistId
+        }
         associatedJuries {
           id
         }
@@ -49,7 +52,6 @@ export const GET_CHECKLIST_BY_ID = gql`
     }
   }
 `;
-
 
 export const ADD_CHECKLIST = gql`
   mutation AddChecklist($input: ChecklistDto!) {
@@ -74,6 +76,16 @@ export const UPDATE_CHECKLIST = gql`
 export const DELETE_CHECKLIST = gql`
   mutation DeleteChecklist($id: Long!) {
     deleteChecklist(id: $id) {
+      code
+      message
+      id
+    }
+  }
+`;
+
+export const UPDATE_ITEM_STATUS = gql`
+  mutation UpdateItemStatus($id: Long!, $active: Boolean!) {
+    updateItemStatus(id: $id, active: $active) {
       code
       message
       id

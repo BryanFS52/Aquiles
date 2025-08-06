@@ -1,72 +1,53 @@
+/*
 import { client } from '@/lib/apollo-client';
 import { gql } from '@apollo/client';
 
 // GraphQL Queries y Mutations para Evaluaciones
-const ADD_EVALUATION = gql`
-  mutation AddEvaluation($input: EvaluationInput!) {
-    addEvaluation(input: $input) {
-      code
-      date
-      message
-      data {
-        id
-        recommendations
-        valueJudgment
-        checklistId
-      }
-    }
-  }
-`;
 
-const GET_EVALUATIONS_BY_CHECKLIST = gql`
-  query GetEvaluationsByChecklist($checklistId: Long!) {
-    evaluationsByChecklist(checklistId: $checklistId) {
-      code
-      date
-      message
-      data {
-        id
-        recommendations
-        valueJudgment
-        checklistId
-      }
-    }
-  }
-`;
-
-const UPDATE_EVALUATION = gql`
-  mutation UpdateEvaluation($id: Long!, $input: EvaluationInput!) {
-    updateEvaluation(id: $id, input: $input) {
-      code
-      date
-      message
-      data {
-        id
-        recommendations
-        valueJudgment
-        checklistId
-      }
-    }
-  }
-`;
 
 // Función para crear una evaluación automáticamente al crear una lista de chequeo
 export const createEvaluationForChecklist = async (checklistId, checklistData) => {
   try {
     const evaluationInput = {
-      recommendations: `Evaluación automática creada para la lista de chequeo del ${checklistData.trimester}° Trimestre - ${checklistData.component}`,
-      valueJudgment: "PENDIENTE", // Valor inicial
-      checklistId: checklistId
+      observations: "", // Iniciar como string vacío en lugar de null
+      recommendations: "", // Iniciar como string vacío en lugar de null
+      valueJudgment: "", // Iniciar como string vacío en lugar de null
+      checklistId: parseInt(checklistId) // Asegurar que sea un número entero
     };
+
+    console.log('Creating evaluation with input:', evaluationInput); // Debug log
+    console.log('Using GraphQL mutation:', ADD_EVALUATION); // Debug log
 
     const { data } = await client.mutate({
       mutation: ADD_EVALUATION,
       variables: { input: evaluationInput },
     });
 
-    return data.addEvaluation;
+    console.log('Evaluation creation response:', data); // Debug log
+    
+    // Verificar la respuesta
+    if (data && data.addEvaluation) {
+      if (data.addEvaluation.code === "200") {
+        console.log('Evaluation created successfully'); // Debug log
+        return data.addEvaluation;
+      } else {
+        console.error('Evaluation creation failed with code:', data.addEvaluation.code);
+        console.error('Error message:', data.addEvaluation.message);
+        throw new Error(`Error creating evaluation: ${data.addEvaluation.message}`);
+      }
+    } else {
+      console.error('Unexpected response format:', data);
+      throw new Error('Unexpected response format from evaluation creation');
+    }
   } catch (error) {
     console.error('Error creating evaluation:', error);
+    console.error('Error details:', error.message);
+    if (error.graphQLErrors) {
+      console.error('GraphQL Errors:', error.graphQLErrors);
+    }
+    if (error.networkError) {
+      console.error('Network Error:', error.networkError);
+    }
     throw error;
   }
 };
@@ -74,14 +55,46 @@ export const createEvaluationForChecklist = async (checklistId, checklistData) =
 // Función para obtener evaluaciones por checklist
 export const fetchEvaluationsByChecklist = async (checklistId) => {
   try {
+    console.log('Fetching evaluations for checklist:', checklistId); // Debug log
+    
     const { data } = await client.query({
       query: GET_EVALUATIONS_BY_CHECKLIST,
-      variables: { checklistId },
       fetchPolicy: 'no-cache',
     });
-    return data.evaluationsByChecklist;
+    
+    console.log('All evaluations response:', data); // Debug log
+    
+    // Filtrar por checklistId ya que no hay query específica
+    if (data.allEvaluations && data.allEvaluations.data) {
+      const filteredEvaluations = data.allEvaluations.data.filter(
+        evaluation => evaluation.checklistId == checklistId // Usar == para comparación más flexible
+      );
+      
+      console.log('Filtered evaluations:', filteredEvaluations); // Debug log
+      
+      return {
+        ...data.allEvaluations,
+        data: filteredEvaluations
+      };
+    }
+    return data.allEvaluations;
   } catch (error) {
     console.error('Error fetching evaluations:', error);
+    throw error;
+  }
+};
+
+// Función para obtener una evaluación por ID
+export const fetchEvaluationById = async (id) => {
+  try {
+    const { data } = await client.query({
+      query: GET_EVALUATION_BY_ID,
+      variables: { id },
+      fetchPolicy: 'no-cache',
+    });
+    return data.evaluationById;
+  } catch (error) {
+    console.error('Error fetching evaluation by ID:', error);
     throw error;
   }
 };
@@ -101,11 +114,16 @@ export const updateEvaluation = async (id, evaluationData) => {
 };
 
 // Función para completar una evaluación (que el instructor puede usar)
-export const completeEvaluation = async (evaluationId, recommendations, valueJudgment) => {
+export const completeEvaluation = async (evaluationId, observations, recommendations, valueJudgment) => {
   try {
+    // Obtener los datos actuales de la evaluación para mantener el checklistId
+    const currentEvaluation = await fetchEvaluationById(evaluationId);
+    
     const evaluationData = {
+      observations: observations,
       recommendations: recommendations,
-      valueJudgment: valueJudgment
+      valueJudgment: valueJudgment,
+      checklistId: currentEvaluation.data.checklistId // Mantener el checklistId existente
     };
 
     return await updateEvaluation(evaluationId, evaluationData);
@@ -114,3 +132,4 @@ export const completeEvaluation = async (evaluationId, recommendations, valueJud
     throw error;
   }
 };
+*/

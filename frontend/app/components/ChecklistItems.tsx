@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useMutation } from '@apollo/client'
-import { UPDATE_ITEM_STATUS } from '@graphql/checklistGraphSimple'
+import { UPDATE_ITEM_STATUS } from '@graphql/checklistGraph'
 import { toast } from 'react-toastify'
 
 interface Item {

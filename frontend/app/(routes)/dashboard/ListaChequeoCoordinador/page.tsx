@@ -1,30 +1,57 @@
 'use client'
 
 import { useState, useEffect } from "react"
+import { useDispatch } from "react-redux"
 import { FaTrashAlt, FaEye, FaUserPlus } from "react-icons/fa"
 import { toast } from "react-toastify"
 import CrearListaChequeo from "@components/Modals/modalNewChecklist"
 import PageTitle from "@components/UI/pageTitle"
 import { addChecklist, fetchAllChecklists, deleteChecklist } from "@services/checkListService"
-import { createEvaluationForChecklist } from "@services/evaluationService"
+import { addEvaluation } from "@slice/evaluationSlice"
+import { AppDispatch } from "@/redux/store"
+
+// Interfaces para tipado
+interface ChecklistData {
+  trimester?: string
+  component?: string
+  remarks?: string
+  [key: string]: any
+}
+
+interface Checklist {
+  id: string
+  state: boolean
+  remarks?: string
+  trimester?: string
+  component?: string
+  [key: string]: any
+}
+
+interface ApiResponse {
+  code: string
+  message?: string
+  id?: string
+  data?: Checklist[]
+}
 
 export default function CoordinadorChecklistView() {
-  const [modalOpen, setModalOpen] = useState(false)
-  const [checklists, setChecklists] = useState([])
-  const [selectedTrimestre, setSelectedTrimestre] = useState("todos")
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false)
-  const [checklistToDelete, setChecklistToDelete] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const dispatch = useDispatch<AppDispatch>()
+  const [modalOpen, setModalOpen] = useState<boolean>(false)
+  const [checklists, setChecklists] = useState<Checklist[]>([])
+  const [selectedTrimestre, setSelectedTrimestre] = useState<string>("todos")
+  const [confirmModalOpen, setConfirmModalOpen] = useState<boolean>(false)
+  const [checklistToDelete, setChecklistToDelete] = useState<string | null>(null)
+  const [loading, setLoading] = useState<boolean>(true)
 
   // Cargar checklists al montar el componente
   useEffect(() => {
     loadChecklists()
   }, [])
 
-  const loadChecklists = async () => {
+  const loadChecklists = async (): Promise<void> => {
     try {
       setLoading(true)
-      const response = await fetchAllChecklists(0, 100) // Cargar todos los checklists
+      const response: ApiResponse = await fetchAllChecklists(0, 100) // Cargar todos los checklists
       if (response.code === "200" && response.data) {
         setChecklists(response.data)
       }
@@ -36,37 +63,45 @@ export default function CoordinadorChecklistView() {
     }
   }
 
-  const handleCreateChecklist = async (checklistData) => {
+  const handleCreateChecklist = async (checklistData: ChecklistData): Promise<void> => {
     try {
-      const response = await addChecklist(checklistData)
+      const response: ApiResponse = await addChecklist(checklistData)
       console.log("API Response:", response); // Debug log
       
       if (response.code === "200") {
         // La respuesta tiene el ID directamente en response.id
         const newChecklistId = response.id;
+        console.log("Checklist created with ID:", newChecklistId); // Debug log
         
-        toast.success("Lista de chequeo creada exitosamente")
-        
-        // Comentamos temporalmente la creación automática de evaluación
-        // hasta confirmar que el schema del backend lo soporte
-        /*
         if (newChecklistId) {
-          // Crear automáticamente una evaluación para esta lista de chequeo
+          // Crear automáticamente una evaluación para esta lista de chequeo usando Redux
           try {
-            await createEvaluationForChecklist(newChecklistId, checklistData);
+            console.log("Attempting to create evaluation for checklist:", newChecklistId); // Debug log
+            
+            const evaluationInput = {
+              observations: "", // Iniciar como string vacío
+              recommendations: "", // Iniciar como string vacío
+              valueJudgment: "", // Iniciar como string vacío
+              checklistId: parseInt(newChecklistId) // Asegurar que sea un número entero
+            };
+
+            console.log('Creating evaluation with input:', evaluationInput); // Debug log
+            
+            const evaluationResponse = await dispatch(addEvaluation(evaluationInput)).unwrap();
+            console.log("Evaluation creation response:", evaluationResponse); // Debug log
             toast.success("Lista de chequeo creada exitosamente con evaluación asignada")
-          } catch (evaluationError) {
+          } catch (evaluationError: any) {
             console.error("Error creating evaluation:", evaluationError);
+            console.error("Evaluation error details:", evaluationError.message);
             // Aún así mostrar éxito de la lista, pero avisar del error de evaluación
             toast.success("Lista de chequeo creada exitosamente")
-            toast.warning("La evaluación no pudo ser creada automáticamente")
+            toast.error("Error al crear la evaluación: " + (evaluationError.message || "Error desconocido"))
           }
         } else {
           console.warn("No se pudo obtener el ID de la lista creada:", response);
           toast.success("Lista de chequeo creada exitosamente")
           toast.warning("No se pudo crear la evaluación automáticamente")
         }
-        */
         
         // Recargar la lista para mostrar el nuevo checklist
         await loadChecklists()
@@ -80,11 +115,11 @@ export default function CoordinadorChecklistView() {
     }
   }
 
-  const handleDeleteChecklist = async () => {
+  const handleDeleteChecklist = async (): Promise<void> => {
     if (!checklistToDelete) return
     
     try {
-      const response = await deleteChecklist(checklistToDelete)
+      const response: ApiResponse = await deleteChecklist(checklistToDelete)
       if (response.code === "200") {
         toast.success("Lista de chequeo eliminada exitosamente")
         // Recargar la lista
@@ -101,7 +136,7 @@ export default function CoordinadorChecklistView() {
     }
   }
 
-  const handleToggleState = async (checklistId, currentState) => {
+  const handleToggleState = async (checklistId: string, currentState: boolean): Promise<void> => {
     try {
       // Aquí harías la llamada al API para actualizar el estado
       // Por ahora simularemos el cambio de estado
@@ -119,19 +154,19 @@ export default function CoordinadorChecklistView() {
     }
   }
 
-  const handleCloseModal = () => setModalOpen(false)
+  const handleCloseModal = (): void => setModalOpen(false)
 
-  const handleOpenConfirmModal = (checklistId) => {
+  const handleOpenConfirmModal = (checklistId: string): void => {
     setChecklistToDelete(checklistId)
     setConfirmModalOpen(true)
   }
 
-  const handleViewChecklist = (checklistId) => {
+  const handleViewChecklist = (checklistId: string): void => {
     // Aquí puedes implementar la navegación a la vista detallada del checklist
     toast.info(`Ver detalles del checklist ${checklistId}`)
   }
 
-  const handleAssignChecklist = (checklistId) => {
+  const handleAssignChecklist = (checklistId: string): void => {
     // Aquí puedes implementar la funcionalidad de asignación
     toast.info(`Asignar checklist ${checklistId}`)
   }
@@ -145,7 +180,7 @@ export default function CoordinadorChecklistView() {
       }
       return !checklist.trimester || checklist.trimester === selectedTrimestre;
     })
-    .sort((a, b) => b.id - a.id) // Ordenar por ID descendente (más recientes primero)
+    .sort((a, b) => parseInt(b.id) - parseInt(a.id)) // Ordenar por ID descendente (más recientes primero)
 
   return (
     <>
@@ -156,7 +191,7 @@ export default function CoordinadorChecklistView() {
           <label htmlFor="trimestre-select" className="text-sm font-medium text-gray-700 dark:text-gray-300">
             Filtrar por trimestre:
           </label>
-                    <select
+          <select
             id="trimestre-select"
             value={selectedTrimestre}
             onChange={(e) => setSelectedTrimestre(e.target.value)}
@@ -191,30 +226,30 @@ export default function CoordinadorChecklistView() {
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
-                                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                    ID
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                    Trimestre
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                    Componente
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                    Estado
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                    Observaciones
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                    Acciones
-                  </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                  ID
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                  Trimestre
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                  Componente
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                  Estado
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                  Observaciones
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                  Acciones
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
               {filteredChecklists.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                  <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
                     {selectedTrimestre === "todos" 
                       ? "No hay listas de chequeo disponibles" 
                       : `No hay listas de chequeo para el trimestre ${selectedTrimestre}`

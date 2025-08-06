@@ -83,7 +83,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate }) {
           <h2 className="text-2xl font-semibold text-gray-800">Crear Lista de Chequeo</h2>
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-blue-800 text-sm">
-              💡 <strong>Nota:</strong> Una vez creada la lista, estará disponible para asignación de evaluaciones en la vista del instructor.
+              💡 <strong>Nota:</strong> Se creará automáticamente una evaluación vinculada a esta lista. El instructor podrá completarla desde su vista.
             </p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
