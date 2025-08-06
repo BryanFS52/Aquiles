@@ -235,16 +235,19 @@ export default function CoordinadorChecklistView() {
       console.log("Opening edit modal for checklist:", checklist.id) // Debug log
       
       // Obtener el checklist completo con todos sus items/indicadores usando Redux
-      const result = await dispatch(fetchChecklistById({ id: parseInt(checklist.id) })).unwrap();
-      console.log("fetchChecklistById result:", result) // Debug log
+      await dispatch(fetchChecklistById({ id: parseInt(checklist.id) })).unwrap();
       
-      if (result && result.data) {
-        console.log("Checklist data items:", result.data.items) // Debug log
-        console.log("Setting editingChecklist to:", result.data) // Debug log
+      // Buscar el checklist transformado en el estado de Redux
+      const updatedChecklist = checklists.find(item => item.id === checklist.id);
+      console.log("Updated checklist from Redux state:", updatedChecklist) // Debug log
+      
+      if (updatedChecklist) {
+        console.log("Checklist items:", updatedChecklist.items) // Debug log
         setIsEditing(true)
-        setEditingChecklist(result.data as any)
+        setEditingChecklist(updatedChecklist as any)
         setModalOpen(true)
       } else {
+        console.log("Checklist not found in Redux state after fetch") // Debug log
         toast.error("Error al obtener los detalles del checklist")
       }
     } catch (error: any) {

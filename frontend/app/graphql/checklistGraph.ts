@@ -104,3 +104,15 @@ export const UPDATE_ITEM_STATUS = gql`
     }
   }
 `;
+
+export const EXPORT_CHECKLIST_PDF = gql`
+  query ExportChecklistToPdf($id: Long!) {
+    exportChecklistToPdf(id: $id)
+  }
+`;
+
+export const EXPORT_CHECKLIST_EXCEL = gql`
+  query ExportChecklistToExcel($id: Long!) {
+    exportChecklistToExcel(id: $id)
+  }
+`;

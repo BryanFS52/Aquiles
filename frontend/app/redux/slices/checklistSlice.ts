@@ -197,8 +197,8 @@ const checklistSlice = createSlice({
             })
             .addCase(fetchChecklistById.fulfilled, (state, action: PayloadAction<GetChecklistByIdQuery['checklistById']>) => {
                 console.log('fetchChecklistById.fulfilled - payload:', action.payload); // Debug log
-                if (action.payload) {
-                    const transformedData = transformGraphQLToChecklistItem(action.payload);
+                if (action.payload && action.payload.data) {
+                    const transformedData = transformGraphQLToChecklistItem(action.payload.data);
                     console.log('fetchChecklistById.fulfilled - transformed data:', transformedData); // Debug log
                     console.log('fetchChecklistById.fulfilled - transformed data items:', transformedData.items); // Debug log
                     

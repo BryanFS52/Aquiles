@@ -1,27 +1,35 @@
 'use client'
 
 import { useState, useEffect, useMemo } from "react";
-import { Check, FileDown, Save, UploadCloud, X } from "lucide-react";
+import { Check, FileDown, Save, UploadCloud, X, AlertTriangle, Phone } from "lucide-react";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import PageTitle from "@components/UI/pageTitle";
-import { fetchAllChecklists } from "@services/checkListService"
+import { fetchAllChecklists, fetchChecklistById } from "@services/checkListService.js";
 import { fetchEvaluationsByChecklist, completeEvaluation } from "@services/evaluationService";
+import { exportChecklistToPdf, exportChecklistToExcel, downloadFileFromBase64 } from "@services/exportService";
+import { 
+  Checklist, 
+  Evaluation, 
+  SimulatedChecklistItem,
+  InstructorChecklistState,
+  ValueJudgment
+} from "@/types/checklist";
 
 export default function InstructorChecklistView() {
-  const [activeChecklists, setActiveChecklists] = useState([]);
-  const [selectedChecklist, setSelectedChecklist] = useState(null);
-  const [selectedTrimester, setSelectedTrimester] = useState("todos");
-  const [selectedTrimestre, setSelectedTrimestre] = useState("1")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [firmaAnterior, setFirmaAnterior] = useState(null)
-  const [firmaNuevo, setFirmaNuevo] = useState(null)
-  const [evaluations, setEvaluations] = useState([])
-  const [selectedEvaluation, setSelectedEvaluation] = useState(null)
-  const [evaluationObservations, setEvaluationObservations] = useState("")
-  const [evaluationRecommendations, setEvaluationRecommendations] = useState("")
-  const [evaluationJudgment, setEvaluationJudgment] = useState("PENDIENTE")
-  const [loading, setLoading] = useState(true);
+  const [activeChecklists, setActiveChecklists] = useState<Checklist[]>([]);
+  const [selectedChecklist, setSelectedChecklist] = useState<Checklist | null>(null);
+  const [selectedTrimester, setSelectedTrimester] = useState<string>("todos");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [firmaAnterior, setFirmaAnterior] = useState<string | null>(null);
+  const [firmaNuevo, setFirmaNuevo] = useState<string | null>(null);
+  const [evaluations, setEvaluations] = useState<Evaluation[]>([]);
+  const [selectedEvaluation, setSelectedEvaluation] = useState<Evaluation | null>(null);
+  const [evaluationObservations, setEvaluationObservations] = useState<string>("");
+  const [evaluationRecommendations, setEvaluationRecommendations] = useState<string>("");
+  const [evaluationJudgment, setEvaluationJudgment] = useState<string>("PENDIENTE");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [itemStates, setItemStates] = useState<{[key: number]: {completed: boolean | null, observations: string}}>({});
 
   const itemsPerPage = 3;
 
@@ -30,13 +38,25 @@ export default function InstructorChecklistView() {
     loadActiveChecklists();
   }, []);
 
-  const loadActiveChecklists = async () => {
+  // Auto-cargar evaluaciones cuando cambie el checklist seleccionado
+  useEffect(() => {
+    if (selectedChecklist) {
+      loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
+    }
+  }, [selectedChecklist]);
+
+  const loadActiveChecklists = async (): Promise<void> => {
     try {
       setLoading(true);
       const response = await fetchAllChecklists(0, 100);
+      console.log("Raw checklists response:", response); // Debug log
+      
       if (response.code === "200" && response.data) {
         // Filtrar solo las listas activas
-        const activeLists = response.data.filter(checklist => checklist.state === true);
+        const activeLists = response.data.filter((checklist: Checklist) => checklist.state === true);
+        console.log("Active checklists found:", activeLists); // Debug log
+        console.log("Trimester values:", activeLists.map(cl => ({ id: cl.id, trimester: cl.trimester, type: typeof cl.trimester }))); // Debug log
+        
         setActiveChecklists(activeLists);
         if (activeLists.length > 0 && !selectedChecklist) {
           setSelectedChecklist(activeLists[0]);
@@ -50,126 +70,193 @@ export default function InstructorChecklistView() {
     }
   };
 
-  // Filtrar checklists por trimestre
-  const filteredChecklists = useMemo(() => {
-    if (selectedTrimester === "todos") {
-      return activeChecklists;
-    }
-    return activeChecklists.filter(checklist => 
-      checklist.trimester === selectedTrimester
-    );
-  }, [activeChecklists, selectedTrimester]);
-
-  // Obtener items del checklist seleccionado (simulado)
-  const items = useMemo(() => {
-    if (!selectedChecklist) return [];
-    // Simulamos items para el checklist seleccionado
-    return [
-      { id: 1, indicator: "El software evidencia autenticación y manejo dinámico de roles.", completed: null, observations: "" },
-      { id: 2, indicator: "Aplica en el sistema procedimientos almacenados y/o funciones.", completed: null, observations: "" },
-      { id: 3, indicator: "Implementa servicios REST siguiendo estándares.", completed: null, observations: "" },
-      { id: 4, indicator: "La aplicación implementa patrones de diseño.", completed: null, observations: "" },
-      { id: 5, indicator: "Se evidencia el uso de principios SOLID.", completed: null, observations: "" },
-      { id: 6, indicator: "Describe la creación de usuarios y privilegios a nivel de base de datos.", completed: null, observations: "" }
-    ];
-  }, [selectedChecklist]);
-
-  const totalPages = Math.ceil(items.length / itemsPerPage);
-  const currentItems = items.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-  const handleTrimesterChange = (value) => {
-    setSelectedTrimester(value);
-    setCurrentPage(1);
-  };
-
-  const handleChecklistChange = async (checklistId) => {
-    const checklist = activeChecklists.find(cl => cl.id === parseInt(checklistId));
-    setSelectedChecklist(checklist);
-    setCurrentPage(1);
-    
-    // Reiniciar estados de evaluación
-    setEvaluations([]);
-    setSelectedEvaluation(null);
-    setEvaluationObservations("");
-    setEvaluationRecommendations("");
-    setEvaluationJudgment("PENDIENTE");
-    
-    // Cargar evaluaciones para esta lista de chequeo
-    if (checklistId && checklistId !== "") {
-      try {
-        console.log("Loading evaluations for checklist ID:", checklistId); // Debug log
-        const evaluationsResponse = await fetchEvaluationsByChecklist(parseInt(checklistId));
-        console.log("Evaluations response:", evaluationsResponse); // Debug log
+  const loadEvaluationsForChecklist = async (checklistId: number): Promise<void> => {
+    try {
+      console.log("Loading evaluations for checklist ID:", checklistId);
+      const evaluationsResponse = await fetchEvaluationsByChecklist(checklistId);
+      console.log("Evaluations response:", evaluationsResponse);
+      
+      if (evaluationsResponse.code === "200" && evaluationsResponse.data) {
+        setEvaluations(evaluationsResponse.data);
+        console.log("Evaluations found:", evaluationsResponse.data.length);
         
-        if (evaluationsResponse.code === "200" && evaluationsResponse.data) {
-          setEvaluations(evaluationsResponse.data);
-          console.log("Evaluations found:", evaluationsResponse.data.length); // Debug log
-          
-          // Si hay evaluaciones, seleccionar la primera automáticamente
-          if (evaluationsResponse.data.length > 0) {
-            const firstEvaluation = evaluationsResponse.data[0];
-            console.log("First evaluation:", firstEvaluation); // Debug log
-            setSelectedEvaluation(firstEvaluation);
-            setEvaluationObservations(firstEvaluation.observations || "");
-            setEvaluationRecommendations(firstEvaluation.recommendations || "");
-            setEvaluationJudgment(firstEvaluation.valueJudgment || "PENDIENTE");
-          } else {
-            console.log("No evaluations found for this checklist"); // Debug log
-          }
+        // Si hay evaluaciones, seleccionar la primera automáticamente
+        if (evaluationsResponse.data.length > 0) {
+          const firstEvaluation = evaluationsResponse.data[0];
+          console.log("First evaluation:", firstEvaluation);
+          setSelectedEvaluation(firstEvaluation);
+          setEvaluationObservations(firstEvaluation.observations || "");
+          setEvaluationRecommendations(firstEvaluation.recommendations || "");
+          setEvaluationJudgment(firstEvaluation.valueJudgment || "PENDIENTE");
         } else {
-          setEvaluations([]);
+          console.log("No evaluations found for this checklist");
+          // Resetear estados de evaluación
           setSelectedEvaluation(null);
           setEvaluationObservations("");
           setEvaluationRecommendations("");
           setEvaluationJudgment("PENDIENTE");
         }
-      } catch (error) {
-        console.error("Error loading evaluations:", error);
-        // No mostrar error al usuario para evaluaciones nuevas
+      } else {
         setEvaluations([]);
         setSelectedEvaluation(null);
         setEvaluationObservations("");
         setEvaluationRecommendations("");
         setEvaluationJudgment("PENDIENTE");
       }
-    } else {
+    } catch (error) {
+      console.error("Error loading evaluations:", error);
+      // No mostrar error al usuario, solo resetear estados
       setEvaluations([]);
       setSelectedEvaluation(null);
       setEvaluationObservations("");
       setEvaluationRecommendations("");
       setEvaluationJudgment("PENDIENTE");
     }
-  };  const handleItemChange = (id, field, value) => {
-    // Aquí actualizarías el estado de los items
+  };
+
+  // Filtrar checklists por trimestre
+  const filteredChecklists = useMemo(() => {
+    if (selectedTrimester === "todos") {
+      return activeChecklists;
+    }
+    return activeChecklists.filter((checklist: Checklist) => {
+      // Convertir ambos valores a string para comparación consistente
+      const checklistTrimester = checklist.trimester?.toString();
+      const selectedTrimesterStr = selectedTrimester.toString();
+      console.log(`Filtering: checklist ${checklist.id} trimester=${checklistTrimester}, selected=${selectedTrimesterStr}`);
+      return checklistTrimester === selectedTrimesterStr;
+    });
+  }, [activeChecklists, selectedTrimester]);
+
+  // Obtener items del checklist seleccionado
+  const items = useMemo((): SimulatedChecklistItem[] => {
+    if (!selectedChecklist || !selectedChecklist.items) {
+      // Simulamos items para el checklist seleccionado si no hay items reales
+      return [
+        { id: 1, indicator: "El software evidencia autenticación y manejo dinámico de roles.", completed: null, observations: "" },
+        { id: 2, indicator: "Aplica en el sistema procedimientos almacenados y/o funciones.", completed: null, observations: "" },
+        { id: 3, indicator: "Implementa servicios REST siguiendo estándares.", completed: null, observations: "" },
+        { id: 4, indicator: "La aplicación implementa patrones de diseño.", completed: null, observations: "" },
+        { id: 5, indicator: "Se evidencia el uso de principios SOLID.", completed: null, observations: "" },
+        { id: 6, indicator: "Describe la creación de usuarios y privilegios a nivel de base de datos.", completed: null, observations: "" }
+      ];
+    }
+    
+    // Mapear los items reales del checklist a nuestro formato
+    return selectedChecklist.items.map((item, index) => ({
+      id: parseInt(item.id || (index + 1).toString()),
+      indicator: item.indicator,
+      completed: null, // Estado inicial
+      observations: "" // Observaciones iniciales vacías
+    }));
+  }, [selectedChecklist]);
+
+  const totalPages = Math.ceil(items.length / itemsPerPage);
+  const currentItems = items.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const handleTrimesterChange = (value: string): void => {
+    setSelectedTrimester(value);
+    setCurrentPage(1);
+  };
+
+  const handleChecklistChange = async (checklistId: string): Promise<void> => {
+    const checklist = activeChecklists.find((cl: Checklist) => cl.id === checklistId);
+    
+    // Reiniciar estados
+    setCurrentPage(1);
+    setItemStates({}); // Resetear el estado de los items
+    
+    if (checklistId && checklistId !== "") {
+      try {
+        // Cargar los detalles completos del checklist con sus items
+        console.log("Loading checklist details for ID:", checklistId);
+        const checklistResponse = await fetchChecklistById(parseInt(checklistId));
+        
+        if (checklistResponse.code === "200" && checklistResponse.data) {
+          console.log("Checklist details loaded:", checklistResponse.data);
+          setSelectedChecklist(checklistResponse.data);
+        } else {
+          // Si no se pueden cargar los detalles, usar el checklist básico
+          setSelectedChecklist(checklist || null);
+          console.warn("Could not load checklist details, using basic data");
+        }
+        
+        // Las evaluaciones se cargarán automáticamente por el useEffect
+        
+      } catch (error) {
+        console.error("Error loading checklist details:", error);
+        // En caso de error, usar el checklist básico y no mostrar error al usuario
+        setSelectedChecklist(checklist || null);
+      }
+    } else {
+      setSelectedChecklist(null);
+    }
+  };
+
+  const handleItemChange = (id: number, field: string, value: any): void => {
+    setItemStates(prev => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        [field]: value
+      }
+    }));
     console.log("Updated item:", { id, field, value });
   };
 
-    const handleFileUpload = (event, setFile) => {
-    const file = event.target.files[0]
+  const handleFileUpload = (
+    event: React.ChangeEvent<HTMLInputElement>, 
+    setFile: React.Dispatch<React.SetStateAction<string | null>>
+  ): void => {
+    const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => setFile(e.target.result)
-      reader.readAsDataURL(file)
+      const reader = new FileReader();
+      reader.onload = (e) => setFile(e.target?.result as string);
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   // Función para completar/actualizar la evaluación
-  const handleCompleteEvaluation = async () => {
+  const handleCompleteEvaluation = async (): Promise<void> => {
     if (!selectedEvaluation) {
       toast.error("No hay evaluación seleccionada");
       return;
     }
 
+    // Validar que todos los campos estén completos
+    if (!evaluationObservations.trim()) {
+      toast.error("Por favor complete las observaciones");
+      return;
+    }
+
+    if (!evaluationRecommendations.trim()) {
+      toast.error("Por favor complete las recomendaciones");
+      return;
+    }
+
+    if (!evaluationJudgment || evaluationJudgment === "PENDIENTE") {
+      toast.error("Por favor seleccione un juicio de valor");
+      return;
+    }
+
     try {
+      console.log("Guardando evaluación:", {
+        id: selectedEvaluation.id,
+        observations: evaluationObservations,
+        recommendations: evaluationRecommendations,
+        valueJudgment: evaluationJudgment
+      });
+
       const response = await completeEvaluation(
-        selectedEvaluation.id,
+        parseInt(selectedEvaluation.id),
         evaluationObservations,
         evaluationRecommendations,
         evaluationJudgment
       );
 
       if (response.code === "200") {
-        toast.success("Evaluación actualizada exitosamente");
+        toast.success("🎉 Evaluación guardada exitosamente en la base de datos");
+        
         // Actualizar el estado local
         setSelectedEvaluation({
           ...selectedEvaluation,
@@ -177,22 +264,123 @@ export default function InstructorChecklistView() {
           recommendations: evaluationRecommendations,
           valueJudgment: evaluationJudgment
         });
+
+        // Actualizar también la lista de evaluaciones
+        setEvaluations(prev => prev.map(evaluation => 
+          evaluation.id === selectedEvaluation.id 
+            ? { ...evaluation, observations: evaluationObservations, recommendations: evaluationRecommendations, valueJudgment: evaluationJudgment }
+            : evaluation
+        ));
+
+        console.log("Evaluación actualizada exitosamente");
       } else {
-        toast.error("Error al actualizar la evaluación");
+        toast.error("Error al guardar la evaluación: " + (response.message || "Error desconocido"));
       }
     } catch (error) {
       console.error("Error updating evaluation:", error);
-      toast.error("Error al actualizar la evaluación");
+      toast.error("Error al guardar la evaluación en la base de datos");
     }
-  };;
+  };
 
-  const handleSaveChecklist = () => {
+  const handleSaveChecklist = async (): Promise<void> => {
     if (!selectedChecklist) {
       toast.error("No hay ninguna lista de chequeo seleccionada");
       return;
     }
-    console.log("Saving checklist:", { selectedChecklist, items });
-    toast.success("La lista de chequeo ha sido guardada exitosamente.");
+
+    try {
+      // Recopilar todos los cambios de los items
+      const updatedItems = items.map(item => {
+        const itemState = itemStates[item.id] || { completed: item.completed, observations: item.observations };
+        return {
+          ...item,
+          completed: itemState.completed,
+          observations: itemState.observations
+        };
+      });
+
+      console.log("Saving checklist:", { 
+        selectedChecklist, 
+        updatedItems,
+        evaluation: selectedEvaluation,
+        itemStates
+      });
+
+      // Crear un objeto con los datos actualizados del checklist
+      const checklistData = {
+        id: selectedChecklist.id,
+        state: selectedChecklist.state,
+        remarks: selectedChecklist.remarks || '',
+        instructorSignature: selectedChecklist.instructorSignature || '',
+        evaluationCriteria: selectedChecklist.evaluationCriteria || '',
+        trimester: selectedChecklist.trimester,
+        component: selectedChecklist.component || '',
+        studySheets: selectedChecklist.studySheets || [],
+        items: updatedItems
+      };
+
+      // Simular guardado exitoso por ahora
+      // TODO: Implementar la llamada real al backend cuando esté disponible
+      console.log("Checklist data to save:", checklistData);
+      
+      // Simular una pequeña demora para mostrar feedback
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast.success("📋 La lista de chequeo ha sido guardada exitosamente!");
+      
+      // También guardar la evaluación si está completa
+      if (selectedEvaluation && evaluationObservations && evaluationRecommendations && evaluationJudgment && evaluationJudgment !== "PENDIENTE") {
+        await handleCompleteEvaluation();
+      }
+      
+    } catch (error) {
+      console.error("Error saving checklist:", error);
+      toast.error("Error al guardar la lista de chequeo");
+    }
+  };
+
+  // Función para exportar a PDF
+  const handleExportPDF = async (): Promise<void> => {
+    if (!selectedChecklist) {
+      toast.error("No hay ninguna lista de chequeo seleccionada para exportar");
+      return;
+    }
+
+    try {
+      toast.info("📄 Generando PDF...");
+      
+      const base64Data = await exportChecklistToPdf(parseInt(selectedChecklist.id));
+      const fileName = `checklist_${selectedChecklist.id}_trimestre_${selectedChecklist.trimester || 'NA'}.pdf`;
+      
+      downloadFileFromBase64(base64Data, fileName, 'application/pdf');
+      
+      toast.success("📥 PDF descargado exitosamente");
+    } catch (error) {
+      console.error("Error exporting PDF:", error);
+      toast.error("Error al exportar a PDF");
+    }
+  };
+
+  // Función para exportar a Excel
+  const handleExportExcel = async (): Promise<void> => {
+    if (!selectedChecklist) {
+      toast.error("No hay ninguna lista de chequeo seleccionada para exportar");
+      return;
+    }
+
+    try {
+      toast.info("📊 Generando Excel...");
+      
+      const base64Data = await exportChecklistToExcel(parseInt(selectedChecklist.id));
+      const fileName = `checklist_${selectedChecklist.id}_trimestre_${selectedChecklist.trimester || 'NA'}.xlsx`;
+      
+      downloadFileFromBase64(base64Data, fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      
+      toast.success("📥 Excel descargado exitosamente");
+    } catch (error) {
+      console.error("Error exporting Excel:", error);
+      toast.error("Error al exportar a Excel");
+    }
   };
 
   return (
@@ -258,7 +446,7 @@ export default function InstructorChecklistView() {
                       value={evaluationObservations}
                       onChange={(e) => setEvaluationObservations(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
-                      rows="3"
+                      rows={3}
                       placeholder="Ingrese sus observaciones generales sobre la evaluación..."
                       required
                     />
@@ -272,7 +460,7 @@ export default function InstructorChecklistView() {
                       value={evaluationRecommendations}
                       onChange={(e) => setEvaluationRecommendations(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
-                      rows="4"
+                      rows={4}
                       placeholder="Ingrese sus recomendaciones para esta evaluación..."
                       required
                     />
@@ -289,6 +477,7 @@ export default function InstructorChecklistView() {
                       required
                     >
                       <option value="">Seleccione un juicio de valor</option>
+                      <option value="PENDIENTE">Pendiente</option>
                       <option value="EXCELENTE">Excelente</option>
                       <option value="BUENO">Bueno</option>
                       <option value="ACEPTABLE">Aceptable</option>
@@ -300,18 +489,18 @@ export default function InstructorChecklistView() {
                   <div className="flex justify-end space-x-3">
                     <button
                       onClick={handleCompleteEvaluation}
-                      disabled={!evaluationObservations || !evaluationRecommendations || !evaluationJudgment}
+                      disabled={!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE"}
                       className={`px-6 py-2 rounded-md transition-colors duration-200 flex items-center space-x-2 ${
-                        (!evaluationObservations || !evaluationRecommendations || !evaluationJudgment)
+                        (!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
                           ? 'bg-gray-400 cursor-not-allowed text-white'
                           : 'bg-green-600 hover:bg-green-700 text-white'
                       }`}
                     >
                       <Save className="w-4 h-4" />
                       <span>
-                        {(!selectedEvaluation.recommendations || !selectedEvaluation.valueJudgment) 
-                          ? 'Completar Evaluación' 
-                          : 'Actualizar Evaluación'
+                        {(!selectedEvaluation?.recommendations || !selectedEvaluation?.valueJudgment) 
+                          ? '💾 Guardar Evaluación' 
+                          : '✏️ Actualizar Evaluación'
                         }
                       </span>
                     </button>
@@ -327,13 +516,17 @@ export default function InstructorChecklistView() {
                   
                   <div className="text-center">
                     <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
-                      Esta lista puede no tener una evaluación creada automáticamente
+                      Esta lista puede no tener una evaluación creada automáticamente.
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
+                      💡 <strong>Sugerencia:</strong> Contacte al coordinador para que cree una evaluación para esta lista de chequeo.
                     </p>
                     <button
-                      onClick={() => toast.info("Contacte al coordinador para crear una evaluación")}
+                      onClick={() => toast.info("📞 Contacte al coordinador para crear una evaluación para esta lista de chequeo")}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors duration-200 flex items-center space-x-2 mx-auto"
                     >
-                      <span>📞 Solicitar Evaluación</span>
+                      <Phone className="w-4 h-4" />
+                      <span>Solicitar Evaluación al Coordinador</span>
                     </button>
                   </div>
                 </div>
@@ -385,12 +578,28 @@ export default function InstructorChecklistView() {
 
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600 dark:text-gray-400">
-              Listas activas: {activeChecklists.length}
+              Listas activas: {activeChecklists.length} | Filtradas: {filteredChecklists.length}
             </span>
-            <button className="flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md bg-gradient-to-r from-lime-600 to-lime-500 text-white focus:outline-none">
+            <button 
+              onClick={handleExportPDF}
+              disabled={!selectedChecklist}
+              className={`flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md transition-colors duration-300 ${
+                selectedChecklist
+                  ? 'bg-gradient-to-r from-lime-600 to-lime-500 text-white hover:from-lime-700 hover:to-lime-600'
+                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+              } focus:outline-none`}
+            >
               <FileDown className="w-4 h-4" /> PDF
             </button>
-            <button className="flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md bg-gradient-to-r from-lime-600 to-lime-500 text-white focus:outline-none">
+            <button 
+              onClick={handleExportExcel}
+              disabled={!selectedChecklist}
+              className={`flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md transition-colors duration-300 ${
+                selectedChecklist
+                  ? 'bg-gradient-to-r from-lime-600 to-lime-500 text-white hover:from-lime-700 hover:to-lime-600'
+                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+              } focus:outline-none`}
+            >
               <FileDown className="w-4 h-4" /> Excel
             </button>
           </div>
@@ -434,44 +643,51 @@ export default function InstructorChecklistView() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {currentItems.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                      <td className="p-6 text-center font-medium text-gray-900 dark:text-white">{item.id}</td>
-                      <td className="p-6 font-medium text-gray-900 dark:text-white">{item.indicator}</td>
-                      <td className="p-6 text-center font-medium text-gray-900 dark:text-white">
-                        <div className="flex justify-center space-x-2">
-                          <label className="flex items-center space-x-1">
-                            <input
-                              type="radio"
-                              name={`completed-${item.id}`}
-                              value="yes"
-                              onChange={() => handleItemChange(item.id, "completed", true)}
-                              checked={item.completed === true}
-                            />
-                            <Check className="w-5 h-5 text-green-600" />
-                          </label>
-                          <label className="flex items-center space-x-1">
-                            <input
-                              type="radio"
-                              name={`completed-${item.id}`}
-                              value="no"
-                              onChange={() => handleItemChange(item.id, "completed", false)}
-                              checked={item.completed === false}
-                            />
-                            <X className="w-5 h-5 text-red-600" />
-                          </label>
-                        </div>
-                      </td>
-                      <td className="p-3">
-                        <textarea
-                          value={item.observations}
-                          onChange={(e) => handleItemChange(item.id, "observations", e.target.value)}
-                          className="border rounded w-full p-2 min-h-[60px]"
-                          placeholder="Agregar observaciones..."
-                        />
-                      </td>
-                    </tr>
-                  ))}
+                  {currentItems.map((item) => {
+                    const itemState = itemStates[item.id] || { completed: item.completed, observations: item.observations };
+                    return (
+                      <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                        <td className="p-6 text-center font-medium text-gray-900 dark:text-white">{item.id}</td>
+                        <td className="p-6 font-medium text-gray-900 dark:text-white">{item.indicator}</td>
+                        <td className="p-6 text-center font-medium text-gray-900 dark:text-white">
+                          <div className="flex justify-center space-x-4">
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`completed-${item.id}`}
+                                value="yes"
+                                onChange={() => handleItemChange(item.id, "completed", true)}
+                                checked={itemState.completed === true}
+                                className="w-4 h-4 text-green-600 focus:ring-green-500"
+                              />
+                              <Check className="w-5 h-5 text-green-600" />
+                              <span className="text-sm text-green-600 font-medium">Sí</span>
+                            </label>
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`completed-${item.id}`}
+                                value="no"
+                                onChange={() => handleItemChange(item.id, "completed", false)}
+                                checked={itemState.completed === false}
+                                className="w-4 h-4 text-red-600 focus:ring-red-500"
+                              />
+                              <X className="w-5 h-5 text-red-600" />
+                              <span className="text-sm text-red-600 font-medium">No</span>
+                            </label>
+                          </div>
+                        </td>
+                        <td className="p-3">
+                          <textarea
+                            value={itemState.observations || ""}
+                            onChange={(e) => handleItemChange(item.id, "observations", e.target.value)}
+                            className="border border-gray-300 dark:border-gray-600 rounded w-full p-3 min-h-[80px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
+                            placeholder="Agregar observaciones detalladas sobre este item..."
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

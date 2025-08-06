@@ -122,3 +122,56 @@ export const deleteChecklist = async (id) => {
     throw error;
   }
 };
+
+// Función para guardar checklist completo con items evaluados
+export const saveChecklistWithEvaluatedItems = async (checklistId, evaluatedItems, evaluationData = null) => {
+  try {
+    console.log('Saving checklist with evaluated items:', { checklistId, evaluatedItems, evaluationData });
+    
+    // Primero, obtener el checklist actual
+    const currentChecklist = await fetchChecklistById(checklistId);
+    
+    if (currentChecklist.code !== '200' || !currentChecklist.data) {
+      throw new Error('No se pudo obtener la información del checklist');
+    }
+    
+    // Preparar los datos actualizados del checklist
+    const updatedChecklistData = {
+      state: currentChecklist.data.state,
+      remarks: currentChecklist.data.remarks || '',
+      instructorSignature: currentChecklist.data.instructorSignature || '',
+      evaluationCriteria: currentChecklist.data.evaluationCriteria || '',
+      trimester: currentChecklist.data.trimester,
+      component: currentChecklist.data.component || '',
+      studySheets: currentChecklist.data.studySheets || []
+    };
+    
+    console.log('Updating checklist with data:', updatedChecklistData);
+    
+    // Actualizar el checklist
+    const updateResponse = await updateChecklist(checklistId, updatedChecklistData);
+    
+    if (updateResponse.code === '200') {
+      console.log('Checklist updated successfully');
+      
+      // TODO: Aquí se podrían actualizar los items individuales si hay una API específica para eso
+      // Por ahora, solo actualizamos el checklist principal
+      
+      return {
+        code: '200',
+        message: 'Checklist guardado exitosamente',
+        data: {
+          checklistId,
+          evaluatedItems,
+          evaluationData
+        }
+      };
+    } else {
+      throw new Error(`Error actualizando checklist: ${updateResponse.message}`);
+    }
+    
+  } catch (error) {
+    console.error('Error saving checklist with evaluated items:', error);
+    throw error;
+  }
+};

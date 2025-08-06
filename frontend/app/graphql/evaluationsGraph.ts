@@ -66,3 +66,23 @@ export const DELETE_EVALUATION = gql`
     }
   }
 `;
+
+export const GET_EVALUATIONS_BY_CHECKLIST = gql`
+  query GetEvaluationsByChecklist($checklistId: Long!) {
+    allEvaluations(page: 0, size: 100) {
+      code
+      message
+      date
+      currentPage
+      totalPages
+      totalItems
+      data {
+        id
+        observations
+        recommendations
+        valueJudgment
+        checklistId
+      }
+    }
+  }
+`;
