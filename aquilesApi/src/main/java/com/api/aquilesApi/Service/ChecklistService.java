@@ -14,14 +14,8 @@ import org.springframework.stereotype.Service;
 public class ChecklistService implements Idao<Checklist, Long> {
 
     private final ChecklistRepository checklistRepository;
-    private final ChecklistHistoryBusiness checklistHistoryBusiness;
-
-    public ChecklistService(
-            ChecklistRepository checklistRepository,
-            ChecklistHistoryBusiness checklistHistoryBusiness
-    ) {
+    public ChecklistService(ChecklistRepository checklistRepository) {
         this.checklistRepository = checklistRepository;
-        this.checklistHistoryBusiness = checklistHistoryBusiness;
     }
 
     @Override
@@ -31,26 +25,13 @@ public class ChecklistService implements Idao<Checklist, Long> {
 
     @Override
     public Checklist getById(Long id) {
-        return checklistRepository.findById(id).orElseThrow(() ->
-                new CustomException("CheckList with id " + id + " not found", HttpStatus.NO_CONTENT));
+        return checklistRepository.findById(id)
+                .orElseThrow(() -> new CustomException("CheckList with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
     @Override
     public void update(Checklist entity) {
-        Checklist existente = checklistRepository.findById(entity.getId())
-                .orElseThrow(() -> new CustomException("Checklist with id " + entity.getId() + " not found", HttpStatus.NO_CONTENT));
-
-        // ⚠️ Usuario responsable (puedes adaptarlo luego con Spring Security)
-        String usuario = "sistema";
-
-        // Guardar estado antes de actualizar
-        checklistHistoryBusiness.guardarHistorial("UPDATE", existente, null, usuario);
-
-        // Guardar cambios
         checklistRepository.save(entity);
-
-        // Guardar estado después de actualizar
-        checklistHistoryBusiness.guardarHistorial("UPDATE", null, entity, usuario);
     }
 
     @Override
@@ -60,23 +41,11 @@ public class ChecklistService implements Idao<Checklist, Long> {
 
     @Override
     public void delete(Checklist entity) {
-        // ⚠️ Usuario responsable (puedes adaptarlo luego con Spring Security)
-        String usuario = "sistema";
-
-        // Guardar estado antes de borrar
-        checklistHistoryBusiness.guardarHistorial("DELETE", entity, null, usuario);
-
         checklistRepository.delete(entity);
     }
 
     @Override
     public void create(Checklist entity) {
-        Checklist guardado = checklistRepository.save(entity);
-
-        // ⚠️ Usuario responsable (puedes adaptarlo luego con Spring Security)
-        String usuario = "sistema";
-
-        // Guardar estado después de crear
-        checklistHistoryBusiness.guardarHistorial("CREATE", null, guardado, usuario);
+        checklistRepository.save(entity);
     }
 }

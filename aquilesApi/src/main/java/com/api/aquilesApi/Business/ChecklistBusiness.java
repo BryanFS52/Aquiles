@@ -55,9 +55,14 @@ public class ChecklistBusiness {
 
             System.out.println("Total Checklist: " + checklistEntityPage.getTotalElements());
 
+            checklistEntityPage.forEach(entity -> {
+                if (entity.getInstructorSignature() != null) {
+                    int dummy = entity.getInstructorSignature().length;
+                }
+            });
+
             return checklistEntityPage.map(entity -> {
                 ChecklistDto dto = modelMapper.map(entity, ChecklistDto.class);
-                // Mapeo manual de los campos que pueden no estar mapeándose correctamente
                 dto.setTrimester(entity.getTrimester());
                 dto.setComponent(entity.getComponent());
                 return dto;
@@ -73,8 +78,10 @@ public class ChecklistBusiness {
     public ChecklistDto findById(Long id) {
         try {
             Checklist checklist = checklistService.getById(id);
+            if (checklist.getInstructorSignature() != null) {
+                int dummy = checklist.getInstructorSignature().length;
+            }
             ChecklistDto dto = modelMapper.map(checklist, ChecklistDto.class);
-            // Mapeo manual de los campos que pueden no estar mapeándose correctamente
             dto.setTrimester(checklist.getTrimester());
             dto.setComponent(checklist.getComponent());
             return dto;
