@@ -4,7 +4,7 @@ import com.api.aquilesApi.Entity.Checklist;
 import com.api.aquilesApi.Repository.ChecklistRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.api.aquilesApi.Business.ChecklistHistoryBusiness;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -14,17 +14,14 @@ import org.springframework.stereotype.Service;
 public class ChecklistService implements Idao<Checklist, Long> {
 
     private final ChecklistRepository checklistRepository;
-    private final ChecklistHistoryService checklistHistoryService;
-    private final ObjectMapper objectMapper;
+    private final ChecklistHistoryBusiness checklistHistoryBusiness;
 
     public ChecklistService(
             ChecklistRepository checklistRepository,
-            ChecklistHistoryService checklistHistoryService,
-            ObjectMapper objectMapper
+            ChecklistHistoryBusiness checklistHistoryBusiness
     ) {
         this.checklistRepository = checklistRepository;
-        this.checklistHistoryService = checklistHistoryService;
-        this.objectMapper = objectMapper;
+        this.checklistHistoryBusiness = checklistHistoryBusiness;
     }
 
     @Override
@@ -47,13 +44,13 @@ public class ChecklistService implements Idao<Checklist, Long> {
         String usuario = "sistema";
 
         // Guardar estado antes de actualizar
-        checklistHistoryService.guardarHistorial("UPDATE", existente, null, usuario);
+        checklistHistoryBusiness.guardarHistorial("UPDATE", existente, null, usuario);
 
         // Guardar cambios
         checklistRepository.save(entity);
 
         // Guardar estado después de actualizar
-        checklistHistoryService.guardarHistorial("UPDATE", null, entity, usuario);
+        checklistHistoryBusiness.guardarHistorial("UPDATE", null, entity, usuario);
     }
 
     @Override
@@ -67,7 +64,7 @@ public class ChecklistService implements Idao<Checklist, Long> {
         String usuario = "sistema";
 
         // Guardar estado antes de borrar
-        checklistHistoryService.guardarHistorial("DELETE", entity, null, usuario);
+        checklistHistoryBusiness.guardarHistorial("DELETE", entity, null, usuario);
 
         checklistRepository.delete(entity);
     }
@@ -80,6 +77,6 @@ public class ChecklistService implements Idao<Checklist, Long> {
         String usuario = "sistema";
 
         // Guardar estado después de crear
-        checklistHistoryService.guardarHistorial("CREATE", null, guardado, usuario);
+        checklistHistoryBusiness.guardarHistorial("CREATE", null, guardado, usuario);
     }
 }

@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
 @Service
 public class ChecklistHistoryService {
 
@@ -42,9 +41,5 @@ public class ChecklistHistoryService {
 
     public List<ChecklistHistory> findByChecklistId(Long checklistId) {
         return historyRepository.findByChecklistId(checklistId);
-    }
-
-    public ChecklistHistory save(ChecklistHistory checklistHistory) {
-        return historyRepository.save(checklistHistory);
     }
 }

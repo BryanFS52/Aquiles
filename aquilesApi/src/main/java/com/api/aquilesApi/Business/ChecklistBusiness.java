@@ -11,7 +11,6 @@ import com.api.aquilesApi.Repository.JuriesRepository;
 import com.api.aquilesApi.Repository.ItemTypeRepository;
 import com.api.aquilesApi.Service.ChecklistExportService;
 import com.api.aquilesApi.Service.ChecklistService;
-import com.api.aquilesApi.Service.ChecklistHistoryService; 
 import com.api.aquilesApi.Service.EvaluationsService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
@@ -28,7 +27,7 @@ public class ChecklistBusiness {
     private final ModelMapper modelMapper;
     private final EvaluationsService evaluationsService;
     private final ChecklistExportService exportService;
-    private final ChecklistHistoryService checklistHistoryService;
+    private final ChecklistHistoryBusiness checklistHistoryBusiness;
     private final ItemTypeRepository itemTypeRepository;
 
     public ChecklistBusiness(
@@ -37,14 +36,14 @@ public class ChecklistBusiness {
             ModelMapper modelMapper,
             EvaluationsService evaluationService, EvaluationsService evaluationsService,
             ChecklistExportService exportService,
-            ChecklistHistoryService checklistHistoryService,
+            ChecklistHistoryBusiness checklistHistoryBusiness,
             ItemTypeRepository itemTypeRepository
     ) {
         this.checklistService = checklistService;
         this.modelMapper = modelMapper;
         this.evaluationsService = evaluationsService;
         this.exportService = exportService;
-        this.checklistHistoryService = checklistHistoryService;
+        this.checklistHistoryBusiness = checklistHistoryBusiness;
         this.itemTypeRepository = itemTypeRepository;
     }   
 
@@ -147,7 +146,7 @@ public class ChecklistBusiness {
             }
             
             // ⭐ GUARDAR HISTORIAL DE CREACIÓN
-            checklistHistoryService.guardarHistorial(
+            checklistHistoryBusiness.guardarHistorial(
                 "Checklist creado", 
                 null, 
                 saved, 
@@ -206,7 +205,7 @@ public class ChecklistBusiness {
             Checklist checklistActualizado = checklistService.save(checklistAntes);
 
             // ⭐ GUARDAR HISTORIAL DE ACTUALIZACIÓN
-            checklistHistoryService.guardarHistorial(
+            checklistHistoryBusiness.guardarHistorial(
                 "Checklist actualizado", 
                 estadoAnterior, 
                 checklistActualizado, 
@@ -228,7 +227,7 @@ public class ChecklistBusiness {
             checklistService.delete(checklistAntes);
             
             // ⭐ GUARDAR HISTORIAL DE ELIMINACIÓN
-            checklistHistoryService.guardarHistorial(
+            checklistHistoryBusiness.guardarHistorial(
                 "Checklist eliminado", 
                 checklistAntes, 
                 null, 
