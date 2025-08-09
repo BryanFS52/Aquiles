@@ -15,16 +15,13 @@ public class ChecklistService implements Idao<Checklist, Long> {
 
     private final ChecklistRepository checklistRepository;
     private final ChecklistHistoryService checklistHistoryService;
-    private final ObjectMapper objectMapper;
 
     public ChecklistService(
             ChecklistRepository checklistRepository,
-            ChecklistHistoryService checklistHistoryService,
-            ObjectMapper objectMapper
+            ChecklistHistoryService checklistHistoryService
     ) {
         this.checklistRepository = checklistRepository;
         this.checklistHistoryService = checklistHistoryService;
-        this.objectMapper = objectMapper;
     }
 
     @Override

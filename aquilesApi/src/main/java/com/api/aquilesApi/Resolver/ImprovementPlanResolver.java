@@ -14,6 +14,7 @@ import java.util.Map;
 
 @DgsComponent
 public class ImprovementPlanResolver {
+
     private final ImprovementPlanBusiness improvementPlanBusiness;
     public ImprovementPlanResolver(ImprovementPlanBusiness improvementPlanBusiness) {
         this.improvementPlanBusiness = improvementPlanBusiness;

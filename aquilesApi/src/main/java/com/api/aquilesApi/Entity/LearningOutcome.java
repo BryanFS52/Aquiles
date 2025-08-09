@@ -1,15 +1,18 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.io.Serializable;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
+@Table(name ="learning_outcome")
 public class LearningOutcome implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

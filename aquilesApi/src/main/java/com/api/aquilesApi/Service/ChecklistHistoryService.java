@@ -14,14 +14,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class ChecklistHistoryService {
 
-    @Autowired
-    private ChecklistHistoryRepository historyRepository;
+    private final ChecklistHistoryRepository historyRepository;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    public ChecklistHistoryService(ChecklistHistoryRepository historyRepository, ObjectMapper objectMapper) {
+        this.historyRepository = historyRepository;
+        this.objectMapper = objectMapper;
+    }
 
 
-    
     public void guardarHistorial(String accion, Checklist antes, Checklist despues, String teacher) {
 
         System.out.println("🟢 Entrando a guardarHistorial() para checklist ID: " + 

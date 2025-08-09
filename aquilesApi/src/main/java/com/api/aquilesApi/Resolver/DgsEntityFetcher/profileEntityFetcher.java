@@ -3,7 +3,6 @@ package com.api.aquilesApi.Resolver.DgsEntityFetcher;
 import com.api.aquilesApi.Dto.Profile;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsEntityFetcher;
-
 import java.util.Map;
 
 @DgsComponent

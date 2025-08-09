@@ -1,6 +1,5 @@
 /*
- * 
- package com.api.aquilesApi.Resolver;
+package com.api.aquilesApi.Resolver;
  
 import com.api.aquilesApi.Business.FollowUpBusiness;
 import com.api.aquilesApi.Dto.StateFollowUpsDto;
@@ -75,4 +74,4 @@ public class FollowUpResolver {
                     }
                 }
 }
-                */
+*/

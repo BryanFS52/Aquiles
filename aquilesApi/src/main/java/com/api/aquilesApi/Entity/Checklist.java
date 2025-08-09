@@ -45,7 +45,6 @@ public class Checklist implements Serializable {
     private Long evaluations;
 
     // Relations
-
     // 1.Relation (1-M) con item
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items;
@@ -62,5 +61,4 @@ public class Checklist implements Serializable {
     // 4.Relation (1-M) con learningOutcome
     @Column(name = "learningOutcome_id")
     private Long LearningOutcome;
-
 }
