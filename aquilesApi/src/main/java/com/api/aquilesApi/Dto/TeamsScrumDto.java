@@ -34,5 +34,5 @@ public class TeamsScrumDto {
     private ChecklistDto checklist;
     private Long studySheetId;
     private List<TeamScrumMemberIdDto>  memberIds;
-    private Long processMethodologyId;
+    private String processMethodologyId;
 }   

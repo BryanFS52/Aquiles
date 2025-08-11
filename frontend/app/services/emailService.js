@@ -3,12 +3,6 @@ import axios from 'axios';
 const API_BASE_URL = "http://localhost:8081/api";
 
 export const sendEmailAbsence = async (email, studentName, date) => {
-    console.log('Datos que se enviarán:', {
-        email,
-        studentName,
-        date
-    });
-
     try {
         const subject = "Notificación de Inasistencia";
         const htmlContent = `
@@ -58,11 +52,6 @@ export const sendEmailAbsence = async (email, studentName, date) => {
             </div>
         `;
 
-        console.log('Contenido del correo:', {
-            subject,
-            htmlContent
-        });
-
         // Enviar solicitud POST al backend
         const response = await axios.post(`${API_BASE_URL}/send-notification`, {
             email,
@@ -74,8 +63,6 @@ export const sendEmailAbsence = async (email, studentName, date) => {
             }
         });
 
-        // Log de la respuesta del servidor
-        console.log('Respuesta del servidor:', response.data);
         return response.data;
     } catch (error) {
         // Log de errores si la solicitud falla

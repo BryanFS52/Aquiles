@@ -59,7 +59,17 @@ public class ResponseHttpApi {
         return response;
     }
 
-    // Error
+    public static Map<String, Object> responseHttpMultiAction(Object data, String code, String msm) {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", data);
+        response.put("date", new Date());
+        response.put("code", code);
+        response.put("message", msm);
+        return response;
+    }
+
+    //Error
     public static Map<String, Object> responseHttpError(String message, HttpStatus codeMessage) {
         Map<String, Object> response = new HashMap<>();
 

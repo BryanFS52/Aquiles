@@ -1,7 +1,16 @@
+type Item {
+    id: ID!
+    code: String!
+    indicator: String!
+    active: Boolean!
+}
+
 type Checklist {
     id: ID!
     state: Boolean
     remarks: String
+    trimester: String
+    component: String
     trimester: String
     component: String
     instructorSignature: String
@@ -29,9 +38,17 @@ type ChecklistPageId {
     message: String
 }
 
+input ItemDto {
+    code: String!
+    indicator: String!
+    active: Boolean!
+}
+
 input ChecklistDto {
     state: Boolean!
     remarks: String!
+    trimester: String!
+    component: String
     trimester: String!
     component: String
     instructorSignature: String!
@@ -54,5 +71,6 @@ extend type Mutation {
     addChecklist(input: ChecklistDto): Response
     updateChecklist(id: Long!, input: ChecklistDto): Response
     deleteChecklist(id: Long!): Response
+    updateItemStatus(itemId: Long!, active: Boolean!): Response
     updateItemStatus(itemId: Long!, active: Boolean!): Response
 }

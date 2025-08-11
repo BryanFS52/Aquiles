@@ -23,9 +23,6 @@ const FichasInstructor: React.FC = () => {
   const { data, loading, error } = useSelector((state: any) => state.studySheet);
   const fichas = data || [];
 
-  console.log('Redux state:', { data, loading, error });
-  console.log('Fichas to render:', fichas);
-
   useEffect(() => {
     dispatch(fetchStudySheetByTeacher({ idTeacher: 1, page: 0, size: 5 }));
   }, [dispatch]);
@@ -128,7 +125,7 @@ const FichasInstructor: React.FC = () => {
             <ApprenticeModal
               isOpen={isModalOpen}
               onClose={closeModal}
-              students={selectedFicha?.studentStudySheets || []}
+              students={selectedFicha?.studentStudySheets?.map((ss: any) => ss.student) || []}
             />
           </div>
         </div>

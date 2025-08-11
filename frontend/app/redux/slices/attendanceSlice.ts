@@ -33,7 +33,7 @@ const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
             }
         }
     };
-};
+}
 
 
 export const fetchAttendances = createAsyncThunk<
