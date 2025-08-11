@@ -167,8 +167,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                 >
                   <option value="">Selecciona un componente</option>
                   <option value="academico">Académico</option>
-                  <option value="administrativo">Administrativo</option>
-                  <option value="financiero">Financiero</option>
+                  <option value="actitudinal">Actitudinal</option>
                 </select>
               </div>
               <div>
