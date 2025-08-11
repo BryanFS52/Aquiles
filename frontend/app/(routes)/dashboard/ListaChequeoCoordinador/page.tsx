@@ -261,13 +261,16 @@ export default function CoordinadorChecklistView() {
     setConfirmModalOpen(true)
   }
 
-  // Filtrar checklists por trimestre seleccionado y ordenar por ID descendente (más recientes primero)
-  // Nota: Si trimester no está disponible o se selecciona "todos", mostrar todos los checklists
-  // También filtrar checklists inválidos/undefined
-  const filteredChecklists = checklists
+  // Normalizar id a string para evitar exclusión por tipo
+  const normalizedChecklists = checklists.map(c => ({
+    ...c,
+    id: c.id != null ? c.id.toString() : ''
+  }));
+
+  const filteredChecklists = normalizedChecklists
     .filter((checklist) => {
       // Filtrar checklists inválidos
-      if (!checklist || !checklist.id) {
+      if (!checklist || checklist.id == null || checklist.id === '') {
         console.warn("Filtering out invalid checklist:", checklist); // Debug log
         return false;
       }
