@@ -33,6 +33,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/trainers/**").permitAll()
                                 .requestMatchers("/api/stateAttendance/**").permitAll()
                                 .requestMatchers("/graphql").permitAll()
+                                .requestMatchers("/aquiles/graphql").permitAll()
                                 .requestMatchers("/subscriptions", "/graphql/ws").permitAll()
                                 .anyRequest().permitAll()
                 );
@@ -42,7 +43,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4000", "http://localhost:3001"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

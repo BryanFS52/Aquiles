@@ -44,6 +44,12 @@ public class Checklist implements Serializable {
     @Column(name = "evaluations")
     private Long evaluations;
 
+    @Column(name = "trimester", length = 50)
+    private String trimester;
+
+    @Column(name = "component", length = 100)
+    private String component;
+
     // Relations
     // 1.Relation (1-M) con item
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -61,4 +67,15 @@ public class Checklist implements Serializable {
     // 4.Relation (1-M) con learningOutcome
     @Column(name = "learningOutcome_id")
     private Long LearningOutcome;
+
+    // 5.Relation (1-M) con juries
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "checklist_juries",
+            joinColumns = @JoinColumn(name = "checklist_id"),
+            inverseJoinColumns = @JoinColumn(name = "jury_id"))
+    private List<Juries> juries;
+
+    // 6.Relation (1-M) con teamsScrum
+    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamsScrum> teamsScrum;
 }

@@ -26,6 +26,9 @@ public class Item implements Serializable {
     @Column(name = "indicator", nullable = false, length = 100)
     private String indicator;
 
+    @Column(name = "active", nullable = false)
+    private Boolean active = true;
+
     // Relations
     // 1. Relation (M-1) con itemType
     @ManyToOne

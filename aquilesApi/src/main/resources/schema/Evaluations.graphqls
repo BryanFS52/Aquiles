@@ -1,0 +1,42 @@
+type Evaluation {
+    id: ID
+    observations: String
+    recommendations: String
+    valueJudgment: String
+    checklistId: Long
+}
+
+type EvaluationPage {
+    code: String
+    data: [Evaluation]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type EvaluationPageId {
+    data: Evaluation
+    date: String
+    code: String
+    message: String
+}
+
+input EvaluationDto {
+    observations: String
+    recommendations: String
+    valueJudgment: String
+    checklistId: Long
+}
+
+extend type Query {
+    allEvaluations(page: Int, size: Int): EvaluationPage
+    evaluationById(id: Long!): EvaluationPageId
+}
+
+extend type Mutation {
+    addEvaluation(input: EvaluationDto!): Response
+    updateEvaluation(id: Long!, input: EvaluationDto!): Response
+    deleteEvaluation(id: Long!): Response
+}

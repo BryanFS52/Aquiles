@@ -7,6 +7,52 @@ import PageTitle from "@components/UI/pageTitle";
 
 // Moving checklistData outside the component to prevent unnecessary re-renders
 const checklistData = {
+  "Trimestre 1": {
+    "Componente Técnico": [
+      { id: 1, indicator: "Domina conceptos básicos de programación.", completed: true, observations: "" },
+      { id: 2, indicator: "Comprende estructuras de datos fundamentales.", completed: true, observations: "" },
+      { id: 3, indicator: "Implementa algoritmos básicos.", completed: true, observations: "" },
+      { id: 4, indicator: "Utiliza herramientas de desarrollo.", completed: true, observations: "" }
+    ],
+    "Componente Funcional": [
+      { id: 1, indicator: "Identifica requerimientos básicos.", completed: true, observations: "" },
+      { id: 2, indicator: "Diseña soluciones simples.", completed: false, observations: "" },
+      { id: 3, indicator: "Documenta procesos básicos.", completed: true, observations: "" }
+    ]
+  },
+  "Trimestre 2": {
+    "Componente Técnico": [
+      { id: 1, indicator: "Implementa programación orientada a objetos.", completed: true, observations: "" },
+      { id: 2, indicator: "Utiliza bases de datos relacionales.", completed: true, observations: "" },
+      { id: 3, indicator: "Crea interfaces de usuario básicas.", completed: false, observations: "" }
+    ],
+    "Componente Funcional": [
+      { id: 1, indicator: "Analiza requerimientos funcionales.", completed: true, observations: "" },
+      { id: 2, indicator: "Diseña modelos de datos.", completed: true, observations: "" }
+    ]
+  },
+  "Trimestre 3": {
+    "Componente Técnico": [
+      { id: 1, indicator: "Desarrolla aplicaciones web básicas.", completed: true, observations: "" },
+      { id: 2, indicator: "Implementa validaciones de datos.", completed: true, observations: "" },
+      { id: 3, indicator: "Utiliza frameworks básicos.", completed: false, observations: "" }
+    ],
+    "Componente Funcional": [
+      { id: 1, indicator: "Implementa lógica de negocio.", completed: true, observations: "" },
+      { id: 2, indicator: "Realiza pruebas básicas.", completed: false, observations: "" }
+    ]
+  },
+  "Trimestre 4": {
+    "Componente Técnico": [
+      { id: 1, indicator: "Desarrolla APIs REST básicas.", completed: true, observations: "" },
+      { id: 2, indicator: "Implementa autenticación básica.", completed: true, observations: "" },
+      { id: 3, indicator: "Utiliza sistemas de control de versiones.", completed: true, observations: "" }
+    ],
+    "Componente Funcional": [
+      { id: 1, indicator: "Integra sistemas básicos.", completed: true, observations: "" },
+      { id: 2, indicator: "Documenta APIs.", completed: false, observations: "" }
+    ]
+  },
   "Trimestre 5": {
     "Componente Técnico": [
       { id: 1, indicator: "El software evidencia autenticación y manejo dinámico de roles.", completed: true, observations: "" },
@@ -27,18 +73,34 @@ const checklistData = {
   "Trimestre 6": {
     "Componente Técnico": [
       { id: 1, indicator: "Implementa servicios REST siguiendo estándares.", completed: true, observations: "" },
-      { id: 2, indicator: "Utiliza JWT para la autenticación de servicios.", completed: false, observations: "" }
+      { id: 2, indicator: "Utiliza JWT para la autenticación de servicios.", completed: false, observations: "" },
+      { id: 3, indicator: "Implementa microservicios.", completed: true, observations: "" },
+      { id: 4, indicator: "Utiliza contenedores Docker.", completed: false, observations: "" }
     ],
     "Componente Funcional": [
       { id: 1, indicator: "Implementa pruebas unitarias.", completed: true, observations: "" },
-      { id: 2, indicator: "Utiliza herramientas de integración continua.", completed: false, observations: "" }
+      { id: 2, indicator: "Utiliza herramientas de integración continua.", completed: false, observations: "" },
+      { id: 3, indicator: "Implementa monitoreo de aplicaciones.", completed: true, observations: "" }
+    ]
+  },
+  "Trimestre 7": {
+    "Componente Técnico": [
+      { id: 1, indicator: "Implementa arquitecturas escalables.", completed: true, observations: "" },
+      { id: 2, indicator: "Utiliza herramientas de orquestación.", completed: false, observations: "" },
+      { id: 3, indicator: "Implementa seguridad avanzada.", completed: true, observations: "" },
+      { id: 4, indicator: "Optimiza rendimiento de aplicaciones.", completed: true, observations: "" }
+    ],
+    "Componente Funcional": [
+      { id: 1, indicator: "Diseña sistemas complejos.", completed: true, observations: "" },
+      { id: 2, indicator: "Implementa metodologías ágiles.", completed: true, observations: "" },
+      { id: 3, indicator: "Lidera equipos de desarrollo.", completed: false, observations: "" }
     ]
   }
 };
 
 export default function ChecklistComponent() {
   // State management
-  const [selectedTrimester, setSelectedTrimester] = useState("Trimestre 5");
+  const [selectedTrimester, setSelectedTrimester] = useState("Trimestre 1");
   const [selectedComponent, setSelectedComponent] = useState("Componente Técnico");
   const [items, setItems] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
