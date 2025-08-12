@@ -6,8 +6,10 @@ import { toast } from "react-toastify";
 import Image from "next/image";
 import PageTitle from "@components/UI/pageTitle";
 import { fetchAllChecklists, fetchChecklistById } from "@services/checkListService.js";
-import { fetchEvaluationsByChecklist, completeEvaluation } from "@services/evaluationService";
+import { fetchEvaluationsByChecklist, fetchEvaluationsByChecklistOld, completeEvaluation } from "@services/evaluationService";
 import { exportChecklistToPdf, exportChecklistToExcel, downloadFileFromBase64 } from "@services/exportService";
+import { GET_ALL_EVALUATIONS } from '@graphql/evaluationsGraph';
+import { clientLAN } from '@/lib/apollo-client';
 import { 
   Checklist, 
   Evaluation, 
@@ -45,6 +47,41 @@ export default function InstructorChecklistView() {
     }
   }, [selectedChecklist]);
 
+  // Función de debugging para ver todas las evaluaciones
+  const debugAllEvaluations = async (): Promise<void> => {
+    try {
+      console.log("=== DEBUGGING ALL EVALUATIONS ===");
+      const { data } = await clientLAN.query({
+        query: GET_ALL_EVALUATIONS,
+        variables: { page: 0, size: 100 },
+        fetchPolicy: 'no-cache',
+      });
+      
+      console.log("All evaluations in database:", data);
+      if (data.allEvaluations && data.allEvaluations.data) {
+        console.log("Total evaluations found:", data.allEvaluations.data.length);
+        data.allEvaluations.data.forEach((evaluation: any, index: number) => {
+          console.log(`Evaluation ${index + 1}:`, {
+            id: evaluation.id,
+            checklistId: evaluation.checklistId,
+            observations: evaluation.observations,
+            recommendations: evaluation.recommendations,
+            valueJudgment: evaluation.valueJudgment
+          });
+        });
+        
+        if (selectedChecklist) {
+          const matchingEvaluations = data.allEvaluations.data.filter(
+            (evaluation: any) => evaluation.checklistId == selectedChecklist.id
+          );
+          console.log(`Evaluations matching checklist ${selectedChecklist.id}:`, matchingEvaluations);
+        }
+      }
+    } catch (error) {
+      console.error("Error debugging evaluations:", error);
+    }
+  };
+
   const loadActiveChecklists = async (): Promise<void> => {
     try {
       setLoading(true);
@@ -72,31 +109,71 @@ export default function InstructorChecklistView() {
 
   const loadEvaluationsForChecklist = async (checklistId: number): Promise<void> => {
     try {
-      console.log("Loading evaluations for checklist ID:", checklistId);
-      const evaluationsResponse = await fetchEvaluationsByChecklist(checklistId);
-      console.log("Evaluations response:", evaluationsResponse);
+      console.log("=== LOADING EVALUATIONS FOR CHECKLIST ===");
+      console.log("Checklist ID:", checklistId);
+      console.log("Checklist ID type:", typeof checklistId);
       
-      if (evaluationsResponse.code === "200" && evaluationsResponse.data) {
-        setEvaluations(evaluationsResponse.data);
-        console.log("Evaluations found:", evaluationsResponse.data.length);
+      const evaluationsResponse = await fetchEvaluationsByChecklist(checklistId);
+      console.log("Raw evaluations response:", evaluationsResponse);
+      
+      if (evaluationsResponse && evaluationsResponse.code === "200") {
+        console.log("Evaluations response successful");
+        console.log("Evaluations data:", evaluationsResponse.data);
         
-        // Si hay evaluaciones, seleccionar la primera automáticamente
-        if (evaluationsResponse.data.length > 0) {
+        if (evaluationsResponse.data && evaluationsResponse.data.length > 0) {
+          setEvaluations(evaluationsResponse.data);
+          console.log("Found evaluations:", evaluationsResponse.data.length);
+          
+          // Si hay evaluaciones, seleccionar la primera automáticamente
           const firstEvaluation = evaluationsResponse.data[0];
-          console.log("First evaluation:", firstEvaluation);
+          console.log("First evaluation details:", firstEvaluation);
+          console.log("First evaluation checklistId:", firstEvaluation.checklistId);
+          
           setSelectedEvaluation(firstEvaluation);
           setEvaluationObservations(firstEvaluation.observations || "");
           setEvaluationRecommendations(firstEvaluation.recommendations || "");
           setEvaluationJudgment(firstEvaluation.valueJudgment || "PENDIENTE");
+          
+          console.log("✅ Evaluation loaded successfully");
         } else {
-          console.log("No evaluations found for this checklist");
-          // Resetear estados de evaluación
-          setSelectedEvaluation(null);
-          setEvaluationObservations("");
-          setEvaluationRecommendations("");
-          setEvaluationJudgment("PENDIENTE");
+          console.log("❌ No evaluations found in response data");
+          // Intentar con la función alternativa
+          console.log("Trying alternative fetch method...");
+          
+          try {
+            const alternativeResponse = await fetchEvaluationsByChecklistOld(checklistId);
+            console.log("Alternative response:", alternativeResponse);
+            
+            if (alternativeResponse && alternativeResponse.data && alternativeResponse.data.length > 0) {
+              setEvaluations(alternativeResponse.data);
+              const firstEvaluation = alternativeResponse.data[0];
+              setSelectedEvaluation(firstEvaluation);
+              setEvaluationObservations(firstEvaluation.observations || "");
+              setEvaluationRecommendations(firstEvaluation.recommendations || "");
+              setEvaluationJudgment(firstEvaluation.valueJudgment || "PENDIENTE");
+              console.log("✅ Evaluation loaded via alternative method");
+            } else {
+              // Resetear estados de evaluación
+              setEvaluations([]);
+              setSelectedEvaluation(null);
+              setEvaluationObservations("");
+              setEvaluationRecommendations("");
+              setEvaluationJudgment("PENDIENTE");
+              console.log("❌ No evaluations found via alternative method either");
+            }
+          } catch (altError) {
+            console.error("Alternative fetch also failed:", altError);
+            setEvaluations([]);
+            setSelectedEvaluation(null);
+            setEvaluationObservations("");
+            setEvaluationRecommendations("");
+            setEvaluationJudgment("PENDIENTE");
+          }
         }
       } else {
+        console.log("❌ Evaluations response failed or no code 200");
+        console.log("Response code:", evaluationsResponse?.code);
+        console.log("Response message:", evaluationsResponse?.message);
         setEvaluations([]);
         setSelectedEvaluation(null);
         setEvaluationObservations("");
@@ -104,7 +181,8 @@ export default function InstructorChecklistView() {
         setEvaluationJudgment("PENDIENTE");
       }
     } catch (error) {
-      console.error("Error loading evaluations:", error);
+      console.error("❌ Error loading evaluations:", error);
+      console.error("Error stack:", error);
       // No mostrar error al usuario, solo resetear estados
       setEvaluations([]);
       setSelectedEvaluation(null);
@@ -521,13 +599,25 @@ export default function InstructorChecklistView() {
                     <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
                       💡 <strong>Sugerencia:</strong> Contacte al coordinador para que cree una evaluación para esta lista de chequeo.
                     </p>
-                    <button
-                      onClick={() => toast.info("📞 Contacte al coordinador para crear una evaluación para esta lista de chequeo")}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors duration-200 flex items-center space-x-2 mx-auto"
-                    >
-                      <Phone className="w-4 h-4" />
-                      <span>Solicitar Evaluación al Coordinador</span>
-                    </button>
+                    
+                    {/* Botones de acción */}
+                    <div className="space-y-3">
+                      <button
+                        onClick={() => toast.info("📞 Contacte al coordinador para crear una evaluación para esta lista de chequeo")}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors duration-200 flex items-center space-x-2 mx-auto"
+                      >
+                        <Phone className="w-4 h-4" />
+                        <span>Solicitar Evaluación al Coordinador</span>
+                      </button>
+                      
+                      {/* Botón de debug temporal */}
+                      <button
+                        onClick={debugAllEvaluations}
+                        className="bg-gray-500 text-white px-4 py-2 rounded-md text-sm hover:bg-gray-600 transition-colors mx-auto block"
+                      >
+                        🔍 Debug: Ver todas las evaluaciones
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

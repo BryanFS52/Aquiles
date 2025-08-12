@@ -188,7 +188,7 @@ public class ChecklistBusiness {
             estadoAnterior.setEvaluation(checklistAntes.getEvaluation());
             estadoAnterior.setLearningOutcome(checklistAntes.getLearningOutcome());
 
-            // Aplicar los cambios
+            // Aplicar los cambios básicos del checklist
             checklistAntes.setState(checklistDto.getState());
             checklistAntes.setRemarks(checklistDto.getRemarks());
             checklistAntes.setStudySheets(checklistDto.getStudySheets());
@@ -200,6 +200,54 @@ public class ChecklistBusiness {
                 );
             }
 
+            // 🔧 ACTUALIZAR ITEMS - ESTA ERA LA PARTE FALTANTE
+            if (checklistDto.getItems() != null) {
+                // Obtener los items existentes
+                List<Item> existingItems = checklistAntes.getItems();
+                if (existingItems == null) {
+                    existingItems = new java.util.ArrayList<>();
+                    checklistAntes.setItems(existingItems);
+                }
+
+                // Actualizar items existentes o crear nuevos
+                for (var itemDto : checklistDto.getItems()) {
+                    Item existingItem = null;
+                    
+                    // Si el itemDto tiene ID, buscar el item existente
+                    if (itemDto.getId() != null) {
+                        for (Item item : existingItems) {
+                            if (item.getId().equals(itemDto.getId())) {
+                                existingItem = item;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (existingItem != null) {
+                        // 🎯 ACTUALIZAR ITEM EXISTENTE
+                        System.out.println("🔄 Updating existing item ID: " + existingItem.getId() + 
+                                         " from '" + existingItem.getIndicator() + 
+                                         "' to '" + itemDto.getIndicator() + "'");
+                        existingItem.setCode(itemDto.getCode());
+                        existingItem.setIndicator(itemDto.getIndicator());
+                        existingItem.setActive(itemDto.getActive() != null ? itemDto.getActive() : true);
+                    } else {
+                        // ➕ CREAR NUEVO ITEM
+                        System.out.println("➕ Creating new item: " + itemDto.getIndicator());
+                        ItemType defaultItemType = getOrCreateDefaultItemType(checklistAntes.getTrimester());
+                        
+                        Item newItem = new Item();
+                        newItem.setCode(itemDto.getCode());
+                        newItem.setIndicator(itemDto.getIndicator());
+                        newItem.setActive(itemDto.getActive() != null ? itemDto.getActive() : true);
+                        newItem.setChecklist(checklistAntes);
+                        newItem.setItemType(defaultItemType);
+                        
+                        existingItems.add(newItem);
+                    }
+                }
+            }
+
             // ✅ Modificar la evaluación ya existente asociada al checklist
             Evaluations eval = checklistAntes.getEvaluation();
             if (eval != null) {
@@ -208,8 +256,10 @@ public class ChecklistBusiness {
                 // Modifica aquí lo que necesites
             }
 
-            // Guardar los cambios
+            // Guardar los cambios (esto persistirá tanto el checklist como los items actualizados)
+            System.out.println("💾 Saving updated checklist with items...");
             Checklist checklistActualizado = checklistService.save(checklistAntes);
+            System.out.println("✅ Checklist saved successfully with " + checklistActualizado.getItems().size() + " items");
 
             // ⭐ GUARDAR HISTORIAL DE ACTUALIZACIÓN
             checklistHistoryBusiness.guardarHistorial(
@@ -220,6 +270,8 @@ public class ChecklistBusiness {
             );
 
         } catch (Exception e) {
+            System.err.println("❌ Error updating checklist: " + e.getMessage());
+            e.printStackTrace();
             throw new CustomException("Error Updating Checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

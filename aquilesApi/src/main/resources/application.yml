@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/DB_Aquiles
     username: postgres
-    password: "Tohka0811"
+    password: "fabrica2024*"
     driver-class-name: org.postgresql.Driver
 
   jpa:

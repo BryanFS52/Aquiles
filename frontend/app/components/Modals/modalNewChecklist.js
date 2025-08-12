@@ -13,20 +13,47 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
 
   // Efecto para cargar datos de edición
   useEffect(() => {
-    if (isEditing && editingData) {
-      setTrimestre(editingData.trimester || '')
+    console.log("Modal useEffect triggered:", { isOpen, isEditing, editingData }); // Debug log
+    
+    if (isOpen && isEditing && editingData) {
+      console.log("Modal received editingData:", editingData) // Debug log
+      console.log("Modal editingData type:", typeof editingData) // Debug log
+      
+      // Cargar datos existentes para edición (SIEMPRE, incluso si ya hay datos)
+      console.log("Loading/reloading data from editingData..."); // Debug log
+      
+      setTrimestre(editingData.trimester?.toString() || '')
       setComponente(editingData.component || '')
       setObservaciones(editingData.remarks || '')
-      // Si hay items específicos en editingData, cargarlos aquí
-      // setItems(editingData.items || [{ indicador: '' }])
-    } else {
-      // Limpiar formulario para nueva creación
+      
+      console.log("Loading items from editingData:", editingData.items) // Debug log
+      
+      // Cargar indicadores existentes si están disponibles
+      if (editingData.items && editingData.items.length > 0) {
+        const loadedItems = editingData.items.map(item => ({
+          id: item.id, // ← Preservar el ID del item existente
+          indicador: item.indicator || ''
+        }))
+        console.log("Mapped items for modal:", loadedItems) // Debug log
+        console.log("🔍 DETAILED INDICATORS BEING LOADED:"); // Debug log
+        loadedItems.forEach((item, index) => {
+          console.log(`  Indicator ${index + 1}: id=${item.id}, indicator="${item.indicador}"`); // Debug log
+        });
+        setItems(loadedItems)
+        console.log("✅ Items loaded into modal form"); // Debug log
+      } else {
+        console.log("No items found, setting default item") // Debug log
+        setItems([{ indicador: '' }])
+      }
+    } else if (isOpen && !isEditing) {
+      // Solo limpiar formulario para nueva creación cuando el modal se abre por primera vez
+      console.log("Clearing form for new creation") // Debug log
       setTrimestre('')
       setComponente('')
       setObservaciones('')
       setItems([{ indicador: '' }])
     }
-  }, [isEditing, editingData, isOpen])
+  }, [isEditing, editingData, isOpen]) // Reaccionar a cambios en editingData
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -48,24 +75,55 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
         component: componente,
         associatedJuries: [],
         items: items.map((item, index) => ({
+          ...(item.id && { id: item.id }), // ← Incluir ID si existe (modo edición)
           code: `IND-${index + 1}`,
           indicator: item.indicador,
           active: true
         }))
       }
 
+      console.log('Modal submitting checklist data:', newChecklist); // Debug log
+      console.log('Is editing mode:', isEditing); // Debug log
+      console.log('🚀 DETAILED INDICATORS BEING SENT:'); // Debug log
+      newChecklist.items.forEach((item, index) => {
+        console.log(`  Item ${index + 1}: id=${item.id || 'NEW'}, code="${item.code}", indicator="${item.indicator}", active=${item.active}`); // Debug log
+      });
+
       if (onCreate) {
+        // Usar la función onCreate que viene del componente padre (que maneja la creación automática de evaluación)
         await onCreate(newChecklist)
+        
+        if (isEditing) {
+          // En modo edición, NO limpiar el formulario - mantener los datos
+          console.log('Update completed successfully, keeping form data...'); // Debug log
+          
+          // Cerrar modal después de actualización
+          if (onClose) {
+            console.log('Closing modal after successful update...'); // Debug log
+            onClose()
+          }
+        } else {
+          // En modo creación, sí limpiar el formulario
+          console.log('Creation completed successfully, resetting form...'); // Debug log
+          resetForm()
+          
+          if (onClose) {
+            console.log('Closing modal after successful creation...'); // Debug log
+            onClose()
+          }
+        }
       } else {
+        // Fallback: crear solo el checklist sin evaluación automática
         await addChecklist(newChecklist)
         toast.success('Lista de chequeo creada exitosamente.')
+        toast.warning('Nota: No se pudo crear la evaluación automática. Contacte al coordinador.')
+        
+        resetForm()
+        if (onClose) onClose()
       }
-
-      resetForm()
-      if (onClose) onClose()
     } catch (error) {
-      console.error('Error al crear la lista de chequeo:', error)
-      toast.error('Error al crear la lista de chequeo. Por favor, intente de nuevo.')
+      console.error('Error in modal:', error)
+      toast.error(isEditing ? 'Error al actualizar la lista de chequeo' : 'Error al crear la lista de chequeo')
     }
   }
 
@@ -76,7 +134,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
   }
 
   const handleAddIndicador = () => {
-    setItems([...items, { indicador: '' }])
+    setItems([...items, { indicador: '' }]) // ← Nuevos items no tienen ID
   }
 
   const handleRemoveIndicador = (index) => {
@@ -102,7 +160,10 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
           </h2>
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-blue-800 text-sm">
-              💡 <strong>Nota:</strong> Se creará automáticamente una evaluación vinculada a esta lista. El instructor podrá completarla desde su vista.
+              💡 <strong>Nota:</strong> {isEditing ? 
+                'Los cambios se guardarán automáticamente. Puede cerrar este modal cuando termine.' : 
+                'Se creará automáticamente una evaluación vinculada a esta lista. El instructor podrá completarla desde su vista.'
+              }
             </p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -131,8 +192,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                 >
                   <option value="">Selecciona un componente</option>
                   <option value="academico">Académico</option>
-                  <option value="administrativo">Administrativo</option>
-                  <option value="financiero">Financiero</option>
+                  <option value="actitudinal">Actitudinal</option>
                 </select>
               </div>
               <div>
@@ -185,7 +245,11 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
 
           </form>
           <button
-            onClick={onClose}
+            onClick={() => {
+              console.log('Cancel button clicked, resetting form...'); // Debug log
+              resetForm()
+              onClose()
+            }}
             className="text-sm text-gray-500 underline mt-4"
           >
             Cancelar
