@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useEffect, useMemo } from "react";
-import { Check, FileDown, Save, UploadCloud, X, AlertTriangle, Phone } from "lucide-react";
+import { Check, FileDown, Save, UploadCloud, X, AlertTriangle, Phone, Edit } from "lucide-react";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import PageTitle from "@components/UI/pageTitle";
 import { fetchAllChecklists, fetchChecklistById } from "@services/checkListService.js";
-import { fetchEvaluationsByChecklist, fetchEvaluationsByChecklistOld, completeEvaluation, createMissingEvaluationForChecklist } from "@services/evaluationService";
+import { fetchEvaluationsByChecklist, fetchEvaluationsByChecklistOld, completeEvaluation, createMissingEvaluationForChecklist, createEvaluationForChecklist } from "@services/evaluationService";
 import { exportChecklistToPdf, exportChecklistToExcel, downloadFileFromBase64 } from "@services/exportService";
 import { GET_ALL_EVALUATIONS } from '@graphql/evaluationsGraph';
 import { clientLAN } from '@/lib/apollo-client';
@@ -32,8 +32,46 @@ export default function InstructorChecklistView() {
   const [evaluationJudgment, setEvaluationJudgment] = useState<string>("PENDIENTE");
   const [loading, setLoading] = useState<boolean>(true);
   const [itemStates, setItemStates] = useState<{[key: number]: {completed: boolean | null, observations: string}}>({});
+  
+  // Estados para el modal de creación de evaluación
+  const [showCreateEvaluationModal, setShowCreateEvaluationModal] = useState(false);
+  const [isCreatingEvaluation, setIsCreatingEvaluation] = useState(false);
+  const [showEvaluationForm, setShowEvaluationForm] = useState(false);
+
+  // Cache en memoria para evaluaciones por checklist
+  const [evaluationsCache, setEvaluationsCache] = useState<{[key: string]: {evaluation: Evaluation, timestamp: number}}>({});
 
   const itemsPerPage = 3;
+
+  // Funciones auxiliares para el cache de evaluaciones
+  const getCachedEvaluation = (checklistId: string) => {
+    const cached = evaluationsCache[checklistId];
+    if (cached) {
+      const fiveMinutes = 5 * 60 * 1000; // 5 minutos en milisegundos
+      if (Date.now() - cached.timestamp < fiveMinutes) {
+        console.log('📦 Usando evaluación desde cache:', cached.evaluation);
+        return cached.evaluation;
+      } else {
+        // Cache expirado, limpiar
+        const newCache = { ...evaluationsCache };
+        delete newCache[checklistId];
+        setEvaluationsCache(newCache);
+        console.log('🗑️ Cache expirado para checklist:', checklistId);
+      }
+    }
+    return null;
+  };
+
+  const setCachedEvaluation = (checklistId: string, evaluation: Evaluation) => {
+    setEvaluationsCache(prev => ({
+      ...prev,
+      [checklistId]: {
+        evaluation,
+        timestamp: Date.now()
+      }
+    }));
+    console.log('💾 Evaluación guardada en cache:', checklistId, evaluation);
+  };
 
   // Cargar listas de chequeo activas
   useEffect(() => {
@@ -43,9 +81,139 @@ export default function InstructorChecklistView() {
   // Auto-cargar evaluaciones cuando cambie el checklist seleccionado
   useEffect(() => {
     if (selectedChecklist) {
-      loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
+      // Al cargar por primera vez o cambiar checklist, NO preservar datos actuales
+      // Queremos ver lo que realmente está en la base de datos
+      loadEvaluationsForChecklist(parseInt(selectedChecklist.id), false);
     }
   }, [selectedChecklist]);
+
+  // Efecto para cargar datos de evaluación seleccionada INMEDIATAMENTE
+  useEffect(() => {
+    if (selectedEvaluation) {
+      console.log('🔄 Cargando datos de evaluación seleccionada:', selectedEvaluation);
+      console.log('📊 Detalles completos de selectedEvaluation:', {
+        id: selectedEvaluation.id,
+        observations: selectedEvaluation.observations,
+        recommendations: selectedEvaluation.recommendations,
+        valueJudgment: selectedEvaluation.valueJudgment,
+        checklistId: selectedEvaluation.checklistId,
+        allProperties: Object.keys(selectedEvaluation)
+      });
+      
+      // Siempre cargar los datos de la evaluación, incluso si están vacíos
+      const obsFromDB = selectedEvaluation.observations || "";
+      const recFromDB = selectedEvaluation.recommendations || "";
+      const judgmentFromDB = selectedEvaluation.valueJudgment || "PENDIENTE";
+      
+      setEvaluationObservations(obsFromDB);
+      setEvaluationRecommendations(recFromDB);
+      setEvaluationJudgment(judgmentFromDB);
+      setShowEvaluationForm(false); // Ocultar formulario inicialmente
+      
+      console.log('✅ Datos cargados en campos del formulario:', {
+        observations: obsFromDB,
+        recommendations: recFromDB,
+        judgment: judgmentFromDB,
+        hasData: !!(obsFromDB || recFromDB || (judgmentFromDB && judgmentFromDB !== "PENDIENTE"))
+      });
+      
+      // Si la evaluación no tiene datos completos, mostrar mensaje informativo
+      if (!obsFromDB && !recFromDB && (!judgmentFromDB || judgmentFromDB === "PENDIENTE")) {
+        console.log('ℹ️ Evaluación encontrada pero sin datos completos - puede necesitar completarse');
+      }
+    } else {
+      // Si no hay evaluación seleccionada, limpiar campos
+      console.log('🧹 Limpiando campos - no hay evaluación seleccionada');
+      setEvaluationObservations("");
+      setEvaluationRecommendations("");
+      setEvaluationJudgment("PENDIENTE");
+      setShowEvaluationForm(false);
+    }
+  }, [selectedEvaluation]);
+
+  // Efecto para persistir los datos de evaluación en localStorage
+  // Solo cuando no hay una evaluación existente en DB
+  useEffect(() => {
+    if (selectedChecklist && !selectedEvaluation && (evaluationObservations || evaluationRecommendations || evaluationJudgment !== "PENDIENTE")) {
+      const evaluationData = {
+        checklistId: selectedChecklist.id,
+        observations: evaluationObservations,
+        recommendations: evaluationRecommendations,
+        judgment: evaluationJudgment,
+        timestamp: Date.now()
+      };
+      localStorage.setItem(`evaluation_${selectedChecklist.id}`, JSON.stringify(evaluationData));
+      console.log('💾 Datos de evaluación guardados en localStorage', evaluationData);
+    }
+  }, [selectedChecklist, selectedEvaluation, evaluationObservations, evaluationRecommendations, evaluationJudgment]);
+
+  // Efecto para recuperar datos de evaluación desde localStorage al cargar
+  // SOLO si no existe una evaluación en la base de datos
+  useEffect(() => {
+    // Solo ejecutar después de haber intentado cargar desde la DB
+    const timeoutId = setTimeout(() => {
+      if (selectedChecklist && !selectedEvaluation) {
+        // Solo usar localStorage si no hay evaluación en DB
+        const savedData = localStorage.getItem(`evaluation_${selectedChecklist.id}`);
+        if (savedData) {
+          try {
+            const parsedData = JSON.parse(savedData);
+            const now = Date.now();
+            const oneHour = 60 * 60 * 1000; // 1 hora en milisegundos
+            
+            // Solo usar datos guardados si son de menos de 1 hora
+            if (now - parsedData.timestamp < oneHour) {
+              console.log('🔄 Recuperando datos desde localStorage (sin evaluación en DB)', parsedData);
+              setEvaluationObservations(parsedData.observations || "");
+              setEvaluationRecommendations(parsedData.recommendations || "");
+              setEvaluationJudgment(parsedData.judgment || "PENDIENTE");
+            } else {
+              // Limpiar datos antiguos
+              localStorage.removeItem(`evaluation_${selectedChecklist.id}`);
+              console.log('🗑️ Datos antiguos de localStorage removidos');
+            }
+          } catch (error) {
+            console.warn('Error al recuperar datos de localStorage:', error);
+          }
+        }
+      } else if (selectedEvaluation) {
+        // Si hay evaluación en DB, los datos ya deberían estar cargados por loadEvaluationsForChecklist
+        console.log('✅ Evaluación existe en DB, datos ya cargados desde la base de datos');
+      }
+    }, 1000); // Dar tiempo para que se carguen los datos desde la DB
+
+    return () => clearTimeout(timeoutId);
+  }, [selectedChecklist, selectedEvaluation]);
+
+  // Efecto adicional para asegurar que los datos se carguen correctamente después de reload
+  // SOLO actúa cuando hay evaluación pero los campos están completamente vacíos (reload)
+  useEffect(() => {
+    if (selectedEvaluation && 
+        !evaluationObservations && 
+        !evaluationRecommendations && 
+        evaluationJudgment === "PENDIENTE" &&
+        (selectedEvaluation.observations || selectedEvaluation.recommendations || selectedEvaluation.valueJudgment !== "PENDIENTE")) {
+      
+      console.log('🔄 Detectando reload - sincronizando datos desde DB...');
+      setEvaluationObservations(selectedEvaluation.observations || "");
+      setEvaluationRecommendations(selectedEvaluation.recommendations || "");
+      setEvaluationJudgment(selectedEvaluation.valueJudgment || "PENDIENTE");
+      console.log('✅ Datos sincronizados desde evaluación existente después de reload');
+    }
+  }, [selectedEvaluation, evaluationObservations, evaluationRecommendations, evaluationJudgment]);
+
+  // Función auxiliar para sincronizar datos después de crear/actualizar evaluación
+  const syncEvaluationDataAfterSave = async (checklistId: number, savedData: any) => {
+    console.log('🔄 Recargando evaluación desde DB después de guardar...');
+    
+    // Recargar desde la base de datos SIN preservar datos locales
+    try {
+      await loadEvaluationsForChecklist(checklistId, false);
+      console.log('✅ Sincronización completada exitosamente');
+    } catch (error) {
+      console.warn('⚠️ Error en sincronización:', error);
+    }
+  };
 
   // Función de debugging para ver todas las evaluaciones
   const debugAllEvaluations = async (): Promise<void> => {
@@ -107,11 +275,32 @@ export default function InstructorChecklistView() {
     }
   };
 
-  const loadEvaluationsForChecklist = async (checklistId: number): Promise<void> => {
+  const loadEvaluationsForChecklist = async (checklistId: number, preserveCurrentData: boolean = false): Promise<void> => {
     try {
       console.log("=== LOADING EVALUATIONS FOR CHECKLIST ===");
       console.log("Checklist ID:", checklistId);
       console.log("Checklist ID type:", typeof checklistId);
+      console.log("Preserve current data:", preserveCurrentData);
+      
+      // Primero verificar si hay una evaluación en cache
+      const cachedEvaluation = getCachedEvaluation(checklistId.toString());
+      if (cachedEvaluation && !preserveCurrentData) {
+        console.log('🚀 Usando evaluación desde cache');
+        setSelectedEvaluation(cachedEvaluation);
+        setEvaluations([cachedEvaluation]);
+        return;
+      }
+      
+      // Si se solicita preservar datos actuales y hay datos llenados, guardarlos temporalmente
+      let preservedData = null;
+      if (preserveCurrentData && (evaluationObservations.trim() || evaluationRecommendations.trim())) {
+        preservedData = {
+          observations: evaluationObservations,
+          recommendations: evaluationRecommendations,
+          judgment: evaluationJudgment
+        };
+        console.log('💾 Preservando datos actuales:', preservedData);
+      }
       
       // Intentar primero con la función principal
       const evaluationsResponse = await fetchEvaluationsByChecklist(checklistId);
@@ -130,10 +319,37 @@ export default function InstructorChecklistView() {
           console.log("First evaluation details:", firstEvaluation);
           console.log("First evaluation checklistId:", firstEvaluation.checklistId);
           
+          // Verificar que la evaluación tenga los datos completos
+          if (!firstEvaluation.observations && !firstEvaluation.recommendations && !firstEvaluation.valueJudgment) {
+            console.log('⚠️ Evaluación encontrada pero sin datos completos:', firstEvaluation);
+          }
+          
           setSelectedEvaluation(firstEvaluation);
-          setEvaluationObservations(firstEvaluation.observations || "");
-          setEvaluationRecommendations(firstEvaluation.recommendations || "");
-          setEvaluationJudgment(firstEvaluation.valueJudgment || "PENDIENTE");
+          
+          // Guardar en cache para futuras consultas
+          setCachedEvaluation(checklistId.toString(), firstEvaluation);
+          
+          // Decidir si cargar datos desde DB o preservar datos actuales
+          if (preservedData) {
+            // Usar datos preservados (recién creados/editados)
+            console.log('🔄 Usando datos preservados en lugar de DB:', preservedData);
+            setEvaluationObservations(preservedData.observations);
+            setEvaluationRecommendations(preservedData.recommendations);
+            setEvaluationJudgment(preservedData.judgment);
+          } else {
+            // Cargar datos desde la evaluación encontrada (el useEffect se encargará)
+            console.log('📋 Cargando datos desde evaluación de BD:', {
+              observations: firstEvaluation.observations,
+              recommendations: firstEvaluation.recommendations,
+              valueJudgment: firstEvaluation.valueJudgment
+            });
+          }
+          
+          // Limpiar localStorage si hay evaluación en DB
+          if (selectedChecklist) {
+            localStorage.removeItem(`evaluation_${selectedChecklist.id}`);
+            console.log('🗑️ Limpiando localStorage - datos cargados desde DB');
+          }
           
           console.log("✅ Evaluation loaded successfully");
           return; // Salir exitosamente
@@ -154,10 +370,35 @@ export default function InstructorChecklistView() {
         if (alternativeResponse && alternativeResponse.code === "200" && alternativeResponse.data && alternativeResponse.data.length > 0) {
           setEvaluations(alternativeResponse.data);
           const firstEvaluation = alternativeResponse.data[0];
+          console.log("Alternative method evaluation details:", firstEvaluation);
+          
           setSelectedEvaluation(firstEvaluation);
-          setEvaluationObservations(firstEvaluation.observations || "");
-          setEvaluationRecommendations(firstEvaluation.recommendations || "");
-          setEvaluationJudgment(firstEvaluation.valueJudgment || "PENDIENTE");
+          
+          // Guardar en cache para futuras consultas
+          setCachedEvaluation(checklistId.toString(), firstEvaluation);
+          
+          // Decidir si cargar datos desde DB o preservar datos actuales
+          if (preservedData) {
+            // Usar datos preservados (recién creados/editados)
+            console.log('🔄 Usando datos preservados en lugar de DB (método alternativo):', preservedData);
+            setEvaluationObservations(preservedData.observations);
+            setEvaluationRecommendations(preservedData.recommendations);
+            setEvaluationJudgment(preservedData.judgment);
+          } else {
+            // Cargar datos desde la evaluación encontrada (el useEffect se encargará)
+            console.log('📋 Cargando datos desde evaluación de BD (método alternativo):', {
+              observations: firstEvaluation.observations,
+              recommendations: firstEvaluation.recommendations,
+              valueJudgment: firstEvaluation.valueJudgment
+            });
+          }
+          
+          // Limpiar localStorage si hay evaluación en DB
+          if (selectedChecklist) {
+            localStorage.removeItem(`evaluation_${selectedChecklist.id}`);
+            console.log('🗑️ Limpiando localStorage - datos cargados desde DB (método alternativo)');
+          }
+          
           console.log("✅ Evaluation loaded via alternative method");
           return; // Salir exitosamente
         } else {
@@ -293,6 +534,39 @@ export default function InstructorChecklistView() {
     }
   };
 
+  // Función para manejar el botón "Actualizar Evaluación"
+  const handleUpdateEvaluationClick = () => {
+    console.log('📝 Mostrando formulario para actualizar evaluación');
+    console.log('📊 Datos de selectedEvaluation:', selectedEvaluation);
+    
+    // Cargar los datos de la evaluación existente en los campos del formulario
+    if (selectedEvaluation) {
+      console.log('🔄 Llenando formulario con datos de BD:', {
+        observations: selectedEvaluation.observations,
+        recommendations: selectedEvaluation.recommendations,
+        valueJudgment: selectedEvaluation.valueJudgment
+      });
+      
+      setEvaluationObservations(selectedEvaluation.observations || "");
+      setEvaluationRecommendations(selectedEvaluation.recommendations || "");
+      setEvaluationJudgment(selectedEvaluation.valueJudgment || "PENDIENTE");
+    }
+    
+    setShowEvaluationForm(true);
+  };
+
+  // Función para cancelar la actualización
+  const handleCancelUpdate = () => {
+    console.log('❌ Cancelando actualización de evaluación');
+    setShowEvaluationForm(false);
+    // Restaurar datos originales
+    if (selectedEvaluation) {
+      setEvaluationObservations(selectedEvaluation.observations || "");
+      setEvaluationRecommendations(selectedEvaluation.recommendations || "");
+      setEvaluationJudgment(selectedEvaluation.valueJudgment || "PENDIENTE");
+    }
+  };
+
   // Función para completar/actualizar la evaluación
   const handleCompleteEvaluation = async (): Promise<void> => {
     if (!selectedEvaluation) {
@@ -317,8 +591,9 @@ export default function InstructorChecklistView() {
     }
 
     try {
-      console.log("Guardando evaluación:", {
-        id: selectedEvaluation.id,
+      console.log("=== GUARDANDO EVALUACIÓN EN BD ===");
+      console.log("ID de evaluación:", selectedEvaluation.id);
+      console.log("Datos a guardar:", {
         observations: evaluationObservations,
         recommendations: evaluationRecommendations,
         valueJudgment: evaluationJudgment
@@ -331,30 +606,52 @@ export default function InstructorChecklistView() {
         evaluationJudgment
       );
 
+      console.log("Respuesta del servidor:", response);
+
       if (response.code === "200") {
         toast.success("🎉 Evaluación guardada exitosamente en la base de datos");
         
-        // Actualizar el estado local
-        setSelectedEvaluation({
+        // Crear el objeto de evaluación actualizado con los datos que acabamos de guardar
+        const updatedEvaluation = {
           ...selectedEvaluation,
           observations: evaluationObservations,
           recommendations: evaluationRecommendations,
           valueJudgment: evaluationJudgment
-        });
+        };
+        
+        console.log("Evaluación actualizada con datos guardados:", updatedEvaluation);
+        
+        // Actualizar el estado local inmediatamente con los datos correctos
+        setSelectedEvaluation(updatedEvaluation);
 
         // Actualizar también la lista de evaluaciones
         setEvaluations(prev => prev.map(evaluation => 
           evaluation.id === selectedEvaluation.id 
-            ? { ...evaluation, observations: evaluationObservations, recommendations: evaluationRecommendations, valueJudgment: evaluationJudgment }
+            ? updatedEvaluation
             : evaluation
         ));
+        
+        // Actualizar cache con la evaluación actualizada
+        if (selectedChecklist) {
+          setCachedEvaluation(selectedChecklist.id, updatedEvaluation);
+        }
+        
+        // Limpiar datos guardados en localStorage ya que se guardó exitosamente
+        if (selectedChecklist) {
+          localStorage.removeItem(`evaluation_${selectedChecklist.id}`);
+          console.log('🗑️ Datos de evaluación removidos del localStorage (guardado exitoso)');
+        }
 
-        console.log("Evaluación actualizada exitosamente");
+        // Ocultar formulario después de actualizar exitosamente
+        setShowEvaluationForm(false);
+
+        console.log("✅ Evaluación actualizada exitosamente en UI");
       } else {
+        console.error("❌ Error en respuesta del servidor:", response);
         toast.error("Error al guardar la evaluación: " + (response.message || "Error desconocido"));
       }
     } catch (error) {
-      console.error("Error updating evaluation:", error);
+      console.error("❌ Error updating evaluation:", error);
       toast.error("Error al guardar la evaluación en la base de datos");
     }
   };
@@ -512,6 +809,147 @@ export default function InstructorChecklistView() {
     }
   };
 
+  // Función para abrir el modal de crear evaluación
+  const handleOpenCreateEvaluationModal = () => {
+    if (selectedEvaluation) {
+      // Si ya existe una evaluación, cargar sus datos
+      console.log('📋 Abriendo modal con datos de evaluación existente:', selectedEvaluation);
+      setEvaluationObservations(selectedEvaluation.observations || "");
+      setEvaluationRecommendations(selectedEvaluation.recommendations || "");
+      setEvaluationJudgment(selectedEvaluation.valueJudgment || "PENDIENTE");
+    } else {
+      // Si no existe evaluación, empezar con campos limpios
+      console.log('📋 Abriendo modal para nueva evaluación');
+      setEvaluationObservations("");
+      setEvaluationRecommendations("");
+      setEvaluationJudgment("PENDIENTE");
+    }
+    
+    setShowCreateEvaluationModal(true);
+  };
+
+  // Función para cerrar el modal
+  const handleCloseCreateEvaluationModal = () => {
+    setShowCreateEvaluationModal(false);
+    setIsCreatingEvaluation(false);
+  };
+
+  // Función mejorada para crear evaluación desde el modal
+  const handleCreateEvaluationFromModal = async () => {
+    if (!selectedChecklist) {
+      toast.error("No hay checklist seleccionado");
+      return;
+    }
+
+    if (!evaluationObservations.trim() || !evaluationRecommendations.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE") {
+      toast.error("Por favor complete todos los campos requeridos");
+      return;
+    }
+
+    setIsCreatingEvaluation(true);
+    
+    try {
+      console.log('=== INICIANDO CREACIÓN DE EVALUACIÓN DESDE MODAL ===');
+      console.log('Checklist ID:', selectedChecklist.id);
+      console.log('Datos de evaluación:', {
+        observations: evaluationObservations,
+        recommendations: evaluationRecommendations,
+        valueJudgment: evaluationJudgment
+      });
+
+      toast.info("💾 Creando evaluación...");
+      
+      // Guardar datos actuales antes de crear
+      const evaluationData = {
+        observations: evaluationObservations.trim(),
+        recommendations: evaluationRecommendations.trim(),
+        valueJudgment: evaluationJudgment,
+        checklistId: parseInt(selectedChecklist.id)
+      };
+      
+      // Crear la evaluación base usando createMissingEvaluationForChecklist
+      const newEvaluationResult = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id));
+      
+      if (newEvaluationResult && newEvaluationResult.code === "200" && newEvaluationResult.id) {
+        console.log('✅ Evaluación base creada con ID:', newEvaluationResult.id);
+        
+        // Completar la evaluación con los datos del formulario
+        const completeResult = await completeEvaluation(
+          parseInt(newEvaluationResult.id),
+          evaluationData.observations,
+          evaluationData.recommendations,
+          evaluationData.valueJudgment
+        );
+        
+        console.log('Complete result:', completeResult);
+        
+        if (completeResult && completeResult.code === "200") {
+          // Crear el objeto de evaluación local con los datos guardados
+          const newEvaluationObject = {
+            id: newEvaluationResult.id,
+            checklistId: parseInt(selectedChecklist.id),
+            observations: evaluationData.observations,
+            recommendations: evaluationData.recommendations,
+            valueJudgment: evaluationData.valueJudgment,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+          
+          // Actualizar inmediatamente los estados locales
+          setSelectedEvaluation(newEvaluationObject);
+          setEvaluations([newEvaluationObject]);
+          
+          // Actualizar cache con la nueva evaluación
+          setCachedEvaluation(selectedChecklist.id, newEvaluationObject);
+          
+          // Mantener los datos en los campos del formulario para mostrarlos
+          setEvaluationObservations(evaluationData.observations);
+          setEvaluationRecommendations(evaluationData.recommendations);
+          setEvaluationJudgment(evaluationData.valueJudgment);
+          
+          console.log('✅ Estados actualizados con la nueva evaluación:', newEvaluationObject);
+          
+          toast.success("✅ Evaluación creada y guardada exitosamente");
+          
+          // Limpiar localStorage
+          if (selectedChecklist) {
+            localStorage.removeItem(`evaluation_${selectedChecklist.id}`);
+            console.log('🗑️ Datos temporales eliminados de localStorage');
+          }
+          
+          // Cerrar el modal
+          setShowCreateEvaluationModal(false);
+          setIsCreatingEvaluation(false);
+        } else {
+          throw new Error(completeResult?.message || "Error al completar la evaluación");
+        }
+      } else {
+        throw new Error(newEvaluationResult?.message || "Error desconocido al crear evaluación");
+      }
+      
+    } catch (error: any) {
+      console.error('❌ Error creating evaluation from modal:', error);
+      
+      // Manejo específico de errores
+      if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+        const firstError = error.graphQLErrors[0];
+        toast.error(`❌ Error GraphQL: ${firstError.message || 'Error en el servidor'}`);
+      } else if (error.networkError) {
+        if (error.networkError.statusCode === 400) {
+          toast.error("❌ Error 400: Los datos enviados no son válidos. Verifique que todos los campos estén completos.");
+        } else {
+          toast.error(`❌ Error de red (${error.networkError.statusCode || 'desconocido'}): ${error.networkError.message || 'Error de conexión'}`);
+        }
+      } else if (error.message) {
+        toast.error(`❌ Error: ${error.message}`);
+      } else {
+        toast.error("❌ Error desconocido al crear la evaluación");
+      }
+    } finally {
+      setIsCreatingEvaluation(false);
+    }
+  };
+
   // Función nueva: Crear y completar evaluación en un solo paso
   const handleCreateAndCompleteEvaluation = async (): Promise<void> => {
     if (!selectedChecklist) {
@@ -548,7 +986,7 @@ export default function InstructorChecklistView() {
       
       // Primero verificar si ya existe una evaluación para este checklist
       console.log("Verificando evaluaciones existentes...");
-      await loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
+      await loadEvaluationsForChecklist(parseInt(selectedChecklist.id), false); // No preservar datos aquí, queremos ver lo que hay en DB
       
       // Dar un momento para que se cargue
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -583,9 +1021,15 @@ export default function InstructorChecklistView() {
         if (completeResponse && completeResponse.code === "200") {
           toast.success("🎉 ¡Evaluación creada y completada exitosamente!");
           
-          // Recargar evaluaciones para mostrar la nueva
-          console.log("Recargando evaluaciones...");
-          await loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
+          // Datos creados exitosamente
+          const savedData = {
+            observations: evaluationObservations,
+            recommendations: evaluationRecommendations,
+            valueJudgment: evaluationJudgment
+          };
+          
+          // Sincronizar datos manteniendo los valores actuales
+          await syncEvaluationDataAfterSave(parseInt(selectedChecklist.id), savedData);
           
         } else {
           console.error("❌ Error al completar evaluación:", completeResponse);
@@ -597,7 +1041,7 @@ export default function InstructorChecklistView() {
         console.log("Evaluación detectada durante creación, recargando...");
         toast.info("ℹ️ Se detectó una evaluación existente, cargando...");
         
-        await loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
+        await loadEvaluationsForChecklist(parseInt(selectedChecklist.id), true);
         
         // Dar tiempo para que se cargue y luego intentar actualizar
         setTimeout(async () => {
@@ -681,200 +1125,186 @@ export default function InstructorChecklistView() {
               </h3>
               
               {selectedEvaluation ? (
-                <div className="space-y-3">
-                  {/* Verificar si la evaluación está completa o pendiente */}
-                  {(!selectedEvaluation.recommendations || !selectedEvaluation.valueJudgment) ? (
-                    <div className="bg-yellow-100 dark:bg-yellow-800 p-3 rounded-md">
-                      <p className="text-yellow-800 dark:text-yellow-200 text-sm font-medium">
-                        📝 <strong>Llenar Evaluación:</strong> Complete los campos para finalizar la evaluación
+                // Vista cuando hay evaluación existente
+                showEvaluationForm ? (
+                  // Mostrar formulario de actualización
+                  <div className="space-y-3">
+                    {/* Estado de la evaluación */}
+                    <div className="bg-blue-100 dark:bg-blue-800 p-3 rounded-md">
+                      <p className="text-blue-800 dark:text-blue-200 text-sm font-medium">
+                        ✏️ <strong>Actualizar Evaluación:</strong> Modifique los campos que desee cambiar
                       </p>
                     </div>
-                  ) : (
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Observaciones: <span className="text-red-500">*</span>
+                      </label>
+                      <textarea
+                        value={evaluationObservations}
+                        onChange={(e) => setEvaluationObservations(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
+                        rows={3}
+                        placeholder="Ingrese sus observaciones generales sobre la evaluación..."
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Recomendaciones: <span className="text-red-500">*</span>
+                      </label>
+                      <textarea
+                        value={evaluationRecommendations}
+                        onChange={(e) => setEvaluationRecommendations(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
+                        rows={4}
+                        placeholder="Ingrese sus recomendaciones para esta evaluación..."
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Juicio de Valor: <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={evaluationJudgment}
+                        onChange={(e) => setEvaluationJudgment(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
+                        required
+                      >
+                        <option value="">Seleccione un juicio de valor</option>
+                        <option value="PENDIENTE">Pendiente</option>
+                        <option value="EXCELENTE">Excelente</option>
+                        <option value="BUENO">Bueno</option>
+                        <option value="ACEPTABLE">Aceptable</option>
+                        <option value="DEFICIENTE">Deficiente</option>
+                        <option value="RECHAZADO">Rechazado</option>
+                      </select>
+                    </div>
+                    
+                    <div className="flex justify-end space-x-3">
+                      <button
+                        onClick={handleCancelUpdate}
+                        className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-colors duration-200 flex items-center space-x-2"
+                      >
+                        <X className="w-4 h-4" />
+                        <span>Cancelar</span>
+                      </button>
+                      <button
+                        onClick={handleCompleteEvaluation}
+                        disabled={!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE"}
+                        className={`px-6 py-2 rounded-md transition-colors duration-200 flex items-center space-x-2 ${
+                          (!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
+                            ? 'bg-gray-400 cursor-not-allowed text-white'
+                            : 'bg-green-600 hover:bg-green-700 text-white'
+                        }`}
+                      >
+                        <Save className="w-4 h-4" />
+                        <span>💾 Guardar Cambios</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // Mostrar vista compacta con botón de actualizar
+                  <div className="space-y-4">
+                    {/* Estado de la evaluación */}
                     <div className="bg-green-100 dark:bg-green-800 p-3 rounded-md">
                       <p className="text-green-800 dark:text-green-200 text-sm font-medium">
-                        ✅ <strong>Evaluación Completada:</strong> Puede modificar los datos si es necesario
+                        ✅ <strong>Evaluación Completada</strong> - Esta lista de chequeo ya tiene evaluación
                       </p>
                     </div>
-                  )}
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Observaciones: <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      value={evaluationObservations}
-                      onChange={(e) => setEvaluationObservations(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
-                      rows={3}
-                      placeholder="Ingrese sus observaciones generales sobre la evaluación..."
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Recomendaciones: <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      value={evaluationRecommendations}
-                      onChange={(e) => setEvaluationRecommendations(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
-                      rows={4}
-                      placeholder="Ingrese sus recomendaciones para esta evaluación..."
-                      required
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Juicio de Valor: <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={evaluationJudgment}
-                      onChange={(e) => setEvaluationJudgment(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
-                      required
-                    >
-                      <option value="">Seleccione un juicio de valor</option>
-                      <option value="PENDIENTE">Pendiente</option>
-                      <option value="EXCELENTE">Excelente</option>
-                      <option value="BUENO">Bueno</option>
-                      <option value="ACEPTABLE">Aceptable</option>
-                      <option value="DEFICIENTE">Deficiente</option>
-                      <option value="RECHAZADO">Rechazado</option>
-                    </select>
-                  </div>
-                  
-                  <div className="flex justify-end space-x-3">
-                    <button
-                      onClick={handleCompleteEvaluation}
-                      disabled={!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE"}
-                      className={`px-6 py-2 rounded-md transition-colors duration-200 flex items-center space-x-2 ${
-                        (!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
-                          ? 'bg-gray-400 cursor-not-allowed text-white'
-                          : 'bg-green-600 hover:bg-green-700 text-white'
-                      }`}
-                    >
-                      <Save className="w-4 h-4" />
-                      <span>
-                        {(!selectedEvaluation?.recommendations || !selectedEvaluation?.valueJudgment) 
-                          ? '💾 Guardar Evaluación' 
-                          : '✏️ Actualizar Evaluación'
-                        }
-                      </span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md">
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0">
-                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                          <span className="text-white text-sm font-bold">1</span>
-                        </div>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-blue-900 dark:text-blue-100 font-semibold mb-2">
-                          📋 Completar Evaluación de la Lista de Chequeo
+                    
+                    {/* Resumen de la evaluación */}
+                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-3">
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          📝 Observaciones:
                         </h4>
-                        <p className="text-blue-800 dark:text-blue-200 text-sm mb-4">
-                          Esta lista de chequeo no tiene evaluación asignada. Complete los campos a continuación y luego haga clic en "Crear Evaluación Completa" para crearla y guardarla en la base de datos.
+                        <p className="text-sm text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-700 p-2 rounded min-h-[40px]">
+                          {selectedEvaluation.observations || "Sin observaciones"}
                         </p>
-                        
-                        {/* Campos de evaluación cuando no existe */}
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
-                              Observaciones: <span className="text-red-500">*</span>
-                            </label>
-                            <textarea
-                              value={evaluationObservations}
-                              onChange={(e) => setEvaluationObservations(e.target.value)}
-                              className="w-full px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
-                              rows={3}
-                              placeholder="Ingrese sus observaciones generales sobre la evaluación..."
-                              required
-                            />
-                          </div>
-                          
-                          <div>
-                            <label className="block text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
-                              Recomendaciones: <span className="text-red-500">*</span>
-                            </label>
-                            <textarea
-                              value={evaluationRecommendations}
-                              onChange={(e) => setEvaluationRecommendations(e.target.value)}
-                              className="w-full px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
-                              rows={4}
-                              placeholder="Ingrese sus recomendaciones para esta evaluación..."
-                              required
-                            />
-                          </div>
-                          
-                          <div>
-                            <label className="block text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
-                              Juicio de Valor: <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                              value={evaluationJudgment}
-                              onChange={(e) => setEvaluationJudgment(e.target.value)}
-                              className="w-full px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
-                              required
-                            >
-                              <option value="">Seleccione un juicio de valor</option>
-                              <option value="PENDIENTE">Pendiente</option>
-                              <option value="EXCELENTE">Excelente</option>
-                              <option value="BUENO">Bueno</option>
-                              <option value="ACEPTABLE">Aceptable</option>
-                              <option value="DEFICIENTE">Deficiente</option>
-                              <option value="RECHAZADO">Rechazado</option>
-                            </select>
-                          </div>
-                          
-                          {/* Indicador de progreso mejorado */}
-                          <div className="bg-white dark:bg-gray-700 p-3 rounded-md border border-blue-200 dark:border-blue-700">
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Progreso de llenado:</p>
-                            <div className="grid grid-cols-3 gap-3">
-                              <div className="flex items-center justify-center p-2 rounded border">
-                                <span className={`w-3 h-3 rounded-full mr-2 ${evaluationObservations?.trim() ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                                <span className="text-xs text-center font-medium">Observaciones</span>
-                              </div>
-                              <div className="flex items-center justify-center p-2 rounded border">
-                                <span className={`w-3 h-3 rounded-full mr-2 ${evaluationRecommendations?.trim() ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                                <span className="text-xs text-center font-medium">Recomendaciones</span>
-                              </div>
-                              <div className="flex items-center justify-center p-2 rounded border">
-                                <span className={`w-3 h-3 rounded-full mr-2 ${evaluationJudgment && evaluationJudgment !== 'PENDIENTE' ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                                <span className="text-xs text-center font-medium">Juicio de Valor</span>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* Botón principal centrado y mejorado */}
-                          <div className="flex flex-col items-center space-y-3 pt-4">
-                            <button
-                              onClick={handleCreateAndCompleteEvaluation}
-                              disabled={!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE"}
-                              className={`px-8 py-3 rounded-md transition-all duration-300 flex items-center space-x-3 text-lg font-semibold ${
-                                (!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
-                                  ? 'bg-gray-400 cursor-not-allowed text-white'
-                                  : 'bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
-                              }`}
-                            >
-                              <Save className="w-6 h-6" />
-                              <span>🚀 Crear Evaluación Completa</span>
-                            </button>
-                            
-                            {/* Botón de debug/ayuda */}
-                            <button
-                              onClick={debugAllEvaluations}
-                              className="text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 px-3 py-1 rounded-md transition-colors"
-                            >
-                              🔍 Ver evaluaciones en consola (Debug)
-                            </button>
-                          </div>
-                        </div>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          💡 Recomendaciones:
+                        </h4>
+                        <p className="text-sm text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-700 p-2 rounded min-h-[40px]">
+                          {selectedEvaluation.recommendations || "Sin recomendaciones"}
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          ⚖️ Juicio de Valor:
+                        </h4>
+                        <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+                          selectedEvaluation.valueJudgment === 'EXCELENTE' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                          selectedEvaluation.valueJudgment === 'BUENO' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                          selectedEvaluation.valueJudgment === 'ACEPTABLE' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                          selectedEvaluation.valueJudgment === 'DEFICIENTE' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
+                          selectedEvaluation.valueJudgment === 'RECHAZADO' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                          'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                        }`}>
+                          {selectedEvaluation.valueJudgment || "PENDIENTE"}
+                        </span>
+                      </div>
+                      
+                      {/* Info adicional para debug */}
+                      <div className="mt-4 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-blue-700 dark:text-blue-300">
+                        <strong>DB Data:</strong> ID: {selectedEvaluation.id} | 
+                        Obs: "{selectedEvaluation.observations || 'N/A'}" | 
+                        Rec: "{selectedEvaluation.recommendations || 'N/A'}" | 
+                        Juicio: "{selectedEvaluation.valueJudgment || 'N/A'}"
+                      </div>
+                    </div>
+                    
+                    {/* Botón para actualizar evaluación */}
+                    <div className="flex justify-center">
+                      <button
+                        onClick={handleUpdateEvaluationClick}
+                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
+                        <Edit className="w-5 h-5" />
+                        <span>✏️ Actualizar Evaluación</span>
+                      </button>
+                    </div>
+                  </div>
+                )
+              ) : (
+                // Vista simplificada cuando no hay evaluación
+                <div className="space-y-6">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-700">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Save className="w-8 h-8 text-white" />
+                      </div>
+                      <h4 className="text-blue-900 dark:text-blue-100 font-semibold text-lg mb-2">
+                        📋 Esta lista no tiene evaluación
+                      </h4>
+                      <p className="text-blue-800 dark:text-blue-200 text-sm mb-6 max-w-md mx-auto">
+                        Para evaluar esta lista de chequeo, haga clic en el botón de abajo para abrir el formulario de evaluación.
+                      </p>
+                      
+                      {/* Botón principal para crear evaluación */}
+                      <button
+                        onClick={handleOpenCreateEvaluationModal}
+                        className="px-8 py-4 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white rounded-lg transition-all duration-300 flex items-center space-x-3 mx-auto font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
+                        <Save className="w-6 h-6" />
+                        <span>🚀 Crear Evaluación</span>
+                      </button>
+                      
+                      {/* Botón de debug */}
+                      <div className="mt-4">
+                        <button
+                          onClick={debugAllEvaluations}
+                          className="text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 px-3 py-1 rounded-md transition-colors"
+                        >
+                          🔍 Ver evaluaciones en consola (Debug)
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -1131,6 +1561,141 @@ export default function InstructorChecklistView() {
           </>
         )}
       </div>
+      
+      {/* Modal para crear evaluación */}
+      {showCreateEvaluationModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Header del modal */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center space-x-2">
+                  <Save className="w-6 h-6 text-blue-600" />
+                  <span>Crear Evaluación</span>
+                </h2>
+                <button
+                  onClick={handleCloseCreateEvaluationModal}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  disabled={isCreatingEvaluation}
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Información del checklist */}
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
+                <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                  📋 Lista de Chequeo: {selectedChecklist?.trimester ? `Trimestre ${selectedChecklist.trimester}` : 'Sin trimestre'}
+                </h3>
+                <p className="text-blue-800 dark:text-blue-200 text-sm">
+                  Complete los siguientes campos para crear la evaluación de esta lista de chequeo.
+                </p>
+              </div>
+
+              {/* Formulario de evaluación */}
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+                    Observaciones: <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={evaluationObservations}
+                    onChange={(e) => setEvaluationObservations(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    rows={4}
+                    placeholder="Describa sus observaciones sobre la lista de chequeo..."
+                    disabled={isCreatingEvaluation}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+                    Recomendaciones: <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    value={evaluationRecommendations}
+                    onChange={(e) => setEvaluationRecommendations(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    rows={4}
+                    placeholder="Agregue sus recomendaciones..."
+                    disabled={isCreatingEvaluation}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+                    Juicio de Valor: <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={evaluationJudgment}
+                    onChange={(e) => setEvaluationJudgment(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    disabled={isCreatingEvaluation}
+                  >
+                    <option value="">Seleccione un juicio de valor</option>
+                    <option value="EXCELENTE">Excelente</option>
+                    <option value="BUENO">Bueno</option>
+                    <option value="ACEPTABLE">Aceptable</option>
+                    <option value="DEFICIENTE">Deficiente</option>
+                    <option value="RECHAZADO">Rechazado</option>
+                  </select>
+                </div>
+
+                {/* Indicador de progreso */}
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Progreso:</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="flex items-center">
+                      <span className={`w-3 h-3 rounded-full mr-2 ${evaluationObservations?.trim() ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-300">Observaciones</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className={`w-3 h-3 rounded-full mr-2 ${evaluationRecommendations?.trim() ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-300">Recomendaciones</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className={`w-3 h-3 rounded-full mr-2 ${evaluationJudgment && evaluationJudgment !== '' ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-300">Juicio de Valor</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botones de acción */}
+              <div className="flex justify-end space-x-4 mt-8">
+                <button
+                  onClick={handleCloseCreateEvaluationModal}
+                  disabled={isCreatingEvaluation}
+                  className="px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCreateEvaluationFromModal}
+                  disabled={isCreatingEvaluation || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment}
+                  className={`px-8 py-3 rounded-lg transition-all duration-300 flex items-center space-x-2 font-semibold ${
+                    (isCreatingEvaluation || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment)
+                      ? 'bg-gray-400 cursor-not-allowed text-white'
+                      : 'bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl'
+                  }`}
+                >
+                  {isCreatingEvaluation ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Creando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-5 h-5" />
+                      <span>Crear Evaluación</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
