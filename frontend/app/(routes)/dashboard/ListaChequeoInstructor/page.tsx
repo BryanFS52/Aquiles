@@ -1356,14 +1356,6 @@ export default function InstructorChecklistView() {
                           {selectedEvaluation.valueJudgment || "PENDIENTE"}
                         </span>
                       </div>
-                      
-                      {/* Info adicional para debug */}
-                      <div className="mt-4 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-blue-700 dark:text-blue-300">
-                        <strong>DB Data:</strong> ID: {selectedEvaluation.id} | 
-                        Obs: "{selectedEvaluation.observations || 'N/A'}" | 
-                        Rec: "{selectedEvaluation.recommendations || 'N/A'}" | 
-                        Juicio: "{selectedEvaluation.valueJudgment || 'N/A'}"
-                      </div>
                     </div>
                     
                     {/* Botón para actualizar evaluación */}
@@ -1458,7 +1450,7 @@ export default function InstructorChecklistView() {
             >
               <Save className="w-4 h-4" />
               <span>
-                {selectedEvaluation ? "💾 Guardar Lista + Evaluación" : "📋 Guardar Lista de Chequeo"}
+                {selectedEvaluation ? "Guardar Lista de chequeo" : "📋 Guardar Lista de Chequeo"}
               </span>
               {(evaluationObservations.trim() || evaluationRecommendations.trim()) && !selectedEvaluation && (
                 <span className="text-xs bg-orange-500 text-white px-2 py-0.5 rounded-full">

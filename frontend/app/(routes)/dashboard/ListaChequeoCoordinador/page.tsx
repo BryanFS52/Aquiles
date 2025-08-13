@@ -103,7 +103,7 @@ export default function CoordinadorChecklistView() {
         console.log('Incoming checklistData:', checklistData);
         
         const updateData = {
-          state: editingChecklist.state !== undefined ? editingChecklist.state : false,
+          state: editingChecklist.state !== undefined ? editingChecklist.state : true,
           remarks: checklistData.remarks || "Sin observaciones",
           trimester: checklistData.trimester || "1",
           component: checklistData.component || "",
@@ -170,7 +170,7 @@ export default function CoordinadorChecklistView() {
       } else {
         // Crear nuevo checklist
         const newChecklistData = {
-          state: false,
+          state: true,
           remarks: checklistData.remarks || "Sin observaciones",
           trimester: checklistData.trimester || "1",
           component: checklistData.component || "",
