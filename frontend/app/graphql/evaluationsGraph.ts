@@ -69,7 +69,7 @@ export const DELETE_EVALUATION = gql`
 
 export const GET_EVALUATIONS_BY_CHECKLIST = gql`
   query GetEvaluationsByChecklist($checklistId: Long!) {
-    allEvaluations(page: 0, size: 100) {
+    evaluationsByChecklist(checklistId: $checklistId) {
       code
       message
       date

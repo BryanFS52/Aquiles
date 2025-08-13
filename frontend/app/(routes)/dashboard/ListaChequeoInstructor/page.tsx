@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import Image from "next/image";
 import PageTitle from "@components/UI/pageTitle";
 import { fetchAllChecklists, fetchChecklistById } from "@services/checkListService.js";
-import { fetchEvaluationsByChecklist, fetchEvaluationsByChecklistOld, completeEvaluation } from "@services/evaluationService";
+import { fetchEvaluationsByChecklist, fetchEvaluationsByChecklistOld, completeEvaluation, createMissingEvaluationForChecklist } from "@services/evaluationService";
 import { exportChecklistToPdf, exportChecklistToExcel, downloadFileFromBase64 } from "@services/exportService";
 import { GET_ALL_EVALUATIONS } from '@graphql/evaluationsGraph';
 import { clientLAN } from '@/lib/apollo-client';
@@ -113,16 +113,17 @@ export default function InstructorChecklistView() {
       console.log("Checklist ID:", checklistId);
       console.log("Checklist ID type:", typeof checklistId);
       
+      // Intentar primero con la función principal
       const evaluationsResponse = await fetchEvaluationsByChecklist(checklistId);
       console.log("Raw evaluations response:", evaluationsResponse);
       
       if (evaluationsResponse && evaluationsResponse.code === "200") {
-        console.log("Evaluations response successful");
+        console.log("✅ Evaluations response successful");
         console.log("Evaluations data:", evaluationsResponse.data);
         
         if (evaluationsResponse.data && evaluationsResponse.data.length > 0) {
           setEvaluations(evaluationsResponse.data);
-          console.log("Found evaluations:", evaluationsResponse.data.length);
+          console.log("✅ Found evaluations:", evaluationsResponse.data.length);
           
           // Si hay evaluaciones, seleccionar la primera automáticamente
           const firstEvaluation = evaluationsResponse.data[0];
@@ -135,60 +136,58 @@ export default function InstructorChecklistView() {
           setEvaluationJudgment(firstEvaluation.valueJudgment || "PENDIENTE");
           
           console.log("✅ Evaluation loaded successfully");
+          return; // Salir exitosamente
         } else {
-          console.log("❌ No evaluations found in response data");
-          // Intentar con la función alternativa
-          console.log("Trying alternative fetch method...");
-          
-          try {
-            const alternativeResponse = await fetchEvaluationsByChecklistOld(checklistId);
-            console.log("Alternative response:", alternativeResponse);
-            
-            if (alternativeResponse && alternativeResponse.data && alternativeResponse.data.length > 0) {
-              setEvaluations(alternativeResponse.data);
-              const firstEvaluation = alternativeResponse.data[0];
-              setSelectedEvaluation(firstEvaluation);
-              setEvaluationObservations(firstEvaluation.observations || "");
-              setEvaluationRecommendations(firstEvaluation.recommendations || "");
-              setEvaluationJudgment(firstEvaluation.valueJudgment || "PENDIENTE");
-              console.log("✅ Evaluation loaded via alternative method");
-            } else {
-              // Resetear estados de evaluación
-              setEvaluations([]);
-              setSelectedEvaluation(null);
-              setEvaluationObservations("");
-              setEvaluationRecommendations("");
-              setEvaluationJudgment("PENDIENTE");
-              console.log("❌ No evaluations found via alternative method either");
-            }
-          } catch (altError) {
-            console.error("Alternative fetch also failed:", altError);
-            setEvaluations([]);
-            setSelectedEvaluation(null);
-            setEvaluationObservations("");
-            setEvaluationRecommendations("");
-            setEvaluationJudgment("PENDIENTE");
-          }
+          console.log("⚠️ No evaluations found in main response, trying alternative method...");
         }
       } else {
-        console.log("❌ Evaluations response failed or no code 200");
+        console.log("⚠️ Main evaluations response failed, trying alternative method...");
         console.log("Response code:", evaluationsResponse?.code);
         console.log("Response message:", evaluationsResponse?.message);
-        setEvaluations([]);
-        setSelectedEvaluation(null);
-        setEvaluationObservations("");
-        setEvaluationRecommendations("");
-        setEvaluationJudgment("PENDIENTE");
       }
-    } catch (error) {
-      console.error("❌ Error loading evaluations:", error);
-      console.error("Error stack:", error);
-      // No mostrar error al usuario, solo resetear estados
+      
+      // Si llegamos aquí, intentar con la función alternativa
+      try {
+        const alternativeResponse = await fetchEvaluationsByChecklistOld(checklistId);
+        console.log("Alternative response:", alternativeResponse);
+        
+        if (alternativeResponse && alternativeResponse.code === "200" && alternativeResponse.data && alternativeResponse.data.length > 0) {
+          setEvaluations(alternativeResponse.data);
+          const firstEvaluation = alternativeResponse.data[0];
+          setSelectedEvaluation(firstEvaluation);
+          setEvaluationObservations(firstEvaluation.observations || "");
+          setEvaluationRecommendations(firstEvaluation.recommendations || "");
+          setEvaluationJudgment(firstEvaluation.valueJudgment || "PENDIENTE");
+          console.log("✅ Evaluation loaded via alternative method");
+          return; // Salir exitosamente
+        } else {
+          console.log("❌ Alternative method also found no evaluations");
+        }
+      } catch (altError) {
+        console.error("❌ Alternative fetch method failed:", altError);
+      }
+      
+      // Si llegamos aquí, no se encontraron evaluaciones con ningún método
+      console.log("❌ No evaluations found with any method for checklist:", checklistId);
       setEvaluations([]);
       setSelectedEvaluation(null);
       setEvaluationObservations("");
       setEvaluationRecommendations("");
       setEvaluationJudgment("PENDIENTE");
+      
+    } catch (error) {
+      console.error("❌ Error loading evaluations:", error);
+      console.error("Error stack:", error);
+      
+      // Resetear estados en caso de error
+      setEvaluations([]);
+      setSelectedEvaluation(null);
+      setEvaluationObservations("");
+      setEvaluationRecommendations("");
+      setEvaluationJudgment("PENDIENTE");
+      
+      // Opcionalmente mostrar un mensaje de error más específico
+      // toast.error("Error al cargar evaluaciones. Puede crear una evaluación nueva.");
     }
   };
 
@@ -397,6 +396,9 @@ export default function InstructorChecklistView() {
         items: updatedItems
       };
 
+      // Mostrar progreso del guardado
+      toast.info("💾 Guardando lista de chequeo...");
+
       // Simular guardado exitoso por ahora
       // TODO: Implementar la llamada real al backend cuando esté disponible
       console.log("Checklist data to save:", checklistData);
@@ -404,16 +406,35 @@ export default function InstructorChecklistView() {
       // Simular una pequeña demora para mostrar feedback
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      toast.success("📋 La lista de chequeo ha sido guardada exitosamente!");
+      // Determinar si también necesitamos manejar la evaluación
+      const hasEvaluationData = evaluationObservations.trim() || evaluationRecommendations.trim() || (evaluationJudgment && evaluationJudgment !== "PENDIENTE");
       
-      // También guardar la evaluación si está completa
-      if (selectedEvaluation && evaluationObservations && evaluationRecommendations && evaluationJudgment && evaluationJudgment !== "PENDIENTE") {
-        await handleCompleteEvaluation();
+      if (selectedEvaluation) {
+        // Ya existe una evaluación, verificar si necesita actualizarse
+        if (hasEvaluationData) {
+          const evaluationNeedsUpdate = 
+            selectedEvaluation.observations !== evaluationObservations ||
+            selectedEvaluation.recommendations !== evaluationRecommendations ||
+            selectedEvaluation.valueJudgment !== evaluationJudgment;
+            
+          if (evaluationNeedsUpdate) {
+            toast.info("🔄 Actualizando evaluación asociada...");
+            await handleCompleteEvaluation();
+          }
+        }
+        toast.success("✅ Lista de chequeo y evaluación guardadas exitosamente!");
+      } else if (hasEvaluationData) {
+        // No hay evaluación pero hay datos, preguntar si quiere crearla
+        toast.info("💡 Se detectaron datos de evaluación. Guarde primero la lista y luego use 'Crear Evaluación Completa'");
+        toast.success("📋 Lista de chequeo guardada exitosamente!");
+      } else {
+        // Solo lista de chequeo sin evaluación
+        toast.success("📋 Lista de chequeo guardada exitosamente!");
       }
       
     } catch (error) {
       console.error("Error saving checklist:", error);
-      toast.error("Error al guardar la lista de chequeo");
+      toast.error("❌ Error al guardar la lista de chequeo");
     }
   };
 
@@ -458,6 +479,166 @@ export default function InstructorChecklistView() {
     } catch (error) {
       console.error("Error exporting Excel:", error);
       toast.error("Error al exportar a Excel");
+    }
+  };
+
+  // Función para crear evaluación automáticamente
+  const handleCreateMissingEvaluation = async (): Promise<void> => {
+    if (!selectedChecklist) {
+      toast.error("No hay ninguna lista de chequeo seleccionada");
+      return;
+    }
+
+    try {
+      toast.info("🔄 Creando evaluación automáticamente...");
+      
+      const response = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id));
+      
+      if (response && response.code === "200") {
+        toast.success("✅ Evaluación creada exitosamente");
+        
+        // Recargar las evaluaciones para mostrar la nueva
+        await loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
+      } else if (response === null) {
+        toast.info("ℹ️ Ya existe una evaluación para esta lista de chequeo");
+        // Intentar recargar las evaluaciones por si no se habían cargado correctamente
+        await loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
+      } else {
+        toast.error("❌ Error al crear la evaluación: " + (response?.message || "Error desconocido"));
+      }
+    } catch (error) {
+      console.error("Error creating missing evaluation:", error);
+      toast.error("❌ Error al crear la evaluación automáticamente");
+    }
+  };
+
+  // Función nueva: Crear y completar evaluación en un solo paso
+  const handleCreateAndCompleteEvaluation = async (): Promise<void> => {
+    if (!selectedChecklist) {
+      toast.error("No hay ninguna lista de chequeo seleccionada");
+      return;
+    }
+
+    // Validar que se hayan completado las observaciones y recomendaciones
+    if (!evaluationObservations.trim()) {
+      toast.error("Por favor complete las observaciones antes de crear la evaluación");
+      return;
+    }
+
+    if (!evaluationRecommendations.trim()) {
+      toast.error("Por favor complete las recomendaciones antes de crear la evaluación");
+      return;
+    }
+
+    if (!evaluationJudgment || evaluationJudgment === "PENDIENTE") {
+      toast.error("Por favor seleccione un juicio de valor antes de crear la evaluación");
+      return;
+    }
+
+    try {
+      console.log("=== INICIANDO CREACIÓN DE EVALUACIÓN COMPLETA ===");
+      console.log("Checklist ID:", selectedChecklist.id);
+      console.log("Datos de evaluación:", {
+        observations: evaluationObservations,
+        recommendations: evaluationRecommendations,
+        valueJudgment: evaluationJudgment
+      });
+
+      toast.info("🚀 Creando evaluación completa...");
+      
+      // Primero verificar si ya existe una evaluación para este checklist
+      console.log("Verificando evaluaciones existentes...");
+      await loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
+      
+      // Dar un momento para que se cargue
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      if (selectedEvaluation) {
+        // Ya existe una evaluación, solo actualizarla
+        console.log("Evaluación existente encontrada, actualizando...");
+        toast.info("ℹ️ Evaluación existente encontrada, actualizando datos...");
+        
+        await handleCompleteEvaluation();
+        return; // Salir de la función
+      }
+      
+      // No existe evaluación, crear una nueva
+      console.log("No existe evaluación, creando nueva...");
+      const createResponse = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id));
+      console.log("Create response:", createResponse);
+      
+      if (createResponse && createResponse.code === "200" && createResponse.id) {
+        console.log("✅ Evaluación base creada con ID:", createResponse.id);
+        
+        // Completar la evaluación inmediatamente
+        console.log("Completando evaluación con datos...");
+        const completeResponse = await completeEvaluation(
+          parseInt(createResponse.id),
+          evaluationObservations,
+          evaluationRecommendations,
+          evaluationJudgment
+        );
+        console.log("Complete response:", completeResponse);
+
+        if (completeResponse && completeResponse.code === "200") {
+          toast.success("🎉 ¡Evaluación creada y completada exitosamente!");
+          
+          // Recargar evaluaciones para mostrar la nueva
+          console.log("Recargando evaluaciones...");
+          await loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
+          
+        } else {
+          console.error("❌ Error al completar evaluación:", completeResponse);
+          toast.error("❌ Evaluación creada pero error al completarla: " + (completeResponse?.message || "Error desconocido"));
+        }
+        
+      } else if (createResponse === null) {
+        // Ya existe una evaluación (detectada durante la creación)
+        console.log("Evaluación detectada durante creación, recargando...");
+        toast.info("ℹ️ Se detectó una evaluación existente, cargando...");
+        
+        await loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
+        
+        // Dar tiempo para que se cargue y luego intentar actualizar
+        setTimeout(async () => {
+          try {
+            await handleCompleteEvaluation();
+          } catch (updateError) {
+            console.error("Error al actualizar evaluación existente:", updateError);
+            toast.error("❌ Error al actualizar la evaluación existente");
+          }
+        }, 1000);
+        
+      } else {
+        console.error("❌ Error al crear evaluación:", createResponse);
+        toast.error("❌ Error al crear la evaluación: " + (createResponse?.message || "Error desconocido"));
+      }
+      
+    } catch (error: any) {
+      console.error("❌ Error creating and completing evaluation:", error);
+      
+      // Manejo específico de errores de Apollo/GraphQL
+      if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+        console.error("GraphQL Errors:", error.graphQLErrors);
+        const firstError = error.graphQLErrors[0];
+        toast.error(`❌ Error GraphQL: ${firstError.message || 'Error en el servidor'}`);
+      } else if (error.networkError) {
+        console.error("Network Error:", error.networkError);
+        if (error.networkError.statusCode === 400) {
+          toast.error("❌ Error 400: Los datos enviados no son válidos. Verifique que todos los campos estén completos.");
+        } else {
+          toast.error(`❌ Error de red (${error.networkError.statusCode || 'desconocido'}): ${error.networkError.message || 'Error de conexión'}`);
+        }
+      } else if (error.message) {
+        toast.error(`❌ Error: ${error.message}`);
+      } else {
+        toast.error("❌ Error desconocido al crear y completar la evaluación");
+      }
+      
+      // Sugerencias adicionales
+      setTimeout(() => {
+        toast.info("💡 Sugerencia: Verifique su conexión e intente nuevamente, o contacte al coordinador.");
+      }, 2000);
     }
   };
 
@@ -585,38 +766,116 @@ export default function InstructorChecklistView() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  <div className="bg-red-100 dark:bg-red-800 p-3 rounded-md">
-                    <p className="text-red-800 dark:text-red-200 text-sm">
-                      ❌ No se encontró evaluación asignada para esta lista de chequeo
-                    </p>
-                  </div>
-                  
-                  <div className="text-center">
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
-                      Esta lista puede no tener una evaluación creada automáticamente.
-                    </p>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
-                      💡 <strong>Sugerencia:</strong> Contacte al coordinador para que cree una evaluación para esta lista de chequeo.
-                    </p>
-                    
-                    {/* Botones de acción */}
-                    <div className="space-y-3">
-                      <button
-                        onClick={() => toast.info("📞 Contacte al coordinador para crear una evaluación para esta lista de chequeo")}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors duration-200 flex items-center space-x-2 mx-auto"
-                      >
-                        <Phone className="w-4 h-4" />
-                        <span>Solicitar Evaluación al Coordinador</span>
-                      </button>
-                      
-                      {/* Botón de debug temporal */}
-                      <button
-                        onClick={debugAllEvaluations}
-                        className="bg-gray-500 text-white px-4 py-2 rounded-md text-sm hover:bg-gray-600 transition-colors mx-auto block"
-                      >
-                        🔍 Debug: Ver todas las evaluaciones
-                      </button>
+                <div className="space-y-4">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md">
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-sm font-bold">1</span>
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-blue-900 dark:text-blue-100 font-semibold mb-2">
+                          📋 Completar Evaluación de la Lista de Chequeo
+                        </h4>
+                        <p className="text-blue-800 dark:text-blue-200 text-sm mb-4">
+                          Esta lista de chequeo no tiene evaluación asignada. Complete los campos a continuación y luego haga clic en "Crear Evaluación Completa" para crearla y guardarla en la base de datos.
+                        </p>
+                        
+                        {/* Campos de evaluación cuando no existe */}
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                              Observaciones: <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                              value={evaluationObservations}
+                              onChange={(e) => setEvaluationObservations(e.target.value)}
+                              className="w-full px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
+                              rows={3}
+                              placeholder="Ingrese sus observaciones generales sobre la evaluación..."
+                              required
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                              Recomendaciones: <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                              value={evaluationRecommendations}
+                              onChange={(e) => setEvaluationRecommendations(e.target.value)}
+                              className="w-full px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
+                              rows={4}
+                              placeholder="Ingrese sus recomendaciones para esta evaluación..."
+                              required
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                              Juicio de Valor: <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                              value={evaluationJudgment}
+                              onChange={(e) => setEvaluationJudgment(e.target.value)}
+                              className="w-full px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
+                              required
+                            >
+                              <option value="">Seleccione un juicio de valor</option>
+                              <option value="PENDIENTE">Pendiente</option>
+                              <option value="EXCELENTE">Excelente</option>
+                              <option value="BUENO">Bueno</option>
+                              <option value="ACEPTABLE">Aceptable</option>
+                              <option value="DEFICIENTE">Deficiente</option>
+                              <option value="RECHAZADO">Rechazado</option>
+                            </select>
+                          </div>
+                          
+                          {/* Indicador de progreso mejorado */}
+                          <div className="bg-white dark:bg-gray-700 p-3 rounded-md border border-blue-200 dark:border-blue-700">
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Progreso de llenado:</p>
+                            <div className="grid grid-cols-3 gap-3">
+                              <div className="flex items-center justify-center p-2 rounded border">
+                                <span className={`w-3 h-3 rounded-full mr-2 ${evaluationObservations?.trim() ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                                <span className="text-xs text-center font-medium">Observaciones</span>
+                              </div>
+                              <div className="flex items-center justify-center p-2 rounded border">
+                                <span className={`w-3 h-3 rounded-full mr-2 ${evaluationRecommendations?.trim() ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                                <span className="text-xs text-center font-medium">Recomendaciones</span>
+                              </div>
+                              <div className="flex items-center justify-center p-2 rounded border">
+                                <span className={`w-3 h-3 rounded-full mr-2 ${evaluationJudgment && evaluationJudgment !== 'PENDIENTE' ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                                <span className="text-xs text-center font-medium">Juicio de Valor</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Botón principal centrado y mejorado */}
+                          <div className="flex flex-col items-center space-y-3 pt-4">
+                            <button
+                              onClick={handleCreateAndCompleteEvaluation}
+                              disabled={!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE"}
+                              className={`px-8 py-3 rounded-md transition-all duration-300 flex items-center space-x-3 text-lg font-semibold ${
+                                (!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
+                                  ? 'bg-gray-400 cursor-not-allowed text-white'
+                                  : 'bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
+                              }`}
+                            >
+                              <Save className="w-6 h-6" />
+                              <span>🚀 Crear Evaluación Completa</span>
+                            </button>
+                            
+                            {/* Botón de debug/ayuda */}
+                            <button
+                              onClick={debugAllEvaluations}
+                              className="text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 px-3 py-1 rounded-md transition-colors"
+                            >
+                              🔍 Ver evaluaciones en consola (Debug)
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -656,13 +915,21 @@ export default function InstructorChecklistView() {
             <button
               onClick={handleSaveChecklist}
               disabled={!selectedChecklist}
-              className={`flex items-center gap-1 px-4 py-2 rounded-md border transition-colors duration-300 ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-md border transition-all duration-300 ${
                 selectedChecklist
-                  ? 'hover:border-[#01b001] border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white'
+                  ? 'hover:border-[#01b001] border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white hover:shadow-md'
                   : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
               }`}
             >
-              <Save className="w-4 h-4" /> Guardar Lista de Chequeo
+              <Save className="w-4 h-4" />
+              <span>
+                {selectedEvaluation ? "💾 Guardar Lista + Evaluación" : "📋 Guardar Lista de Chequeo"}
+              </span>
+              {(evaluationObservations.trim() || evaluationRecommendations.trim()) && !selectedEvaluation && (
+                <span className="text-xs bg-orange-500 text-white px-2 py-0.5 rounded-full">
+                  Datos pendientes
+                </span>
+              )}
             </button>
           </div>
 

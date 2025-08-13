@@ -59,6 +59,25 @@ public class EvaluationsResolver {
         }
     }
 
+    @DgsQuery
+    public Map<String, Object> evaluationsByChecklist(@InputArgument("checklistId") Long checklistId) {
+        try {
+            List<EvaluationsDto> evaluations = evaluationsBusiness.findByChecklistId(checklistId);
+            return ResponseHttpApi.responseHttpFindAll(
+                    evaluations,
+                    ResponseHttpApi.CODE_OK,
+                    "Query ok",
+                    1, // totalPages
+                    0, // currentPage
+                    evaluations.size() // totalElements
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving evaluations by checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     @DgsMutation
     public Map<String, Object> addEvaluation(@InputArgument("input") EvaluationsDto input) {
         try {

@@ -18,6 +18,7 @@ import {
 
 
 const ttransformGraphQLToAttendanceItem = (graphqlData: any): Evaluation => {
+    console.log('Transforming evaluation data:', graphqlData); // Debug log
     return {
         id: graphqlData.id,
         observations: graphqlData.observations,
@@ -174,9 +175,14 @@ const evaluationSlice = createSlice({
             })
             // addEvaluation
             .addCase(addEvaluation.fulfilled, (state, action: PayloadAction<AddEvaluationMutation['addEvaluation']>) => {
+                console.log('=== ADD EVALUATION FULFILLED ===');
+                console.log('Response payload:', action.payload);
+                
                 if (action.payload) {
-                    const newEvaluation = ttransformGraphQLToAttendanceItem(action.payload);
-                    state.data.push(newEvaluation);
+                    console.log('Evaluation added successfully:', action.payload);
+                    // Note: addEvaluation solo devuelve {code, message, id}, no los datos completos de la evaluación
+                    // No agregamos al estado local aquí porque no tenemos los datos completos
+                    console.log('Evaluation created with ID:', action.payload.id);
                 }
                 state.error = null;
             })

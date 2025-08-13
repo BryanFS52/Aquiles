@@ -200,6 +200,18 @@ public class ChecklistBusiness {
                 );
             }
 
+            // 🔗 VINCULAR EVALUACIÓN SI SE PROPORCIONA evaluationId
+            if (checklistDto.getEvaluationId() != null) {
+                try {
+                    Evaluations evaluation = evaluationsService.getById(checklistDto.getEvaluationId());
+                    checklistAntes.setEvaluation(evaluation);
+                    System.out.println("✅ Linked evaluation ID: " + checklistDto.getEvaluationId() + " to checklist");
+                } catch (Exception e) {
+                    System.err.println("❌ Error linking evaluation: " + e.getMessage());
+                    // No lanzamos excepción para que el resto de la actualización continúe
+                }
+            }
+
             // 🔧 ACTUALIZAR ITEMS - ESTA ERA LA PARTE FALTANTE
             if (checklistDto.getItems() != null) {
                 // Obtener los items existentes

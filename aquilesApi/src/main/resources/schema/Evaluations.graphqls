@@ -33,6 +33,7 @@ input EvaluationDto {
 extend type Query {
     allEvaluations(page: Int, size: Int): EvaluationPage
     evaluationById(id: Long!): EvaluationPageId
+    evaluationsByChecklist(checklistId: Long!): EvaluationPage
 }
 
 extend type Mutation {

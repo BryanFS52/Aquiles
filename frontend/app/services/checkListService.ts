@@ -128,3 +128,22 @@ export const deleteChecklist = async (id: number): Promise<ApiResponse> => {
     throw error;
   }
 };
+
+// Función auxiliar para vincular evaluaciones con checklists
+export const updateChecklistEvaluationLink = async (checklistId: number, evaluationId: number): Promise<ApiResponse> => {
+  try {
+    console.log('Linking evaluation', evaluationId, 'to checklist', checklistId);
+    
+    // Esta función puede ser implementada más adelante si el backend requiere vinculación explícita
+    // Por ahora, las evaluaciones se vinculan automáticamente por el campo checklistId
+    
+    return {
+      code: '200',
+      message: 'Evaluation linked successfully (automatic via checklistId)'
+    } as ApiResponse;
+    
+  } catch (error) {
+    console.error('Error linking evaluation to checklist:', error);
+    throw error;
+  }
+};
