@@ -1192,300 +1192,336 @@ export default function InstructorChecklistView() {
   };
 
   return (
-    <div className="w-full">
-      {/* Contenido principal adaptado al layout */}
-      <div className="p-6 space-y-6">
+    <div className="w-full bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-900 min-h-screen">
+      {/* Estilos CSS para el diseño hexagonal */}
+      <style jsx>{`
+        /* Estilos para los hexágonos */
+        .hexagon-container {
+          width: 250px;
+          height: 250px;
+          position: relative;
+        }
+        
+        .hexagon {
+          width: 100%;
+          height: 100%;
+          position: relative;
+          border-radius: 20px;
+          transform: rotate(45deg);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hexagon:hover {
+          transform: rotate(45deg) scale(1.05);
+        }
+        
+        .hexagon-inner {
+          width: calc(100% - 8px);
+          height: calc(100% - 8px);
+          position: absolute;
+          top: 4px;
+          left: 4px;
+          border-radius: 16px;
+          transform: rotate(-45deg);
+          transition: all 0.3s ease;
+        }
+        
+        .hexagon-inner:hover {
+          transform: rotate(-45deg) scale(0.98);
+        }
+        
+        /* Animación de flotación para los hexágonos */
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(45deg); }
+          50% { transform: translateY(-10px) rotate(45deg); }
+        }
+        
+        .hexagon-container:hover .hexagon {
+          animation: float 2s ease-in-out infinite;
+        }
+        
+        /* Estilos para inputs hexagonales */
+        .hexagon-input:focus {
+          transform: scale(1.02);
+          box-shadow: 0 10px 30px rgba(1, 176, 1, 0.3);
+        }
+        
+        /* Estilos para botones hexagonales */
+        .hexagon-button:hover:not(:disabled) {
+          box-shadow: 0 15px 40px rgba(1, 176, 1, 0.4);
+        }
+        
+        .hexagon-export:hover:not(:disabled) {
+          box-shadow: 0 15px 40px rgba(1, 176, 1, 0.3);
+        }
+        
+        /* Estilos para la tabla hexagonal */
+        .hexagon-cell {
+          position: relative;
+          overflow: hidden;
+        }
+        
+        /* Estilos para opciones de selección */
+        .hexagon-choice {
+          /* Sin efectos hover */
+        }
+        
+        /* Estilos para textarea hexagonal */
+        .hexagon-textarea {
+          /* Sin efectos especiales */
+        }
+        
+        /* Estilos para navegación */
+        .hexagon-nav:hover:not(:disabled) {
+          box-shadow: 0 10px 30px rgba(14, 50, 75, 0.4);
+        }
+        
+        /* Estilos para upload */
+        .hexagon-upload:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 15px 40px rgba(1, 176, 1, 0.2);
+        }
+        
+        /* Efectos de brillo en hover */
+        .hexagon-container::after {
+          content: '';
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: conic-gradient(
+            from 0deg,
+            transparent 0deg,
+            rgba(1, 176, 1, 0.1) 60deg,
+            rgba(14, 50, 75, 0.1) 120deg,
+            transparent 180deg
+          );
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          pointer-events: none;
+          border-radius: 50%;
+          animation: spin 6s linear infinite;
+        }
+        
+        .hexagon-container:hover::after {
+          opacity: 1;
+        }
+        
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        
+        /* Respuesta para móviles */
+        @media (max-width: 768px) {
+          .hexagon-container {
+            width: 200px;
+            height: 200px;
+          }
+        }
+        
+        /* Efectos adicionales de profundidad */
+        .glass-effect {
+          backdrop-filter: blur(10px);
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Gradientes personalizados */
+        .gradient-primary {
+          background: linear-gradient(135deg, #0e324b 0%, #01b001 50%, #0e324b 100%);
+        }
+        
+        .gradient-secondary {
+          background: linear-gradient(135deg, #01b001 0%, #0e324b 50%, #01b001 100%);
+        }
+      `}</style>
+
+      {/* Contenido principal con diseño tipo panal */}
+      <div className="p-6 space-y-8">
         <PageTitle>Lista de Chequeo - Vista del Instructor</PageTitle>
 
-        {/* Información del centro y datos generales */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 bg-white dark:bg-black/20 shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
-            <p className="text-2xl font-bold text-black dark:text-white">Centro de Formación:</p>
-            <p className="text-base text-black dark:text-white">Centro de Servicios Financieros</p>
-            <p className="text-2xl font-bold text-black dark:text-white">Fecha:</p>
-            <p className="text-base text-black dark:text-white">05/02/2024 - 05/05/2024</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-black/20 shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
-            <p className="text-2xl font-bold text-black dark:text-white">Jornada:</p>
-            <p className="text-base text-black dark:text-white">Diurna</p>
-            <p className="text-2xl font-bold text-black dark:text-white">Ficha:</p>
-            <p className="text-base text-black dark:text-white">2558735</p>
-          </div>
-          <div className="p-4 bg-white dark:bg-black/20 shadow rounded border border-darkGreen/10 dark:border-shadowBlue/30 space-y-2 transition-colors duration-300">
-            <p className="text-2xl font-bold text-black dark:text-white">Instructor Calificador:</p>
-            <p className="text-base text-black dark:text-white">Juan Pérez</p>
-            <p className="text-2xl font-bold text-black dark:text-white">Lista Seleccionada:</p>
-            {selectedChecklist ? (
-              <p className="text-base text-black dark:text-white">ID: {selectedChecklist.id} - {selectedChecklist.component || 'N/A'}</p>
-            ) : (
-              <p className="text-base text-gray-500 dark:text-gray-400">Ninguna lista seleccionada</p>
-            )}
-          </div>
-
-          {/* Sección de Evaluación */}
-          {selectedChecklist && (
-            <div className="p-4 bg-green-50 dark:bg-green-900/20 shadow rounded border border-green-200 dark:border-green-800 space-y-4 transition-colors duration-300">
-              <h3 className="text-xl font-bold text-green-900 dark:text-green-100">
-                📋 Evaluación de Lista de Chequeo
-              </h3>
-              
-              {selectedEvaluation ? (
-                // Vista cuando hay evaluación existente
-                showEvaluationForm ? (
-                  // Mostrar formulario de actualización
-                  <div className="space-y-3">
-                    {/* Estado de la evaluación */}
-                    <div className="bg-blue-100 dark:bg-blue-800 p-3 rounded-md">
-                      <p className="text-blue-800 dark:text-blue-200 text-sm font-medium">
-                        ✏️ <strong>Actualizar Evaluación:</strong> Modifique los campos que desee cambiar
-                      </p>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Observaciones: <span className="text-red-500">*</span>
-                      </label>
-                      <textarea
-                        value={evaluationObservations}
-                        onChange={(e) => setEvaluationObservations(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
-                        rows={3}
-                        placeholder="Ingrese sus observaciones generales sobre la evaluación..."
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Recomendaciones: <span className="text-red-500">*</span>
-                      </label>
-                      <textarea
-                        value={evaluationRecommendations}
-                        onChange={(e) => setEvaluationRecommendations(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
-                        rows={4}
-                        placeholder="Ingrese sus recomendaciones para esta evaluación..."
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Juicio de Valor: <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        value={evaluationJudgment}
-                        onChange={(e) => setEvaluationJudgment(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-300"
-                        required
-                      >
-                        <option value="">Seleccione un juicio de valor</option>
-                        <option value="PENDIENTE">Pendiente</option>
-                        <option value="EXCELENTE">Excelente</option>
-                        <option value="BUENO">Bueno</option>
-                        <option value="ACEPTABLE">Aceptable</option>
-                        <option value="DEFICIENTE">Deficiente</option>
-                        <option value="RECHAZADO">Rechazado</option>
-                      </select>
-                    </div>
-                    
-                    <div className="flex justify-end space-x-3">
-                      <button
-                        onClick={handleCancelUpdate}
-                        className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-colors duration-200 flex items-center space-x-2"
-                      >
-                        <X className="w-4 h-4" />
-                        <span>Cancelar</span>
-                      </button>
-                      <button
-                        onClick={handleCompleteEvaluation}
-                        disabled={!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE"}
-                        className={`px-6 py-2 rounded-md transition-colors duration-200 flex items-center space-x-2 ${
-                          (!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
-                            ? 'bg-gray-400 cursor-not-allowed text-white'
-                            : 'bg-green-600 hover:bg-green-700 text-white'
-                        }`}
-                      >
-                        <Save className="w-4 h-4" />
-                        <span>💾 Guardar Cambios</span>
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  // Mostrar vista compacta con botón de actualizar
-                  <div className="space-y-4">
-                    {/* Estado de la evaluación */}
-                    <div className="bg-green-100 dark:bg-green-800 p-3 rounded-md">
-                      <p className="text-green-800 dark:text-green-200 text-sm font-medium">
-                        ✅ <strong>Evaluación Completada</strong> - Esta lista de chequeo ya tiene evaluación
-                      </p>
-                    </div>
-                    
-                    {/* Resumen de la evaluación */}
-                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-3">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          📝 Observaciones:
-                        </h4>
-                        <p className="text-sm text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-700 p-2 rounded min-h-[40px]">
-                          {selectedEvaluation.observations || "Sin observaciones"}
-                        </p>
+        {/* Diseño hexagonal para información del centro */}
+        <div className="relative">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center justify-center">
+            {/* Panel hexagonal 1 */}
+            <div className="group relative">
+              <div className="hexagon-container mx-auto">
+                <div className="hexagon bg-gradient-to-br from-[#0e324b] via-[#01b001] to-[#0e324b] shadow-2xl hover:shadow-green-200 dark:hover:shadow-green-800 transition-all duration-500 transform hover:scale-105">
+                  <div className="hexagon-inner bg-white dark:bg-gray-800 flex items-center justify-center">
+                    <div className="text-center p-6">
+                      <div className="mb-4">
+                        <div className="w-12 h-12 bg-[#0e324b] rounded-full flex items-center justify-center mx-auto mb-3">
+                          <span className="text-white font-bold text-lg">🏢</span>
+                        </div>
                       </div>
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          💡 Recomendaciones:
-                        </h4>
-                        <p className="text-sm text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-700 p-2 rounded min-h-[40px]">
-                          {selectedEvaluation.recommendations || "Sin recomendaciones"}
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          ⚖️ Juicio de Valor:
-                        </h4>
-                        <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
-                          selectedEvaluation.valueJudgment === 'EXCELENTE' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                          selectedEvaluation.valueJudgment === 'BUENO' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                          selectedEvaluation.valueJudgment === 'ACEPTABLE' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                          selectedEvaluation.valueJudgment === 'DEFICIENTE' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
-                          selectedEvaluation.valueJudgment === 'RECHAZADO' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
-                          'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-                        }`}>
-                          {selectedEvaluation.valueJudgment || "PENDIENTE"}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    {/* Botón para actualizar evaluación */}
-                    <div className="flex justify-center">
-                      <button
-                        onClick={handleUpdateEvaluationClick}
-                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
-                      >
-                        <Edit className="w-5 h-5" />
-                        <span>✏️ Actualizar Evaluación</span>
-                      </button>
-                    </div>
-                  </div>
-                )
-              ) : (
-                // Vista simplificada cuando no hay evaluación
-                <div className="space-y-6">
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-700">
-                    <div className="text-center">
-                      <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Save className="w-8 h-8 text-white" />
-                      </div>
-                      <h4 className="text-blue-900 dark:text-blue-100 font-semibold text-lg mb-2">
-                        📋 Esta lista no tiene evaluación
-                      </h4>
-                      <p className="text-blue-800 dark:text-blue-200 text-sm mb-6 max-w-md mx-auto">
-                        Para evaluar esta lista de chequeo, haga clic en el botón de abajo para abrir el formulario de evaluación.
-                      </p>
-                      
-                      {/* Botón principal para crear evaluación */}
-                      <button
-                        onClick={handleOpenCreateEvaluationModal}
-                        className="px-8 py-4 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white rounded-lg transition-all duration-300 flex items-center space-x-3 mx-auto font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
-                      >
-                        <Save className="w-6 h-6" />
-                        <span>🚀 Crear Evaluación</span>
-                      </button>
-                      
-                      {/* Botón de debug */}
-                      <div className="mt-4">
-                        <button
-                          onClick={debugAllEvaluations}
-                          className="text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 px-3 py-1 rounded-md transition-colors"
-                        >
-                          🔍 Ver evaluaciones en consola (Debug)
-                        </button>
+                      <h3 className="text-lg font-bold text-[#0e324b] dark:text-white mb-2">Centro de Formación</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 leading-tight">Centro de Servicios Financieros</p>
+                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                        <p className="text-xs font-semibold text-[#01b001]">Fecha</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-300">05/02/2024 - 05/05/2024</p>
                       </div>
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
-          )}
+
+            {/* Panel hexagonal 2 */}
+            <div className="group relative">
+              <div className="hexagon-container mx-auto">
+                <div className="hexagon bg-gradient-to-br from-[#01b001] via-[#0e324b] to-[#01b001] shadow-2xl hover:shadow-blue-200 dark:hover:shadow-blue-800 transition-all duration-500 transform hover:scale-105">
+                  <div className="hexagon-inner bg-white dark:bg-gray-800 flex items-center justify-center">
+                    <div className="text-center p-6">
+                      <div className="mb-4">
+                        <div className="w-12 h-12 bg-[#01b001] rounded-full flex items-center justify-center mx-auto mb-3">
+                          <span className="text-white font-bold text-lg">📚</span>
+                        </div>
+                      </div>
+                      <h3 className="text-lg font-bold text-[#0e324b] dark:text-white mb-2">Datos de Formación</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        <span className="font-semibold text-[#0e324b] dark:text-white">Jornada:</span> Diurna
+                      </p>
+                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                        <p className="text-xs font-semibold text-[#01b001]">Ficha</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-300">2558735</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Panel hexagonal 3 */}
+            <div className="group relative">
+              <div className="hexagon-container mx-auto">
+                <div className="hexagon bg-gradient-to-br from-[#0e324b] via-[#01b001] to-[#0e324b] shadow-2xl hover:shadow-green-200 dark:hover:shadow-green-800 transition-all duration-500 transform hover:scale-105">
+                  <div className="hexagon-inner bg-white dark:bg-gray-800 flex items-center justify-center">
+                    <div className="text-center p-6">
+                      <div className="mb-4">
+                        <div className="w-12 h-12 bg-[#0e324b] rounded-full flex items-center justify-center mx-auto mb-3">
+                          <span className="text-white font-bold text-lg">👨‍🏫</span>
+                        </div>
+                      </div>
+                      <h3 className="text-lg font-bold text-[#0e324b] dark:text-white mb-2">Instructor Calificador</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Juan Pérez</p>
+                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                        <p className="text-xs font-semibold text-[#01b001]">Lista Seleccionada</p>
+                        {selectedChecklist ? (
+                          <p className="text-xs text-gray-600 dark:text-gray-300 leading-tight">ID: {selectedChecklist.id} - {selectedChecklist.component || 'N/A'}</p>
+                        ) : (
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Ninguna lista seleccionada</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Controles de filtros y acciones */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-          <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-            <select
-              onChange={(e) => handleTrimesterChange(e.target.value)}
-              value={selectedTrimester}
-              className="p-2 border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300 border rounded"
-            >
-              <option value="todos">Todos los Trimestres</option>
-              {[...Array(7)].map((_, i) => (
-                <option key={i + 1} value={i + 1}>Trimestre {i + 1}</option>
-              ))}
-            </select>
+        {/* Controles de filtros y acciones con diseño hexagonal */}
+        <div className="relative">
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl border border-gray-200 dark:border-gray-700 shadow-xl p-6">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+              <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                <div className="relative group">
+                  <select
+                    onChange={(e) => handleTrimesterChange(e.target.value)}
+                    value={selectedTrimester}
+                    className="hexagon-input appearance-none p-4 pl-12 pr-10 border-2 border-[#0e324b] bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-[#0e324b] dark:text-white rounded-full focus:ring-4 focus:ring-[#01b001]/30 focus:border-[#01b001] transition-all duration-300 shadow-lg hover:shadow-xl font-semibold cursor-pointer"
+                  >
+                    <option value="todos">Todos los Trimestres</option>
+                    {[...Array(7)].map((_, i) => (
+                      <option key={i + 1} value={i + 1}>Trimestre {i + 1}</option>
+                    ))}
+                  </select>
+                  
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#0e324b] pointer-events-none">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
 
-            <select
-              onChange={(e) => handleChecklistChange(e.target.value)}
-              value={selectedChecklist?.id || ""}
-              className="p-2 border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300 border rounded"
-              disabled={filteredChecklists.length === 0}
-            >
-              <option value="">Seleccionar Lista de Chequeo</option>
-              {filteredChecklists.map((checklist) => (
-                <option key={checklist.id} value={checklist.id}>
-                  ID: {checklist.id} - {checklist.component || 'Lista de Chequeo'} (T{checklist.trimester || 'N/A'})
-                </option>
-              ))}
-            </select>
+                <div className="relative group">
+                  <select
+                    onChange={(e) => handleChecklistChange(e.target.value)}
+                    value={selectedChecklist?.id || ""}
+                    className="hexagon-input appearance-none p-4 pl-12 pr-10 border-2 border-[#0e324b] bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-[#0e324b] dark:text-white rounded-full focus:ring-4 focus:ring-[#01b001]/30 focus:border-[#01b001] transition-all duration-300 shadow-lg hover:shadow-xl font-semibold cursor-pointer"
+                    disabled={filteredChecklists.length === 0}
+                  >
+                    <option value="">Seleccionar Lista de Chequeo</option>
+                    {filteredChecklists.map((checklist) => (
+                      <option key={checklist.id} value={checklist.id}>
+                        ID: {checklist.id} - {checklist.component || 'Lista de Chequeo'} (T{checklist.trimester || 'N/A'})
+                      </option>
+                    ))}
+                  </select>
+                  
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#0e324b] pointer-events-none">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
 
-            <button
-              onClick={handleSaveChecklist}
-              disabled={!selectedChecklist}
-              className={`flex items-center gap-2 px-4 py-2 rounded-md border transition-all duration-300 ${
-                selectedChecklist
-                  ? 'hover:border-[#01b001] border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white hover:shadow-md'
-                  : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
-              }`}
-            >
-              <Save className="w-4 h-4" />
-              <span>
-                {selectedEvaluation ? "Guardar Lista de chequeo" : "📋 Guardar Lista de Chequeo"}
-              </span>
-              {(evaluationObservations.trim() || evaluationRecommendations.trim()) && !selectedEvaluation && (
-                <span className="text-xs bg-orange-500 text-white px-2 py-0.5 rounded-full">
-                  Datos pendientes
-                </span>
-              )}
-            </button>
-          </div>
+                <button
+                  onClick={handleSaveChecklist}
+                  disabled={!selectedChecklist}
+                  className={`hexagon-button flex items-center gap-3 px-6 py-4 rounded-full border-2 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                    selectedChecklist
+                      ? 'border-[#01b001] bg-gradient-to-r from-[#01b001] to-[#0e324b] text-white hover:from-[#0e324b] hover:to-[#01b001]'
+                      : 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  <Save className="w-5 h-5" />
+                  <span>Guardar Lista</span>
+                  {(evaluationObservations.trim() || evaluationRecommendations.trim()) && !selectedEvaluation && (
+                    <span className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs">
+                      Pendientes
+                    </span>
+                  )}
+                </button>
+              </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-              Listas activas: {activeChecklists.length} | Filtradas: {filteredChecklists.length}
-            </span>
-            <button 
-              onClick={handleExportPDF}
-              disabled={!selectedChecklist}
-              className={`flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md transition-colors duration-300 ${
-                selectedChecklist
-                  ? 'bg-gradient-to-r from-lime-600 to-lime-500 text-white hover:from-lime-700 hover:to-lime-600'
-                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-              } focus:outline-none`}
-            >
-              <FileDown className="w-4 h-4" /> PDF
-            </button>
-            <button 
-              onClick={handleExportExcel}
-              disabled={!selectedChecklist}
-              className={`flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md transition-colors duration-300 ${
-                selectedChecklist
-                  ? 'bg-gradient-to-r from-lime-600 to-lime-500 text-white hover:from-lime-700 hover:to-lime-600'
-                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-              } focus:outline-none`}
-            >
-              <FileDown className="w-4 h-4" /> Excel
-            </button>
+              <div className="flex items-center gap-4">
+                <div className="bg-gradient-to-r from-[#0e324b] to-[#01b001] text-white px-4 py-2 rounded-full shadow-md">
+                  <span className="text-sm font-semibold">
+                    Activas: {activeChecklists.length} | Filtradas: {filteredChecklists.length}
+                  </span>
+                </div>
+                
+                <button 
+                  onClick={handleExportPDF}
+                  disabled={!selectedChecklist}
+                  className={`hexagon-export flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                    selectedChecklist
+                      ? 'bg-gradient-to-r from-[#01b001] to-lime-500 text-white hover:from-lime-500 hover:to-[#01b001]'
+                      : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                  }`}
+                >
+                  <FileDown className="w-5 h-5" />
+                  <span>PDF</span>
+                </button>
+                
+                <button 
+                  onClick={handleExportExcel}
+                  disabled={!selectedChecklist}
+                  className={`hexagon-export flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                    selectedChecklist
+                      ? 'bg-gradient-to-r from-[#01b001] to-lime-500 text-white hover:from-lime-500 hover:to-[#01b001]'
+                      : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                  }`}
+                >
+                  <FileDown className="w-5 h-5" />
+                  <span>Excel</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1515,81 +1551,162 @@ export default function InstructorChecklistView() {
           </div>
         ) : (
           <>
-            {/* Tabla principal */}
-            <div className="overflow-x-auto bg-white shadow-md rounded-lg border border-gray-300">
-              <table className="min-w-full text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
-                <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-600 text-gray-600 dark:text-gray-400">
-                  <tr className="font-medium text-gray-900 dark:text-white">
-                    <th className="text-xl font-bold p-3 text-center">Item</th>
-                    <th className="text-xl font-bold p-3 text-left">Indicadores y/o Variables</th>
-                    <th className="text-xl font-bold p-3 text-center">Sí / No</th>
-                    <th className="text-xl font-bold p-3 text-left">Observaciones</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                  {currentItems.map((item) => {
-                    const itemState = itemStates[item.id] || { completed: item.completed, observations: item.observations };
-                    return (
-                      <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
-                        <td className="p-6 text-center font-medium text-gray-900 dark:text-white">{item.id}</td>
-                        <td className="p-6 font-medium text-gray-900 dark:text-white">{item.indicator}</td>
-                        <td className="p-6 text-center font-medium text-gray-900 dark:text-white">
-                          <div className="flex justify-center space-x-4">
-                            <label className="flex items-center space-x-2 cursor-pointer">
-                              <input
-                                type="radio"
-                                name={`completed-${item.id}`}
-                                value="yes"
-                                onChange={() => handleItemChange(item.id, "completed", true)}
-                                checked={itemState.completed === true}
-                                className="w-4 h-4 text-green-600 focus:ring-green-500"
-                              />
-                              <Check className="w-5 h-5 text-green-600" />
-                              <span className="text-sm text-green-600 font-medium">Sí</span>
-                            </label>
-                            <label className="flex items-center space-x-2 cursor-pointer">
-                              <input
-                                type="radio"
-                                name={`completed-${item.id}`}
-                                value="no"
-                                onChange={() => handleItemChange(item.id, "completed", false)}
-                                checked={itemState.completed === false}
-                                className="w-4 h-4 text-red-600 focus:ring-red-500"
-                              />
-                              <X className="w-5 h-5 text-red-600" />
-                              <span className="text-sm text-red-600 font-medium">No</span>
-                            </label>
+            {/* Tabla principal con diseño hexagonal */}
+            <div className="relative">
+              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div className="bg-gradient-to-r from-[#0e324b] via-[#01b001] to-[#0e324b] p-6">
+                  <h2 className="text-2xl font-bold text-white text-center flex items-center justify-center gap-3">
+                    
+                    Lista de Chequeo
+                    
+                  </h2>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm">
+                    <thead className="bg-gradient-to-r from-gray-100 to-blue-50 dark:from-gray-700 dark:to-blue-900">
+                      <tr>
+                        <th className="hexagon-cell text-xl font-bold p-6 text-center text-[#0e324b] dark:text-white">
+                          <div className="flex items-center justify-center gap-2">
+                         
+                            Item
                           </div>
-                        </td>
-                        <td className="p-3">
-                          <textarea
-                            value={itemState.observations || ""}
-                            onChange={(e) => handleItemChange(item.id, "observations", e.target.value)}
-                            className="border border-gray-300 dark:border-gray-600 rounded w-full p-3 min-h-[80px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
-                            placeholder="Agregar observaciones detalladas sobre este item..."
-                          />
-                        </td>
+                        </th>
+                        <th className="hexagon-cell text-xl font-bold p-6 text-left text-[#0e324b] dark:text-white">
+                          <div className="flex items-center gap-2">
+                         
+                            Indicadores y/o Variables
+                          </div>
+                        </th>
+                        <th className="hexagon-cell text-xl font-bold p-6 text-center text-[#0e324b] dark:text-white">
+                          <div className="flex items-center justify-center gap-2">
+                            
+                            Evaluación
+                          </div>
+                        </th>
+                        <th className="hexagon-cell text-xl font-bold p-6 text-left text-[#0e324b] dark:text-white">
+                          <div className="flex items-center gap-2">
+                           
+                            Observaciones
+                          </div>
+                        </th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                      {currentItems.map((item, index) => {
+                        const itemState = itemStates[item.id] || { completed: item.completed, observations: item.observations };
+                        return (
+                          <tr key={item.id} className={`${
+                            index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-750'
+                          }`}>
+                            <td className="hexagon-cell p-6 text-center">
+                              <div className="w-12 h-12 bg-gradient-to-br from-[#0e324b] to-[#01b001] rounded-full flex items-center justify-center mx-auto shadow-lg">
+                                <span className="text-white font-bold text-lg">{item.id}</span>
+                              </div>
+                            </td>
+                            <td className="hexagon-cell p-6">
+                              <div className="bg-gradient-to-r from-white to-blue-50 dark:from-gray-800 dark:to-blue-900/30 p-4 rounded-2xl border border-gray-200 dark:border-gray-600 shadow-inner">
+                                <p className="font-medium text-[#0e324b] dark:text-white leading-relaxed">
+                                  {item.indicator}
+                                </p>
+                              </div>
+                            </td>
+                            <td className="hexagon-cell p-6 text-center">
+                              <div className="flex justify-center space-x-6">
+                                <label className={`hexagon-choice flex items-center space-x-3 cursor-pointer p-3 rounded-2xl border-2 ${
+                                  itemState.completed === true 
+                                    ? 'border-[#01b001] bg-green-50 dark:bg-green-900/30 shadow-lg transform scale-105' 
+                                    : 'border-gray-300 dark:border-gray-600'
+                                }`}>
+                                  <input
+                                    type="radio"
+                                    name={`completed-${item.id}`}
+                                    value="yes"
+                                    onChange={() => handleItemChange(item.id, "completed", true)}
+                                    checked={itemState.completed === true}
+                                    className="sr-only"
+                                  />
+                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                    itemState.completed === true ? 'bg-[#01b001] text-white' : 'bg-gray-200 dark:bg-gray-600'
+                                  }`}>
+                                    <Check className="w-5 h-5" />
+                                  </div>
+                                  <span className={`font-semibold ${
+                                    itemState.completed === true ? 'text-[#01b001]' : 'text-gray-600 dark:text-gray-400'
+                                  }`}>
+                                    Sí
+                                  </span>
+                                </label>
+                                <label className={`hexagon-choice flex items-center space-x-3 cursor-pointer p-3 rounded-2xl border-2 ${
+                                  itemState.completed === false 
+                                    ? 'border-red-500 bg-red-50 dark:bg-red-900/30 shadow-lg transform scale-105' 
+                                    : 'border-gray-300 dark:border-gray-600'
+                                }`}>
+                                  <input
+                                    type="radio"
+                                    name={`completed-${item.id}`}
+                                    value="no"
+                                    onChange={() => handleItemChange(item.id, "completed", false)}
+                                    checked={itemState.completed === false}
+                                    className="sr-only"
+                                  />
+                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                    itemState.completed === false ? 'bg-red-500 text-white' : 'bg-gray-200 dark:bg-gray-600'
+                                  }`}>
+                                    <X className="w-5 h-5" />
+                                  </div>
+                                  <span className={`font-semibold ${
+                                    itemState.completed === false ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'
+                                  }`}>
+                                    No
+                                  </span>
+                                </label>
+                              </div>
+                            </td>
+                            <td className="hexagon-cell p-6">
+                              <div className="relative">
+                                <textarea
+                                  value={itemState.observations || ""}
+                                  onChange={(e) => handleItemChange(item.id, "observations", e.target.value)}
+                                  className="hexagon-textarea w-full p-4 border-2 border-gray-300 dark:border-gray-600 rounded-2xl min-h-[100px] bg-gradient-to-r from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 text-[#0e324b] dark:text-white focus:ring-4 focus:ring-[#01b001]/30 focus:border-[#01b001] resize-vertical shadow-inner"
+                                  placeholder="Agregar observaciones detalladas sobre este item..."
+                                />
+                                
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
 
-            {/* Paginación */}
-            <div className="flex justify-center items-center space-x-4 mt-4">
+            {/* Paginación con diseño hexagonal */}
+            <div className="flex justify-center items-center space-x-6 mt-8">
               <button
-                className={`px-4 py-2 rounded ${currentPage === 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#0e324b] hover:bg-[#01b001] text-white'} transition-colors duration-300`}
+                className={`hexagon-nav px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg ${
+                  currentPage === 1 
+                    ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
+                    : 'bg-gradient-to-r from-[#0e324b] to-[#01b001] hover:from-[#01b001] hover:to-[#0e324b] text-white shadow-xl'
+                }`}
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
               >
                 ‹ Anterior
               </button>
-              <div className="text-lg font-medium">
-                Página {currentPage} de {totalPages}
+              <div className="bg-gradient-to-r from-[#0e324b] to-[#01b001] text-white px-6 py-3 rounded-full shadow-lg">
+                <span className="font-bold text-lg">
+                  Página {currentPage} de {totalPages}
+                </span>
               </div>
               <button
-                className={`px-4 py-2 rounded ${currentPage === totalPages ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#0e324b] hover:bg-[#01b001] text-white'} transition-colors duration-300`}
+                className={`hexagon-nav px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg ${
+                  currentPage === totalPages 
+                    ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
+                    : 'bg-gradient-to-r from-[#0e324b] to-[#01b001] hover:from-[#01b001] hover:to-[#0e324b] text-white shadow-xl'
+                }`}
                 onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
               >
@@ -1597,15 +1714,239 @@ export default function InstructorChecklistView() {
               </button>
             </div>
 
-            {/* Sección de firmas */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+            {/* Sección de Evaluación - Movida debajo de la tabla */}
+            {selectedChecklist && (
+              <div className="mt-12 relative">
+                <div className="bg-gradient-to-br from-green-50 via-blue-50 to-green-50 dark:from-green-900/20 dark:via-blue-900/20 dark:to-green-900/20 rounded-3xl shadow-2xl border border-green-200 dark:border-green-800 overflow-hidden">
+                  <div className="bg-gradient-to-r from-[#01b001] via-[#0e324b] to-[#01b001] p-6">
+                    <h3 className="text-2xl font-bold text-white text-center flex items-center justify-center gap-3">
+          
+                      Evaluación de Lista de Chequeo
+                      
+                    </h3>
+                  </div>
+                  
+                  <div className="p-8">
+                    {selectedEvaluation ? (
+                      // Vista cuando hay evaluación existente
+                      showEvaluationForm ? (
+                        // Mostrar formulario de actualización con diseño hexagonal
+                        <div className="space-y-6">
+                          {/* Estado de la evaluación */}
+                          <div className="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-800 dark:to-blue-900/50 p-6 rounded-2xl border border-blue-200 dark:border-blue-700 shadow-inner">
+                            <p className="text-blue-800 dark:text-blue-200 text-center font-medium flex items-center justify-center gap-2">
+                              
+                              <strong>Actualizar Evaluación:</strong> Modifique los campos que desee cambiar
+                            </p>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                              <label className="block text-lg font-semibold text-[#0e324b] dark:text-white mb-2">
+                                <span className="flex items-center gap-2">
+                                  
+                                  Observaciones: <span className="text-red-500">*</span>
+                                </span>
+                              </label>
+                              <textarea
+                                value={evaluationObservations}
+                                onChange={(e) => setEvaluationObservations(e.target.value)}
+                                className="w-full px-4 py-4 border-2 border-[#0e324b] dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-[#01b001]/30 focus:border-[#01b001] bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-[#0e324b] dark:text-white shadow-inner transition-all duration-300"
+                                rows={4}
+                                placeholder="Ingrese sus observaciones generales sobre la evaluación..."
+                                required
+                              />
+                            </div>
+                            
+                            <div className="space-y-4">
+                              <label className="block text-lg font-semibold text-[#0e324b] dark:text-white mb-2">
+                                <span className="flex items-center gap-2">
+                                  
+                                  Recomendaciones: <span className="text-red-500">*</span>
+                                </span>
+                              </label>
+                              <textarea
+                                value={evaluationRecommendations}
+                                onChange={(e) => setEvaluationRecommendations(e.target.value)}
+                                className="w-full px-4 py-4 border-2 border-[#0e324b] dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-[#01b001]/30 focus:border-[#01b001] bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-[#0e324b] dark:text-white shadow-inner transition-all duration-300"
+                                rows={4}
+                                placeholder="Ingrese sus recomendaciones para esta evaluación..."
+                                required
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="mt-6">
+                            <label className="block text-lg font-semibold text-[#0e324b] dark:text-white mb-4">
+                              <span className="flex items-center gap-2">
+                                <span className="text-xl">⚖️</span>
+                                Juicio de Valor: <span className="text-red-500">*</span>
+                              </span>
+                            </label>
+                            <select
+                              value={evaluationJudgment}
+                              onChange={(e) => setEvaluationJudgment(e.target.value)}
+                              className="w-full px-6 py-4 border-2 border-[#0e324b] dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-[#01b001]/30 focus:border-[#01b001] bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-[#0e324b] dark:text-white font-semibold text-lg shadow-inner transition-all duration-300"
+                              required
+                            >
+                              <option value="">Seleccione un juicio de valor</option>
+                              <option value="PENDIENTE">Pendiente</option>
+                              <option value="EXCELENTE">Excelente</option>
+                              <option value="BUENO">Bueno</option>
+                              <option value="ACEPTABLE">Aceptable</option>
+                              <option value="DEFICIENTE">Deficiente</option>
+                              <option value="RECHAZADO">Rechazado</option>
+                            </select>
+                          </div>
+                          
+                          <div className="flex justify-center space-x-6 mt-8">
+                            <button
+                              onClick={handleCancelUpdate}
+                              className="px-8 py-4 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white rounded-2xl transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                            >
+                              <X className="w-5 h-5" />
+                              <span>Cancelar</span>
+                            </button>
+                            <button
+                              onClick={handleCompleteEvaluation}
+                              disabled={!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE"}
+                              className={`px-8 py-4 rounded-2xl transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                                (!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
+                                  ? 'bg-gray-400 cursor-not-allowed text-white'
+                                  : 'bg-gradient-to-r from-[#01b001] to-[#0e324b] hover:from-[#0e324b] hover:to-[#01b001] text-white'
+                              }`}
+                            >
+                              <Save className="w-5 h-5" />
+                              <span>Guardar Cambios</span>
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        // Mostrar vista compacta con botón de actualizar
+                        <div className="space-y-6">
+                          {/* Estado de la evaluación */}
+                          <div className="bg-gradient-to-r from-green-100 to-green-50 dark:from-green-800 dark:to-green-900/50 p-6 rounded-2xl border border-green-200 dark:border-green-700 shadow-inner">
+                            <p className="text-green-800 dark:text-green-200 text-center font-medium flex items-center justify-center gap-2">
+                              <span className="text-2xl">✅</span>
+                              <strong>Evaluación Completada</strong> - Esta lista de chequeo ya tiene evaluación
+                            </p>
+                          </div>
+                          
+                          {/* Resumen de la evaluación con diseño hexagonal */}
+                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div className="bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 rounded-2xl p-6 shadow-lg">
+                              <div className="text-center mb-4">
+                                <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                                  <span className="text-white text-xl">📝</span>
+                                </div>
+                                <h4 className="text-lg font-bold text-[#0e324b] dark:text-white">Observaciones</h4>
+                              </div>
+                              <div className="bg-gradient-to-r from-blue-50 to-white dark:from-blue-900/30 dark:to-gray-700 p-4 rounded-xl border border-blue-200 dark:border-blue-600">
+                                <p className="text-sm text-[#0e324b] dark:text-white leading-relaxed min-h-[80px]">
+                                  {selectedEvaluation.observations || "Sin observaciones"}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            <div className="bg-white dark:bg-gray-800 border-2 border-green-200 dark:border-green-700 rounded-2xl p-6 shadow-lg">
+                              <div className="text-center mb-4">
+                                <div className="w-12 h-12 bg-[#01b001] rounded-full flex items-center justify-center mx-auto mb-3">
+                                  <span className="text-white text-xl">💡</span>
+                                </div>
+                                <h4 className="text-lg font-bold text-[#0e324b] dark:text-white">Recomendaciones</h4>
+                              </div>
+                              <div className="bg-gradient-to-r from-green-50 to-white dark:from-green-900/30 dark:to-gray-700 p-4 rounded-xl border border-green-200 dark:border-green-600">
+                                <p className="text-sm text-[#0e324b] dark:text-white leading-relaxed min-h-[80px]">
+                                  {selectedEvaluation.recommendations || "Sin recomendaciones"}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            <div className="bg-white dark:bg-gray-800 border-2 border-purple-200 dark:border-purple-700 rounded-2xl p-6 shadow-lg">
+                              <div className="text-center mb-4">
+                                <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                                  <span className="text-white text-xl">⚖️</span>
+                                </div>
+                                <h4 className="text-lg font-bold text-[#0e324b] dark:text-white">Juicio de Valor</h4>
+                              </div>
+                              <div className="flex justify-center">
+                                <span className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg ${
+                                  selectedEvaluation.valueJudgment === 'EXCELENTE' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
+                                  selectedEvaluation.valueJudgment === 'BUENO' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' :
+                                  selectedEvaluation.valueJudgment === 'ACEPTABLE' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white' :
+                                  selectedEvaluation.valueJudgment === 'DEFICIENTE' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' :
+                                  selectedEvaluation.valueJudgment === 'RECHAZADO' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
+                                  'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
+                                }`}>
+                                  {selectedEvaluation.valueJudgment || "PENDIENTE"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Botón para actualizar evaluación */}
+                          <div className="flex justify-center mt-8">
+                            <button
+                              onClick={handleUpdateEvaluationClick}
+                              className="px-10 py-4 bg-gradient-to-r from-[#0e324b] via-blue-600 to-blue-700 hover:from-blue-700 hover:to-[#0e324b] text-white rounded-2xl transition-all duration-300 flex items-center space-x-4 font-bold text-lg shadow-2xl hover:shadow-blue-300 dark:hover:shadow-blue-800 transform hover:scale-105"
+                            >
+                              <Edit className="w-6 h-6" />
+                              <span>Actualizar Evaluación</span>
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    ) : (
+                      // Vista cuando no hay evaluación con diseño hexagonal
+                      <div className="text-center space-y-8">
+                        <div className="bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-blue-900/20 dark:via-gray-800 dark:to-blue-900/20 p-8 rounded-3xl border-2 border-blue-200 dark:border-blue-700 shadow-inner">
+                          
+                          <h4 className="text-2xl font-bold text-[#0e324b] dark:text-white mb-4 flex items-center justify-center gap-3">
+                            
+                            Esta lista no tiene evaluación
+                          </h4>
+                          <p className="text-lg text-blue-800 dark:text-blue-200 mb-8 max-w-2xl mx-auto leading-relaxed">
+                            Para evaluar esta lista de chequeo, haga clic en el botón de abajo para abrir el formulario de evaluación completo.
+                          </p>
+                          
+                          {/* Botón principal para crear evaluación */}
+                          <button
+                            onClick={handleOpenCreateEvaluationModal}
+                            className="px-12 py-6 bg-gradient-to-r from-[#01b001] via-blue-600 to-[#0e324b] hover:from-[#0e324b] hover:via-[#01b001] hover:to-blue-600 text-white rounded-3xl transition-all duration-500 flex items-center space-x-4 mx-auto font-bold text-xl shadow-2xl hover:shadow-green-300 dark:hover:shadow-green-800 transform hover:scale-110"
+                          >
+                            <Save className="w-8 h-8" />
+                            <span>Crear Evaluación</span>
+                          </button>
+                          
+                          {/* Botón de debug con diseño hexagonal */}
+                          
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Sección de firmas con diseño hexagonal */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
               {/* Firma Instructor Técnico Anterior */}
-              <div className="bg-white p-4 rounded-lg shadow-md border border-gray-300">
-                <p className="text-lg font-semibold text-center mb-4">Instructor técnico anterior</p>
+              <div className="bg-gradient-to-br from-white via-blue-50 to-white dark:from-gray-800 dark:via-blue-900/30 dark:to-gray-800 p-6 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-[#0e324b] to-[#01b001] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-white text-2xl">👨‍🏫</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-[#0e324b] dark:text-white">Instructor Técnico Anterior</h3>
+                </div>
                 <div className="flex flex-col items-center">
-                  <label className="flex flex-col items-center cursor-pointer mb-3 p-4 border-2 border-dashed border-[#00324d] rounded-lg w-full hover:border-[#01b001] transition-colors duration-300">
-                    <UploadCloud className="w-8 h-8 hover:text-[#01b001] transition-colors duration-300 mb-2" />
-                    <span className="font-semibold text-sm text-center">Subir firma</span>
+                  <label className="hexagon-upload flex flex-col items-center cursor-pointer mb-4 p-6 border-3 border-dashed border-[#0e324b] rounded-2xl w-full hover:border-[#01b001] hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-300 group">
+                    <UploadCloud className="w-12 h-12 text-[#0e324b] group-hover:text-[#01b001] transition-colors duration-300 mb-3 group-hover:animate-bounce" />
+                    <span className="font-semibold text-lg text-center text-[#0e324b] dark:text-white group-hover:text-[#01b001] transition-colors duration-300">
+                      Subir Firma Digital
+                    </span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                      Formatos: JPG, PNG, GIF
+                    </span>
                     <input
                       type="file"
                       accept="image/*"
@@ -1615,25 +1956,37 @@ export default function InstructorChecklistView() {
                   </label>
                   {firmaAnterior && (
                     <div className="w-full flex justify-center">
-                      <Image
-                        src={firmaAnterior}
-                        alt="Firma instructor anterior"
-                        width={100}
-                        height={100}
-                        className="max-h-20 max-w-full object-contain border border-[#00324d] rounded-md p-2"
-                      />
+                      <div className="bg-white dark:bg-gray-700 p-4 rounded-2xl border-2 border-[#01b001] shadow-lg">
+                        <Image
+                          src={firmaAnterior}
+                          alt="Firma instructor anterior"
+                          width={150}
+                          height={100}
+                          className="max-h-24 max-w-full object-contain rounded-lg"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Firma Instructor Técnico Nuevo */}
-              <div className="bg-white p-4 rounded-lg shadow-md border border-gray-300">
-                <p className="text-lg font-semibold text-center mb-4">Instructor técnico nuevo</p>
+              <div className="bg-gradient-to-br from-white via-green-50 to-white dark:from-gray-800 dark:via-green-900/30 dark:to-gray-800 p-6 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700">
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-[#01b001] to-[#0e324b] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-white text-2xl">👨‍💼</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-[#0e324b] dark:text-white">Instructor Técnico Nuevo</h3>
+                </div>
                 <div className="flex flex-col items-center">
-                  <label className="flex flex-col items-center cursor-pointer mb-3 p-4 border-2 border-dashed border-[#00324d] rounded-lg w-full hover:border-[#01b001] transition-colors duration-300">
-                    <UploadCloud className="w-8 h-8 hover:text-[#01b001] transition-colors duration-300 mb-2" />
-                    <span className="font-semibold text-sm text-center">Subir firma</span>
+                  <label className="hexagon-upload flex flex-col items-center cursor-pointer mb-4 p-6 border-3 border-dashed border-[#0e324b] rounded-2xl w-full hover:border-[#01b001] hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-300 group">
+                    <UploadCloud className="w-12 h-12 text-[#0e324b] group-hover:text-[#01b001] transition-colors duration-300 mb-3 group-hover:animate-bounce" />
+                    <span className="font-semibold text-lg text-center text-[#0e324b] dark:text-white group-hover:text-[#01b001] transition-colors duration-300">
+                      Subir Firma Digital
+                    </span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                      Formatos: JPG, PNG, GIF
+                    </span>
                     <input
                       type="file"
                       accept="image/*"
@@ -1643,13 +1996,15 @@ export default function InstructorChecklistView() {
                   </label>
                   {firmaNuevo && (
                     <div className="w-full flex justify-center">
-                      <Image
-                        src={firmaNuevo}
-                        alt="Firma instructor nuevo"
-                        height={100}
-                        width={100}
-                        className="max-h-20 max-w-full object-contain border border-[#00324d] rounded-md p-2"
-                      />
+                      <div className="bg-white dark:bg-gray-700 p-4 rounded-2xl border-2 border-[#01b001] shadow-lg">
+                        <Image
+                          src={firmaNuevo}
+                          alt="Firma instructor nuevo"
+                          height={100}
+                          width={150}
+                          className="max-h-24 max-w-full object-contain rounded-lg"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
