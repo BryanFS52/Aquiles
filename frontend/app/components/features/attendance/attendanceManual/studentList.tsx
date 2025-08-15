@@ -62,6 +62,9 @@ export function StudentList({
         }
     }
 
+    console.log(selectedStudent)
+    console.log(students)
+
     const getStatusColor = (status: string | undefined | null): string => {
         if (!status) return statusColorMap.default;
         return statusColorMap[status.toLowerCase()] ?? statusColorMap.default;
@@ -83,7 +86,7 @@ export function StudentList({
             {students.map((student, index) => (
 
                 <div
-                    key={student.id}
+                    key={student.student.id}
                     className="bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors rounded-lg p-3 sm:p-4 border border-gray-200 dark:border-gray-600"
                 >
                     <div className="flex items-center justify-between gap-2 sm:gap-4">
@@ -94,10 +97,10 @@ export function StudentList({
                             <div className="min-w-0 flex-1">
                                 <div className="flex items-center space-x-1 sm:space-x-2">
                                     <h3 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate">
-                                        {student.person?.name || "N/A"} {student.person?.lastname || ""}
+                                        {student.student?.person?.name || "N/A"} {student.student?.person?.lastname || ""}
                                     </h3>
                                     <button
-                                        onClick={() => onStudentSelect(selectedStudent === student.id ? null : student.id)}
+                                        onClick={() => onStudentSelect(selectedStudent === student.student.id ? null : student.student.id)}
                                         className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 flex-shrink-0"
                                     >
                                         <ChevronDown
@@ -105,20 +108,20 @@ export function StudentList({
                                         />
                                     </button>
                                 </div>
-                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Doc: {student.person?.document || "N/A"}</p>
+                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Doc: {student.student?.person?.document || "N/A"}</p>
 
-                                {selectedStudent === student.id && (
+                                {selectedStudent === student.student.id && (
                                     <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-200 dark:border-gray-600 space-y-1 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-2 text-xs sm:text-sm">
                                         <div className="flex items-center space-x-2">
                                             <Mail className="w-3 h-3 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                                             <span className="text-gray-600 dark:text-gray-300 truncate">
-                                                {student.person?.email || "No disponible"}
+                                                {student.student?.person?.email || "No disponible"}
                                             </span>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <Phone className="w-3 h-3 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                                             <span className="text-gray-600 dark:text-gray-300 truncate">
-                                                {student.person?.phone || "No disponible"}
+                                                {student.student?.person?.phone || "No disponible"}
                                             </span>
                                         </div>
                                     </div>
@@ -126,11 +129,11 @@ export function StudentList({
                             </div>
                         </div>
                         <div className="flex items-center space-x-1 sm:space-x-3 flex-shrink-0">
-                            <div className="hidden sm:block">{getStatusIcon(attendance[student.id])}</div>
+                            <div className="hidden sm:block">{getStatusIcon(attendance[student.student.id])}</div>
                             <select
-                                value={attendance[student.id] || ""}
-                                onChange={(e) => onAttendanceChange(student.id, e.target.value as AttendanceStatus)}
-                                className={`px-2 py-1 sm:px-3 sm:py-2 border rounded-lg font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-0 w-20 sm:w-auto ${getStatusColor(attendance[student.id])}`}
+                                value={attendance[student.student.id] || ""}
+                                onChange={(e) => onAttendanceChange(student.student.id, e.target.value as AttendanceStatus)}
+                                className={`px-2 py-1 sm:px-3 sm:py-2 border rounded-lg font-medium text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-0 w-20 sm:w-auto ${getStatusColor(attendance[student.student.id])}`}
                             >
                                 <option value="" disabled hidden>
                                     Seleccionar

@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,27 +31,29 @@ public class TeamsScrumBusiness {
 
     // Validation Object
     private void validationObject(TeamsScrumDto teamsScrumDto) throws CustomException {
-        // Validation max 4 members
+        // Validar que memberIds no sea null y que no tenga más de 4 miembros
         if (teamsScrumDto.getMemberIds() != null && teamsScrumDto.getMemberIds().size() > 4) {
             throw new CustomException("A Team Scrum can have a maximum of 4 members.", HttpStatus.BAD_REQUEST);
         }
 
-        // Validation
-        List<Long> memberIdList = teamsScrumDto.getMemberIds()
-                .stream()
-                .map(TeamScrumMemberIdDto::getStudentId)
-                .collect(Collectors.toList());
+        // Solo continuar si memberIds no es null
+        if (teamsScrumDto.getMemberIds() != null) {
+            List<Long> memberIdList = teamsScrumDto.getMemberIds()
+                    .stream()
+                    .map(TeamScrumMemberIdDto::getStudentId)
+                    .collect(Collectors.toList());
 
-        boolean studentResult = teamScrumService.existsByStudySheetIdAndMemberIds(
-                teamsScrumDto.getStudySheetId(),
-                memberIdList
-        );
+            boolean studentResult = teamScrumService.existsByStudySheetIdAndMemberIds(
+                    teamsScrumDto.getStudySheetId(),
+                    memberIdList
+            );
 
-
-        if (studentResult) {
-            throw new CustomException("Some of the selected students are already assigned to a Team Scrum within this study sheet.", HttpStatus.CONFLICT);
+            if (studentResult) {
+                throw new CustomException("Some of the selected students are already assigned to a Team Scrum within this study sheet.", HttpStatus.CONFLICT);
+            }
         }
     }
+
 
     // Find All
     public Page<TeamsScrumDto> findAll(int page, int size) {
@@ -127,12 +128,11 @@ public class TeamsScrumBusiness {
                         .collect(Collectors.toList());
 
                 teamsScrum.setMemberIds(memberIds);
-            } else {
-                teamsScrum.setMemberIds(Collections.emptyList());
             }
 
             teamScrumService.save(teamsScrum);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new CustomException("Error Updating Team Scrum: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

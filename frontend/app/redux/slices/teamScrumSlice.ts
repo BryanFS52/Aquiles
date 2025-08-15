@@ -1,6 +1,6 @@
 import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { GET_TEAMS_SCRUMS, GET_TEAM_SCRUM_BY_ID, ADD_TEAM_SCRUM, ADD_PROFILE_TO_STUDENT, UPDATE_TEAM_SCRUM, DELETE_TEAM_SCRUM, } from '@graphql/teamsScrumGraph';
+import { GET_TEAMS_SCRUMS, GET_TEAM_SCRUM_BY_ID, GET_TEAM_SCRUM_BY_ID_WITH_STUDENTS, ADD_TEAM_SCRUM, ADD_PROFILE_TO_STUDENT, UPDATE_TEAM_SCRUM, DELETE_TEAM_SCRUM, } from '@graphql/teamsScrumGraph';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import {
     TeamsScrum,
@@ -8,6 +8,8 @@ import {
     GetTeamsScrumsQueryVariables,
     GetTeamScrumByIdQuery,
     GetTeamScrumByIdQueryVariables,
+    GetTeamScrumByIdWithStudentsQuery,
+    GetTeamScrumByIdWithStudentsQueryVariables,
     AddTeamScrumMutation,
     AddTeamScrumMutationVariables,
     UpdateTeamScrumMutation,
@@ -67,7 +69,22 @@ export const fetchTeamScrumById = createAsyncThunk<GetTeamScrumByIdQuery['teamSc
     }
 );
 
+export const fetchTeamScrumByIdWithStudents = createAsyncThunk<GetTeamScrumByIdWithStudentsQuery['teamScrumById'], GetTeamScrumByIdWithStudentsQueryVariables, { rejectValue: { code: string; message: string } }>(
+    'teamScrum/fetchByIdWithStudents',
+    async ({ id }, { rejectWithValue }) => {
+        try {
+            const { data } = await clientLAN.query<GetTeamScrumByIdWithStudentsQuery, GetTeamScrumByIdWithStudentsQueryVariables>({
+                query: GET_TEAM_SCRUM_BY_ID_WITH_STUDENTS,
+                variables: { id },
+            });
 
+            return data.teamScrumById;
+        } catch (error: any) {
+            console.error("Apollo error:", error);
+            return rejectWithValue({ code: '500', message: error.message });
+        }
+    }
+);
 
 export const addTeamScrum = createAsyncThunk<AddTeamScrumMutation['addTeamScrum'], AddTeamScrumMutationVariables['input'],
     { rejectValue: { code: string; message: string } }
@@ -206,6 +223,22 @@ const teamScrumSlice = createSlice({
                 state.loading = false;
             })
             .addCase(fetchTeamScrumById.rejected, (state, action) => {
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
+                state.error = { code, message };
+                state.loading = false;
+            })
+            // fetchTeamScrumByIdWithStudents
+            .addCase(fetchTeamScrumByIdWithStudents.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchTeamScrumByIdWithStudents.fulfilled, (state, action: PayloadAction<GetTeamScrumByIdWithStudentsQuery['teamScrumById']>) => {
+                if (action.payload) {
+                    state.dataForTeamScrumById = transformGraphQLToTeamScrumItem(action.payload.data);
+                }
+                state.loading = false;
+            })
+            .addCase(fetchTeamScrumByIdWithStudents.rejected, (state, action) => {
                 const payload = action.payload as RejectedPayload;
                 const { code, message } = payload || {};
                 state.error = { code, message };

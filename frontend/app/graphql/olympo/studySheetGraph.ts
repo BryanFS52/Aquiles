@@ -137,18 +137,6 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
         startLective
         endLective
         state
-        offer {
-          name
-        }
-        journey {
-          name
-        }
-        quarter {
-          name {
-            extension
-            number
-          }
-        }
         trainingProject {
           name
           program {
@@ -156,8 +144,8 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
           }
         }
         studentStudySheets {
-          id
           student {
+            id
             person {
               document
               name

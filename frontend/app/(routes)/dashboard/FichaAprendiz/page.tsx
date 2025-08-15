@@ -6,8 +6,7 @@ import { HiSparkles, HiAcademicCap } from "react-icons/hi";
 import { useLoader } from "@/context/LoaderContext";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { fetchStudySheetWithStudents } from "@slice/olympo/studySheetSlice";
-import { Student } from "@graphql/generated";
+import { fetchStudySheetWithStudents, clearStudySheetState } from "@slice/olympo/studySheetSlice";
 import Image from "next/image";
 import PageTitle from "@components/UI/pageTitle";
 import EmptyState from "@components/UI/emptyState";
@@ -21,6 +20,8 @@ const ApprenticeView = () => {
   const students = studySheet?.id ? dataForStudents[studySheet.id] || [] : [];
 
   useEffect(() => {
+    // Limpiar estado anterior antes de cargar nueva ficha
+    dispatch(clearStudySheetState());
     dispatch(fetchStudySheetWithStudents({ id: 5 }));
   }, [dispatch]);
 
@@ -136,9 +137,9 @@ const ApprenticeView = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {students.map((student: Student, index: number) => (
+                {students.map((studentStudySheet: any, index: number) => (
                   <div
-                    key={student.id}
+                    key={studentStudySheet.student.id}
                     className="group relative bg-gradient-to-br from-white to-lightGray/50 dark:from-darkBlue dark:to-shadowBlue rounded-2xl p-6 shadow-lg border border-lightGray dark:border-darkGray hover:shadow-xl transition-all duration-500 hover:-translate-y-2 hover:scale-105"
                     style={{
                       animationDelay: `${index * 100}ms`,
@@ -156,10 +157,10 @@ const ApprenticeView = () => {
                         <div className="relative">
                           <Image
                             src={
-                              student.person?.photo ||
-                              `https://ui-avatars.com/api/?name=${encodeURIComponent(`${student.person?.name} ${student.person?.lastname}`)}&background=398F0F&color=fff&size=128`
+                              studentStudySheet.student?.person?.photo ||
+                              `https://ui-avatars.com/api/?name=${encodeURIComponent(`${studentStudySheet.student?.person?.name} ${studentStudySheet.student?.person?.lastname}`)}&background=398F0F&color=fff&size=128`
                             }
-                            alt={`${student.person?.name} ${student.person?.lastname}`}
+                            alt={`${studentStudySheet.student?.person?.name} ${studentStudySheet.student?.person?.lastname}`}
                             width={80}
                             height={80}
                             className="w-20 h-20 rounded-full object-cover mx-auto ring-4 ring-white dark:ring-shadowBlue shadow-lg group-hover:ring-primary/50 transition-all duration-300"
@@ -173,12 +174,12 @@ const ApprenticeView = () => {
                       {/* Información del estudiante */}
                       <div className="space-y-2">
                         <h3 className="text-lg font-bold text-black dark:text-white group-hover:text-primary dark:group-hover:text-lightGreen transition-colors duration-300">
-                          {student.person?.name} {student.person?.lastname}
+                          {studentStudySheet.student?.person?.name} {studentStudySheet.student?.person?.lastname}
                         </h3>
 
                         <div className="flex items-center justify-center gap-2 text-sm text-darkGray dark:text-grayText">
                           <FaEnvelope className="w-3 h-3 text-primary" />
-                          <span className="truncate max-w-full">{student.person?.email}</span>
+                          <span className="truncate max-w-full">{studentStudySheet.student?.person?.email}</span>
                         </div>
                       </div>
 

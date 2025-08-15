@@ -2,12 +2,11 @@
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { GrAttachment } from "react-icons/gr";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { AppDispatch } from "@/redux/store";
 import PageTitle from "@components/UI/pageTitle";
-import JustificationFilters from "@components/features/justification/justificationsFilter";
-import JustificationTable from "@components/features/justification/justificationsTable";
+import JustificationFilters from "@/components/features/justifications/justificationsFilter";
+import JustificationTable from "@/components/features/justifications/justificationsTable";
 import EmptyState from "@components/UI/emptyState";
 import {
   fetchJustifications,

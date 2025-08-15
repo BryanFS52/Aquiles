@@ -30,6 +30,8 @@ const AttendanceManualPage: React.FC = () => {
     const studySheetObj = Array.isArray(studySheet) ? studySheet[0] : studySheet
     const students = studySheetObj?.studentStudySheets || []
 
+    console.log(students)
+
     const [attendance, setAttendance] = useState<Record<string | number, AttendanceStatus>>({})
     const [searchTerm, setSearchTerm] = useState<string>("")
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toLocaleDateString('en-CA'))
@@ -69,8 +71,8 @@ const AttendanceManualPage: React.FC = () => {
     const filteredStudents = useMemo(() => {
         if (!students.length) return []
 
-        let filtered = students.filter((student: any) => {
-            const person = student?.person || {}
+        let filtered = students.filter((studentStudySheet: any) => {
+            const person = studentStudySheet?.student?.person || {}
             const name = person?.name || ""
             const lastname = person?.lastname || ""
             const document = person?.document || ""
@@ -83,13 +85,14 @@ const AttendanceManualPage: React.FC = () => {
         })
 
         if (selectedFilter !== "todos") {
-            filtered = filtered.filter((student: any) => attendance[student.id] === selectedFilter)
+            filtered = filtered.filter((studentStudySheet: any) => attendance[studentStudySheet.id] === selectedFilter)
         }
 
         return filtered
     }, [searchTerm, students, selectedFilter, attendance])
 
     const handleAttendanceChange = (studentId: string | number, value: AttendanceStatus): void => {
+        console.log(`Attendance changed for student ${studentId}: ${value}`)
         setAttendance((prev) => ({ ...prev, [studentId]: value }))
     }
 
@@ -100,6 +103,7 @@ const AttendanceManualPage: React.FC = () => {
         }
 
         const entries = Object.entries(attendance)
+        console.log("Entries to save:", entries)
         if (!entries.length) {
             toast.warning("No hay asistencia marcada para guardar.")
             return

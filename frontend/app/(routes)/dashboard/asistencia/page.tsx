@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import type { AppDispatch, RootState } from '@/redux/store'
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store'
 import { useRouter } from 'next/navigation';
 import { BsPersonCircle } from "react-icons/bs";
 import TableAttendance from "@components/features/attendance/tableAttendance";

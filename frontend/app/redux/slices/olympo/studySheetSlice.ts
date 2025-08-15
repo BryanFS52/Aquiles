@@ -90,6 +90,7 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet =
                     date_birth: ss.student?.person?.date_birth,
                 },
             },
+            studentStudySheetState: ss.studentStudySheetState || null,
         })) || [],
 
         teamsScrum: graphqlData.teamsScrum?.filter((t: any) => t !== null).map((team: any) => ({
@@ -176,7 +177,7 @@ export const fetchStudySheetWithStudents = createAsyncThunk<GetStudySheetWithStu
             query: GET_STUDY_SHEET_WITH_STUDENTS,
             variables: { id },
             fetchPolicy: 'no-cache',
-        })
+        });
         return data.studySheetById;
     }
 );
@@ -332,19 +333,15 @@ const studySheetSlice = createSlice({
             .addCase(fetchStudySheetWithStudents.fulfilled, (state, action) => {
                 const item = action.payload;
 
-                if (item) {
+                if (item?.data) {
                     const transformed = transformGraphQLToStudySheetItem(item.data);
+
+                    // Para FichaAprendiz, simplemente reemplazamos todo el array con la nueva ficha
+                    state.data = [transformed];
+
+                    // Asignar estudiantes
                     const sheetId = transformed.id;
-
-                    if (sheetId != null) {
-                        const existingIndex = state.data.findIndex(s => s.id === sheetId);
-                        if (existingIndex !== -1) {
-                            state.data[existingIndex] = transformed;
-                        } else {
-                            state.data.push(transformed);
-                        }
-
-                        // Filtra los null antes de asignar
+                    if (sheetId) {
                         state.dataForStudents[sheetId] = (transformed.studentStudySheets ?? []).filter(Boolean) as Student[];
                     }
                 }

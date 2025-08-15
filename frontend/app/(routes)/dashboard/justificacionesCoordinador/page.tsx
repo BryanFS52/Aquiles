@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import PageTitle from "@components/UI/pageTitle";
-import JustificationFilters from "@components/features/justification/justificationsFilter";
+import JustificationFilters from "@/components/features/justifications/justificationsFilter";
 import {
   fetchJustifications,
   setFilterOptions,
@@ -16,8 +16,8 @@ import {
   generateFileName,
   updateJustificationStatus,
 } from '@slice/justificationSlice';
-import JustificationTable from "@/components/features/justification/justificationsTable";
-import { AppDispatch, RootState } from "@/redux/store";
+import JustificationTable from "@/components/features/justifications/justificationsTable";
+import { AppDispatch } from "@/redux/store";
 
 
 export default function JustificacionesCoordinator() {
@@ -31,7 +31,7 @@ export default function JustificacionesCoordinator() {
     localCurrentPage,
     filterOptions,
     itemsPerPage
-  } = useSelector((state:any) => state.justification);
+  } = useSelector((state: any) => state.justification);
 
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function JustificacionesCoordinator() {
     dispatch(goToNextPage());
   };
 
-  const handleDownloadFile = (justificacion:any) => {
+  const handleDownloadFile = (justificacion: any) => {
     if (justificacion.archivoAdjunto) {
       const mimeType = justificacion.archivoMime || "application/octet-stream";
       const fileName = generateFileName(justificacion.id, mimeType);
@@ -100,11 +100,11 @@ export default function JustificacionesCoordinator() {
       {/* Table */}
       {!loading && !errorMessage && (
         <>
-        <JustificationTable
-          filteredData={filteredData}
-          handleDownloadFile={handleDownloadFile}
-          handleStatusChange={handleStatusChange}
-        />
+          <JustificationTable
+            filteredData={filteredData}
+            handleDownloadFile={handleDownloadFile}
+            handleStatusChange={handleStatusChange}
+          />
 
           {/* Pagination */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">

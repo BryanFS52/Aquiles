@@ -43,12 +43,13 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         setSearchTerm(e.target.value);
-        const filtered = (studySheetData?.studentStudySheets as any[])?.filter((student: any) => {
-            if (!student || !student.person) return false;
+        const filtered = (studySheetData?.studentStudySheets as any[])?.filter((studentStudySheet: any) => {
+            if (!studentStudySheet || !studentStudySheet.student || !studentStudySheet.student.person) return false;
+            const person = studentStudySheet.student.person;
             return (
-                student.person.name?.toLowerCase().includes(e.target.value.toLowerCase()) ||
-                student.person.lastname?.toLowerCase().includes(e.target.value.toLowerCase()) ||
-                student.person.document?.toLowerCase().includes(e.target.value.toLowerCase())
+                person.name?.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                person.lastname?.toLowerCase().includes(e.target.value.toLowerCase()) ||
+                person.document?.toLowerCase().includes(e.target.value.toLowerCase())
             );
         }) || [];
         setFilteredStudents(filtered);
@@ -177,16 +178,16 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-lightGray">
-                                {filteredStudents?.map((student: any) => (
-                                    <tr key={student.id} className="hover:bg-gray-50">
+                                {filteredStudents?.map((studentStudySheet: any) => (
+                                    <tr key={studentStudySheet.id} className="hover:bg-gray-50">
                                         <td className="px-1 sm:px-2 py-1.5 sm:py-2 border border-lightGray text-xs sm:text-sm">
-                                            <div className="truncate" title={student.person?.document || 'N/A'}>
-                                                {student.person?.document || 'N/A'}
+                                            <div className="truncate" title={studentStudySheet.student?.person?.document || 'N/A'}>
+                                                {studentStudySheet.student?.person?.document || 'N/A'}
                                             </div>
                                         </td>
                                         <td className="px-1 sm:px-2 py-1.5 sm:py-2 border border-lightGray text-xs sm:text-sm">
-                                            <div className="truncate" title={`${student.person?.name || ''} ${student.person?.lastname || ''}`}>
-                                                {student.person?.name || 'N/A'} {student.person?.lastname || ''}
+                                            <div className="truncate" title={`${studentStudySheet.student?.person?.name || ''} ${studentStudySheet.student?.person?.lastname || ''}`}>
+                                                {studentStudySheet.student?.person?.name || 'N/A'} {studentStudySheet.student?.person?.lastname || ''}
                                             </div>
                                         </td>
                                         {[...Array(4)].map((_, weekIndex) => (
