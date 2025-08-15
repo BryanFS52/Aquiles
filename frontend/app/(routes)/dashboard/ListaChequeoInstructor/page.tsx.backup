@@ -46,81 +46,144 @@ export default function InstructorChecklistView() {
 
   const itemsPerPage = 3;
 
-  // Funciones auxiliares para extraer y estructurar datos de evaluaciones
-  const extractItemStatesFromEvaluation = (evaluation: Evaluation) => {
-    if (!evaluation.observations) return {};
-    
+  // Funciones auxiliares para el cache de evaluaciones
+  const getCachedEvaluation = (checklistId: string) => {
+    // Primero verificar cache en memoria
+    const memoryCache = evaluationsCache[checklistId];
+    if (memoryCache) {
+      const fiveMinutes = 5 * 60 * 1000; // 5 minutos en milisegundos
+      if (Date.now() - memoryCache.timestamp < fiveMinutes) {
+        console.log('📦 Usando evaluación desde cache en memoria:', memoryCache.evaluation);
+        return memoryCache.evaluation;
+      } else {
+        // Cache en memoria expirado, limpiar
+        const newCache = { ...evaluationsCache };
+        delete newCache[checklistId];
+        setEvaluationsCache(newCache);
+        console.log('🗑️ Cache en memoria expirado para checklist:', checklistId);
+      }
+    }
+
+    // Si no hay cache en memoria, verificar localStorage
     try {
-      const parsed = JSON.parse(evaluation.observations);
-      if (parsed.itemStates && typeof parsed.itemStates === 'object') {
-        console.log('📋 Estados de items extraídos desde evaluación:', parsed.itemStates);
-        return parsed.itemStates;
+      const localStorageKey = `evaluation_cache_${checklistId}`;
+      const localCache = localStorage.getItem(localStorageKey);
+      if (localCache) {
+        const parsedCache = JSON.parse(localCache);
+        const thirtyMinutes = 30 * 60 * 1000; // 30 minutos para localStorage
+        
+        if (Date.now() - parsedCache.timestamp < thirtyMinutes) {
+          console.log('🏪 Usando evaluación desde localStorage:', parsedCache.evaluation);
+          
+          // Restaurar también en memoria para próximas consultas
+          setEvaluationsCache(prev => ({
+            ...prev,
+            [checklistId]: {
+              evaluation: parsedCache.evaluation,
+              timestamp: Date.now()
+            }
+          }));
+          
+          return parsedCache.evaluation;
+        } else {
+          // Cache en localStorage expirado, limpiar
+          localStorage.removeItem(localStorageKey);
+          console.log('🗑️ Cache en localStorage expirado para checklist:', checklistId);
+        }
       }
     } catch (error) {
-      console.log('ℹ️ No se pudieron extraer estados de items desde observations');
+      console.warn('Error al leer cache de localStorage:', error);
     }
-    
-    return {};
+
+    return null;
   };
 
-  const extractGeneralObservationsFromEvaluation = (evaluation: Evaluation) => {
-    if (!evaluation.observations) return "";
+  const setCachedEvaluation = (checklistId: string, evaluation: Evaluation) => {
+    const timestamp = Date.now();
     
-    try {
-      const parsed = JSON.parse(evaluation.observations);
-      if (parsed.generalObservations && typeof parsed.generalObservations === 'string') {
-        return parsed.generalObservations;
+    // Actualizar cache en memoria
+    setEvaluationsCache(prev => ({
+      ...prev,
+      [checklistId]: {
+        evaluation,
+        timestamp
       }
-    } catch (error) {
-      console.log('ℹ️ No se pudieron extraer observaciones generales, usando observations completo');
-    }
+    }));
     
-    // Si no se puede parsear como JSON, usar el valor completo
-    return evaluation.observations;
+    // Actualizar cache en localStorage
+    try {
+      const localStorageKey = `evaluation_cache_${checklistId}`;
+      const cacheData = {
+        evaluation,
+        timestamp,
+        checklistId
+      };
+      localStorage.setItem(localStorageKey, JSON.stringify(cacheData));
+      console.log('💾 Evaluación guardada en cache (memoria + localStorage):', checklistId, evaluation);
+    } catch (error) {
+      console.warn('Error al guardar cache en localStorage:', error);
+    }
   };
 
-  // Cargar listas de chequeo activas y recuperar selección previa
+  // Función para limpiar caches antiguos al inicializar
+  const cleanExpiredCaches = () => {
+    try {
+      const keys = Object.keys(localStorage);
+      const evaluationCacheKeys = keys.filter(key => key.startsWith('evaluation_cache_'));
+      const tempDataKeys = keys.filter(key => key.startsWith('evaluation_temp_'));
+      const thirtyMinutes = 30 * 60 * 1000;
+      const oneHour = 60 * 60 * 1000;
+      
+      // Limpiar caches de evaluaciones expirados (30 minutos)
+      evaluationCacheKeys.forEach(key => {
+        try {
+          const cached = JSON.parse(localStorage.getItem(key) || '{}');
+          if (cached.timestamp && Date.now() - cached.timestamp > thirtyMinutes) {
+            localStorage.removeItem(key);
+            console.log('🧹 Cache de evaluación limpiado:', key);
+          }
+        } catch (error) {
+          // Si hay error al parsear, limpiar la entrada corrupta
+          localStorage.removeItem(key);
+          console.log('🧹 Cache corrupto limpiado:', key);
+        }
+      });
+
+      // Limpiar datos temporales expirados (1 hora)
+      tempDataKeys.forEach(key => {
+        try {
+          const tempData = JSON.parse(localStorage.getItem(key) || '{}');
+          if (tempData.timestamp && Date.now() - tempData.timestamp > oneHour) {
+            localStorage.removeItem(key);
+            console.log('🧹 Datos temporales limpiados:', key);
+          }
+        } catch (error) {
+          // Si hay error al parsear, limpiar la entrada corrupta
+          localStorage.removeItem(key);
+          console.log('🧹 Datos temporales corruptos limpiados:', key);
+        }
+      });
+    } catch (error) {
+      console.warn('Error al limpiar caches:', error);
+    }
+  };
+
+  // Limpiar caches antiguos al cargar el componente
+  useEffect(() => {
+    cleanExpiredCaches();
+  }, []);
+
+  // Cargar listas de chequeo activas
   useEffect(() => {
     loadActiveChecklists();
   }, []);
 
-  // Recuperar selección de checklist después de cargar las listas
-  useEffect(() => {
-    if (activeChecklists.length > 0 && !selectedChecklist) {
-      // Intentar recuperar la selección previa del localStorage
-      const savedChecklistId = localStorage.getItem('selectedChecklistId');
-      if (savedChecklistId) {
-        const foundChecklist = activeChecklists.find(cl => cl.id === savedChecklistId);
-        if (foundChecklist) {
-          console.log('🔄 Recuperando selección de checklist después de reload:', foundChecklist.id);
-          setSelectedChecklist(foundChecklist);
-        } else {
-          // Si el checklist guardado no existe, limpiar localStorage
-          localStorage.removeItem('selectedChecklistId');
-        }
-      }
-    }
-  }, [activeChecklists, selectedChecklist]);
-
   // Auto-cargar evaluaciones cuando cambie el checklist seleccionado
   useEffect(() => {
     if (selectedChecklist) {
-      console.log("=== CHECKLIST CHANGED - LOADING EVALUATIONS ===");
-      // Guardar selección en localStorage para persistencia de navegación
-      localStorage.setItem('selectedChecklistId', selectedChecklist.id);
-      console.log('💾 Guardando selección de checklist para persistencia:', selectedChecklist.id);
-      
-      // Siempre cargar desde la base de datos
-      loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
-    } else {
-      // Si no hay checklist, limpiar localStorage y datos
-      localStorage.removeItem('selectedChecklistId');
-      setEvaluations([]);
-      setSelectedEvaluation(null);
-      setEvaluationObservations("");
-      setEvaluationRecommendations("");
-      setEvaluationJudgment("PENDIENTE");
-      setItemStates({});
+      // Al cargar por primera vez o cambiar checklist, NO preservar datos actuales
+      // Queremos ver lo que realmente está en la base de datos
+      loadEvaluationsForChecklist(parseInt(selectedChecklist.id), false);
     }
   }, [selectedChecklist]);
 
@@ -137,38 +200,124 @@ export default function InstructorChecklistView() {
         allProperties: Object.keys(selectedEvaluation)
       });
       
-      // Siempre cargar desde la base de datos
-      setEvaluationObservations(selectedEvaluation.observations || "");
-      setEvaluationRecommendations(selectedEvaluation.recommendations || "");
-      setEvaluationJudgment(selectedEvaluation.valueJudgment || "PENDIENTE");
+      // Siempre cargar los datos de la evaluación, incluso si están vacíos
+      const obsFromDB = selectedEvaluation.observations || "";
+      const recFromDB = selectedEvaluation.recommendations || "";
+      const judgmentFromDB = selectedEvaluation.valueJudgment || "PENDIENTE";
       
-      // Extraer estados de items desde observations
-      const itemStates = extractItemStatesFromEvaluation(selectedEvaluation);
-      setItemStates(itemStates);
-      console.log('📋 Estados de items cargados desde DB:', itemStates);
+      setEvaluationObservations(obsFromDB);
+      setEvaluationRecommendations(recFromDB);
+      setEvaluationJudgment(judgmentFromDB);
+      setShowEvaluationForm(false); // Ocultar formulario inicialmente
+      
+      console.log('✅ Datos cargados en campos del formulario:', {
+        observations: obsFromDB,
+        recommendations: recFromDB,
+        judgment: judgmentFromDB,
+        hasData: !!(obsFromDB || recFromDB || (judgmentFromDB && judgmentFromDB !== "PENDIENTE"))
+      });
+      
+      // Si la evaluación no tiene datos completos, mostrar mensaje informativo
+      if (!obsFromDB && !recFromDB && (!judgmentFromDB || judgmentFromDB === "PENDIENTE")) {
+        console.log('ℹ️ Evaluación encontrada pero sin datos completos - puede necesitar completarse');
+      }
     } else {
-      // Limpiar estados si no hay evaluación
+      // Si no hay evaluación seleccionada, limpiar campos
+      console.log('🧹 Limpiando campos - no hay evaluación seleccionada');
       setEvaluationObservations("");
       setEvaluationRecommendations("");
       setEvaluationJudgment("PENDIENTE");
-      setItemStates({});
+      setShowEvaluationForm(false);
     }
   }, [selectedEvaluation]);
+
+  // Efecto para persistir los datos de evaluación temporal en localStorage
+  // Solo cuando no hay una evaluación existente en DB (para datos en proceso de creación)
+  useEffect(() => {
+    if (selectedChecklist && !selectedEvaluation && (evaluationObservations || evaluationRecommendations || evaluationJudgment !== "PENDIENTE")) {
+      const evaluationData = {
+        checklistId: selectedChecklist.id,
+        observations: evaluationObservations,
+        recommendations: evaluationRecommendations,
+        judgment: evaluationJudgment,
+        timestamp: Date.now()
+      };
+      // Usar clave diferente para datos temporales (en proceso de creación)
+      localStorage.setItem(`evaluation_temp_${selectedChecklist.id}`, JSON.stringify(evaluationData));
+      console.log('💾 Datos temporales guardados en localStorage', evaluationData);
+    }
+  }, [selectedChecklist, selectedEvaluation, evaluationObservations, evaluationRecommendations, evaluationJudgment]);
+
+  // Efecto para recuperar datos temporales desde localStorage al cargar
+  // SOLO si no existe una evaluación en la base de datos
+  useEffect(() => {
+    // Solo ejecutar después de haber intentado cargar desde la DB
+    const timeoutId = setTimeout(() => {
+      if (selectedChecklist && !selectedEvaluation) {
+        // Solo usar localStorage temporal si no hay evaluación en DB
+        const savedData = localStorage.getItem(`evaluation_temp_${selectedChecklist.id}`);
+        if (savedData) {
+          try {
+            const parsedData = JSON.parse(savedData);
+            const now = Date.now();
+            const oneHour = 60 * 60 * 1000; // 1 hora en milisegundos
+            
+            // Solo usar datos guardados si son de menos de 1 hora
+            if (now - parsedData.timestamp < oneHour) {
+              console.log('🔄 Recuperando datos temporales desde localStorage (sin evaluación en DB)', parsedData);
+              setEvaluationObservations(parsedData.observations || "");
+              setEvaluationRecommendations(parsedData.recommendations || "");
+              setEvaluationJudgment(parsedData.judgment || "PENDIENTE");
+            } else {
+              // Limpiar datos antiguos
+              localStorage.removeItem(`evaluation_temp_${selectedChecklist.id}`);
+              console.log('🗑️ Datos temporales antiguos removidos');
+            }
+          } catch (error) {
+            console.warn('Error al recuperar datos temporales de localStorage:', error);
+          }
+        }
+      } else if (selectedEvaluation) {
+        // Si hay evaluación en DB, limpiar datos temporales
+        if (selectedChecklist) {
+          localStorage.removeItem(`evaluation_temp_${selectedChecklist.id}`);
+          console.log('✅ Evaluación existe en DB, datos temporales limpiados');
+        }
+      }
+    }, 1000); // Dar tiempo para que se carguen los datos desde la DB
+
+    return () => clearTimeout(timeoutId);
+  }, [selectedChecklist, selectedEvaluation]);
+
+  // Efecto adicional para asegurar que los datos se carguen correctamente después de reload
+  // SOLO actúa cuando hay evaluación pero los campos están completamente vacíos (reload)
+  useEffect(() => {
+    if (selectedEvaluation && 
+        !evaluationObservations && 
+        !evaluationRecommendations && 
+        evaluationJudgment === "PENDIENTE" &&
+        (selectedEvaluation.observations || selectedEvaluation.recommendations || selectedEvaluation.valueJudgment !== "PENDIENTE")) {
+      
+      console.log('🔄 Detectando reload - sincronizando datos desde DB...');
+      setEvaluationObservations(selectedEvaluation.observations || "");
+      setEvaluationRecommendations(selectedEvaluation.recommendations || "");
+      setEvaluationJudgment(selectedEvaluation.valueJudgment || "PENDIENTE");
+      console.log('✅ Datos sincronizados desde evaluación existente después de reload');
+    }
+  }, [selectedEvaluation, evaluationObservations, evaluationRecommendations, evaluationJudgment]);
 
   // Función auxiliar para sincronizar datos después de crear/actualizar evaluación
   const syncEvaluationDataAfterSave = async (checklistId: number, savedData: any) => {
     console.log('🔄 Recargando evaluación desde DB después de guardar...');
     
-    // Recargar desde la base de datos
+    // Recargar desde la base de datos SIN preservar datos locales
     try {
-      await loadEvaluationsForChecklist(checklistId);
+      await loadEvaluationsForChecklist(checklistId, false);
       console.log('✅ Sincronización completada exitosamente');
     } catch (error) {
       console.warn('⚠️ Error en sincronización:', error);
     }
   };
-
-
 
   // Función de debugging para ver todas las evaluaciones
   const debugAllEvaluations = async (): Promise<void> => {
@@ -230,12 +379,34 @@ export default function InstructorChecklistView() {
     }
   };
 
-  const loadEvaluationsForChecklist = async (checklistId: number): Promise<void> => {
+  const loadEvaluationsForChecklist = async (checklistId: number, preserveCurrentData: boolean = false): Promise<void> => {
     try {
-      console.log("=== LOADING EVALUATIONS FROM DATABASE ===");
+      console.log("=== LOADING EVALUATIONS FOR CHECKLIST ===");
       console.log("Checklist ID:", checklistId);
+      console.log("Checklist ID type:", typeof checklistId);
+      console.log("Preserve current data:", preserveCurrentData);
       
-      // Cargar evaluaciones desde la base de datos
+      // Primero verificar si hay una evaluación en cache
+      const cachedEvaluation = getCachedEvaluation(checklistId.toString());
+      if (cachedEvaluation && !preserveCurrentData) {
+        console.log('🚀 Usando evaluación desde cache');
+        setSelectedEvaluation(cachedEvaluation);
+        setEvaluations([cachedEvaluation]);
+        return;
+      }
+      
+      // Si se solicita preservar datos actuales y hay datos llenados, guardarlos temporalmente
+      let preservedData = null;
+      if (preserveCurrentData && (evaluationObservations.trim() || evaluationRecommendations.trim())) {
+        preservedData = {
+          observations: evaluationObservations,
+          recommendations: evaluationRecommendations,
+          judgment: evaluationJudgment
+        };
+        console.log('💾 Preservando datos actuales:', preservedData);
+      }
+      
+      // Intentar primero con la función principal
       const evaluationsResponse = await fetchEvaluationsByChecklist(checklistId);
       console.log("Raw evaluations response:", evaluationsResponse);
       
@@ -247,13 +418,46 @@ export default function InstructorChecklistView() {
           setEvaluations(evaluationsResponse.data);
           console.log("✅ Found evaluations:", evaluationsResponse.data.length);
           
-          // Seleccionar la primera evaluación
+          // Si hay evaluaciones, seleccionar la primera automáticamente
           const firstEvaluation = evaluationsResponse.data[0];
           console.log("First evaluation details:", firstEvaluation);
+          console.log("First evaluation checklistId:", firstEvaluation.checklistId);
+          
+          // Verificar que la evaluación tenga los datos completos
+          if (!firstEvaluation.observations && !firstEvaluation.recommendations && !firstEvaluation.valueJudgment) {
+            console.log('⚠️ Evaluación encontrada pero sin datos completos:', firstEvaluation);
+          }
           
           setSelectedEvaluation(firstEvaluation);
+          
+          // Guardar en cache para futuras consultas
+          setCachedEvaluation(checklistId.toString(), firstEvaluation);
+          
+          // Decidir si cargar datos desde DB o preservar datos actuales
+          if (preservedData) {
+            // Usar datos preservados (recién creados/editados)
+            console.log('🔄 Usando datos preservados en lugar de DB:', preservedData);
+            setEvaluationObservations(preservedData.observations);
+            setEvaluationRecommendations(preservedData.recommendations);
+            setEvaluationJudgment(preservedData.judgment);
+          } else {
+            // Cargar datos desde la evaluación encontrada (el useEffect se encargará)
+            console.log('📋 Cargando datos desde evaluación de BD:', {
+              observations: firstEvaluation.observations,
+              recommendations: firstEvaluation.recommendations,
+              valueJudgment: firstEvaluation.valueJudgment
+            });
+          }
+          
+          // Limpiar localStorage si hay evaluación en DB
+          if (selectedChecklist) {
+            localStorage.removeItem(`evaluation_${selectedChecklist.id}`);
+            localStorage.removeItem(`evaluation_temp_${selectedChecklist.id}`);
+            console.log('🗑️ Limpiando localStorage - datos cargados desde DB');
+          }
+          
           console.log("✅ Evaluation loaded successfully");
-          return;
+          return; // Salir exitosamente
         } else {
           console.log("⚠️ No evaluations found in main response, trying alternative method...");
         }
@@ -274,8 +478,35 @@ export default function InstructorChecklistView() {
           console.log("Alternative method evaluation details:", firstEvaluation);
           
           setSelectedEvaluation(firstEvaluation);
+          
+          // Guardar en cache para futuras consultas
+          setCachedEvaluation(checklistId.toString(), firstEvaluation);
+          
+          // Decidir si cargar datos desde DB o preservar datos actuales
+          if (preservedData) {
+            // Usar datos preservados (recién creados/editados)
+            console.log('🔄 Usando datos preservados en lugar de DB (método alternativo):', preservedData);
+            setEvaluationObservations(preservedData.observations);
+            setEvaluationRecommendations(preservedData.recommendations);
+            setEvaluationJudgment(preservedData.judgment);
+          } else {
+            // Cargar datos desde la evaluación encontrada (el useEffect se encargará)
+            console.log('📋 Cargando datos desde evaluación de BD (método alternativo):', {
+              observations: firstEvaluation.observations,
+              recommendations: firstEvaluation.recommendations,
+              valueJudgment: firstEvaluation.valueJudgment
+            });
+          }
+          
+          // Limpiar localStorage si hay evaluación en DB
+          if (selectedChecklist) {
+            localStorage.removeItem(`evaluation_${selectedChecklist.id}`);
+            localStorage.removeItem(`evaluation_temp_${selectedChecklist.id}`);
+            console.log('🗑️ Limpiando localStorage - datos cargados desde DB (método alternativo)');
+          }
+          
           console.log("✅ Evaluation loaded via alternative method");
-          return;
+          return; // Salir exitosamente
         } else {
           console.log("❌ Alternative method also found no evaluations");
         }
@@ -283,17 +514,17 @@ export default function InstructorChecklistView() {
         console.error("❌ Alternative fetch method failed:", altError);
       }
       
-      // Si llegamos aquí, no se encontraron evaluaciones
+      // Si llegamos aquí, no se encontraron evaluaciones con ningún método
       console.log("❌ No evaluations found with any method for checklist:", checklistId);
       setEvaluations([]);
       setSelectedEvaluation(null);
       setEvaluationObservations("");
       setEvaluationRecommendations("");
       setEvaluationJudgment("PENDIENTE");
-      setItemStates({});
       
     } catch (error) {
       console.error("❌ Error loading evaluations:", error);
+      console.error("Error stack:", error);
       
       // Resetear estados en caso de error
       setEvaluations([]);
@@ -301,7 +532,9 @@ export default function InstructorChecklistView() {
       setEvaluationObservations("");
       setEvaluationRecommendations("");
       setEvaluationJudgment("PENDIENTE");
-      setItemStates({});
+      
+      // Opcionalmente mostrar un mensaje de error más específico
+      // toast.error("Error al cargar evaluaciones. Puede crear una evaluación nueva.");
     }
   };
 
@@ -347,9 +580,6 @@ export default function InstructorChecklistView() {
 
   const handleTrimesterChange = (value: string): void => {
     setSelectedTrimester(value);
-    // Guardar selección de trimestre en localStorage
-    localStorage.setItem('selectedTrimester', value);
-    console.log('💾 Guardando selección de trimestre para persistencia:', value);
     setCurrentPage(1);
   };
 
@@ -507,7 +737,17 @@ export default function InstructorChecklistView() {
             : evaluation
         ));
         
-        console.log('✅ Datos guardados exitosamente en la base de datos');
+        // Actualizar cache con la evaluación actualizada
+        if (selectedChecklist) {
+          setCachedEvaluation(selectedChecklist.id, updatedEvaluation);
+        }
+        
+        // Limpiar datos guardados en localStorage ya que se guardó exitosamente
+        if (selectedChecklist) {
+          localStorage.removeItem(`evaluation_${selectedChecklist.id}`);
+          localStorage.removeItem(`evaluation_temp_${selectedChecklist.id}`);
+          console.log('🗑️ Datos de evaluación removidos del localStorage (guardado exitoso)');
+        }
 
         // Ocultar formulario después de actualizar exitosamente
         setShowEvaluationForm(false);
@@ -766,6 +1006,9 @@ export default function InstructorChecklistView() {
           setSelectedEvaluation(newEvaluationObject);
           setEvaluations([newEvaluationObject]);
           
+          // Actualizar cache con la nueva evaluación
+          setCachedEvaluation(selectedChecklist.id, newEvaluationObject);
+          
           // Mantener los datos en los campos del formulario para mostrarlos
           setEvaluationObservations(evaluationData.observations);
           setEvaluationRecommendations(evaluationData.recommendations);
@@ -775,7 +1018,12 @@ export default function InstructorChecklistView() {
           
           toast.success("✅ Evaluación creada y guardada exitosamente");
           
-          console.log('✅ Evaluación guardada exitosamente');
+          // Limpiar localStorage
+          if (selectedChecklist) {
+            localStorage.removeItem(`evaluation_${selectedChecklist.id}`);
+            localStorage.removeItem(`evaluation_temp_${selectedChecklist.id}`);
+            console.log('🗑️ Datos temporales eliminados de localStorage');
+          }
           
           // Cerrar el modal
           setShowCreateEvaluationModal(false);
@@ -846,7 +1094,7 @@ export default function InstructorChecklistView() {
       
       // Primero verificar si ya existe una evaluación para este checklist
       console.log("Verificando evaluaciones existentes...");
-      await loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
+      await loadEvaluationsForChecklist(parseInt(selectedChecklist.id), false); // No preservar datos aquí, queremos ver lo que hay en DB
       
       // Dar un momento para que se cargue
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -901,7 +1149,7 @@ export default function InstructorChecklistView() {
         console.log("Evaluación detectada durante creación, recargando...");
         toast.info("ℹ️ Se detectó una evaluación existente, cargando...");
         
-        await loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
+        await loadEvaluationsForChecklist(parseInt(selectedChecklist.id), true);
         
         // Dar tiempo para que se cargue y luego intentar actualizar
         setTimeout(async () => {

@@ -28,9 +28,9 @@ public class Checklist implements Serializable {
     @Column(name = "remarks", nullable = false, length = 255)
     private String remarks;
 
-    @Lob
+    
     @Column(name = "instructor_signature", nullable = false)
-    private byte [] instructorSignature;
+    private byte[] instructorSignature;
 
     @Column(name = "evaluation_criteria", nullable = false)
     private boolean evaluationCriteria;
