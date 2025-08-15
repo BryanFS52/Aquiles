@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { client } from '../../lib/apollo-client';
+import { clientLAN } from '@lib/apollo-client';
 import {
   GET_ALL_JUSTIFICATION_STATUS,
   GET_JUSTIFICATION_STATUS_BY_ID,
   ADD_JUSTIFICATION_STATUS,
   UPDATE_JUSTIFICATION_STATUS,
   DELETE_JUSTIFICATION_STATUS
-} from '../../graphql/justificationStatusGraph';
+} from '@graphql/justificationStatusGraph';
 
 // Tipos
 export interface JustificationStatus {
@@ -46,7 +46,7 @@ const initialState: JustificationStatusState = {
 export const fetchAllJustificationStatuses = createAsyncThunk(
   'justificationStatus/fetchAll',
   async ({ page = 0, size = 10 }: { page?: number; size?: number }) => {
-    const { data } = await client.query({
+    const { data } = await clientLAN.query({
       query: GET_ALL_JUSTIFICATION_STATUS,
       variables: { page, size },
     });
@@ -57,7 +57,7 @@ export const fetchAllJustificationStatuses = createAsyncThunk(
 export const fetchJustificationStatusById = createAsyncThunk(
   'justificationStatus/fetchById',
   async (id: string) => {
-    const { data } = await client.query({
+    const { data } = await clientLAN.query({
       query: GET_JUSTIFICATION_STATUS_BY_ID,
       variables: { id: parseInt(id) },
     });
@@ -68,7 +68,7 @@ export const fetchJustificationStatusById = createAsyncThunk(
 export const addJustificationStatus = createAsyncThunk(
   'justificationStatus/add',
   async (input: JustificationStatusDto) => {
-    const { data } = await client.mutate({
+    const { data } = await clientLAN.mutate({
       mutation: ADD_JUSTIFICATION_STATUS,
       variables: { input },
     });
@@ -79,7 +79,7 @@ export const addJustificationStatus = createAsyncThunk(
 export const updateJustificationStatusEntity = createAsyncThunk(
   'justificationStatus/updateEntity',
   async ({ id, input }: { id: string; input: JustificationStatusDto }) => {
-    const { data } = await client.mutate({
+    const { data } = await clientLAN.mutate({
       mutation: UPDATE_JUSTIFICATION_STATUS,
       variables: { id: parseInt(id), input },
     });
@@ -90,7 +90,7 @@ export const updateJustificationStatusEntity = createAsyncThunk(
 export const deleteJustificationStatus = createAsyncThunk(
   'justificationStatus/delete',
   async (id: string) => {
-    const { data } = await client.mutate({
+    const { data } = await clientLAN.mutate({
       mutation: DELETE_JUSTIFICATION_STATUS,
       variables: { id: parseInt(id) },
     });
@@ -227,11 +227,6 @@ const justificationStatusSlice = createSlice({
   },
 });
 
-export const { 
-  clearError, 
-  clearCurrentJustificationStatus, 
-  setCurrentPage,
-  updateLocalJustificationStatus
-} = justificationStatusSlice.actions;
+export const { } = justificationStatusSlice.actions;
 
 export default justificationStatusSlice.reducer;

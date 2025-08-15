@@ -48,4 +48,8 @@ public class JustificationStatusService implements Idao<JustificationStatus, Lon
         this.justificationStatusRepository.save(entity);
     }
 
+    public boolean existByName(String name) {
+        return justificationStatusRepository.existsByName(name);
+    }
+
 }

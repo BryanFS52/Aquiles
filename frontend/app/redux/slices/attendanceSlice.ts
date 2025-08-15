@@ -250,7 +250,7 @@ export const deleteAttendance = createAsyncThunk<string, string,
 const initialState: AttendanceState = {
     ...createInitialPaginatedState<Attendance>(),
     studentAttendances: {
-        data: [],
+        data: [],   
         loading: false,
         error: null as string | null,
         showForm: false,

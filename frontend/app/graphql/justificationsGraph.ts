@@ -70,6 +70,62 @@ export const GET_JUSTIFICATION_BY_ID = gql`
   }
 `;
 
+export const GET_JUSTIFICATION_AND_STUDY_SHEET_BY_ID = gql`
+  query GetJustificationAndStudySheetById($id: Long!) {
+    studySheetById(id: $id) {
+      code
+      message
+      data {
+        id
+        number
+        trainingProject {
+          program {
+            id
+            name
+          }
+        }
+        studentStudySheets {
+          student {
+            id
+            person {
+              id
+              document
+              name
+              lastname
+            }
+            attendances {
+              id
+              justification {
+                id
+                description
+                justificationFile
+                absenceDate
+                justificationDate
+                state
+                justificationType {
+                  id
+                  name
+                }
+                justificationStatus {
+                  id
+                  name
+                  state
+                }
+              }
+            }
+          }
+          studentStudySheetState {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+
+
 export const ADD_JUSTIFICATION = gql`
   mutation AddJustification($input: JustificationDto!) {
     addJustification(input: $input) {
@@ -96,3 +152,12 @@ export const DELETE_JUSTIFICATION = gql`
     }
   }
 `;
+
+// export const UPDATE_JUSTIFICATION_STATUS_BY_ID = gql`
+//   mutation UpdateJustificationStatusById($id: Long!, $input: JustificationStatusDto!) {
+//     updateJustificationStatus(id: $id, input: $input) {
+//       code
+//       message
+//     }
+//   }
+// `;

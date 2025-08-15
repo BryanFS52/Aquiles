@@ -10,7 +10,6 @@ import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-
 import java.util.Map;
 
 @DgsComponent

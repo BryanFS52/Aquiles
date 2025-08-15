@@ -20,7 +20,6 @@ export type Scalars = {
   JSON: { input: any; output: any; }
   Long: { input: any; output: any; }
   ObjectId: { input: any; output: any; }
-  Upload: { input: any; output: any; }
 };
 
 export type Administrative = {
@@ -1085,6 +1084,13 @@ export type JustificationTypePageId = {
   message?: Maybe<Scalars['String']['output']>;
 };
 
+export type JustificationsByStudySheetId = {
+  code?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<Array<Maybe<Justification>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+};
+
 export type LaborDepartment = {
   id?: Maybe<Scalars['ID']['output']>;
   name?: Maybe<Scalars['String']['output']>;
@@ -1303,7 +1309,6 @@ export type Mutation = {
   deleteTrainingLevel?: Maybe<Response>;
   deleteTrainingProject?: Maybe<Response>;
   generateQRCode?: Maybe<QrCodePayload>;
-  saveMassivePersons?: Maybe<ResponseMassive>;
   sendNotification?: Maybe<Scalars['String']['output']>;
   updateAdministrative?: Maybe<Response>;
   updateAdministrativeType?: Maybe<Response>;
@@ -1873,11 +1878,6 @@ export type MutationDeleteTrainingLevelArgs = {
 
 export type MutationDeleteTrainingProjectArgs = {
   id?: InputMaybe<Scalars['Long']['input']>;
-};
-
-
-export type MutationSaveMassivePersonsArgs = {
-  file?: InputMaybe<Scalars['Upload']['input']>;
 };
 
 
@@ -2663,6 +2663,7 @@ export type Query = {
   finalReportById?: Maybe<FinalReportPageId>;
   improvementPlanById?: Maybe<ImprovementPlanPageId>;
   juryById?: Maybe<JuriesPageId>;
+  justificationAndStudySheetById?: Maybe<JustificationPage>;
   justificationById?: Maybe<JustificationPageId>;
   justificationStatusById?: Maybe<JustificationStatusPageId>;
   justificationTypeById?: Maybe<JustificationTypePageId>;
@@ -3129,6 +3130,12 @@ export type QueryImprovementPlanByIdArgs = {
 
 export type QueryJuryByIdArgs = {
   id: Scalars['Long']['input'];
+};
+
+
+export type QueryJustificationAndStudySheetByIdArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -3842,7 +3849,7 @@ export type GetAllJustificationStatusQueryVariables = Exact<{
 }>;
 
 
-export type GetAllJustificationStatusQuery = { allJustificationsStatus?: { code?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, message?: string | null, data?: Array<{ id?: string | null, name?: string | null, state?: boolean | null } | null> | null } | null };
+export type GetAllJustificationStatusQuery = { allJustificationsStatus?: { date?: string | null, code?: string | null, message?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id?: string | null, name?: string | null, state?: boolean | null } | null> | null } | null };
 
 export type GetJustificationStatusByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
@@ -3925,6 +3932,13 @@ export type GetJustificationByIdQueryVariables = Exact<{
 
 export type GetJustificationByIdQuery = { justificationById?: { code?: string | null, message?: string | null, data?: { id: string, description?: string | null, justificationFile?: string | null, absenceDate?: string | null, justificationDate?: string | null, state?: boolean | null, justificationType?: { id: string, name?: string | null } | null, justificationStatus?: { id?: string | null, name?: string | null, state?: boolean | null } | null, attendance?: { id: string } | null } | null } | null };
 
+export type GetJustificationAndStudySheetByIdQueryVariables = Exact<{
+  id: Scalars['Long']['input'];
+}>;
+
+
+export type GetJustificationAndStudySheetByIdQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, number?: number | null, trainingProject?: { program?: { id?: string | null, name?: string | null } | null } | null, studentStudySheets?: Array<{ student?: { id?: string | null, person?: { id?: string | null, document?: string | null, name?: string | null, lastname?: string | null } | null, attendances?: Array<{ id: string, justification?: { id: string, description?: string | null, justificationFile?: string | null, absenceDate?: string | null, justificationDate?: string | null, state?: boolean | null, justificationType?: { id: string, name?: string | null } | null, justificationStatus?: { id?: string | null, name?: string | null, state?: boolean | null } | null } | null } | null> | null } | null, studentStudySheetState?: { id?: string | null, name?: string | null } | null } | null> | null } | null } | null };
+
 export type AddJustificationMutationVariables = Exact<{
   input: JustificationDto;
 }>;
@@ -3946,6 +3960,14 @@ export type DeleteJustificationMutationVariables = Exact<{
 
 
 export type DeleteJustificationMutation = { deleteJustification?: { code?: string | null, message?: string | null } | null };
+
+export type UpdateJustificationStatusByIdMutationVariables = Exact<{
+  id: Scalars['Long']['input'];
+  input: JustificationStatusDto;
+}>;
+
+
+export type UpdateJustificationStatusByIdMutation = { updateJustificationStatus?: { code?: string | null, message?: string | null } | null };
 
 export type GetProgramsQueryVariables = Exact<{
   idCoordination?: InputMaybe<Scalars['Long']['input']>;
@@ -5096,17 +5118,17 @@ export type DeleteImprovementPlanMutationOptions = Apollo.BaseMutationOptions<De
 export const GetAllJustificationStatusDocument = gql`
     query GetAllJustificationStatus($page: Int, $size: Int) {
   allJustificationsStatus(page: $page, size: $size) {
+    date
     code
+    message
     data {
       id
       name
       state
     }
-    date
     totalPages
     totalItems
     currentPage
-    message
   }
 }
     `;
@@ -5147,14 +5169,14 @@ export type GetAllJustificationStatusQueryResult = Apollo.QueryResult<GetAllJust
 export const GetJustificationStatusByIdDocument = gql`
     query GetJustificationStatusById($id: Long!) {
   justificationStatusById(id: $id) {
+    date
+    code
+    message
     data {
       id
       name
       state
     }
-    date
-    code
-    message
   }
 }
     `;
@@ -5632,6 +5654,92 @@ export type GetJustificationByIdQueryHookResult = ReturnType<typeof useGetJustif
 export type GetJustificationByIdLazyQueryHookResult = ReturnType<typeof useGetJustificationByIdLazyQuery>;
 export type GetJustificationByIdSuspenseQueryHookResult = ReturnType<typeof useGetJustificationByIdSuspenseQuery>;
 export type GetJustificationByIdQueryResult = Apollo.QueryResult<GetJustificationByIdQuery, GetJustificationByIdQueryVariables>;
+export const GetJustificationAndStudySheetByIdDocument = gql`
+    query GetJustificationAndStudySheetById($id: Long!) {
+  studySheetById(id: $id) {
+    code
+    message
+    data {
+      id
+      number
+      trainingProject {
+        program {
+          id
+          name
+        }
+      }
+      studentStudySheets {
+        student {
+          id
+          person {
+            id
+            document
+            name
+            lastname
+          }
+          attendances {
+            id
+            justification {
+              id
+              description
+              justificationFile
+              absenceDate
+              justificationDate
+              state
+              justificationType {
+                id
+                name
+              }
+              justificationStatus {
+                id
+                name
+                state
+              }
+            }
+          }
+        }
+        studentStudySheetState {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetJustificationAndStudySheetByIdQuery__
+ *
+ * To run a query within a React component, call `useGetJustificationAndStudySheetByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetJustificationAndStudySheetByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetJustificationAndStudySheetByIdQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetJustificationAndStudySheetByIdQuery(baseOptions: Apollo.QueryHookOptions<GetJustificationAndStudySheetByIdQuery, GetJustificationAndStudySheetByIdQueryVariables> & ({ variables: GetJustificationAndStudySheetByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetJustificationAndStudySheetByIdQuery, GetJustificationAndStudySheetByIdQueryVariables>(GetJustificationAndStudySheetByIdDocument, options);
+      }
+export function useGetJustificationAndStudySheetByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetJustificationAndStudySheetByIdQuery, GetJustificationAndStudySheetByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetJustificationAndStudySheetByIdQuery, GetJustificationAndStudySheetByIdQueryVariables>(GetJustificationAndStudySheetByIdDocument, options);
+        }
+export function useGetJustificationAndStudySheetByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetJustificationAndStudySheetByIdQuery, GetJustificationAndStudySheetByIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetJustificationAndStudySheetByIdQuery, GetJustificationAndStudySheetByIdQueryVariables>(GetJustificationAndStudySheetByIdDocument, options);
+        }
+export type GetJustificationAndStudySheetByIdQueryHookResult = ReturnType<typeof useGetJustificationAndStudySheetByIdQuery>;
+export type GetJustificationAndStudySheetByIdLazyQueryHookResult = ReturnType<typeof useGetJustificationAndStudySheetByIdLazyQuery>;
+export type GetJustificationAndStudySheetByIdSuspenseQueryHookResult = ReturnType<typeof useGetJustificationAndStudySheetByIdSuspenseQuery>;
+export type GetJustificationAndStudySheetByIdQueryResult = Apollo.QueryResult<GetJustificationAndStudySheetByIdQuery, GetJustificationAndStudySheetByIdQueryVariables>;
 export const AddJustificationDocument = gql`
     mutation AddJustification($input: JustificationDto!) {
   addJustification(input: $input) {
@@ -5735,6 +5843,41 @@ export function useDeleteJustificationMutation(baseOptions?: Apollo.MutationHook
 export type DeleteJustificationMutationHookResult = ReturnType<typeof useDeleteJustificationMutation>;
 export type DeleteJustificationMutationResult = Apollo.MutationResult<DeleteJustificationMutation>;
 export type DeleteJustificationMutationOptions = Apollo.BaseMutationOptions<DeleteJustificationMutation, DeleteJustificationMutationVariables>;
+export const UpdateJustificationStatusByIdDocument = gql`
+    mutation UpdateJustificationStatusById($id: Long!, $input: JustificationStatusDto!) {
+  updateJustificationStatus(id: $id, input: $input) {
+    code
+    message
+  }
+}
+    `;
+export type UpdateJustificationStatusByIdMutationFn = Apollo.MutationFunction<UpdateJustificationStatusByIdMutation, UpdateJustificationStatusByIdMutationVariables>;
+
+/**
+ * __useUpdateJustificationStatusByIdMutation__
+ *
+ * To run a mutation, you first call `useUpdateJustificationStatusByIdMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateJustificationStatusByIdMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateJustificationStatusByIdMutation, { data, loading, error }] = useUpdateJustificationStatusByIdMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateJustificationStatusByIdMutation(baseOptions?: Apollo.MutationHookOptions<UpdateJustificationStatusByIdMutation, UpdateJustificationStatusByIdMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateJustificationStatusByIdMutation, UpdateJustificationStatusByIdMutationVariables>(UpdateJustificationStatusByIdDocument, options);
+      }
+export type UpdateJustificationStatusByIdMutationHookResult = ReturnType<typeof useUpdateJustificationStatusByIdMutation>;
+export type UpdateJustificationStatusByIdMutationResult = Apollo.MutationResult<UpdateJustificationStatusByIdMutation>;
+export type UpdateJustificationStatusByIdMutationOptions = Apollo.BaseMutationOptions<UpdateJustificationStatusByIdMutation, UpdateJustificationStatusByIdMutationVariables>;
 export const GetProgramsDocument = gql`
     query GetPrograms($idCoordination: Long, $idTrainingLevel: Long, $name: String, $page: Int, $size: Int) {
   allPrograms(
