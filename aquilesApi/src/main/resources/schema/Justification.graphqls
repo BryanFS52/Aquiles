@@ -21,6 +21,13 @@ type JustificationPage {
     message: String
 }
 
+type JustificationsByStudySheetId {
+    data: [Justification]
+    date: String
+    code: String
+    message: String
+}
+
 type JustificationPageId {
     data: Justification
     date: String
@@ -42,6 +49,7 @@ input JustificationDto {
 
 extend type Query {
     allJustifications(page: Int, size: Int): JustificationPage
+    justificationByStudySheetId(page: Int, size: Int):JustificationPage
     justificationById(id: Long!): JustificationPageId
 }
 

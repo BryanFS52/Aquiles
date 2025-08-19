@@ -4,17 +4,18 @@ import { gql } from '@apollo/client';
 export const GET_ALL_JUSTIFICATION_STATUS = gql`
   query GetAllJustificationStatus($page: Int, $size: Int) {
     allJustificationsStatus(page: $page, size: $size) {
+      date
       code
+      message
       data {
         id
         name
         state
       }
-      date
+      
       totalPages
       totalItems
       currentPage
-      message
     }
   }
 `;
@@ -23,14 +24,14 @@ export const GET_ALL_JUSTIFICATION_STATUS = gql`
 export const GET_JUSTIFICATION_STATUS_BY_ID = gql`
   query GetJustificationStatusById($id: Long!) {
     justificationStatusById(id: $id) {
+      date
+      code
+      message
       data {
         id
         name
         state
       }
-      date
-      code
-      message
     }
   }
 `;

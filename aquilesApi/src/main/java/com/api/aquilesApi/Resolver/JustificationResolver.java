@@ -39,6 +39,25 @@ public class JustificationResolver {
         }
     }
 
+    // justificationByStudySheetId Justifications (GraphQL)
+    @DgsQuery
+    public Map<String, Object> justificationByStudySheetId(@InputArgument Integer page, @InputArgument Integer size) {
+        try {
+            Page<JustificationDto> justificationDtoPge = justificationBusiness.findAll(page, size);
+            return ResponseHttpApi.responseHttpFindAll(
+                    justificationDtoPge.getContent(),
+                    ResponseHttpApi.CODE_OK,
+                    "Query oK",
+                    justificationDtoPge.getTotalPages(),
+                    justificationDtoPge.getNumber(),
+                    (int) justificationDtoPge.getTotalElements()
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving justificationByStudySheetId: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // FindById Justification (GraphQL)
     @DgsQuery
     public Map<String, Object> justificationById(@InputArgument Long id) {
@@ -61,7 +80,7 @@ public class JustificationResolver {
     public Map<String, Object> addJustification(@InputArgument(name = "input") JustificationDto justificationDto) {
         try {
             JustificationDto result = justificationBusiness.add(justificationDto);
-            
+
             return ResponseHttpApi.responseHttpAction(
                     result.getId(),
                     ResponseHttpApi.CODE_OK,
@@ -69,7 +88,7 @@ public class JustificationResolver {
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error adding Justification: " + e.getMessage(), 
+                    "Error adding Justification: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR
             );
         }

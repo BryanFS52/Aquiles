@@ -70,6 +70,62 @@ export const GET_JUSTIFICATION_BY_ID = gql`
   }
 `;
 
+export const GET_JUSTIFICATION_BY_STUDY_SHEET_BY_ID = gql`
+  query GetJustificationByStudySheetId($id: Long!) {
+    studySheetById(id: $id) {
+      code
+      message
+      data {
+        id
+        number
+        trainingProject {
+          program {
+            id
+            name
+          }
+        }
+        studentStudySheets {
+          student {
+            id
+            person {
+              id
+              document
+              name
+              lastname
+            }
+            attendances {
+              id
+              justification {
+                id
+                description
+                justificationFile
+                absenceDate
+                justificationDate
+                state
+                justificationType {
+                  id
+                  name
+                }
+                justificationStatus {
+                  id
+                  name
+                  state
+                }
+              }
+            }
+          }
+          studentStudySheetState {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+
+
 export const ADD_JUSTIFICATION = gql`
   mutation AddJustification($input: JustificationDto!) {
     addJustification(input: $input) {

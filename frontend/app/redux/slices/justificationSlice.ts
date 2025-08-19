@@ -1,7 +1,7 @@
 import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
-import { GET_ALL_JUSTIFICATIONS, GET_JUSTIFICATION_BY_ID, ADD_JUSTIFICATION, UPDATE_JUSTIFICATION, DELETE_JUSTIFICATION } from '@graphql/justificationsGraph'
+import { GET_ALL_JUSTIFICATIONS, GET_JUSTIFICATION_BY_ID, ADD_JUSTIFICATION, UPDATE_JUSTIFICATION, DELETE_JUSTIFICATION, GET_JUSTIFICATION_BY_STUDY_SHEET_BY_ID } from '@graphql/justificationsGraph'
 import {
     Attendance,
     Justification,
@@ -14,7 +14,9 @@ import {
     UpdateJustificationMutation,
     UpdateJustificationMutationVariables,
     DeleteJustificationMutation,
-    DeleteJustificationMutationVariables
+    DeleteJustificationMutationVariables,
+    GetJustificationByStudySheetIdQuery,
+    GetJustificationByStudySheetIdQueryVariables
 } from '@graphql/generated'
 
 // Tipos para el estado extendido
@@ -393,6 +395,19 @@ export const fetchJustificationById = createAsyncThunk<GetJustificationByIdQuery
     }
 );
 
+export const fetchJustificationByStudySheetId = createAsyncThunk<GetJustificationByStudySheetIdQuery["studySheetById"],GetJustificationByStudySheetIdQueryVariables>(
+    "justificationByStudySheetId/fetch",
+    async (variables, { rejectWithValue }) => {
+        const { data } = await clientLAN.query<GetJustificationByStudySheetIdQuery, GetJustificationByStudySheetIdQueryVariables>({
+            query: GET_JUSTIFICATION_BY_STUDY_SHEET_BY_ID,
+            variables,
+            fetchPolicy: "no-cache",
+        });
+
+        return data.studySheetById;
+    }
+);
+
 export const addJustification = createAsyncThunk<AddJustificationMutation['addJustification'], AddJustificationMutationVariables['input'],
     { rejectValue: { code: string; message: string } }
 >(
@@ -566,7 +581,6 @@ const initialState: JustificationState = {
         currentAttendance: null,
     }
 };
-
 const justificationSlice = createSlice({
     name: 'justifications',
     initialState,

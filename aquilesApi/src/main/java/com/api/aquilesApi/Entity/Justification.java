@@ -43,7 +43,7 @@ public class Justification implements Serializable {
     // 2.Relation (M-1) con justificationType
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "justification_type_id", nullable = true)
-    private JustificationType justificationTypeId;
+    private JustificationType justificationType;
 
     // 3. Relation (1-1) con attendance
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -55,26 +55,30 @@ public class Justification implements Serializable {
     @JoinColumn(name = "justification_status_id", referencedColumnName = "id")
     private JustificationStatus justificationStatus;
 
-    public String getJustificationFile() {
-        return Base64.getEncoder().encodeToString(justificationFile);
+    public byte[] getJustificationFile() {
+        return Base64.getEncoder().encodeToString(justificationFile).getBytes();
     }
 
-    public void setJustificationFile(String justificationFile) {
+    public void setJustificationFile(byte[] justificationFile) {
         this.justificationFile = Base64.getDecoder().decode(justificationFile);
     }
 
-    public void setAbsenceDate(String absenceDateString) {
-
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-        this.absenceDate = LocalDate.parse(absenceDateString);
+    public void setAbsenceDate(LocalDate date) {
+        this.absenceDate = date;
     }
 
-    public void setJustificationDate(String justificationDateString){
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-        this.justificationDate = LocalDate.parse(justificationDateString);
+    public void setAbsenceDate(String dateStr) {
+        this.absenceDate = LocalDate.parse(dateStr);
     }
 
-    // ✅ Método para obtener fecha formateada para mostrar
+    public void setJustificationDate(LocalDate date) {
+        this.justificationDate = date;
+    }
+
+    public void setJustificationDate(String dateStr) {
+        this.justificationDate = LocalDate.parse(dateStr);
+    }
+
     public String getFormattedJustificationDate() {
         if (this.justificationDate != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");

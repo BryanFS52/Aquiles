@@ -7,4 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface JustificationStatusRepository extends JpaRepository<JustificationStatus, Long> {
 
+    boolean existsByName(String name);
+
+
 }

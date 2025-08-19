@@ -26,6 +26,7 @@ public class Attendance implements Serializable {
     private Long id;
 
     @Column(name = "attendance_date", nullable = false)
+
     private Date attendanceDate;
 
     @Column (name = "student_id")
