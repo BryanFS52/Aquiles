@@ -362,7 +362,7 @@ export default function CoordinadorChecklistView() {
             id="trimestre-select"
             value={selectedTrimestre}
             onChange={(e) => setSelectedTrimestre(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00324d] dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
+            className="px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-full focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
           >
             <option value="todos">Todos los Trimestres</option>
             <option value="1">Primer Trimestre</option>
@@ -377,57 +377,34 @@ export default function CoordinadorChecklistView() {
 
         <button
           onClick={handleOpenCreateModal}
-          className="bg-[#00324d] text-white px-4 py-2 rounded hover:bg-[#40b003] transition-colors"
+          className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white px-6 py-3 rounded-full hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
         >
-          Crear Lista de Chequeo
+          + Crear Lista de Chequeo
         </button>
       </div>
 
       {loading ? (
         <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00324d]"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lime-600 dark:border-shadowBlue"></div>
           <span className="ml-2 text-gray-600 dark:text-gray-400">Cargando listas de chequeo...</span>
         </div>
       ) : (
-        <div className="overflow-x-auto mt-4 max-h-96 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-800">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                  ID
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                  Trimestre
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                  Componente
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                  Indicadores
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                  Estado
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                  Observaciones
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-              {filteredChecklists.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                    {selectedTrimestre === "todos" 
-                      ? "No hay listas de chequeo disponibles" 
-                      : `No hay listas de chequeo para el trimestre ${selectedTrimestre}`
-                    }
-                  </td>
-                </tr>
-              ) : (
-                filteredChecklists.map((checklist) => {
+        <div className="mt-6 overflow-visible">
+          {filteredChecklists.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border-2 border-dashed border-gray-300 dark:border-gray-600">
+                <p className="text-gray-500 dark:text-gray-400 text-lg">
+                  {selectedTrimestre === "todos" 
+                    ? "No hay listas de chequeo disponibles" 
+                    : `No hay listas de chequeo para el trimestre ${selectedTrimestre}`
+                  }
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="max-h-[calc(100vh-300px)] overflow-y-auto pb-8 px-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+                {filteredChecklists.map((checklist) => {
                   // Debug log para cada checklist en el render
                   console.log(`Rendering checklist ${checklist.id}:`, checklist);
                   console.log(`Checklist ${checklist.id} items:`, checklist.items);
@@ -439,74 +416,110 @@ export default function CoordinadorChecklistView() {
                   }
                   
                   return (
-                    <tr key={`checklist-${checklist.id}`}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300">
-                        {checklist.id}
-                      </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-xs font-medium">
-                        {checklist.trimester ? `${checklist.trimester}° Trimestre` : 'No especificado'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      {checklist.component || 'N/A'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      <span className="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-xs font-medium">
-                        {checklist.items ? checklist.items.length : 0} indicadores
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      <button
-                        onClick={() => handleToggleState(checklist.id, checklist.state)}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                          checklist.state
-                            ? 'bg-green-600 focus:ring-green-500'
-                            : 'bg-gray-200 focus:ring-gray-500'
-                        }`}
-                        title={checklist.state ? 'Desactivar lista' : 'Activar lista'}
-                      >
-                        <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition duration-200 ease-in-out ${
-                            checklist.state ? 'translate-x-6' : 'translate-x-1'
-                          }`}
-                        />
-                      </button>
-                      <span className={`ml-2 text-xs font-medium ${
-                        checklist.state 
-                          ? 'text-green-600 dark:text-green-400' 
-                          : 'text-gray-500 dark:text-gray-400'
-                      }`}>
-                        {checklist.state ? 'Activo' : 'Inactivo'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      {checklist.remarks || 'Sin observaciones'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      <div className="flex space-x-2">
-                        <button 
-                          onClick={() => handleOpenEditModal(checklist)}
-                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                          title="Editar"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button 
-                          onClick={() => handleOpenConfirmModal(checklist.id)}
-                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                          title="Eliminar"
-                        >
-                          <FaTrashAlt />
-                        </button>
+                    <div 
+                      key={`checklist-${checklist.id}`}
+                      className="group relative transform transition-all duration-300 hover:scale-105 hover:z-10"
+                    >
+                      <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border-2 border-lime-500/30 dark:border-shadowBlue/50 shadow-2xl hover:shadow-lime-200 dark:hover:shadow-shadowBlue/30 overflow-hidden">
+                        {/* Header de la tarjeta */}
+                        <div className="bg-gradient-to-br from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue p-4">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="text-lg font-bold text-white">
+                                {checklist.trimester ? `${checklist.trimester}° Trimestre` : 'No especificado'}
+                              </h3>
+                            </div>
+                            <div className="flex space-x-2">
+                              <button 
+                                onClick={() => handleOpenEditModal(checklist)}
+                                className="text-white hover:text-yellow-300 transition-colors p-2 rounded-full hover:bg-white/10"
+                                title="Editar"
+                              >
+                                <FaEdit className="w-4 h-4" />
+                              </button>
+                              <button 
+                                onClick={() => handleOpenConfirmModal(checklist.id)}
+                                className="text-white hover:text-red-300 transition-colors p-2 rounded-full hover:bg-white/10"
+                                title="Eliminar"
+                              >
+                                <FaTrashAlt className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Contenido de la tarjeta */}
+                        <div className="p-6 space-y-4">
+                          {/* Componente */}
+                          <div>
+                            <span className="text-xs font-semibold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                              Componente
+                            </span>
+                            <p className="text-sm text-darkBlue dark:text-white mt-1 font-medium">
+                              {checklist.component || 'N/A'}
+                            </p>
+                          </div>
+
+                          {/* Indicadores */}
+                          <div>
+                            <span className="text-xs font-semibold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                              Indicadores
+                            </span>
+                            <div className="mt-1">
+                              <span className="inline-block px-3 py-1 bg-gradient-to-r from-lime-100 to-lime-200 dark:from-shadowBlue/20 dark:to-darkBlue/20 text-lime-800 dark:text-lime-300 rounded-full text-xs font-bold border border-lime-300 dark:border-shadowBlue/30">
+                                {checklist.items ? checklist.items.length : 0} indicadores
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Estado */}
+                          <div>
+                            <span className="text-xs font-semibold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                              Estado
+                            </span>
+                            <div className="mt-2 flex items-center">
+                              <button
+                                onClick={() => handleToggleState(checklist.id, checklist.state)}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                                  checklist.state
+                                    ? 'bg-gradient-to-r from-lime-600 to-lime-500 focus:ring-lime-500'
+                                    : 'bg-gray-200 dark:bg-gray-600 focus:ring-gray-500'
+                                }`}
+                                title={checklist.state ? 'Desactivar lista' : 'Activar lista'}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition duration-200 ease-in-out shadow-lg ${
+                                    checklist.state ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                              <span className={`ml-3 text-xs font-bold ${
+                                checklist.state 
+                                  ? 'text-lime-600 dark:text-lime-400' 
+                                  : 'text-gray-500 dark:text-gray-400'
+                              }`}>
+                                {checklist.state ? 'Activo' : 'Inactivo'}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Observaciones */}
+                          <div>
+                            <span className="text-xs font-semibold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                              Competencia
+                            </span>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2 leading-relaxed">
+                              {checklist.remarks || 'Sin observaciones'}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                    </td>
-                  </tr>
+                    </div>
                   );
-                })
-              )}
-            </tbody>
-          </table>
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

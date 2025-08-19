@@ -171,12 +171,12 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                 </select>
               </div>
               <div>
-                <label htmlFor="observaciones" className="block text-sm font-medium text-gray-700">Observaciones</label>
+                <label htmlFor="observaciones" className="block text-sm font-medium text-gray-700">Competencia</label>
                 <textarea
                   id="observaciones"
                   value={observaciones}
                   onChange={(e) => setObservaciones(e.target.value)}
-                  placeholder="Escribe las observaciones para esta lista de chequeo..."
+                  placeholder="Describe la competencia asociada a esta lista de chequeo..."
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00324d] h-24 resize-none"
                 />
               </div>
