@@ -26,6 +26,7 @@ export default function JustificacionesInstructor() {
   const { showLoader, hideLoader } = useLoader();
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+
   const {
     filteredData,
     loading,
@@ -41,6 +42,7 @@ export default function JustificacionesInstructor() {
   const { justificationStatuses } = useSelector(
     (state: RootState) => state.justificationStatus
   );
+
 
   useEffect(() => {
     if (loading || isTransitioning) {
@@ -91,6 +93,7 @@ export default function JustificacionesInstructor() {
   const canGoNext = localCurrentPage < totalPages;
   const canGoPrevious = localCurrentPage > 1;
 
+
   // Verificar si hay datos de justificaciones en el state
   if (!loading && !error && (!justificationsData || justificationsData.length === 0)) {
     return <EmptyState message="No se encontraron justificaciones para esta ficha. Selecciona una ficha desde el panel del instructor." />;
@@ -110,6 +113,7 @@ export default function JustificacionesInstructor() {
         onRefresh={handleRefresh}
       />
 
+      {errorMessage && <EmptyState message={errorMessage} />}
       {errorMessage && <EmptyState message={errorMessage} />}
 
       {!loading && !errorMessage && (

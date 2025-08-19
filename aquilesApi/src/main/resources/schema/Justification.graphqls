@@ -28,6 +28,13 @@ type JustificationsByStudySheetId {
     message: String
 }
 
+type JustificationsByStudySheetId {
+    data: [Justification]
+    date: String
+    code: String
+    message: String
+}
+
 type JustificationPageId {
     data: Justification
     date: String

@@ -1091,6 +1091,13 @@ export type JustificationsByStudySheetId = {
   message?: Maybe<Scalars['String']['output']>;
 };
 
+export type JustificationsByStudySheetId = {
+  code?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<Array<Maybe<Justification>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+};
+
 export type LaborDepartment = {
   id?: Maybe<Scalars['ID']['output']>;
   name?: Maybe<Scalars['String']['output']>;
@@ -3850,6 +3857,7 @@ export type GetAllJustificationStatusQueryVariables = Exact<{
 
 
 export type GetAllJustificationStatusQuery = { allJustificationsStatus?: { date?: string | null, code?: string | null, message?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id?: string | null, name?: string | null, state?: boolean | null } | null> | null } | null };
+export type GetAllJustificationStatusQuery = { allJustificationsStatus?: { date?: string | null, code?: string | null, message?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id?: string | null, name?: string | null, state?: boolean | null } | null> | null } | null };
 
 export type GetJustificationStatusByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
@@ -3960,6 +3968,14 @@ export type DeleteJustificationMutationVariables = Exact<{
 
 
 export type DeleteJustificationMutation = { deleteJustification?: { code?: string | null, message?: string | null } | null };
+
+export type UpdateJustificationStatusByIdMutationVariables = Exact<{
+  id: Scalars['Long']['input'];
+  input: JustificationStatusDto;
+}>;
+
+
+export type UpdateJustificationStatusByIdMutation = { updateJustificationStatus?: { code?: string | null, message?: string | null } | null };
 
 export type GetProgramsQueryVariables = Exact<{
   idCoordination?: InputMaybe<Scalars['Long']['input']>;
@@ -5111,7 +5127,9 @@ export const GetAllJustificationStatusDocument = gql`
     query GetAllJustificationStatus($page: Int, $size: Int) {
   allJustificationsStatus(page: $page, size: $size) {
     date
+    date
     code
+    message
     message
     data {
       id
@@ -5161,6 +5179,9 @@ export type GetAllJustificationStatusQueryResult = Apollo.QueryResult<GetAllJust
 export const GetJustificationStatusByIdDocument = gql`
     query GetJustificationStatusById($id: Long!) {
   justificationStatusById(id: $id) {
+    date
+    code
+    message
     date
     code
     message
@@ -5835,6 +5856,41 @@ export function useDeleteJustificationMutation(baseOptions?: Apollo.MutationHook
 export type DeleteJustificationMutationHookResult = ReturnType<typeof useDeleteJustificationMutation>;
 export type DeleteJustificationMutationResult = Apollo.MutationResult<DeleteJustificationMutation>;
 export type DeleteJustificationMutationOptions = Apollo.BaseMutationOptions<DeleteJustificationMutation, DeleteJustificationMutationVariables>;
+export const UpdateJustificationStatusByIdDocument = gql`
+    mutation UpdateJustificationStatusById($id: Long!, $input: JustificationStatusDto!) {
+  updateJustificationStatus(id: $id, input: $input) {
+    code
+    message
+  }
+}
+    `;
+export type UpdateJustificationStatusByIdMutationFn = Apollo.MutationFunction<UpdateJustificationStatusByIdMutation, UpdateJustificationStatusByIdMutationVariables>;
+
+/**
+ * __useUpdateJustificationStatusByIdMutation__
+ *
+ * To run a mutation, you first call `useUpdateJustificationStatusByIdMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateJustificationStatusByIdMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateJustificationStatusByIdMutation, { data, loading, error }] = useUpdateJustificationStatusByIdMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateJustificationStatusByIdMutation(baseOptions?: Apollo.MutationHookOptions<UpdateJustificationStatusByIdMutation, UpdateJustificationStatusByIdMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateJustificationStatusByIdMutation, UpdateJustificationStatusByIdMutationVariables>(UpdateJustificationStatusByIdDocument, options);
+      }
+export type UpdateJustificationStatusByIdMutationHookResult = ReturnType<typeof useUpdateJustificationStatusByIdMutation>;
+export type UpdateJustificationStatusByIdMutationResult = Apollo.MutationResult<UpdateJustificationStatusByIdMutation>;
+export type UpdateJustificationStatusByIdMutationOptions = Apollo.BaseMutationOptions<UpdateJustificationStatusByIdMutation, UpdateJustificationStatusByIdMutationVariables>;
 export const GetProgramsDocument = gql`
     query GetPrograms($idCoordination: Long, $idTrainingLevel: Long, $name: String, $page: Int, $size: Int) {
   allPrograms(

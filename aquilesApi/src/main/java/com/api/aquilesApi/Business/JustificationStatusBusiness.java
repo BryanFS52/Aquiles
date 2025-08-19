@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -30,15 +31,17 @@ public class JustificationStatusBusiness {
     }
 
     // Validation object
-    private JustificationStatusDto validationObject(Map<String, Object> json, JustificationStatusDto justificationStatusDto) {
-        // Extracting data from the JSON object
-        JSONObject dataObject = util.getData(json);
-
-        // Assigns the JSON value to DTO
-        justificationStatusDto.setId(dataObject.getLong("justificationStatusId"));
-        justificationStatusDto.setState(dataObject.getBoolean("state"));
-
-        return justificationStatusDto;
+    private void validationObject(JustificationStatusDto justificationStatusDto) throws CustomException {
+        boolean isUpdate = justificationStatusDto.getId() != null;
+        JustificationStatus existingStatus = null;
+        if (isUpdate) {
+            existingStatus = justificationStatusService.getById(justificationStatusDto.getId());
+        }
+        if (!isUpdate || Objects.equals( justificationStatusDto.getName() ,existingStatus.getName())) {
+            if(justificationStatusService.existByName(justificationStatusDto.getName())) {
+                throw new CustomException("Status Justification with name " + justificationStatusDto.getName() + " already exists", HttpStatus.BAD_REQUEST);
+            }
+        }
     }
 
     // FindAll
@@ -70,9 +73,11 @@ public class JustificationStatusBusiness {
         }
     }
 
+
     //Add
     public JustificationStatusDto add(JustificationStatusDto justificationStatusDto) {
         try {
+            validationObject(justificationStatusDto);
             justificationStatusDto.setState(true);
             JustificationStatus justificationStatus = modelMapper.map(justificationStatusDto, JustificationStatus.class);
             return modelMapper.map(this.justificationStatusService.save(justificationStatus), JustificationStatusDto.class);
@@ -85,6 +90,7 @@ public class JustificationStatusBusiness {
     public void update(Long justificationStatusId, JustificationStatusDto justificationStatusDto) {
         try {
             justificationStatusDto.setId(justificationStatusId);
+            validationObject(justificationStatusDto);
             JustificationStatus justificationStatus = modelMapper.map(justificationStatusDto, JustificationStatus.class);
             this.justificationStatusService.save(justificationStatus);
         } catch (Exception e) {

@@ -152,3 +152,12 @@ export const DELETE_JUSTIFICATION = gql`
     }
   }
 `;
+
+// export const UPDATE_JUSTIFICATION_STATUS_BY_ID = gql`
+//   mutation UpdateJustificationStatusById($id: Long!, $input: JustificationStatusDto!) {
+//     updateJustificationStatus(id: $id, input: $input) {
+//       code
+//       message
+//     }
+//   }
+// `;

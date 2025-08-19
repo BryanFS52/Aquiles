@@ -70,12 +70,9 @@ public class AttendancesBusiness {
     }
 
     // Get attendances by student ID
-    public List<AttendanceDto> findAllByStudentId(Long studentId) {
+    public List<Attendance> findAllByStudentId(Long studentId) {
         try {
-            List<Attendance> attendanceList = attendancesService.findAllByStudentId(studentId);
-            return attendanceList.stream()
-                    .map(entity -> modelMapper.map(entity, AttendanceDto.class))
-                    .collect(Collectors.toList());
+             return attendancesService.findAllByStudentId(studentId);
         } catch (Exception e) {
             throw new CustomException("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

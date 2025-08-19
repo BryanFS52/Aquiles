@@ -10,6 +10,7 @@ import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
 import java.util.Map;
 
 @DgsComponent
@@ -111,19 +112,39 @@ public class JustificationResolver {
         }
     }
 
-    // Delete Justification (GraphQL)
+    // Update Justification Status Only (GraphQL)
     @DgsMutation
-    public Map<String, Object> deleteJustification(@InputArgument Long id) {
+    public Map<String, Object> updateJustificationStatus(@InputArgument Long id, @InputArgument Long statusId) {
         try {
-            justificationBusiness.delete(id);
+            justificationBusiness.updateJustificationStatus(id, statusId);
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
-                    "Delete ok"
+                    "Status update ok"
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error deleting Justification: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error updating Justification status: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    // Get justifications by study sheet ID (GraphQL)
+    @DgsQuery
+    public Map<String, Object> justificationsByStudySheetId(@InputArgument Long studySheetId) {
+        try {
+            List<JustificationDto> justifications = justificationBusiness.findByStudySheetId(studySheetId);
+            return ResponseHttpApi.responseHttpFindAll(
+                    justifications,
+                    ResponseHttpApi.CODE_OK,
+                    "Query by study sheet ID ok",
+                    1, // Single page
+                    0, // Page 0
+                    justifications.size()
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving justifications by study sheet: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }

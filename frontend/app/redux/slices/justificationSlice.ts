@@ -68,6 +68,13 @@ interface JustificationState extends ReturnType<typeof createInitialPaginatedSta
     localCurrentPage: number;
     itemsPerPage: number;
     form: JustificationFormState;
+    currentStudySheetInfo?: {
+        id: string;
+        number: string;
+        programName: string;
+        studentsWithJustifications: number;
+        totalJustifications: number;
+    };
 }
 
 // Utilidades existentes
@@ -221,11 +228,10 @@ const convertDateToBackendFormat = (dateString: string | null | undefined): stri
 };
 
 // Función para transformar datos al formato del componente
-const transformToComponentFormat = (justifications: Justification[]): TransformedJustificationItem[] => {
+const transformToComponentFormat = (justifications: Justification[], currentStudySheetInfo?: { number: string }): TransformedJustificationItem[] => {
     return justifications.map((j) => {
         const student = j.attendance?.student;
         const person = student?.person;
-        const studySheet = student?.studentStudySheets?.[0];
 
         console.log("🔍 Transformando justificación:", {
             justificationId: j.id,
@@ -233,7 +239,8 @@ const transformToComponentFormat = (justifications: Justification[]): Transforme
             absenceDate: j.absenceDate,
             justificationDate: j.justificationDate,
             justificationStatus: j.justificationStatus,
-            state: j.state
+            state: j.state,
+            fichaNumber: currentStudySheetInfo?.number
         });
 
         const booleanState = Boolean(j.state);
@@ -250,7 +257,7 @@ const transformToComponentFormat = (justifications: Justification[]): Transforme
         
         return {
             id: Number(j.id),
-            ficha: studySheet?.studentStudySheetState?.toString() || "Sin ficha",
+            ficha: currentStudySheetInfo?.number || "Sin ficha", // Usar el número de ficha del contexto actual
             absenceDate: formatDateSafely(j.absenceDate),
             justificationDate: formatDateSafely(j.justificationDate),
             estado: estadoDisplay,  
@@ -384,6 +391,18 @@ export const fetchJustifications = createAsyncThunk<GetAllJustificationsQuery['a
     }
 );
 
+export const fetchJustificationAndStudySheetById = createAsyncThunk<GetJustificationAndStudySheetByIdQuery['studySheetById'], GetJustificationAndStudySheetByIdQueryVariables>(
+    'justifications/fetchJustificationAndStudySheetById',
+    async ({ id }) => {
+        const { data } = await clientLAN.query<GetJustificationAndStudySheetByIdQuery, GetJustificationAndStudySheetByIdQueryVariables>({
+            query: GET_JUSTIFICATION_AND_STUDY_SHEET_BY_ID,
+            variables: { id },
+            fetchPolicy: 'no-cache',
+        });
+        return data.studySheetById;
+    }
+);
+
 export const fetchJustificationById = createAsyncThunk<GetJustificationByIdQuery['justificationById'], GetJustificationByIdQueryVariables>(
     'justifications/fetchById',
     async ({ id }) => {
@@ -455,7 +474,7 @@ export const updateJustification = createAsyncThunk<UpdateJustificationMutation[
 
 // Nueva función para cambiar el estado de una justificación
 export const updateJustificationStatus = createAsyncThunk<
-    UpdateJustificationMutation['updateJustification'],
+    UpdateJustificationStatusByIdMutation['updateJustificationStatus'],
     { id: string; statusId: string },
     { rejectValue: { code: string; message: string } }
 >(
@@ -463,29 +482,26 @@ export const updateJustificationStatus = createAsyncThunk<
     async ({ id, statusId }, { rejectWithValue, getState }) => {
         try {
             const justificationId = parseInt(id);
-            const justificationStatusId = parseInt(statusId);
+            const statusIdParsed = parseInt(statusId);
 
-            // Crear el input con el justificationStatus para la relación real
-            const input: UpdateJustificationMutationVariables['input'] = {
-                justificationStatus: {
-                    id: justificationStatusId
-                }
-            } as any; // Usar any temporalmente debido a inconsistencia en tipos generados
-
-            console.log("🔄 Actualizando justificationStatus con relación real:", {
+            console.log("🔄 Actualizando justificationStatus:", {
                 id: justificationId,
-                statusId,
-                justificationStatusId,
-                input,
-                inputString: JSON.stringify(input, null, 2)
+                statusId: statusIdParsed
             });
 
-            const { data } = await clientLAN.mutate<UpdateJustificationMutation, UpdateJustificationMutationVariables>({
-                mutation: UPDATE_JUSTIFICATION,
+            // Usar la estructura que requiere el backend actual
+            const input = {
+                id: statusId, // Usar el string directamente como requiere el tipo
+                name: null, // Este campo puede ser null ya que no es requerido para la actualización
+                state: null
+            };
+
+            const { data } = await clientLAN.mutate<UpdateJustificationStatusByIdMutation, UpdateJustificationStatusByIdMutationVariables>({
+                mutation: UPDATE_JUSTIFICATION_STATUS_BY_ID,
                 variables: { id: justificationId, input },
             });
 
-            const res = data?.updateJustification;
+            const res = data?.updateJustificationStatus;
             console.log("📋 Respuesta del backend:", res);
             
             if (!res || res.code !== '200') {
@@ -692,7 +708,7 @@ const justificationSlice = createSlice({
 
                     console.log("🔄 Datos transformados:", state.data);
 
-                    state.transformedData = transformToComponentFormat(state.data);
+                    state.transformedData = transformToComponentFormat(state.data, undefined);
                     console.log("📊 Datos para componente:", state.transformedData);
                     
                     state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
@@ -707,6 +723,104 @@ const justificationSlice = createSlice({
                 state.error = action.error.message || 'Error fetching justifications';
                 state.loading = false;
             })
+            // fetchJustificationAndStudySheetById
+            .addCase(fetchJustificationAndStudySheetById.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchJustificationAndStudySheetById.fulfilled, (state, action: PayloadAction<GetJustificationAndStudySheetByIdQuery['studySheetById']>) => {
+                if (action.payload?.data) {
+                    console.log("📥 Datos de studySheet recibidos:", action.payload.data);
+                    
+                    const studySheetId = action.payload.data.id?.toString() || '';
+                    const studySheetNumber = action.payload.data.number;
+                    const programName = action.payload.data.trainingProject?.program?.name;
+                    
+                    // Extraer justificaciones válidas (no null) de estudiantes en esta ficha específica
+                    const justifications: Justification[] = [];
+                    let studentsWithJustifications = 0;
+                    let totalJustifications = 0;
+                    
+                    action.payload.data.studentStudySheets?.forEach(studentSheet => {
+                        if (studentSheet?.student?.attendances) {
+                            let studentHasJustifications = false;
+                            
+                            studentSheet.student.attendances.forEach(attendance => {
+                                // FILTRO CLAVE: Solo justificaciones no-null
+                                if (attendance?.justification && attendance.justification.id) {
+                                    
+                                    // FILTRO ADICIONAL: Validar que sea una justificación válida y reciente
+                                    // En teoría, si viene de studySheetById(id), debería ser de esta ficha
+                                    // Pero como precaución, validamos que tenga datos básicos
+                                    const justification = attendance.justification;
+                                    
+                                    if (justification.absenceDate && justification.justificationDate && 
+                                        justification.justificationStatus && justification.justificationType) {
+                                        
+                                        studentHasJustifications = true;
+                                        totalJustifications++;
+                                        
+                                        const justificationData = {
+                                            ...justification,
+                                            attendance: {
+                                                id: attendance.id,
+                                                student: studentSheet.student
+                                            }
+                                        };
+                                        
+                                        justifications.push(transformGraphQLToJustificationItem(justificationData));
+                                        
+                                        console.log(`✅ Justificación añadida:`, {
+                                            justificationId: justification.id,
+                                            studentId: studentSheet.student?.id,
+                                            studentName: `${studentSheet.student?.person?.name} ${studentSheet.student?.person?.lastname}`,
+                                            attendanceId: attendance.id,
+                                            fichaNumber: studySheetNumber,
+                                            absenceDate: justification.absenceDate,
+                                            statusName: justification.justificationStatus?.name
+                                        });
+                                    } else {
+                                        console.log(`⚠️ Justificación con datos incompletos ignorada:`, {
+                                            justificationId: justification.id,
+                                            hasAbsenceDate: !!justification.absenceDate,
+                                            hasJustificationDate: !!justification.justificationDate,
+                                            hasStatus: !!justification.justificationStatus,
+                                            hasType: !!justification.justificationType
+                                        });
+                                    }
+                                }
+                            });
+                            
+                            if (studentHasJustifications) {
+                                studentsWithJustifications++;
+                            }
+                        }
+                    });
+                    
+                    console.log(`🔄 Resumen de justificaciones para ficha ${studySheetNumber}:`);
+                    console.log(`📊 Estudiantes con justificaciones: ${studentsWithJustifications}`);
+                    console.log(`📋 Total de justificaciones: ${totalJustifications}`);
+                    console.log(`📝 IDs de justificaciones:`, justifications.map(j => j.id));
+                    
+                    // Solo mostrar justificaciones de esta ficha específica
+                    state.data = justifications;
+                    state.transformedData = transformToComponentFormat(state.data, { number: studySheetNumber?.toString() || '' });
+                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+                    
+                    // Información de la ficha actual para la UI
+                    state.currentStudySheetInfo = {
+                        id: studySheetId,
+                        number: studySheetNumber?.toString() || '',
+                        programName: programName || 'Sin programa',
+                        studentsWithJustifications,
+                        totalJustifications
+                    };
+                }
+                state.loading = false;
+            })
+            .addCase(fetchJustificationAndStudySheetById.rejected, (state, action) => {
+                state.error = action.error.message || 'Error fetching study sheet with justifications';
+                state.loading = false;
+            })
             // fetchJustificationById - existente
             .addCase(fetchJustificationById.pending, (state) => {
                 state.loading = true;
@@ -714,7 +828,7 @@ const justificationSlice = createSlice({
             .addCase(fetchJustificationById.fulfilled, (state, action: PayloadAction<GetJustificationByIdQuery['justificationById']>) => {
                 if (action.payload) {
                     state.data = [transformGraphQLToJustificationItem(action.payload)];
-                    state.transformedData = transformToComponentFormat(state.data);
+                    state.transformedData = transformToComponentFormat(state.data, undefined);
                     state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                 }
                 state.loading = false;
@@ -734,7 +848,7 @@ const justificationSlice = createSlice({
                 if (action.payload) {
                     const newJustification = transformGraphQLToJustificationItem(action.payload);
                     state.data.push(newJustification);
-                    state.transformedData = transformToComponentFormat(state.data);
+                    state.transformedData = transformToComponentFormat(state.data, state.currentStudySheetInfo);
                     state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
 
                     // ✅ Resetear formulario después de éxito
@@ -759,7 +873,7 @@ const justificationSlice = createSlice({
                     const index = state.data.findIndex((justification: Justification) => justification.id === updatedJustification.id);
                     if (index !== -1) {
                         state.data[index] = updatedJustification;
-                        state.transformedData = transformToComponentFormat(state.data);
+                        state.transformedData = transformToComponentFormat(state.data, state.currentStudySheetInfo);
                         state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                     }
                 }
@@ -794,7 +908,7 @@ const justificationSlice = createSlice({
                         };
                         
                         // Regenerar transformedData y filteredData
-                        state.transformedData = transformToComponentFormat(state.data);
+                        state.transformedData = transformToComponentFormat(state.data, state.currentStudySheetInfo);
                         state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                         
                         console.log("✅ justificationStatus actualizado localmente para justificación:", targetId, "nuevo statusId:", statusId);
@@ -815,7 +929,7 @@ const justificationSlice = createSlice({
             .addCase(deleteJustification.fulfilled, (state, action: PayloadAction<string>) => {
                 if (action.payload) {
                     state.data = state.data.filter((justification) => justification.id !== String(action.payload));
-                    state.transformedData = transformToComponentFormat(state.data);
+                    state.transformedData = transformToComponentFormat(state.data, state.currentStudySheetInfo);
                     state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                 }
                 state.error = null;
