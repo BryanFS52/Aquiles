@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @DgsComponent
-public class teamScrumStudentData {
+public class TeamScrumStudentData {
 
     private final TeamsScrumBusiness teamsScrumBusiness;
     private final ModelMapper modelMapper;
 
-    public teamScrumStudentData(TeamsScrumBusiness teamsScrumBusiness, ModelMapper modelMapper) {
+    public TeamScrumStudentData(TeamsScrumBusiness teamsScrumBusiness, ModelMapper modelMapper) {
         this.teamsScrumBusiness = teamsScrumBusiness;
 
         this.modelMapper = modelMapper;

@@ -10,11 +10,11 @@ import org.modelmapper.ModelMapper;
 import java.util.Map;
 
 @DgsComponent
-public class processMethodologyTeamScrumData {
+public class ProcessMethodologyTeamScrumData {
 
     private final ModelMapper modelMapper;
 
-    public processMethodologyTeamScrumData(ModelMapper modelMapper) {
+    public ProcessMethodologyTeamScrumData(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
 

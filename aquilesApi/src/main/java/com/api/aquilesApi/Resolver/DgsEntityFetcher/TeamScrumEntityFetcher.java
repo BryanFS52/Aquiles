@@ -11,12 +11,12 @@ import org.modelmapper.ModelMapper;
 import java.util.Map;
 
 @DgsComponent
-public class teamScrumEntityFetcher {
+public class TeamScrumEntityFetcher {
 
     private final ModelMapper modelMapper;
     private final TeamsScrumBusiness teamsScrumBusiness;
 
-    public teamScrumEntityFetcher(ModelMapper modelMapper, TeamsScrumBusiness teamsScrumBusiness) {
+    public TeamScrumEntityFetcher(ModelMapper modelMapper, TeamsScrumBusiness teamsScrumBusiness) {
         this.modelMapper = modelMapper;
         this.teamsScrumBusiness = teamsScrumBusiness;
     }

@@ -6,7 +6,7 @@ import com.netflix.graphql.dgs.DgsEntityFetcher;
 import java.util.Map;
 
 @DgsComponent
-public class profileEntityFetcher {
+public class ProfileEntityFetcher {
 
     @DgsEntityFetcher(name = "Profile")
     public Profile getProfile(Map<String, Object> values) {

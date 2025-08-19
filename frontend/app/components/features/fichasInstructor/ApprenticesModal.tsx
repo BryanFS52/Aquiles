@@ -2,12 +2,12 @@
 
 import React from 'react';
 import Modal from '@/components/UI/Modal';
-import { Student } from './types';
+import { StudentStudySheet } from './types';
 
 interface ApprenticesModalProps {
     isOpen: boolean;
     onClose: () => void;
-    students: Student[];
+    students: StudentStudySheet[];
 }
 
 export const ApprenticesModal: React.FC<ApprenticesModalProps> = ({
@@ -30,14 +30,15 @@ export const ApprenticesModal: React.FC<ApprenticesModalProps> = ({
 
                     <div className="grid gap-3">
                         {students.map((student, index) => {
-                            const person = student?.person;
+                            const person = student?.student?.person;
                             const displayName = person?.name && person?.lastname
                                 ? `${person.name} ${person.lastname}`
                                 : person?.name || 'Nombre no disponible';
+                            const studentState = student?.studentStudySheetState?.name || 'Estado no disponible';
 
                             return (
                                 <div
-                                    key={student?.id || index}
+                                    key={student?.student?.id || index}
                                     className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600"
                                 >
                                     <div className="flex items-center space-x-3">
@@ -62,11 +63,11 @@ export const ApprenticesModal: React.FC<ApprenticesModalProps> = ({
                                     </div>
 
                                     <div className="flex items-center space-x-2">
-                                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${student?.state
+                                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${studentState === 'En formacion'
                                             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                                            : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
                                             }`}>
-                                            {student?.state ? 'Activo' : 'Inactivo'}
+                                            {studentState}
                                         </span>
                                     </div>
                                 </div>

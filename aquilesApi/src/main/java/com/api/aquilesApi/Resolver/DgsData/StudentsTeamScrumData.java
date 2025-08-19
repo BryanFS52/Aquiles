@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 @DgsComponent
-public class studentsTeamScrumData {
+public class StudentsTeamScrumData {
     private final ModelMapper modelMapper;
 
-    public studentsTeamScrumData(ModelMapper modelMapper) {
+    public StudentsTeamScrumData(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
 

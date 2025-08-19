@@ -114,11 +114,16 @@ export const GET_STUDY_SHEET_BY_ID = gql`
             }
           }
           studentStudySheetState {
-
             id
             name
           }
         }
+        teacherStudySheets{
+                id
+                competence {
+                    name
+                }
+            }
       }
     }
   }

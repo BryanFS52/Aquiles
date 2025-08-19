@@ -28,7 +28,16 @@ const Modal: React.FC<ModalProps> = ({
             if (e.key === "Escape") onClose();
         };
         window.addEventListener("keydown", onKeyDown);
-        return () => window.removeEventListener("keydown", onKeyDown);
+        // Guarda el overflow original
+        const originalOverflow = document.body.style.overflow;
+        // Bloquea el scroll
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            window.removeEventListener("keydown", onKeyDown);
+            // Restaura el overflow original
+            document.body.style.overflow = originalOverflow;
+        };
     }, [isOpen, onClose]);
 
     if (!isOpen) return null;

@@ -93,9 +93,7 @@ export const FichasInstructorContainer: React.FC = () => {
                             isOpen={isModalOpen}
                             onClose={handleCloseModal}
                             students={
-                                selectedFicha?.studentStudySheets
-                                    ?.map((ss) => ss?.student)
-                                    ?.filter((student): student is NonNullable<typeof student> => Boolean(student)) || []
+                                selectedFicha?.studentStudySheets?.filter((ss): ss is NonNullable<typeof ss> => Boolean(ss)) || []
                             }
                         />
                     </div>

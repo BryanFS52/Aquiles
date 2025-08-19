@@ -1,6 +1,5 @@
 "use client"
 
-import { TransformedAttendanceItem } from "@/redux/slices/attendanceSlice";
 import { motion } from "framer-motion";
 import { FaRegFileAlt } from "react-icons/fa";
 

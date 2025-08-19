@@ -7,7 +7,7 @@ import com.netflix.graphql.dgs.DgsEntityFetcher;
 import java.util.Map;
 
 @DgsComponent
-public class studySheetEntityFetcher {
+public class StudySheetEntityFetcher {
     @DgsEntityFetcher(name = "StudySheet")
     public StudySheet studySheetReference(Map<String, Object> values) {
         String idStr = (String) values.get("id");

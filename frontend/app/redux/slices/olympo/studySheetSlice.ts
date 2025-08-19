@@ -93,6 +93,13 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet =
             studentStudySheetState: ss.studentStudySheetState || null,
         })) || [],
 
+        teacherStudySheets: graphqlData.teacherStudySheets?.map((ts: any) => ({
+            id: ts.id,
+            competence: ts.competence ? {
+                name: ts.competence.name
+            } : null,
+        })) || [],
+
         teamsScrum: graphqlData.teamsScrum?.filter((t: any) => t !== null).map((team: any) => ({
             id: team.id,
             teamName: team.teamName,

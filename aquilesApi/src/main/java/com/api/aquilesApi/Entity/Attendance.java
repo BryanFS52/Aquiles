@@ -33,8 +33,8 @@ public class Attendance implements Serializable {
     @Column (name = "student_id")
     private Long studentId;
 
-    @Column (name = "study_sheet_quarter")
-    private Long studySheetQuarter;
+    @Column (name = "competence_quarter")
+    private Long competenceQuarter;
 
     // Relations
     // Relation (1-1) con justification

@@ -4,8 +4,6 @@ import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
-import { useUser } from '@context/UserContext';
-import { useLoader } from '@context/LoaderContext';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
 import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
 import {
@@ -37,9 +35,6 @@ export const JustificationsContainer: React.FC = () => {
   const base64Ref = useRef<string>('');
   const formRef = useRef<HTMLDivElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
-
-  const { user } = useUser();
-  const { showLoader, hideLoader } = useLoader();
 
   // Estado local para controlar la carga del modal
   const [shouldLoadModal, setShouldLoadModal] = useState(false);

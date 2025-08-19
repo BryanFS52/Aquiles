@@ -1,6 +1,6 @@
 "use client"
 
-import AttendanceTable from "@/components/features/attendance/attendanceTable";
+import AttendanceTable from "@/components/features/asistencia/attendanceTable";
 import PageTitle from "@/components/UI/pageTitle";
 import { fetchAttendances } from "@/redux/slices/attendanceSlice";
 import { AppDispatch, RootState } from "@/redux/store";

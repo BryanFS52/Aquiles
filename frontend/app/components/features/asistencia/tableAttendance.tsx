@@ -19,6 +19,13 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
     const [currentTrimester, setCurrentTrimester] = useState<number>(1);
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [filteredStudents, setFilteredStudents] = useState<any>(studySheetData?.studentStudySheets || []);
+    const [selectedCompetence, setSelectedCompetence] = useState<string>("");
+
+    // Obtener competencias desde la API
+    const competences = studySheetData?.teacherStudySheets?.map((teacherSheet: any) => ({
+        id: teacherSheet.id,
+        name: teacherSheet.competence?.name || 'Sin nombre'
+    })) || [];
 
     useEffect(() => {
         setFilteredStudents(studySheetData?.studentStudySheets || []);
@@ -85,12 +92,33 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                             <span className="hidden xs:inline">Toma de</span> Asistencia <BsQrCode className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
 
+
+
                         <button
                             onClick={onNavigate}
-                            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl shadow bg-gradient-to-r from-lime-400 to-lime-600 text-black hover:bg-lightGreen whitespace-nowrap"
+                            disabled={!selectedCompetence}
+                            className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl shadow whitespace-nowrap transition ${selectedCompetence
+                                ? 'bg-gradient-to-r from-lime-400 to-lime-600 text-black hover:bg-lightGreen cursor-pointer'
+                                : 'bg-lightGray text-grayText cursor-not-allowed opacity-60'
+                                }`}
+                            title={!selectedCompetence ? 'Debe seleccionar una competencia primero' : ''}
                         >
                             <span className="hidden xs:inline">Asistencia</span> Manual <FaClipboardList className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
+
+                        {/* Selector de Competencia */}
+                        <select
+                            value={selectedCompetence}
+                            onChange={(e) => setSelectedCompetence(e.target.value)}
+                            className="h-9 sm:h-10 px-3 pr-8 text-xs sm:text-sm rounded-xl border border-lightGray focus:outline-none focus:ring-2 focus:ring-lightGreen focus:border-lightGreen shadow-sm bg-white min-w-[200px] sm:min-w-[250px]"
+                        >
+                            <option value="">Seleccione competencia...</option>
+                            {competences.map((competence) => (
+                                <option key={competence.id} value={competence.id}>
+                                    {competence.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     {/* Trimester Controls */}

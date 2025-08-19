@@ -7,13 +7,13 @@ import { toast } from "react-toastify"
 import { Save } from "lucide-react"
 import { fetchStudySheetById } from "@slice/olympo/studySheetSlice"
 import { addAttendance } from "@slice/attendanceSlice"
-import { AttendanceHeader } from "@components/features/attendance/attendanceManual/attendanceManualHeader"
-import { AttendanceStatsSection } from "@components/features/attendance/attendanceManual/attendanceStatsCard"
-import { CourseInfoSection } from "@components/features/attendance/attendanceManual/courseInfo"
-import { AttendanceControls } from "@components/features/attendance/attendanceManual/attendanceControls"
-import { StudentList } from "@components/features/attendance/attendanceManual/studentList"
-import { AttendanceHistory } from "@components/features/attendance/attendanceManual/attendanceHistory"
-import { ErrorState, EmptyStudentsState } from "@components/features/attendance/attendanceManual/state"
+import { AttendanceHeader } from "@/components/features/asistencia/attendanceManual/attendanceManualHeader"
+import { AttendanceStatsSection } from "@/components/features/asistencia/attendanceManual/attendanceStatsCard"
+import { CourseInfoSection } from "@/components/features/asistencia/attendanceManual/courseInfo"
+import { AttendanceControls } from "@/components/features/asistencia/attendanceManual/attendanceControls"
+import { StudentList } from "@/components/features/asistencia/attendanceManual/studentList"
+import { AttendanceHistory } from "@/components/features/asistencia/attendanceManual/attendanceHistory"
+import { ErrorState, EmptyStudentsState } from "@/components/features/asistencia/attendanceManual/state"
 import { useLoader } from "@context/LoaderContext"
 import type {
     AttendanceHistory as AttendanceHistoryType,
@@ -38,11 +38,6 @@ const AttendanceManualPage: React.FC = () => {
     const [selectedFilter, setSelectedFilter] = useState<FilterOption>("todos")
     const [selectedStudent, setSelectedStudent] = useState<string | number | null>(null)
     const [attendanceHistory, setAttendanceHistory] = useState<AttendanceHistoryType[]>([])
-
-    useEffect(() => {
-        // Si no hay datos o el array está vacío, no necesariamente hacer fetch
-        // La data debería venir desde la página anterior
-    }, [studySheet, dispatch])
 
     useEffect(() => {
         if (loading) {

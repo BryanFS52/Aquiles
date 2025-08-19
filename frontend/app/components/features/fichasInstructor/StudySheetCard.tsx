@@ -12,7 +12,7 @@ export const StudySheetCard: React.FC<StudySheetCardProps> = ({
     loading = false
 }) => {
     return (
-        <div className="flex flex-col md:flex-row items-center gap-6 shadow-xl rounded-2xl p-6 bg-white dark:bg-gradient-to-br dark:from-shadowBlue dark:to-darkBlue ring-2 ring-white/10 dark:ring-shadowBlue/40 transition-all">
+        <div className="flex flex-col md:flex-row items-center gap-6 shadow-xl rounded-2xl p-6 bg-white dark:bg-gradient-to-br dark:from-shadowBlue dark:to-darkBlue border border-gray-300/80 dark:border-gray-600/70 ring-2 ring-white/10 dark:ring-shadowBlue/40 transition-all">
             {/* Sección de Aprendices */}
             <div className="flex flex-col items-center">
                 <div

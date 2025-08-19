@@ -9,11 +9,11 @@ import org.modelmapper.ModelMapper;
 import java.util.Map;
 
 @DgsComponent
-public class studySheetTeamScrumData {
+public class StudySheetTeamScrumData {
 
     private final ModelMapper modelMapper;
 
-    public studySheetTeamScrumData(ModelMapper modelMapper) {
+    public StudySheetTeamScrumData(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
 

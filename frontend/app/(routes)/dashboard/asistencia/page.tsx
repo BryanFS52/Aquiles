@@ -5,10 +5,10 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store'
 import { useRouter } from 'next/navigation';
 import { BsPersonCircle } from "react-icons/bs";
-import TableAttendance from "@components/features/attendance/tableAttendance";
+import { useLoader } from '@context/LoaderContext';
+import TableAttendance from "@/components/features/asistencia/tableAttendance";
 import PageTitle from "@components/UI/pageTitle";
-import AttendanceFooter from "@components/features/attendance/attendanceFooter";
-import { useLoader } from '@/context/LoaderContext';
+import AttendanceFooter from "@/components/features/asistencia/attendanceFooter";
 
 export default function Attendance() {
     const router = useRouter();

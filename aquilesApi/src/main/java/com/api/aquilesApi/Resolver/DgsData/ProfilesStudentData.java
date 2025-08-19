@@ -13,10 +13,10 @@ import java.util.Map;
 import java.util.Objects;
 
 @DgsComponent
-public class profilesStudentData {
+public class ProfilesStudentData {
     private final TeamsScrumBusiness  teamsScrumBusiness;
 
-    public profilesStudentData(TeamsScrumBusiness teamsScrumBusiness) {
+    public ProfilesStudentData(TeamsScrumBusiness teamsScrumBusiness) {
         this.teamsScrumBusiness = teamsScrumBusiness;
     }
     @DgsData(parentType = "Student", field = "profiles")
