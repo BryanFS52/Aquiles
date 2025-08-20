@@ -5,10 +5,10 @@ import { IoIosArrowDown } from "react-icons/io";
 import { useRouter } from 'next/navigation';
 import { EventClickArg } from '@fullcalendar/core'
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/redux/store';
+import { AppDispatch, RootState } from '@redux/store';
 import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
 import { Attendance } from '@graphql/generated';
-import { useLoader } from "@/context/LoaderContext";
+import { useLoader } from "@context/LoaderContext";
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'

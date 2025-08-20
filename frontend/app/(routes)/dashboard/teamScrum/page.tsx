@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
+import { AppDispatch, RootState } from "@redux/store";
 import { fetchStudySheetByTeacherIdWithTeamScrum } from "@slice/olympo/studySheetSlice";
 import { StudySheet } from "@graphql/generated";
 import { useLoader } from "@context/LoaderContext";

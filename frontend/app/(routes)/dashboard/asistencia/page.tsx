@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store'
+import { RootState } from '@redux/store'
 import { useRouter } from 'next/navigation';
 import { BsPersonCircle } from "react-icons/bs";
 import { useLoader } from '@context/LoaderContext';
-import TableAttendance from "@/components/features/asistencia/tableAttendance";
+import TableAttendance from "@components/features/asistencia/tableAttendance";
 import PageTitle from "@components/UI/pageTitle";
-import AttendanceFooter from "@/components/features/asistencia/attendanceFooter";
+import AttendanceFooter from "@components/features/asistencia/attendanceFooter";
 
 export default function Attendance() {
     const router = useRouter();

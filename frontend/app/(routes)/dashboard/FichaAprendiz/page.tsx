@@ -3,9 +3,9 @@
 import { useEffect } from "react";
 import { FaUsers, FaRegClock, FaGraduationCap, FaRegListAlt, FaEnvelope, FaUserGraduate } from "react-icons/fa";
 import { HiSparkles, HiAcademicCap } from "react-icons/hi";
-import { useLoader } from "@/context/LoaderContext";
+import { useLoader } from "@context/LoaderContext";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
+import { AppDispatch, RootState } from "@redux/store";
 import { fetchStudySheetWithStudents, clearStudySheetState } from "@slice/olympo/studySheetSlice";
 import Image from "next/image";
 import PageTitle from "@components/UI/pageTitle";

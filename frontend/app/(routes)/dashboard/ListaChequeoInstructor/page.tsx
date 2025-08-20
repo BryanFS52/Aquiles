@@ -1,20 +1,18 @@
 'use client'
 
 import { useState, useEffect, useMemo } from "react";
-import { Check, FileDown, Save, UploadCloud, X, AlertTriangle, Phone } from "lucide-react";
+import { Check, FileDown, Save, UploadCloud, X, Phone } from "lucide-react";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import PageTitle from "@components/UI/pageTitle";
 import { fetchAllChecklists, fetchChecklistById } from "@services/checkListService.js";
 import { fetchEvaluationsByChecklist, completeEvaluation } from "@services/evaluationService";
 import { exportChecklistToPdf, exportChecklistToExcel, downloadFileFromBase64 } from "@services/exportService";
-import { 
-  Checklist, 
-  Evaluation, 
-  SimulatedChecklistItem,
-  InstructorChecklistState,
-  ValueJudgment
-} from "@/types/checklist";
+import {
+  Checklist,
+  Evaluation,
+  SimulatedChecklistItem
+} from "@type/checklist";
 
 export default function InstructorChecklistView() {
   const [activeChecklists, setActiveChecklists] = useState<Checklist[]>([]);
@@ -29,7 +27,7 @@ export default function InstructorChecklistView() {
   const [evaluationRecommendations, setEvaluationRecommendations] = useState<string>("");
   const [evaluationJudgment, setEvaluationJudgment] = useState<string>("PENDIENTE");
   const [loading, setLoading] = useState<boolean>(true);
-  const [itemStates, setItemStates] = useState<{[key: number]: {completed: boolean | null, observations: string}}>({});
+  const [itemStates, setItemStates] = useState<{ [key: number]: { completed: boolean | null, observations: string } }>({});
 
   const itemsPerPage = 3;
 
@@ -50,13 +48,13 @@ export default function InstructorChecklistView() {
       setLoading(true);
       const response = await fetchAllChecklists(0, 100);
       console.log("Raw checklists response:", response); // Debug log
-      
+
       if (response.code === "200" && response.data) {
         // Filtrar solo las listas activas
         const activeLists = response.data.filter((checklist: Checklist) => checklist.state === true);
         console.log("Active checklists found:", activeLists); // Debug log
         console.log("Trimester values:", activeLists.map(cl => ({ id: cl.id, trimester: cl.trimester, type: typeof cl.trimester }))); // Debug log
-        
+
         setActiveChecklists(activeLists);
         if (activeLists.length > 0 && !selectedChecklist) {
           setSelectedChecklist(activeLists[0]);
@@ -75,11 +73,11 @@ export default function InstructorChecklistView() {
       console.log("Loading evaluations for checklist ID:", checklistId);
       const evaluationsResponse = await fetchEvaluationsByChecklist(checklistId);
       console.log("Evaluations response:", evaluationsResponse);
-      
+
       if (evaluationsResponse.code === "200" && evaluationsResponse.data) {
         setEvaluations(evaluationsResponse.data);
         console.log("Evaluations found:", evaluationsResponse.data.length);
-        
+
         // Si hay evaluaciones, seleccionar la primera automáticamente
         if (evaluationsResponse.data.length > 0) {
           const firstEvaluation = evaluationsResponse.data[0];
@@ -141,7 +139,7 @@ export default function InstructorChecklistView() {
         { id: 6, indicator: "Describe la creación de usuarios y privilegios a nivel de base de datos.", completed: null, observations: "" }
       ];
     }
-    
+
     // Mapear los items reales del checklist a nuestro formato
     return selectedChecklist.items.map((item, index) => ({
       id: parseInt(item.id || (index + 1).toString()),
@@ -161,17 +159,17 @@ export default function InstructorChecklistView() {
 
   const handleChecklistChange = async (checklistId: string): Promise<void> => {
     const checklist = activeChecklists.find((cl: Checklist) => cl.id === checklistId);
-    
+
     // Reiniciar estados
     setCurrentPage(1);
     setItemStates({}); // Resetear el estado de los items
-    
+
     if (checklistId && checklistId !== "") {
       try {
         // Cargar los detalles completos del checklist con sus items
         console.log("Loading checklist details for ID:", checklistId);
         const checklistResponse = await fetchChecklistById(parseInt(checklistId));
-        
+
         if (checklistResponse.code === "200" && checklistResponse.data) {
           console.log("Checklist details loaded:", checklistResponse.data);
           setSelectedChecklist(checklistResponse.data);
@@ -180,9 +178,9 @@ export default function InstructorChecklistView() {
           setSelectedChecklist(checklist || null);
           console.warn("Could not load checklist details, using basic data");
         }
-        
+
         // Las evaluaciones se cargarán automáticamente por el useEffect
-        
+
       } catch (error) {
         console.error("Error loading checklist details:", error);
         // En caso de error, usar el checklist básico y no mostrar error al usuario
@@ -205,7 +203,7 @@ export default function InstructorChecklistView() {
   };
 
   const handleFileUpload = (
-    event: React.ChangeEvent<HTMLInputElement>, 
+    event: React.ChangeEvent<HTMLInputElement>,
     setFile: React.Dispatch<React.SetStateAction<string | null>>
   ): void => {
     const file = event.target.files?.[0];
@@ -256,7 +254,7 @@ export default function InstructorChecklistView() {
 
       if (response.code === "200") {
         toast.success("🎉 Evaluación guardada exitosamente en la base de datos");
-        
+
         // Actualizar el estado local
         setSelectedEvaluation({
           ...selectedEvaluation,
@@ -266,8 +264,8 @@ export default function InstructorChecklistView() {
         });
 
         // Actualizar también la lista de evaluaciones
-        setEvaluations(prev => prev.map(evaluation => 
-          evaluation.id === selectedEvaluation.id 
+        setEvaluations(prev => prev.map(evaluation =>
+          evaluation.id === selectedEvaluation.id
             ? { ...evaluation, observations: evaluationObservations, recommendations: evaluationRecommendations, valueJudgment: evaluationJudgment }
             : evaluation
         ));
@@ -299,8 +297,8 @@ export default function InstructorChecklistView() {
         };
       });
 
-      console.log("Saving checklist:", { 
-        selectedChecklist, 
+      console.log("Saving checklist:", {
+        selectedChecklist,
         updatedItems,
         evaluation: selectedEvaluation,
         itemStates
@@ -322,17 +320,17 @@ export default function InstructorChecklistView() {
       // Simular guardado exitoso por ahora
       // TODO: Implementar la llamada real al backend cuando esté disponible
       console.log("Checklist data to save:", checklistData);
-      
+
       // Simular una pequeña demora para mostrar feedback
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       toast.success("📋 La lista de chequeo ha sido guardada exitosamente!");
-      
+
       // También guardar la evaluación si está completa
       if (selectedEvaluation && evaluationObservations && evaluationRecommendations && evaluationJudgment && evaluationJudgment !== "PENDIENTE") {
         await handleCompleteEvaluation();
       }
-      
+
     } catch (error) {
       console.error("Error saving checklist:", error);
       toast.error("Error al guardar la lista de chequeo");
@@ -348,12 +346,12 @@ export default function InstructorChecklistView() {
 
     try {
       toast.info("📄 Generando PDF...");
-      
+
       const base64Data = await exportChecklistToPdf(parseInt(selectedChecklist.id));
       const fileName = `checklist_${selectedChecklist.id}_trimestre_${selectedChecklist.trimester || 'NA'}.pdf`;
-      
+
       downloadFileFromBase64(base64Data, fileName, 'application/pdf');
-      
+
       toast.success("📥 PDF descargado exitosamente");
     } catch (error) {
       console.error("Error exporting PDF:", error);
@@ -370,12 +368,12 @@ export default function InstructorChecklistView() {
 
     try {
       toast.info("📊 Generando Excel...");
-      
+
       const base64Data = await exportChecklistToExcel(parseInt(selectedChecklist.id));
       const fileName = `checklist_${selectedChecklist.id}_trimestre_${selectedChecklist.trimester || 'NA'}.xlsx`;
-      
+
       downloadFileFromBase64(base64Data, fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      
+
       toast.success("📥 Excel descargado exitosamente");
     } catch (error) {
       console.error("Error exporting Excel:", error);
@@ -420,7 +418,7 @@ export default function InstructorChecklistView() {
               <h3 className="text-xl font-bold text-green-900 dark:text-green-100">
                 📋 Evaluación de Lista de Chequeo
               </h3>
-              
+
               {selectedEvaluation ? (
                 <div className="space-y-3">
                   {/* Verificar si la evaluación está completa o pendiente */}
@@ -437,7 +435,7 @@ export default function InstructorChecklistView() {
                       </p>
                     </div>
                   )}
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Observaciones: <span className="text-red-500">*</span>
@@ -451,7 +449,7 @@ export default function InstructorChecklistView() {
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Recomendaciones: <span className="text-red-500">*</span>
@@ -465,7 +463,7 @@ export default function InstructorChecklistView() {
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Juicio de Valor: <span className="text-red-500">*</span>
@@ -485,21 +483,20 @@ export default function InstructorChecklistView() {
                       <option value="RECHAZADO">Rechazado</option>
                     </select>
                   </div>
-                  
+
                   <div className="flex justify-end space-x-3">
                     <button
                       onClick={handleCompleteEvaluation}
                       disabled={!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE"}
-                      className={`px-6 py-2 rounded-md transition-colors duration-200 flex items-center space-x-2 ${
-                        (!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
-                          ? 'bg-gray-400 cursor-not-allowed text-white'
-                          : 'bg-green-600 hover:bg-green-700 text-white'
-                      }`}
+                      className={`px-6 py-2 rounded-md transition-colors duration-200 flex items-center space-x-2 ${(!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
+                        ? 'bg-gray-400 cursor-not-allowed text-white'
+                        : 'bg-green-600 hover:bg-green-700 text-white'
+                        }`}
                     >
                       <Save className="w-4 h-4" />
                       <span>
-                        {(!selectedEvaluation?.recommendations || !selectedEvaluation?.valueJudgment) 
-                          ? '💾 Guardar Evaluación' 
+                        {(!selectedEvaluation?.recommendations || !selectedEvaluation?.valueJudgment)
+                          ? '💾 Guardar Evaluación'
                           : '✏️ Actualizar Evaluación'
                         }
                       </span>
@@ -513,7 +510,7 @@ export default function InstructorChecklistView() {
                       ❌ No se encontró evaluación asignada para esta lista de chequeo
                     </p>
                   </div>
-                  
+
                   <div className="text-center">
                     <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
                       Esta lista puede no tener una evaluación creada automáticamente.
@@ -566,11 +563,10 @@ export default function InstructorChecklistView() {
             <button
               onClick={handleSaveChecklist}
               disabled={!selectedChecklist}
-              className={`flex items-center gap-1 px-4 py-2 rounded-md border transition-colors duration-300 ${
-                selectedChecklist
-                  ? 'hover:border-[#01b001] border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white'
-                  : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
-              }`}
+              className={`flex items-center gap-1 px-4 py-2 rounded-md border transition-colors duration-300 ${selectedChecklist
+                ? 'hover:border-[#01b001] border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white'
+                : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                }`}
             >
               <Save className="w-4 h-4" /> Guardar Lista de Chequeo
             </button>
@@ -580,25 +576,23 @@ export default function InstructorChecklistView() {
             <span className="text-sm text-gray-600 dark:text-gray-400">
               Listas activas: {activeChecklists.length} | Filtradas: {filteredChecklists.length}
             </span>
-            <button 
+            <button
               onClick={handleExportPDF}
               disabled={!selectedChecklist}
-              className={`flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md transition-colors duration-300 ${
-                selectedChecklist
-                  ? 'bg-gradient-to-r from-lime-600 to-lime-500 text-white hover:from-lime-700 hover:to-lime-600'
-                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-              } focus:outline-none`}
+              className={`flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md transition-colors duration-300 ${selectedChecklist
+                ? 'bg-gradient-to-r from-lime-600 to-lime-500 text-white hover:from-lime-700 hover:to-lime-600'
+                : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                } focus:outline-none`}
             >
               <FileDown className="w-4 h-4" /> PDF
             </button>
-            <button 
+            <button
               onClick={handleExportExcel}
               disabled={!selectedChecklist}
-              className={`flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md transition-colors duration-300 ${
-                selectedChecklist
-                  ? 'bg-gradient-to-r from-lime-600 to-lime-500 text-white hover:from-lime-700 hover:to-lime-600'
-                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-              } focus:outline-none`}
+              className={`flex items-center gap-1 px-4 py-2 border-[#0e324b] rounded-md transition-colors duration-300 ${selectedChecklist
+                ? 'bg-gradient-to-r from-lime-600 to-lime-500 text-white hover:from-lime-700 hover:to-lime-600'
+                : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                } focus:outline-none`}
             >
               <FileDown className="w-4 h-4" /> Excel
             </button>
@@ -614,8 +608,8 @@ export default function InstructorChecklistView() {
         ) : filteredChecklists.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400 text-lg">
-              {selectedTrimester === "todos" 
-                ? "No hay listas de chequeo activas disponibles" 
+              {selectedTrimester === "todos"
+                ? "No hay listas de chequeo activas disponibles"
                 : `No hay listas de chequeo activas para el trimestre ${selectedTrimester}`
               }
             </p>

@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { FaTrashAlt, FaEdit } from "react-icons/fa"
 import { toast } from "react-toastify"
+import { AppDispatch, RootState } from "@redux/store"
+import { addEvaluation } from "@slice/evaluationSlice"
 import CrearListaChequeo from "@components/Modals/modalNewChecklist"
 import PageTitle from "@components/UI/pageTitle"
 import {
@@ -14,8 +16,6 @@ import {
   updateChecklistState,
   deleteChecklist
 } from "@slice/checklistSlice"
-import { addEvaluation } from "@slice/evaluationSlice"
-import { AppDispatch, RootState } from "@/redux/store"
 
 // Interfaces para tipado
 interface ChecklistItem {
@@ -386,8 +386,8 @@ export default function CoordinadorChecklistView() {
                         <button
                           onClick={() => handleToggleState(checklist.id, checklist.state)}
                           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${checklist.state
-                              ? 'bg-green-600 focus:ring-green-500'
-                              : 'bg-gray-200 focus:ring-gray-500'
+                            ? 'bg-green-600 focus:ring-green-500'
+                            : 'bg-gray-200 focus:ring-gray-500'
                             }`}
                           title={checklist.state ? 'Desactivar lista' : 'Activar lista'}
                         >
@@ -397,8 +397,8 @@ export default function CoordinadorChecklistView() {
                           />
                         </button>
                         <span className={`ml-2 text-xs font-medium ${checklist.state
-                            ? 'text-green-600 dark:text-green-400'
-                            : 'text-gray-500 dark:text-gray-400'
+                          ? 'text-green-600 dark:text-green-400'
+                          : 'text-gray-500 dark:text-gray-400'
                           }`}>
                           {checklist.state ? 'Activo' : 'Inactivo'}
                         </span>

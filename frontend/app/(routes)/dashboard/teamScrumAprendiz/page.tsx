@@ -7,7 +7,7 @@ import { MdGroups } from "react-icons/md";
 import { FaArrowLeft, FaArrowRight, FaHashtag, FaUsers, FaProjectDiagram } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useLoader } from '@context/LoaderContext';
-import { RootState, AppDispatch } from "@/redux/store";
+import { RootState, AppDispatch } from "@redux/store";
 import { fetchTeamScrumByIdWithStudents, updateTeamScrum } from "@slice/teamScrumSlice";
 import Slider, { Settings } from "react-slick";
 import PageTitle from "@components/UI/pageTitle";

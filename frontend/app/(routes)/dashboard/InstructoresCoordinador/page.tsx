@@ -1,14 +1,39 @@
 'use client'
 
-import React from "react"
+import React, { useState, ReactNode } from "react"
 import Image from "next/image"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faUserGroup } from "@fortawesome/free-solid-svg-icons"
 import PageTitle from "@components/UI/pageTitle"
 
-const InstructorCard = ({ instructor }) => {
-    const [showModal, setShowModal] = React.useState(false)
-    const [showModalFichas, setShowModalFichas] = React.useState(false)
+/* Tipos */
+interface Ficha {
+    ficha: string;
+}
+
+interface Instructor {
+    name: string;
+    specialty: string;
+    contractTime: string;
+    centers: string;
+    modalidad: string;
+    fichas: Ficha[];
+}
+
+interface InstructorCardProps {
+    instructor: Instructor;
+}
+
+interface ModalProps {
+    onClose: () => void;
+    children: ReactNode;
+}
+
+/* Componentes */
+
+const InstructorCard: React.FC<InstructorCardProps> = ({ instructor }) => {
+    const [showModal, setShowModal] = useState < boolean > (false)
+    const [showModalFichas, setShowModalFichas] = useState < boolean > (false)
 
     const avatarUrl = `https://api.dicebear.com/8.x/initials/svg?seed=${encodeURIComponent(instructor.name)}`
 
@@ -70,7 +95,7 @@ const InstructorCard = ({ instructor }) => {
     )
 }
 
-const Modal = ({ onClose, children }) => (
+const Modal: React.FC<ModalProps> = ({ onClose, children }) => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
         <div className="bg-white dark:bg-[#0b1f33] p-6 rounded-lg shadow-xl max-w-md w-full">
             {children}
@@ -84,8 +109,8 @@ const Modal = ({ onClose, children }) => (
     </div>
 )
 
-export default function InstructoresCoordinador() {
-    const instructors = [
+export default function InstructoresCoordinador(): JSX.Element {
+    const instructors: Instructor[] = [
         {
             name: 'Lucía María Pérez Gonzales',
             specialty: 'Desarrollo Web',

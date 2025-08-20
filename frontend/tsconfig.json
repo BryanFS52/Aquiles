@@ -70,6 +70,9 @@
       "@feature/*": [
         "./app/features/*"
       ],
+      "@redux/*": [
+        "./app/redux/*"
+      ],
     }
   },
   "include": [
