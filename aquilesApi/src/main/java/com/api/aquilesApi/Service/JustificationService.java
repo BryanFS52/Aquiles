@@ -66,13 +66,8 @@ public class JustificationService implements Idao<Justification, Long> {
         this.justificationRepository.delete(entity);
     }
 
-    // Buscar justificaciones por ficha de estudio
-    public List<Justification> findByStudySheetId(Long studySheetId) {
-        try {
-            return justificationRepository.findByStudySheetId(studySheetId);
-        } catch (Exception e) {
-            System.err.println("Error finding justifications by study sheet ID: " + e.getMessage());
-            return List.of(); // Retorna lista vacía en caso de error
-        }
+    //Justification by attendance by Student ID
+    public List<Justification> findByStudentId(Long studentId) {
+        return justificationRepository.findAllByAttendanceStudentId(studentId);
     }
 }

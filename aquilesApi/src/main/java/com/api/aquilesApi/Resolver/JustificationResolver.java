@@ -40,25 +40,6 @@ public class JustificationResolver {
         }
     }
 
-    // justificationByStudySheetId Justifications (GraphQL)
-    @DgsQuery
-    public Map<String, Object> justificationByStudySheetId(@InputArgument Integer page, @InputArgument Integer size) {
-        try {
-            Page<JustificationDto> justificationDtoPge = justificationBusiness.findAll(page, size);
-            return ResponseHttpApi.responseHttpFindAll(
-                    justificationDtoPge.getContent(),
-                    ResponseHttpApi.CODE_OK,
-                    "Query oK",
-                    justificationDtoPge.getTotalPages(),
-                    justificationDtoPge.getNumber(),
-                    (int) justificationDtoPge.getTotalElements()
-            );
-        } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error retrieving justificationByStudySheetId: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     // FindById Justification (GraphQL)
     @DgsQuery
     public Map<String, Object> justificationById(@InputArgument Long id) {
@@ -72,6 +53,27 @@ public class JustificationResolver {
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error retrieving Justification: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    // Find Justification by attendance by studentID (GraphQL)
+    @DgsQuery
+    public Map<String, Object> justificationByStudentId(@InputArgument Long studentId) {
+        try {
+            List<JustificationDto> justificationDtos = justificationBusiness.findByStudentId(studentId);
+            return ResponseHttpApi.responseHttpFindAll(
+                    justificationDtos,
+                    ResponseHttpApi.CODE_OK,
+                    "Query by studentId ok",
+                    1,
+                    0,
+                    justificationDtos.size()
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving Justifications by Student ID: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
@@ -114,9 +116,9 @@ public class JustificationResolver {
 
     // Update Justification Status Only (GraphQL)
     @DgsMutation
-    public Map<String, Object> updateJustificationStatus(@InputArgument Long id, @InputArgument Long statusId) {
+    public Map<String, Object> updateStatusInJustification(@InputArgument Long id, @InputArgument(name = "input") Long statusId) {
         try {
-            justificationBusiness.updateJustificationStatus(id, statusId);
+            justificationBusiness.UpdateStatusInJustification(id, statusId);
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
@@ -124,27 +126,8 @@ public class JustificationResolver {
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error updating Justification status: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
-    }
-
-    // Get justifications by study sheet ID (GraphQL)
-    @DgsQuery
-    public Map<String, Object> justificationsByStudySheetId(@InputArgument Long studySheetId) {
-        try {
-            List<JustificationDto> justifications = justificationBusiness.findByStudySheetId(studySheetId);
-            return ResponseHttpApi.responseHttpFindAll(
-                    justifications,
-                    ResponseHttpApi.CODE_OK,
-                    "Query by study sheet ID ok",
-                    1, // Single page
-                    0, // Page 0
-                    justifications.size()
-            );
-        } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error retrieving justifications by study sheet: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error updating Justification status: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }

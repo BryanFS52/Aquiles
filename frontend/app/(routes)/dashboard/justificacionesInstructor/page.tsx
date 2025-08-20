@@ -43,7 +43,6 @@ export default function JustificacionesInstructor() {
     (state: RootState) => state.justificationStatus
   );
 
-
   useEffect(() => {
     if (loading || isTransitioning) {
       showLoader();
@@ -56,13 +55,32 @@ export default function JustificacionesInstructor() {
     dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
   }, [dispatch]);
 
+  // Log para debugging del estado de justificaciones
+  useEffect(() => {
+    console.log("📊 Estado actual:", {
+      loading,
+      dataLength: justificationsData?.length,
+      filteredDataLength: filteredData?.length,
+      totalItems,
+      currentPage: localCurrentPage
+    });
+  }, [loading, justificationsData, filteredData, totalItems, localCurrentPage]);
+
   const handleFilterChange = (filterType: string, value: string) => {
     dispatch(setFilterOptions({ [filterType]: value }));
     dispatch(setLocalCurrentPage(1));
   };
 
   const handleRefresh = () => {
-    console.log("Refresh solicitado, datos actuales:", justificationsData);
+    console.log("🔄 Refresh solicitado");
+    // Aquí podrías agregar lógica para recargar datos específicos si es necesario
+  };
+
+  const handleStatusUpdateError = (error: any, justificacionId: string) => {
+    console.error("Error al actualizar estado:", {
+      justificacionId,
+      error: error?.message || 'Error desconocido'
+    });
   };
 
   const handlePreviousPage = () => dispatch(goToPreviousPage());
@@ -80,12 +98,13 @@ export default function JustificacionesInstructor() {
     dispatch(updateJustificationStatus({ id: justificacionId, statusId: newStatusId }))
       .then((result) => {
         if (updateJustificationStatus.fulfilled.match(result)) {
-          // No hacer fetch, los datos se actualizan automáticamente en el state
-          console.log("✅ Estado de justificación actualizado");
+          console.log("Estado actualizado exitosamente");
+        } else if (updateJustificationStatus.rejected.match(result)) {
+          handleStatusUpdateError(result.payload, justificacionId);
         }
       })
       .catch((error) => {
-        console.error("❌ Error al actualizar el estado:", error);
+        handleStatusUpdateError(error, justificacionId);
       });
   };
 

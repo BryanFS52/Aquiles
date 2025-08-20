@@ -70,65 +70,55 @@ export const GET_JUSTIFICATION_BY_ID = gql`
   }
 `;
 
-export const GET_JUSTIFICATION_BY_STUDY_SHEET_BY_ID = gql`
-  query GetJustificationByStudySheetId($id: Long!) {
-    studySheetById(id: $id) {
+export const GET_JUSTIFICATION_BY_STUDENT_ID = gql`
+  query GetJustificationByStudentId($studentId: Long!, $page: Int, $size: Int) {
+    justificationByStudentId(studentId: $studentId, page: $page, size: $size) {
       code
       message
       data {
         id
-        number
-        trainingProject {
-          program {
-            id
-            name
-          }
+        description
+        justificationFile
+        absenceDate
+        justificationDate
+        state
+        justificationType {
+          id
+          name
         }
-        studentStudySheets {
+        justificationStatus {
+          id
+          name
+          state
+        }
+        attendance {
           student {
             id
             person {
-              id
-              document
               name
               lastname
+              document
             }
-            attendances {
-              id
-              justification {
-                id
-                description
-                justificationFile
-                absenceDate
-                justificationDate
-                state
-                justificationType {
-                  id
-                  name
-                }
-                justificationStatus {
-                  id
-                  name
-                  state
-                }
-              }
-            }
-          }
-          studentStudySheetState {
-            id
-            name
           }
         }
       }
     }
   }
-`;
-
+`
 
 
 export const ADD_JUSTIFICATION = gql`
   mutation AddJustification($input: JustificationDto!) {
     addJustification(input: $input) {
+      code
+      message
+    }
+  }
+`;
+
+export const UPDATE_STATUS_IN_JUSTIFICATION = gql`
+  mutation UpdateStatusInJustification($id: Long!, $input: Long!) {
+    updateStatusInJustification(id: $id, input: $input) {
       code
       message
     }
@@ -152,12 +142,3 @@ export const DELETE_JUSTIFICATION = gql`
     }
   }
 `;
-
-// export const UPDATE_JUSTIFICATION_STATUS_BY_ID = gql`
-//   mutation UpdateJustificationStatusById($id: Long!, $input: JustificationStatusDto!) {
-//     updateJustificationStatus(id: $id, input: $input) {
-//       code
-//       message
-//     }
-//   }
-// `;

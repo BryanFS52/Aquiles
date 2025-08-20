@@ -11,7 +11,7 @@ import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
 import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
 import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
 import {
-  fetchJustifications,
+  fetchJustificationsByStudentId,
   generateFileName,
   formatErrorMessage,
 } from "@slice/justificationSlice";
@@ -96,8 +96,7 @@ export default function JustificacionAprendiz() {
   useEffect(() => {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
     dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 }));
-    dispatch(fetchJustifications({ page: 0, size: 10 }));
-    // Cargar los estados de justificación
+      dispatch(fetchJustificationsByStudentId({ studentId: 2, page: 0, size: 10 }));
     dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
   }, [dispatch]);
 
@@ -277,7 +276,7 @@ export default function JustificacionAprendiz() {
       
       // ✅ Actualizar datos y ocultar formulario inmediatamente después del éxito
       await Promise.all([
-        dispatch(fetchJustifications({ page: 0, size: 10 })).unwrap(),
+        dispatch(fetchJustificationsByStudentId({ studentId: 2, page: 0, size: 10 })).unwrap(),
         dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 })).unwrap()
       ]);
       
@@ -303,7 +302,7 @@ export default function JustificacionAprendiz() {
           // ✅ Actualizar datos y ocultar formulario cuando hay error de duplicado
           try {
             await Promise.all([
-              dispatch(fetchJustifications({ page: 0, size: 10 })).unwrap(),
+              dispatch(fetchJustificationsByStudentId({ studentId: 2, page: 0, size: 10 })).unwrap(),
               dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 })).unwrap()
             ]);
           } catch (refreshError) {
