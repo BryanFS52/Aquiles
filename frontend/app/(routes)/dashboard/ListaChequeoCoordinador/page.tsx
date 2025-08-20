@@ -60,23 +60,26 @@ export default function CoordinadorChecklistView() {
 
   const loadChecklists = async (): Promise<void> => {
     try {
+      console.log('🔄 Loading checklists with force refresh...'); // Debug log
       const result = await dispatch(fetchChecklists({ page: 0, size: 100 })).unwrap()
       console.log('loadChecklists Redux result:', result) // Debug log
       if (result?.data) {
-        console.log('loadChecklists data:', result.data) // Debug log
+        console.log('loadChecklists data count:', result.data.length) // Debug log
         console.log('First checklist sample:', result.data[0]) // Debug log
         if (result.data[0] && result.data[0].items) {
           console.log('First checklist items:', result.data[0].items) // Debug log
         }
+        console.log('✅ Checklists loaded successfully'); // Debug log
       }
     } catch (error) {
-      console.error("Error loading checklists:", error)
+      console.error("❌ Error loading checklists:", error)
       toast.error("Error al cargar las listas de chequeo")
     }
   }
 
   const transformItems = (items: ChecklistItem[]) => {
     return items.map((item, index) => ({
+      ...(item.id && { id: item.id }), // ← Preservar ID si existe
       code: item.code || `IND-${index + 1}`,
       indicator: item.indicator,
       active: item.active !== undefined ? item.active : true
@@ -87,20 +90,29 @@ export default function CoordinadorChecklistView() {
     try {
       if (isEditing && editingChecklist) {
         // Actualizar checklist existente
-        console.log('Updating checklist with ID:', editingChecklist.id, 'Data:', checklistData); // Debug log
+        console.log('=== UPDATING CHECKLIST ===');
+        console.log('Updating checklist with ID:', editingChecklist.id);
+        console.log('Original editingChecklist:', editingChecklist);
+        console.log('Incoming checklistData:', checklistData);
 
         const updateData = {
-          state: editingChecklist.state || false,
+          state: editingChecklist.state !== undefined ? editingChecklist.state : true,
           remarks: checklistData.remarks || "Sin observaciones",
           trimester: checklistData.trimester || "1",
           component: checklistData.component || "",
-          evaluationCriteria: false,
-          instructorSignature: "No signature",
-          studySheets: null,
-          evaluations: null,
-          associatedJuries: null,
+          evaluationCriteria: editingChecklist.evaluationCriteria || false,
+          instructorSignature: editingChecklist.instructorSignature || "No signature",
+          studySheets: editingChecklist.studySheets || null,
+          evaluations: editingChecklist.evaluations || null,
+          associatedJuries: editingChecklist.associatedJuries || null,
           items: checklistData.items ? transformItems(checklistData.items) : []
         };
+
+        console.log('Final updateData being sent:', updateData);
+        console.log('🎯 DETAILED UPDATEDATA ITEMS:');
+        updateData.items.forEach((item, index) => {
+          console.log(`  UpdateData Item ${index + 1}: id=${item.id || 'NO_ID'}, code="${item.code}", indicator="${item.indicator}", active=${item.active}`);
+        });
 
         const result = await dispatch(updateChecklist({
           id: parseInt(editingChecklist.id),
@@ -110,17 +122,48 @@ export default function CoordinadorChecklistView() {
         console.log("Update result:", result); // Debug log
 
         if (result && result.code === "200") {
+          console.log("✅ Update successful, refreshing specific checklist data..."); // Debug log
           toast.success("Lista de chequeo actualizada exitosamente");
-          // Recargar la lista para mostrar los cambios
+
+          // Pequeño delay para asegurar que la DB se actualice
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          // Primero recargar el checklist específico por ID para forzar una actualización
+          console.log("📡 Fetching updated checklist by ID...");
+          await dispatch(fetchChecklistById({ id: parseInt(editingChecklist.id) })).unwrap();
+
+          // Luego recargar toda la lista para asegurar consistencia
+          console.log("📡 Reloading full checklist data...");
           await loadChecklists();
+
+          // Cerrar el modal
           handleCloseModal();
+
+          console.log("✅ Data refreshed and modal closed"); // Debug log
+          console.log("📊 Final checklist data after update:"); // Debug log
+
+          // Buscar el checklist actualizado en los datos actuales
+          const updatedChecklistInState = normalizedChecklists.find(c => c.id === editingChecklist.id);
+          console.log("Updated checklist in state:", updatedChecklistInState); // Debug log
+          if (updatedChecklistInState) {
+            console.log("Updated checklist items:", updatedChecklistInState.items); // Debug log
+            console.log("🔍 DETAILED FINAL ITEMS AFTER UPDATE:"); // Debug log
+            if (updatedChecklistInState.items) {
+              updatedChecklistInState.items.forEach((item, index) => {
+                if (item) {
+                  console.log(`  Final Item ${index + 1}: id=${item.id}, indicator="${item.indicator}", active=${item.active}`); // Debug log
+                }
+              });
+            }
+          }
         } else {
+          console.log("❌ Update failed:", result); // Debug log
           toast.error(result?.message || "Error al actualizar la lista de chequeo");
         }
       } else {
         // Crear nuevo checklist
         const newChecklistData = {
-          state: false,
+          state: true,
           remarks: checklistData.remarks || "Sin observaciones",
           trimester: checklistData.trimester || "1",
           component: checklistData.component || "",
@@ -145,17 +188,30 @@ export default function CoordinadorChecklistView() {
               const evaluationInput = {
                 observations: "",
                 recommendations: "",
-                valueJudgment: "",
-                checklistId: newChecklistId
+                valueJudgment: "PENDIENTE",
+                checklistId: parseInt(newChecklistId) // Asegurar que es un número
               };
 
-              console.log('Creating evaluation with input:', evaluationInput); // Debug log
+              console.log('=== CREATING EVALUATION ===');
+              console.log('Checklist ID:', newChecklistId);
+              console.log('Checklist ID type:', typeof newChecklistId);
+              console.log('Parsed Checklist ID:', parseInt(newChecklistId));
+              console.log('Creating evaluation with input:', evaluationInput);
 
               const evaluationResponse = await dispatch(addEvaluation(evaluationInput)).unwrap();
-              console.log("Evaluation creation response:", evaluationResponse); // Debug log
-              toast.success("Lista de chequeo creada exitosamente con evaluación asignada")
+              console.log("Evaluation creation response:", evaluationResponse);
+
+              if (evaluationResponse && evaluationResponse.code === "200") {
+                console.log("✅ Evaluation created successfully with ID:", evaluationResponse.id);
+                toast.success("Lista de chequeo creada exitosamente con evaluación asignada")
+              } else {
+                console.log("❌ Evaluation creation failed:", evaluationResponse);
+                toast.success("Lista de chequeo creada exitosamente")
+                toast.error("Error al crear la evaluación: " + (evaluationResponse?.message || "Error desconocido"))
+              }
             } catch (evaluationError: any) {
-              console.error("Error creating evaluation:", evaluationError);
+              console.error("❌ Error creating evaluation:", evaluationError);
+              console.error("Error stack:", evaluationError);
               toast.success("Lista de chequeo creada exitosamente")
               toast.error("Error al crear la evaluación: " + (evaluationError.message || "Error desconocido"))
             }
@@ -213,8 +269,8 @@ export default function CoordinadorChecklistView() {
     setIsEditing(false)
     setEditingChecklist(null)
 
-    // No necesitamos recargar las listas cuando solo cancelamos - el estado de Redux ya tiene los datos correctos
-    console.log("Modal closed, maintaining current checklist data") // Debug log
+    // Limpiar cualquier cache o estado temporal
+    console.log("Modal closed, states cleared") // Debug log
   }
 
   const handleOpenCreateModal = (): void => {
@@ -235,10 +291,21 @@ export default function CoordinadorChecklistView() {
       console.log("Updated checklist from Redux state:", updatedChecklist) // Debug log
 
       if (updatedChecklist) {
-        console.log("Checklist items:", updatedChecklist.items) // Debug log
+        console.log("=== OPENING EDIT MODAL ==="); // Debug log
+        console.log("Checklist items being passed to modal:", updatedChecklist.items) // Debug log
+        console.log("🔍 DETAILED ITEMS BEING PASSED TO MODAL:"); // Debug log
+        if (updatedChecklist.items) {
+          updatedChecklist.items.forEach((item, index) => {
+            if (item) {
+              console.log(`  Item ${index + 1}: id=${item.id}, indicator="${item.indicator}", active=${item.active}`); // Debug log
+            }
+          });
+        }
         setIsEditing(true)
         setEditingChecklist(updatedChecklist as any)
         setModalOpen(true)
+        console.log("Edit modal opened successfully"); // Debug log
+        console.log("=== END OPENING EDIT MODAL ==="); // Debug log
       } else {
         console.log("Checklist not found in Redux state after fetch") // Debug log
         toast.error("Error al obtener los detalles del checklist")

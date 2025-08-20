@@ -10,9 +10,9 @@ import { fetchEvaluationsByChecklist, fetchEvaluationsByChecklistOld, completeEv
 import { exportChecklistToPdf, exportChecklistToExcel, downloadFileFromBase64 } from "@services/exportService";
 import { GET_ALL_EVALUATIONS } from '@graphql/evaluationsGraph';
 import { clientLAN } from '@/lib/apollo-client';
-import {
-  Checklist,
-  Evaluation,
+import { 
+  Checklist, 
+  Evaluation, 
   SimulatedChecklistItem,
   InstructorChecklistState,
   ValueJudgment
@@ -37,8 +37,8 @@ export default function InstructorChecklistView() {
   const [evaluationRecommendations, setEvaluationRecommendations] = useState<string>("");
   const [evaluationJudgment, setEvaluationJudgment] = useState<string>("PENDIENTE");
   const [loading, setLoading] = useState<boolean>(true);
-  const [itemStates, setItemStates] = useState<{ [key: number]: { completed: boolean | null, observations: string } }>({});
-
+  const [itemStates, setItemStates] = useState<{[key: number]: {completed: boolean | null, observations: string}}>({});
+  
   // Estados para el modal de creación de evaluación
   const [showCreateEvaluationModal, setShowCreateEvaluationModal] = useState(false);
   const [isCreatingEvaluation, setIsCreatingEvaluation] = useState(false);
@@ -46,81 +46,144 @@ export default function InstructorChecklistView() {
 
   const itemsPerPage = 3;
 
-  // Funciones auxiliares para extraer y estructurar datos de evaluaciones
-  const extractItemStatesFromEvaluation = (evaluation: Evaluation) => {
-    if (!evaluation.observations) return {};
-
-    try {
-      const parsed = JSON.parse(evaluation.observations);
-      if (parsed.itemStates && typeof parsed.itemStates === 'object') {
-        console.log('📋 Estados de items extraídos desde evaluación:', parsed.itemStates);
-        return parsed.itemStates;
+  // Funciones auxiliares para el cache de evaluaciones
+  const getCachedEvaluation = (checklistId: string) => {
+    // Primero verificar cache en memoria
+    const memoryCache = evaluationsCache[checklistId];
+    if (memoryCache) {
+      const fiveMinutes = 5 * 60 * 1000; // 5 minutos en milisegundos
+      if (Date.now() - memoryCache.timestamp < fiveMinutes) {
+        console.log('📦 Usando evaluación desde cache en memoria:', memoryCache.evaluation);
+        return memoryCache.evaluation;
+      } else {
+        // Cache en memoria expirado, limpiar
+        const newCache = { ...evaluationsCache };
+        delete newCache[checklistId];
+        setEvaluationsCache(newCache);
+        console.log('🗑️ Cache en memoria expirado para checklist:', checklistId);
       }
-    } catch (error) {
-      console.log('ℹ️ No se pudieron extraer estados de items desde observations');
     }
 
-    return {};
-  };
-
-  const extractGeneralObservationsFromEvaluation = (evaluation: Evaluation) => {
-    if (!evaluation.observations) return "";
-
+    // Si no hay cache en memoria, verificar localStorage
     try {
-      const parsed = JSON.parse(evaluation.observations);
-      if (parsed.generalObservations && typeof parsed.generalObservations === 'string') {
-        return parsed.generalObservations;
+      const localStorageKey = `evaluation_cache_${checklistId}`;
+      const localCache = localStorage.getItem(localStorageKey);
+      if (localCache) {
+        const parsedCache = JSON.parse(localCache);
+        const thirtyMinutes = 30 * 60 * 1000; // 30 minutos para localStorage
+        
+        if (Date.now() - parsedCache.timestamp < thirtyMinutes) {
+          console.log('🏪 Usando evaluación desde localStorage:', parsedCache.evaluation);
+          
+          // Restaurar también en memoria para próximas consultas
+          setEvaluationsCache(prev => ({
+            ...prev,
+            [checklistId]: {
+              evaluation: parsedCache.evaluation,
+              timestamp: Date.now()
+            }
+          }));
+          
+          return parsedCache.evaluation;
+        } else {
+          // Cache en localStorage expirado, limpiar
+          localStorage.removeItem(localStorageKey);
+          console.log('🗑️ Cache en localStorage expirado para checklist:', checklistId);
+        }
       }
     } catch (error) {
-      console.log('ℹ️ No se pudieron extraer observaciones generales, usando observations completo');
+      console.warn('Error al leer cache de localStorage:', error);
     }
 
-    // Si no se puede parsear como JSON, usar el valor completo
-    return evaluation.observations;
+    return null;
   };
 
-  // Cargar listas de chequeo activas y recuperar selección previa
+  const setCachedEvaluation = (checklistId: string, evaluation: Evaluation) => {
+    const timestamp = Date.now();
+    
+    // Actualizar cache en memoria
+    setEvaluationsCache(prev => ({
+      ...prev,
+      [checklistId]: {
+        evaluation,
+        timestamp
+      }
+    }));
+    
+    // Actualizar cache en localStorage
+    try {
+      const localStorageKey = `evaluation_cache_${checklistId}`;
+      const cacheData = {
+        evaluation,
+        timestamp,
+        checklistId
+      };
+      localStorage.setItem(localStorageKey, JSON.stringify(cacheData));
+      console.log('💾 Evaluación guardada en cache (memoria + localStorage):', checklistId, evaluation);
+    } catch (error) {
+      console.warn('Error al guardar cache en localStorage:', error);
+    }
+  };
+
+  // Función para limpiar caches antiguos al inicializar
+  const cleanExpiredCaches = () => {
+    try {
+      const keys = Object.keys(localStorage);
+      const evaluationCacheKeys = keys.filter(key => key.startsWith('evaluation_cache_'));
+      const tempDataKeys = keys.filter(key => key.startsWith('evaluation_temp_'));
+      const thirtyMinutes = 30 * 60 * 1000;
+      const oneHour = 60 * 60 * 1000;
+      
+      // Limpiar caches de evaluaciones expirados (30 minutos)
+      evaluationCacheKeys.forEach(key => {
+        try {
+          const cached = JSON.parse(localStorage.getItem(key) || '{}');
+          if (cached.timestamp && Date.now() - cached.timestamp > thirtyMinutes) {
+            localStorage.removeItem(key);
+            console.log('🧹 Cache de evaluación limpiado:', key);
+          }
+        } catch (error) {
+          // Si hay error al parsear, limpiar la entrada corrupta
+          localStorage.removeItem(key);
+          console.log('🧹 Cache corrupto limpiado:', key);
+        }
+      });
+
+      // Limpiar datos temporales expirados (1 hora)
+      tempDataKeys.forEach(key => {
+        try {
+          const tempData = JSON.parse(localStorage.getItem(key) || '{}');
+          if (tempData.timestamp && Date.now() - tempData.timestamp > oneHour) {
+            localStorage.removeItem(key);
+            console.log('🧹 Datos temporales limpiados:', key);
+          }
+        } catch (error) {
+          // Si hay error al parsear, limpiar la entrada corrupta
+          localStorage.removeItem(key);
+          console.log('🧹 Datos temporales corruptos limpiados:', key);
+        }
+      });
+    } catch (error) {
+      console.warn('Error al limpiar caches:', error);
+    }
+  };
+
+  // Limpiar caches antiguos al cargar el componente
+  useEffect(() => {
+    cleanExpiredCaches();
+  }, []);
+
+  // Cargar listas de chequeo activas
   useEffect(() => {
     loadActiveChecklists();
   }, []);
 
-  // Recuperar selección de checklist después de cargar las listas
-  useEffect(() => {
-    if (activeChecklists.length > 0 && !selectedChecklist) {
-      // Intentar recuperar la selección previa del localStorage
-      const savedChecklistId = localStorage.getItem('selectedChecklistId');
-      if (savedChecklistId) {
-        const foundChecklist = activeChecklists.find(cl => cl.id === savedChecklistId);
-        if (foundChecklist) {
-          console.log('🔄 Recuperando selección de checklist después de reload:', foundChecklist.id);
-          setSelectedChecklist(foundChecklist);
-        } else {
-          // Si el checklist guardado no existe, limpiar localStorage
-          localStorage.removeItem('selectedChecklistId');
-        }
-      }
-    }
-  }, [activeChecklists, selectedChecklist]);
-
   // Auto-cargar evaluaciones cuando cambie el checklist seleccionado
   useEffect(() => {
     if (selectedChecklist) {
-      console.log("=== CHECKLIST CHANGED - LOADING EVALUATIONS ===");
-      // Guardar selección en localStorage para persistencia de navegación
-      localStorage.setItem('selectedChecklistId', selectedChecklist.id);
-      console.log('💾 Guardando selección de checklist para persistencia:', selectedChecklist.id);
-
-      // Siempre cargar desde la base de datos
-      loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
-    } else {
-      // Si no hay checklist, limpiar localStorage y datos
-      localStorage.removeItem('selectedChecklistId');
-      setEvaluations([]);
-      setSelectedEvaluation(null);
-      setEvaluationObservations("");
-      setEvaluationRecommendations("");
-      setEvaluationJudgment("PENDIENTE");
-      setItemStates({});
+      // Al cargar por primera vez o cambiar checklist, NO preservar datos actuales
+      // Queremos ver lo que realmente está en la base de datos
+      loadEvaluationsForChecklist(parseInt(selectedChecklist.id), false);
     }
   }, [selectedChecklist]);
 
@@ -136,39 +199,125 @@ export default function InstructorChecklistView() {
         checklistId: selectedEvaluation.checklistId,
         allProperties: Object.keys(selectedEvaluation)
       });
-
-      // Siempre cargar desde la base de datos
-      setEvaluationObservations(selectedEvaluation.observations || "");
-      setEvaluationRecommendations(selectedEvaluation.recommendations || "");
-      setEvaluationJudgment(selectedEvaluation.valueJudgment || "PENDIENTE");
-
-      // Extraer estados de items desde observations
-      const itemStates = extractItemStatesFromEvaluation(selectedEvaluation);
-      setItemStates(itemStates);
-      console.log('📋 Estados de items cargados desde DB:', itemStates);
+      
+      // Siempre cargar los datos de la evaluación, incluso si están vacíos
+      const obsFromDB = selectedEvaluation.observations || "";
+      const recFromDB = selectedEvaluation.recommendations || "";
+      const judgmentFromDB = selectedEvaluation.valueJudgment || "PENDIENTE";
+      
+      setEvaluationObservations(obsFromDB);
+      setEvaluationRecommendations(recFromDB);
+      setEvaluationJudgment(judgmentFromDB);
+      setShowEvaluationForm(false); // Ocultar formulario inicialmente
+      
+      console.log('✅ Datos cargados en campos del formulario:', {
+        observations: obsFromDB,
+        recommendations: recFromDB,
+        judgment: judgmentFromDB,
+        hasData: !!(obsFromDB || recFromDB || (judgmentFromDB && judgmentFromDB !== "PENDIENTE"))
+      });
+      
+      // Si la evaluación no tiene datos completos, mostrar mensaje informativo
+      if (!obsFromDB && !recFromDB && (!judgmentFromDB || judgmentFromDB === "PENDIENTE")) {
+        console.log('ℹ️ Evaluación encontrada pero sin datos completos - puede necesitar completarse');
+      }
     } else {
-      // Limpiar estados si no hay evaluación
+      // Si no hay evaluación seleccionada, limpiar campos
+      console.log('🧹 Limpiando campos - no hay evaluación seleccionada');
       setEvaluationObservations("");
       setEvaluationRecommendations("");
       setEvaluationJudgment("PENDIENTE");
-      setItemStates({});
+      setShowEvaluationForm(false);
     }
   }, [selectedEvaluation]);
+
+  // Efecto para persistir los datos de evaluación temporal en localStorage
+  // Solo cuando no hay una evaluación existente en DB (para datos en proceso de creación)
+  useEffect(() => {
+    if (selectedChecklist && !selectedEvaluation && (evaluationObservations || evaluationRecommendations || evaluationJudgment !== "PENDIENTE")) {
+      const evaluationData = {
+        checklistId: selectedChecklist.id,
+        observations: evaluationObservations,
+        recommendations: evaluationRecommendations,
+        judgment: evaluationJudgment,
+        timestamp: Date.now()
+      };
+      // Usar clave diferente para datos temporales (en proceso de creación)
+      localStorage.setItem(`evaluation_temp_${selectedChecklist.id}`, JSON.stringify(evaluationData));
+      console.log('💾 Datos temporales guardados en localStorage', evaluationData);
+    }
+  }, [selectedChecklist, selectedEvaluation, evaluationObservations, evaluationRecommendations, evaluationJudgment]);
+
+  // Efecto para recuperar datos temporales desde localStorage al cargar
+  // SOLO si no existe una evaluación en la base de datos
+  useEffect(() => {
+    // Solo ejecutar después de haber intentado cargar desde la DB
+    const timeoutId = setTimeout(() => {
+      if (selectedChecklist && !selectedEvaluation) {
+        // Solo usar localStorage temporal si no hay evaluación en DB
+        const savedData = localStorage.getItem(`evaluation_temp_${selectedChecklist.id}`);
+        if (savedData) {
+          try {
+            const parsedData = JSON.parse(savedData);
+            const now = Date.now();
+            const oneHour = 60 * 60 * 1000; // 1 hora en milisegundos
+            
+            // Solo usar datos guardados si son de menos de 1 hora
+            if (now - parsedData.timestamp < oneHour) {
+              console.log('🔄 Recuperando datos temporales desde localStorage (sin evaluación en DB)', parsedData);
+              setEvaluationObservations(parsedData.observations || "");
+              setEvaluationRecommendations(parsedData.recommendations || "");
+              setEvaluationJudgment(parsedData.judgment || "PENDIENTE");
+            } else {
+              // Limpiar datos antiguos
+              localStorage.removeItem(`evaluation_temp_${selectedChecklist.id}`);
+              console.log('🗑️ Datos temporales antiguos removidos');
+            }
+          } catch (error) {
+            console.warn('Error al recuperar datos temporales de localStorage:', error);
+          }
+        }
+      } else if (selectedEvaluation) {
+        // Si hay evaluación en DB, limpiar datos temporales
+        if (selectedChecklist) {
+          localStorage.removeItem(`evaluation_temp_${selectedChecklist.id}`);
+          console.log('✅ Evaluación existe en DB, datos temporales limpiados');
+        }
+      }
+    }, 1000); // Dar tiempo para que se carguen los datos desde la DB
+
+    return () => clearTimeout(timeoutId);
+  }, [selectedChecklist, selectedEvaluation]);
+
+  // Efecto adicional para asegurar que los datos se carguen correctamente después de reload
+  // SOLO actúa cuando hay evaluación pero los campos están completamente vacíos (reload)
+  useEffect(() => {
+    if (selectedEvaluation && 
+        !evaluationObservations && 
+        !evaluationRecommendations && 
+        evaluationJudgment === "PENDIENTE" &&
+        (selectedEvaluation.observations || selectedEvaluation.recommendations || selectedEvaluation.valueJudgment !== "PENDIENTE")) {
+      
+      console.log('🔄 Detectando reload - sincronizando datos desde DB...');
+      setEvaluationObservations(selectedEvaluation.observations || "");
+      setEvaluationRecommendations(selectedEvaluation.recommendations || "");
+      setEvaluationJudgment(selectedEvaluation.valueJudgment || "PENDIENTE");
+      console.log('✅ Datos sincronizados desde evaluación existente después de reload');
+    }
+  }, [selectedEvaluation, evaluationObservations, evaluationRecommendations, evaluationJudgment]);
 
   // Función auxiliar para sincronizar datos después de crear/actualizar evaluación
   const syncEvaluationDataAfterSave = async (checklistId: number, savedData: any) => {
     console.log('🔄 Recargando evaluación desde DB después de guardar...');
-
-    // Recargar desde la base de datos
+    
+    // Recargar desde la base de datos SIN preservar datos locales
     try {
-      await loadEvaluationsForChecklist(checklistId);
+      await loadEvaluationsForChecklist(checklistId, false);
       console.log('✅ Sincronización completada exitosamente');
     } catch (error) {
       console.warn('⚠️ Error en sincronización:', error);
     }
   };
-
-
 
   // Función de debugging para ver todas las evaluaciones
   const debugAllEvaluations = async (): Promise<void> => {
@@ -179,7 +328,7 @@ export default function InstructorChecklistView() {
         variables: { page: 0, size: 100 },
         fetchPolicy: 'no-cache',
       });
-
+      
       console.log("All evaluations in database:", data);
       if (data.allEvaluations && data.allEvaluations.data) {
         console.log("Total evaluations found:", data.allEvaluations.data.length);
@@ -192,7 +341,7 @@ export default function InstructorChecklistView() {
             valueJudgment: evaluation.valueJudgment
           });
         });
-
+        
         if (selectedChecklist) {
           const matchingEvaluations = data.allEvaluations.data.filter(
             (evaluation: any) => evaluation.checklistId == selectedChecklist.id
@@ -210,13 +359,13 @@ export default function InstructorChecklistView() {
       setLoading(true);
       const response = await fetchAllChecklists(0, 100);
       console.log("Raw checklists response:", response); // Debug log
-
+      
       if (response.code === "200" && response.data) {
         // Filtrar solo las listas activas
         const activeLists = response.data.filter((checklist: Checklist) => checklist.state === true);
         console.log("Active checklists found:", activeLists); // Debug log
         console.log("Trimester values:", activeLists.map(cl => ({ id: cl.id, trimester: cl.trimester, type: typeof cl.trimester }))); // Debug log
-
+        
         setActiveChecklists(activeLists);
         if (activeLists.length > 0 && !selectedChecklist) {
           setSelectedChecklist(activeLists[0]);
@@ -230,30 +379,85 @@ export default function InstructorChecklistView() {
     }
   };
 
-  const loadEvaluationsForChecklist = async (checklistId: number): Promise<void> => {
+  const loadEvaluationsForChecklist = async (checklistId: number, preserveCurrentData: boolean = false): Promise<void> => {
     try {
-      console.log("=== LOADING EVALUATIONS FROM DATABASE ===");
+      console.log("=== LOADING EVALUATIONS FOR CHECKLIST ===");
       console.log("Checklist ID:", checklistId);
-
-      // Cargar evaluaciones desde la base de datos
+      console.log("Checklist ID type:", typeof checklistId);
+      console.log("Preserve current data:", preserveCurrentData);
+      
+      // Primero verificar si hay una evaluación en cache
+      const cachedEvaluation = getCachedEvaluation(checklistId.toString());
+      if (cachedEvaluation && !preserveCurrentData) {
+        console.log('🚀 Usando evaluación desde cache');
+        setSelectedEvaluation(cachedEvaluation);
+        setEvaluations([cachedEvaluation]);
+        return;
+      }
+      
+      // Si se solicita preservar datos actuales y hay datos llenados, guardarlos temporalmente
+      let preservedData = null;
+      if (preserveCurrentData && (evaluationObservations.trim() || evaluationRecommendations.trim())) {
+        preservedData = {
+          observations: evaluationObservations,
+          recommendations: evaluationRecommendations,
+          judgment: evaluationJudgment
+        };
+        console.log('💾 Preservando datos actuales:', preservedData);
+      }
+      
+      // Intentar primero con la función principal
       const evaluationsResponse = await fetchEvaluationsByChecklist(checklistId);
       console.log("Raw evaluations response:", evaluationsResponse);
-
+      
       if (evaluationsResponse && evaluationsResponse.code === "200") {
         console.log("✅ Evaluations response successful");
         console.log("Evaluations data:", evaluationsResponse.data);
-
+        
         if (evaluationsResponse.data && evaluationsResponse.data.length > 0) {
           setEvaluations(evaluationsResponse.data);
           console.log("✅ Found evaluations:", evaluationsResponse.data.length);
-
-          // Seleccionar la primera evaluación
+          
+          // Si hay evaluaciones, seleccionar la primera automáticamente
           const firstEvaluation = evaluationsResponse.data[0];
           console.log("First evaluation details:", firstEvaluation);
-
+          console.log("First evaluation checklistId:", firstEvaluation.checklistId);
+          
+          // Verificar que la evaluación tenga los datos completos
+          if (!firstEvaluation.observations && !firstEvaluation.recommendations && !firstEvaluation.valueJudgment) {
+            console.log('⚠️ Evaluación encontrada pero sin datos completos:', firstEvaluation);
+          }
+          
           setSelectedEvaluation(firstEvaluation);
+          
+          // Guardar en cache para futuras consultas
+          setCachedEvaluation(checklistId.toString(), firstEvaluation);
+          
+          // Decidir si cargar datos desde DB o preservar datos actuales
+          if (preservedData) {
+            // Usar datos preservados (recién creados/editados)
+            console.log('🔄 Usando datos preservados en lugar de DB:', preservedData);
+            setEvaluationObservations(preservedData.observations);
+            setEvaluationRecommendations(preservedData.recommendations);
+            setEvaluationJudgment(preservedData.judgment);
+          } else {
+            // Cargar datos desde la evaluación encontrada (el useEffect se encargará)
+            console.log('📋 Cargando datos desde evaluación de BD:', {
+              observations: firstEvaluation.observations,
+              recommendations: firstEvaluation.recommendations,
+              valueJudgment: firstEvaluation.valueJudgment
+            });
+          }
+          
+          // Limpiar localStorage si hay evaluación en DB
+          if (selectedChecklist) {
+            localStorage.removeItem(`evaluation_${selectedChecklist.id}`);
+            localStorage.removeItem(`evaluation_temp_${selectedChecklist.id}`);
+            console.log('🗑️ Limpiando localStorage - datos cargados desde DB');
+          }
+          
           console.log("✅ Evaluation loaded successfully");
-          return;
+          return; // Salir exitosamente
         } else {
           console.log("⚠️ No evaluations found in main response, trying alternative method...");
         }
@@ -262,46 +466,75 @@ export default function InstructorChecklistView() {
         console.log("Response code:", evaluationsResponse?.code);
         console.log("Response message:", evaluationsResponse?.message);
       }
-
+      
       // Si llegamos aquí, intentar con la función alternativa
       try {
         const alternativeResponse = await fetchEvaluationsByChecklistOld(checklistId);
         console.log("Alternative response:", alternativeResponse);
-
+        
         if (alternativeResponse && alternativeResponse.code === "200" && alternativeResponse.data && alternativeResponse.data.length > 0) {
           setEvaluations(alternativeResponse.data);
           const firstEvaluation = alternativeResponse.data[0];
           console.log("Alternative method evaluation details:", firstEvaluation);
-
+          
           setSelectedEvaluation(firstEvaluation);
+          
+          // Guardar en cache para futuras consultas
+          setCachedEvaluation(checklistId.toString(), firstEvaluation);
+          
+          // Decidir si cargar datos desde DB o preservar datos actuales
+          if (preservedData) {
+            // Usar datos preservados (recién creados/editados)
+            console.log('🔄 Usando datos preservados en lugar de DB (método alternativo):', preservedData);
+            setEvaluationObservations(preservedData.observations);
+            setEvaluationRecommendations(preservedData.recommendations);
+            setEvaluationJudgment(preservedData.judgment);
+          } else {
+            // Cargar datos desde la evaluación encontrada (el useEffect se encargará)
+            console.log('📋 Cargando datos desde evaluación de BD (método alternativo):', {
+              observations: firstEvaluation.observations,
+              recommendations: firstEvaluation.recommendations,
+              valueJudgment: firstEvaluation.valueJudgment
+            });
+          }
+          
+          // Limpiar localStorage si hay evaluación en DB
+          if (selectedChecklist) {
+            localStorage.removeItem(`evaluation_${selectedChecklist.id}`);
+            localStorage.removeItem(`evaluation_temp_${selectedChecklist.id}`);
+            console.log('🗑️ Limpiando localStorage - datos cargados desde DB (método alternativo)');
+          }
+          
           console.log("✅ Evaluation loaded via alternative method");
-          return;
+          return; // Salir exitosamente
         } else {
           console.log("❌ Alternative method also found no evaluations");
         }
       } catch (altError) {
         console.error("❌ Alternative fetch method failed:", altError);
       }
-
-      // Si llegamos aquí, no se encontraron evaluaciones
+      
+      // Si llegamos aquí, no se encontraron evaluaciones con ningún método
       console.log("❌ No evaluations found with any method for checklist:", checklistId);
       setEvaluations([]);
       setSelectedEvaluation(null);
       setEvaluationObservations("");
       setEvaluationRecommendations("");
       setEvaluationJudgment("PENDIENTE");
-      setItemStates({});
-
+      
     } catch (error) {
       console.error("❌ Error loading evaluations:", error);
-
+      console.error("Error stack:", error);
+      
       // Resetear estados en caso de error
       setEvaluations([]);
       setSelectedEvaluation(null);
       setEvaluationObservations("");
       setEvaluationRecommendations("");
       setEvaluationJudgment("PENDIENTE");
-      setItemStates({});
+      
+      // Opcionalmente mostrar un mensaje de error más específico
+      // toast.error("Error al cargar evaluaciones. Puede crear una evaluación nueva.");
     }
   };
 
@@ -332,7 +565,7 @@ export default function InstructorChecklistView() {
         { id: 6, indicator: "Describe la creación de usuarios y privilegios a nivel de base de datos.", completed: null, observations: "" }
       ];
     }
-
+    
     // Mapear los items reales del checklist a nuestro formato
     return selectedChecklist.items.map((item, index) => ({
       id: parseInt(item.id || (index + 1).toString()),
@@ -347,25 +580,22 @@ export default function InstructorChecklistView() {
 
   const handleTrimesterChange = (value: string): void => {
     setSelectedTrimester(value);
-    // Guardar selección de trimestre en localStorage
-    localStorage.setItem('selectedTrimester', value);
-    console.log('💾 Guardando selección de trimestre para persistencia:', value);
     setCurrentPage(1);
   };
 
   const handleChecklistChange = async (checklistId: string): Promise<void> => {
     const checklist = activeChecklists.find((cl: Checklist) => cl.id === checklistId);
-
+    
     // Reiniciar estados
     setCurrentPage(1);
     setItemStates({}); // Resetear el estado de los items
-
+    
     if (checklistId && checklistId !== "") {
       try {
         // Cargar los detalles completos del checklist con sus items
         console.log("Loading checklist details for ID:", checklistId);
         const checklistResponse = await fetchChecklistById(parseInt(checklistId));
-
+        
         if (checklistResponse.code === "200" && checklistResponse.data) {
           console.log("Checklist details loaded:", checklistResponse.data);
           setSelectedChecklist(checklistResponse.data);
@@ -374,9 +604,9 @@ export default function InstructorChecklistView() {
           setSelectedChecklist(checklist || null);
           console.warn("Could not load checklist details, using basic data");
         }
-
+        
         // Las evaluaciones se cargarán automáticamente por el useEffect
-
+        
       } catch (error) {
         console.error("Error loading checklist details:", error);
         // En caso de error, usar el checklist básico y no mostrar error al usuario
@@ -399,7 +629,7 @@ export default function InstructorChecklistView() {
   };
 
   const handleFileUpload = (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>, 
     setFile: React.Dispatch<React.SetStateAction<string | null>>
   ): void => {
     const file = event.target.files?.[0];
@@ -414,7 +644,7 @@ export default function InstructorChecklistView() {
   const handleUpdateEvaluationClick = () => {
     console.log('📝 Mostrando formulario para actualizar evaluación');
     console.log('📊 Datos de selectedEvaluation:', selectedEvaluation);
-
+    
     // Cargar los datos de la evaluación existente en los campos del formulario
     if (selectedEvaluation) {
       console.log('🔄 Llenando formulario con datos de BD:', {
@@ -422,12 +652,12 @@ export default function InstructorChecklistView() {
         recommendations: selectedEvaluation.recommendations,
         valueJudgment: selectedEvaluation.valueJudgment
       });
-
+      
       setEvaluationObservations(selectedEvaluation.observations || "");
       setEvaluationRecommendations(selectedEvaluation.recommendations || "");
       setEvaluationJudgment(selectedEvaluation.valueJudgment || "PENDIENTE");
     }
-
+    
     setShowEvaluationForm(true);
   };
 
@@ -486,7 +716,7 @@ export default function InstructorChecklistView() {
 
       if (response.code === "200") {
         toast.success("🎉 Evaluación guardada exitosamente en la base de datos");
-
+        
         // Crear el objeto de evaluación actualizado con los datos que acabamos de guardar
         const updatedEvaluation = {
           ...selectedEvaluation,
@@ -494,20 +724,30 @@ export default function InstructorChecklistView() {
           recommendations: evaluationRecommendations,
           valueJudgment: evaluationJudgment
         };
-
+        
         console.log("Evaluación actualizada con datos guardados:", updatedEvaluation);
-
+        
         // Actualizar el estado local inmediatamente con los datos correctos
         setSelectedEvaluation(updatedEvaluation);
 
         // Actualizar también la lista de evaluaciones
-        setEvaluations(prev => prev.map(evaluation =>
-          evaluation.id === selectedEvaluation.id
+        setEvaluations(prev => prev.map(evaluation => 
+          evaluation.id === selectedEvaluation.id 
             ? updatedEvaluation
             : evaluation
         ));
-
-        console.log('✅ Datos guardados exitosamente en la base de datos');
+        
+        // Actualizar cache con la evaluación actualizada
+        if (selectedChecklist) {
+          setCachedEvaluation(selectedChecklist.id, updatedEvaluation);
+        }
+        
+        // Limpiar datos guardados en localStorage ya que se guardó exitosamente
+        if (selectedChecklist) {
+          localStorage.removeItem(`evaluation_${selectedChecklist.id}`);
+          localStorage.removeItem(`evaluation_temp_${selectedChecklist.id}`);
+          console.log('🗑️ Datos de evaluación removidos del localStorage (guardado exitoso)');
+        }
 
         // Ocultar formulario después de actualizar exitosamente
         setShowEvaluationForm(false);
@@ -540,8 +780,8 @@ export default function InstructorChecklistView() {
         };
       });
 
-      console.log("Saving checklist:", {
-        selectedChecklist,
+      console.log("Saving checklist:", { 
+        selectedChecklist, 
         updatedItems,
         evaluation: selectedEvaluation,
         itemStates
@@ -566,21 +806,21 @@ export default function InstructorChecklistView() {
       // Simular guardado exitoso por ahora
       // TODO: Implementar la llamada real al backend cuando esté disponible
       console.log("Checklist data to save:", checklistData);
-
+      
       // Simular una pequeña demora para mostrar feedback
       await new Promise(resolve => setTimeout(resolve, 1000));
-
+      
       // Determinar si también necesitamos manejar la evaluación
       const hasEvaluationData = evaluationObservations.trim() || evaluationRecommendations.trim() || (evaluationJudgment && evaluationJudgment !== "PENDIENTE");
-
+      
       if (selectedEvaluation) {
         // Ya existe una evaluación, verificar si necesita actualizarse
         if (hasEvaluationData) {
-          const evaluationNeedsUpdate =
+          const evaluationNeedsUpdate = 
             selectedEvaluation.observations !== evaluationObservations ||
             selectedEvaluation.recommendations !== evaluationRecommendations ||
             selectedEvaluation.valueJudgment !== evaluationJudgment;
-
+            
           if (evaluationNeedsUpdate) {
             toast.info("🔄 Actualizando evaluación asociada...");
             await handleCompleteEvaluation();
@@ -595,7 +835,7 @@ export default function InstructorChecklistView() {
         // Solo lista de chequeo sin evaluación
         toast.success("📋 Lista de chequeo guardada exitosamente!");
       }
-
+      
     } catch (error) {
       console.error("Error saving checklist:", error);
       toast.error("❌ Error al guardar la lista de chequeo");
@@ -611,12 +851,12 @@ export default function InstructorChecklistView() {
 
     try {
       toast.info("📄 Generando PDF...");
-
+      
       const base64Data = await exportChecklistToPdf(parseInt(selectedChecklist.id));
       const fileName = `checklist_${selectedChecklist.id}_trimestre_${selectedChecklist.trimester || 'NA'}.pdf`;
-
+      
       downloadFileFromBase64(base64Data, fileName, 'application/pdf');
-
+      
       toast.success("📥 PDF descargado exitosamente");
     } catch (error) {
       console.error("Error exporting PDF:", error);
@@ -633,12 +873,12 @@ export default function InstructorChecklistView() {
 
     try {
       toast.info("📊 Generando Excel...");
-
+      
       const base64Data = await exportChecklistToExcel(parseInt(selectedChecklist.id));
       const fileName = `checklist_${selectedChecklist.id}_trimestre_${selectedChecklist.trimester || 'NA'}.xlsx`;
-
+      
       downloadFileFromBase64(base64Data, fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
+      
       toast.success("📥 Excel descargado exitosamente");
     } catch (error) {
       console.error("Error exporting Excel:", error);
@@ -655,12 +895,12 @@ export default function InstructorChecklistView() {
 
     try {
       toast.info("🔄 Creando evaluación automáticamente...");
-
+      
       const response = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id));
-
+      
       if (response && response.code === "200") {
         toast.success("✅ Evaluación creada exitosamente");
-
+        
         // Recargar las evaluaciones para mostrar la nueva
         await loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
       } else if (response === null) {
@@ -691,7 +931,7 @@ export default function InstructorChecklistView() {
       setEvaluationRecommendations("");
       setEvaluationJudgment("PENDIENTE");
     }
-
+    
     setShowCreateEvaluationModal(true);
   };
 
@@ -714,7 +954,7 @@ export default function InstructorChecklistView() {
     }
 
     setIsCreatingEvaluation(true);
-
+    
     try {
       console.log('=== INICIANDO CREACIÓN DE EVALUACIÓN DESDE MODAL ===');
       console.log('Checklist ID:', selectedChecklist.id);
@@ -725,7 +965,7 @@ export default function InstructorChecklistView() {
       });
 
       toast.info("💾 Creando evaluación...");
-
+      
       // Guardar datos actuales antes de crear
       const evaluationData = {
         observations: evaluationObservations.trim(),
@@ -733,13 +973,13 @@ export default function InstructorChecklistView() {
         valueJudgment: evaluationJudgment,
         checklistId: parseInt(selectedChecklist.id)
       };
-
+      
       // Crear la evaluación base usando createMissingEvaluationForChecklist
       const newEvaluationResult = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id));
-
+      
       if (newEvaluationResult && newEvaluationResult.code === "200" && newEvaluationResult.id) {
         console.log('✅ Evaluación base creada con ID:', newEvaluationResult.id);
-
+        
         // Completar la evaluación con los datos del formulario
         const completeResult = await completeEvaluation(
           parseInt(newEvaluationResult.id),
@@ -747,9 +987,9 @@ export default function InstructorChecklistView() {
           evaluationData.recommendations,
           evaluationData.valueJudgment
         );
-
+        
         console.log('Complete result:', completeResult);
-
+        
         if (completeResult && completeResult.code === "200") {
           // Crear el objeto de evaluación local con los datos guardados
           const newEvaluationObject = {
@@ -761,22 +1001,30 @@ export default function InstructorChecklistView() {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           };
-
+          
           // Actualizar inmediatamente los estados locales
           setSelectedEvaluation(newEvaluationObject);
           setEvaluations([newEvaluationObject]);
-
+          
+          // Actualizar cache con la nueva evaluación
+          setCachedEvaluation(selectedChecklist.id, newEvaluationObject);
+          
           // Mantener los datos en los campos del formulario para mostrarlos
           setEvaluationObservations(evaluationData.observations);
           setEvaluationRecommendations(evaluationData.recommendations);
           setEvaluationJudgment(evaluationData.valueJudgment);
-
+          
           console.log('✅ Estados actualizados con la nueva evaluación:', newEvaluationObject);
-
+          
           toast.success("✅ Evaluación creada y guardada exitosamente");
-
-          console.log('✅ Evaluación guardada exitosamente');
-
+          
+          // Limpiar localStorage
+          if (selectedChecklist) {
+            localStorage.removeItem(`evaluation_${selectedChecklist.id}`);
+            localStorage.removeItem(`evaluation_temp_${selectedChecklist.id}`);
+            console.log('🗑️ Datos temporales eliminados de localStorage');
+          }
+          
           // Cerrar el modal
           setShowCreateEvaluationModal(false);
           setIsCreatingEvaluation(false);
@@ -786,10 +1034,10 @@ export default function InstructorChecklistView() {
       } else {
         throw new Error(newEvaluationResult?.message || "Error desconocido al crear evaluación");
       }
-
+      
     } catch (error: any) {
       console.error('❌ Error creating evaluation from modal:', error);
-
+      
       // Manejo específico de errores
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
         const firstError = error.graphQLErrors[0];
@@ -843,31 +1091,31 @@ export default function InstructorChecklistView() {
       });
 
       toast.info("🚀 Creando evaluación completa...");
-
+      
       // Primero verificar si ya existe una evaluación para este checklist
       console.log("Verificando evaluaciones existentes...");
-      await loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
-
+      await loadEvaluationsForChecklist(parseInt(selectedChecklist.id), false); // No preservar datos aquí, queremos ver lo que hay en DB
+      
       // Dar un momento para que se cargue
       await new Promise(resolve => setTimeout(resolve, 500));
-
+      
       if (selectedEvaluation) {
         // Ya existe una evaluación, solo actualizarla
         console.log("Evaluación existente encontrada, actualizando...");
         toast.info("ℹ️ Evaluación existente encontrada, actualizando datos...");
-
+        
         await handleCompleteEvaluation();
         return; // Salir de la función
       }
-
+      
       // No existe evaluación, crear una nueva
       console.log("No existe evaluación, creando nueva...");
       const createResponse = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id));
       console.log("Create response:", createResponse);
-
+      
       if (createResponse && createResponse.code === "200" && createResponse.id) {
         console.log("✅ Evaluación base creada con ID:", createResponse.id);
-
+        
         // Completar la evaluación inmediatamente
         console.log("Completando evaluación con datos...");
         const completeResponse = await completeEvaluation(
@@ -880,29 +1128,29 @@ export default function InstructorChecklistView() {
 
         if (completeResponse && completeResponse.code === "200") {
           toast.success("🎉 ¡Evaluación creada y completada exitosamente!");
-
+          
           // Datos creados exitosamente
           const savedData = {
             observations: evaluationObservations,
             recommendations: evaluationRecommendations,
             valueJudgment: evaluationJudgment
           };
-
+          
           // Sincronizar datos manteniendo los valores actuales
           await syncEvaluationDataAfterSave(parseInt(selectedChecklist.id), savedData);
-
+          
         } else {
           console.error("❌ Error al completar evaluación:", completeResponse);
           toast.error("❌ Evaluación creada pero error al completarla: " + (completeResponse?.message || "Error desconocido"));
         }
-
+        
       } else if (createResponse === null) {
         // Ya existe una evaluación (detectada durante la creación)
         console.log("Evaluación detectada durante creación, recargando...");
         toast.info("ℹ️ Se detectó una evaluación existente, cargando...");
-
-        await loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
-
+        
+        await loadEvaluationsForChecklist(parseInt(selectedChecklist.id), true);
+        
         // Dar tiempo para que se cargue y luego intentar actualizar
         setTimeout(async () => {
           try {
@@ -912,15 +1160,15 @@ export default function InstructorChecklistView() {
             toast.error("❌ Error al actualizar la evaluación existente");
           }
         }, 1000);
-
+        
       } else {
         console.error("❌ Error al crear evaluación:", createResponse);
         toast.error("❌ Error al crear la evaluación: " + (createResponse?.message || "Error desconocido"));
       }
-
+      
     } catch (error: any) {
       console.error("❌ Error creating and completing evaluation:", error);
-
+      
       // Manejo específico de errores de Apollo/GraphQL
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
         console.error("GraphQL Errors:", error.graphQLErrors);
@@ -938,7 +1186,7 @@ export default function InstructorChecklistView() {
       } else {
         toast.error("❌ Error desconocido al crear y completar la evaluación");
       }
-
+      
       // Sugerencias adicionales
       setTimeout(() => {
         toast.info("💡 Sugerencia: Verifique su conexión e intente nuevamente, o contacte al coordinador.");
@@ -1182,7 +1430,7 @@ export default function InstructorChecklistView() {
                       <option key={i + 1} value={i + 1}>Trimestre {i + 1}</option>
                     ))}
                   </select>
-
+                  
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-darkBlue dark:text-shadowBlue pointer-events-none">
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -1204,7 +1452,7 @@ export default function InstructorChecklistView() {
                       </option>
                     ))}
                   </select>
-
+                  
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-darkBlue dark:text-shadowBlue pointer-events-none">
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -1215,10 +1463,11 @@ export default function InstructorChecklistView() {
                 <button
                   onClick={handleSaveChecklist}
                   disabled={!selectedChecklist}
-                  className={`hexagon-button flex items-center gap-3 px-6 py-4 rounded-full border-2 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${selectedChecklist
+                  className={`hexagon-button flex items-center gap-3 px-6 py-4 rounded-full border-2 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                    selectedChecklist
                       ? 'border-lime-500 dark:border-shadowBlue bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue'
                       : 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
-                    }`}
+                  }`}
                 >
                   <Save className="w-5 h-5" />
                   <span>Guardar Lista</span>
@@ -1236,26 +1485,28 @@ export default function InstructorChecklistView() {
                     Activas: {activeChecklists.length} | Filtradas: {filteredChecklists.length}
                   </span>
                 </div>
-
-                <button
+                
+                <button 
                   onClick={handleExportPDF}
                   disabled={!selectedChecklist}
-                  className={`hexagon-export flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${selectedChecklist
+                  className={`hexagon-export flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                    selectedChecklist
                       ? 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue'
                       : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                    }`}
+                  }`}
                 >
                   <FileDown className="w-5 h-5" />
                   <span>PDF</span>
                 </button>
-
-                <button
+                
+                <button 
                   onClick={handleExportExcel}
                   disabled={!selectedChecklist}
-                  className={`hexagon-export flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${selectedChecklist
+                  className={`hexagon-export flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                    selectedChecklist
                       ? 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue'
                       : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                    }`}
+                  }`}
                 >
                   <FileDown className="w-5 h-5" />
                   <span>Excel</span>
@@ -1274,8 +1525,8 @@ export default function InstructorChecklistView() {
         ) : filteredChecklists.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400 text-lg">
-              {selectedTrimester === "todos"
-                ? "No hay listas de chequeo activas disponibles"
+              {selectedTrimester === "todos" 
+                ? "No hay listas de chequeo activas disponibles" 
                 : `No hay listas de chequeo activas para el trimestre ${selectedTrimester}`
               }
             </p>
@@ -1296,37 +1547,37 @@ export default function InstructorChecklistView() {
               <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue p-6">
                   <h2 className="text-2xl font-bold text-white text-center flex items-center justify-center gap-3">
-
+                    
                     Lista de Chequeo
-
+                    
                   </h2>
                 </div>
-
+                
                 <div className="overflow-x-auto">
                   <table className="min-w-full text-sm">
                     <thead className="bg-gradient-to-r from-gray-400 to-gray-400 dark:from-gray-400">
                       <tr>
                         <th className="hexagon-cell text-xl font-bold p-6 text-center text-white">
                           <div className="flex items-center justify-center gap-2">
-
+                         
                             Item
                           </div>
                         </th>
                         <th className="hexagon-cell text-xl font-bold p-6 text-left text-white">
                           <div className="flex items-center gap-2">
-
+                         
                             Indicadores y/o Variables
                           </div>
                         </th>
                         <th className="hexagon-cell text-xl font-bold p-6 text-center text-white">
                           <div className="flex items-center justify-center gap-2">
-
+                            
                             Evaluación
                           </div>
                         </th>
                         <th className="hexagon-cell text-xl font-bold p-6 text-left text-white">
                           <div className="flex items-center gap-2">
-
+                           
                             Observaciones
                           </div>
                         </th>
@@ -1336,8 +1587,9 @@ export default function InstructorChecklistView() {
                       {currentItems.map((item, index) => {
                         const itemState = itemStates[item.id] || { completed: item.completed, observations: item.observations };
                         return (
-                          <tr key={item.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-750'
-                            }`}>
+                          <tr key={item.id} className={`${
+                            index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-750'
+                          }`}>
                             <td className="hexagon-cell p-6 text-center">
                               <div className="w-12 h-12 bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue rounded-full flex items-center justify-center mx-auto shadow-lg">
                                 <span className="text-white font-bold text-lg">{item.id}</span>
@@ -1352,10 +1604,11 @@ export default function InstructorChecklistView() {
                             </td>
                             <td className="hexagon-cell p-6 text-center">
                               <div className="flex justify-center space-x-6">
-                                <label className={`hexagon-choice flex items-center space-x-3 cursor-pointer p-3 rounded-2xl border-2 ${itemState.completed === true
-                                    ? 'border-lime-500 dark:border-lime-500 bg-green-50 dark:bg-green-900/30 shadow-lg transform scale-105'
+                                <label className={`hexagon-choice flex items-center space-x-3 cursor-pointer p-3 rounded-2xl border-2 ${
+                                  itemState.completed === true 
+                                    ? 'border-lime-500 dark:border-lime-500 bg-green-50 dark:bg-green-900/30 shadow-lg transform scale-105' 
                                     : 'border-gray-300 dark:border-gray-600'
-                                  }`}>
+                                }`}>
                                   <input
                                     type="radio"
                                     name={`completed-${item.id}`}
@@ -1364,19 +1617,22 @@ export default function InstructorChecklistView() {
                                     checked={itemState.completed === true}
                                     className="sr-only"
                                   />
-                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${itemState.completed === true ? 'bg-lime-500 text-white' : 'bg-gray-200 dark:bg-gray-600'
-                                    }`}>
+                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                    itemState.completed === true ? 'bg-lime-500 text-white' : 'bg-gray-200 dark:bg-gray-600'
+                                  }`}>
                                     <Check className="w-5 h-5" />
                                   </div>
-                                  <span className={`font-semibold ${itemState.completed === true ? 'text-lime-600' : 'text-gray-600 dark:text-gray-400'
-                                    }`}>
+                                  <span className={`font-semibold ${
+                                    itemState.completed === true ? 'text-lime-600' : 'text-gray-600 dark:text-gray-400'
+                                  }`}>
                                     Sí
                                   </span>
                                 </label>
-                                <label className={`hexagon-choice flex items-center space-x-3 cursor-pointer p-3 rounded-2xl border-2 ${itemState.completed === false
-                                    ? 'border-red-500 bg-red-50 dark:bg-red-900/30 shadow-lg transform scale-105'
+                                <label className={`hexagon-choice flex items-center space-x-3 cursor-pointer p-3 rounded-2xl border-2 ${
+                                  itemState.completed === false 
+                                    ? 'border-red-500 bg-red-50 dark:bg-red-900/30 shadow-lg transform scale-105' 
                                     : 'border-gray-300 dark:border-gray-600'
-                                  }`}>
+                                }`}>
                                   <input
                                     type="radio"
                                     name={`completed-${item.id}`}
@@ -1385,12 +1641,14 @@ export default function InstructorChecklistView() {
                                     checked={itemState.completed === false}
                                     className="sr-only"
                                   />
-                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${itemState.completed === false ? 'bg-red-500 text-white' : 'bg-gray-200 dark:bg-gray-600'
-                                    }`}>
+                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                    itemState.completed === false ? 'bg-red-500 text-white' : 'bg-gray-200 dark:bg-gray-600'
+                                  }`}>
                                     <X className="w-5 h-5" />
                                   </div>
-                                  <span className={`font-semibold ${itemState.completed === false ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'
-                                    }`}>
+                                  <span className={`font-semibold ${
+                                    itemState.completed === false ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'
+                                  }`}>
                                     No
                                   </span>
                                 </label>
@@ -1404,7 +1662,7 @@ export default function InstructorChecklistView() {
                                   className="hexagon-textarea w-full p-4 border-2 border-gray-300 dark:border-gray-600 rounded-2xl min-h-[100px] bg-gradient-to-r from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 text-darkBlue dark:text-white focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue resize-vertical shadow-inner"
                                   placeholder="Agregar observaciones detalladas sobre este item..."
                                 />
-
+                                
                               </div>
                             </td>
                           </tr>
@@ -1419,10 +1677,11 @@ export default function InstructorChecklistView() {
             {/* Paginación con diseño hexagonsal */}
             <div className="flex justify-center items-center space-x-6 mt-8">
               <button
-                className={`hexagon-nav px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg ${currentPage === 1
-                    ? 'bg-gray-300 cursor-not-allowed text-gray-500'
+                className={`hexagon-nav px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg ${
+                  currentPage === 1 
+                    ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
                     : 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white shadow-xl'
-                  }`}
+                }`}
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
               >
@@ -1434,10 +1693,11 @@ export default function InstructorChecklistView() {
                 </span>
               </div>
               <button
-                className={`hexagon-nav px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg ${currentPage === totalPages
-                    ? 'bg-gray-300 cursor-not-allowed text-gray-500'
+                className={`hexagon-nav px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg ${
+                  currentPage === totalPages 
+                    ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
                     : 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white shadow-xl'
-                  }`}
+                }`}
                 onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
               >
@@ -1451,12 +1711,12 @@ export default function InstructorChecklistView() {
                 <div className="bg-gradient-to-br from-green-50 via-white to-green-50 dark:from-green-900/20 dark:via-gray-800 dark:to-green-900/20 rounded-3xl shadow-2xl border border-green-200 dark:border-green-800 overflow-hidden">
                   <div className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue p-6">
                     <h3 className="text-2xl font-bold text-white text-center flex items-center justify-center gap-3">
-
+          
                       Evaluación de Lista de Chequeo
-
+                      
                     </h3>
                   </div>
-
+                  
                   <div className="p-8">
                     {selectedEvaluation ? (
                       // Vista cuando hay evaluación existente
@@ -1466,16 +1726,16 @@ export default function InstructorChecklistView() {
                           {/* Estado de la evaluación */}
                           <div className="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-800 dark:to-blue-900/50 p-6 rounded-2xl border border-blue-200 dark:border-blue-700 shadow-inner">
                             <p className="text-blue-800 dark:text-blue-200 text-center font-medium flex items-center justify-center gap-2">
-
+                              
                               <strong>Actualizar Evaluación:</strong> Modifique los campos que desee cambiar
                             </p>
                           </div>
-
+                          
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-4">
                               <label className="block text-lg font-semibold text-darkBlue dark:text-white mb-2">
                                 <span className="flex items-center gap-2">
-
+                                  
                                   Observaciones: <span className="text-red-500">*</span>
                                 </span>
                               </label>
@@ -1488,11 +1748,11 @@ export default function InstructorChecklistView() {
                                 required
                               />
                             </div>
-
+                            
                             <div className="space-y-4">
                               <label className="block text-lg font-semibold text-darkBlue dark:text-white mb-2">
                                 <span className="flex items-center gap-2">
-
+                                  
                                   Recomendaciones: <span className="text-red-500">*</span>
                                 </span>
                               </label>
@@ -1506,7 +1766,7 @@ export default function InstructorChecklistView() {
                               />
                             </div>
                           </div>
-
+                          
                           <div className="mt-6">
                             <label className="block text-lg font-semibold text-darkBlue dark:text-white mb-4">
                               <span className="flex items-center gap-2">
@@ -1529,7 +1789,7 @@ export default function InstructorChecklistView() {
                               <option value="RECHAZADO">Rechazado</option>
                             </select>
                           </div>
-
+                          
                           <div className="flex justify-center space-x-6 mt-8">
                             <button
                               onClick={handleCancelUpdate}
@@ -1541,10 +1801,11 @@ export default function InstructorChecklistView() {
                             <button
                               onClick={handleCompleteEvaluation}
                               disabled={!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE"}
-                              className={`px-8 py-4 rounded-2xl transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${(!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
+                              className={`px-8 py-4 rounded-2xl transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                                (!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
                                   ? 'bg-gray-400 cursor-not-allowed text-white'
                                   : 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white'
-                                }`}
+                              }`}
                             >
                               <Save className="w-5 h-5" />
                               <span>Guardar Cambios</span>
@@ -1561,7 +1822,7 @@ export default function InstructorChecklistView() {
                               <strong>Evaluación Completada</strong> - Esta lista de chequeo ya tiene evaluación
                             </p>
                           </div>
-
+                          
                           {/* Resumen de la evaluación con diseño hexagonal */}
                           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             <div className="bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 rounded-2xl p-6 shadow-lg">
@@ -1577,7 +1838,7 @@ export default function InstructorChecklistView() {
                                 </p>
                               </div>
                             </div>
-
+                            
                             <div className="bg-white dark:bg-gray-800 border-2 border-green-200 dark:border-green-700 rounded-2xl p-6 shadow-lg">
                               <div className="text-center mb-4">
                                 <div className="w-12 h-12 bg-lime-600 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -1591,7 +1852,7 @@ export default function InstructorChecklistView() {
                                 </p>
                               </div>
                             </div>
-
+                            
                             <div className="bg-white dark:bg-gray-800 border-2 border-purple-200 dark:border-purple-700 rounded-2xl p-6 shadow-lg">
                               <div className="text-center mb-4">
                                 <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -1600,19 +1861,20 @@ export default function InstructorChecklistView() {
                                 <h4 className="text-lg font-bold text-darkBlue dark:text-white">Juicio de Valor</h4>
                               </div>
                               <div className="flex justify-center">
-                                <span className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg ${selectedEvaluation.valueJudgment === 'EXCELENTE' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
-                                    selectedEvaluation.valueJudgment === 'BUENO' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' :
-                                      selectedEvaluation.valueJudgment === 'ACEPTABLE' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white' :
-                                        selectedEvaluation.valueJudgment === 'DEFICIENTE' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' :
-                                          selectedEvaluation.valueJudgment === 'RECHAZADO' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
-                                            'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
-                                  }`}>
+                                <span className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg ${
+                                  selectedEvaluation.valueJudgment === 'EXCELENTE' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
+                                  selectedEvaluation.valueJudgment === 'BUENO' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' :
+                                  selectedEvaluation.valueJudgment === 'ACEPTABLE' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white' :
+                                  selectedEvaluation.valueJudgment === 'DEFICIENTE' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' :
+                                  selectedEvaluation.valueJudgment === 'RECHAZADO' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
+                                  'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
+                                }`}>
                                   {selectedEvaluation.valueJudgment || "PENDIENTE"}
                                 </span>
                               </div>
                             </div>
                           </div>
-
+                          
                           {/* Botón para actualizar evaluación */}
                           <div className="flex justify-center mt-8">
                             <button
@@ -1629,15 +1891,15 @@ export default function InstructorChecklistView() {
                       // Vista cuando no hay evaluación con diseño hexagonal
                       <div className="text-center space-y-8">
                         <div className="bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 p-8 rounded-3xl border-2 border-gray-200 dark:border-gray-600 shadow-inner">
-
+                          
                           <h4 className="text-2xl font-bold text-darkBlue dark:text-white mb-4 flex items-center justify-center gap-3">
-
+                            
                             Esta lista no tiene evaluación
                           </h4>
                           <p className="text-lg text-gray-800 dark:text-gray-200 mb-8 max-w-2xl mx-auto leading-relaxed">
                             Para evaluar esta lista de chequeo, haga clic en el botón de abajo para abrir el formulario de evaluación completo.
                           </p>
-
+                          
                           {/* Botón principal para crear evaluación */}
                           <button
                             onClick={handleOpenCreateEvaluationModal}
@@ -1646,9 +1908,9 @@ export default function InstructorChecklistView() {
                             <Save className="w-8 h-8" />
                             <span>Crear Evaluación</span>
                           </button>
-
+                          
                           {/* Botón de debug con diseño hexagonal */}
-
+                          
                         </div>
                       </div>
                     )}
@@ -1742,7 +2004,7 @@ export default function InstructorChecklistView() {
           </>
         )}
       </div>
-
+      
       {/* Modal para crear evaluación */}
       {showCreateEvaluationModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
@@ -1788,7 +2050,7 @@ export default function InstructorChecklistView() {
                     disabled={isCreatingEvaluation}
                   />
                 </div>
-
+                
                 <div>
                   <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
                     Recomendaciones: <span className="text-red-500">*</span>
@@ -1802,7 +2064,7 @@ export default function InstructorChecklistView() {
                     disabled={isCreatingEvaluation}
                   />
                 </div>
-
+                
                 <div>
                   <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
                     Juicio de Valor: <span className="text-red-500">*</span>
@@ -1854,10 +2116,11 @@ export default function InstructorChecklistView() {
                 <button
                   onClick={handleCreateEvaluationFromModal}
                   disabled={isCreatingEvaluation || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment}
-                  className={`px-8 py-3 rounded-lg transition-all duration-300 flex items-center space-x-2 font-semibold ${(isCreatingEvaluation || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment)
+                  className={`px-8 py-3 rounded-lg transition-all duration-300 flex items-center space-x-2 font-semibold ${
+                    (isCreatingEvaluation || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment)
                       ? 'bg-gray-400 cursor-not-allowed text-white'
                       : 'bg-gradient-to-r from-lime-600 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-white shadow-lg hover:shadow-xl'
-                    }`}
+                  }`}
                 >
                   {isCreatingEvaluation ? (
                     <>

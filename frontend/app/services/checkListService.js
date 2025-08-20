@@ -175,3 +175,51 @@ export const saveChecklistWithEvaluatedItems = async (checklistId, evaluatedItem
     throw error;
   }
 };
+
+// Función para actualizar la vinculación entre checklist y evaluación
+export const updateChecklistEvaluationLink = async (checklistId, evaluationId) => {
+  try {
+    console.log('🔗 Updating checklist-evaluation link:', { checklistId, evaluationId });
+    
+    // Obtener los datos actuales del checklist
+    const currentChecklistResponse = await fetchChecklistById(checklistId);
+    
+    if (currentChecklistResponse.code !== "200" || !currentChecklistResponse.data) {
+      throw new Error("Could not fetch current checklist data");
+    }
+    
+    const currentChecklist = currentChecklistResponse.data;
+    console.log('Current checklist data for linking:', currentChecklist);
+    
+    // Preparar datos para actualización con el evaluation_id
+    const updateData = {
+      state: currentChecklist.state,
+      remarks: currentChecklist.remarks || "",
+      trimester: currentChecklist.trimester,
+      component: currentChecklist.component || "",
+      evaluationCriteria: currentChecklist.evaluationCriteria || false,
+      instructorSignature: currentChecklist.instructorSignature || "",
+      studySheets: currentChecklist.studySheets || null,
+      associatedJuries: currentChecklist.associatedJuries || null,
+      items: currentChecklist.items || [],
+      evaluationId: parseInt(evaluationId) // ⭐ CLAVE: Vincular la evaluación
+    };
+    
+    console.log('Updating checklist with evaluation link:', updateData);
+    
+    const { data } = await clientLAN.mutate({
+      mutation: UPDATE_CHECKLIST,
+      variables: { 
+        id: parseInt(checklistId), 
+        input: updateData 
+      },
+    });
+    
+    console.log('Checklist-evaluation linking result:', data);
+    return data.updateChecklist;
+    
+  } catch (error) {
+    console.error('❌ Error updating checklist-evaluation link:', error);
+    throw error;
+  }
+};

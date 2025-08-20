@@ -38,6 +38,7 @@ public class ChecklistDto {
     @NotNull(message = "Los jurados asociados son obligatorios")
     private Set<Long> associatedJuries;
     private EvaluationsDto evaluation;
+    private Long evaluationId; // ID de la evaluación para vinculación
     private TeamsScrumDto teamsScrum;
     private Long studySheets;
     private List<ItemDto> items;

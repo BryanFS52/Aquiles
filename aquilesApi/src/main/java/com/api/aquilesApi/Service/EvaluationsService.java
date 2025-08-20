@@ -1,8 +1,5 @@
 package com.api.aquilesApi.Service;
 
-import com.api.aquilesApi.Business.EvaluationsBusiness;
-import com.api.aquilesApi.Dto.EvaluationsDto;
-import com.api.aquilesApi.Entity.Checklist;
 import com.api.aquilesApi.Entity.Evaluations;
 import com.api.aquilesApi.Repository.EvaluationsRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
@@ -11,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class EvaluationsService implements Idao<Evaluations, Long> {
@@ -50,5 +49,9 @@ public class EvaluationsService implements Idao<Evaluations, Long> {
     @Override
     public void create(Evaluations entity) {
         evaluationRepository.save(entity);
+    }
+    
+    public List<Evaluations> findByChecklistId(Long checklistId) {
+        return evaluationRepository.findByChecklistId(checklistId);
     }
 }

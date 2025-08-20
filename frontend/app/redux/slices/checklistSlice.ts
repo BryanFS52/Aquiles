@@ -51,6 +51,7 @@ export const fetchChecklistById = createAsyncThunk<GetChecklistByIdQuery['checkl
         const { data } = await clientLAN.query<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>({
             query: GET_CHECKLIST_BY_ID,
             variables: { id },
+            fetchPolicy: 'no-cache', // Forzar recarga desde servidor
         });
         return data.checklistById;
     }
@@ -84,16 +85,25 @@ export const updateChecklist = createAsyncThunk<UpdateChecklistMutation['updateC
     'checklist/update',
     async ({ id, input }, { rejectWithValue }) => {
         try {
+            console.log('=== REDUX UPDATE CHECKLIST ===');
+            console.log('ID:', id);
+            console.log('Input data:', input);
+            console.log('Input items:', input.items);
+            
             const { data } = await clientLAN.mutate<UpdateChecklistMutation, UpdateChecklistMutationVariables>({
                 mutation: UPDATE_CHECKLIST,
                 variables: { id, input },
             });
 
+            console.log('GraphQL update response:', data);
+            
             const res = data?.updateChecklist;
             if (!res || res.code !== '200') {
+                console.log('Update failed with response:', res);
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
             }
 
+            console.log('✅ Update successful in Redux:', res);
             return res;
         } catch (error: any) {
             return rejectWithValue({ code: '500', message: error.message });
@@ -234,8 +244,14 @@ const checklistSlice = createSlice({
             })
             // updateChecklist
             .addCase(updateChecklist.fulfilled, (state, action: PayloadAction<UpdateChecklistMutation['updateChecklist']>) => {
-                // Solo marcamos que el estado de error es null, la recarga de datos se hace desde el componente
+                console.log('=== REDUX REDUCER UPDATE FULFILLED ===');
+                console.log('Update completed successfully, action payload:', action.payload);
+                
+                state.loading = false;
                 state.error = null;
+                
+                console.log('✅ Update successful - state will be refreshed from component');
+                // Los datos se recargan desde el componente para asegurar consistencia
             })
             .addCase(updateChecklist.rejected, (state, action) => {
                 const payload = action.payload as RejectedPayload;

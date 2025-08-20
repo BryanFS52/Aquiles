@@ -54,6 +54,18 @@ public class EvaluationsBusiness {
         }
     }
 
+    // Find By Checklist Id
+    public List<EvaluationsDto> findByChecklistId(Long checklistId) {
+        try {
+            List<Evaluations> evaluations = evaluationsService.findByChecklistId(checklistId);
+            return evaluations.stream()
+                    .map(evaluation -> modelMapper.map(evaluation, EvaluationsDto.class))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new CustomException("Error retrieving evaluations for checklist ID " + checklistId + ": " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     // Add
     public EvaluationsDto add(EvaluationsDto evaluationsDto) {
         try {
