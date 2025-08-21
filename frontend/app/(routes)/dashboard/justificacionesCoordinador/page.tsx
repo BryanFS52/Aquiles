@@ -3,8 +3,10 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import { AppDispatch } from "@redux/store";
 import PageTitle from "@components/UI/pageTitle";
-import JustificationFilters from "@components/features/justification/justificationsFilter";
+import JustificationFilters from "@components/features/justifications/justificationsFilter";
+import JustificationTable from "@components/features/justifications/justificationsTable";
 import {
   fetchJustifications,
   setFilterOptions,
@@ -63,7 +65,7 @@ export default function JustificacionesCoordinator() {
     dispatch(goToNextPage());
   };
 
-  const handleDownloadFile = (justificacion:any) => {
+  const handleDownloadFile = (justificacion: any) => {
     if (justificacion.archivoAdjunto) {
       const mimeType = justificacion.archivoMime || "application/octet-stream";
       const fileName = generateFileName(justificacion.id, mimeType);
@@ -119,11 +121,11 @@ export default function JustificacionesCoordinator() {
       {/* Table */}
       {!loading && !errorMessage && (
         <>
-        <JustificationTable
-          filteredData={filteredData}
-          handleDownloadFile={handleDownloadFile}
-          handleStatusChange={handleStatusChange}
-        />
+          <JustificationTable
+            filteredData={filteredData}
+            handleDownloadFile={handleDownloadFile}
+            handleStatusChange={handleStatusChange}
+          />
 
           {/* Pagination */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">

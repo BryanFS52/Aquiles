@@ -1,13 +1,16 @@
 package com.api.aquilesApi.Business;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import com.api.aquilesApi.Dto.ChecklistDto;
 import com.api.aquilesApi.Entity.Checklist;
 import com.api.aquilesApi.Entity.Evaluations;
+    import com.api.aquilesApi.Entity.Item;
+import com.api.aquilesApi.Entity.ItemType;
 import com.api.aquilesApi.Repository.JuriesRepository;
+import com.api.aquilesApi.Repository.ItemTypeRepository;
 import com.api.aquilesApi.Service.ChecklistExportService;
 import com.api.aquilesApi.Service.ChecklistService;
-import com.api.aquilesApi.Service.ChecklistHistoryService; 
 import com.api.aquilesApi.Service.EvaluationsService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
@@ -22,23 +25,26 @@ public class ChecklistBusiness {
 
     private final ChecklistService checklistService;
     private final ModelMapper modelMapper;
-    private final EvaluationsService EvaluationsService;
+    private final EvaluationsService evaluationsService;
     private final ChecklistExportService exportService;
-    private final ChecklistHistoryService checklistHistoryService; // ⭐ AGREGAR ESTA LÍNEA
+    private final ChecklistHistoryBusiness checklistHistoryBusiness;
+    private final ItemTypeRepository itemTypeRepository;
 
     public ChecklistBusiness(
             ChecklistService checklistService,
             JuriesRepository juriesRepository,
             ModelMapper modelMapper,
-            EvaluationsService evaluationService,
+            EvaluationsService evaluationService, EvaluationsService evaluationsService,
             ChecklistExportService exportService,
-            ChecklistHistoryService checklistHistoryService // ⭐ AGREGAR ESTE PARÁMETRO
+            ChecklistHistoryBusiness checklistHistoryBusiness,
+            ItemTypeRepository itemTypeRepository
     ) {
         this.checklistService = checklistService;
         this.modelMapper = modelMapper;
-        this.EvaluationsService = evaluationService;
+        this.evaluationsService = evaluationsService;
         this.exportService = exportService;
-        this.checklistHistoryService = checklistHistoryService; // ⭐ AGREGAR ESTA ASIGNACIÓN
+        this.checklistHistoryBusiness = checklistHistoryBusiness;
+        this.itemTypeRepository = itemTypeRepository;
     }   
 
     // Find All
@@ -49,7 +55,18 @@ public class ChecklistBusiness {
 
             System.out.println("Total Checklist: " + checklistEntityPage.getTotalElements());
 
-            return checklistEntityPage.map(entity -> modelMapper.map(entity, ChecklistDto.class));
+            checklistEntityPage.forEach(entity -> {
+                if (entity.getInstructorSignature() != null) {
+                    int dummy = entity.getInstructorSignature().length;
+                }
+            });
+
+            return checklistEntityPage.map(entity -> {
+                ChecklistDto dto = modelMapper.map(entity, ChecklistDto.class);
+                dto.setTrimester(entity.getTrimester());
+                dto.setComponent(entity.getComponent());
+                return dto;
+            });
         } catch (DataAccessException e) {
             throw new CustomException("Error retrieving checklist due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
@@ -61,7 +78,13 @@ public class ChecklistBusiness {
     public ChecklistDto findById(Long id) {
         try {
             Checklist checklist = checklistService.getById(id);
-            return modelMapper.map(checklist, ChecklistDto.class);
+            if (checklist.getInstructorSignature() != null) {
+                int dummy = checklist.getInstructorSignature().length;
+            }
+            ChecklistDto dto = modelMapper.map(checklist, ChecklistDto.class);
+            dto.setTrimester(checklist.getTrimester());
+            dto.setComponent(checklist.getComponent());
+            return dto;
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
@@ -72,8 +95,14 @@ public class ChecklistBusiness {
     // Add
     public ChecklistDto add(ChecklistDto checklistDto) {
         try {
-            // Paso 1: mapear campos simples
-            Checklist checklist = modelMapper.map(checklistDto, Checklist.class);
+            // Paso 1: crear checklist manualmente para evitar problemas con el mapeo de items
+            Checklist checklist = new Checklist();
+            checklist.setState(checklistDto.getState());
+            checklist.setRemarks(checklistDto.getRemarks());
+            checklist.setTrimester(checklistDto.getTrimester());
+            checklist.setComponent(checklistDto.getComponent());
+            checklist.setEvaluationCriteria(checklistDto.isEvaluationCriteria());
+            checklist.setStudySheets(checklistDto.getStudySheets());
 
             // 🔧 Conversión manual del String a byte[] para instructorSignature
             if (checklistDto.getInstructorSignature() != null) {
@@ -82,24 +111,60 @@ public class ChecklistBusiness {
                 );
             }
 
-            // Paso 2: asignar manualmente la entidad Evaluations si se proporciona un ID
-            if (checklistDto.getEvaluations() != null) {
-                Evaluations eval = EvaluationsService.findById(checklistDto.getEvaluations());
-                checklist.setEvaluation(eval);
+            // Paso 2: asignar manualmente la entidad Evaluations si se proporciona un ID válido
+            // Paso 2: asignar manualmente la entidad Evaluation si se proporciona un ID válido
+            if (checklistDto.getEvaluation() != null && checklistDto.getEvaluation().getId() != null) {
+                try {
+                    Evaluations eval = evaluationsService.getById(checklistDto.getEvaluation().getId());
+                    checklist.setEvaluation(eval);
+                } catch (Exception e) {
+                    System.out.println("Warning: Evaluation with ID " + checklistDto.getEvaluation().getId() + " not found. Continuing without evaluation.");
+                }
             }
 
-            // Paso 3: guardar
+
+            // Paso 3: guardar el checklist primero
             Checklist saved = checklistService.save(checklist);
             
+            // Paso 4: crear los items si se proporcionan
+            if (checklistDto.getItems() != null && !checklistDto.getItems().isEmpty()) {
+                // Obtener o crear un ItemType por defecto para este trimestre
+                ItemType defaultItemType = getOrCreateDefaultItemType(saved.getTrimester());
+                
+                // Inicializar la lista de items si es null
+                if (saved.getItems() == null) {
+                    saved.setItems(new java.util.ArrayList<>());
+                }
+                
+                for (var itemDto : checklistDto.getItems()) {
+                    Item item = new Item();
+                    item.setCode(itemDto.getCode());
+                    item.setIndicator(itemDto.getIndicator());
+                    item.setActive(itemDto.getActive() != null ? itemDto.getActive() : true);
+                    item.setChecklist(saved);
+                    item.setItemType(defaultItemType);
+                    
+                    // Agregar el item a la lista del checklist
+                    saved.getItems().add(item);
+                }
+                
+                // Volver a guardar para persistir los items
+                saved = checklistService.save(saved);
+            }
+            
             // ⭐ GUARDAR HISTORIAL DE CREACIÓN
-            checklistHistoryService.guardarHistorial(
+            checklistHistoryBusiness.guardarHistorial(
                 "Checklist creado", 
                 null, 
                 saved, 
                 "Sistema" // Puedes cambiar esto por el usuario actual
             );
             
-            return modelMapper.map(saved, ChecklistDto.class);
+            ChecklistDto result = modelMapper.map(saved, ChecklistDto.class);
+            // Mapeo manual de los campos que pueden no estar mapeándose correctamente
+            result.setTrimester(saved.getTrimester());
+            result.setComponent(saved.getComponent());
+            return result;
         } catch (Exception e) {
             throw new CustomException("Error creating checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -123,7 +188,7 @@ public class ChecklistBusiness {
             estadoAnterior.setEvaluation(checklistAntes.getEvaluation());
             estadoAnterior.setLearningOutcome(checklistAntes.getLearningOutcome());
 
-            // Aplicar los cambios
+            // Aplicar los cambios básicos del checklist
             checklistAntes.setState(checklistDto.getState());
             checklistAntes.setRemarks(checklistDto.getRemarks());
             checklistAntes.setStudySheets(checklistDto.getStudySheets());
@@ -135,6 +200,66 @@ public class ChecklistBusiness {
                 );
             }
 
+            // 🔗 VINCULAR EVALUACIÓN SI SE PROPORCIONA evaluationId
+            if (checklistDto.getEvaluationId() != null) {
+                try {
+                    Evaluations evaluation = evaluationsService.getById(checklistDto.getEvaluationId());
+                    checklistAntes.setEvaluation(evaluation);
+                    System.out.println("✅ Linked evaluation ID: " + checklistDto.getEvaluationId() + " to checklist");
+                } catch (Exception e) {
+                    System.err.println("❌ Error linking evaluation: " + e.getMessage());
+                    // No lanzamos excepción para que el resto de la actualización continúe
+                }
+            }
+
+            // 🔧 ACTUALIZAR ITEMS - ESTA ERA LA PARTE FALTANTE
+            if (checklistDto.getItems() != null) {
+                // Obtener los items existentes
+                List<Item> existingItems = checklistAntes.getItems();
+                if (existingItems == null) {
+                    existingItems = new java.util.ArrayList<>();
+                    checklistAntes.setItems(existingItems);
+                }
+
+                // Actualizar items existentes o crear nuevos
+                for (var itemDto : checklistDto.getItems()) {
+                    Item existingItem = null;
+                    
+                    // Si el itemDto tiene ID, buscar el item existente
+                    if (itemDto.getId() != null) {
+                        for (Item item : existingItems) {
+                            if (item.getId().equals(itemDto.getId())) {
+                                existingItem = item;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (existingItem != null) {
+                        // 🎯 ACTUALIZAR ITEM EXISTENTE
+                        System.out.println("🔄 Updating existing item ID: " + existingItem.getId() + 
+                                         " from '" + existingItem.getIndicator() + 
+                                         "' to '" + itemDto.getIndicator() + "'");
+                        existingItem.setCode(itemDto.getCode());
+                        existingItem.setIndicator(itemDto.getIndicator());
+                        existingItem.setActive(itemDto.getActive() != null ? itemDto.getActive() : true);
+                    } else {
+                        // ➕ CREAR NUEVO ITEM
+                        System.out.println("➕ Creating new item: " + itemDto.getIndicator());
+                        ItemType defaultItemType = getOrCreateDefaultItemType(checklistAntes.getTrimester());
+                        
+                        Item newItem = new Item();
+                        newItem.setCode(itemDto.getCode());
+                        newItem.setIndicator(itemDto.getIndicator());
+                        newItem.setActive(itemDto.getActive() != null ? itemDto.getActive() : true);
+                        newItem.setChecklist(checklistAntes);
+                        newItem.setItemType(defaultItemType);
+                        
+                        existingItems.add(newItem);
+                    }
+                }
+            }
+
             // ✅ Modificar la evaluación ya existente asociada al checklist
             Evaluations eval = checklistAntes.getEvaluation();
             if (eval != null) {
@@ -143,11 +268,13 @@ public class ChecklistBusiness {
                 // Modifica aquí lo que necesites
             }
 
-            // Guardar los cambios
+            // Guardar los cambios (esto persistirá tanto el checklist como los items actualizados)
+            System.out.println("💾 Saving updated checklist with items...");
             Checklist checklistActualizado = checklistService.save(checklistAntes);
+            System.out.println("✅ Checklist saved successfully with " + checklistActualizado.getItems().size() + " items");
 
             // ⭐ GUARDAR HISTORIAL DE ACTUALIZACIÓN
-            checklistHistoryService.guardarHistorial(
+            checklistHistoryBusiness.guardarHistorial(
                 "Checklist actualizado", 
                 estadoAnterior, 
                 checklistActualizado, 
@@ -155,6 +282,8 @@ public class ChecklistBusiness {
             );
 
         } catch (Exception e) {
+            System.err.println("❌ Error updating checklist: " + e.getMessage());
+            e.printStackTrace();
             throw new CustomException("Error Updating Checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
@@ -169,7 +298,7 @@ public class ChecklistBusiness {
             checklistService.delete(checklistAntes);
             
             // ⭐ GUARDAR HISTORIAL DE ELIMINACIÓN
-            checklistHistoryService.guardarHistorial(
+            checklistHistoryBusiness.guardarHistorial(
                 "Checklist eliminado", 
                 checklistAntes, 
                 null, 
@@ -194,5 +323,24 @@ public class ChecklistBusiness {
     public String exportChecklistExcel(Long checklistId) {
         Checklist checklist = checklistService.getById(checklistId);
         return exportService.exportExcelBase64(checklist);
+    }
+
+    // Helper method to get or create default ItemType
+    private ItemType getOrCreateDefaultItemType(String trimester) {
+        // Intentar obtener un ItemType existente para el trimestre
+        List<ItemType> existingTypes = itemTypeRepository.findAll();
+        
+        // Buscar un ItemType que coincida con el trimestre
+        for (ItemType itemType : existingTypes) {
+            if (trimester.equals(itemType.getTrimester())) {
+                return itemType;
+            }
+        }
+        
+        // Si no hay ninguno para este trimestre, crear uno nuevo
+        ItemType newItemType = new ItemType();
+        newItemType.setName("Default");
+        newItemType.setTrimester(trimester);
+        return itemTypeRepository.save(newItemType);
     }
 }

@@ -78,6 +78,18 @@ public class AttendancesBusiness {
         }
     }
 
+
+    public List<AttendanceDto> findAllByCompetenceQuarterId(Long id) {
+        try {
+            List<Attendance> attendanceList = attendancesService.findAllByCompetenceQuarterId(id);
+            return attendanceList.stream()
+                    .map(entity -> modelMapper.map(entity, AttendanceDto.class))
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new CustomException("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // Get filtered attendances (student and state)
     public Page<AttendanceDto> findAllByStudentId(Long studentId, Long idState, Pageable pageable) {
         try {

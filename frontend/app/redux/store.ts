@@ -3,6 +3,7 @@ import justificationReducer from "@slice/justificationSlice";
 import justificationTypeReducer from "@slice/justificationTypeSlice";
 import justificationStatusReducer from "./slices/justificationStatusSlice";
 import checklistReducer from "@slice/checklistSlice";
+import evaluationReducer from "@slice/evaluationSlice";
 import studentReducer from "@slice/olympo/studentSlice";
 import programReducer from "@slice/olympo/programSlice";
 import studySheetReducer from "@slice/olympo/studySheetSlice";
@@ -10,6 +11,7 @@ import teamScrumReducer from "@slice/teamScrumSlice"
 import attendancesReducer from "@slice/attendanceSlice"
 import attendanceStateReducer from "@slice/attendanceStateSlice"
 import profileReducer from "@slice/atlas/profileSlice";
+import processMethodologiesReducer from "@slice/atlas/processMethodologiesSlice";
 
 const store = configureStore({
     reducer: {
@@ -17,13 +19,15 @@ const store = configureStore({
         justificationType: justificationTypeReducer,
         justificationStatus: justificationStatusReducer,
         checklist: checklistReducer,
+        evaluation: evaluationReducer,
         student: studentReducer,
         program: programReducer,
         studySheet: studySheetReducer,
         teamScrum: teamScrumReducer,
         attendances: attendancesReducer,
         attendanceState: attendanceStateReducer,
-        profile: profileReducer
+        profile: profileReducer,
+        processMethodologies: processMethodologiesReducer
     }
 });
 

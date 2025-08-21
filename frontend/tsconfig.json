@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2017",
+    "forceConsistentCasingInFileNames": true,
     "lib": [
       "dom",
       "dom.iterable",
@@ -68,6 +69,9 @@
       ],
       "@feature/*": [
         "./app/features/*"
+      ],
+      "@redux/*": [
+        "./app/redux/*"
       ],
     }
   },

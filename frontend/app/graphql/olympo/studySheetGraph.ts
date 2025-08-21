@@ -51,6 +51,10 @@ export const GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID = gql`
         id
         teamName
         projectName
+        processMethodology{
+          id
+          name
+        }
         students {
           id
           person {
@@ -110,11 +114,16 @@ export const GET_STUDY_SHEET_BY_ID = gql`
             }
           }
           studentStudySheetState {
-
             id
             name
           }
         }
+        teacherStudySheets{
+                id
+                competence {
+                    name
+                }
+            }
       }
     }
   }
@@ -133,18 +142,6 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
         startLective
         endLective
         state
-        offer {
-          name
-        }
-        journey {
-          name
-        }
-        quarter {
-          name {
-            extension
-            number
-          }
-        }
         trainingProject {
           name
           program {
@@ -152,8 +149,8 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
           }
         }
         studentStudySheets {
-          id
           student {
+            id
             person {
               document
               name
@@ -194,7 +191,6 @@ export const GET_STUDY_SHEET_WITH_STUDENTS = gql`
             }
         }
         studentStudySheets {
-          id
           student {
             id
             person {
@@ -227,6 +223,13 @@ query studySheetByTeacherIdWithTeamScrum($idTeacher: Long, $page: Int, $size: In
         state
         journey {
           name
+        }
+        quarter{
+            id
+            name{
+                extension
+                number
+            }
         }
         trainingProject {
           name

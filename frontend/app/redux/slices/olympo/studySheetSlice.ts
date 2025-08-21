@@ -22,8 +22,8 @@ import {
 
 // Función para transformar datos de GraphQL a StudySheet
 export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet => {
-    return {
-        id: graphqlData.id,
+    const result = {
+        id: graphqlData.id ?? graphqlData._id ?? "",
         number: graphqlData.number,
         numberStudents: graphqlData.numberStudents,
         startLective: graphqlData.startLective,
@@ -52,7 +52,15 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet =
                     extension: q.name?.extension,
                 },
             }))
-            : [],
+            : graphqlData.quarter?.name
+                ? [{
+                    id: graphqlData.quarter.id,
+                    name: {
+                        number: graphqlData.quarter.name.number,
+                        extension: graphqlData.quarter.name.extension,
+                    },
+                }]
+                : [],
 
         trainingProject: graphqlData.trainingProject
             ? {
@@ -67,25 +75,41 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet =
             }
             : null,
 
-        studentStudySheets: graphqlData.studentStudySheets?.filter((s: any) => s !== null).map((ss: any) => ({
-            id: ss.student?.id,
-            state: ss.studentStyudySheetState?.name,
-            person: {
-                id: ss.student?.person?.id,
-                document: ss.student?.person?.document,
-                name: ss.student?.person?.name,
-                lastname: ss.student?.person?.lastname,
-                email: ss.student?.person?.email,
-                phone: ss.student?.person?.phone,
-                blood_type: ss.student?.person?.blood_type,
-                date_birth: ss.student?.person?.date_birth,
+        studentStudySheets: graphqlData.studentStudySheets?.map((ss: any) => ({
+            id: ss.id,
+            student: {
+                id: ss.student?.id,
+                person: {
+                    id: ss.student?.person?.id,
+                    name: ss.student?.person?.name,
+                    lastname: ss.student?.person?.lastname,
+                    document: ss.student?.person?.document,
+                    email: ss.student?.person?.email,
+                    phone: ss.student?.person?.phone,
+                    blood_type: ss.student?.person?.blood_type,
+                    date_birth: ss.student?.person?.date_birth,
+                },
             },
+            studentStudySheetState: ss.studentStudySheetState || null,
+        })) || [],
+
+        teacherStudySheets: graphqlData.teacherStudySheets?.map((ts: any) => ({
+            id: ts.id,
+            competence: ts.competence ? {
+                name: ts.competence.name
+            } : null,
         })) || [],
 
         teamsScrum: graphqlData.teamsScrum?.filter((t: any) => t !== null).map((team: any) => ({
             id: team.id,
             teamName: team.teamName,
             projectName: team.projectName,
+            processMethodologyId: team.processMethodologyId,
+            processMethodology: team.processMethodology ? {
+                id: team.processMethodology.id,
+                name: team.processMethodology.name,
+                description: team.processMethodology.description
+            } : null,
             problem: team.problem,
             objectives: team.objectives,
             description: team.description,
@@ -99,6 +123,8 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet =
             })) || [],
         })) || [],
     };
+
+    return result;
 };
 
 
@@ -158,8 +184,7 @@ export const fetchStudySheetWithStudents = createAsyncThunk<GetStudySheetWithStu
             query: GET_STUDY_SHEET_WITH_STUDENTS,
             variables: { id },
             fetchPolicy: 'no-cache',
-        })
-        console.log("GraphQL response ->", data.studySheetById);
+        });
         return data.studySheetById;
     }
 );
@@ -190,7 +215,18 @@ const initialState: ExtendedStudySheetState = {
 const studySheetSlice = createSlice({
     name: 'studySheet',
     initialState,
-    reducers: {},
+    reducers: {
+        clearStudySheetState: (state) => {
+            state.data = [];
+            state.loading = false;
+            state.error = null;
+            state.dataForStudents = {};
+            state.dataForTeamScrums = [];
+            state.currentPage = 0;
+            state.totalItems = 0;
+            state.totalPages = 0;
+        }
+    },
     extraReducers: (builder) => {
         // Fetch all Study Sheets
         builder
@@ -200,7 +236,6 @@ const studySheetSlice = createSlice({
             })
             .addCase(fetchStudySheets.fulfilled, (state, action) => {
                 const payload = action.payload;
-                console.log('Payload fetchStudySheets:', payload);
 
                 if (payload?.data) {
                     const transformedData = payload.data
@@ -211,8 +246,6 @@ const studySheetSlice = createSlice({
                     state.totalItems = payload.totalItems ?? 0;
                     state.totalPages = payload.totalPages ?? 0;
                     state.currentPage = payload.currentPage ?? 0;
-
-                    console.log('Transformed data fetchStudySheets:', transformedData);
                 } else {
                     // fallback en caso de payload vacío
                     state.data = [];
@@ -251,7 +284,13 @@ const studySheetSlice = createSlice({
             })
             .addCase(fetchStudySheetWithTeamScrum.fulfilled, (state, action) => {
                 const item = action.payload?.data;
-                state.data = item ? [transformGraphQLToStudySheetItem(item)] : [];
+
+                if (item) {
+                    const transformed = transformGraphQLToStudySheetItem(item);
+                    state.data = [transformed];
+                } else {
+                    state.data = [];
+                }
                 state.loading = false;
             })
             .addCase(fetchStudySheetWithTeamScrum.rejected, (state, action) => {
@@ -267,7 +306,6 @@ const studySheetSlice = createSlice({
             })
             .addCase(fetchStudySheetByTeacher.fulfilled, (state, action) => {
                 const payload = action.payload;
-                console.log('Payload fetchStudySheetByTeacher:33333333333333333333333333333333', payload);
 
                 if (payload?.data) {
                     const transformedData = payload.data
@@ -279,7 +317,6 @@ const studySheetSlice = createSlice({
                     state.totalPages = payload.totalPages ?? 0;
                     state.currentPage = payload.currentPage ?? 0;
 
-                    console.log('Transformed data:', transformedData);
                 } else {
                     // fallback en caso de payload vacío
                     state.data = [];
@@ -302,24 +339,17 @@ const studySheetSlice = createSlice({
             })
             .addCase(fetchStudySheetWithStudents.fulfilled, (state, action) => {
                 const item = action.payload;
-                console.log(action.payload);
 
-                if (item) {
+                if (item?.data) {
                     const transformed = transformGraphQLToStudySheetItem(item.data);
+
+                    // Para FichaAprendiz, simplemente reemplazamos todo el array con la nueva ficha
+                    state.data = [transformed];
+
+                    // Asignar estudiantes
                     const sheetId = transformed.id;
-
-                    if (sheetId != null) {
-                        const existingIndex = state.data.findIndex(s => s.id === sheetId);
-                        if (existingIndex !== -1) {
-                            state.data[existingIndex] = transformed;
-                        } else {
-                            state.data.push(transformed);
-                        }
-
-                        // Filtra los null antes de asignar
+                    if (sheetId) {
                         state.dataForStudents[sheetId] = (transformed.studentStudySheets ?? []).filter(Boolean) as Student[];
-
-                        console.log(state.dataForStudents);
                     }
                 }
 
@@ -362,6 +392,6 @@ const studySheetSlice = createSlice({
     }
 });
 
-export const { } = studySheetSlice.actions;
+export const { clearStudySheetState } = studySheetSlice.actions;
 
 export default studySheetSlice.reducer;

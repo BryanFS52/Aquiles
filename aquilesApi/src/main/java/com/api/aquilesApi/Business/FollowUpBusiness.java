@@ -1,9 +1,9 @@
-/*
-package com.api.aquilesApi.Business;
+ package com.api.aquilesApi.Business;
  
-import com.api.aquilesApi.Dto.StateFollowUpsDto;
 import com.api.aquilesApi.Service.FollowUpService;
-import com.api.aquilesApi.Entity.FollowUps;
+import com.api.aquilesApi.Dto.FollowUpActionDto;
+import com.api.aquilesApi.Entity.FollowUpAction;
+import com.api.aquilesApi.Entity.FollowUpAction;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -24,14 +24,14 @@ public FollowUpBusiness(FollowUpService followUpService) {
 //Validation Object
 
 // Find All
-public Page<StateFollowUpsDto> findAll(int page, int size) {
+public Page<FollowUpActionDto> findAll(int page, int size) {
     try {
         PageRequest pageRequest = PageRequest.of(page, size);
-            Page<FollowUps> followUpsEntityPage = followUpService.findAll(pageRequest);
+            Page<FollowUpAction> followUpsEntityPage = followUpService.findAll(pageRequest);
 
             System.out.println("Total FollowUps: " + followUpsEntityPage.getTotalElements());
             System.out.println("Total FollowUps: " + followUpsEntityPage);
-            return followUpsEntityPage.map(entity -> modelMapper.map(entity, StateFollowUpsDto.class));
+            return followUpsEntityPage.map(entity -> modelMapper.map(entity, FollowUpActionDto.class));
         } catch (DataAccessException e) {
             throw new CustomException("Error retrieving followUps due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
@@ -40,10 +40,10 @@ public Page<StateFollowUpsDto> findAll(int page, int size) {
     }
     
     // Find By ID
-    public StateFollowUpsDto findById(Long id) {
+    public FollowUpActionDto findById(Long id) {
         try {
-            FollowUps followUps = followUpService.getById(id);
-            return modelMapper.map(followUps, StateFollowUpsDto.class);
+            FollowUpAction followUps = followUpService.getById(id);
+            return modelMapper.map(followUps, FollowUpActionDto.class);
         } catch (CustomException e) {
             throw e; //Exception Custom
         } catch (Exception e) {
@@ -52,15 +52,13 @@ public Page<StateFollowUpsDto> findAll(int page, int size) {
     }
     
     // Add
-    public StateFollowUpsDto add(StateFollowUpsDto stateFollowUpsDto) {
+    public FollowUpActionDto add(FollowUpActionDto stateFollowUpsDto) {
         try {
-            FollowUps followUpsEntity = new FollowUps();
+            FollowUpAction followUpsEntity = new FollowUpAction();
             followUpsEntity.setName(stateFollowUpsDto.getName());
-            return modelMapper.map(followUpService.save(followUpsEntity), StateFollowUpsDto.class);
+            return modelMapper.map(followUpService.save(followUpsEntity), FollowUpActionDto.class);
         } catch (Exception e) {
             throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }
-
- */

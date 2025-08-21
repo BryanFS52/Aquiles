@@ -3,6 +3,7 @@ type Attendance @key(fields: "id") {
     attendanceDate: String
     attendanceState: AttendanceState
     student: Student
+    competenceQuarter : TeacherStudySheet
     justification: Justification
 }
 
@@ -27,7 +28,7 @@ input AttendanceDto {
     id: ID
     attendanceDate: String
     attendanceState: AttendanceStateDto
-    studySheetQuarter: Long
+    competenceQuarter: Long
     studentId: Long
 }
 

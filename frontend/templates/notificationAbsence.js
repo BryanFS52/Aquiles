@@ -5,13 +5,11 @@ const generateEmailContent = (studentName, date) => {
   if (!studentName || !date) {
     console.error('Error: studentName o date son indefinidos.');
   }
-  return 
+  return
 };
 
 const sendEmail = async (email, subject, studentName, date) => {
   const htmlContent = generateEmailContent(studentName, date);
-
-  console.log('Contenido HTML del correo:', htmlContent); 
 
   try {
     const response = await fetch('/api/send-notification', {
@@ -27,7 +25,7 @@ const sendEmail = async (email, subject, studentName, date) => {
     });
 
     if (response.ok) {
-      console.log('Correo enviado con éxito');
+      // Correo enviado con éxito
     } else {
       console.error('Error al enviar el correo');
     }

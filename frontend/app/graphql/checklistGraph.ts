@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 
-// Queries and Mutations for Checklist
 export const GET_ALL_CHECKLISTS = gql`
   query GetAllChecklists($page: Int, $size: Int) {
     allChecklists(page: $page, size: $size) {
@@ -16,15 +15,19 @@ export const GET_ALL_CHECKLISTS = gql`
         remarks
         instructorSignature
         evaluationCriteria
-        associatedJuries {
+        trimester
+        component
+        studySheets
+        items {
           id
+          code
+          indicator
+          active
         }
       }
     }
   }
 `;
-
-
 
 export const GET_CHECKLIST_BY_ID = gql`
   query GetChecklistById($id: Long!) {
@@ -38,6 +41,22 @@ export const GET_CHECKLIST_BY_ID = gql`
         remarks
         instructorSignature
         evaluationCriteria
+        trimester
+        component
+        studySheets
+        items {
+          id
+          code
+          indicator
+          active
+        }
+        evaluations {
+          id
+          observations
+          recommendations
+          valueJudgment
+          checklistId
+        }
         associatedJuries {
           id
         }
@@ -45,7 +64,6 @@ export const GET_CHECKLIST_BY_ID = gql`
     }
   }
 `;
-
 
 export const ADD_CHECKLIST = gql`
   mutation AddChecklist($input: ChecklistDto!) {
@@ -74,5 +92,27 @@ export const DELETE_CHECKLIST = gql`
       message
       id
     }
+  }
+`;
+
+export const UPDATE_ITEM_STATUS = gql`
+  mutation UpdateItemStatus($itemId: Long!, $active: Boolean!) {
+    updateItemStatus(itemId: $itemId, active: $active) {
+      code
+      message
+      id
+    }
+  }
+`;
+
+export const EXPORT_CHECKLIST_PDF = gql`
+  query ExportChecklistToPdf($id: Long!) {
+    exportChecklistToPdf(id: $id)
+  }
+`;
+
+export const EXPORT_CHECKLIST_EXCEL = gql`
+  query ExportChecklistToExcel($id: Long!) {
+    exportChecklistToExcel(id: $id)
   }
 `;

@@ -1,6 +1,5 @@
 package com.api.aquilesApi.Service;
 
-import com.api.aquilesApi.Entity.TeamScrumMemberId;
 import com.api.aquilesApi.Entity.TeamsScrum;
 import com.api.aquilesApi.Repository.TeamScrumRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
@@ -69,7 +68,7 @@ public class TeamScrumService implements Idao<TeamsScrum, Long> {
     }
 
     // Check if team exists for a study sheet and members
-    public boolean existsByStudySheetIdAndMemberIds(Long studySheetId, List<TeamScrumMemberId> memberIds) {
+    public boolean existsByStudySheetIdAndMemberIds(Long studySheetId, List<Long> memberIds) {
         return teamsScrumRepository.existsByStudySheetIdAndMemberIds(studySheetId, memberIds);
     }
 }

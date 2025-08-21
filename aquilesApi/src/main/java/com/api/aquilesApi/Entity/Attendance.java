@@ -2,6 +2,7 @@ package com.api.aquilesApi.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.Date;
 import java.util.Set;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Getter
 @Setter
@@ -32,8 +34,8 @@ public class Attendance implements Serializable {
     @Column (name = "student_id")
     private Long studentId;
 
-    @Column (name = "study_sheet_quarter")
-    private Long studySheetQuarter;
+    @Column (name = "competence_quarter")
+    private Long competenceQuarter;
 
     // Relations
     // Relation (1-1) con justification
@@ -44,7 +46,6 @@ public class Attendance implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "stateAttendance_id", referencedColumnName = "id")
     private AttendanceState attendanceState;
-
 
     // 3.Relation (M-M) con notifications
     @ManyToMany(mappedBy = "attendances")

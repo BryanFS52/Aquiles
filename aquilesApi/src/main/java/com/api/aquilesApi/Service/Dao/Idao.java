@@ -5,23 +5,24 @@ import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
-public interface Idao<T, ID>{
-    // Método para obtener o retornar una lista de todas las instancias de una entidad en la base de datos.
-    // Para obtener una lista de todas las entidades con paginación
+public interface Idao<T, ID> {
+    // Method to get or return a list of all instances of an entity in the database.
+    // To get a list of all entities with pagination
     Page<T> findAll(PageRequest pageable);
 
-    // Método para obtener una instancia específica de la entidad basada en un identificador único.
+    // Method to get a specific instance of the entity based on a unique identifier.
     T getById(ID id);
 
-    // Método para actualizar una instancia existente de la entidad en la base de datos.
+    // Method to update an existing instance of the entity in the database.
     void update(T entity);
 
-    // Método para guardar una instancia de la entidad en la base de datos, ya sea creando una nueva entrada o actualizando una existente, devuelve la entidad guardada
+    // Method to save an instance of the entity in the database, either by creating a new entry or updating an existing one, returns the saved entity.
     T save(T entity);
 
-    // Método para eliminar una instancia existente de la entidad de la base de datos.
+    // Method to delete an existing instance of the entity from the database.
     void delete(T entity);
 
-    // Método para crear una nueva instancia de la entidad en la base de datos (puede ser redundante con save dependiendo del uso).
+    // Method to create a new instance of the entity in the database (maybe redundant with save depending on usage).
     void create(T entity);
 }
+

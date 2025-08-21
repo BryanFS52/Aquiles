@@ -5,8 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import type { AppDispatch, RootState } from "@/redux/store";
 import PageTitle from "@components/UI/pageTitle";
-import JustificationFilters from "@components/features/justification/justificationsFilter";
-import JustificationTable from "@components/features/justification/justificationsTable";
+import JustificationFilters from "@components/features/justifications/justificationsFilter";
+import JustificationTable from "@components/features/justifications/justificationsTable";
 import EmptyState from "@components/UI/emptyState";
 import {
   setFilterOptions,
@@ -25,8 +25,6 @@ export default function JustificacionesInstructor() {
   const dispatch = useDispatch<AppDispatch>();
   const { showLoader, hideLoader } = useLoader();
   const [isTransitioning, setIsTransitioning] = useState(false);
-
-
   const {
     filteredData,
     loading,
@@ -42,6 +40,28 @@ export default function JustificacionesInstructor() {
   const { justificationStatuses } = useSelector(
     (state: RootState) => state.justificationStatus
   );
+  
+  useEffect(() => {
+    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
+  }, [dispatch]);
+
+  const handleFilterChange = (filterType: string, value: string) => {
+    dispatch(setFilterOptions({ [filterType]: value }));
+    dispatch(setLocalCurrentPage(1));
+  };
+  
+  const handleRefresh = () => {
+    console.log("🔄 Refresh solicitado");
+    // Aquí podrías agregar lógica para recargar datos específicos si es necesario
+  };
+  
+  const handlePreviousPage = () => {
+    dispatch(goToPreviousPage());
+  };
+
+  const handleNextPage = () => {
+    dispatch(goToNextPage());
+  };
 
   useEffect(() => {
     if (loading || isTransitioning) {
@@ -51,40 +71,12 @@ export default function JustificacionesInstructor() {
     }
   }, [loading, isTransitioning, showLoader, hideLoader]);
 
-  useEffect(() => {
-    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
-  }, [dispatch]);
-
-  // Log para debugging del estado de justificaciones
-  useEffect(() => {
-    console.log("📊 Estado actual:", {
-      loading,
-      dataLength: justificationsData?.length,
-      filteredDataLength: filteredData?.length,
-      totalItems,
-      currentPage: localCurrentPage
-    });
-  }, [loading, justificationsData, filteredData, totalItems, localCurrentPage]);
-
-  const handleFilterChange = (filterType: string, value: string) => {
-    dispatch(setFilterOptions({ [filterType]: value }));
-    dispatch(setLocalCurrentPage(1));
-  };
-
-  const handleRefresh = () => {
-    console.log("🔄 Refresh solicitado");
-    // Aquí podrías agregar lógica para recargar datos específicos si es necesario
-  };
-
   const handleStatusUpdateError = (error: any, justificacionId: string) => {
     console.error("Error al actualizar estado:", {
       justificacionId,
       error: error?.message || 'Error desconocido'
     });
   };
-
-  const handlePreviousPage = () => dispatch(goToPreviousPage());
-  const handleNextPage = () => dispatch(goToNextPage());
 
   const handleDownloadFile = (justificacion: any) => {
     if (justificacion.archivoAdjunto) {
@@ -108,6 +100,17 @@ export default function JustificacionesInstructor() {
       });
   };
 
+  // Log para debugging del estado de justificaciones
+  useEffect(() => {
+    console.log("📊 Estado actual:", {
+      loading,
+      dataLength: justificationsData?.length,
+      filteredDataLength: filteredData?.length,
+      totalItems,
+      currentPage: localCurrentPage
+    });
+  }, [loading, justificationsData, filteredData, totalItems, localCurrentPage]);
+
   const errorMessage = formatErrorMessage(error);
   const canGoNext = localCurrentPage < totalPages;
   const canGoPrevious = localCurrentPage > 1;
@@ -125,6 +128,8 @@ export default function JustificacionesInstructor() {
   return (
     <div className="space-y-6">
       <PageTitle>Justificaciones de aprendices</PageTitle>
+
+      {/* Filters */}
       <JustificationFilters
         filterOptions={filterOptions}
         loading={loading}
@@ -132,9 +137,12 @@ export default function JustificacionesInstructor() {
         onRefresh={handleRefresh}
       />
 
-      {errorMessage && <EmptyState message={errorMessage} />}
-      {errorMessage && <EmptyState message={errorMessage} />}
+      {/* Error Message */}
+      {errorMessage && (
+        <EmptyState message={errorMessage} />
+      )}
 
+      {/* Table */}
       {!loading && !errorMessage && (
         <>
           <JustificationTable
@@ -143,6 +151,7 @@ export default function JustificacionesInstructor() {
             handleStatusChange={handleStatusChange}
           />
 
+          {/* Pagination */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
             <button
               onClick={handlePreviousPage}

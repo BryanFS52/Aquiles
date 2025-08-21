@@ -1,6 +1,6 @@
 package com.api.aquilesApi.Dto;
 
-import lombok.AllArgsConstructor;
+import  lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,7 +17,9 @@ public class AttendanceDto {
     private Long studentId;
 
     // @NotNull(message = "")
-    private Long studySheetQuarter;
+    private Long competenceQuarter;
+
+    // @NotNull(message = "")
     private JustificationDto justification;
 
     // @NotNull(message = "")

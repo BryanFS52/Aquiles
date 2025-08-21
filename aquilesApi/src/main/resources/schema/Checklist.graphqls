@@ -1,9 +1,3 @@
-type Item {
-    id: ID!
-    code: String!
-    indicator: String!
-    active: Boolean!
-}
 
 type Checklist {
     id: ID!
@@ -13,8 +7,8 @@ type Checklist {
     component: String
     instructorSignature: String
     evaluationCriteria: Boolean
-    studySheets: Long
-    evaluations: Long
+    studySheets: Long 
+    evaluations: Evaluation
     items: [Item]
     associatedJuries: [Juries]
 }
@@ -36,11 +30,6 @@ type ChecklistPageId {
     message: String
 }
 
-input ItemDto {
-    code: String!
-    indicator: String!
-    active: Boolean!
-}
 
 input ChecklistDto {
     state: Boolean!
@@ -50,28 +39,18 @@ input ChecklistDto {
     instructorSignature: String!
     evaluationCriteria: Boolean!
     studySheets: Long
-    evaluations: Long
+    evaluationId: Long
+    evaluations: [EvaluationDto]
     items: [ItemDto]
-    associatedJuries: [ID!]!
-}
-
-type ChecklistHistory {
-    id: ID
-    checklistId: ID
-    actions: String
-    teacher: String
-    date: String
-    dateBefore: String
-    dateAfter: String
+    associatedJuries: [Long]
 }
 
 extend type Query {
     allChecklists(page: Int, size: Int): ChecklistPage
     checklistById(id: Long!): ChecklistPageId
-    Response(code: String, message: String, Date: String): Response
     exportChecklistToPdf(id: Long!): String
     exportChecklistToExcel(id: Long!): String
-    checklistHistoryById(checklistId: ID!): [ChecklistHistory]
+
 }
 
 extend type Mutation {

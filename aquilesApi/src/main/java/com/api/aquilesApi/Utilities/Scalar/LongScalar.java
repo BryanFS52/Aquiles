@@ -16,7 +16,7 @@ import java.util.Locale;
 @DgsScalar(name = "Long")
 public class LongScalar implements Coercing<Long, String> {
 
-    // ✅ Versión moderna con contexto (usada por Spring GraphQL y DGS)
+    // ✅ Versión modern con contexto (usada por Spring GraphQL y DGS)
     @Override
     public String serialize(@NotNull Object dataFetcherResult, @NotNull GraphQLContext graphQLContext, @NotNull Locale locale) throws CoercingSerializeException {
         if (dataFetcherResult instanceof Long || dataFetcherResult instanceof Integer) {

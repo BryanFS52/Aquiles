@@ -103,6 +103,7 @@ const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
             id: graphqlData.attendanceState?.id ?? '',
             status: graphqlData.attendanceState?.status ?? '',
         },
+        competenceQuarter: graphqlData.competenceQuarter ?? '',
         student: {
             id: graphqlData.student?.id ?? '',
             person: {
@@ -112,7 +113,7 @@ const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
             }
         }
     };
-};
+}
 
 
 export const fetchAttendances = createAsyncThunk<
