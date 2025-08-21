@@ -35,7 +35,7 @@ export function CourseInfoSection({ studySheet, }: CourseInfoSectionProps) {
                         </div>
                     </div>
 
-                    {/* keiros */}
+                    {/* Horario */}
                     <div className="flex items-center space-x-3">
                         <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                         <div>

@@ -13,7 +13,7 @@ public class TeamsScrumDto {
 
     private Long id;
     // @NotNull(message = "El nombre es obligatorio")
-    private String teamName;    
+    private String teamName;        
 
     // @NotNull(message = "El nombre del proyecto es obligatorio")
     private String projectName;

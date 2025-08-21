@@ -28,9 +28,9 @@ export default function Attendance() {
         (s: any) => s?.state !== "Activo"
     )?.length || 0;
 
-    const handleNavigate = () => {
+    const handleNavigate = (competenceId: string) => {
         setIsTransitioning(true);
-        router.push('/dashboard/asistenciaManual');
+        router.push(`/dashboard/asistenciaManual?competenceId=${competenceId}`);
     };
 
     useEffect(() => {

@@ -6,8 +6,8 @@ import type { JSX } from "react"
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { fetchAttendanceState } from '@slice/attendanceStateSlice';
-import { RootState } from '@/redux/store';
-import type { AppDispatch } from '@/redux/store';
+import { RootState } from '@redux/store';
+import type { AppDispatch } from '@redux/store';
 
 interface StudentListProps {
     students: any[]
@@ -38,7 +38,6 @@ export function StudentList({
         ausente: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900 dark:text-red-200 dark:border-red-700",
         justificado: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700",
         retardo: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700",
-        // fallback por si llega otro
         default: "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600",
     };
 

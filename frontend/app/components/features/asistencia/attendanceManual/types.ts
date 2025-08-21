@@ -1,5 +1,6 @@
 export interface AsistenciaManualContainerProps {
     isDarkMode?: boolean;
+    competenceId?: string | null;
 }
 
 // Re-exportar tipos existentes para centralizar
@@ -8,4 +9,5 @@ export type {
     AttendanceStats,
     AttendanceStatus,
     FilterOption,
+    Competence,
 } from "@type/pages/attendanceManual";
