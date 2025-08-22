@@ -5,9 +5,8 @@ type ImprovementPlan {
     reason: String!
     state: Boolean!
     qualification: Boolean!
-    studySheetId: ID!
-    studentId: ID!
-    teacherCompetence: ID!
+    student: Student
+    teacherCompetence: TeacherStudySheet
 }
 
 input ImprovementPlanDto {
@@ -16,7 +15,6 @@ input ImprovementPlanDto {
     reason: String!
     state: Boolean!
     qualification: Boolean!
-    studySheetId: ID!
     studentId: ID!
     teacherCompetence: ID!
 }

@@ -28,8 +28,7 @@ public class Justification implements Serializable {
     @Column(name = "justification_file", nullable = false)
     private byte[] justificationFile;
 
-    @Column(name = "absence_date", nullable = false)
-    private LocalDate absenceDate;
+
 
     @Column(name = "justification_date", nullable = false)
     private LocalDate justificationDate;
@@ -65,13 +64,7 @@ public class Justification implements Serializable {
         this.justificationFile = Base64.getDecoder().decode(justificationFile);
     }
 
-    public void setAbsenceDate(LocalDate date) {
-        this.absenceDate = date;
-    }
 
-    public void setAbsenceDate(String dateStr) {
-        this.absenceDate = LocalDate.parse(dateStr);
-    }
 
     public void setJustificationDate(LocalDate date) {
         this.justificationDate = date;
@@ -89,11 +82,5 @@ public class Justification implements Serializable {
         return null;
     }
 
-    public String getFormattedAbsenceDate() {
-        if (this.absenceDate != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            return this.absenceDate.format(formatter);
-        }
-        return null;
-    }
+
 }

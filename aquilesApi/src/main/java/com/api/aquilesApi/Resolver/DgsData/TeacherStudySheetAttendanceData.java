@@ -1,7 +1,6 @@
 package com.api.aquilesApi.Resolver.DgsData;
 
 import com.api.aquilesApi.Business.AttendancesBusiness;
-import com.api.aquilesApi.Dto.AttendanceDto;
 import com.api.aquilesApi.Dto.TeacherStudySheet;
 import com.api.aquilesApi.Entity.Attendance;
 import com.netflix.graphql.dgs.DgsComponent;
@@ -10,7 +9,6 @@ import com.netflix.graphql.dgs.DgsDataFetchingEnvironment;
 import org.modelmapper.ModelMapper;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @DgsComponent
 public class TeacherStudySheetAttendanceData {
@@ -32,10 +30,7 @@ public class TeacherStudySheetAttendanceData {
 
         Long teacherStudySheetId = teacherStudySheet.getId();
 
-        List<AttendanceDto> attendanceDtoList = attendancesBusiness.findAllByStudentId(teacherStudySheetId);
+        return attendancesBusiness.findAllByStudentId(teacherStudySheetId);
 
-        return attendanceDtoList.stream()
-                .map(dto -> modelMapper.map(dto, Attendance.class))
-                .collect(Collectors.toList());
     }
 }

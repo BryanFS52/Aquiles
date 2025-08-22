@@ -11,6 +11,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class ImprovementPlanBusiness {
     private final ImprovementPlanService improvementPlanService;
@@ -36,6 +38,14 @@ public class ImprovementPlanBusiness {
             throw new CustomException("Error retrieving improvemenPlan due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             throw new CustomException("An unexpected error occurred while retrieving improvemenPlan.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public List<ImprovementPlan> findAllByStudentId(Long id){
+        try {
+            return improvementPlanService.findAllByStudentId(id);
+        } catch (Exception e) {
+            throw new CustomException("Error Getting Improvement Plans by Student ID: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -81,6 +91,14 @@ public class ImprovementPlanBusiness {
             throw e;
         } catch (Exception e) {
             throw new CustomException("Error Deleting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    public List<Long> findAllByTeacherCompetence(Long teacherCompetence) {
+        try {
+            return improvementPlanService.findAllByTeacherCompetence(teacherCompetence);
+        } catch (Exception e) {
+            throw new CustomException("Error Getting Teacher Competence IDs: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }

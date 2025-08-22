@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
 
@@ -37,6 +39,12 @@ public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
                 ));
     }
 
+
+
+    public List<ImprovementPlan> findAllByStudentId(Long id) {
+        return improvementPlanRepository.findAllByStudentId(id);
+    }
+
     @Override
     public void update(ImprovementPlan entity) {
         improvementPlanRepository.save(entity);
@@ -57,8 +65,14 @@ public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
         improvementPlanRepository.save(entity);
     }
 
+
+
     public boolean existsActivePlanForStudent(Long studentId) {
         return improvementPlanRepository.existsByStudentIdAndStateTrue(studentId);
+    }
+
+    public List<Long> findAllByTeacherCompetence(Long teacherCompetence) {
+        return improvementPlanRepository.findAllByTeacherCompetence(teacherCompetence);
     }
 
 }

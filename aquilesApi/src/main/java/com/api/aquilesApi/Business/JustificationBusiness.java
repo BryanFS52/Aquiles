@@ -86,7 +86,7 @@ public class JustificationBusiness {
     // Map Entity to DTO
     private JustificationDto mapToDto(Justification justification) {
         JustificationDto dto = modelMapper.map(justification, JustificationDto.class);
-        dto.setAbsenceDate(justification.getFormattedAbsenceDate());
+
         dto.setJustificationDate(justification.getFormattedJustificationDate());
         return dto;
     }
@@ -95,7 +95,7 @@ public class JustificationBusiness {
     private Justification buildJustificationFromDto(JustificationDto dto, boolean isNew) {
         Justification justification = new Justification();
 
-        justification.setAbsenceDate(dto.getAbsenceDate());
+
         justification.setJustificationDate(isNew ? LocalDate.now().toString() : dto.getJustificationDate());
         justification.setDescription(dto.getDescription());
         justification.setState(dto.getState());
