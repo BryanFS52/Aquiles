@@ -3,8 +3,10 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import { AppDispatch } from "@redux/store";
 import PageTitle from "@components/UI/pageTitle";
-import JustificationFilters from "@components/features/justification/justificationsFilter";
+import JustificationFilters from "@components/features/justifications/justificationsFilter";
+import JustificationTable from "@components/features/justifications/justificationsTable";
 import {
   fetchJustifications,
   setFilterOptions,
@@ -16,6 +18,7 @@ import {
   generateFileName,
   updateJustificationStatus,
 } from '@slice/justificationSlice';
+import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
 import JustificationTable from "@/components/features/justification/justificationsTable";
 import { AppDispatch, RootState } from "@/redux/store";
 
@@ -31,11 +34,18 @@ export default function JustificacionesCoordinator() {
     localCurrentPage,
     filterOptions,
     itemsPerPage
-  } = useSelector((state:any) => state.justification);
+  } = useSelector((state: RootState) => state.justification);
+
+  // Obtener los estados de justificación para mapear IDs a nombres
+  const { justificationStatuses } = useSelector(
+    (state: RootState) => state.justificationStatus
+  );
 
 
   useEffect(() => {
     dispatch(fetchJustifications({ page: 0, size: itemsPerPage }));
+    // Cargar los estados de justificación
+    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
   }, [dispatch, localCurrentPage, itemsPerPage]);
 
   const handleFilterChange = (filterType: string, value: string) => {
@@ -55,7 +65,7 @@ export default function JustificacionesCoordinator() {
     dispatch(goToNextPage());
   };
 
-  const handleDownloadFile = (justificacion:any) => {
+  const handleDownloadFile = (justificacion: any) => {
     if (justificacion.archivoAdjunto) {
       const mimeType = justificacion.archivoMime || "application/octet-stream";
       const fileName = generateFileName(justificacion.id, mimeType);
@@ -63,14 +73,25 @@ export default function JustificacionesCoordinator() {
     }
   };
 
-  const handleStatusChange = (justificacionId: string, newStatus: string) => {
-    dispatch(updateJustificationStatus({ id: justificacionId, status: newStatus }))
-      .then(() => {
-        // Refrescar los datos después de actualizar el estado
-        dispatch(fetchJustifications({ page: localCurrentPage - 1, size: itemsPerPage }));
+  const handleStatusChange = (justificacionId: string, newStatusId: string) => {
+    console.log("🔄 Cambiando estado de justificación (Coordinador):", {
+      id: justificacionId,
+      newStatusId
+    });
+    
+    // Enviar directamente el statusId para usar la relación real
+    dispatch(updateJustificationStatus({ id: justificacionId, statusId: newStatusId }))
+      .then((result) => {
+        if (updateJustificationStatus.fulfilled.match(result)) {
+          console.log("✅ Estado actualizado exitosamente");
+          // ✅ Recargar los datos para obtener la relación actualizada desde el backend
+          dispatch(fetchJustifications({ page: localCurrentPage - 1, size: itemsPerPage }));
+        } else {
+          console.error("❌ Error al actualizar el estado:", result.payload);
+        }
       })
       .catch((error) => {
-        console.error("Error al actualizar el estado:", error);
+        console.error("❌ Error inesperado al actualizar el estado:", error);
       });
   };
 
@@ -100,11 +121,11 @@ export default function JustificacionesCoordinator() {
       {/* Table */}
       {!loading && !errorMessage && (
         <>
-        <JustificationTable
-          filteredData={filteredData}
-          handleDownloadFile={handleDownloadFile}
-          handleStatusChange={handleStatusChange}
-        />
+          <JustificationTable
+            filteredData={filteredData}
+            handleDownloadFile={handleDownloadFile}
+            handleStatusChange={handleStatusChange}
+          />
 
           {/* Pagination */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">

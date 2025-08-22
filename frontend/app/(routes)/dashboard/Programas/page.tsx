@@ -10,7 +10,7 @@ import { BsPersonRolodex } from 'react-icons/bs';
 import { SlCalculator } from 'react-icons/sl';
 import { GrUserSettings } from 'react-icons/gr';
 import { LiaLanguageSolid } from 'react-icons/lia';
-import { Program, IconMapType, programsData, ITEMS_PER_PAGE } from '@/types/pages/programs';
+import { Program, IconMapType, programsData, ITEMS_PER_PAGE } from '@type/pages/programs';
 import { PaginationState } from '@type/global/pagination'
 import PageTitle from '@components/UI/pageTitle';
 

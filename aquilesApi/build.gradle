@@ -22,6 +22,8 @@ configurations {
 
 repositories {
 	mavenCentral()
+	maven { url 'https://jitpack.io' }
+	maven { url "https://repo.spring.io/milestone" }
 }
 
 ext {
@@ -39,6 +41,11 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -58,6 +65,12 @@ dependencies {
 	implementation 'org.apache.poi:poi-ooxml:5.2.3'
 	implementation 'org.apache.pdfbox:pdfbox:2.0.28'
 
+	// Reports XLS or PDF
+	implementation 'net.sf.jasperreports:jasperreports:6.20.0'
+	implementation 'com.lowagie:itext:2.1.7' // Explicitly adding iText
+	implementation 'org.apache.poi:poi:5.2.3' // Para formatos XLS (HSSF)
+	implementation 'org.apache.poi:poi-ooxml:5.2.3' // Para formatos XLSX (XSSF)
+	implementation 'org.apache.pdfbox:pdfbox:2.0.28' // Usa la versión más reciente
 	// JSON
 	implementation 'org.json:json:20240303'
 

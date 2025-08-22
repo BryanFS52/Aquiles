@@ -10,6 +10,7 @@ import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
 import java.util.Map;
 
 @DgsComponent
@@ -24,13 +25,13 @@ public class JustificationResolver {
     @DgsQuery
     public Map<String, Object> allJustifications(@InputArgument Integer page, @InputArgument Integer size) {
         try {
-            Page<JustificationDto> justificationDtoPage = justificationBusiness.findAll(page , size);
+            Page<JustificationDto> justificationDtoPage = justificationBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
                     justificationDtoPage.getContent(),
                     ResponseHttpApi.CODE_OK,
                     "Query ok",
                     justificationDtoPage.getTotalPages(),
-                    page,
+                    justificationDtoPage.getNumber(),
                     (int) justificationDtoPage.getTotalElements()
             );
         } catch (Exception e) {
@@ -56,19 +57,42 @@ public class JustificationResolver {
         }
     }
 
+    // Find Justification by attendance by studentID (GraphQL)
+    @DgsQuery
+    public Map<String, Object> justificationByStudentId(@InputArgument Long studentId) {
+        try {
+            List<JustificationDto> justificationDtos = justificationBusiness.findByStudentId(studentId);
+            return ResponseHttpApi.responseHttpFindAll(
+                    justificationDtos,
+                    ResponseHttpApi.CODE_OK,
+                    "Query by studentId ok",
+                    1,
+                    0,
+                    justificationDtos.size()
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving Justifications by Student ID: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     // Add a new Justification (GraphQL)
     @DgsMutation
     public Map<String, Object> addJustification(@InputArgument(name = "input") JustificationDto justificationDto) {
         try {
-            JustificationDto justificationDto1 = justificationBusiness.add(justificationDto);
+            JustificationDto result = justificationBusiness.add(justificationDto);
+
             return ResponseHttpApi.responseHttpAction(
-                    justificationDto1.getId(),
+                    result.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
             );
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error adding Justification: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error adding Justification: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
@@ -90,19 +114,20 @@ public class JustificationResolver {
         }
     }
 
-    // Delete Justification (GraphQL)
+    // Update Justification Status Only (GraphQL)
     @DgsMutation
-    public Map<String, Object> deleteJustification(@InputArgument Long id) {
+    public Map<String, Object> updateStatusInJustification(@InputArgument Long id, @InputArgument(name = "input") Long statusId) {
         try {
-            justificationBusiness.delete(id);
+            justificationBusiness.UpdateStatusInJustification(id, statusId);
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
-                    "Delete ok"
+                    "Status update ok"
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error deleting Justification: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error updating Justification status: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }

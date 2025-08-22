@@ -120,14 +120,7 @@ export const Header: React.FC<HeaderProps> = ({ role: initialRole }) => {
           {isOpen && (
             <div
               ref={notificationsRef}
-              className={`
-                absolute z-50 
-                right-0 top-full mt-2
-                ${isMobile
-                  ? "w-72 sm:w-80 max-w-[calc(100vw-24px)]"
-                  : "w-80 lg:w-96"
-                }
-              `}
+              className="absolute z-50 right-0 top-full mt-2"
             >
               <Notifications />
             </div>

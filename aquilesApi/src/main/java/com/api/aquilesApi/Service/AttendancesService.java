@@ -24,6 +24,7 @@ public class AttendancesService implements Idao<Attendance, Long> {
     // Get all attendances paginated
     @Override
     public Page<Attendance> findAll(PageRequest pageRequest) {
+
         return attendancesRepository.findAll(pageRequest);
     }
 
@@ -60,7 +61,12 @@ public class AttendancesService implements Idao<Attendance, Long> {
 
     // Get all attendances for a specific student
     public List<Attendance> findAllByStudentId(Long studentId) {
+        System.out.println("Fetching attendances for student ID: " + studentId);
         return attendancesRepository.findAllByStudentId(studentId);
+    }
+
+    public List<Attendance> findAllByCompetenceQuarterId(Long id) {
+        return attendancesRepository.findAllByCompetenceQuarter(id);
     }
 
     // Filter attendances by student and/or state

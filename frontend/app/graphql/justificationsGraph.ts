@@ -14,11 +14,17 @@ export const GET_ALL_JUSTIFICATIONS = gql`
         id
         description
         justificationFile
+        absenceDate
         justificationDate
         state
         justificationType {
           id
           name
+        }
+        justificationStatus {
+          id
+          name
+          state
         }
         attendance {
           student {
@@ -44,20 +50,75 @@ export const GET_JUSTIFICATION_BY_ID = gql`
         id
         description
         justificationFile
+        absenceDate
         justificationDate
         state
         justificationType {
           id
           name
         }
+        justificationStatus {
+          id
+          name
+          state
+        }
+        attendance {
+          id
+        }
       }
     }
   }
 `;
 
+export const GET_JUSTIFICATION_BY_STUDENT_ID = gql`
+  query GetJustificationByStudentId($studentId: Long!, $page: Int, $size: Int) {
+    justificationByStudentId(studentId: $studentId, page: $page, size: $size) {
+      code
+      message
+      data {
+        id
+        description
+        justificationFile
+        absenceDate
+        justificationDate
+        state
+        justificationType {
+          id
+          name
+        }
+        justificationStatus {
+          id
+          name
+          state
+        }
+        attendance {
+          student {
+            id
+            person {
+              name
+              lastname
+              document
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+
 export const ADD_JUSTIFICATION = gql`
   mutation AddJustification($input: JustificationDto!) {
     addJustification(input: $input) {
+      code
+      message
+    }
+  }
+`;
+
+export const UPDATE_STATUS_IN_JUSTIFICATION = gql`
+  mutation UpdateStatusInJustification($id: Long!, $input: Long!) {
+    updateStatusInJustification(id: $id, input: $input) {
       code
       message
     }

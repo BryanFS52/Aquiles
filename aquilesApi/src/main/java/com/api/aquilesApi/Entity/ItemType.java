@@ -1,6 +1,7 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,9 +9,10 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.List;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "item_type")
 public class ItemType implements Serializable {
@@ -21,6 +23,9 @@ public class ItemType implements Serializable {
     // Columns
     @Column(name = "name", nullable = false, length = 20)
     private String name;
+
+    @Column(name = "trimester", nullable = false)
+    private String trimester;
 
     // Relations
     // 1. Relation (1-M) con item

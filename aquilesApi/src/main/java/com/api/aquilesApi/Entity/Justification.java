@@ -1,6 +1,7 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.Base64;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "justification")
 public class Justification implements Serializable {
@@ -25,6 +27,9 @@ public class Justification implements Serializable {
 
     @Column(name = "justification_file", nullable = false)
     private byte[] justificationFile;
+
+    @Column(name = "absence_date", nullable = false)
+    private LocalDate absenceDate;
 
     @Column(name = "justification_date", nullable = false)
     private LocalDate justificationDate;
@@ -40,24 +45,55 @@ public class Justification implements Serializable {
     // 2.Relation (M-1) con justificationType
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "justification_type_id", nullable = true)
-    private JustificationType justificationTypeId;
+    private JustificationType justificationType;
 
     // 3. Relation (1-1) con attendance
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "attendance_id", referencedColumnName = "id")
     private Attendance attendance;
 
-    public String getJustificationFile() {
-        return Base64.getEncoder().encodeToString(justificationFile);
+    // 4. Relation (M-1) con justificationStatus
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "justification_status_id", referencedColumnName = "id")
+    private JustificationStatus justificationStatus;
+
+    public byte[] getJustificationFile() {
+        return Base64.getEncoder().encodeToString(justificationFile).getBytes();
     }
 
-    public void setJustificationFile(String justificationFile) {
+    public void setJustificationFile(byte[] justificationFile) {
         this.justificationFile = Base64.getDecoder().decode(justificationFile);
     }
 
-    public void setJustificationDate(String justificationDateString) {
+    public void setAbsenceDate(LocalDate date) {
+        this.absenceDate = date;
+    }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-        this.justificationDate = LocalDate.parse(justificationDateString);
+    public void setAbsenceDate(String dateStr) {
+        this.absenceDate = LocalDate.parse(dateStr);
+    }
+
+    public void setJustificationDate(LocalDate date) {
+        this.justificationDate = date;
+    }
+
+    public void setJustificationDate(String dateStr) {
+        this.justificationDate = LocalDate.parse(dateStr);
+    }
+
+    public String getFormattedJustificationDate() {
+        if (this.justificationDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return this.justificationDate.format(formatter);
+        }
+        return null;
+    }
+
+    public String getFormattedAbsenceDate() {
+        if (this.absenceDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return this.absenceDate.format(formatter);
+        }
+        return null;
     }
 }

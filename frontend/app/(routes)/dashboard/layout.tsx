@@ -1,7 +1,7 @@
 // layout.tsx (servidor)
 import { Inter } from 'next/font/google';
-import ClientLayoutWrapper from './ClientLayoutWrapper';
 import { ToastContainer } from 'react-toastify';
+import ClientLayoutWrapper from './ClientLayoutWrapper';
 import 'react-toastify/dist/ReactToastify.css';
 
 const inter = Inter({ subsets: ['latin'] });

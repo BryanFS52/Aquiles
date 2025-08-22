@@ -15,6 +15,10 @@ public interface AttendancesRepository extends JpaRepository<Attendance, Long> {
 
     // Finds attendances by studentId and/or attendanceStateId, ignoring null filters.
     List<Attendance> findAllByStudentId(Long studentId);
+
+    List<Attendance> findAllByCompetenceQuarter(Long id);
+
+    //
     @Query("""
     SELECT a FROM Attendance a
     WHERE (:studentId IS NULL OR a.studentId = :studentId)
@@ -25,4 +29,13 @@ public interface AttendancesRepository extends JpaRepository<Attendance, Long> {
             @Param("attendanceStateId") Long attendanceStateId,
             Pageable pageable
     );
+
+    // Finds all attendances that have a justification
+    @Query("SELECT a FROM Attendance a WHERE a.justification IS NOT NULL")
+    List<Attendance> findAllAttendancesWithJustification();
+
+    // Finds all attendances that have a justification with pagination
+    @Query("SELECT a FROM Attendance a WHERE a.justification IS NOT NULL")
+    Page<Attendance> findAllAttendancesWithJustification(Pageable pageable);
+
 }

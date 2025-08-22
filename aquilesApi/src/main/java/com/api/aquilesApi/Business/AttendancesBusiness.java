@@ -70,9 +70,18 @@ public class AttendancesBusiness {
     }
 
     // Get attendances by student ID
-    public List<AttendanceDto> findAllByStudentId(Long studentId) {
+    public List<Attendance> findAllByStudentId(Long studentId) {
         try {
-            List<Attendance> attendanceList = attendancesService.findAllByStudentId(studentId);
+             return attendancesService.findAllByStudentId(studentId);
+        } catch (Exception e) {
+            throw new CustomException("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    public List<AttendanceDto> findAllByCompetenceQuarterId(Long id) {
+        try {
+            List<Attendance> attendanceList = attendancesService.findAllByCompetenceQuarterId(id);
             return attendanceList.stream()
                     .map(entity -> modelMapper.map(entity, AttendanceDto.class))
                     .collect(Collectors.toList());
@@ -92,13 +101,13 @@ public class AttendancesBusiness {
     }
 
     // Add new attendance
-    public AttendanceDto add(AttendanceDto attendancesDto) {
+    public AttendanceDto add(AttendanceDto attendanceDto) {
         try {
             Attendance attendance = new Attendance();
-            attendance.setAttendanceDate(attendancesDto.getAttendanceDate());
-            AttendanceState attendanceState = stateAttendanceService.getById(attendancesDto.getAttendanceState().getId());
+            attendance.setAttendanceDate(attendanceDto.getAttendanceDate());
+            AttendanceState attendanceState = stateAttendanceService.getById(attendanceDto.getAttendanceState().getId());
             attendance.setAttendanceState(attendanceState);
-            attendance.setStudentId(attendancesDto.getStudentId());
+            attendance.setStudentId(attendanceDto.getStudentId());
 
             return modelMapper.map(attendancesService.save(attendance), AttendanceDto.class);
         } catch (Exception e) {
@@ -107,10 +116,10 @@ public class AttendancesBusiness {
     }
 
     // Update existing attendance
-    public void update(Long attendanceId, AttendanceDto attendancesDto) {
+    public void update(Long attendanceId, AttendanceDto attendanceDto) {
         try {
-            attendancesDto.setId(attendanceId);
-            Attendance attendance = modelMapper.map(attendancesDto, Attendance.class);
+            attendanceDto.setId(attendanceId);
+            Attendance attendance = modelMapper.map(attendanceDto, Attendance.class);
             attendancesService.save(attendance);
         } catch (Exception e) {
             throw new CustomException("Error Updating Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);

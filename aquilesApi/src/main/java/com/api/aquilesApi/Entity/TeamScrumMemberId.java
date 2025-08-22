@@ -7,15 +7,30 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Objects;
+
+@NoArgsConstructor
+@AllArgsConstructor
 @Embeddable
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class    TeamScrumMemberId {
+public class TeamScrumMemberId {
     @Column(name = "student_id", nullable = false)
     private Long studentId;
 
     @Column(name = "profile_id")
     private String profileId;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TeamScrumMemberId)) return false;
+        TeamScrumMemberId that = (TeamScrumMemberId) o;
+        return Objects.equals(studentId, that.studentId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(studentId);
+    }
 }
