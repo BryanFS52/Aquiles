@@ -7,18 +7,27 @@ import com.api.aquilesApi.Dto.Student;
 import com.api.aquilesApi.Entity.Attendance;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.api.aquilesApi.Utilities.QRCode.QrCodeGenerator;
-import com.netflix.graphql.dgs.*;
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsData;
+import com.netflix.graphql.dgs.DgsDataFetchingEnvironment;
+import com.netflix.graphql.dgs.DgsEntityFetcher;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.netflix.graphql.dgs.DgsQuery;
+import com.netflix.graphql.dgs.InputArgument;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.Collections;
+
 
 @DgsComponent
 public class AttendancesResolver {
@@ -107,6 +116,8 @@ public class AttendancesResolver {
                     "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    // Attendance by Student whit Justification
+
 
     // FindAll Attendances (GraphQL)
     @DgsQuery
@@ -124,6 +135,30 @@ public class AttendancesResolver {
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DgsQuery
+    public Map<String, Object> allAttendanceByCompetenceQuarterIdWithJustifications( @InputArgument Long competenceQuarterId, @InputArgument Integer page, @InputArgument Integer size) {
+        try {
+            int safePage = (page != null) ? page : 0;
+            int safeSize = (size != null) ? size : 10;
+
+            Pageable pageable = PageRequest.of(safePage, safeSize);
+            Page<AttendanceDto> attendances = attendancesBusiness.findAllByCompetenceQuarterId(competenceQuarterId, pageable);
+
+            return ResponseHttpApi.responseHttpFindAll(
+                    attendances.getContent(),
+                    ResponseHttpApi.CODE_OK,
+                    "Query by competence quarter id ok",
+                    attendances.getSize(),
+                    safePage,
+                    attendances.getTotalPages()
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 

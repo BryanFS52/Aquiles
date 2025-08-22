@@ -59,6 +59,10 @@ public class AttendancesService implements Idao<Attendance, Long> {
         this.attendancesRepository.save(entity);
     }
 
+    public Page<Attendance> findAllByCompetenceQuarterIdAndJustifications( Long id, Pageable pageable) {
+        return attendancesRepository.findAllByCompetenceQuarterIdAndJustifications(id, pageable);
+    }
+
     // Get all attendances for a specific student
     public List<Attendance> findAllByStudentId(Long studentId) {
         System.out.println("Fetching attendances for student ID: " + studentId);

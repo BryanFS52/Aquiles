@@ -32,7 +32,7 @@ public class TeacherStudySheetAttendanceData {
 
         Long teacherStudySheetId = teacherStudySheet.getId();
 
-        List<AttendanceDto> attendanceDtoList = attendancesBusiness.findAllByStudentId(teacherStudySheetId);
+        List<Attendance> attendanceDtoList = attendancesBusiness.findAllByStudentId(teacherStudySheetId);
 
         return attendanceDtoList.stream()
                 .map(dto -> modelMapper.map(dto, Attendance.class))

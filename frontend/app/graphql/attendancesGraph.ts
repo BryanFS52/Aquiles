@@ -74,6 +74,33 @@ export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
   }
 `;
 
+export const GET_ATTENDANCES_BY_COMPETENCE_QUARTER_AND_JUSTIFICATIONS = gql`
+  query allAttendanceByCompetenceQuarterIdWithJustifications($competenceQuarterId: Long!) {
+      allAttendanceByCompetenceQuarterIdWithJustifications(competenceQuarterId: $competenceQuarterId){
+        data{
+          id
+          justification{
+              id
+              absenceDate
+              justificationDate
+              justificationFile
+              justificationStatus{
+                  name
+              }
+            }
+            student{
+                person{
+                  name
+                  lastname
+                  document
+                }
+              }
+            }
+          }
+        }
+      }
+`;
+
 export const ADD_ATTENDANCE = gql`
   mutation AddAttendance($input: AttendanceDto!) {
     addAttendance(input: $input) {

@@ -73,7 +73,7 @@ export const JustificationsContainer: React.FC = () => {
   // Effects
   useEffect(() => {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-    dispatch(fetchAttendancesByStudent({ id: 1, stateId: 2 }));
+    dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 }));
     dispatch(fetchJustifications({ page: 0, size: 10 }));
   }, [dispatch]);
 

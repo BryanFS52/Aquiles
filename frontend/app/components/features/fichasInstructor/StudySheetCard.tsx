@@ -9,6 +9,7 @@ export const StudySheetCard: React.FC<StudySheetCardProps> = ({
     studySheet,
     onViewApprentices,
     onTakeAttendance,
+    onTakeJustification,
     loading = false
 }) => {
     return (
@@ -42,29 +43,55 @@ export const StudySheetCard: React.FC<StudySheetCardProps> = ({
             </div>
 
             {/* Botón de Asistencia */}
-            <div className="w-full md:w-auto mt-4 md:mt-0 md:ml-auto text-center">
-                <button
-                    onClick={() => onTakeAttendance(studySheet)}
-                    className="group relative bg-gradient-to-r from-lime-600 to-green-600 hover:from-lime-700 hover:to-green-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg focus:outline-none focus:ring-4 focus:ring-lime-500/50 active:scale-95 flex items-center justify-center gap-2 min-w-[180px]"
-                    disabled={loading}
-                >
-                    <svg
-                        className={`w-5 h-5 transition-transform duration-300 ${loading ? 'animate-spin' : 'group-hover:scale-110'}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+            <div className="">
+                <div className="w-full md:w-auto mt-4 md:mt-0 md:ml-auto text-center p-1">
+                    <button
+                        onClick={() => onTakeAttendance(studySheet)}
+                        className="group relative bg-gradient-to-r from-lime-600 to-green-600 hover:from-lime-700 hover:to-green-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg focus:outline-none focus:ring-4 focus:ring-lime-500/50 active:scale-95 flex items-center justify-center gap-2 min-w-[180px]"
+                        disabled={loading}
                     >
-                        {loading ? (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        ) : (
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        )}
-                    </svg>
-                    <span className="relative">
-                        {loading ? 'Procesando...' : 'Tomar asistencia'}
-                    </span>
-                    <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </button>
+                        <svg
+                            className={`w-5 h-5 transition-transform duration-300 ${loading ? 'animate-spin' : 'group-hover:scale-110'}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            {loading ? (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            ) : (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            )}
+                        </svg>
+                        <span className="relative">
+                            {loading ? 'Procesando...' : 'Tomar asistencia'}
+                        </span>
+                        <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </button>
+                </div>
+                <div className="w-full md:w-auto mt-4 md:mt-0 md:ml-auto text-center p-1">
+                    <button
+                        onClick={() => onTakeJustification(studySheet)}
+                        className="group relative bg-gradient-to-r from-lime-600 to-green-600 hover:from-lime-700 hover:to-green-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg focus:outline-none focus:ring-4 focus:ring-lime-500/50 active:scale-95 flex items-center justify-center gap-2 min-w-[180px]"
+                        disabled={loading}
+                    >
+                        <svg
+                            className={`w-5 h-5 transition-transform duration-300 ${loading ? 'animate-spin' : 'group-hover:scale-110'}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            {loading ? (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            ) : (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            )}
+                        </svg>
+                        <span className="relative">
+                            {loading ? 'Procesando...' : 'Ver Justificacion'}
+                        </span>
+                        <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </button>
+                </div>
             </div>
         </div>
     );

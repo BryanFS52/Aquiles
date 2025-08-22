@@ -44,6 +44,11 @@ export const FichasInstructorContainer: React.FC = () => {
         setSelectedFicha(ficha);
         setModalOpen(true);
     };
+    
+    const handleViewApprenticesJustifications = (ficha: StudySheet) => {
+        setSelectedFicha(ficha);
+        setModalOpen(true);
+    };
 
     const handleCloseModal = () => {
         setSelectedFicha(null);
@@ -64,6 +69,19 @@ export const FichasInstructorContainer: React.FC = () => {
         }
     };
 
+    const handleTakeJustification = async (studySheet: StudySheet) => {
+        if (!studySheet.id) return;
+
+        setIsTransitioning(true);
+        try {
+            await dispatch(fetchStudySheetById({ id: parseInt(studySheet.id) }));
+            router.push('/dashboard/justificacionesInstructor');
+        } catch (error) {
+            console.error('Error al cargar la ficha:', error);
+        } finally {
+            setIsTransitioning(false);
+        }
+    };
     // Early returns
     if (!loading && (!fichas || fichas.length === 0)) {
         return <EmptyState message="No se encontraron fichas disponibles." />;
@@ -83,6 +101,8 @@ export const FichasInstructorContainer: React.FC = () => {
                                         studySheet={studySheet}
                                         onViewApprentices={handleViewApprentices}
                                         onTakeAttendance={handleTakeAttendance}
+                                        onTakeJustification={handleTakeJustification}
+                                        onViewApprenticesJustifications={handleViewApprenticesJustifications}
                                         loading={loading}
                                     />
                                 </div>

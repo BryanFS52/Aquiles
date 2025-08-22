@@ -177,6 +177,7 @@ export type ChecklistDto = {
   associatedJuries?: InputMaybe<Array<InputMaybe<Scalars['Long']['input']>>>;
   component?: InputMaybe<Scalars['String']['input']>;
   evaluationCriteria: Scalars['Boolean']['input'];
+  evaluationId?: InputMaybe<Scalars['Long']['input']>;
   evaluations?: InputMaybe<Array<InputMaybe<EvaluationDto>>>;
   instructorSignature: Scalars['String']['input'];
   items?: InputMaybe<Array<InputMaybe<ItemDto>>>;
@@ -2263,6 +2264,12 @@ export type MutationUpdateRelationArgs = {
 };
 
 
+export type MutationUpdateStateAttendanceArgs = {
+  id: Scalars['Long']['input'];
+  input: AttendanceStateDto;
+};
+
+
 export type MutationUpdateStatusInJustificationArgs = {
   id: Scalars['Long']['input'];
   input: Scalars['Long']['input'];
@@ -2689,7 +2696,6 @@ export type Query = {
   AllFollowUpsAction?: Maybe<FollowUpActionPage>;
   FollowUpActionById?: Maybe<FollowUpActionPageId>;
   ProfileById?: Maybe<ProfileById>;
-  Response?: Maybe<Response>;
   allAdministrative?: Maybe<AdministrativePage>;
   allAdministrativeList?: Maybe<AdministrativePage>;
   allAdministrativeTypes?: Maybe<AdministrativeTypePage>;
@@ -2797,6 +2803,7 @@ export type Query = {
   checklistHistoryById?: Maybe<ChecklistHistoryPageId>;
   checklistHistoryId?: Maybe<Array<Maybe<ChecklistHistory>>>;
   evaluationById?: Maybe<EvaluationPageId>;
+  evaluationsByChecklist?: Maybe<EvaluationPage>;
   exportChecklistToExcel?: Maybe<Scalars['String']['output']>;
   exportChecklistToPdf?: Maybe<Scalars['String']['output']>;
   finalReportById?: Maybe<FinalReportPageId>;
@@ -2805,7 +2812,6 @@ export type Query = {
   juryById?: Maybe<JuriesPageId>;
   justificationById?: Maybe<JustificationPageId>;
   justificationByStudentId?: Maybe<JustificationPage>;
-  justificationByStudySheetId?: Maybe<JustificationPage>;
   justificationStatusById?: Maybe<JustificationStatusPageId>;
   justificationTypeById?: Maybe<JustificationTypePageId>;
   personById?: Maybe<PersonById>;
@@ -2829,13 +2835,6 @@ export type QueryFollowUpActionByIdArgs = {
 
 export type QueryProfileByIdArgs = {
   id?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type QueryResponseArgs = {
-  Date?: InputMaybe<Scalars['String']['input']>;
-  code?: InputMaybe<Scalars['String']['input']>;
-  message?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -2968,6 +2967,7 @@ export type QueryAllEnvironmentsArgs = {
   headquarterId?: InputMaybe<Scalars['Long']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -3102,6 +3102,7 @@ export type QueryAllOffersArgs = {
   offerName?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -3118,6 +3119,7 @@ export type QueryAllPhasesArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -3156,6 +3158,7 @@ export type QueryAllProjectActivitiesArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -3269,6 +3272,7 @@ export type QueryAllTrainingProjectsArgs = {
   name?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -3306,6 +3310,11 @@ export type QueryChecklistHistoryIdArgs = {
 
 export type QueryEvaluationByIdArgs = {
   id: Scalars['Long']['input'];
+};
+
+
+export type QueryEvaluationsByChecklistArgs = {
+  checklistId: Scalars['Long']['input'];
 };
 
 
@@ -3348,12 +3357,6 @@ export type QueryJustificationByStudentIdArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
   studentId: Scalars['Long']['input'];
-};
-
-
-export type QueryJustificationByStudySheetIdArgs = {
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -4098,7 +4101,7 @@ export type GetEvaluationsByChecklistQueryVariables = Exact<{
 }>;
 
 
-export type GetEvaluationsByChecklistQuery = { allEvaluations?: { code?: string | null, message?: string | null, date?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null> | null } | null };
+export type GetEvaluationsByChecklistQuery = { evaluationsByChecklist?: { code?: string | null, message?: string | null, date?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null> | null } | null };
 
 export type GenerateQrCodeMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -4231,13 +4234,6 @@ export type GetJustificationByIdQueryVariables = Exact<{
 
 export type GetJustificationByIdQuery = { justificationById?: { code?: string | null, message?: string | null, data?: { id: string, description?: string | null, justificationFile?: string | null, absenceDate?: string | null, justificationDate?: string | null, state?: boolean | null, justificationType?: { id: string, name?: string | null } | null, justificationStatus?: { id?: string | null, name?: string | null, state?: boolean | null } | null, attendance?: { id: string } | null } | null } | null };
 
-export type GetJustificationByStudySheetIdQueryVariables = Exact<{
-  id: Scalars['Long']['input'];
-}>;
-
-
-export type GetJustificationByStudySheetIdQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, number?: number | null, trainingProject?: { program?: { id?: string | null, name?: string | null } | null } | null, studentStudySheets?: Array<{ student?: { id?: string | null, person?: { id?: string | null, document?: string | null, name?: string | null, lastname?: string | null } | null, attendances?: Array<{ id: string, justification?: { id: string, description?: string | null, justificationFile?: string | null, absenceDate?: string | null, justificationDate?: string | null, state?: boolean | null, justificationType?: { id: string, name?: string | null } | null, justificationStatus?: { id?: string | null, name?: string | null, state?: boolean | null } | null } | null } | null> | null } | null, studentStudySheetState?: { id?: string | null, name?: string | null } | null } | null> | null } | null } | null };
-
 export type GetJustificationByStudentIdQueryVariables = Exact<{
   studentId: Scalars['Long']['input'];
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -4325,7 +4321,7 @@ export type GetStudySheetByIdQueryVariables = Exact<{
 }>;
 
 
-export type GetStudySheetByIdQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, number?: number | null, numberStudents?: number | null, quarter?: Array<{ id?: string | null, name?: { number?: number | null, extension?: string | null } | null } | null> | null, trainingProject?: { id?: string | null, name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null, studentStudySheets?: Array<{ id?: string | null, student?: { id?: string | null, person?: { id?: string | null, document?: string | null, name?: string | null, lastname?: string | null, email?: string | null, phone?: string | null } | null } | null, studentStudySheetState?: { id?: string | null, name?: string | null } | null } | null> | null, teacherStudySheets?: Array<{ id?: string | null, competence?: { name?: string | null } | null, quarter?: { id?: string | null, name?: { number?: number | null, extension?: string | null } | null } | null } | null> | null } | null } | null };
+export type GetStudySheetByIdQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, number?: number | null, numberStudents?: number | null, quarter?: Array<{ id?: string | null, name?: { number?: number | null, extension?: string | null } | null } | null> | null, trainingProject?: { id?: string | null, name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null, studentStudySheets?: Array<{ id?: string | null, student?: { id?: string | null, person?: { id?: string | null, document?: string | null, name?: string | null, lastname?: string | null, email?: string | null, phone?: string | null } | null } | null, studentStudySheetState?: { id?: string | null, name?: string | null } | null } | null> | null, teacherStudySheets?: Array<{ id?: string | null, competence?: { name?: string | null } | null } | null> | null } | null } | null };
 
 export type StudySheetByTeacherQueryVariables = Exact<{
   idTeacher?: InputMaybe<Scalars['Long']['input']>;
@@ -5553,7 +5549,7 @@ export type DeleteEvaluationMutationResult = Apollo.MutationResult<DeleteEvaluat
 export type DeleteEvaluationMutationOptions = Apollo.BaseMutationOptions<DeleteEvaluationMutation, DeleteEvaluationMutationVariables>;
 export const GetEvaluationsByChecklistDocument = gql`
     query GetEvaluationsByChecklist($checklistId: Long!) {
-  allEvaluations(page: 0, size: 100) {
+  evaluationsByChecklist(checklistId: $checklistId) {
     code
     message
     date
@@ -6386,92 +6382,6 @@ export type GetJustificationByIdQueryHookResult = ReturnType<typeof useGetJustif
 export type GetJustificationByIdLazyQueryHookResult = ReturnType<typeof useGetJustificationByIdLazyQuery>;
 export type GetJustificationByIdSuspenseQueryHookResult = ReturnType<typeof useGetJustificationByIdSuspenseQuery>;
 export type GetJustificationByIdQueryResult = Apollo.QueryResult<GetJustificationByIdQuery, GetJustificationByIdQueryVariables>;
-export const GetJustificationByStudySheetIdDocument = gql`
-    query GetJustificationByStudySheetId($id: Long!) {
-  studySheetById(id: $id) {
-    code
-    message
-    data {
-      id
-      number
-      trainingProject {
-        program {
-          id
-          name
-        }
-      }
-      studentStudySheets {
-        student {
-          id
-          person {
-            id
-            document
-            name
-            lastname
-          }
-          attendances {
-            id
-            justification {
-              id
-              description
-              justificationFile
-              absenceDate
-              justificationDate
-              state
-              justificationType {
-                id
-                name
-              }
-              justificationStatus {
-                id
-                name
-                state
-              }
-            }
-          }
-        }
-        studentStudySheetState {
-          id
-          name
-        }
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useGetJustificationByStudySheetIdQuery__
- *
- * To run a query within a React component, call `useGetJustificationByStudySheetIdQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetJustificationByStudySheetIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetJustificationByStudySheetIdQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useGetJustificationByStudySheetIdQuery(baseOptions: Apollo.QueryHookOptions<GetJustificationByStudySheetIdQuery, GetJustificationByStudySheetIdQueryVariables> & ({ variables: GetJustificationByStudySheetIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetJustificationByStudySheetIdQuery, GetJustificationByStudySheetIdQueryVariables>(GetJustificationByStudySheetIdDocument, options);
-      }
-export function useGetJustificationByStudySheetIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetJustificationByStudySheetIdQuery, GetJustificationByStudySheetIdQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetJustificationByStudySheetIdQuery, GetJustificationByStudySheetIdQueryVariables>(GetJustificationByStudySheetIdDocument, options);
-        }
-export function useGetJustificationByStudySheetIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetJustificationByStudySheetIdQuery, GetJustificationByStudySheetIdQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetJustificationByStudySheetIdQuery, GetJustificationByStudySheetIdQueryVariables>(GetJustificationByStudySheetIdDocument, options);
-        }
-export type GetJustificationByStudySheetIdQueryHookResult = ReturnType<typeof useGetJustificationByStudySheetIdQuery>;
-export type GetJustificationByStudySheetIdLazyQueryHookResult = ReturnType<typeof useGetJustificationByStudySheetIdLazyQuery>;
-export type GetJustificationByStudySheetIdSuspenseQueryHookResult = ReturnType<typeof useGetJustificationByStudySheetIdSuspenseQuery>;
-export type GetJustificationByStudySheetIdQueryResult = Apollo.QueryResult<GetJustificationByStudySheetIdQuery, GetJustificationByStudySheetIdQueryVariables>;
 export const GetJustificationByStudentIdDocument = gql`
     query GetJustificationByStudentId($studentId: Long!, $page: Int, $size: Int) {
   justificationByStudentId(studentId: $studentId, page: $page, size: $size) {
@@ -7049,13 +6959,6 @@ export const GetStudySheetByIdDocument = gql`
         id
         competence {
           name
-        }
-        quarter {
-          id
-          name {
-            number
-            extension
-          }
         }
       }
     }
