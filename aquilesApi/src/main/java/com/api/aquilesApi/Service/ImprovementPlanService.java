@@ -6,11 +6,13 @@ import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
+
     private final ImprovementPlanRepository improvementPlanRepository;
 
     public ImprovementPlanService(ImprovementPlanRepository improvementPlanRepository) {
@@ -22,15 +24,22 @@ public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
         return improvementPlanRepository.findAll(pageRequest);
     }
 
+    public Page<ImprovementPlan> findAll(Pageable pageable) {
+        return improvementPlanRepository.findAll(pageable);
+    }
+
     @Override
     public ImprovementPlan getById(Long id) {
-        return improvementPlanRepository.findById(id).orElseThrow(() ->
-                new CustomException("Attendance Type with id " + id + " not found", HttpStatus.NO_CONTENT));
+        return improvementPlanRepository.findById(id)
+                .orElseThrow(() -> new CustomException(
+                        "Improvement Plan with id " + id + " not found",
+                        HttpStatus.NO_CONTENT
+                ));
     }
 
     @Override
     public void update(ImprovementPlan entity) {
-        this.improvementPlanRepository.save(entity);
+        improvementPlanRepository.save(entity);
     }
 
     @Override
@@ -40,11 +49,16 @@ public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
 
     @Override
     public void delete(ImprovementPlan entity) {
-        this.improvementPlanRepository.delete(entity);
+        improvementPlanRepository.delete(entity);
     }
 
     @Override
     public void create(ImprovementPlan entity) {
-        this.improvementPlanRepository.save(entity);
+        improvementPlanRepository.save(entity);
     }
+
+    public boolean existsActivePlanForStudent(Long studentId) {
+        return improvementPlanRepository.existsByStudentIdAndStateTrue(studentId);
+    }
+
 }

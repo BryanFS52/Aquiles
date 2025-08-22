@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ImprovementPlanRepository extends JpaRepository<ImprovementPlan, Long> {
+
+    boolean existsByStudentIdAndStateTrue(Long studentId);
 }

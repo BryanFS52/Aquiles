@@ -23,7 +23,6 @@ public class ImprovementPlanBusiness {
 
     // Validation object
 
-
     // Find All
     public Page<ImprovementPlanDto> findAll(int page, int size) {
         try {
