@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { AppDispatch } from '@/redux/store';
 import { fetchStudySheetByTeacher, fetchStudySheetById } from '@slice/olympo/studySheetSlice';
+import { fetchJustificationsByCompetenceQuarter } from '@slice/competenceQuarterJustificationsSlice';
 import { useLoader } from '@context/LoaderContext';
 import { StudySheetCard } from './StudySheetCard';
 import { ApprenticesModal } from './ApprenticesModal';
@@ -74,10 +75,10 @@ export const FichasInstructorContainer: React.FC = () => {
 
         setIsTransitioning(true);
         try {
-            await dispatch(fetchStudySheetById({ id: parseInt(studySheet.id) }));
+            await dispatch(fetchJustificationsByCompetenceQuarter({ competenceQuarterId: parseInt(studySheet.id) }));
             router.push('/dashboard/justificacionesInstructor');
         } catch (error) {
-            console.error('Error al cargar la ficha:', error);
+            console.error('Error al cargar las justificaciones:', error);
         } finally {
             setIsTransitioning(false);
         }

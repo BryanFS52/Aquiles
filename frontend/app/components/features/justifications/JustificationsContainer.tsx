@@ -180,14 +180,37 @@ export const JustificationsContainer: React.FC = () => {
     dispatch(setSubmitting(true));
 
     try {
+      // Extraer studentId de la asistencia actual
+      const studentId = currentAttendance?.student?.id;
+      if (!studentId) {
+        throw new Error("No se pudo obtener el ID del estudiante");
+      }
+
+      // Construir el input según el JustificationDto esperado por el backend
       const formDataWithFile = {
+        studentId: parseInt(studentId.toString()),
         description: form.formData.descripcion,
         justificationFile: base64Ref.current,
-        justificationDate: new Date().toLocaleDateString('en-CA'),
-        justificationType: { id: form.formData.justificationTypeId.id },
-        attendance: { id: currentAttendance?.id },
+        absenceDate: currentAttendance?.attendanceDate, // Usar la fecha de la asistencia
+        justificationDate: new Date().toISOString().split('T')[0], // Formato YYYY-MM-DD
         state: false,
+        attendance: {
+          id: currentAttendance?.id,
+          studentId: parseInt(studentId.toString()),
+          attendanceDate: currentAttendance?.attendanceDate,
+          competenceQuarter: currentAttendance?.competenceQuarter?.id || null,
+          attendanceState: currentAttendance?.attendanceState ? {
+            id: currentAttendance.attendanceState.id,
+            status: currentAttendance.attendanceState.status
+          } : null
+        },
+        justificationType: { 
+          id: form.formData.justificationTypeId.id.toString()
+        },
+        // No incluir justificationStatus ya que se asigna automáticamente en el backend
       };
+
+      console.log("🚀 Enviando justificación con datos:", formDataWithFile);
 
       await dispatch(addJustification(formDataWithFile)).unwrap();
 

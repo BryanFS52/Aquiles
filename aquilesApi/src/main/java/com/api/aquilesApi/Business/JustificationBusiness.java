@@ -38,8 +38,8 @@ public class JustificationBusiness {
 
     // Validation Object
     public void ValidationObject(JustificationDto dto) {
-//        if (dto.getAbsenceDate() == null || dto.getAbsenceDate().isEmpty())
-//            throw new CustomException("Absence date is required", HttpStatus.BAD_REQUEST);
+        if (dto.getAbsenceDate() == null || dto.getAbsenceDate().isEmpty())
+            throw new CustomException("Absence date is required", HttpStatus.BAD_REQUEST);
 
         if (dto.getAttendance() == null || dto.getAttendance().getId() == null)
             throw new CustomException("Attendance ID is required", HttpStatus.BAD_REQUEST);

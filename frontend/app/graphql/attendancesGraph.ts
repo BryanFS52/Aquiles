@@ -55,7 +55,7 @@ export const GET_ATTENDANCES_BY_STUDENT = gql`
 `;
 
 export const GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT = gql`
- query GetAttendancesAndCompetenceByStudentId($id: Long) {
+  query GetAttendancesAndCompetenceByStudentId($id: Long) {
     allAttendancesByStudentId(id: $id) {
       data {
         id
@@ -72,7 +72,7 @@ export const GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT = gql`
       }
     }
   }
-`
+`;
 
 export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
   query GetAttendancesAndJustificationsByStudent($id: Long!) {
@@ -95,30 +95,29 @@ export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
 `;
 
 export const GET_ATTENDANCES_BY_COMPETENCE_QUARTER_AND_JUSTIFICATIONS = gql`
-  query allAttendanceByCompetenceQuarterIdWithJustifications($competenceQuarterId: Long!) {
-      allAttendanceByCompetenceQuarterIdWithJustifications(competenceQuarterId: $competenceQuarterId){
-        data{
+  query GetAttendancesByCompetenceQuarterAndJustifications($competenceQuarterId: Long!) {
+    allAttendanceByCompetenceQuarterIdWithJustifications(competenceQuarterId: $competenceQuarterId) {
+      data {
+        id
+        justification {
           id
-          justification{
-              id
-              absenceDate
-              justificationDate
-              justificationFile
-              justificationStatus{
-                  name
-              }
-            }
-            student{
-                person{
-                  name
-                  lastname
-                  document
-                }
-              }
-            }
+          absenceDate
+          justificationDate
+          justificationFile
+          justificationStatus {
+            name
+          }
+        }
+        student {
+          person {
+            name
+            lastname
+            document
           }
         }
       }
+    }
+  }
 `;
 
 export const ADD_ATTENDANCE = gql`
