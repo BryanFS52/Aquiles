@@ -20,10 +20,12 @@ import type {
     AttendanceStatus,
     FilterOption,
     AsistenciaManualContainerProps,
+    Competence,
 } from "./types"
 
 export const AsistenciaManualContainer: React.FC<AsistenciaManualContainerProps> = ({
-    isDarkMode = false
+    isDarkMode = false,
+    competenceId = null
 }) => {
     const dispatch = useDispatch<AppDispatch>()
     const { data: studySheet, loading, error } = useSelector((state: any) => state.studySheet)
@@ -32,14 +34,39 @@ export const AsistenciaManualContainer: React.FC<AsistenciaManualContainerProps>
     const studySheetObj = Array.isArray(studySheet) ? studySheet[0] : studySheet
     const students = studySheetObj?.studentStudySheets || []
 
-    console.log(students)
-
+    // Estados del componente
     const [attendance, setAttendance] = useState<Record<string | number, AttendanceStatus>>({})
     const [searchTerm, setSearchTerm] = useState<string>("")
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toLocaleDateString('en-CA'))
     const [selectedFilter, setSelectedFilter] = useState<FilterOption>("todos")
     const [selectedStudent, setSelectedStudent] = useState<string | number | null>(null)
+    const [selectedCompetence, setSelectedCompetence] = useState<string | number | null>(null)
     const [attendanceHistory, setAttendanceHistory] = useState<AttendanceHistoryType[]>([])
+
+    // Configuración de competencia
+    const isCompetenceFixed = Boolean(competenceId)
+
+    // Extraer competencias disponibles del studySheet
+    const competences: Competence[] = useMemo(() => {
+        if (!studySheetObj?.teacherStudySheets) return []
+
+        return studySheetObj.teacherStudySheets
+            .filter((ts: any) => ts.competence?.name)
+            .map((ts: any) => ({
+                id: ts.id,
+                name: ts.competence.name
+            }))
+    }, [studySheetObj?.teacherStudySheets])
+
+    // Establecer la competencia inicial si viene por parámetro
+    useEffect(() => {
+        if (competenceId && competences.length > 0) {
+            const competenceExists = competences.find(c => c.id.toString() === competenceId)
+            if (competenceExists) {
+                setSelectedCompetence(competenceId)
+            }
+        }
+    }, [competenceId, competences])
 
     useEffect(() => {
         if (loading) {
@@ -53,15 +80,7 @@ export const AsistenciaManualContainer: React.FC<AsistenciaManualContainerProps>
         if (students.length > 0) {
             const initialAttendance: Record<string | number, AttendanceStatus> = {}
             setAttendance(initialAttendance)
-
-            const mockHistory: AttendanceHistoryType[] = [
-                { date: "2024-12-01", presente: 6, ausente: 1, justificado: 1, retardo: 0 },
-                { date: "2024-12-02", presente: 7, ausente: 0, justificado: 0, retardo: 1 },
-                { date: "2024-12-03", presente: 5, ausente: 2, justificado: 1, retardo: 0 },
-                { date: "2024-12-04", presente: 8, ausente: 0, justificado: 0, retardo: 0 },
-                { date: "2024-12-05", presente: 6, ausente: 1, justificado: 0, retardo: 1 },
-            ]
-            setAttendanceHistory(mockHistory)
+            setAttendanceHistory([])
         }
     }, [students])
 
@@ -89,24 +108,29 @@ export const AsistenciaManualContainer: React.FC<AsistenciaManualContainerProps>
     }, [searchTerm, students, selectedFilter, attendance])
 
     const handleAttendanceChange = (studentId: string | number, value: AttendanceStatus): void => {
-        console.log(`Attendance changed for student ${studentId}: ${value}`)
         setAttendance((prev) => ({ ...prev, [studentId]: value }))
     }
 
     const handleSave = async (): Promise<void> => {
+        // Validaciones previas
         if (!studySheetObj?.id) {
             toast.error("No se encontró la ficha de estudio.")
             return
         }
 
+        if (!selectedCompetence) {
+            toast.error("Debe seleccionar una competencia antes de guardar.")
+            return
+        }
+
         const entries = Object.entries(attendance)
-        console.log("Entries to save:", entries)
         if (!entries.length) {
             toast.warning("No hay asistencia marcada para guardar.")
             return
         }
 
         try {
+            // Guardar cada registro de asistencia
             await Promise.all(
                 entries.map(([studentId, statusId]) => {
                     if (!statusId) return Promise.resolve()
@@ -120,11 +144,15 @@ export const AsistenciaManualContainer: React.FC<AsistenciaManualContainerProps>
                             attendanceDate: selectedDate,
                             studentId: Number(studentId),
                             attendanceState,
+                            competenceQuarter: selectedCompetence.toString(),
                         })
                     ).unwrap()
                 })
             )
+
             toast.success("Asistencia guardada exitosamente")
+            // Limpiar el formulario después de guardar exitosamente
+            setAttendance({})
         } catch (error: any) {
             toast.error(`Error al guardar asistencia: ${error.message ?? "Error desconocido"}`)
         }
@@ -187,14 +215,18 @@ export const AsistenciaManualContainer: React.FC<AsistenciaManualContainerProps>
                             selectedDate={selectedDate}
                             searchTerm={searchTerm}
                             selectedFilter={selectedFilter}
+                            selectedCompetence={selectedCompetence}
+                            competences={competences}
                             onDateChange={setSelectedDate}
                             onSearchChange={setSearchTerm}
                             onFilterChange={setSelectedFilter}
+                            onCompetenceChange={setSelectedCompetence}
+                            isCompetenceFixed={!!competenceId}
                         />
 
                         <div className={`rounded-xl shadow-sm border transition-colors ${isDarkMode
-                                ? 'bg-gray-800 border-gray-700'
-                                : 'bg-white border-gray-200'
+                            ? 'bg-gray-800 border-gray-700'
+                            : 'bg-white border-gray-200'
                             }`}>
                             <div className="p-6">
                                 <StudentList
@@ -212,10 +244,14 @@ export const AsistenciaManualContainer: React.FC<AsistenciaManualContainerProps>
                         <div className="flex justify-end">
                             <button
                                 onClick={handleSave}
-                                className={`px-8 py-3 rounded-2xl transition-colors font-medium flex items-center space-x-2 shadow-sm ${isDarkMode
+                                disabled={!selectedCompetence || Object.keys(attendance).length === 0}
+                                className={`px-8 py-3 rounded-2xl transition-colors font-medium flex items-center space-x-2 shadow-sm ${!selectedCompetence || Object.keys(attendance).length === 0
+                                    ? 'bg-gray-400 cursor-not-allowed text-gray-200'
+                                    : isDarkMode
                                         ? 'bg-blue-600 hover:bg-blue-700 text-white'
                                         : 'bg-green-500 hover:bg-green-600 text-white'
                                     }`}
+                                title={!selectedCompetence ? 'Debe seleccionar una competencia' : Object.keys(attendance).length === 0 ? 'No hay asistencia marcada' : ''}
                             >
                                 <Save className="w-5 h-5" />
                                 <span>Guardar Asistencia</span>

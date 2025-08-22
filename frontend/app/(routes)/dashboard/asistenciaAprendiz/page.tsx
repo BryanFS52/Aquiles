@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { EventClickArg } from '@fullcalendar/core'
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@redux/store';
-import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
+import { fetchAttendanceAndCompetenceByStudent } from '@slice/attendanceSlice';
 import { Attendance } from '@graphql/generated';
 import { useLoader } from "@context/LoaderContext";
 import FullCalendar from '@fullcalendar/react'
@@ -18,24 +18,6 @@ import EmptyState from "@components/UI/emptyState";
 import Modal from "@components/UI/Modal";
 
 // Tipos TypeScript
-interface Event {
-  id: string;
-  title: string;
-  start: string;
-  end?: string;
-  type: string;
-}
-
-interface CalendarEvent {
-  id: string;
-  title: string;
-  start: string;
-  end?: string;
-  className: string;
-  extendedProps: {
-    type: string;
-  };
-}
 
 type FilterType = 'all' | 'Asistencia' | 'Inasistencia' | 'Retardo' | 'Justificacion';
 
@@ -927,6 +909,8 @@ export default function AsistenciaAprendiz() {
     title: string;
     date: string;
     attendanceId: number;
+    competenceName?: string;
+    competenceQuarterId?: string;
   } | null>(null);
 
   const router = useRouter();
@@ -951,7 +935,7 @@ export default function AsistenciaAprendiz() {
   // Cargar asistencias del estudiante al montar el componente
   useEffect(() => {
     const studentId = 1; // ID hardcodeado como solicitas
-    dispatch(fetchAttendancesByStudent({ id: studentId, stateId: null }));
+    dispatch(fetchAttendanceAndCompetenceByStudent({ id: studentId }));
   }, [dispatch]);
 
   // Manejar el loader basado en el estado de loading
@@ -966,6 +950,7 @@ export default function AsistenciaAprendiz() {
   // Función para mapear el estado de la asistencia a un tipo de evento del calendario
   const mapAttendanceStateToEventType = (status: string): string => {
     const statusMap: { [key: string]: string } = {
+      'Presente': 'Asistencia',
       'Asistencia': 'Asistencia',
       'Inasistencia': 'Inasistencia',
       'Ausente': 'Inasistencia', // Mapear "Ausente" a "Inasistencia"
@@ -984,10 +969,11 @@ export default function AsistenciaAprendiz() {
 
     // Transformar cada asistencia a un evento individual del calendario
     const calendarEvents = studentAttendances.data
-      .filter((attendance: Attendance) => attendance.attendanceDate) // Filtrar eventos con fecha válida
-      .map((attendance: Attendance, index: number) => {
-        const status = attendance.attendanceState?.status || 'Asistencia';
+      .filter((attendance: any) => attendance.attendanceDate) // Filtrar eventos con fecha válida
+      .map((attendance: any, index: number) => {
+        const status = attendance.attendanceState?.status || 'Presente';
         const eventType = mapAttendanceStateToEventType(status);
+        const competenceName = attendance.competenceQuarter?.competence?.name || '';
 
         // Crear un ID único combinando el ID original con el índice para evitar duplicados
         const uniqueId = `${attendance.id}-${index}`;
@@ -1002,8 +988,9 @@ export default function AsistenciaAprendiz() {
           extendedProps: {
             type: eventType,
             attendanceId: attendance.id,
-            studentInfo: attendance.student,
-            originalStatus: status // Agregar el status original para debugging
+            originalStatus: status, // Agregar el status original
+            competenceName: competenceName, // Agregar el nombre de la competencia
+            competenceQuarterId: attendance.competenceQuarter?.id || ''
           }
         };
       });
@@ -1013,7 +1000,7 @@ export default function AsistenciaAprendiz() {
 
     // Debug: Log para verificar eventos
     console.log('Total events created:', calendarEvents.length);
-    console.log('Events for date 2025-08-12:', calendarEvents.filter(e => e.start === '2025-08-12'));
+    console.log('Sample event with competence:', calendarEvents[0]);
     console.log('Filtered events:', filteredEvents.length);
 
     return filteredEvents;
@@ -1046,19 +1033,22 @@ export default function AsistenciaAprendiz() {
 
   const handleGoToJustifications = () => {
     closeModal();
-    router.push('dashboard/justificacionesAprendiz');
+    router.push('./justificacionesAprendiz');
   };
 
   // Función para obtener el color del estado
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'Presente':
       case 'Asistencia':
         return 'text-green-600 bg-green-50 border-green-200';
       case 'Inasistencia':
+      case 'Ausente':
         return 'text-red-600 bg-red-50 border-red-200';
       case 'Retardo':
         return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       case 'Justificacion':
+      case 'Justificado':
         return 'text-blue-600 bg-blue-50 border-blue-200';
       default:
         return 'text-gray-600 bg-gray-50 border-gray-200';
@@ -1083,13 +1073,17 @@ export default function AsistenciaAprendiz() {
       const attendanceId = info.event.extendedProps.attendanceId;
       const eventTitle = info.event.title;
       const eventDate = info.event.startStr;
+      const competenceName = info.event.extendedProps.competenceName;
+      const competenceQuarterId = info.event.extendedProps.competenceQuarterId;
 
       // Establecer los datos del evento seleccionado y abrir el modal
       setSelectedEvent({
         id: info.event.id,
         title: eventTitle,
         date: eventDate,
-        attendanceId: attendanceId
+        attendanceId: attendanceId,
+        competenceName: competenceName,
+        competenceQuarterId: competenceQuarterId
       });
       setIsModalOpen(true);
     },
@@ -1312,7 +1306,7 @@ export default function AsistenciaAprendiz() {
                   <span className="text-sm font-medium text-gray-600">Fecha</span>
                 </div>
                 <span className="text-sm font-semibold text-gray-900">
-                  {new Date(selectedEvent.date).toLocaleDateString('es-ES', {
+                  {new Date(selectedEvent.date + 'T00:00:00').toLocaleDateString('es-ES', {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
@@ -1331,15 +1325,18 @@ export default function AsistenciaAprendiz() {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
-                <div className="flex items-center space-x-3">
-                  <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                  <span className="text-sm font-medium text-gray-600">ID de Registro</span>
+              {/* Mostrar información de competencia si está disponible */}
+              {selectedEvent.competenceName && (
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 rounded-full bg-indigo-500"></div>
+                    <span className="text-sm font-medium text-gray-600">Competencia</span>
+                  </div>
+                  <span className="text-sm font-semibold text-gray-900">
+                    {selectedEvent.competenceName}
+                  </span>
                 </div>
-                <span className="text-sm font-semibold text-gray-900">
-                  #{selectedEvent.attendanceId}
-                </span>
-              </div>
+              )}
             </div>
 
             {/* Descripción adicional */}
@@ -1353,9 +1350,9 @@ export default function AsistenciaAprendiz() {
                 <div>
                   <h4 className="text-sm font-semibold text-blue-900 mb-1">Información</h4>
                   <p className="text-sm font-semibold text-black">
-                    {selectedEvent.title === 'Inasistencia'
+                    {selectedEvent.title === 'Inasistencia' || selectedEvent.title === 'Ausente'
                       ? 'Este es tu registro de inasistencia para el día seleccionado. Si necesitas justificar esta ausencia, puedes acceder a la página de justificaciones.'
-                      : 'Este es tu registro de asistencia para el día seleccionado. El registro es informativo y no requiere acciones adicionales.'
+                      : `Este es tu registro de asistencia para el día seleccionado${selectedEvent.competenceName ? ` en la competencia "${selectedEvent.competenceName}"` : ''}. El registro es informativo y no requiere acciones adicionales.`
                     }
                   </p>
                 </div>
@@ -1370,8 +1367,8 @@ export default function AsistenciaAprendiz() {
               >
                 Cerrar
               </button>
-              {/* Solo mostrar botón de justificaciones si el estado es "Inasistencia" */}
-              {selectedEvent.title === 'Ausente' && (
+              {/* Solo mostrar botón de justificaciones si el estado es "Inasistencia" o "Ausente" */}
+              {(selectedEvent.title === 'Ausente' || selectedEvent.title === 'Inasistencia') && (
                 <button
                   onClick={handleGoToJustifications}
                   className="flex-1 px-4 py-2.5 text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-lg font-medium transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300"

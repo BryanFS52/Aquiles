@@ -105,7 +105,8 @@ public class AttendancesBusiness {
             attendance.setAttendanceDate(attendanceDto.getAttendanceDate());
             AttendanceState attendanceState = stateAttendanceService.getById(attendanceDto.getAttendanceState().getId());
             attendance.setAttendanceState(attendanceState);
-            attendance.setStudentId(attendanceDto.getStudentId());
+            attendance.setStudentId(attendancesDto.getStudentId());
+            attendance.setCompetenceQuarter(attendancesDto.getCompetenceQuarter());
 
             return modelMapper.map(attendancesService.save(attendance), AttendanceDto.class);
         } catch (Exception e) {

@@ -10,7 +10,7 @@ import ModalQR from "@components/Modals/modalQR";
 
 interface TableAttendanceProps {
     studySheetData?: StudySheet;
-    onNavigate: () => void;
+    onNavigate: (competenceId: string) => void;
 }
 
 const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNavigate }) => {
@@ -95,7 +95,7 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
 
 
                         <button
-                            onClick={onNavigate}
+                            onClick={() => onNavigate(selectedCompetence)}
                             disabled={!selectedCompetence}
                             className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl shadow whitespace-nowrap transition ${selectedCompetence
                                 ? 'bg-gradient-to-r from-lime-400 to-lime-600 text-black hover:bg-lightGreen cursor-pointer'

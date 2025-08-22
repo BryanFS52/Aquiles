@@ -40,6 +40,12 @@ export interface AttendanceData {
     date: string;
     attendance: Record<string | number, string>;
     studySheetId?: string | number;
+    competenceQuarter?: string | number;
+}
+
+export interface Competence {
+    id: string | number;
+    name: string;
 }
 
 export interface AttendanceManualPageProps {

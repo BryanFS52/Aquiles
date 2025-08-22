@@ -1,11 +1,13 @@
 import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph';
+import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT, GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import {
     Attendance,
     GetAttendancesQuery,
     GetAttendancesQueryVariables,
+    GetAttendancesAndCompetenceByStudentIdQuery,
+    GetAttendancesAndCompetenceByStudentIdQueryVariables,
     AddAttendanceMutation,
     AddAttendanceMutationVariables,
     UpdateAttendanceMutation,
@@ -161,6 +163,23 @@ export const fetchAttendancesByStudent = createAsyncThunk<
     }
 );
 
+export const fetchAttendanceAndCompetenceByStudent = createAsyncThunk<GetAttendancesAndCompetenceByStudentIdQuery['allAttendancesByStudentId'], GetAttendancesAndCompetenceByStudentIdQueryVariables>(
+    'attendance/fetchWithCompetence',
+    async ({ id }, { rejectWithValue }) => {
+        try {
+            const { data } = await clientLAN.query<GetAttendancesAndCompetenceByStudentIdQuery, GetAttendancesAndCompetenceByStudentIdQueryVariables>({
+                query: GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT,
+                variables: { id },
+                fetchPolicy: 'no-cache',
+            });
+            return data.allAttendancesByStudentId;
+        } catch (error) {
+            console.error("Error al obtener asistencias y competencias por estudiante", error);
+            return rejectWithValue({ message: (error as Error).message || 'Unknown error' });
+        }
+    }
+);
+
 export const fetchAttendancesAndJustificationsByStudent = createAsyncThunk<
     any, // Reemplazar con el tipo correcto una vez generado
     { id: number }
@@ -251,7 +270,7 @@ export const deleteAttendance = createAsyncThunk<string, string,
 const initialState: AttendanceState = {
     ...createInitialPaginatedState<Attendance>(),
     studentAttendances: {
-        data: [],   
+        data: [] as any[],
         loading: false,
         error: null as string | null,
         showForm: false,
@@ -301,6 +320,22 @@ const attendanceSlice = createSlice({
             .addCase(fetchAttendancesByStudent.rejected, (state, action) => {
                 state.studentAttendances.loading = false;
                 state.studentAttendances.error = (action.payload as RejectedPayload)?.message ?? action.error.message ?? 'Error al cargar asistencias del estudiante';
+            })
+            .addCase(fetchAttendanceAndCompetenceByStudent.pending, (state) => {
+                state.studentAttendances.loading = true;
+                state.studentAttendances.error = null;
+            })
+            .addCase(fetchAttendanceAndCompetenceByStudent.fulfilled, (state, action) => {
+                const payload = action.payload;
+                if (payload?.data) {
+                    state.studentAttendances.data = payload.data.filter((item: any) => item !== null);
+                }
+                state.studentAttendances.loading = false;
+                state.studentAttendances.error = null;
+            })
+            .addCase(fetchAttendanceAndCompetenceByStudent.rejected, (state, action) => {
+                state.studentAttendances.loading = false;
+                state.studentAttendances.error = (action.payload as RejectedPayload)?.message ?? action.error.message ?? 'Error al cargar asistencias y competencias del estudiante';
             })
             .addCase(fetchAttendancesAndJustificationsByStudent.pending, (state) => {
                 state.justificationsLoading = true;

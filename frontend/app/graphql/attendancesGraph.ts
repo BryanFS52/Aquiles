@@ -54,6 +54,26 @@ export const GET_ATTENDANCES_BY_STUDENT = gql`
   }
 `;
 
+export const GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT = gql`
+ query GetAttendancesAndCompetenceByStudentId($id: Long) {
+    allAttendancesByStudentId(id: $id) {
+      data {
+        id
+        attendanceDate
+        attendanceState{
+            status
+        }
+        competenceQuarter{
+                id
+                competence {
+                    name
+                }
+            }
+      }
+    }
+  }
+`
+
 export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
   query GetAttendancesAndJustificationsByStudent($id: Long!) {
     allAttendancesByStudentId(id: $id) {
