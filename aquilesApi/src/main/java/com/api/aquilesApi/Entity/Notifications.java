@@ -1,6 +1,7 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,9 +10,10 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "notifications")
 public class Notifications implements Serializable {
@@ -33,16 +35,12 @@ public class Notifications implements Serializable {
     private Boolean state;
 
     // Relations
-    // 1.Relation (1-1) con apprenticeRegulations
-    @OneToOne(mappedBy = "notification")
-    private ApprenticeRegulations apprenticeRegulations;
-
-    // 2.Relation (1-1) con notifications_type
+    // 1.Relation (1-1) con notifications_type
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "type_id", referencedColumnName = "id")
     private NotificationsType type;
 
-    // 3.Relation (M-M) con attendance
+    // 2.Relation (M-M) con attendance
     @ManyToMany
     @JoinTable(
             name = "notification_attendance",
@@ -51,22 +49,22 @@ public class Notifications implements Serializable {
     )
     private Set<Attendance> attendances;
 
-    // 4.Relation (1-1) con justification
+    // 3.Relation (1-1) con justification
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "justification_id", referencedColumnName = "id")
     private Justification justification;
 
-    // 5.Relation (1-1) con juries
+    // 4.Relation (1-1) con juries
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "jury_id", referencedColumnName = "id")
     private Juries jury;
 
-    // 6.Relation (1-1) con improvementPlan
+    // 5.Relation (1-1) con improvementPlan
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "improvement_plan_id", referencedColumnName = "id")
     private ImprovementPlan improvementPlan;
 
-    // 7.Relation (1-1) con finalReport
+    // 6.Relation (1-1) con finalReport
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "final_report_id", referencedColumnName = "id")
     private FinalReport finalReport;

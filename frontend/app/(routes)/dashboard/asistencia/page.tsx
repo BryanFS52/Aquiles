@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import type { AppDispatch, RootState } from '@/redux/store'
+import { useSelector } from 'react-redux';
+import { RootState } from '@redux/store'
 import { useRouter } from 'next/navigation';
 import { BsPersonCircle } from "react-icons/bs";
-import TableAttendance from "@components/features/attendance/tableAttendance";
+import { useLoader } from '@context/LoaderContext';
+import TableAttendance from "@components/features/asistencia/tableAttendance";
 import PageTitle from "@components/UI/pageTitle";
-import AttendanceFooter from "@components/features/attendance/attendanceFooter";
-import { useLoader } from '@/context/LoaderContext';
+import AttendanceFooter from "@components/features/asistencia/attendanceFooter";
 
 export default function Attendance() {
     const router = useRouter();
@@ -22,9 +22,6 @@ export default function Attendance() {
     const students = (studySheet?.studentStudySheets as any[])?.filter(
         (s: any) => s?.state === "Activo"
     ) || [];
-
-    console.log('Asistencia - studySheet:', studySheet);
-    console.log('Asistencia - students:', students);
 
     const activeStudents = students.length;
     const withdrawnStudents = (studySheet?.studentStudySheets as any[])?.filter(

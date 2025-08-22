@@ -1,10 +1,15 @@
+
 type Checklist {
     id: ID!
     state: Boolean
     remarks: String
+    trimester: String
+    component: String
     instructorSignature: String
     evaluationCriteria: Boolean
-    checklistHistory: String
+    studySheets: Long 
+    evaluations: Evaluation
+    items: [Item]
     associatedJuries: [Juries]
 }
 
@@ -25,22 +30,32 @@ type ChecklistPageId {
     message: String
 }
 
+
 input ChecklistDto {
     state: Boolean!
     remarks: String!
+    trimester: String!
+    component: String
     instructorSignature: String!
     evaluationCriteria: Boolean!
-    checklistHistory: String!
-    associatedJuries: [ID!]!
+    studySheets: Long
+    evaluationId: Long
+    evaluations: [EvaluationDto]
+    items: [ItemDto]
+    associatedJuries: [Long]
 }
 
 extend type Query {
     allChecklists(page: Int, size: Int): ChecklistPage
     checklistById(id: Long!): ChecklistPageId
+    exportChecklistToPdf(id: Long!): String
+    exportChecklistToExcel(id: Long!): String
+
 }
 
 extend type Mutation {
     addChecklist(input: ChecklistDto): Response
     updateChecklist(id: Long!, input: ChecklistDto): Response
     deleteChecklist(id: Long!): Response
+    updateItemStatus(itemId: Long!, active: Boolean!): Response
 }

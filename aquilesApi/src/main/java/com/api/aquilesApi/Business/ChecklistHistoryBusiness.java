@@ -1,0 +1,140 @@
+package com.api.aquilesApi.Business;
+
+import com.api.aquilesApi.Dto.ChecklistHistoryDTO;
+import com.api.aquilesApi.Entity.ChecklistHistory;
+import com.api.aquilesApi.Service.ChecklistHistoryService;
+import com.api.aquilesApi.Utilities.CustomException;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+
+@Component
+public class ChecklistHistoryBusiness {
+    private final ChecklistHistoryService checklistHistoryService;
+    private final ModelMapper modelMapper;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+
+    public ChecklistHistoryBusiness(ChecklistHistoryService checklistHistoryService, ModelMapper modelMapper, com.fasterxml.jackson.databind.ObjectMapper objectMapper) {
+        this.checklistHistoryService = checklistHistoryService;
+        this.modelMapper = modelMapper;
+        this.objectMapper = objectMapper;
+    }
+    // Guardar historial de cambios en checklist
+    public void guardarHistorial(String accion, com.api.aquilesApi.Entity.Checklist antes, com.api.aquilesApi.Entity.Checklist despues, String teacher) {
+        System.out.println("🟢 Entrando a guardarHistorial() para checklist ID: " +
+                ((despues != null) ? despues.getId() : (antes != null) ? antes.getId() : "null"));
+
+        try {
+            com.api.aquilesApi.Entity.ChecklistHistory history = new com.api.aquilesApi.Entity.ChecklistHistory();
+
+            Long checklistId = (despues != null) ? despues.getId() : (antes != null) ? antes.getId() : null;
+
+            if (checklistId == null) {
+                System.err.println("❌ No se puede guardar historial: checklistId es null");
+                return;
+            }
+
+            history.setChecklistId(checklistId);
+            history.setActions(accion);
+            history.setTeacher(teacher);
+
+            if (antes != null) {
+                com.api.aquilesApi.Dto.ChecklistHistoryDTO dtoAntes = convertir(antes);
+                history.setDateBefore(objectMapper.writeValueAsString(dtoAntes));
+            }
+
+            if (despues != null) {
+                com.api.aquilesApi.Dto.ChecklistHistoryDTO dtoDespues = convertir(despues);
+                history.setDateAfter(objectMapper.writeValueAsString(dtoDespues));
+            }
+
+            checklistHistoryService.add(history);
+            System.out.println("✅ Historial guardado para checklist ID: " + checklistId);
+
+        } catch (Exception e) {
+            System.err.println("❌ Error guardando historial: " + e.getMessage());
+        }
+    }
+
+    private com.api.aquilesApi.Dto.ChecklistHistoryDTO convertir(com.api.aquilesApi.Entity.Checklist checklist) {
+        com.api.aquilesApi.Dto.ChecklistHistoryDTO dto = new com.api.aquilesApi.Dto.ChecklistHistoryDTO();
+        dto.setId(checklist.getId());
+        dto.setState(checklist.getState());
+        dto.setRemarks(checklist.getRemarks());
+        dto.setEvaluationCriteria(checklist.isEvaluationCriteria());
+        dto.setDateAssigned(checklist.getDateAssigned());
+        dto.setStudySheets(checklist.getStudySheets());
+        dto.setEvaluations(checklist.getEvaluations());
+        dto.setLearningOutcome(checklist.getLearningOutcome());
+        return dto;
+    }
+    //validation object
+
+
+    //find all
+
+    public Page<ChecklistHistoryDTO> findAll(int page, int size) {
+        try {
+            PageRequest pageRequest = PageRequest.of(page, size);
+            Page<ChecklistHistory> checklistHistoryPage = checklistHistoryService.findAll(pageRequest);
+            return checklistHistoryPage.map(checklistHistory -> modelMapper.map(checklistHistory, ChecklistHistoryDTO.class));
+        } catch (Exception e) {
+            throw new CustomException("Error retrieving checklist history: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //find by id
+    public ChecklistHistoryDTO findById(Long id) {
+        try {
+            ChecklistHistory checklistHistory = checklistHistoryService.getById(id);
+            return modelMapper.map(checklistHistory, ChecklistHistoryDTO.class);
+        } catch (CustomException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new CustomException("Error retrieving checklist history with ID " + id + ": " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    //add
+    public ChecklistHistoryDTO add(ChecklistHistoryDTO checklistHistoryDTO) {
+        try {
+            ChecklistHistory checklistHistory = modelMapper.map(checklistHistoryDTO, ChecklistHistory.class);
+            checklistHistory = checklistHistoryService.add(checklistHistory);
+            return modelMapper.map(checklistHistory, ChecklistHistoryDTO.class);
+        } catch (Exception e) {
+            throw new CustomException("Error adding checklist history: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    //update
+    public void update(Long ChecklistHistoryId, ChecklistHistoryDTO checklistHistoryDTO) {
+        try {
+            ChecklistHistory checklistHistory = modelMapper.map(checklistHistoryDTO, ChecklistHistory.class);
+            checklistHistory.setId(checklistHistory.getId());
+            checklistHistoryService.update(checklistHistory);
+        } catch (CustomException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new CustomException("Error updating checklist history with ID " + ChecklistHistoryId + ": " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    //delete
+    public void delete(Long checklistHistoryId) {
+        try {
+            ChecklistHistory checklistHistory = checklistHistoryService.getById(checklistHistoryId);
+            checklistHistoryService.delete(checklistHistory);
+        } catch (CustomException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new CustomException("Error deleting checklist history with ID " + checklistHistoryId + ": " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+}

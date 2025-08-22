@@ -1,6 +1,7 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,9 +9,10 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.Set;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "justification_types")
 public class JustificationType implements Serializable {
@@ -27,6 +29,6 @@ public class JustificationType implements Serializable {
 
     // Relations
     // 1. Relation (1-M) con justification
-    @OneToMany(mappedBy = "justificationTypeId")
+    @OneToMany(mappedBy = "justificationType")
     private Set<Justification> justificationSet;
 }

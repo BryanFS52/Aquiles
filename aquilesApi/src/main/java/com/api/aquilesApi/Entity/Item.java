@@ -1,15 +1,17 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "items")
 public class Item implements Serializable {
@@ -23,6 +25,9 @@ public class Item implements Serializable {
 
     @Column(name = "indicator", nullable = false, length = 100)
     private String indicator;
+
+    @Column(name = "active", nullable = false)
+    private Boolean active = true;
 
     // Relations
     // 1. Relation (M-1) con itemType

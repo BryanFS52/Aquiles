@@ -1,0 +1,48 @@
+type ChecklistHistory {
+  id: ID
+  checklistId: Long
+  actions: String
+  teacher: String
+  date: String
+  dateBefore: String
+  dateAfter: String
+}
+
+
+type ChecklistHistoryPage {
+  code: String
+  data: [ChecklistHistory]
+  date: String
+  totalPages: Int
+  totalItems: Int
+  currentPage: Int
+  message: String
+}
+
+type checklistHistoryPageId {
+  data: ChecklistHistory
+  date: String
+  code: String
+  message: String
+}
+
+input ChecklistHistoryDto {
+  checklistId: ID!
+  actions: String!
+  teacher: String!
+  date: String!
+  dateBefore: String
+  dateAfter: String
+}
+
+extend type Query {
+  allChecklistHistory(page: Int, size: Int): ChecklistHistoryPage
+  checklistHistoryById(id: Long!): checklistHistoryPageId
+  checklistHistoryId(checklistId: ID!): [ChecklistHistory]
+}
+
+extend type Mutation {
+  addChecklistHistory(input: ChecklistHistoryDto!): Response
+  updateChecklistHistory(id: Long!, input: ChecklistHistoryDto!): Response
+  deleteChecklistHistory(id: Long!): Response
+}

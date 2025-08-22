@@ -17,11 +17,10 @@ public class AttendanceDto {
     private Long studentId;
 
     // @NotNull(message = "")
-    private Long studySheetQuarter;
+    private Long competenceQuarter;
 
     // @NotNull(message = "")
     private JustificationDto justification;
 
     // @NotNull(message = "")
-    private AttendanceStateDto attendanceState;
-}
+    private AttendanceStateDto attendanceState;}

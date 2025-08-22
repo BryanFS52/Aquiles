@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -28,14 +29,17 @@ public class ChecklistDto {
     @NotNull(message = "El criterio de evaluación es obligatorio")
     private boolean evaluationCriteria;
 
-    @NotNull(message = "El historial del checklist es obligatorio")
-    @Size(max = 255, message = "El historial del checklist no puede exceder los 255 caracteres")
-    private String checklistHistory;
+    @NotNull(message = "El trimestre es obligatorio")
+    private String trimester;
+
+    private String component;
 
     // Relations
-    private Set<Long> associatedJuriesIds;
-    private ItemDto item;
-    private EvaluationsDto evaluations;
+    @NotNull(message = "Los jurados asociados son obligatorios")
+    private Set<Long> associatedJuries;
+    private EvaluationsDto evaluation;
+    private Long evaluationId; // ID de la evaluación para vinculación
     private TeamsScrumDto teamsScrum;
-
+    private Long studySheets;
+    private List<ItemDto> items;
 }

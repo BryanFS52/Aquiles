@@ -1,10 +1,12 @@
 scalar Long
 
 type Response {
-    id : Long
-    code : String
-    message : String
+    id: Long
+    code: String
+    message: String
 }
+
+
 
 type Query {
 }

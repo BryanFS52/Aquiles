@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +55,9 @@ public class TeamsScrum implements Serializable {
             name = "team_scrum_members",
             joinColumns = @JoinColumn(name = "team_id")
     )
-    private List<TeamScrumMemberId> memberIds = new ArrayList<>();
+    private List<TeamScrumMemberId>memberIds = new ArrayList<>();
 
-    private Long processMethodologyId;
+    // 4. Relation con (M-1) processMethodology (Atlas)
+    @Column(name = "process_methodology_id", nullable = true)
+    private String processMethodologyId;
 }

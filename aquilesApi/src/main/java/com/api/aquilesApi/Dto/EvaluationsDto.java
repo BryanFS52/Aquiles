@@ -1,5 +1,9 @@
 package com.api.aquilesApi.Dto;
 
+import com.api.aquilesApi.Entity.Checklist;
+
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -23,5 +27,8 @@ public class EvaluationsDto {
     @Size(max = 13, message = "El juicio de valor no puede exceder los 13 caracteres")
     private String valueJudgment;
 
-    // Relations
+    private Checklist checklist;
+
+    // Este sí debe estar en el input
+    private Long checklistId;
 }

@@ -177,10 +177,8 @@ const ModalQR = ({ isOpen, onClose }) => {
           headers: { "Content-Type": "application/json" },
         }
       );
-      console.log(response.data.message);
       toast.success("Correo enviado con éxito!");
     } catch (error) {
-      console.error("Error al enviar correo:", error);
       toast.error("Error al enviar el correo.");
     }
   };
