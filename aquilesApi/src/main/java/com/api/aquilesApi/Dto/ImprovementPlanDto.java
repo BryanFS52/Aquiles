@@ -1,4 +1,5 @@
 package com.api.aquilesApi.Dto;
+package com.api.aquilesApi.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
