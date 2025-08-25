@@ -1,13 +1,11 @@
 "use client";
 
-import React, { useRef, ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import React, { useRef, ChangeEvent, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoPeople } from 'react-icons/io5';
 import { FaCalendarDay, FaRegListAlt, FaCheckCircle } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
-import { useUser } from '@context/UserContext';
-import { useLoader } from '@/context/LoaderContext';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
 import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
 import { AppDispatch, RootState } from '@/redux/store';
@@ -33,24 +31,21 @@ import {
 } from "@slice/justificationSlice";
 
 // Helper component for formatting dates
-  const formatDate = (dateString: string) => {
-    const [year, month, day] = dateString.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
-    return date.toLocaleDateString("es-CO", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
+const formatDate = (dateString: string) => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  return date.toLocaleDateString("es-CO", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
 
 export const JustificationsContainer: React.FC = () => {
-    const fileRef = useRef<File | null>(null);
-    const base64Ref = useRef<string>('');
-    const formRef = useRef<HTMLDivElement>(null);
-    const topRef = useRef<HTMLDivElement>(null);
-
-  const { user } = useUser();
-  const { showLoader, hideLoader } = useLoader();
+  const fileRef = useRef<File | null>(null);
+  const base64Ref = useRef<string>('');
+  const formRef = useRef<HTMLDivElement>(null);
+  const topRef = useRef<HTMLDivElement>(null);
 
   // Estado local para controlar la carga del modal
   const [shouldLoadModal, setShouldLoadModal] = useState(false);
@@ -163,7 +158,7 @@ export const JustificationsContainer: React.FC = () => {
     }
   };
 
-    const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(validateForm());
 
@@ -270,7 +265,7 @@ export const JustificationsContainer: React.FC = () => {
   };
 
   const handleUpdateJustificationTypeId = (value: any) => {
-      dispatch(updateJustificationTypeId(value));
+    dispatch(updateJustificationTypeId(value));
   };
 
   const handleDownloadFile = (justificacion: any) => {
@@ -372,7 +367,7 @@ export const JustificationsContainer: React.FC = () => {
                   </div>
                 </div>
               )}
-              
+
               {absences.length === 0 && (
                 <div className="text-center py-12">
                   <motion.div

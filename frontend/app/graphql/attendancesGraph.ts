@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 
 // Queries and Mutations for Attendances
-
 export const GET_ALL_ATTENDANCES = gql`
   query GetAttendances($page: Int, $size: Int) {
     allAttendances(page: $page, size: $size) {

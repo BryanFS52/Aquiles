@@ -39,7 +39,7 @@ export default function JustificationTable({
     if (justificacion.justificationStatus && justificacion.justificationStatus !== "Sin status") {
       return justificacion.justificationStatus;
     }
-    
+
     // ✅ Fallback al campo estado que también contiene el nombre del estado
     return justificacion.estado || "En proceso";
   };
@@ -92,9 +92,8 @@ export default function JustificationTable({
               <td className="px-6 py-4">
                 {justificacion.archivoAdjunto ? (
                   <GrAttachment
-                    title={`Descargar archivo (${
-                      justificacion.archivoMime || "desconocido"
-                    })`}
+                    title={`Descargar archivo (${justificacion.archivoMime || "desconocido"
+                      })`}
                     className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
                     onClick={() => handleDownloadFile(justificacion)}
                   />
@@ -106,27 +105,18 @@ export default function JustificationTable({
               </td>
               <td className="px-6 py-4">
                 <span
-<<<<<<< HEAD:frontend/app/components/features/justification/justificationsTable.tsx
-                  className={`inline-flex items-center px-1.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
-                    getCurrentStatusName(justificacion) === "Aceptado"
+                  className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getCurrentStatusName(justificacion) === "Aceptado"
                       ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
                       : getCurrentStatusName(justificacion) === "Denegado"
-                      ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
-                      : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
-                  }`}
-=======
-                  className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${justificacion.estado === "Activo"
-                      ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
-                      : "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                        ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
                     }`}
->>>>>>> origin/gabrielDev:frontend/app/components/features/justifications/justificationsTable.tsx
                 >
                   {getCurrentStatusName(justificacion)}
                 </span>
               </td>
               <td className="px-6 py-4">
                 <div className="flex space-x-2">
-<<<<<<< HEAD:frontend/app/components/features/justification/justificationsTable.tsx
                   <select
                     value={getCurrentSelectValue(justificacion)}
                     onChange={(e) => handleSelectChange(justificacion.id, e)}
@@ -146,30 +136,6 @@ export default function JustificationTable({
                       Cargando...
                     </span>
                   )}
-=======
-                  <button
-                    onClick={() => handleStatusChange(justificacion.id, "Aceptado")}
-                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 ${justificacion.estado === "Aceptado"
-                        ? "bg-green-500 text-white cursor-default"
-                        : "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40"
-                      }`}
-                    disabled={justificacion.estado === "Aceptado"}
-                    title="Aceptar justificación"
-                  >
-                    <Check className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange(justificacion.id, "Denegado")}
-                    className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 ${justificacion.estado === "Denegado"
-                        ? "bg-red-500 text-white cursor-default"
-                        : "bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40"
-                      }`}
-                    disabled={justificacion.estado === "Denegado"}
-                    title="Denegar justificación"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
->>>>>>> origin/gabrielDev:frontend/app/components/features/justifications/justificationsTable.tsx
                 </div>
               </td>
             </tr>

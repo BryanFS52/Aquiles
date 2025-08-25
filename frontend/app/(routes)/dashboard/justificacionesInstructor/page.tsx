@@ -40,7 +40,7 @@ export default function JustificacionesInstructor() {
   const { justificationStatuses } = useSelector(
     (state: RootState) => state.justificationStatus
   );
-  
+
   useEffect(() => {
     dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
   }, [dispatch]);
@@ -49,12 +49,12 @@ export default function JustificacionesInstructor() {
     dispatch(setFilterOptions({ [filterType]: value }));
     dispatch(setLocalCurrentPage(1));
   };
-  
+
   const handleRefresh = () => {
     console.log("🔄 Refresh solicitado");
     // Aquí podrías agregar lógica para recargar datos específicos si es necesario
   };
-  
+
   const handlePreviousPage = () => {
     dispatch(goToPreviousPage());
   };
@@ -118,7 +118,7 @@ export default function JustificacionesInstructor() {
 
   // Verificar si hay datos de justificaciones en el state
   if (!loading && !error && (!justificationsData || justificationsData.length === 0)) {
-    return <EmptyState message="No se encontraron justificaciones para esta ficha. Selecciona una ficha desde el panel del instructor." />;
+    return <EmptyState message="No se encontraron justificaciones para esta ficha." />;
   }
 
   if (!loading && !errorMessage && (!filteredData || filteredData.length === 0)) {
