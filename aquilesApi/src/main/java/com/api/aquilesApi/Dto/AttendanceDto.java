@@ -10,8 +10,12 @@ import lombok.NoArgsConstructor;
 public class AttendanceDto {
 
     private Long id;
+
     // @NotNull(message = "")
     private String attendanceDate;
+
+    // @NotNull(message = "")
+    private AttendanceStateDto attendanceState;
 
     // @NotNull(message = "")
     private Long studentId;
@@ -22,6 +26,5 @@ public class AttendanceDto {
     // @NotNull(message = "")
     private JustificationDto justification;
 
-    // @NotNull(message = "")
-    private AttendanceStateDto attendanceState;
+
 }

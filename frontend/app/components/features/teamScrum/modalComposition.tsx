@@ -1,45 +1,9 @@
 "use client"
 
 import React, { useState, useMemo, useEffect } from "react"
-import { X, Users, Crown, Code, Database, GitBranch, ChevronDown, User } from "lucide-react"
+import { X, Users, Crown, Code, Database, GitBranch, ChevronDown, User, BarChart3, CheckCircle, Clock, Target, TrendingUp, UserCheck, Settings } from "lucide-react"
 import { TeamsScrum, Student, Profile } from "@graphql/generated"
-
-interface ModalProps {
-    isOpen: boolean
-    onClose: () => void
-    children: React.ReactNode
-}
-
-const Modal = ({ isOpen, onClose, children }: ModalProps) => {
-    useEffect(() => {
-        if (isOpen) {
-            // Bloquear scroll del body cuando el modal está abierto
-            document.body.style.overflow = 'hidden'
-            document.body.style.paddingRight = '15px' // Compensar scrollbar
-        } else {
-            // Restaurar scroll del body cuando el modal se cierra
-            document.body.style.overflow = 'unset'
-            document.body.style.paddingRight = '0px'
-        }
-
-        // Cleanup cuando el componente se desmonta
-        return () => {
-            document.body.style.overflow = 'unset'
-            document.body.style.paddingRight = '0px'
-        }
-    }, [isOpen])
-
-    if (!isOpen) return null
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-            <div className="fixed inset-0" onClick={onClose} />
-            <div className="relative bg-white rounded-xl shadow-xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-                {children}
-            </div>
-        </div>
-    )
-}
+import Modal from "@components/UI/Modal"
 
 // Función para generar colores consistentes basados en el nombre del perfil
 const generateProfileColors = (profileName: string) => {
@@ -175,23 +139,23 @@ const HierarchyNode = ({
     const generateRoleColors = (roleName: string) => {
         // Para los miembros del equipo, usar siempre colores grises pero con variaciones
         const grayVariations = [
-            { bg: 'bg-gray-600', border: 'border-gray-600', icon: Crown, title: 'Manager' },
-            { bg: 'bg-slate-600', border: 'border-slate-600', icon: Code, title: 'Frontend Developer' },
-            { bg: 'bg-zinc-600', border: 'border-zinc-600', icon: Database, title: 'Backend Developer' },
-            { bg: 'bg-neutral-600', border: 'border-neutral-600', icon: User, title: 'Scrum Master' },
-            { bg: 'bg-stone-600', border: 'border-stone-600', icon: Users, title: 'Product Owner' },
-            { bg: 'bg-gray-700', border: 'border-gray-700', icon: User, title: 'Team Member' },
-            { bg: 'bg-slate-700', border: 'border-slate-700', icon: User, title: 'Designer' },
-            { bg: 'bg-zinc-700', border: 'border-zinc-700', icon: User, title: 'QA Tester' },
-            { bg: 'bg-neutral-700', border: 'border-neutral-700', icon: User, title: 'DevOps' },
-            { bg: 'bg-stone-700', border: 'border-stone-700', icon: User, title: 'Analyst' },
-            { bg: 'bg-gray-500', border: 'border-gray-500', icon: User, title: 'Developer' },
-            { bg: 'bg-slate-500', border: 'border-slate-500', icon: User, title: 'Consultant' },
-            { bg: 'bg-zinc-500', border: 'border-zinc-500', icon: User, title: 'Specialist' },
-            { bg: 'bg-neutral-500', border: 'border-neutral-500', icon: User, title: 'Lead' },
-            { bg: 'bg-stone-500', border: 'border-stone-500', icon: User, title: 'Junior' },
-            { bg: 'bg-gray-800', border: 'border-gray-800', icon: User, title: 'Senior' },
-            { bg: 'bg-gray-600', border: 'border-gray-600', icon: User, title: 'Sin Rol Asignado' }
+            { bg: 'bg-gray-600', border: 'border-gray-600', text: 'text-gray-600', icon: Crown, title: 'Manager' },
+            { bg: 'bg-slate-600', border: 'border-slate-600', text: 'text-slate-600', icon: Code, title: 'Frontend Developer' },
+            { bg: 'bg-zinc-600', border: 'border-zinc-600', text: 'text-zinc-600', icon: Database, title: 'Backend Developer' },
+            { bg: 'bg-neutral-600', border: 'border-neutral-600', text: 'text-neutral-600', icon: User, title: 'Scrum Master' },
+            { bg: 'bg-stone-600', border: 'border-stone-600', text: 'text-stone-600', icon: Users, title: 'Product Owner' },
+            { bg: 'bg-gray-700', border: 'border-gray-700', text: 'text-gray-700', icon: User, title: 'Team Member' },
+            { bg: 'bg-slate-700', border: 'border-slate-700', text: 'text-slate-700', icon: User, title: 'Designer' },
+            { bg: 'bg-zinc-700', border: 'border-zinc-700', text: 'text-zinc-700', icon: User, title: 'QA Tester' },
+            { bg: 'bg-neutral-700', border: 'border-neutral-700', text: 'text-neutral-700', icon: User, title: 'DevOps' },
+            { bg: 'bg-stone-700', border: 'border-stone-700', text: 'text-stone-700', icon: User, title: 'Analyst' },
+            { bg: 'bg-gray-500', border: 'border-gray-500', text: 'text-gray-500', icon: User, title: 'Developer' },
+            { bg: 'bg-slate-500', border: 'border-slate-500', text: 'text-slate-500', icon: User, title: 'Consultant' },
+            { bg: 'bg-zinc-500', border: 'border-zinc-500', text: 'text-zinc-500', icon: User, title: 'Specialist' },
+            { bg: 'bg-neutral-500', border: 'border-neutral-500', text: 'text-neutral-500', icon: User, title: 'Lead' },
+            { bg: 'bg-stone-500', border: 'border-stone-500', text: 'text-stone-500', icon: User, title: 'Junior' },
+            { bg: 'bg-gray-800', border: 'border-gray-800', text: 'text-gray-800', icon: User, title: 'Senior' },
+            { bg: 'bg-gray-600', border: 'border-gray-600', text: 'text-gray-600', icon: User, title: 'Sin Rol Asignado' }
         ]
 
         // Crear hash para consistencia
@@ -222,78 +186,105 @@ const HierarchyNode = ({
     const initials = `${member.person?.name?.[0] || ''}${member.person?.lastname?.[0] || ''}`
 
     return (
-        <div className="flex flex-col items-center">
-            {/* Nodo principal */}
-            <div className={`relative bg-white rounded-lg p-4 shadow-lg ${config.border} border-2 min-w-[200px] ${isManager ? 'ring-2 ring-yellow-400' : ''} ${selectedRole ? 'cursor-pointer hover:shadow-xl transition-shadow' : ''
-                }`}>
-                <div className="flex items-center space-x-3">
-                    <div className={`w-12 h-12 ${config.bg} rounded-full flex items-center justify-center text-white font-bold`}>
-                        {initials}
-                    </div>
-                    <div className="flex-1">
-                        <h3 className="font-semibold text-gray-800 text-sm">
-                            {`${member.person?.name || ''} ${member.person?.lastname || ''}`}
-                        </h3>
-                        <p className="text-xs text-gray-600 truncate" title={role}>
-                            {role.length > 25 ? `${role.substring(0, 25)}...` : role}
-                        </p>
-                    </div>
-                    <div className={`p-2 ${config.bg} rounded-lg`}>
-                        <RoleIcon className="w-4 h-4 text-white" />
-                    </div>
-                </div>
+        <div className="group">
+            {/* Tarjeta elegante pero compacta */}
+            <div className={`relative bg-white rounded-xl border p-4 shadow-sm hover:shadow-md transition-all duration-300 ${selectedRole ? 'cursor-pointer hover:bg-blue-50/30 hover:border-blue-200' : 'hover:bg-gray-50'
+                } ${isManager ? 'border-l-4 border-l-yellow-400 bg-gradient-to-r from-yellow-50/50 to-white' : 'border-gray-200'} w-full max-w-sm mx-auto`}>
 
-                {/* Indicador de que se puede hacer clic */}
-                {selectedRole && (
-                    <div className="absolute -top-2 -right-2 bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold animate-pulse">
-                        !
-                    </div>
-                )}
+                {/* Efecto sutil de fondo */}
+                <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-100/20 to-transparent rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-                {/* Botón de asignación de rol */}
-                {profiles.length > 0 && onSelectProfile && member.id && (
-                    <div className="mt-3 pt-3 border-t border-gray-200">
-                        <div className="text-center">
-                            <button
-                                onClick={async () => {
-                                    if (selectedRole) {
-                                        await onSelectProfile(member.id!, selectedRole)
-                                    } else {
-                                        // Mostrar mensaje de que debe seleccionar un rol primero
-                                        alert('Por favor, selecciona un rol primero desde el panel izquierdo.')
-                                    }
-                                }}
-                                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${selectedRole && !isAssigning
-                                    ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                    }`}
-                                disabled={!selectedRole || isAssigning}
-                            >
-                                {isAssigning ? (
-                                    <div className="flex items-center space-x-2">
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                        <span>Asignando...</span>
-                                    </div>
-                                ) : selectedRole ? (
-                                    `Asignar ${selectedRole.name}`
-                                ) : (
-                                    'Selecciona un rol'
-                                )}
-                            </button>
-
-                            {/* Mostrar rol actual si existe */}
-                            {(member as any).assignedProfile && (member as any).assignedProfile !== "Sin Rol" && (
-                                <div className="mt-2">
-                                    <span className="text-xs text-gray-500">Rol actual:</span>
-                                    <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ml-1 ${getProfileColor((member as any).assignedProfile || '')}`}>
-                                        <User className="w-3 h-3 mr-1" />
-                                        {(member as any).assignedProfile}
-                                    </div>
+                <div className="relative">
+                    <div className="flex items-center justify-between mb-3">
+                        {/* Info del miembro */}
+                        <div className="flex items-center space-x-3 flex-1">
+                            <div className="relative">
+                                <div className={`w-10 h-10 ${config.bg} rounded-xl flex items-center justify-center text-white font-semibold text-xs shadow-md ring-2 ring-white ring-opacity-80`}>
+                                    {initials}
                                 </div>
+                                {isManager && (
+                                    <div className="absolute -top-0.5 -right-0.5 bg-yellow-400 rounded-full p-0.5 shadow-sm">
+                                        <Crown className="w-2.5 h-2.5 text-yellow-800" />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-gray-900 text-sm truncate">
+                                    {`${member.person?.name || ''} ${member.person?.lastname || ''}`}
+                                </h4>
+                                <div className="flex items-center space-x-1.5 mt-0.5">
+                                    <RoleIcon className="w-3 h-3 text-gray-400" />
+                                    <p className="text-xs text-gray-600 truncate">
+                                        {role}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Status y acciones */}
+                        <div className="flex flex-col items-end space-y-1">
+                            {selectedRole && (
+                                <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse shadow-sm"></div>
                             )}
+                            <div className="flex items-center space-x-1">
+                                <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+                                <span className="text-xs text-gray-500">Online</span>
+                            </div>
                         </div>
                     </div>
-                )}
+
+                    {/* Rol actual con estilo mejorado */}
+                    {(member as any).assignedProfile && (member as any).assignedProfile !== "Sin Rol" && (
+                        <div className="mb-3 p-2.5 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100/50">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-1.5">
+                                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                                    <span className="text-xs font-medium text-green-700">Rol Asignado</span>
+                                </div>
+                                <span className="text-xs font-semibold text-green-800 bg-white/60 px-2 py-0.5 rounded">
+                                    {(member as any).assignedProfile}
+                                </span>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Botón de asignación elegante */}
+                    {profiles.length > 0 && onSelectProfile && member.id && (
+                        <button
+                            onClick={async () => {
+                                if (selectedRole) {
+                                    await onSelectProfile(member.id!, selectedRole)
+                                } else {
+                                    alert('Por favor, selecciona un rol primero.')
+                                }
+                            }}
+                            className={`w-full py-2.5 px-3 text-xs font-medium rounded-lg transition-all duration-300 ${selectedRole && !isAssigning
+                                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-sm hover:shadow-md transform hover:-translate-y-0.5'
+                                : 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                                }`}
+                            disabled={!selectedRole || isAssigning}
+                        >
+                            <div className="flex items-center justify-center space-x-1.5">
+                                {isAssigning ? (
+                                    <>
+                                        <div className="animate-spin rounded-full h-3 w-3 border-b border-white"></div>
+                                        <span>Asignando...</span>
+                                    </>
+                                ) : selectedRole ? (
+                                    <>
+                                        <UserCheck className="w-3 h-3" />
+                                        <span>Asignar {selectedRole.name}</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Target className="w-3 h-3" />
+                                        <span>Selecciona un rol</span>
+                                    </>
+                                )}
+                            </div>
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     )
@@ -387,26 +378,41 @@ const TeamHierarchy = ({
     }, [teamData, profiles])
 
     return (
-        <div className="pt-8">
-            {/* Todos los miembros del equipo (incluyendo sin roles) */}
+        <div className="pt-4">
+            {/* Lista compacta de miembros */}
             {studentsWithRole && studentsWithRole.length > 0 && (
                 <div className="mt-0 border-t border-gray-200 pt-6">
-                    <div className="text-center mb-6">
-                        <h3 className="text-lg font-semibold text-gray-700 flex items-center justify-center space-x-2">
-                            <Users className="w-5 h-5 text-gray-600" />
-                            <span>Todos los Miembros del Equipo</span>
-                            <span className="bg-gray-200 text-gray-800 text-xs font-semibold px-2 py-1 rounded-full">
+                    {/* Header compacto */}
+                    <div className="mb-6 text-center">
+                        <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-gray-50 to-blue-50 px-4 py-3 rounded-xl border border-gray-100 shadow-sm">
+                            <div className="p-1.5 bg-blue-100 rounded-lg">
+                                <Users className="w-4 h-4 text-blue-600" />
+                            </div>
+                            <div>
+                                <h3 className="text-base font-semibold text-gray-900">
+                                    Miembros del Equipo
+                                </h3>
+                                <p className="text-xs text-gray-600">
+                                    {studentsWithRole.length} personas • Gestiona roles
+                                </p>
+                            </div>
+                            <div className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                                 {studentsWithRole.length}
-                            </span>
-                        </h3>
-                        <p className="text-sm text-gray-500 mt-1">
-                            Incluyendo miembros sin roles asignados
-                        </p>
+                            </div>
+                        </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
+
+                    {/* Grid compacto */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-w-5xl mx-auto">
                         {studentsWithRole.map((student: any, index: number) =>
                             student ? (
-                                <div key={student.id || index} className="flex justify-center">
+                                <div
+                                    key={student.id || index}
+                                    className="transform transition-all duration-300 hover:scale-[1.02]"
+                                    style={{
+                                        animationDelay: `${index * 0.1}s`
+                                    }}
+                                >
                                     <HierarchyNode
                                         member={student}
                                         role={(student as any).assignedProfile}
@@ -428,10 +434,10 @@ const TeamHierarchy = ({
 
             {/* Mensaje si no hay miembros */}
             {(!studentsWithRole || studentsWithRole.length === 0) && (
-                <div className="text-center py-12">
-                    <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">No hay miembros en el equipo</p>
-                    <p className="text-sm text-gray-400 mt-2">
+                <div className="text-center py-8 md:py-12">
+                    <Users className="w-12 h-12 md:w-16 md:h-16 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-500 text-sm md:text-base">No hay miembros en el equipo</p>
+                    <p className="text-xs md:text-sm text-gray-400 mt-2">
                         Los datos del equipo no contienen estudiantes o están vacíos
                     </p>
                 </div>
@@ -513,158 +519,262 @@ export const ModalComposition = ({
     if (!teamData) return null
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
-            {/* Header */}
-            <header className="flex items-center justify-between p-6 border-b bg-gray-50">
-                <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-lime-500 rounded-lg">
-                        <GitBranch className="w-6 h-6 text-white" />
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={
+                <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-gradient-to-br from-lime-500 to-lime-600 rounded-xl shadow-lg">
+                        <GitBranch className="w-6 h-6 text-white drop-shadow-sm" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Organigrama del Equipo</h2>
-                        <p className="text-gray-600">Estructura jerárquica y organización</p>
+                        <span className="text-xl font-bold text-gray-900 tracking-tight">Organigrama del Equipo</span>
+                        <p className="text-gray-600 text-sm mt-1 font-medium">Estructura jerárquica y organización</p>
                     </div>
                 </div>
-                <button
-                    onClick={onClose}
-                    className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100"
-                >
-                    <X className="w-5 h-5" />
-                </button>
-            </header>
+            }
+            size="xxl"
+            className="max-h-[90vh] w-full max-w-5xl mx-auto"
+        >
+            <div className="max-h-[70vh] overflow-y-auto px-3 py-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                {/* Stats con elementos innovadores pero manteniendo colores */}
+                <div className="relative overflow-hidden px-6 py-6 bg-gradient-to-r from-white to-gray-50 border border-gray-100 rounded-xl mb-6 shadow-sm">
+                    {/* Elementos decorativos sutiles */}
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-gray-100 rounded-full blur-xl opacity-30 animate-pulse"></div>
+                    <div className="absolute bottom-0 left-0 w-16 h-16 bg-blue-50 rounded-full blur-xl opacity-40 animate-bounce"></div>
 
-            {/* Stats */}
-            <div className="px-6 py-4 bg-white border-b">
-                <div className="flex space-x-8">
-                    <div className="text-center">
-                        <div className="text-sm text-gray-500">Total</div>
-                        <div className="text-2xl font-bold text-gray-900">{teamStats.total}</div>
+                    <div className="relative grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div className="text-center group relative">
+                            <div className="absolute inset-0 bg-gray-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105"></div>
+                            <div className="relative">
+                                <div className="text-sm text-gray-500 font-medium mb-2 flex items-center justify-center space-x-1">
+                                    <Users className="w-4 h-4" />
+                                    <span>Total</span>
+                                </div>
+                                <div className="text-2xl font-bold text-gray-900 transition-transform duration-200 group-hover:scale-110">{teamStats.total}</div>
+                                <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
+                                    <div className="bg-gray-600 h-1 rounded-full transition-all duration-1000" style={{ width: '100%' }}></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="text-center group relative">
+                            <div className="absolute inset-0 bg-green-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105"></div>
+                            <div className="relative">
+                                <div className="text-sm text-gray-500 font-medium mb-2 flex items-center justify-center space-x-1">
+                                    <CheckCircle className="w-4 h-4" />
+                                    <span>Con Roles</span>
+                                </div>
+                                <div className="text-2xl font-bold text-green-600 transition-transform duration-200 group-hover:scale-110">{teamStats.withRoles}</div>
+                                <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
+                                    <div className="bg-green-600 h-1 rounded-full transition-all duration-1000"
+                                        style={{ width: `${teamStats.total > 0 ? (teamStats.withRoles / teamStats.total) * 100 : 0}%` }}></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="text-center group relative">
+                            <div className="absolute inset-0 bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105"></div>
+                            <div className="relative">
+                                <div className="text-sm text-gray-500 font-medium mb-2 flex items-center justify-center space-x-1">
+                                    <Clock className="w-4 h-4" />
+                                    <span>Sin Roles</span>
+                                </div>
+                                <div className="text-2xl font-bold text-red-600 transition-transform duration-200 group-hover:scale-110">{teamStats.withoutRoles}</div>
+                                <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
+                                    <div className="bg-red-600 h-1 rounded-full transition-all duration-1000"
+                                        style={{ width: `${teamStats.total > 0 ? (teamStats.withoutRoles / teamStats.total) * 100 : 0}%` }}></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="text-center group relative">
+                            <div className="absolute inset-0 bg-blue-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105"></div>
+                            <div className="relative">
+                                <div className="text-sm text-gray-500 font-medium mb-2 flex items-center justify-center space-x-1">
+                                    <Target className="w-4 h-4" />
+                                    <span>Roles Únicos</span>
+                                </div>
+                                <div className="text-2xl font-bold text-blue-600 transition-transform duration-200 group-hover:scale-110">{teamStats.uniqueRoles}</div>
+                                <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
+                                    <div className="bg-blue-600 h-1 rounded-full transition-all duration-1000" style={{ width: '85%' }}></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="text-center">
-                        <div className="text-sm text-gray-500">Con Roles</div>
-                        <div className="text-2xl font-bold text-green-600">{teamStats.withRoles}</div>
+                </div>
+
+                {/* Perfiles Disponibles con elementos innovadores pero manteniendo colores */}
+                {profiles.length > 0 ? (
+                    <div className="relative overflow-hidden px-6 py-5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl mb-6 shadow-sm">
+                        {/* Elementos decorativos sutiles */}
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full blur-xl opacity-20 animate-pulse"></div>
+                        <div className="absolute bottom-0 left-0 w-20 h-20 bg-indigo-100 rounded-full blur-xl opacity-30 animate-bounce"></div>
+
+                        <div className="relative">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
+                                <div className="flex items-center space-x-3 mb-2 sm:mb-0">
+                                    <div className="relative group">
+                                        <div className="absolute inset-0 bg-blue-200 rounded-lg blur opacity-0 group-hover:opacity-50 transition-all duration-300"></div>
+                                        <div className="relative p-2 bg-blue-100 rounded-lg transform group-hover:scale-110 transition-all duration-300">
+                                            <User className="w-5 h-5 text-blue-600" />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span className="text-base font-semibold text-gray-700 flex items-center space-x-2">
+                                            <Settings className="w-4 h-4" />
+                                            <span>Roles Disponibles para Asignar</span>
+                                        </span>
+                                        <p className="text-xs text-gray-500 mt-1">Selecciona y asigna roles a los miembros</p>
+                                    </div>
+                                </div>
+                                <div className="relative group">
+                                    <div className="absolute inset-0 bg-blue-200 rounded-full blur opacity-0 group-hover:opacity-50 transition-all duration-300 animate-pulse"></div>
+                                    <span className="relative text-xs font-semibold text-blue-700 bg-blue-200 px-3 py-2 rounded-full shadow-sm transform group-hover:scale-105 transition-all duration-300 flex items-center space-x-1">
+                                        <TrendingUp className="w-3 h-3" />
+                                        <span>{profiles.length} opciones</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-wrap gap-3 justify-center">
+                                {profiles.map((profile, index) => (
+                                    <div
+                                        key={profile.id}
+                                        className={`group relative transform hover:scale-105 transition-all duration-300 hover:z-10`}
+                                        style={{
+                                            animationDelay: `${index * 0.1}s`
+                                        }}
+                                    >
+                                        <div className="absolute inset-0 bg-white rounded-xl blur opacity-0 group-hover:opacity-50 transition-all duration-300"></div>
+                                        <div className={`relative inline-flex items-center px-4 py-3 rounded-xl text-sm font-medium border border-opacity-20 shadow-sm hover:shadow-lg transition-all duration-200 ${getProfileColor(profile.name || '')}`}>
+                                            <div className={`w-3 h-3 rounded-full mr-3 ${getProfileDotColor(profile.name || '')} shadow-sm animate-pulse`}></div>
+                                            <span className="truncate max-w-[120px] font-medium">{profile.name}</span>
+                                            <span className="ml-3 text-xs opacity-75 hidden md:inline bg-white bg-opacity-50 px-2 py-1 rounded-full">
+                                                {profile.description}
+                                            </span>
+
+                                            {/* Efecto de brillo sutil */}
+                                            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/10 to-transparent transform skew-x-12 group-hover:animate-pulse"></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
-                    <div className="text-center">
-                        <div className="text-sm text-gray-500">Sin Roles</div>
-                        <div className="text-2xl font-bold text-red-600">{teamStats.withoutRoles}</div>
+                ) : (
+                    <div className="px-6 py-5 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-100 rounded-xl mb-6 shadow-sm">
+                        <div className="flex items-center space-x-3">
+                            <div className="p-2 bg-yellow-100 rounded-lg">
+                                <User className="w-5 h-5 text-yellow-600" />
+                            </div>
+                            <div>
+                                <span className="text-base font-semibold text-yellow-700">Sin perfiles disponibles</span>
+                                <p className="text-sm text-yellow-600 mt-1 font-medium">
+                                    No hay perfiles configurados para la metodología de proceso seleccionada en este equipo.
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                    <div className="text-center">
-                        <div className="text-sm text-gray-500">Roles Únicos</div>
-                        <div className="text-2xl font-bold text-blue-600">{teamStats.uniqueRoles}</div>
+                )}
+
+                {/* Main Content */}
+                <div className="px-1 py-1">
+                    <div className="space-y-8">
+                        {/* Panel de Roles Disponibles */}
+                        <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-lg border border-gray-100">
+                            <div className="flex items-center space-x-3 mb-6">
+                                <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md">
+                                    <User className="w-6 h-6 text-white drop-shadow-sm" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-gray-800 tracking-tight flex items-center space-x-2">
+                                        <BarChart3 className="w-5 h-5" />
+                                        <span>Roles Disponibles para Asignar</span>
+                                    </h3>
+                                    <p className="text-sm text-gray-600 font-medium">Selecciona un rol y asígnalo a un miembro</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {profiles.map((profile) => {
+                                    const profileColors = generateProfileColors(profile.name || '')
+                                    return (
+                                        <div
+                                            key={profile.id}
+                                            onClick={() => setSelectedRole(profile)}
+                                            className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${selectedRole?.id === profile.id
+                                                ? `border-solid shadow-xl ring-4 ring-opacity-30 scale-105`
+                                                : 'border-dashed hover:border-solid'
+                                                } ${profileColors.bg} hover:opacity-95 ${selectedRole?.id === profile.id ? `ring-4 ring-offset-2` : ''
+                                                }`}
+                                            style={{
+                                                borderColor: selectedRole?.id === profile.id ? profileColors.dot.replace('bg-', '#') : undefined
+                                            }}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className={`w-5 h-5 rounded-full ${getProfileDotColor(profile.name || '')} shadow-md ring-2 ring-white`}></div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className={`font-bold text-sm ${profileColors.text} truncate tracking-tight`}>{profile.name}</h4>
+                                                        <p className="text-xs text-gray-600 truncate font-medium mt-1">{profile.description}</p>
+                                                    </div>
+                                                </div>
+                                                {selectedRole?.id === profile.id && (
+                                                    <div className="text-green-600 flex-shrink-0 animate-pulse">
+                                                        <div className="p-1 bg-green-100 rounded-full">
+                                                            <CheckCircle className="w-5 h-5" />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+
+                            {/* Instrucciones */}
+                            <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 shadow-sm">
+                                {selectedRole ? (
+                                    <div className="text-sm text-blue-700 flex items-center space-x-3">
+                                        <div className="p-2 bg-green-100 rounded-lg">
+                                            <CheckCircle className="w-5 h-5 text-green-600" />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold mb-1 flex items-center space-x-1">
+                                                <UserCheck className="w-4 h-4" />
+                                                <span>Rol seleccionado: {selectedRole.name}</span>
+                                            </p>
+                                            <p className="text-xs font-medium">Ahora haz clic en un miembro del equipo para asignárselo.</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="text-sm text-blue-700 flex items-center space-x-3">
+                                        <div className="p-2 bg-blue-100 rounded-lg">
+                                            <Settings className="w-5 h-5 text-blue-600" />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold mb-1 flex items-center space-x-1">
+                                                <Target className="w-4 h-4" />
+                                                <span>Instrucciones:</span>
+                                            </p>
+                                            <p className="text-xs font-medium">Selecciona un rol y luego haz clic en un miembro del equipo para asignárselo.</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Panel de Miembros del Equipo */}
+                        <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-lg border border-gray-100">
+                            <TeamHierarchy
+                                teamData={teamData}
+                                profiles={profiles}
+                                onSelectProfile={handleProfileAssignment}
+                                selectedRole={selectedRole}
+                                assigningProfile={assigningProfile}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
-
-            {/* Perfiles Disponibles */}
-            {profiles.length > 0 ? (
-                <div className="px-6 py-3 bg-blue-50 border-b">
-                    <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
-                            <User className="w-4 h-4 text-blue-600" />
-                            <span>Roles Disponibles para Asignar</span>
-                        </h3>
-                        <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
-                            {profiles.length} opciones
-                        </span>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        {profiles.map((profile) => (
-                            <div
-                                key={profile.id}
-                                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getProfileColor(profile.name || '')}`}
-                            >
-                                <div className={`w-2 h-2 rounded-full mr-2 ${getProfileDotColor(profile.name || '')}`}></div>
-                                {profile.name}
-                                <span className="ml-2 text-xs opacity-75">({profile.description})</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            ) : (
-                <div className="px-6 py-3 bg-yellow-50 border-b">
-                    <div className="flex items-center space-x-2">
-                        <User className="w-4 h-4 text-yellow-600" />
-                        <span className="text-sm font-semibold text-yellow-700">Sin perfiles disponibles</span>
-                    </div>
-                    <p className="text-xs text-yellow-600 mt-1">
-                        No hay perfiles configurados para la metodología de proceso seleccionada en este equipo.
-                    </p>
-                </div>
-            )}
-
-            {/* Main Content */}
-            <main className="px-6 pt-6 bg-gray-50 flex-1 overflow-y-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Panel de Roles Disponibles */}
-                    <div className="lg:col-span-1 bg-white rounded-lg p-2 shadow-sm border h-fit">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center space-x-2">
-                            <User className="w-5 h-5 text-blue-600" />
-                            <span>Roles Disponibles</span>
-                        </h3>
-
-                        <div className="space-y-2">
-                            {profiles.map((profile) => {
-                                const profileColors = generateProfileColors(profile.name || '')
-                                return (
-                                    <div
-                                        key={profile.id}
-                                        onClick={() => setSelectedRole(profile)}
-                                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md ${selectedRole?.id === profile.id
-                                            ? `border-solid shadow-lg ring-2 ring-offset-2 ring-opacity-50`
-                                            : 'border-dashed'
-                                            } ${profileColors.bg} hover:opacity-90 ${selectedRole?.id === profile.id ? `ring-2 ring-offset-2` : ''
-                                            }`}
-                                        style={{
-                                            borderColor: selectedRole?.id === profile.id ? profileColors.dot.replace('bg-', '#') : undefined
-                                        }}
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center space-x-3">
-                                                <div className={`w-4 h-4 rounded-full ${getProfileDotColor(profile.name || '')}`}></div>
-                                                <div>
-                                                    <h4 className={`font-semibold ${profileColors.text}`}>{profile.name}</h4>
-                                                    <p className="text-xs text-gray-600">{profile.description}</p>
-                                                </div>
-                                            </div>
-                                            {selectedRole?.id === profile.id && (
-                                                <div className="text-green-600">
-                                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                                    </svg>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-
-                        <div className="mt-2 p-3 bg-blue-50 rounded-lg">
-                            {selectedRole ? (
-                                <p className="text-sm text-blue-700">
-                                    <strong>Rol seleccionado:</strong> {selectedRole.name}<br />
-                                    <span className="text-xs">Ahora haz clic en un miembro del equipo para asignárselo.</span>
-                                </p>
-                            ) : (
-                                <p className="text-sm text-blue-700">
-                                    <strong>Instrucciones:</strong> Selecciona un rol y luego haz clic en un miembro del equipo para asignárselo.
-                                </p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Panel de Miembros del Equipo */}
-                    <div className="lg:col-span-2">
-                        <TeamHierarchy
-                            teamData={teamData}
-                            profiles={profiles}
-                            onSelectProfile={handleProfileAssignment}
-                            selectedRole={selectedRole}
-                            assigningProfile={assigningProfile}
-                        />
-                    </div>
-                </div>
-            </main>
         </Modal>
     )
 }
