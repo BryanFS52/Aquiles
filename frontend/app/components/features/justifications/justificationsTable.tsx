@@ -1,9 +1,11 @@
 "use client"
 
 import Image from "next/image";
+import { useSelector } from "react-redux";
 import { GrAttachment } from "react-icons/gr";
 import persona from "@public/img/persona.jpg";
-import { Check, X } from "lucide-react";
+import { RootState } from "@/redux/store";
+import { getStatusNameById, getActiveStatuses } from "@/redux/slices/justificationStatusSlice";
 
 interface JustificationTableProps {
   filteredData: any[];
@@ -16,6 +18,37 @@ export default function JustificationTable({
   handleDownloadFile,
   handleStatusChange,
 }: JustificationTableProps) {
+  // Obtener los estados de justificación del store
+  const { justificationStatuses, loading: loadingStatuses } = useSelector(
+    (state: RootState) => state.justificationStatus
+  );
+
+  const handleSelectChange = (justificacionId: string, event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newStatusId = event.target.value;
+    console.log("🔄 Cambiando estado:", {
+      justificacionId,
+      newStatusId
+    });
+    if (newStatusId) {
+      handleStatusChange(justificacionId, newStatusId);
+    }
+  };
+
+  const getCurrentStatusName = (justificacion: any) => {
+    // ✅ Priorizar el campo justificationStatus que ya contiene el nombre correcto
+    if (justificacion.justificationStatus && justificacion.justificationStatus !== "Sin status") {
+      return justificacion.justificationStatus;
+    }
+    
+    // ✅ Fallback al campo estado que también contiene el nombre del estado
+    return justificacion.estado || "En proceso";
+  };
+
+  // ✅ Función para obtener el valor actual para el select (justificationStatus.id)
+  const getCurrentSelectValue = (justificacion: any) => {
+    return justificacion.justificationStatusId || "";
+  };
+
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
       <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
@@ -26,9 +59,10 @@ export default function JustificationTable({
             <th className="px-6 py-4 font-medium">Foto</th>
             <th className="px-6 py-4 font-medium">Documento</th>
             <th className="px-6 py-4 font-medium">Aprendiz</th>
-            <th className="px-6 py-4 font-medium">Fecha de Justificación</th>
+            <th className="px-6 py-4 font-medium">Fecha de ausencia</th>
+            <th className="px-6 py-4 font-medium">Fecha de justificacion</th>
             <th className="px-6 py-4 font-medium">Archivo Adjunto</th>
-            <th className="px-6 py-4 font-medium">Estado</th>
+            <th className="px-6 py-4 font-medium">Estado del proceso</th>
             <th className="px-6 py-4 font-medium">Acciones</th>
           </tr>
         </thead>
@@ -53,11 +87,14 @@ export default function JustificationTable({
               <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                 {justificacion.aprendiz}
               </td>
-              <td className="px-6 py-4">{justificacion.fecha}</td>
+              <td className="px-6 py-4">{justificacion.absenceDate}</td>
+              <td className="px-6 py-4">{justificacion.justificationDate}</td>
               <td className="px-6 py-4">
                 {justificacion.archivoAdjunto ? (
                   <GrAttachment
-                    title={`Descargar archivo (${justificacion.archivoMime || "desconocido"})`}
+                    title={`Descargar archivo (${
+                      justificacion.archivoMime || "desconocido"
+                    })`}
                     className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
                     onClick={() => handleDownloadFile(justificacion)}
                   />
@@ -69,16 +106,47 @@ export default function JustificationTable({
               </td>
               <td className="px-6 py-4">
                 <span
+<<<<<<< HEAD:frontend/app/components/features/justification/justificationsTable.tsx
+                  className={`inline-flex items-center px-1.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
+                    getCurrentStatusName(justificacion) === "Aceptado"
+                      ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                      : getCurrentStatusName(justificacion) === "Denegado"
+                      ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                      : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
+                  }`}
+=======
                   className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${justificacion.estado === "Activo"
                       ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
                       : "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
                     }`}
+>>>>>>> origin/gabrielDev:frontend/app/components/features/justifications/justificationsTable.tsx
                 >
-                  {justificacion.estado}
+                  {getCurrentStatusName(justificacion)}
                 </span>
               </td>
               <td className="px-6 py-4">
                 <div className="flex space-x-2">
+<<<<<<< HEAD:frontend/app/components/features/justification/justificationsTable.tsx
+                  <select
+                    value={getCurrentSelectValue(justificacion)}
+                    onChange={(e) => handleSelectChange(justificacion.id, e)}
+                    disabled={loadingStatuses}
+                    title="Cambiar estado de la justificación"
+                    className="px-3 py-2 text-xs font-medium bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200 min-w-[120px]"
+                  >
+                    <option value="">Seleccionar estado...</option>
+                    {getActiveStatuses(justificationStatuses).map((status) => (
+                      <option key={status.id} value={status.id}>
+                        {status.name}
+                      </option>
+                    ))}
+                  </select>
+                  {loadingStatuses && (
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      Cargando...
+                    </span>
+                  )}
+=======
                   <button
                     onClick={() => handleStatusChange(justificacion.id, "Aceptado")}
                     className={`px-3 py-1 rounded-md text-xs font-medium transition-colors duration-200 ${justificacion.estado === "Aceptado"
@@ -101,6 +169,7 @@ export default function JustificationTable({
                   >
                     <X className="w-4 h-4" />
                   </button>
+>>>>>>> origin/gabrielDev:frontend/app/components/features/justifications/justificationsTable.tsx
                 </div>
               </td>
             </tr>

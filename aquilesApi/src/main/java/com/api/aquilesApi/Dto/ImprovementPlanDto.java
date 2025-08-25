@@ -1,11 +1,10 @@
 package com.api.aquilesApi.Dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -13,22 +12,30 @@ import lombok.NoArgsConstructor;
 public class ImprovementPlanDto {
     private Long id;
 
-    @NotBlank(message = "La ciudad es obligatoria")
-    @Size(max = 55, message = "La ciudad no puede exceder los 55 caracteres")
+    // @NotBlank(message = "La ciudad es obligatoria")
+    // @Size(max = 55, message = "La ciudad no puede exceder los 55 caracteres")
     private String city;
 
-    @NotNull(message = "La fecha es obligatoria")
+    // @NotNull(message = "La fecha es obligatoria")
     private String date;
 
-    @NotBlank(message = "El motivo es obligatorio")
-    @Size(max = 255, message = "El motivo no puede exceder los 255 caracteres")
+    // @NotBlank(message = "El motivo es obligatorio")
+    // @Size(max = 255, message = "El motivo no puede exceder los 255 caracteres")
     private String reason;
 
-    @NotNull(message = "El número es obligatorio")
-    private Integer number;
-
-    @NotNull(message = "El estado es obligatorio")
+    // @NotNull(message = "El estado es obligatorio")
     private Boolean state;
 
+    // @NotNull(message = "La calificación es obligatoria")
+    private Boolean qualification;
+
+    // @NotNull(message = "El estudiante es obligatorio")
+    private Long studentId;
+
+    // @NotNull(message = "La competencia del instructor es obligatoria")
+    private Long teacherCompetence;
+
     // Relations
+    private List<ImprovementPlanActivityDto> improvementPlanActivityDto;
+    private ImprovementPlanFaultTypeDto improvementPlanFaultTypeDto;
 }

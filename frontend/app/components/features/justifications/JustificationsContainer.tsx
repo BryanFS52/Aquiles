@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IoPeople } from 'react-icons/io5';
 import { FaCalendarDay, FaRegListAlt, FaCheckCircle } from 'react-icons/fa';
@@ -14,34 +14,34 @@ import { AppDispatch, RootState } from '@/redux/store';
 import { Attendance } from '@graphql/generated';
 import PageTitle from '@components/UI/pageTitle';
 import JustificationFormComponent from '@/components/features/justifications/justificationForm';
-import {
-    fetchJustifications,
-    showForm,
-    resetForm,
-    updateFormField,
-    updateNumericField,
-    updateTextField,
-    updateJustificationTypeId,
-    addJustification,
-    validateForm,
-    downloadBase64File,
-    setSubmitting,
-    setCurrentAttendance,
-    generateFileName,
-    FormDataState,
-} from '@slice/justificationSlice';
 import JustificationsHistorical from '@/components/features/justifications/justificationsHistorical';
+import {
+  showForm,
+  resetForm,
+  updateFormField,
+  updateNumericField,
+  updateTextField,
+  updateJustificationTypeId,
+  addJustification,
+  validateForm,
+  downloadBase64File,
+  setSubmitting,
+  setCurrentAttendance,
+  FormDataState,
+  fetchJustifications,
+  generateFileName,
+} from "@slice/justificationSlice";
 
 // Helper component for formatting dates
-const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string) => {
     const [year, month, day] = dateString.split('-').map(Number);
     const date = new Date(year, month - 1, day);
-    return date.toLocaleDateString('es-CO', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
+    return date.toLocaleDateString("es-CO", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
-};
+  };
 
 export const JustificationsContainer: React.FC = () => {
     const fileRef = useRef<File | null>(null);
@@ -49,430 +49,430 @@ export const JustificationsContainer: React.FC = () => {
     const formRef = useRef<HTMLDivElement>(null);
     const topRef = useRef<HTMLDivElement>(null);
 
-    const { user } = useUser();
-    const { showLoader, hideLoader } = useLoader();
+  const { user } = useUser();
+  const { showLoader, hideLoader } = useLoader();
 
-    // Estado local para controlar la carga del modal
-    const [shouldLoadModal, setShouldLoadModal] = useState(false);
+  // Estado local para controlar la carga del modal
+  const [shouldLoadModal, setShouldLoadModal] = useState(false);
 
-    const dispatch = useDispatch<AppDispatch>();
-    const fileInputRefPrev = useRef<HTMLInputElement>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const fileInputRefPrev = useRef<HTMLInputElement>(null);
 
-    // Redux selectors
-    const {
-        data: justificationTypesData,
-        loading: loadingJustificationTypes,
-        error: errorJustificationTypes,
-    } = useSelector((state: RootState) => state.justificationType);
+  // Redux selectors
+  const {
+    data: justificationTypesData,
+    loading: loadingJustificationTypes,
+    error: errorJustificationTypes,
+  } = useSelector((state: RootState) => state.justificationType);
 
-    const {
-        data: attendancesData,
-        loading: loadingAttendances,
-        error: errorAttendances,
-    } = useSelector((state: RootState) => state.attendances.studentAttendances);
+  const {
+    data: attendancesData,
+    loading: loadingAttendances,
+    error: errorAttendances,
+  } = useSelector((state: RootState) => state.attendances.studentAttendances);
 
-    const {
-        transformedData: justificationsData,
-        loading: loadingJustifications,
-    } = useSelector((state: RootState) => state.justification);
+  const {
+    transformedData: justificationsData,
+    loading: loadingJustifications,
+  } = useSelector((state: RootState) => state.justification);
 
-    const {
-        loading: loadingJustification,
-        error: errorJustification,
-        form,
-    } = useSelector((state: RootState) => state.justification);
+  const {
+    loading: loadingJustification,
+    error: errorJustification,
+    form,
+  } = useSelector((state: RootState) => state.justification);
 
-    const currentAttendance = useSelector(
-        (state: RootState) => state.justification.form.currentAttendance
+  const currentAttendance = useSelector(
+    (state: RootState) => state.justification.form.currentAttendance
+  );
+
+  // Effects
+  useEffect(() => {
+    dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
+    dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 }));
+    dispatch(fetchJustifications({ page: 0, size: 10 }));
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (form.showForm && !shouldLoadModal) {
+      const timer = setTimeout(() => {
+        setShouldLoadModal(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else if (!form.showForm && shouldLoadModal) {
+      setShouldLoadModal(false);
+    }
+  }, [form.showForm, shouldLoadModal]);
+
+  // Handlers
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    dispatch(updateFormField({ field: name as keyof FormDataState, value }));
+  };
+
+  const handleNumericInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    dispatch(
+      updateNumericField({ field: e.target.name, value: e.target.value })
     );
+  };
 
-    // Effects
-    useEffect(() => {
-        dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-        dispatch(fetchAttendancesByStudent({ id: 1, stateId: 2 }));
-        dispatch(fetchJustifications({ page: 0, size: 10 }));
-    }, [dispatch]);
+  const handleTextInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    dispatch(updateTextField({ field: e.target.name, value: e.target.value }));
+  };
 
-    useEffect(() => {
-        if (form.showForm && !shouldLoadModal) {
-            const timer = setTimeout(() => {
-                setShouldLoadModal(true);
-            }, 100);
-            return () => clearTimeout(timer);
-        } else if (!form.showForm && shouldLoadModal) {
-            setShouldLoadModal(false);
-        }
-    }, [form.showForm, shouldLoadModal]);
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    // Handlers
-    const handleInputChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-        const { name, value } = e.target;
-        dispatch(updateFormField({ field: name as keyof FormDataState, value }));
-    };
+    const validTypes = ["image/jpeg", "image/png", "application/pdf"];
+    const maxSize = 5 * 1024 * 1024;
 
-    const handleNumericInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        dispatch(
-            updateNumericField({ field: e.target.name, value: e.target.value })
-        );
-    };
+    if (!validTypes.includes(file.type)) {
+      toast.error("Tipo de archivo no permitido. Solo PDF, JPG o PNG.");
+      return;
+    }
 
-    const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        dispatch(updateTextField({ field: e.target.name, value: e.target.value }));
-    };
+    if (file.size > maxSize) {
+      toast.error("El archivo supera el tamaño máximo permitido (5MB).");
+      return;
+    }
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+    try {
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const result = reader.result as string;
+          const base64 = result.split(",")[1];
+          resolve(base64);
+        };
+        reader.onerror = () => reject("Error al leer el archivo.");
+        reader.readAsDataURL(file);
+      });
 
-        const validTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-        const maxSize = 5 * 1024 * 1024;
-
-        if (!validTypes.includes(file.type)) {
-            toast.error('Tipo de archivo no permitido. Solo PDF, JPG o PNG.');
-            return;
-        }
-
-        if (file.size > maxSize) {
-            toast.error('El archivo supera el tamaño máximo permitido (5MB).');
-            return;
-        }
-
-        try {
-            const base64 = await new Promise<string>((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    const result = reader.result as string;
-                    const base64 = result.split(',')[1];
-                    resolve(base64);
-                };
-                reader.onerror = () => reject('Error al leer el archivo.');
-                reader.readAsDataURL(file);
-            });
-
-            fileRef.current = file;
-            base64Ref.current = base64;
-            toast.success('Archivo procesado correctamente.');
-        } catch (error) {
-            toast.error(
-                typeof error === 'string'
-                    ? error
-                    : 'Error inesperado al procesar el archivo.'
-            );
-        }
-    };
+      fileRef.current = file;
+      base64Ref.current = base64;
+      toast.success("Archivo procesado correctamente.");
+    } catch (error) {
+      toast.error(
+        typeof error === "string"
+          ? error
+          : "Error inesperado al procesar el archivo."
+      );
+    }
+  };
 
     const handleSave = async (e: React.FormEvent) => {
-        e.preventDefault();
-        dispatch(validateForm());
+    e.preventDefault();
+    dispatch(validateForm());
 
-        if (form.validationErrors.length > 0) {
-            form.validationErrors.forEach((error) => toast.error(error));
-            return;
+    if (form.validationErrors.length > 0) {
+      form.validationErrors.forEach((error) => toast.error(error));
+      return;
+    }
+
+    if (!base64Ref.current) {
+      toast.error("Debes cargar un archivo antes de enviar.");
+      return;
+    }
+
+    dispatch(setSubmitting(true));
+
+    try {
+      const formDataWithFile = {
+        description: form.formData.descripcion,
+        justificationFile: base64Ref.current,
+        justificationDate: new Date().toLocaleDateString('en-CA'),
+        justificationType: { id: form.formData.justificationTypeId.id },
+        attendance: { id: currentAttendance?.id },
+        state: false,
+      };
+
+      await dispatch(addJustification(formDataWithFile)).unwrap();
+
+      toast.success("¡Tu justificación ha sido enviada exitosamente!");
+      dispatch(fetchJustifications({ page: 0, size: 10 }));
+      dispatch(resetForm());
+      fileRef.current = null;
+      base64Ref.current = "";
+
+      setTimeout(() => {
+        topRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 200);
+    } catch (error: any) {
+      console.error("Error al enviar justificación:", error);
+      const errorString = JSON.stringify(error);
+      let toastMessage = "Error inesperado al enviar la justificación.";
+
+      if (
+        errorString.includes("duplicate key value violates unique constraint")
+      ) {
+        toastMessage = "Esta asistencia ya ha sido justificada.";
+      } else if (error?.message) {
+        toastMessage = error.message;
+      }
+      toast.error(toastMessage);
+    } finally {
+      dispatch(setSubmitting(false));
+    }
+  };
+
+  const handleCancel = () => {
+    dispatch(resetForm());
+    fileRef.current = null;
+    base64Ref.current = "";
+    setShouldLoadModal(false);
+    toast.info("Formulario cancelado");
+
+    setTimeout(() => {
+      topRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 200);
+  };
+
+  const handleShowForm = (attendanceId?: string) => {
+    if (attendanceId && attendancesData) {
+      const currentAttendance = attendancesData.find(
+        (a) => a.id === attendanceId
+      );
+
+      if (currentAttendance) {
+        const person = currentAttendance.student?.person;
+
+        if (person?.document && person?.name && person?.lastname) {
+          dispatch(
+            updateFormField({
+              field: "numeroDocumento",
+              value: person.document,
+            })
+          );
+          dispatch(
+            updateFormField({
+              field: "nombreAprendiz",
+              value: `${person.name} ${person.lastname}`,
+            })
+          );
         }
 
-        if (!base64Ref.current) {
-            toast.error('Debes cargar un archivo antes de enviar.');
-            return;
-        }
-
-        dispatch(setSubmitting(true));
-
-        try {
-            const formDataWithFile = {
-                description: form.formData.descripcion,
-                justificationFile: base64Ref.current,
-                justificationDate: new Date().toLocaleDateString('en-CA'), // Formato YYYY-MM-DD en zona local
-                justificationType: { id: form.formData.justificationTypeId.id },
-                attendance: { id: currentAttendance?.id },
-                state: false,
-            };
-
-            await dispatch(addJustification(formDataWithFile)).unwrap();
-
-            toast.success('¡Tu justificación ha sido enviada exitosamente!');
-            dispatch(fetchJustifications({ page: 0, size: 10 }));
-            dispatch(resetForm());
-            fileRef.current = null;
-            base64Ref.current = '';
-
-            setTimeout(() => {
-                topRef.current?.scrollIntoView({ behavior: 'smooth' });
-            }, 200);
-        } catch (error: any) {
-            console.error('Error al enviar justificación:', error);
-            const errorString = JSON.stringify(error);
-            let toastMessage = 'Error inesperado al enviar la justificación.';
-
-            if (
-                errorString.includes('duplicate key value violates unique constraint')
-            ) {
-                toastMessage = 'Esta asistencia ya ha sido justificada.';
-            } else if (error?.message) {
-                toastMessage = error.message;
-            }
-            toast.error(toastMessage);
-        } finally {
-            dispatch(setSubmitting(false));
-        }
-    };
-
-    const handleCancel = () => {
-        dispatch(resetForm());
-        fileRef.current = null;
-        base64Ref.current = '';
-        setShouldLoadModal(false);
-        toast.info('Formulario cancelado');
-
-        setTimeout(() => {
-            topRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 200);
-    };
-
-    const handleShowForm = (attendanceId?: string) => {
-        if (attendanceId && attendancesData) {
-            const currentAttendance = attendancesData.find(
-                (a) => a.id === attendanceId
-            );
-
-            if (currentAttendance) {
-                const person = currentAttendance.student?.person;
-
-                if (person?.document && person?.name && person?.lastname) {
-                    dispatch(
-                        updateFormField({
-                            field: 'numeroDocumento',
-                            value: person.document,
-                        })
-                    );
-                    dispatch(
-                        updateFormField({
-                            field: 'nombreAprendiz',
-                            value: `${person.name} ${person.lastname}`,
-                        })
-                    );
-                }
-
-                dispatch(
-                    updateFormField({ field: 'notificationId', value: attendanceId })
-                );
-
-                dispatch(setCurrentAttendance(currentAttendance));
-                setTimeout(() => {
-                    dispatch(showForm());
-                    formRef.current?.scrollIntoView({ behavior: 'smooth' });
-                }, 10);
-            } else {
-                console.warn('No se encontró la asistencia con ID:', attendanceId);
-            }
-        }
-    };
-
-    const handleUpdateJustificationTypeId = (value: any) => {
-        dispatch(updateJustificationTypeId(value));
-    };
-
-    const handleDownloadFile = (justificacion: any) => {
-        if (justificacion.archivoAdjunto) {
-            const mimeType = justificacion.archivoMime || 'application/octet-stream';
-            const fileName = generateFileName(justificacion.id, mimeType);
-            downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
-        }
-    };
-
-    // Loading states
-    if (
-        loadingJustificationTypes ||
-        loadingAttendances ||
-        loadingJustifications
-    ) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary"></div>
-                <span className="ml-4 text-xl font-semibold text-black dark:text-white">
-                    Cargando datos...
-                </span>
-            </div>
+        dispatch(
+          updateFormField({ field: "notificationId", value: attendanceId })
         );
+
+        dispatch(setCurrentAttendance(currentAttendance));
+        setTimeout(() => {
+          dispatch(showForm());
+          formRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 10);
+      } else {
+        console.warn("No se encontró la asistencia con ID:", attendanceId);
+      }
     }
+  };
 
-    if (errorJustificationTypes || errorAttendances) {
-        return <p>Error cargando datos</p>;
+  const handleUpdateJustificationTypeId = (value: any) => {
+      dispatch(updateJustificationTypeId(value));
+  };
+
+  const handleDownloadFile = (justificacion: any) => {
+    if (justificacion.archivoAdjunto) {
+      const mimeType = justificacion.archivoMime || "application/octet-stream";
+      const fileName = generateFileName(justificacion.id, mimeType);
+      downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
     }
+  };
 
-    const absences = attendancesData || [];
-
+  // Loading states
+  if (
+    loadingJustificationTypes ||
+    loadingAttendances ||
+    loadingJustifications
+  ) {
     return (
-        <div className="h-auto">
-            <div ref={topRef} className="mb-6">
-                <PageTitle>Justificaciones</PageTitle>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2">
-                <AnimatePresence mode="wait">
-                    {!form.showForm && !shouldLoadModal && (
-                        <motion.div
-                            key="absences-list"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.4 }}
-                        >
-                            {/* AbsencesList Component Inline */}
-                            <div className="bg-white dark:bg-[#002033] rounded-xl shadow-lg p-8 border border-gray-100 dark:border-gray-800">
-                                <div className="flex items-center mb-6">
-                                    <div className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 p-3 rounded-full shadow-lg">
-                                        <IoPeople className="text-2xl text-white" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                                            Ausencias Registradas
-                                        </h2>
-                                        <p className="text-gray-600 text-sm dark:text-gray-400">
-                                            Gestiona tus justificaciones de ausencias
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {absences.length > 0 && (
-                                    <div className="mb-6">
-                                        <div className="max-h-80 overflow-y-auto pr-2 space-y-4">
-                                            {absences.map((attendance: Attendance, index) => (
-                                                <motion.div
-                                                    key={attendance.id}
-                                                    initial={{ opacity: 0, x: -20 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ delay: index * 0.1 }}
-                                                    className="group hover:shadow-md transition-all duration-300 p-4 bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 dark:bg-gradient-to-r dark:from-red-300 dark:to-orange-100 dark:border-red-800 rounded-xl relative overflow-hidden"
-                                                >
-                                                    <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                                                    <div className="relative flex items-center justify-between">
-                                                        <div className="flex items-center">
-                                                            <div className="bg-red-500 p-2 rounded-lg shadow-md">
-                                                                <FaCalendarDay className="text-white text-lg" />
-                                                            </div>
-                                                            <div className="ml-4">
-                                                                <div className="font-semibold text-gray-800 text-lg">
-                                                                    {formatDate(attendance.attendanceDate ?? '')}
-                                                                </div>
-                                                                <div className="text-sm text-red-600 font-medium">
-                                                                    Estado:{' '}
-                                                                    {attendance.attendanceState?.status || 'Ausente'}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <button
-                                                            onClick={() => handleShowForm(attendance.id)}
-                                                            className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
-                                                        >
-                                                            <FaRegListAlt className="mr-2" />
-                                                            Justificar
-                                                        </button>
-                                                    </div>
-                                                </motion.div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {absences.length === 0 && (
-                                    <div className="text-center py-12">
-                                        <motion.div
-                                            initial={{ scale: 0 }}
-                                            animate={{ scale: 1 }}
-                                            transition={{ type: 'spring', duration: 0.6 }}
-                                            className="mb-6"
-                                        >
-                                            <div className="bg-gradient-to-r from-green-400 to-emerald-500 p-6 rounded-full inline-block shadow-lg">
-                                                <FaCheckCircle className="text-6xl text-white" />
-                                            </div>
-                                        </motion.div>
-                                        <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-3">
-                                            ¡Excelente asistencia!
-                                        </h3>
-                                        <p className="text-gray-600 dark:text-gray-300 text-lg">
-                                            No tienes ausencias pendientes por justificar.
-                                        </p>
-                                        <p className="text-gray-500 dark:text-gray-300 text-sm mt-2">
-                                            Continúa manteniendo tu buen récord de asistencia.
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                        </motion.div>
-                    )}
-
-                    {form.showForm && shouldLoadModal && (
-                        <motion.div
-                            key="justification-form"
-                            ref={formRef}
-                            initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -30, scale: 0.95 }}
-                            transition={{ duration: 0.5, ease: 'easeInOut' }}
-                            className="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 dark:border-gray-800 dark:bg-[#002033]"
-                        >
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center">
-                                    <div className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 p-3 rounded-full shadow-lg">
-                                        <FaRegListAlt className="text-2xl text-white" />
-                                    </div>
-                                    <div className="ml-4">
-                                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                                            Formulario de Justificación
-                                        </h2>
-                                        <p className="text-gray-600 dark:text-gray-400 text-sm">
-                                            Completa los datos para justificar tu ausencia
-                                        </p>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={handleCancel}
-                                    className="text-gray-400 dark:hover:text-gray-100 hover:text-gray-600 text-2xl transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full"
-                                >
-                                    ×
-                                </button>
-                            </div>
-
-                            <div className="mt-6">
-                                <JustificationFormComponent
-                                    form={form}
-                                    justificationTypesData={justificationTypesData}
-                                    loadingJustificationTypes={loadingJustificationTypes}
-                                    loadingJustification={loadingJustification}
-                                    handleSave={handleSave}
-                                    handleCancel={handleCancel}
-                                    handleInputChange={handleInputChange}
-                                    handleTextInputChange={handleTextInputChange}
-                                    handleNumericInputChange={handleNumericInputChange}
-                                    handleFileChange={handleFileChange}
-                                    updateJustificationTypeId={handleUpdateJustificationTypeId}
-                                    fileRef={fileRef}
-                                    fileInputRefPrev={fileInputRefPrev}
-                                />
-                            </div>
-                        </motion.div>
-                    )}
-
-                    <motion.div
-                        key="justification-history"
-                        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -30, scale: 0.95 }}
-                        transition={{ duration: 0.5, ease: 'easeInOut' }}
-                        className="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 dark:border-gray-800 dark:bg-[#002033]"
-                    >
-                        <JustificationsHistorical
-                            data={justificationsData}
-                            loading={loadingJustifications}
-                            handleDownloadFile={handleDownloadFile}
-                        />
-                    </motion.div>
-                </AnimatePresence>
-            </div>
-        </div>
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary"></div>
+        <span className="ml-4 text-xl font-semibold text-black dark:text-white">
+          Cargando datos...
+        </span>
+      </div>
     );
-};
+  }
+  if (errorJustificationTypes || errorAttendances)
+    return <p>Error cargando datos</p>;
+
+  const absences = attendancesData || [];
+  return (
+    <div className="h-auto">
+      <div ref={topRef} className="mb-6">
+        <PageTitle>Justificaciones</PageTitle>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 ">
+        <AnimatePresence mode="wait">
+          {!form.showForm && !shouldLoadModal && (
+            <motion.div
+              key="absences-list"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+              className="bg-white dark:bg-[#002033] rounded-xl shadow-lg p-8 border border-gray-100 dark:border-gray-800"
+            >
+              <div className="flex items-center mb-6 ">
+                <div className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 p-3 rounded-full shadow-lg">
+                  <IoPeople className="text-2xl text-white" />
+                </div>
+                <div className="ml-4 ">
+                  <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                    Ausencias Registradas
+                  </h2>
+                  <p className="text-gray-600 text-sm dark:text-gray-400">
+                    Gestiona tus justificaciones de ausencias
+                  </p>
+                </div>
+              </div>
+
+              {absences.length > 0 && (
+                <div className="mb-6 ">
+                  <div className="max-h-80 overflow-y-auto pr-2 space-y-4">
+                    {absences.map((attendance: Attendance, index) => (
+                      <motion.div
+                        key={attendance.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="group hover:shadow-md transition-all duration-300 p-4 bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 dark:bg-gradient-to-r dark:from-red-300 dark:to-orange-100 dark:border-red-800 rounded-xl relative overflow-hidden"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="relative flex items-center justify-between">
+                          <div className="flex items-center">
+                            <div className="bg-red-500 p-2 rounded-lg shadow-md">
+                              <FaCalendarDay className="text-white text-lg" />
+                            </div>
+                            <div className="ml-4">
+                              <div className="font-semibold text-gray-800 text-lg">
+                                {formatDate(attendance.attendanceDate ?? '')}
+                              </div>
+                              <div className="text-sm text-red-600 font-medium">
+                                Estado:{" "}
+                                {attendance.attendanceState?.status ||
+                                  "Ausente"}
+                              </div>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleShowForm(attendance.id)}
+                            className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
+                          >
+                            <FaRegListAlt className="mr-2" />
+                            Justificar
+                          </button>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {absences.length === 0 && (
+                <div className="text-center py-12">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", duration: 0.6 }}
+                    className="mb-6"
+                  >
+                    <div className="bg-gradient-to-r from-green-400 to-emerald-500 p-6 rounded-full inline-block shadow-lg">
+                      <FaCheckCircle className="text-6xl text-white" />
+                    </div>
+                  </motion.div>
+                  <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-3">
+                    ¡Excelente asistencia!
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-lg">
+                    No tienes ausencias pendientes por justificar.
+                  </p>
+                  <p className="text-gray-500 dark:text-gray-300 text-sm mt-2">
+                    Continúa manteniendo tu buen récord de asistencia.
+                  </p>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {form.showForm && shouldLoadModal && (
+            <motion.div
+              key="justification-form"
+              ref={formRef}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -30, scale: 0.95 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 dark:border-gray-800 dark:bg-[#002033] "
+            >
+              <div className="">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 p-3 rounded-full shadow-lg">
+                      <FaRegListAlt className="text-2xl text-white" />
+                    </div>
+                    <div className="ml-4">
+                      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                        Formulario de Justificación
+                      </h2>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">
+                        Completa los datos para justificar tu ausencia
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleCancel}
+                    className="text-gray-400 dark:hover:text-gray-100 hover:text-gray-600 text-2xl transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+
+              <div className="">
+                <JustificationFormComponent
+                  form={form}
+                  fileInputRefPrev={fileInputRefPrev}
+                  justificationTypesData={justificationTypesData}
+                  loadingJustificationTypes={loadingJustificationTypes}
+                  loadingJustification={loadingJustification}
+                  handleSave={handleSave}
+                  handleCancel={handleCancel}
+                  handleInputChange={handleInputChange}
+                  handleTextInputChange={handleTextInputChange}
+                  handleNumericInputChange={handleNumericInputChange}
+                  handleFileChange={handleFileChange}
+                  updateJustificationTypeId={handleUpdateJustificationTypeId}
+                  fileRef={fileRef}
+                />
+              </div>
+            </motion.div>
+          )}
+
+          <motion.div
+            key="justification-history"
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -30, scale: 0.95 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 dark:border-gray-800 dark:bg-[#002033] "
+          >
+            <div className="">
+              <JustificationsHistorical
+                data={justificationsData}
+                loading={loadingJustifications}
+                handleDownloadFile={handleDownloadFile}
+              />
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
 
 export default JustificationsContainer;

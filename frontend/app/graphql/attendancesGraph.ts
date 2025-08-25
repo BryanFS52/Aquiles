@@ -83,7 +83,7 @@ export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
           id
           description
           justificationFile
-          justificationDate
+          absenceDate
           justificationType {
             id
             name

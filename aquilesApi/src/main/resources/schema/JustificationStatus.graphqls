@@ -1,0 +1,39 @@
+type JustificationStatus {
+    id: ID
+    name: String
+    state: Boolean
+}
+
+type JustificationStatusPage {
+    code: String
+    data: [JustificationStatus]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type JustificationStatusPageId {
+    data: JustificationStatus
+    date: String
+    code: String
+    message: String
+}
+
+input JustificationStatusDto {
+    id: ID
+    name: String
+    state: Boolean
+}
+
+extend type Query {
+    allJustificationsStatus(page: Int, size: Int): JustificationStatusPage
+    justificationStatusById(id: Long!): JustificationStatusPageId
+}
+
+extend type Mutation {
+    addJustificationStatus(input: JustificationStatusDto!): Response
+    updateJustificationStatus(id: Long!, input: JustificationStatusDto!): Response
+    deleteJustificationStatus(id: Long!): Response
+}

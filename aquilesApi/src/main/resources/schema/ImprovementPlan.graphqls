@@ -3,16 +3,20 @@ type ImprovementPlan {
     city: String!
     date: String!
     reason: String!
-    number: Int!
     state: Boolean!
+    qualification: Boolean!
+    student: Student
+    teacherCompetence: TeacherStudySheet
 }
 
 input ImprovementPlanDto {
     city: String!
     date: String!
     reason: String!
-    number: Int!
     state: Boolean!
+    qualification: Boolean!
+    studentId: ID!
+    teacherCompetence: ID!
 }
 
 type ImprovementPlanPage {

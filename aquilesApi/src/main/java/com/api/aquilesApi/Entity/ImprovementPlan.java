@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,28 +18,46 @@ import java.util.Date;
 @Entity
 @Table(name = "improvement_plan")
 public class ImprovementPlan implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Columns
     @Column(name = "city", nullable = false, length = 55)
     private String city;
 
-    @Column(name = "date", nullable = false, length = 10)
+    @Column(name = "date", nullable = false)
     private Date date;
 
     @Column(name = "reason", nullable = false, length = 255)
     private String reason;
 
-    @Column(name = "number", nullable = false)
-    private Integer number;
-
     @Column(name = "state", nullable = false)
     private Boolean state;
 
-    // Relations
-    // 1.Relation (1-1) con Notifications
-    @OneToOne(mappedBy = "improvementPlan")
+    @Column(name = "qualification", nullable = false)
+    private Boolean qualification;
+
+    // Relation
+    private Long studentId;
+    private Long teacherCompetence;
+    // Delete
+    @OneToOne(mappedBy = "improvementPlan", cascade = CascadeType.ALL, orphanRemoval = true)
     private Notifications notification;
+
+    @OneToMany(mappedBy = "improvementPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ImprovementPlanActivity> activities;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "improvement_plan_evidence_type",
+            joinColumns = @JoinColumn(name = "improvement_plan_id"),
+            inverseJoinColumns = @JoinColumn(name = "evidence_type_id")
+    )
+    private List<ImprovementPlanEvidenceType> evidenceTypes;
+
+    @ManyToOne
+    @JoinColumn(name = "fault_type_id")
+    private ImprovementPlanFaultType faultType;
+
 }

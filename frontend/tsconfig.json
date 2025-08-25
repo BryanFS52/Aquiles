@@ -85,7 +85,7 @@
     "app/(routes)/dashboard/Aprendices/page.jss",
     "app/graphql/olympo/programGraph.s",
     "app/graphql/justificationsGraph.ts",
-    "app/(routes)/dashboard/justificaciones/page.jsx"
+    "app/(routes)/dashboard/justificacionesInstructor/page.jsx"
   ],
   "exclude": [
     "node_modules"

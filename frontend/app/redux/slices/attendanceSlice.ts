@@ -18,6 +18,85 @@ import {
     AllAttendancesByStudentIdQueryVariables,
 } from '@graphql/generated';
 
+interface FilterOptions {
+    selectedFiltro: string;
+    searchTerm: string;
+}
+
+export interface TransformedAttendanceItem {
+    id: string;
+    // programa: string;
+    // ficha: string;
+    // fecha: string;
+    estado: string;
+    documento: string;
+    aprendiz: string;
+}
+
+interface StudentAttendances {
+    data: Attendance[];
+    loading: boolean;
+    error: string | null;
+    showForm: boolean;
+}
+interface AttendanceState extends ReturnType<typeof createInitialPaginatedState> {
+    studentAttendances: StudentAttendances;
+    data: Attendance[];
+    transformedData: TransformedAttendanceItem[];
+    filteredData: TransformedAttendanceItem[];
+    filterOptions: FilterOptions;
+    justifications: any[];
+    justificationsLoading: boolean;
+}
+const transformToComponentFormat = (attendances: Attendance[]): TransformedAttendanceItem[] => {
+    return attendances.map((a) => {
+        const student = a.student;
+        const person = student?.person;
+
+        return {
+            id: a.id,
+            // programa: "Sin programa", // Dato no disponible en AttendanceItem
+            // ficha: "Sin ficha", // Dato no disponible en AttendanceItem
+            // fecha: new Date(a.attendanceDate).toLocaleDateString("es-CO"),
+            estado: a.attendanceState?.status || "Sin estado",
+            documento: person?.document || '',
+            aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim()
+        };
+    });
+};
+
+const filterAttendances = (
+    data: TransformedAttendanceItem[],
+    filterOptions: FilterOptions
+): TransformedAttendanceItem[] => {
+    const { selectedFiltro, searchTerm } = filterOptions;
+
+    if (!searchTerm) return data;
+
+    if (!selectedFiltro || selectedFiltro === "todo") {
+        return data.filter((j) =>
+            // j.programa.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            // j.ficha.toString().includes(searchTerm) ||
+            // j.fecha.includes(searchTerm) ||
+            j.estado.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }
+
+    return data.filter((j) => {
+        switch (selectedFiltro) {
+            // case "programa":
+            //     return j.programa.toLowerCase().includes(searchTerm.toLowerCase());
+            // case "ficha":
+            //     return j.ficha.toString().includes(searchTerm);
+            // case "fecha":
+            //     return j.fecha.includes(searchTerm);
+            case "estado":
+                return j.estado.toLowerCase().includes(searchTerm.toLowerCase());
+            default:
+                return true;
+        }
+    });
+};
 const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
     return {
         id: graphqlData.id,
@@ -188,7 +267,7 @@ export const deleteAttendance = createAsyncThunk<string, string,
     }
 );
 
-const initialState = {
+const initialState: AttendanceState = {
     ...createInitialPaginatedState<Attendance>(),
     studentAttendances: {
         data: [] as any[],

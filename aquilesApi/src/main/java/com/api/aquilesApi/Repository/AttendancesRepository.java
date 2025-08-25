@@ -29,4 +29,13 @@ public interface AttendancesRepository extends JpaRepository<Attendance, Long> {
             @Param("attendanceStateId") Long attendanceStateId,
             Pageable pageable
     );
+
+    // Finds all attendances that have a justification
+    @Query("SELECT a FROM Attendance a WHERE a.justification IS NOT NULL")
+    List<Attendance> findAllAttendancesWithJustification();
+
+    // Finds all attendances that have a justification with pagination
+    @Query("SELECT a FROM Attendance a WHERE a.justification IS NOT NULL")
+    Page<Attendance> findAllAttendancesWithJustification(Pageable pageable);
+
 }
