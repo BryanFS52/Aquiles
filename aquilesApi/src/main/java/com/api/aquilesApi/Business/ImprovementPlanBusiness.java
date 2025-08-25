@@ -94,6 +94,7 @@ public class ImprovementPlanBusiness {
         }
     }
 
+    // Método existente - mantener
     public List<Long> findAllByTeacherCompetence(Long teacherCompetence) {
         try {
             return improvementPlanService.findAllByTeacherCompetence(teacherCompetence);

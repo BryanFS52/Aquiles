@@ -39,8 +39,6 @@ public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
                 ));
     }
 
-
-
     public List<ImprovementPlan> findAllByStudentId(Long id) {
         return improvementPlanRepository.findAllByStudentId(id);
     }
@@ -65,14 +63,17 @@ public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
         improvementPlanRepository.save(entity);
     }
 
-
-
     public boolean existsActivePlanForStudent(Long studentId) {
         return improvementPlanRepository.existsByStudentIdAndStateTrue(studentId);
     }
 
+    // Método existente - mantener
+    public List<ImprovementPlan> findImprovementPlansByTeacherCompetence(Long teacherCompetence) {
+        return improvementPlanRepository.findByTeacherCompetence(teacherCompetence);
+    }
+
+    // Método nuevo que necesitas agregar
     public List<Long> findAllByTeacherCompetence(Long teacherCompetence) {
         return improvementPlanRepository.findAllByTeacherCompetence(teacherCompetence);
     }
-
 }

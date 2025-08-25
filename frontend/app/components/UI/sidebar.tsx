@@ -10,6 +10,7 @@ import { HiUserGroup } from 'react-icons/hi2';
 import { FaChalkboardUser } from 'react-icons/fa6';
 import { GiNotebook } from 'react-icons/gi';
 import { PiStudentFill } from 'react-icons/pi';
+import { FaClipboardList } from 'react-icons/fa';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -32,7 +33,7 @@ interface SidebarProps {
 
 type RoleType = 'instructor' | 'aprendiz' | 'coordinador';
 
-// Íconos estáticos
+// Íconos estáticos (originales, solo Planes de Mejoramiento usa FontAwesome)
 const IconFichas: React.ReactNode = <FaRegListAlt className='text-2xl' />;
 const IconProgramas: React.ReactNode = <FaLaptopCode className='text-2xl' />;
 const IconAsistencia: React.ReactNode = <BsPersonFillCheck className='text-2xl' />;
@@ -41,6 +42,7 @@ const IconSustentaciones: React.ReactNode = <FaChalkboardUser className='text-2x
 const IconJustificaciones: React.ReactNode = <GiNotebook className='text-2xl' />;
 const IconProfesor: React.ReactNode = <FaChalkboardTeacher className='text-2xl' />;
 const IconAprendices: React.ReactNode = <PiStudentFill className='text-2xl' />;
+const IconPlanesMejoramiento: React.ReactNode = <FaClipboardList className='text-2xl' />;
 
 // Configuración de menú por rol
 const MENU_CONFIG: MenuConfig = {
@@ -50,6 +52,7 @@ const MENU_CONFIG: MenuConfig = {
         //{ href: "/dashboard/asistencia", label: "Asistencia", icon: IconAsistencia },
         { href: "/dashboard/teamScrum", label: "Teams", icon: IconTeams },
         { href: "/dashboard/ListaChequeoInstructor", label: "Sustentaciones", icon: IconSustentaciones },
+        { href: "/dashboard/planesMejoramientoInstructor", label: "Planes de Mejoramiento", icon: IconPlanesMejoramiento },
         //{ href: "/dashboard/JustificacionesFichasInstructor", label: "Justificaciones", icon: IconJustificaciones },
     ],
     aprendiz: [
@@ -58,6 +61,7 @@ const MENU_CONFIG: MenuConfig = {
         { href: "/dashboard/teamScrumAprendiz", label: "Team", icon: IconTeams },
         { href: "/dashboard/ListaChequeoAprendiz", label: "Sustentaciones", icon: IconSustentaciones },
         { href: "/dashboard/justificacionesAprendiz", label: "Justificaciones", icon: IconJustificaciones },
+        { href: "/dashboard/PlanesMejoramientoAprendiz", label: "Planes de Mejoramiento", icon: IconPlanesMejoramiento },
     ],
     coordinador: [
         { href: "/dashboard/FichasCoordinador", label: "Fichas", icon: IconFichas },

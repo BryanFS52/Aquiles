@@ -19,5 +19,8 @@ public interface ImprovementPlanRepository extends JpaRepository<ImprovementPlan
     @Query("SELECT ip.teacherCompetence FROM ImprovementPlan ip WHERE ip.teacherCompetence = :teacherCompetence")
     List<Long> findAllByTeacherCompetence(@Param("teacherCompetence") Long teacherCompetence);
 
+    // Método adicional por si quiero las entidades completas las entidades completas
+    @Query("SELECT ip FROM ImprovementPlan ip WHERE ip.teacherCompetence = :teacherCompetence")
+    List<ImprovementPlan> findByTeacherCompetence(@Param("teacherCompetence") Long teacherCompetence);
 }
 
