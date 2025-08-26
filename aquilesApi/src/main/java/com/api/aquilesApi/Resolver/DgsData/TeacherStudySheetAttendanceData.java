@@ -23,8 +23,10 @@ public class TeacherStudySheetAttendanceData {
     }
 
 
+
     @DgsData(parentType = "TeacherStudySheet")
-    public List<Attendance> attendances(DgsDataFetchingEnvironment env){
+
+    public List<Attendance> attendances(DgsDataFetchingEnvironment env) {
         TeacherStudySheet teacherStudySheet = env.getSource();
         assert teacherStudySheet != null;
 
@@ -32,5 +34,6 @@ public class TeacherStudySheetAttendanceData {
 
         List<Attendance> attendanceDtoList = attendancesBusiness.findAllByStudentId(teacherStudySheetId);
 
+        return attendanceDtoList;
     }
 }
