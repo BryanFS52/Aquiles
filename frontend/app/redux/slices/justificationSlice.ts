@@ -460,11 +460,11 @@ export const updateJustification = createAsyncThunk<UpdateJustificationMutation[
 // Nueva función para cambiar el estado de una justificación
 export const updateJustificationStatus = createAsyncThunk<
     UpdateStatusInJustificationMutation['updateStatusInJustification'],
-    { id: string; statusId: string },
+    { id: string; statusId: string; statusName?: string },
     { rejectValue: { code: string; message: string } }
 >(
     'justifications/updateStatus',
-    async ({ id, statusId }, { rejectWithValue }) => {
+    async ({ id, statusId, statusName }, { rejectWithValue }) => {
         try {
             const justificationId = parseInt(id);
             const justificationStatusId = parseInt(statusId);
@@ -472,6 +472,7 @@ export const updateJustificationStatus = createAsyncThunk<
             console.log("🔄 Actualizando justificationStatus con nueva mutation:", {
                 id: justificationId,
                 statusId: justificationStatusId,
+                statusName: statusName,
                 mutation: "UPDATE_STATUS_IN_JUSTIFICATION"
             });
 
@@ -490,7 +491,8 @@ export const updateJustificationStatus = createAsyncThunk<
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Error al actualizar el estado' });
             }
 
-            return res;
+            // Retornar el resultado con el statusName incluido
+            return { ...res, statusName };
         } catch (error: any) {
             console.error("❌ Error actualizando estado:", error);
             return rejectWithValue({ code: '500', message: error.message });
@@ -799,7 +801,7 @@ const justificationSlice = createSlice({
             .addCase(updateJustificationStatus.fulfilled, (state, action) => {
                 // Actualizar el estado local inmediatamente
                 if (action.meta.arg && action.payload) {
-                    const { id, statusId } = action.meta.arg;
+                    const { id, statusId, statusName } = action.meta.arg;
                     
                     // Convertir ambos IDs a string para comparación consistente
                     const targetId = id.toString();
@@ -809,20 +811,24 @@ const justificationSlice = createSlice({
                         console.log("🔄 Actualizando justificación en índice:", justificationIndex, {
                             id: targetId,
                             newStatusId: statusId,
+                            newStatusName: statusName,
                             estadoAnterior: (state.data[justificationIndex] as any).justificationStatus
                         });
                         
-                        // ✅ Actualizar la relación justificationStatus con id y name temporal
+                        // ✅ Actualizar la relación justificationStatus con id y name real
                         (state.data[justificationIndex] as any).justificationStatus = { 
                             id: statusId,
-                            name: "Actualizado" // Temporal hasta que se recarguen los datos
+                            name: statusName || "Estado actualizado" // Usar el nombre real o un fallback
                         };
                         
                         // Regenerar transformedData y filteredData
                         state.transformedData = transformToComponentFormat(state.data);
                         state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                         
-                        console.log("✅ justificationStatus actualizado localmente para justificación:", targetId, "nuevo statusId:", statusId);
+                        console.log("✅ justificationStatus actualizado localmente para justificación:", targetId, {
+                            statusId: statusId,
+                            statusName: statusName
+                        });
                         console.log("📋 Datos transformados actualizados:", state.transformedData.find(t => t.id.toString() === targetId));
                     } else {
                         console.warn("⚠️ No se encontró la justificación con ID:", targetId, "en la lista");

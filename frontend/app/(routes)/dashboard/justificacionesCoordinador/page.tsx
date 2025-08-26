@@ -3,7 +3,8 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import { AppDispatch } from "@redux/store";
+import { toast } from "react-toastify";
+import { AppDispatch, RootState } from "@redux/store";
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFilters from "@components/features/justifications/justificationsFilter";
 import JustificationTable from "@components/features/justifications/justificationsTable";
@@ -19,8 +20,6 @@ import {
   updateJustificationStatus,
 } from '@slice/justificationSlice';
 import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
-import JustificationTable from "@/components/features/justification/justificationsTable";
-import { AppDispatch, RootState } from "@/redux/store";
 
 
 export default function JustificacionesCoordinator() {
@@ -74,25 +73,70 @@ export default function JustificacionesCoordinator() {
   };
 
   const handleStatusChange = (justificacionId: string, newStatusId: string) => {
-    console.log("🔄 Cambiando estado de justificación (Coordinador):", {
-      id: justificacionId,
-      newStatusId
-    });
+    // Buscar el nombre del estado en la lista de estados disponibles
+    const selectedStatus = justificationStatuses.find(status => status.id?.toString() === newStatusId);
+    const statusName = selectedStatus?.name || "Estado actualizado";
+
+    // Buscar la justificación actual para verificar si ya tiene el mismo estado
+    const currentJustification = filteredData.find((j: any) => j.id.toString() === justificacionId);
+    const currentStatusId = currentJustification?.justificationStatusId?.toString() || 
+                           currentJustification?.justificationStatus?.toString();
     
+    if (currentStatusId === newStatusId) {
+      return; // No hacer nada si el estado es el mismo
+    }
+
     // Enviar directamente el statusId para usar la relación real
-    dispatch(updateJustificationStatus({ id: justificacionId, statusId: newStatusId }))
+    dispatch(updateJustificationStatus({ 
+      id: justificacionId, 
+      statusId: newStatusId,
+      statusName: statusName
+    }))
       .then((result) => {
         if (updateJustificationStatus.fulfilled.match(result)) {
-          console.log("✅ Estado actualizado exitosamente");
-          // ✅ Recargar los datos para obtener la relación actualizada desde el backend
-          dispatch(fetchJustifications({ page: localCurrentPage - 1, size: itemsPerPage }));
+          // Mostrar mensaje personalizado según el estado
+          showJustificationStatusMessage(statusName);
+          
+          // Ya no necesitamos recargar ya que el estado se actualiza localmente
         } else {
-          console.error("❌ Error al actualizar el estado:", result.payload);
+          const error = result.payload as any;
+          if (error?.code !== "500" || !error?.message?.includes("already has the specified status")) {
+            // Solo mostrar error si no es el caso de estado duplicado (para debugging)
+            // console.error("❌ Error al actualizar el estado:", error);
+          }
         }
       })
       .catch((error) => {
-        console.error("❌ Error inesperado al actualizar el estado:", error);
+        // Error inesperado (para debugging)
+        // console.error("❌ Error inesperado al actualizar el estado:", error);
       });
+  };
+
+  // Función para mostrar mensajes de estado de justificación
+  const showJustificationStatusMessage = (statusName: string) => {
+    const statusNameLower = statusName.toLowerCase();
+    
+    if (statusNameLower.includes('aprobad') || statusNameLower.includes('acepta')) {
+      toast.success(`🎉 Justificación aprobada: ${statusName}`, {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } else if (statusNameLower.includes('denegad') || statusNameLower.includes('rechaza') || statusNameLower.includes('no acepta')) {
+      toast.error(`❌ Justificación denegada: ${statusName}`, {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } else if (statusNameLower.includes('proceso') || statusNameLower.includes('pendiente') || statusNameLower.includes('revision')) {
+      toast.info(`📝 Justificación en proceso: ${statusName}`, {
+        position: "top-right",
+        autoClose: 4000,
+      });
+    } else {
+      toast.info(`📋 Estado actualizado: ${statusName}`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
   };
 
   const errorMessage = formatErrorMessage(error);

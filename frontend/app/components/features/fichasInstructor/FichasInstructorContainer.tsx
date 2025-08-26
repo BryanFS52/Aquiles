@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { AppDispatch } from '@/redux/store';
 import { fetchStudySheetByTeacher, fetchStudySheetById } from '@slice/olympo/studySheetSlice';
+import { fetchJustificationsByCompetenceQuarter } from '@slice/competenceQuarterJustificationsSlice';
 import { useLoader } from '@context/LoaderContext';
 import { StudySheetCard } from './StudySheetCard';
 import { ApprenticesModal } from './ApprenticesModal';
@@ -44,6 +45,11 @@ export const FichasInstructorContainer: React.FC = () => {
         setSelectedFicha(ficha);
         setModalOpen(true);
     };
+    
+    const handleViewApprenticesJustifications = (ficha: StudySheet) => {
+        setSelectedFicha(ficha);
+        setModalOpen(true);
+    };
 
     const handleCloseModal = () => {
         setSelectedFicha(null);
@@ -64,6 +70,19 @@ export const FichasInstructorContainer: React.FC = () => {
         }
     };
 
+    const handleTakeJustification = async (studySheet: StudySheet) => {
+        if (!studySheet.id) return;
+
+        setIsTransitioning(true);
+        try {
+            await dispatch(fetchJustificationsByCompetenceQuarter({ competenceQuarterId: parseInt(studySheet.id) }));
+            router.push('/dashboard/justificacionesInstructor');
+        } catch (error) {
+            console.error('Error al cargar las justificaciones:', error);
+        } finally {
+            setIsTransitioning(false);
+        }
+    };
     // Early returns
     if (!loading && (!fichas || fichas.length === 0)) {
         return <EmptyState message="No se encontraron fichas disponibles." />;
@@ -83,6 +102,8 @@ export const FichasInstructorContainer: React.FC = () => {
                                         studySheet={studySheet}
                                         onViewApprentices={handleViewApprentices}
                                         onTakeAttendance={handleTakeAttendance}
+                                        onTakeJustification={handleTakeJustification}
+                                        onViewApprenticesJustifications={handleViewApprenticesJustifications}
                                         loading={loading}
                                     />
                                 </div>

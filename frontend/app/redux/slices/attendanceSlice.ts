@@ -1,6 +1,6 @@
 import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT, GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph';
+import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import {
     Attendance,
@@ -45,8 +45,6 @@ interface AttendanceState extends ReturnType<typeof createInitialPaginatedState>
     transformedData: TransformedAttendanceItem[];
     filteredData: TransformedAttendanceItem[];
     filterOptions: FilterOptions;
-    justifications: any[];
-    justificationsLoading: boolean;
 }
 const transformToComponentFormat = (attendances: Attendance[]): TransformedAttendanceItem[] => {
     return attendances.map((a) => {
@@ -117,7 +115,6 @@ const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
     };
 }
 
-
 export const fetchAttendances = createAsyncThunk<
     GetAttendancesQuery['allAttendances'],
     GetAttendancesQueryVariables
@@ -176,25 +173,6 @@ export const fetchAttendanceAndCompetenceByStudent = createAsyncThunk<GetAttenda
         } catch (error) {
             console.error("Error al obtener asistencias y competencias por estudiante", error);
             return rejectWithValue({ message: (error as Error).message || 'Unknown error' });
-        }
-    }
-);
-
-export const fetchAttendancesAndJustificationsByStudent = createAsyncThunk<
-    any, // Reemplazar con el tipo correcto una vez generado
-    { id: number }
->(
-    'attendance/fetchWithJustifications',
-    async ({ id }, { rejectWithValue }) => {
-        try {
-            const { data } = await clientLAN.query({
-                query: GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT,
-                variables: { id },
-                fetchPolicy: 'no-cache',
-            });
-            return data.allAttendancesByStudentId.data;
-        } catch (error) {
-            return rejectWithValue({ message: (error as Error).message });
         }
     }
 );
@@ -275,8 +253,12 @@ const initialState: AttendanceState = {
         error: null as string | null,
         showForm: false,
     },
-    justifications: [] as any[],
-    justificationsLoading: false,
+    transformedData: [],
+    filteredData: [],
+    filterOptions: {
+        selectedFiltro: '',
+        searchTerm: ''
+    }
 };
 
 const attendanceSlice = createSlice({
@@ -328,7 +310,8 @@ const attendanceSlice = createSlice({
             .addCase(fetchAttendanceAndCompetenceByStudent.fulfilled, (state, action) => {
                 const payload = action.payload;
                 if (payload?.data) {
-                    state.studentAttendances.data = payload.data.filter((item: any) => item !== null);
+                    const cleanData = payload.data.filter((item): item is NonNullable<typeof item> & { id: string } => !!item && !!item.id);
+                    state.studentAttendances.data = cleanData.map(transformGraphQLToAttendanceItem);
                 }
                 state.studentAttendances.loading = false;
                 state.studentAttendances.error = null;
@@ -336,19 +319,6 @@ const attendanceSlice = createSlice({
             .addCase(fetchAttendanceAndCompetenceByStudent.rejected, (state, action) => {
                 state.studentAttendances.loading = false;
                 state.studentAttendances.error = (action.payload as RejectedPayload)?.message ?? action.error.message ?? 'Error al cargar asistencias y competencias del estudiante';
-            })
-            .addCase(fetchAttendancesAndJustificationsByStudent.pending, (state) => {
-                state.justificationsLoading = true;
-            })
-            .addCase(fetchAttendancesAndJustificationsByStudent.fulfilled, (state, action) => {
-                const justifications = action.payload
-                    .filter((j: any) => j !== null);
-                state.justifications = justifications;
-                state.loading = false;
-            })
-            .addCase(fetchAttendancesAndJustificationsByStudent.rejected, (state, action) => {
-                state.error = (action.payload as RejectedPayload)?.message ?? 'Error fetching justifications';
-                state.loading = false;
             })
             .addCase(addAttendance.fulfilled, (state, action: PayloadAction<AddAttendanceMutation['addAttendance']>) => {
                 if (action.payload && action.payload.id) {
