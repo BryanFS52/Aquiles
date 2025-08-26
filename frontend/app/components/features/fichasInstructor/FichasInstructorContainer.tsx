@@ -45,7 +45,7 @@ export const FichasInstructorContainer: React.FC = () => {
         setSelectedFicha(ficha);
         setModalOpen(true);
     };
-    
+
     const handleViewApprenticesJustifications = (ficha: StudySheet) => {
         setSelectedFicha(ficha);
         setModalOpen(true);
