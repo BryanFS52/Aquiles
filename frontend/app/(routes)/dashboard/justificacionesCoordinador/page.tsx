@@ -18,6 +18,10 @@ import {
   downloadBase64File,
   generateFileName,
   updateJustificationStatus,
+  toggleMultiFilter,
+  setMultiFilter,
+  clearMultiFilters,
+  MultiFilterState,
 } from '@slice/justificationSlice';
 import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
 
@@ -54,6 +58,22 @@ export default function JustificacionesCoordinator() {
 
   const handleRefresh = () => {
     dispatch(fetchJustifications({ page: localCurrentPage, size: itemsPerPage }));
+  };
+
+  // 🆕 Nuevas funciones para multi-filtros
+  const handleMultiFilterChange = (field: keyof MultiFilterState, value: string) => {
+    dispatch(setMultiFilter({ field, value }));
+    dispatch(setLocalCurrentPage(1));
+  };
+
+  const handleToggleMultiFilter = () => {
+    dispatch(toggleMultiFilter());
+    dispatch(setLocalCurrentPage(1));
+  };
+
+  const handleClearMultiFilters = () => {
+    dispatch(clearMultiFilters());
+    dispatch(setLocalCurrentPage(1));
   };
 
   const handlePreviousPage = () => {
@@ -143,6 +163,14 @@ export default function JustificacionesCoordinator() {
   const canGoNext = localCurrentPage < totalPages;
   const canGoPrevious = localCurrentPage > 1;
 
+  // Determinar si hay filtros aplicados
+  const { selectedFiltro, searchTerm, enableMultiFilter, multiFilters } = filterOptions;
+  const hasFiltersApplied = Boolean(
+    selectedFiltro ||
+    searchTerm ||
+    (enableMultiFilter && Object.values(multiFilters).some(value => value))
+  );
+
   return (
     <div className="space-y-6">
       <PageTitle>Justificaciones de aprendices</PageTitle>
@@ -152,6 +180,9 @@ export default function JustificacionesCoordinator() {
         filterOptions={filterOptions}
         loading={loading}
         onFilterChange={handleFilterChange}
+        onMultiFilterChange={handleMultiFilterChange}
+        onToggleMultiFilter={handleToggleMultiFilter}
+        onClearMultiFilters={handleClearMultiFilters}
         onRefresh={handleRefresh}
       />
 
@@ -162,39 +193,46 @@ export default function JustificacionesCoordinator() {
         </div>
       )}
 
-      {/* Table */}
-      {!loading && !errorMessage && (
+      {/* Table with built-in empty states */}
+      {!errorMessage && (
         <>
           <JustificationTable
             filteredData={filteredData}
             handleDownloadFile={handleDownloadFile}
             handleStatusChange={handleStatusChange}
+            hasAnyData={totalItems > 0}
+            isLoading={loading}
+            hasError={Boolean(error)}
+            hasFiltersApplied={hasFiltersApplied}
+            isInstructorView={false}
           />
 
-          {/* Pagination */}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
-            <button
-              className="flex items-center px-4 py-2 text-sm font-medium text-black dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
-              onClick={handlePreviousPage}
-              disabled={!canGoPrevious}
-            >
-              <IoIosArrowBack className="mr-2" />
-              Anterior
-            </button>
+          {/* Pagination - solo mostrar si hay datos */}
+          {!loading && filteredData.length > 0 && (
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
+              <button
+                className="flex items-center px-4 py-2 text-sm font-medium text-black dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+                onClick={handlePreviousPage}
+                disabled={!canGoPrevious}
+              >
+                <IoIosArrowBack className="mr-2" />
+                Anterior
+              </button>
 
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-              Página {localCurrentPage} de {totalPages} ({totalItems} registros)
-            </span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                Página {localCurrentPage} de {totalPages} ({totalItems} registros)
+              </span>
 
-            <button
-              className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
-              onClick={handleNextPage}
-              disabled={!canGoNext}
-            >
-              Siguiente
-              <IoIosArrowForward className="ml-2" />
-            </button>
-          </div>
+              <button
+                className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+                onClick={handleNextPage}
+                disabled={!canGoNext}
+              >
+                Siguiente
+                <IoIosArrowForward className="ml-2" />
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>

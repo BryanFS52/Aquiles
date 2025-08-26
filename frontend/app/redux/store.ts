@@ -10,9 +10,10 @@ import studySheetReducer from "@slice/olympo/studySheetSlice";
 import teamScrumReducer from "@slice/teamScrumSlice"
 import attendancesReducer from "@slice/attendanceSlice"
 import attendanceStateReducer from "@slice/attendanceStateSlice"
-import competenceQuarterJustificationsReducer from "@slice/competenceQuarterJustificationsSlice"
 import profileReducer from "@slice/atlas/profileSlice";
 import processMethodologiesReducer from "@slice/atlas/processMethodologiesSlice";
+import noveltyReducer from "@slice/themis/noveltySlice";
+import noveltyTypeReducer from "@slice/themis/noveltyTypeSlice";
 
 const store = configureStore({
     reducer: {
@@ -27,9 +28,10 @@ const store = configureStore({
         teamScrum: teamScrumReducer,
         attendances: attendancesReducer,
         attendanceState: attendanceStateReducer,
-        competenceQuarterJustifications: competenceQuarterJustificationsReducer,
         profile: profileReducer,
-        processMethodologies: processMethodologiesReducer
+        processMethodologies: processMethodologiesReducer,
+        novelty: noveltyReducer,
+        noveltyType: noveltyTypeReducer
     }
 });
 

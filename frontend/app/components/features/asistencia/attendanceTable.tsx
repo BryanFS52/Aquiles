@@ -6,11 +6,13 @@ import { FaRegFileAlt } from "react-icons/fa";
 interface AttendanceTableProps {
   data: any[];
   loading: boolean;
+  onReportNovelty?: (studentId?: number) => void;
 }
 
 export default function AttendanceTable({
   data,
-  loading
+  loading,
+  onReportNovelty
 }: AttendanceTableProps) {
   return (
     <motion.div
@@ -66,11 +68,30 @@ export default function AttendanceTable({
                     <div className="flex items-center">{summary.aprendiz}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center">{summary.cantidad}</div>
+                    <div className={`flex items-center font-semibold ${
+                      summary.cantidad >= 3 
+                        ? '' 
+                        : summary.cantidad >= 2
+                    }`}>
+                      {summary.cantidad}
+                      {summary.cantidad >= 3}
+                      {summary.cantidad === 2}
+                    </div>
                   </td>
-                  <td>
-                    <button className="text-blue-500 hover:underline">
-                      Reportar
+                  <td className="px-6 py-4">
+                    <button 
+                      onClick={() => onReportNovelty?.(summary.id)}
+                      className={`px-3 py-1 text-sm rounded transition-colors ${
+                        summary.cantidad >= 3
+                        ? 'bg-red-600 text-white hover:bg-red-700'
+                        : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
+                      disabled={summary.cantidad < 3}
+                      title={summary.cantidad >= 3 
+                        ? `` 
+                        : ``
+                      }
+                    >
+                      {summary.cantidad >= 3 ? 'Reportar Deserción' : 'Reportar deserción'}
                     </button>
                   </td>
                 </motion.tr>

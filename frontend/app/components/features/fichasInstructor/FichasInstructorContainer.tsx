@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { AppDispatch } from '@/redux/store';
 import { fetchStudySheetByTeacher, fetchStudySheetById } from '@slice/olympo/studySheetSlice';
-import { fetchJustificationsByCompetenceQuarter } from '@slice/competenceQuarterJustificationsSlice';
+import { fetchJustificationsByCompetenceQuarter } from '@slice/justificationSlice';
 import { useLoader } from '@context/LoaderContext';
 import { StudySheetCard } from './StudySheetCard';
 import { ApprenticesModal } from './ApprenticesModal';

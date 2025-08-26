@@ -9,7 +9,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/DB_Aquiles
     username: postgres
     password: "fabrica2024*"
-    driver-class-name: org.postgresql.Driver
+    driver-class-name: org.postgresql.Driver  
 
   jpa:
     hibernate:
