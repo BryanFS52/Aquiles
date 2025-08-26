@@ -70,6 +70,9 @@ const PlanMejoramientoInstructor: React.FC = () => {
         });
     };
 
+    if (loading) {
+        return null;
+    }
 
     // Early return para estado vacío
     if (!loading && (!studySheets || studySheets.length === 0)) {
