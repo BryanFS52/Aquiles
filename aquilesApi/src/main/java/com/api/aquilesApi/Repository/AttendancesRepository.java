@@ -31,11 +31,14 @@ public interface AttendancesRepository extends JpaRepository<Attendance, Long> {
     );
 
     // Finds all attendances that have a justification
-    @Query("SELECT a FROM Attendance a WHERE a.justification IS NOT NULL")
-    List<Attendance> findAllAttendancesWithJustification();
-
-    // Finds all attendances that have a justification with pagination
-    @Query("SELECT a FROM Attendance a WHERE a.justification IS NOT NULL")
-    Page<Attendance> findAllAttendancesWithJustification(Pageable pageable);
+    @Query("""
+    SELECT a FROM Attendance a
+    WHERE a.competenceQuarter = :competenceQuarterId
+      AND a.justification IS NOT NULL
+    """)
+    Page<Attendance> findAllByCompetenceQuarterIdAndJustifications(
+            @Param("competenceQuarterId") Long competenceQuarterId,
+            Pageable pageable
+    );
 
 }

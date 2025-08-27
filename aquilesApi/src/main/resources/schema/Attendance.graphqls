@@ -35,6 +35,7 @@ input AttendanceDto {
 extend type Query {
     allAttendances(page: Int, size: Int): AttendancePage
     attendanceById(id: Long!): AttendancePageId
+    allAttendanceByCompetenceQuarterIdWithJustifications(competenceQuarterId: Long, page: Int, size: Int): AttendancePage
     allAttendancesByStudentId(id: Long, stateId: Long, page: Int, size: Int): AttendancePage
 }
 

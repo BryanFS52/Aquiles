@@ -79,12 +79,10 @@ public class AttendancesBusiness {
     }
 
 
-    public List<AttendanceDto> findAllByCompetenceQuarterId(Long id) {
+    public Page<AttendanceDto> findAllByCompetenceQuarterId(Long id, Pageable pageable) {
         try {
-            List<Attendance> attendanceList = attendancesService.findAllByCompetenceQuarterId(id);
-            return attendanceList.stream()
-                    .map(entity -> modelMapper.map(entity, AttendanceDto.class))
-                    .collect(Collectors.toList());
+            Page<Attendance> attendanceList = attendancesService.findAllByCompetenceQuarterIdAndJustifications(id, pageable);
+            return attendanceList.map(entity -> modelMapper.map(entity, AttendanceDto.class));
         } catch (Exception e) {
             throw new CustomException("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -54,8 +54,6 @@ export default function JustificationTable({
       <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
         <thead className="text-xs uppercase bg-gray-50 dark:bg-gray-700 text-black dark:text-white">
           <tr>
-            <th className="px-6 py-4 font-medium">Programa</th>
-            <th className="px-6 py-4 font-medium">Ficha</th>
             <th className="px-6 py-4 font-medium">Foto</th>
             <th className="px-6 py-4 font-medium">Documento</th>
             <th className="px-6 py-4 font-medium">Aprendiz</th>
@@ -72,10 +70,6 @@ export default function JustificationTable({
               key={justificacion.id}
               className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
             >
-              <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                {justificacion.programa}
-              </td>
-              <td className="px-6 py-4">{justificacion.ficha}</td>
               <td className="px-6 py-4">
                 <Image
                   src={persona}
@@ -105,7 +99,7 @@ export default function JustificationTable({
               </td>
               <td className="px-6 py-4">
                 <span
-                  className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getCurrentStatusName(justificacion) === "Aceptado"
+                  className={`inline-flex items-center px-1.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getCurrentStatusName(justificacion) === "Aceptado"
                       ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
                       : getCurrentStatusName(justificacion) === "Denegado"
                         ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"

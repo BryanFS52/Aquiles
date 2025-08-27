@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import { toast } from "react-toastify";
 import type { AppDispatch, RootState } from "@/redux/store";
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFilters from "@components/features/justifications/justificationsFilter";
@@ -18,6 +19,12 @@ import {
   downloadBase64File,
   updateJustificationStatus,
 } from "@slice/justificationSlice";
+import {
+  selectJustifications,
+  selectJustificationsLoading,
+  selectJustificationsError,
+  selectHasJustifications
+} from "@slice/competenceQuarterJustificationsSlice";
 import { fetchAllJustificationStatuses } from "@/redux/slices/justificationStatusSlice";
 import { useLoader } from "@/context/LoaderContext";
 
@@ -37,6 +44,12 @@ export default function JustificacionesInstructor() {
     data: justificationsData
   } = useSelector((state: RootState) => state.justification);
 
+  // Usar selectores del slice de competenceQuarterJustifications
+  const competenceQuarterJustifications = useSelector(selectJustifications);
+  const competenceQuarterLoading = useSelector(selectJustificationsLoading);
+  const competenceQuarterError = useSelector(selectJustificationsError);
+  const hasCompetenceQuarterData = useSelector(selectHasJustifications);
+
   const { justificationStatuses } = useSelector(
     (state: RootState) => state.justificationStatus
   );
@@ -51,7 +64,6 @@ export default function JustificacionesInstructor() {
   };
 
   const handleRefresh = () => {
-    console.log("🔄 Refresh solicitado");
     // Aquí podrías agregar lógica para recargar datos específicos si es necesario
   };
 
@@ -71,13 +83,6 @@ export default function JustificacionesInstructor() {
     }
   }, [loading, isTransitioning, showLoader, hideLoader]);
 
-  const handleStatusUpdateError = (error: any, justificacionId: string) => {
-    console.error("Error al actualizar estado:", {
-      justificacionId,
-      error: error?.message || 'Error desconocido'
-    });
-  };
-
   const handleDownloadFile = (justificacion: any) => {
     if (justificacion.archivoAdjunto) {
       const mimeType = justificacion.archivoMime || "application/octet-stream";
@@ -87,41 +92,114 @@ export default function JustificacionesInstructor() {
   };
 
   const handleStatusChange = (justificacionId: string, newStatusId: string) => {
-    dispatch(updateJustificationStatus({ id: justificacionId, statusId: newStatusId }))
+    // Buscar el nombre del estado en la lista de estados disponibles
+    const selectedStatus = justificationStatuses.find(status => status.id?.toString() === newStatusId);
+    const statusName = selectedStatus?.name || "Estado actualizado";
+
+    // Buscar la justificación actual para verificar si ya tiene el mismo estado
+    let currentJustification: any = null;
+    if (hasCompetenceQuarterData) {
+      currentJustification = competenceQuarterJustifications.find((j: any) => j.id.toString() === justificacionId);
+    } else {
+      currentJustification = filteredData.find((j: any) => j.id.toString() === justificacionId);
+    }
+
+    // Verificar si el estado ya es el mismo
+    const currentStatusId = currentJustification?.justificationStatus?.id?.toString() ||
+      currentJustification?.justificationStatusId?.toString();
+
+    if (currentStatusId === newStatusId) {
+      return; // No hacer nada si el estado es el mismo
+    }
+
+    // Enviar directamente el statusId para usar la relación real
+    dispatch(updateJustificationStatus({
+      id: justificacionId,
+      statusId: newStatusId,
+      statusName: statusName
+    }))
       .then((result) => {
         if (updateJustificationStatus.fulfilled.match(result)) {
-          console.log("Estado actualizado exitosamente");
-        } else if (updateJustificationStatus.rejected.match(result)) {
-          handleStatusUpdateError(result.payload, justificacionId);
+          // Mostrar mensaje personalizado según el estado
+          showJustificationStatusMessage(statusName);
+
+          // Ya no necesitamos recargar ya que el estado se actualiza localmente
+        } else {
+          const error = result.payload as any;
+          if (error?.code !== "500" || !error?.message?.includes("already has the specified status")) {
+            // Solo mostrar error si no es el caso de estado duplicado (para debugging)
+            // console.error("❌ Error al actualizar el estado:", error);
+          }
         }
       })
       .catch((error) => {
-        handleStatusUpdateError(error, justificacionId);
+        // Error inesperado (para debugging)
+        // console.error("❌ Error inesperado al actualizar el estado:", error);
       });
   };
 
+  // Función para mostrar mensajes de estado de justificación
+  const showJustificationStatusMessage = (statusName: string) => {
+    const statusNameLower = statusName.toLowerCase();
+
+    if (statusNameLower.includes('aprobad') || statusNameLower.includes('acepta')) {
+      toast.success(`🎉 Justificación aprobada: ${statusName}`, {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } else if (statusNameLower.includes('denegad') || statusNameLower.includes('rechaza') || statusNameLower.includes('no acepta')) {
+      toast.error(`❌ Justificación denegada: ${statusName}`, {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } else if (statusNameLower.includes('proceso') || statusNameLower.includes('pendiente') || statusNameLower.includes('revision')) {
+      toast.info(`📝 Justificación en proceso: ${statusName}`, {
+        position: "top-right",
+        autoClose: 4000,
+      });
+    } else {
+      toast.info(`📋 Estado actualizado: ${statusName}`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  };
+
+  // Función para transformar datos de competence quarter al formato de justificaciones
+  // Esta función ya no es necesaria, la lógica está en el slice
+
   // Log para debugging del estado de justificaciones
   useEffect(() => {
-    console.log("📊 Estado actual:", {
-      loading,
-      dataLength: justificationsData?.length,
-      filteredDataLength: filteredData?.length,
-      totalItems,
-      currentPage: localCurrentPage
-    });
-  }, [loading, justificationsData, filteredData, totalItems, localCurrentPage]);
+    // Debug logs removidos para producción
+  }, [loading, justificationsData, filteredData, totalItems, localCurrentPage, competenceQuarterJustifications, competenceQuarterLoading, competenceQuarterError, hasCompetenceQuarterData]);
 
   const errorMessage = formatErrorMessage(error);
-  const canGoNext = localCurrentPage < totalPages;
-  const canGoPrevious = localCurrentPage > 1;
 
+  // Determinar qué datos usar - simplificado usando selectores
+  const hasJustificationData = justificationsData && justificationsData.length > 0;
+  const isLoadingAny = loading || competenceQuarterLoading;
 
-  // Verificar si hay datos de justificaciones en el state
-  if (!loading && !error && (!justificationsData || justificationsData.length === 0)) {
-    return <EmptyState message="No se encontraron justificaciones para esta ficha." />;
+  const canGoNext = hasCompetenceQuarterData ? false : localCurrentPage < totalPages;
+  const canGoPrevious = hasCompetenceQuarterData ? false : localCurrentPage > 1;
+
+  // Preparar datos para mostrar
+  let dataToShow = filteredData;
+  let totalItemsToShow = totalItems;
+  let hasDataToShow = hasJustificationData;
+
+  // Si tenemos datos de competence quarter, usarlos en su lugar
+  if (hasCompetenceQuarterData) {
+    dataToShow = competenceQuarterJustifications;
+    totalItemsToShow = competenceQuarterJustifications.length;
+    hasDataToShow = competenceQuarterJustifications.length > 0;
   }
 
-  if (!loading && !errorMessage && (!filteredData || filteredData.length === 0)) {
+  // Verificar si hay datos de justificaciones en el state
+  if (!isLoadingAny && !error && !competenceQuarterError && !hasDataToShow) {
+    return <EmptyState message="No se encontraron justificaciones para esta ficha. Selecciona una ficha desde el panel del instructor." />;
+  }
+
+  if (!isLoadingAny && !errorMessage && hasDataToShow && dataToShow.length === 0) {
     return <EmptyState message="No se encontraron justificaciones que coincidan con los filtros aplicados." />;
   }
 
@@ -143,10 +221,10 @@ export default function JustificacionesInstructor() {
       )}
 
       {/* Table */}
-      {!loading && !errorMessage && (
+      {!isLoadingAny && !errorMessage && (
         <>
           <JustificationTable
-            filteredData={filteredData}
+            filteredData={dataToShow}
             handleDownloadFile={handleDownloadFile}
             handleStatusChange={handleStatusChange}
           />
@@ -166,7 +244,7 @@ export default function JustificacionesInstructor() {
             </button>
 
             <span className="text-sm text-gray-700 dark:text-gray-300">
-              Página {localCurrentPage} de {totalPages} ({totalItems} registros)
+              Página {localCurrentPage} de {hasCompetenceQuarterData ? 1 : totalPages} ({totalItemsToShow} registros)
             </span>
 
             <button

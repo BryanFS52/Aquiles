@@ -22,6 +22,8 @@ export interface StudySheetCardProps {
     studySheet: StudySheet;
     onViewApprentices: (studySheet: StudySheet) => void;
     onTakeAttendance: (studySheet: StudySheet) => void;
+    onViewApprenticesJustifications: (studySheet: StudySheet) => void;
+    onTakeJustification: (studySheet: StudySheet) => void;
     loading?: boolean;
 }
 
