@@ -1,11 +1,11 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.JustificationDto;
+import com.api.aquilesApi.Entity.Attendance;
+import com.api.aquilesApi.Entity.AttendanceState;
 import com.api.aquilesApi.Entity.Justification;
-import com.api.aquilesApi.Service.AttendancesService;
-import com.api.aquilesApi.Service.JustificationService;
-import com.api.aquilesApi.Service.JustificationStatusService;
-import com.api.aquilesApi.Service.JustificationTypeService;
+import com.api.aquilesApi.Entity.JustificationStatus;
+import com.api.aquilesApi.Service.*;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
@@ -15,7 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -25,14 +28,16 @@ public class JustificationBusiness {
     private final AttendancesService attendancesService;
     private final JustificationTypeService justificationTypeService;
     private final JustificationStatusService justificationStatusService;
+    private final StateAttendanceService  stateAttendanceService;
     private final ModelMapper modelMapper;
 
     public JustificationBusiness(JustificationService justificationService, AttendancesService attendancesService, JustificationTypeService
-            justificationTypeService, JustificationStatusService justificationStatusService, ModelMapper modelMapper) {
+            justificationTypeService, JustificationStatusService justificationStatusService, StateAttendanceService stateAttendanceService, ModelMapper modelMapper) {
         this.justificationService = justificationService;
         this.attendancesService = attendancesService;
         this.justificationTypeService = justificationTypeService;
         this.justificationStatusService = justificationStatusService;
+        this.stateAttendanceService = stateAttendanceService;
         this.modelMapper = modelMapper;
     }
 
@@ -153,6 +158,18 @@ public class JustificationBusiness {
     public JustificationDto add(JustificationDto dto) {
         ValidationObject(dto);
         Justification justification = buildJustificationFromDto(dto, true);
+        Attendance attendance = attendancesService.getById(dto.getAttendance().getId());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate attendanceDate = LocalDate.parse(attendance.getAttendanceDate(), formatter);
+        LocalDate justificationDate = LocalDate.parse(dto.getJustificationDate());
+        long daysBetween = ChronoUnit.DAYS.between(attendanceDate, justificationDate);
+
+        if (daysBetween > 3) {
+            throw new CustomException(
+                    "La justificación no puede superar los 3 días desde la fecha de asistencia",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
         return mapToDto(justificationService.save(justification));
     }
 
@@ -171,7 +188,17 @@ public class JustificationBusiness {
             validateStatusUpdate(id, statusId);
 
             Justification existing = justificationService.getById(id);
-            existing.setJustificationStatus(justificationStatusService.getById(statusId));
+            JustificationStatus justificationStatus = justificationStatusService.getById(statusId);
+            if (Objects.equals(justificationStatus.getName(), "Aceptado")){
+                AttendanceState attendanceState = stateAttendanceService.getById(3L);
+                existing.getAttendance().setAttendanceState(attendanceState);
+            }
+            if (Objects.equals(justificationStatus.getName(), "Denegado")){
+                AttendanceState attendanceState = stateAttendanceService.getById(4L);
+                existing.getAttendance().setAttendanceState(attendanceState);
+            }
+
+            existing.setJustificationStatus(justificationStatus);
             justificationService.save(existing);
 
         } catch (CustomException e) {
