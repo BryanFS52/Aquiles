@@ -1,13 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { RootState, AppDispatch } from '@redux/store'
 import { 
   closeModal, 
   updateFormField, 
-  setSelectedFile, 
   submitNovelty, 
   processFile,
   clearError, 
@@ -21,6 +20,9 @@ interface NoveltyModalProps {
 
 export default function NoveltyModal({ isOpen, onClose }: NoveltyModalProps) {
   const dispatch = useDispatch<AppDispatch>()
+  
+  // Estado local para manejar el archivo seleccionado
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
   
   const { 
     loading, 
@@ -68,11 +70,14 @@ export default function NoveltyModal({ isOpen, onClose }: NoveltyModalProps) {
     const file = e.target.files?.[0]
     if (file) {
       try {
-        dispatch(setSelectedFile(file))
+        // Mantener archivo localmente para mostrar información
+        setSelectedFile(file)
+        // Procesar archivo - el base64 se almacenará automáticamente en Redux
         await dispatch(processFile(file)).unwrap()
       } catch (error) {
         toast.error('Error al procesar el archivo')
         console.error('Error processing file:', error)
+        setSelectedFile(null)
       }
     }
   }
@@ -86,6 +91,12 @@ export default function NoveltyModal({ isOpen, onClose }: NoveltyModalProps) {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('Form submission - formData before submit:', {
+      studentId: formData.studentId,
+      teacherId: formData.teacherId,
+      observation: formData.observation ? 'Present' : 'Empty',
+      noveltyType: formData.noveltyType.id ? 'Present' : 'Empty'
+    })
     try {
       await dispatch(submitNovelty()).unwrap()
     } catch (error) {
@@ -95,9 +106,27 @@ export default function NoveltyModal({ isOpen, onClose }: NoveltyModalProps) {
 
   // Handle close
   const handleClose = () => {
+    setSelectedFile(null) // Limpiar archivo seleccionado
     dispatch(closeModal())
     onClose()
   }
+
+  // Limpiar archivo cuando se resetee el formulario
+  useEffect(() => {
+    if (!formData.noveltyFiles) {
+      setSelectedFile(null)
+    }
+  }, [formData.noveltyFiles])
+
+  // Debug: monitorear cambios en IDs
+  useEffect(() => {
+    console.log('FormData IDs changed:', {
+      studentId: formData.studentId,
+      teacherId: formData.teacherId,
+      modalOpen,
+      selectedStudentAbsences: selectedStudentAbsences ? 'Present' : 'Null'
+    })
+  }, [formData.studentId, formData.teacherId, modalOpen, selectedStudentAbsences])
 
   if (!isOpen || !modalOpen) return null
 
@@ -201,9 +230,9 @@ export default function NoveltyModal({ isOpen, onClose }: NoveltyModalProps) {
               disabled={loading || !canReport}
               title="Seleccione un archivo de evidencia"
             />
-            {formData.selectedFile && (
+            {selectedFile && (
               <p className="text-sm text-gray-600 mt-1">
-                Archivo seleccionado: {formData.selectedFile.name} ({(formData.selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+                Archivo seleccionado: {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
               </p>
             )}
           </div>

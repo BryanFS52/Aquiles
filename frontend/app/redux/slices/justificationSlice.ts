@@ -1038,34 +1038,31 @@ const justificationSlice = createSlice({
                     
                     // Convertir ambos IDs a string para comparación consistente
                     const targetId = id.toString();
-                    const justificationIndex = state.data.findIndex(j => j.id.toString() === targetId);
                     
+                    // ✅ Actualizar en state.data para coordinadores
+                    const justificationIndex = state.data.findIndex(j => j.id.toString() === targetId);
                     if (justificationIndex !== -1) {
-                        // console.log("🔄 Actualizando justificación en índice:", justificationIndex, {
-                        //     id: targetId,
-                        //     newStatusId: statusId,
-                        //     newStatusName: statusName,
-                        //     estadoAnterior: (state.data[justificationIndex] as any).justificationStatus
-                        // });
-                        
-                        // ✅ Actualizar la relación justificationStatus con id y name real
+                        // Actualizar la relación justificationStatus con id y name real
                         (state.data[justificationIndex] as any).justificationStatus = { 
                             id: statusId,
-                            name: statusName || "Estado actualizado" // Usar el nombre real o un fallback
+                            name: statusName || "Estado actualizado"
                         };
                         
-                        // Regenerar transformedData y filteredData
+                        // Regenerar transformedData y filteredData para coordinadores
                         state.transformedData = transformToComponentFormat(state.data);
                         state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+                    }
+
+                    // ✅ NUEVO: Actualizar también en competenceQuarterData para instructores
+                    const competenceQuarterIndex = state.competenceQuarterData.findIndex(j => j.id.toString() === targetId);
+                    if (competenceQuarterIndex !== -1) {
+                        // Actualizar directamente los campos en el objeto transformado
+                        state.competenceQuarterData[competenceQuarterIndex].estado = statusName || "Estado actualizado";
+                        state.competenceQuarterData[competenceQuarterIndex].justificationStatus = statusName || "Estado actualizado";
+                        state.competenceQuarterData[competenceQuarterIndex].justificationStatusId = statusId;
                         
-                        // console.log("✅ justificationStatus actualizado localmente para justificación:", targetId, {
-                        //     statusId: statusId,
-                        //     statusName: statusName
-                        // });
-                        // console.log("📋 Datos transformados actualizados:", state.transformedData.find(t => t.id.toString() === targetId));
-                    } else {
-                        // console.warn("⚠️ No se encontró la justificación con ID:", targetId, "en la lista");
-                        // console.log("📋 IDs disponibles:", state.data.map(j => j.id.toString()));
+                        // Regenerar filteredData para instructores
+                        state.competenceQuarterFilteredData = filterJustifications(state.competenceQuarterData, state.competenceQuarterFilterOptions);
                     }
                 }
                 state.error = null;

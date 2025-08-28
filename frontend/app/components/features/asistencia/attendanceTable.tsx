@@ -28,8 +28,8 @@ export default function AttendanceTable({
             <tr>
               <th className="px-6 py-4 font-medium">Documento</th>
               <th className="px-6 py-4 font-medium">Aprendiz</th>
-              <th className="px-6 py-4 font-medium">Cantidad de Ausencias</th>
-              <th className="px-6 py-4 font-medium">Ausencias consecutivas</th>
+              <th className="px-6 py-4 font-medium">Ausencias e Injustificadas</th>
+              <th className="px-6 py-4 font-medium">Ausencias e Injustificadas consecutivas</th>
               <th className="px-6 py-4 font-medium">Acciones</th>
             </tr>
           </thead>
@@ -90,7 +90,7 @@ export default function AttendanceTable({
                         ? 'Solo puedes reportar si tiene al menos 5 ausencias o 3 consecutivas.'
                         : 'Reportar deserción'}
                     >
-                      {summary.cantidad >= 5 || summary.consecutivas >= 3 ? 'Reportar Deserción' : 'Reportar deserción'}
+                      {summary.cantidad >= 5 || summary.consecutivas >= 3 ? 'Reportar' : 'Reportar'}
                     </button>
                   </td>
                 </motion.tr>

@@ -39,7 +39,7 @@ export interface NoveltyFormData {
   processFlowStatus: { id: string };
   studentId: number;
   teacherId: number;
-  selectedFile: File | null;
+  // selectedFile eliminado - manejado localmente en el componente
 }
 
 // Interface para validación de ausencias
@@ -47,6 +47,7 @@ export interface StudentAbsenceData {
   studentId: number;
   absenceCount: number;
   canReportDesertion: boolean;
+  teacherId: number; // Agregar teacherId al payload
   // Información adicional del estudiante
   studentName?: string;
   studentDocument?: string;
@@ -91,8 +92,7 @@ const initialFormData: NoveltyFormData = {
   noveltyStatus: { id: '1' }, // Valor por defecto para deserción
   processFlowStatus: { id: '1' }, // Valor por defecto para deserción
   studentId: 0,
-  teacherId: 0,
-  selectedFile: null,
+  teacherId: 0, // Se establecerá cuando se abra el modal
 };
 
 const initialState: NoveltyState = {
@@ -124,21 +124,30 @@ export const openNoveltyModal = createAsyncThunk<
     try {
       console.log('Opening novelty modal for student:', { studentId, teacherId, absenceCount, studentName });
       
+      // Validar que teacherId sea válido
+      if (!teacherId || teacherId === 0) {
+        return rejectWithValue({
+          code: 'INVALID_TEACHER_ID',
+          message: 'ID del instructor no válido. Por favor, inicie sesión nuevamente.'
+        });
+      }
+      
       const canReportDesertion = absenceCount >= 3;
       
       if (!canReportDesertion) {
         return rejectWithValue({
           code: 'INSUFFICIENT_ABSENCES',
-          message: `El estudiante debe tener al menos 3 ausencias para reportar deserción. Ausencias actuales: ${absenceCount}`
+          message: `El estudiante debe tener al menos 3 ausencias e injustificadas para reportar deserción. Ausencias/Injustificadas actuales: ${absenceCount}`
         });
       }
 
       // Cargar tipos de novedad y filtrar por "Deserción"
-      await dispatch(fetchNoveltyTypes({ page: 0, size: 100 })).unwrap();
+      await dispatch(fetchNoveltyTypes({ page: 0, size: 10 })).unwrap();
       await dispatch(filterByDesercion());
 
       return {
         studentId,
+        teacherId, // ¡INCLUIR teacherId en el retorno!
         absenceCount,
         canReportDesertion,
         studentName,
@@ -214,10 +223,24 @@ export const submitNovelty = createAsyncThunk<
         });
       }
 
+      if (!formData.teacherId || formData.teacherId <= 0) {
+        return rejectWithValue({
+          code: 'VALIDATION_ERROR',
+          message: 'ID del instructor no válido. Por favor, inicie sesión nuevamente.'
+        });
+      }
+
+      if (!formData.studentId || formData.studentId <= 0) {
+        return rejectWithValue({
+          code: 'VALIDATION_ERROR',
+          message: 'ID del estudiante no válido'
+        });
+      }
+
       if (!selectedStudentAbsences?.canReportDesertion) {
         return rejectWithValue({
           code: 'INSUFFICIENT_ABSENCES',
-          message: 'El estudiante no cumple con el mínimo de ausencias para reportar deserción'
+          message: 'El estudiante no cumple con el mínimo de ausencias e injustificadas para reportar deserción'
         });
       }
 
@@ -233,7 +256,13 @@ export const submitNovelty = createAsyncThunk<
         teacherId: formData.teacherId,
       };
 
-      console.log('Submitting novelty:', noveltyData);
+      console.log('Submitting novelty with data:', {
+        ...noveltyData,
+        teacherId: formData.teacherId,
+        studentId: formData.studentId,
+        observation: formData.observation ? 'Present' : 'Missing',
+        noveltyType: formData.noveltyType.id ? 'Present' : 'Missing'
+      });
       
       const { data } = await clientLAN.mutate<AddNoveltyMutation, AddNoveltyMutationVariables>({
         mutation: ADD_NOVELTY,
@@ -296,8 +325,8 @@ const noveltySlice = createSlice({
       }
     },
     
-    setSelectedFile: (state, action: PayloadAction<File | null>) => {
-      state.formData.selectedFile = action.payload;
+    setNoveltyFiles: (state, action: PayloadAction<string>) => {
+      state.formData.noveltyFiles = action.payload;
     },
     
     initializeForm: (state, action: PayloadAction<{ studentId: number; teacherId: number }>) => {
@@ -335,7 +364,9 @@ const noveltySlice = createSlice({
         state.modalOpen = true;
         state.selectedStudentAbsences = action.payload;
         state.noveltyTypesLoaded = true;
+        // Establecer tanto studentId como teacherId desde el payload
         state.formData.studentId = action.payload.studentId;
+        state.formData.teacherId = action.payload.teacherId;
       })
       .addCase(openNoveltyModal.rejected, (state, action) => {
         state.loading = false;
@@ -381,7 +412,7 @@ const noveltySlice = createSlice({
 export const { 
   closeModal,
   updateFormField,
-  setSelectedFile,
+  setNoveltyFiles,
   initializeForm,
   clearError, 
   clearSubmitSuccess, 

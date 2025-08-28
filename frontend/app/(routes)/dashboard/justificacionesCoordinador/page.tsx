@@ -60,7 +60,6 @@ export default function JustificacionesCoordinator() {
     dispatch(fetchJustifications({ page: localCurrentPage, size: itemsPerPage }));
   };
 
-  // 🆕 Nuevas funciones para multi-filtros
   const handleMultiFilterChange = (field: keyof MultiFilterState, value: string) => {
     dispatch(setMultiFilter({ field, value }));
     dispatch(setLocalCurrentPage(1));
@@ -99,8 +98,7 @@ export default function JustificacionesCoordinator() {
 
     // Buscar la justificación actual para verificar si ya tiene el mismo estado
     const currentJustification = filteredData.find((j: any) => j.id.toString() === justificacionId);
-    const currentStatusId = currentJustification?.justificationStatusId?.toString() || 
-                           currentJustification?.justificationStatus?.toString();
+    const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.justificationStatus?.toString();
     
     if (currentStatusId === newStatusId) {
       return; // No hacer nada si el estado es el mismo
@@ -137,22 +135,22 @@ export default function JustificacionesCoordinator() {
     const statusNameLower = statusName.toLowerCase();
     
     if (statusNameLower.includes('aprobad') || statusNameLower.includes('acepta')) {
-      toast.success(`🎉 Justificación aprobada: ${statusName}`, {
+      toast.success(`Justificación aprobada`, {
         position: "top-right",
         autoClose: 5000,
       });
     } else if (statusNameLower.includes('denegad') || statusNameLower.includes('rechaza') || statusNameLower.includes('no acepta')) {
-      toast.error(`❌ Justificación denegada: ${statusName}`, {
+      toast.error(`Justificación denegada`, {
         position: "top-right",
         autoClose: 5000,
       });
     } else if (statusNameLower.includes('proceso') || statusNameLower.includes('pendiente') || statusNameLower.includes('revision')) {
-      toast.info(`📝 Justificación en proceso: ${statusName}`, {
+      toast.info(`Justificación está en proceso`, {
         position: "top-right",
         autoClose: 4000,
       });
     } else {
-      toast.info(`📋 Estado actualizado: ${statusName}`, {
+      toast.info(`Estado actualizado: ${statusName}`, {
         position: "top-right",
         autoClose: 3000,
       });

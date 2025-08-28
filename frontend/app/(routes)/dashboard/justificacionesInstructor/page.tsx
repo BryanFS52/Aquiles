@@ -131,22 +131,22 @@ export default function JustificacionesInstructor() {
     const statusNameLower = statusName.toLowerCase();
     
     if (statusNameLower.includes('aprobad') || statusNameLower.includes('acepta')) {
-      toast.success(`🎉 Justificación aprobada: ${statusName}`, {
+      toast.success(`Justificación aprobada`, {
         position: "top-right",
         autoClose: 5000,
       });
     } else if (statusNameLower.includes('denegad') || statusNameLower.includes('rechaza') || statusNameLower.includes('no acepta')) {
-      toast.error(`❌ Justificación denegada: ${statusName}`, {
+      toast.error(`Justificación denegada`, {
         position: "top-right",
         autoClose: 5000,
       });
     } else if (statusNameLower.includes('proceso') || statusNameLower.includes('pendiente') || statusNameLower.includes('revision')) {
-      toast.info(`📝 Justificación en proceso: ${statusName}`, {
+      toast.info(`Justificación en proceso`, {
         position: "top-right",
         autoClose: 4000,
       });
     } else {
-      toast.info(`📋 Estado actualizado: ${statusName}`, {
+      toast.info(`Estado actualizado: ${statusName}`, {
         position: "top-right",
         autoClose: 3000,
       });

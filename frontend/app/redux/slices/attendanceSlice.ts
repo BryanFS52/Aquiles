@@ -33,6 +33,14 @@ export interface TransformedAttendanceItem {
     aprendiz: string;
 }
 
+export interface StudentSummary {
+    id: number;
+    documento: string;
+    aprendiz: string;
+    cantidad: number; // Total de ausencias e injustificadas
+    consecutivas: number;
+}
+
 interface StudentAttendances {
     data: Attendance[];
     loading: boolean;
@@ -45,6 +53,7 @@ interface AttendanceState extends ReturnType<typeof createInitialPaginatedState>
     transformedData: TransformedAttendanceItem[];
     filteredData: TransformedAttendanceItem[];
     filterOptions: FilterOptions;
+    attendanceSummary: StudentSummary[];
 }
 const transformToComponentFormat = (attendances: Attendance[]): TransformedAttendanceItem[] => {
     return attendances.map((a) => {
@@ -114,6 +123,77 @@ const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
         }
     };
 }
+
+export const processAndSummarizeAttendances = (attendances: Attendance[]): StudentSummary[] => {
+    if (!attendances) return [];
+
+    // Agrupar asistencias por estudiante
+    const grouped: Record<string, Attendance[]> = {};
+    attendances.forEach(a => {
+        const studentId = a.student?.id;
+        if (!studentId) return;
+        if (!grouped[studentId]) grouped[studentId] = [];
+        grouped[studentId].push(a);
+    });
+
+    const result: StudentSummary[] = [];
+    Object.entries(grouped).forEach(([studentId, attendances]) => {
+        const person = attendances[0]?.student?.person;
+        // Filtrar ausencias e injustificadas
+        const absences = attendances.filter(a => {
+            const status = a.attendanceState?.status?.toLowerCase();
+            return (status === 'ausente' || status === 'injustificado') && !!a.attendanceDate;
+        });
+        
+        // Debug: log de estados encontrados para este estudiante
+        if (attendances.length > 0) {
+            const person = attendances[0]?.student?.person;
+            const allStatuses = attendances.map(a => a.attendanceState?.status).filter(Boolean);
+            const uniqueStatuses = [...new Set(allStatuses)];
+            console.log(`Estados de asistencia para ${person?.name} ${person?.lastname}:`, uniqueStatuses);
+            console.log(`Total ausencias + injustificadas encontradas: ${absences.length}`);
+        }
+        // Ordenar por fecha (solo si la fecha existe)
+        absences.sort((a, b) => {
+            const dateA = a.attendanceDate ? new Date(a.attendanceDate).getTime() : 0;
+            const dateB = b.attendanceDate ? new Date(b.attendanceDate).getTime() : 0;
+            return dateA - dateB;
+        });
+
+        // Detectar 3 ausencias seguidas
+        let maxConsecutive = 0;
+        let currentConsecutive = 1;
+        for (let i = 1; i < absences.length; i++) {
+            const prevDateStr = absences[i - 1].attendanceDate;
+            const currDateStr = absences[i].attendanceDate;
+            if (!prevDateStr || !currDateStr) {
+                currentConsecutive = 1;
+                continue;
+            }
+            const prevDate = new Date(prevDateStr);
+            const currDate = new Date(currDateStr);
+            // Si la ausencia es el día siguiente
+            if ((currDate.getTime() - prevDate.getTime()) <= 1000 * 60 * 60 * 24 + 1000 * 60 * 60 * 12) { // 1.5 días tolerancia
+                currentConsecutive++;
+                maxConsecutive = Math.max(maxConsecutive, currentConsecutive);
+            } else {
+                currentConsecutive = 1;
+            }
+        }
+        if (maxConsecutive === 0 && absences.length > 0) maxConsecutive = 1;
+
+        // Detectar si supera el límite (contando ausencias e injustificadas)
+        const totalAbsences = absences.length;
+        result.push({
+            id: parseInt(studentId),
+            documento: person?.document || '',
+            aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim(),
+            cantidad: totalAbsences, // Total de ausencias + injustificadas
+            consecutivas: maxConsecutive
+        });
+    });
+    return result;
+};
 
 export const fetchAttendances = createAsyncThunk<
     GetAttendancesQuery['allAttendances'],
@@ -258,13 +338,18 @@ const initialState: AttendanceState = {
     filterOptions: {
         selectedFiltro: '',
         searchTerm: ''
-    }
+    },
+    attendanceSummary: []
 };
 
 const attendanceSlice = createSlice({
     name: 'attendance',
     initialState,
-    reducers: {},
+    reducers: {
+        updateAttendanceSummary: (state) => {
+            state.attendanceSummary = processAndSummarizeAttendances(state.data);
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchAttendances.pending, (state) => {
@@ -280,6 +365,8 @@ const attendanceSlice = createSlice({
                     state.totalItems = payload.totalItems ?? 0;
                     state.totalPages = payload.totalPages ?? 0;
                     state.currentPage = payload.currentPage ?? 0;
+                    // Procesar resumen de asistencias automáticamente
+                    state.attendanceSummary = processAndSummarizeAttendances(state.data);
                 }
                 state.loading = false;
             })
@@ -361,6 +448,6 @@ const attendanceSlice = createSlice({
     }
 });
 
-export const { } = attendanceSlice.actions;
+export const { updateAttendanceSummary } = attendanceSlice.actions;
 
 export default attendanceSlice.reducer;

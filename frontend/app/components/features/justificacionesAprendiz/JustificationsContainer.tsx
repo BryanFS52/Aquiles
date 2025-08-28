@@ -30,6 +30,7 @@ import PageTitle from '@components/UI/pageTitle';
 import { AbsencesList } from './AbsencesList';
 import { JustificationFormModal } from './JustificationFormModal';
 import { JustificationsHistory } from './JustificationsHistory';
+import { TEMPORAL_APRENDIZ_ID } from '@/temporaryCredential';
 
 export const JustificationsContainer: React.FC = () => {
   const fileRef = useRef<File | null>(null);
@@ -72,13 +73,13 @@ export const JustificationsContainer: React.FC = () => {
   );
   
   // const para simplificar el uso del ID del estudiante
-  const STUDENT_ID = 3;
+  TEMPORAL_APRENDIZ_ID;
 
   // Effects
   useEffect(() => {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-    dispatch(fetchAttendancesByStudent({ id: STUDENT_ID, stateId: 2 }));
-    dispatch(fetchJustificationsByStudentId({ studentId: STUDENT_ID, page: 0, size: 10 }));
+    dispatch(fetchAttendancesByStudent({ id: TEMPORAL_APRENDIZ_ID, stateId: 2 }));
+    dispatch(fetchJustificationsByStudentId({ studentId: TEMPORAL_APRENDIZ_ID, page: 0, size: 10 }));
   }, [dispatch]);
 
   useEffect(() => {
@@ -203,7 +204,7 @@ export const JustificationsContainer: React.FC = () => {
       await dispatch(addJustification(formDataWithFile)).unwrap();
 
       toast.success('¡Tu justificación ha sido enviada exitosamente!');
-      dispatch(fetchJustificationsByStudentId({ studentId: STUDENT_ID, page: 0, size: 10 }));
+      dispatch(fetchJustificationsByStudentId({ studentId: TEMPORAL_APRENDIZ_ID, page: 0, size: 10 }));
       dispatch(resetForm());
       fileRef.current = null;
       base64Ref.current = '';
