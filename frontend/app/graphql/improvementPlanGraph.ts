@@ -15,15 +15,17 @@ export const GET_ALL_IMPROVEMENT_PLANS = gql`
         city
         date
         reason
-        number
-        state
+        state       
+        qualification
+        studentId
+        teacherCompetence
       }
     }
   }
 `;
 
 export const GET_IMPROVEMENT_PLAN_BY_ID = gql`
-  query GetImprovementPlanById($id: Long!) {
+  query GetImprovementPlanById($id: ID!) {
     improvementPlanById(id: $id) {
       code
       message
@@ -33,8 +35,10 @@ export const GET_IMPROVEMENT_PLAN_BY_ID = gql`
         city
         date
         reason
-        number
         state
+        qualification
+        studentId
+        teacherCompetence
       }
     }
   }
@@ -51,7 +55,7 @@ export const ADD_IMPROVEMENT_PLAN = gql`
 `;
 
 export const UPDATE_IMPROVEMENT_PLAN = gql`
-  mutation UpdateImprovementPlan($id: Long!, $input: ImprovementPlanDto!) {
+  mutation UpdateImprovementPlan($id: ID!, $input: ImprovementPlanDto!) {
     updateImprovementPlan(id: $id, input: $input) {
       code
       message
@@ -61,7 +65,7 @@ export const UPDATE_IMPROVEMENT_PLAN = gql`
 `;
 
 export const DELETE_IMPROVEMENT_PLAN = gql`
-  mutation DeleteImprovementPlan($id: Long!) {
+  mutation DeleteImprovementPlan($id: ID!) {
     deleteImprovementPlan(id: $id) {
       code
       message

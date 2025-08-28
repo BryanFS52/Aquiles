@@ -38,4 +38,5 @@ public class ImprovementPlanDto {
     // Relations
     private List<ImprovementPlanActivityDto> improvementPlanActivityDto;
     private ImprovementPlanFaultTypeDto improvementPlanFaultTypeDto;
+    private ImprovementPlanEvidenceMapDto improvementPlanEvidenceMapDto;
 }

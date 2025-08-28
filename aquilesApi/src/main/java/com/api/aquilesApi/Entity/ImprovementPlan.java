@@ -5,9 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -50,7 +48,7 @@ public class ImprovementPlan implements Serializable {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-            name = "improvement_plan_evidence_type",
+            name = "improvement_plan_evidence_map",
             joinColumns = @JoinColumn(name = "improvement_plan_id"),
             inverseJoinColumns = @JoinColumn(name = "evidence_type_id")
     )
