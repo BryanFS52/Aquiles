@@ -25,6 +25,23 @@ public class ImprovementPlanBusiness {
 
     // Validation object
 
+
+
+    public Page<ImprovementPlanDto> findByFilter(int page, int size, Long teacherCompetence) {
+        try {
+            PageRequest pageRequest = PageRequest.of(page, size);
+            Page<ImprovementPlan> improvementPlanPage = improvementPlanService.findByFilter(pageRequest, teacherCompetence);
+
+            System.out.println("Total Attendances: " + improvementPlanPage.getTotalElements());
+
+            return improvementPlanPage.map(entity -> modelMapper.map(entity, ImprovementPlanDto.class));
+        } catch (DataAccessException e) {
+            throw new CustomException("Error retrieving improvemenPlan by filter due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            throw new CustomException("An unexpected error occurred while retrieving improvemenPlan by filter.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // Find All
     public Page<ImprovementPlanDto> findAll(int page, int size) {
         try {
@@ -94,7 +111,6 @@ public class ImprovementPlanBusiness {
         }
     }
 
-    // Método existente - mantener
     public List<Long> findAllByTeacherCompetence(Long teacherCompetence) {
         try {
             return improvementPlanService.findAllByTeacherCompetence(teacherCompetence);

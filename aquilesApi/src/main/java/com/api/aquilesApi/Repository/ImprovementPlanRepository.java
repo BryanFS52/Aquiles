@@ -1,6 +1,10 @@
 package com.api.aquilesApi.Repository;
 
+
 import com.api.aquilesApi.Entity.ImprovementPlan;
+import com.netflix.graphql.dgs.InputArgument;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,6 +22,9 @@ public interface ImprovementPlanRepository extends JpaRepository<ImprovementPlan
 
     @Query("SELECT ip.teacherCompetence FROM ImprovementPlan ip WHERE ip.teacherCompetence = :teacherCompetence")
     List<Long> findAllByTeacherCompetence(@Param("teacherCompetence") Long teacherCompetence);
+
+    @Query("SELECT ip FROM ImprovementPlan ip WHERE ip.teacherCompetence = :teacherCompetence")
+    Page<ImprovementPlan> searchByFilter(Pageable pageable, @InputArgument("teacherCompetenceId") Long teacherCompetence);
 
     // Método adicional por si quiero las entidades completas las entidades completas
     @Query("SELECT ip FROM ImprovementPlan ip WHERE ip.teacherCompetence = :teacherCompetence")
