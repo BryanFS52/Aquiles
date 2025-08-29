@@ -142,6 +142,9 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
         startLective
         endLective
         state
+        journey{
+          name
+        }
         trainingProject {
           name
           program {
