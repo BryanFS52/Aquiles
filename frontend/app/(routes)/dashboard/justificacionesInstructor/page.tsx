@@ -44,7 +44,7 @@ export default function JustificacionesInstructor() {
   const { justificationStatuses } = useSelector(
     (state: RootState) => state.justificationStatus
   );
-  
+
   useEffect(() => {
     dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
     // Activar el modo competence quarter
@@ -54,7 +54,7 @@ export default function JustificacionesInstructor() {
   const handleFilterChange = (filterType: string, value: string) => {
     dispatch(setCompetenceQuarterFilterOptions({ [filterType]: value }));
   };
-  
+
   const handleRefresh = () => {
     // Aquí podrías agregar lógica para recargar datos específicos si es necesario
   };

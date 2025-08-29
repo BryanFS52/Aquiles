@@ -47,7 +47,7 @@ interface StudentAttendances {
     error: string | null;
     showForm: boolean;
 }
-interface AttendanceState extends ReturnType<typeof createInitialPaginatedState>{
+interface AttendanceState extends ReturnType<typeof createInitialPaginatedState> {
     studentAttendances: StudentAttendances;
     data: Attendance[];
     transformedData: TransformedAttendanceItem[];

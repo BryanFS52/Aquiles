@@ -73,15 +73,10 @@ public class AttendancesResolver {
         assert student != null;
 
         Long studentId = student.getId();
-        System.out.println(studentId);
-
         List<Attendance> attendanceDtoList = attendancesBusiness.findAllByStudentId(studentId);
-        System.out.println(attendanceDtoList);
-
         if (attendanceDtoList == null || attendanceDtoList.isEmpty()) {
             return Collections.emptyList();
         }
-
         return attendanceDtoList;
     }
 

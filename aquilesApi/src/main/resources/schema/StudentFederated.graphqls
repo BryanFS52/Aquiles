@@ -3,4 +3,5 @@ type Student @key(fields: "id") @extends{
     attendances : [Attendance]
     teamScrums: [TeamsScrum]
     profiles : [Profile]
+    improvementPlans: [ImprovementPlan]
 }

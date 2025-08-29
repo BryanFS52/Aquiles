@@ -1,0 +1,44 @@
+type ImprovementPlanActivity {
+    id: ID!
+    improvementPlanId: ID!
+    description: String!
+    deliveryDate: String!
+    deliveryFormat: String!
+    learningOutcome: String!
+}
+
+input ImprovementPlanActivityDto {
+    improvementPlanId: ID!
+    description: String!
+    deliveryDate: String!
+    deliveryFormat: String!
+    learningOutcome: String!
+}
+
+type ImprovementPlanActivityPage {
+    code: String
+    data: [ImprovementPlanActivity]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type ImprovementPlanActivityPageId {
+    data: ImprovementPlanActivity
+    date: String
+    code: String
+    message: String
+}
+
+extend type Query {
+    allImprovementPlanActivities(page: Int, size: Int): ImprovementPlanActivityPage
+    improvementPlanActivityById(id: Long!): ImprovementPlanActivityPageId
+}
+
+extend type Mutation {
+    addImprovementPlanActivity(input: ImprovementPlanActivityDto): Response
+    updateImprovementPlanActivity(id: Long!, input: ImprovementPlanActivityDto): Response
+    deleteImprovementPlanActivity(id: Long!): Response
+}

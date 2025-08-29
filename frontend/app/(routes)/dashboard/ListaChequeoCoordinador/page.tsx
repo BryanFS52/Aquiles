@@ -474,8 +474,8 @@ export default function CoordinadorChecklistView() {
                               <button
                                 onClick={() => handleToggleState(checklist.id, checklist.state)}
                                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${checklist.state
-                                    ? 'bg-gradient-to-r from-lime-600 to-lime-500 focus:ring-lime-500'
-                                    : 'bg-gray-200 dark:bg-gray-600 focus:ring-gray-500'
+                                  ? 'bg-gradient-to-r from-lime-600 to-lime-500 focus:ring-lime-500'
+                                  : 'bg-gray-200 dark:bg-gray-600 focus:ring-gray-500'
                                   }`}
                                 title={checklist.state ? 'Desactivar lista' : 'Activar lista'}
                               >
@@ -485,8 +485,8 @@ export default function CoordinadorChecklistView() {
                                 />
                               </button>
                               <span className={`ml-3 text-xs font-bold ${checklist.state
-                                  ? 'text-lime-600 dark:text-lime-400'
-                                  : 'text-gray-500 dark:text-gray-400'
+                                ? 'text-lime-600 dark:text-lime-400'
+                                : 'text-gray-500 dark:text-gray-400'
                                 }`}>
                                 {checklist.state ? 'Activo' : 'Inactivo'}
                               </span>

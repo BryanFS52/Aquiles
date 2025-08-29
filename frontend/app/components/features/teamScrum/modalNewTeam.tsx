@@ -90,12 +90,13 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
       ...provided,
       borderColor: errors.members ? '#ef4444' : state.isFocused ? '#3b82f6' : '#d1d5db',
       borderWidth: '2px',
-      boxShadow: state.isFocused ? '0 0 0 1px #3b82f6' : 'none',
+      boxShadow: state.isFocused ? '0 0 0 2px #3b82f650, 0 0 0 4px #3b82f620' : 'none',
       '&:hover': {
         borderColor: state.isFocused ? '#3b82f6' : '#9ca3af'
       },
       minHeight: '44px',
-      borderRadius: '6px'
+      borderRadius: '6px',
+      margin: '2px' // Agregar margen para evitar que se corte el ring
     }),
     multiValue: (provided: any) => ({
       ...provided,
@@ -239,8 +240,8 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
       size="md"
       className="max-h-[90vh] overflow-hidden"
     >
-      <div className="max-h-[60vh] overflow-y-auto">
-        <div className="space-y-4">
+      <div className="max-h-[60vh] overflow-y-auto px-2 py-2">
+        <div className="space-y-6 px-1 py-1">
 
           {/* Marcos de trabajo */}
           <div>
@@ -253,7 +254,7 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
               required
               value={teamData.processMethodologyId || ''}
               onChange={(e) => handleInputChange('processMethodologyId', e.target.value)}
-              className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:opacity-50 ${errors.processMethodologyId ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors disabled:opacity-50 ${errors.processMethodologyId ? 'border-red-500' : 'border-gray-300'}`}
               disabled={isSubmitting}
             >
               <option value="" disabled>Selecciona un marco de trabajo...</option>
@@ -279,7 +280,7 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
               placeholder="Ej: Team Alpha, Desarrolladores Frontend..."
               value={teamData.teamName || ''}
               onChange={(e) => handleInputChange('teamName', e.target.value)}
-              className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${errors.teamName
+              className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors ${errors.teamName
                 ? 'border-red-500 focus:ring-red-500'
                 : 'border-gray-300'
                 }`}
@@ -301,7 +302,7 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
               placeholder="Ej: Sistema de Gestión, App Mobile..."
               value={teamData.projectName || ''}
               onChange={(e) => handleInputChange('projectName', e.target.value)}
-              className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${errors.projectName
+              className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors ${errors.projectName
                 ? 'border-red-500 focus:ring-red-500'
                 : 'border-gray-300'
                 }`}

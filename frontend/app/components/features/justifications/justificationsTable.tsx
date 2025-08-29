@@ -53,7 +53,7 @@ export default function JustificationTable({
     if (justificacion.justificationStatus && justificacion.justificationStatus !== "Sin status") {
       return justificacion.justificationStatus;
     }
-    
+
     // ✅ Fallback al campo estado que también contiene el nombre del estado
     return justificacion.estado || "En proceso";
   };
@@ -132,9 +132,8 @@ export default function JustificationTable({
               <td className="px-6 py-4">
                 {justificacion.archivoAdjunto ? (
                   <GrAttachment
-                    title={`Descargar archivo (${
-                      justificacion.archivoMime || "desconocido"
-                    })`}
+                    title={`Descargar archivo (${justificacion.archivoMime || "desconocido"
+                      })`}
                     className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
                     onClick={() => handleDownloadFile(justificacion)}
                   />
