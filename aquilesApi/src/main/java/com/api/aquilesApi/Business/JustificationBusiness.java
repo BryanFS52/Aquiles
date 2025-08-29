@@ -193,11 +193,10 @@ public class JustificationBusiness {
                 AttendanceState attendanceState = stateAttendanceService.getById(3L);
                 existing.getAttendance().setAttendanceState(attendanceState);
             }
-            if (Objects.equals(justificationStatus.getName(), "Denegado")){
-                AttendanceState attendanceState = stateAttendanceService.getById(4L);
-                existing.getAttendance().setAttendanceState(attendanceState);
-            }
-
+//            if (Objects.equals(justificationStatus.getName(), "Denegado")){
+//                AttendanceState attendanceState = stateAttendanceService.getById(4L);
+//                existing.getAttendance().setAttendanceState(attendanceState);
+//            }
             existing.setJustificationStatus(justificationStatus);
             justificationService.save(existing);
 
