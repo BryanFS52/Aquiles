@@ -77,8 +77,8 @@ export const FichasInstructorContainer: React.FC = () => {
 
         setIsTransitioning(true);
         try {
-            await dispatch(fetchJustificationsByCompetenceQuarter({ competenceQuarterId: parseInt(studySheet.id) }));
-            router.push('/dashboard/justificacionesInstructor');
+            await dispatch(fetchJustificationsByCompetenceQuarter({ competenceQuarterId: parseInt("") }));
+            router.push('/dashboard/justificacionesInstructor/[competenceQuarterId]');
         } catch (error) {
             console.error('Error al cargar las justificaciones:', error);
         } finally {

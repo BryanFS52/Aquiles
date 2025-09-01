@@ -144,7 +144,7 @@ export default function ModalTeamInformation({
         setLoading(true);
 
         try {
-            const success = await onSave(team.id, formData);
+            const success = await onSave(team.id ?? "", formData);
             if (success) {
                 onClose();
             }

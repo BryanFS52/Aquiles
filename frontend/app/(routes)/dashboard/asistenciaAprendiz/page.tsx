@@ -16,6 +16,7 @@ import interactionPlugin from '@fullcalendar/interaction'
 import PageTitle from "@components/UI/pageTitle";
 import EmptyState from "@components/UI/emptyState";
 import Modal from "@components/UI/Modal";
+import { TEMPORAL_APRENDIZ_ID } from "@/temporaryCredential";
 
 // Tipos TypeScript
 
@@ -934,8 +935,7 @@ export default function AsistenciaAprendiz() {
 
   // Cargar asistencias del estudiante al montar el componente
   useEffect(() => {
-    const studentId = 1; // ID hardcodeado como solicitas
-    dispatch(fetchAttendanceAndCompetenceByStudent({ id: studentId }));
+    dispatch(fetchAttendanceAndCompetenceByStudent({ id: TEMPORAL_APRENDIZ_ID }));
   }, [dispatch]);
 
   // Manejar el loader basado en el estado de loading
@@ -948,18 +948,18 @@ export default function AsistenciaAprendiz() {
   }, [loading, showLoader, hideLoader]);
 
   // Función para mapear el estado de la asistencia a un tipo de evento del calendario
-  const mapAttendanceStateToEventType = (status: string): string => {
+  const mapAttendanceStateToEventType = useCallback((status: string): string => {
     const statusMap: { [key: string]: string } = {
       'Presente': 'Asistencia',
       'Asistencia': 'Asistencia',
       'Inasistencia': 'Inasistencia',
-      'Ausente': 'Inasistencia', // Mapear "Ausente" a "Inasistencia"
+      'Ausente': 'Inasistencia',
       'Retardo': 'Retardo',
       'Justificacion': 'Justificacion',
       'Justificado': 'Justificacion'
     };
     return statusMap[status] || 'Asistencia';
-  };
+  }, []);
 
   // Función para obtener eventos filtrados y formatearlos para FullCalendar
   const getFilteredEvents = useCallback(() => {

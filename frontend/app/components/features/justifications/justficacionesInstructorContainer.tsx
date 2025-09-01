@@ -23,8 +23,9 @@ import {
 } from "@slice/justificationSlice";
 import { fetchAllJustificationStatuses } from "@/redux/slices/justificationStatusSlice";
 import { useLoader } from "@/context/LoaderContext";
+import { JustificacionesInstructorContainerProps } from "./types";
 
-export default function JustificacionesInstructor() {
+export const JustificacionesInstructorContainer: React.FC<JustificacionesInstructorContainerProps> = ({ competenceQuarterId }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { showLoader, hideLoader } = useLoader();
 

@@ -1,3 +1,15 @@
+'use client';
+
+import React from 'react';
+
+export default function AprendicesListPage() {
+  return (
+    <div>
+      <h1>Lista de aprendices</h1>
+    </div>
+  );
+}
+
 /*
 'use client';
 

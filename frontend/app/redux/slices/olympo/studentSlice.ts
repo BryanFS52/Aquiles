@@ -10,8 +10,17 @@ import {
     GetStudentListQueryVariables
 } from '@graphql/generated'
 
+export interface StudentWithSheets extends Student {
+  studySheets?: {
+    id: string;
+    number: string;
+    state: string;
+  }[];
+}
+
+
 // Función para transformar datos de GraphQL a Student
-export const transformGraphQLToStudentItem = (graphqlData: any): Student => {
+export const transformGraphQLToStudentItem = (graphqlData: any): StudentWithSheets => {
     return {
         id: graphqlData.id,
         state: graphqlData.state,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { FaTrashAlt, FaEdit } from "react-icons/fa"
 import { toast } from "react-toastify"
@@ -52,16 +52,14 @@ export default function CoordinadorChecklistView() {
   const [checklistToDelete, setChecklistToDelete] = useState<string | null>(null)
   const [editingChecklist, setEditingChecklist] = useState<Checklist | null>(null)
   const [isEditing, setIsEditing] = useState<boolean>(false)
-
-  // Cargar checklists al montar el componente
-  useEffect(() => {
-    loadChecklists()
-  }, [])
-
-  const loadChecklists = async (): Promise<void> => {
+  
+  
+  const loadChecklists = useCallback(async (): Promise<void> => {
     try {
-      console.log('🔄 Loading checklists with force refresh...'); // Debug log
-      const result = await dispatch(fetchChecklists({ page: 0, size: 100 })).unwrap()
+    console.log("🔄 Loading checklists with force refresh...") // Debug log
+    const result = await dispatch(
+      fetchChecklists({ page: 0, size: 100 })
+    ).unwrap()
       console.log('loadChecklists Redux result:', result) // Debug log
       if (result?.data) {
         console.log('loadChecklists data count:', result.data.length) // Debug log
@@ -75,8 +73,13 @@ export default function CoordinadorChecklistView() {
       console.error("❌ Error loading checklists:", error)
       toast.error("Error al cargar las listas de chequeo")
     }
-  }
-
+  }, [dispatch])
+  
+  // Cargar checklists al montar el componente
+  useEffect(() => {
+    loadChecklists();
+  }, [loadChecklists]);
+  
   const transformItems = (items: ChecklistItem[]) => {
     return items.map((item, index) => ({
       ...(item.id && { id: item.id }), // ← Preservar ID si existe
