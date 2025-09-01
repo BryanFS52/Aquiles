@@ -91,12 +91,12 @@ export default function NoveltyModal({ isOpen, onClose }: NoveltyModalProps) {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Form submission - formData before submit:', {
-      studentId: formData.studentId,
-      teacherId: formData.teacherId,
-      observation: formData.observation ? 'Present' : 'Empty',
-      noveltyType: formData.noveltyType.id ? 'Present' : 'Empty'
-    })
+    // console.log('Form submission - formData before submit:', {
+    //   studentId: formData.studentId,
+    //   teacherId: formData.teacherId,
+    //   observation: formData.observation ? 'Present' : 'Empty',
+    //   noveltyType: formData.noveltyType.id ? 'Present' : 'Empty'
+    // })
     try {
       await dispatch(submitNovelty()).unwrap()
     } catch (error) {
@@ -118,15 +118,15 @@ export default function NoveltyModal({ isOpen, onClose }: NoveltyModalProps) {
     }
   }, [formData.noveltyFiles])
 
-  // Debug: monitorear cambios en IDs
-  useEffect(() => {
-    console.log('FormData IDs changed:', {
-      studentId: formData.studentId,
-      teacherId: formData.teacherId,
-      modalOpen,
-      selectedStudentAbsences: selectedStudentAbsences ? 'Present' : 'Null'
-    })
-  }, [formData.studentId, formData.teacherId, modalOpen, selectedStudentAbsences])
+  // // Debug: monitorear cambios en IDs
+  // useEffect(() => {
+  //   console.log('FormData IDs changed:', {
+  //     studentId: formData.studentId,
+  //     teacherId: formData.teacherId,
+  //     modalOpen,
+  //     selectedStudentAbsences: selectedStudentAbsences ? 'Present' : 'Null'
+  //   })
+  // }, [formData.studentId, formData.teacherId, modalOpen, selectedStudentAbsences])
 
   if (!isOpen || !modalOpen) return null
 

@@ -146,14 +146,14 @@ export const processAndSummarizeAttendances = (attendances: Attendance[]): Stude
             return (status === 'ausente' || status === 'injustificado') && !!a.attendanceDate;
         });
         
-        // Debug: log de estados encontrados para este estudiante
-        if (attendances.length > 0) {
-            const person = attendances[0]?.student?.person;
-            const allStatuses = attendances.map(a => a.attendanceState?.status).filter(Boolean);
-            const uniqueStatuses = [...new Set(allStatuses)];
-            console.log(`Estados de asistencia para ${person?.name} ${person?.lastname}:`, uniqueStatuses);
-            console.log(`Total ausencias + injustificadas encontradas: ${absences.length}`);
-        }
+        // // Debug: log de estados encontrados para este estudiante
+        // if (attendances.length > 0) {
+        //     const person = attendances[0]?.student?.person;
+        //     const allStatuses = attendances.map(a => a.attendanceState?.status).filter(Boolean);
+        //     const uniqueStatuses = [...new Set(allStatuses)];
+        //     console.log(`Estados de asistencia para ${person?.name} ${person?.lastname}:`, uniqueStatuses);
+        //     console.log(`Total ausencias + injustificadas encontradas: ${absences.length}`);
+        // }
         // Ordenar por fecha (solo si la fecha existe)
         absences.sort((a, b) => {
             const dateA = a.attendanceDate ? new Date(a.attendanceDate).getTime() : 0;
