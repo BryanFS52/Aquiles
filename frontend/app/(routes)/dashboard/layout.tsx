@@ -16,11 +16,11 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-      <div className={`bg-white text-black font-sans ${inter.className}`}>
-        <ToastContainer />
-        <ClientLayoutWrapper initialUserData={initialUserData}>
-          {children}
-        </ClientLayoutWrapper>
-      </div>
+    <>
+      <ToastContainer />
+      <ClientLayoutWrapper initialUserData={initialUserData}>
+        {children}
+      </ClientLayoutWrapper>
+    </>
   );
 }
