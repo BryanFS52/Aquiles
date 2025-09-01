@@ -30,7 +30,7 @@ public class TeacherStudySheetAttendanceData {
 
         Long teacherStudySheetId = teacherStudySheet.getId();
 
-        List<Attendance> attendanceDtoList = attendancesBusiness.findAllByStudentId(teacherStudySheetId);
+        return attendancesBusiness.findAllByStudentId(teacherStudySheetId);
 
     }
 }
