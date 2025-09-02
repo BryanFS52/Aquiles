@@ -11,14 +11,22 @@ export const GET_ALL_IMPROVEMENT_PLANS = gql`
       totalItems
       currentPage
       data {
-        id
         city
         date
         reason
-        state       
+        state   
         qualification
-        studentId
-        teacherCompetence
+        teacherCompetence{
+            competence{
+                name
+            }
+        }
+        student{
+            person{
+                id
+                name
+            }
+        }
       }
     }
   }

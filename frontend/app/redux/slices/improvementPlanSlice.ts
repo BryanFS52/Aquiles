@@ -16,6 +16,33 @@ import {
     DeleteImprovementPlanMutationVariables
 } from '@graphql/generated'
 
+// Interface temporal para las variables de la query actualizada
+interface ImprovementPlanQueryVariables {
+    page?: number;
+    size?: number;
+}
+
+// Interface para el plan de mejoramiento con la nueva estructura
+interface ImprovementPlanWithDetails {
+    id: string;
+    city: string;
+    date: string;
+    reason: string;
+    state: boolean;
+    qualification?: string;
+    teacherCompetence?: {
+        competence?: {
+            name?: string;
+        };
+    };
+    student?: {
+        person?: {
+            id?: string;
+            name?: string;
+        };
+    };
+}
+
 // Función para transformar datos de GraphQL a ImprovementPlan
 const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPlan => {
     return {
