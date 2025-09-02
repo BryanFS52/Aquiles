@@ -54,4 +54,14 @@ public class EvaluationsService implements Idao<Evaluations, Long> {
     public List<Evaluations> findByChecklistId(Long checklistId) {
         return evaluationRepository.findByChecklistId(checklistId);
     }
+
+    // Nuevo método para la relación 1:1 - obtener la evaluación única de un checklist
+    public Evaluations findEvaluationByChecklistId(Long checklistId) {
+        return evaluationRepository.findEvaluationByChecklistId(checklistId);
+    }
+
+    // Verificar si existe una evaluación para un checklist
+    public boolean existsByChecklistId(Long checklistId) {
+        return evaluationRepository.existsByChecklistId(checklistId);
+    }
 }

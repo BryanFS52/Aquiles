@@ -136,10 +136,17 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
           <h2 className="text-2xl font-semibold text-gray-800">
             {isEditing ? 'Editar Lista de Chequeo' : 'Crear Lista de Chequeo'}
           </h2>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-blue-800 text-sm">
-              💡 <strong>Nota:</strong> Se creará automáticamente una evaluación vinculada a esta lista. El instructor podrá completarla desde su vista.
+          <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-blue-800 text-sm flex items-start space-x-2">
+              <span className="text-green-600 font-bold">✅</span>
+              <span>
+                <strong>Nuevo:</strong> Al crear esta lista de chequeo, se generará automáticamente una evaluación asociada en la base de datos. 
+                Esta evaluación estará disponible para que el instructor la complete con observaciones, recomendaciones y juicio de valor.
+              </span>
             </p>
+            <div className="mt-2 text-xs text-blue-600">
+              <strong>Relación:</strong> Lista de Chequeo ↔ Evaluación (1:1)
+            </div>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">

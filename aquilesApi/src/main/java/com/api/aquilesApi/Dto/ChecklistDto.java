@@ -34,11 +34,14 @@ public class ChecklistDto {
 
     private String component;
 
-    // Relations
+    // Relations - Relación 1:1 con Evaluación
     @NotNull(message = "Los jurados asociados son obligatorios")
     private Set<Long> associatedJuries;
-    private EvaluationsDto evaluation;
-    private Long evaluationId; // ID de la evaluación para vinculación
+    
+    // Para la relación 1:1 con evaluación - solo uno de estos campos se usa según el contexto
+    private EvaluationsDto evaluation; // Objeto completo para respuestas
+    private Long evaluationId; // Solo ID para requests de vinculación
+    
     private TeamsScrumDto teamsScrum;
     private Long studySheets;
     private List<ItemDto> items;

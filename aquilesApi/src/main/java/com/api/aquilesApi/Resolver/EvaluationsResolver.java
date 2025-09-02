@@ -78,6 +78,46 @@ public class EvaluationsResolver {
         }
     }
 
+    // Nuevo endpoint para obtener la evaluación única de un checklist (relación 1:1)
+    @DgsQuery
+    public Map<String, Object> evaluationByChecklist(@InputArgument("checklistId") Long checklistId) {
+        try {
+            EvaluationsDto evaluation = evaluationsBusiness.findEvaluationByChecklistId(checklistId);
+            if (evaluation != null) {
+                return ResponseHttpApi.responseHttpFindId(
+                        evaluation,
+                        ResponseHttpApi.CODE_OK,
+                        "Evaluation found for checklist"
+                );
+            } else {
+                return ResponseHttpApi.responseHttpError(
+                        "No evaluation found for checklist ID: " + checklistId, HttpStatus.NOT_FOUND
+                );
+            }
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving evaluation by checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    // Endpoint para verificar si existe evaluación para un checklist
+    @DgsQuery
+    public Map<String, Object> evaluationExistsForChecklist(@InputArgument("checklistId") Long checklistId) {
+        try {
+            boolean exists = evaluationsBusiness.existsByChecklistId(checklistId);
+            return ResponseHttpApi.responseHttpFindId(
+                    Map.of("exists", exists, "checklistId", checklistId),
+                    ResponseHttpApi.CODE_OK,
+                    exists ? "Evaluation exists for checklist" : "No evaluation found for checklist"
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error checking evaluation existence: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     @DgsMutation
     public Map<String, Object> addEvaluation(@InputArgument("input") EvaluationsDto input) {
         try {
