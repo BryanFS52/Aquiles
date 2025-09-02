@@ -15,8 +15,23 @@ export const GET_ALL_IMPROVEMENT_PLANS = gql`
         city
         date
         reason
-        number
         state
+        qualification
+        student {
+          id
+          person {
+            name
+            lastname
+            document
+          }
+        }
+        teacherCompetence {
+          id
+          competence {
+            id
+            name
+          }
+        }
       }
     }
   }
@@ -33,8 +48,23 @@ export const GET_IMPROVEMENT_PLAN_BY_ID = gql`
         city
         date
         reason
-        number
         state
+        qualification
+        student {
+          id
+          person {
+            name
+            lastname
+            document
+          }
+        }
+        teacherCompetence {
+          id
+          competence {
+            id
+            name
+          }
+        }
       }
     }
   }
@@ -45,7 +75,6 @@ export const ADD_IMPROVEMENT_PLAN = gql`
     addImprovementPlan(input: $input) {
       code
       message
-      id
     }
   }
 `;
@@ -55,7 +84,6 @@ export const UPDATE_IMPROVEMENT_PLAN = gql`
     updateImprovementPlan(id: $id, input: $input) {
       code
       message
-      id
     }
   }
 `;
@@ -65,7 +93,6 @@ export const DELETE_IMPROVEMENT_PLAN = gql`
     deleteImprovementPlan(id: $id) {
       code
       message
-      id
     }
   }
 `;

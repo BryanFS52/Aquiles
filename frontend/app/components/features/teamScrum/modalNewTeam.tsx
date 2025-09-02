@@ -343,7 +343,7 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
               maxMenuHeight={200}
               required
               menuPlacement="auto"
-              menuPortalTarget={document.body}
+              menuPortalTarget={typeof window !== "undefined" ? document.body : undefined}
               menuPosition="fixed"
             />
 

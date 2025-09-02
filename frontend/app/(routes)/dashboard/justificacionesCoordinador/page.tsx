@@ -3,7 +3,8 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import { AppDispatch } from "@redux/store";
+import { AppDispatch, RootState } from "@/redux/store";
+import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFilters from "@components/features/justifications/justificationsFilter";
 import JustificationTable from "@components/features/justifications/justificationsTable";
@@ -18,9 +19,6 @@ import {
   generateFileName,
   updateJustificationStatus,
 } from '@slice/justificationSlice';
-import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
-import JustificationTable from "@/components/features/justification/justificationsTable";
-import { AppDispatch, RootState } from "@/redux/store";
 
 
 export default function JustificacionesCoordinator() {
@@ -78,7 +76,7 @@ export default function JustificacionesCoordinator() {
       id: justificacionId,
       newStatusId
     });
-    
+
     // Enviar directamente el statusId para usar la relación real
     dispatch(updateJustificationStatus({ id: justificacionId, statusId: newStatusId }))
       .then((result) => {

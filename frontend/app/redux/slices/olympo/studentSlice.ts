@@ -24,7 +24,7 @@ export const transformGraphQLToStudentItem = (graphqlData: any): Student => {
             email: graphqlData.person?.email,
             address: graphqlData.person?.address,
         },
-        studySheets: graphqlData.studySheets?.map((sheet: any) => ({
+        studentStudySheets: graphqlData.studentStudySheets?.map((sheet: any) => ({
             id: sheet.id,
             number: sheet.number,
             state: sheet.state

@@ -55,9 +55,6 @@ const transformToComponentFormat = (attendances: Attendance[]): TransformedAtten
 
         return {
             id: a.id,
-            // programa: "Sin programa", // Dato no disponible en AttendanceItem
-            // ficha: "Sin ficha", // Dato no disponible en AttendanceItem
-            // fecha: new Date(a.attendanceDate).toLocaleDateString("es-CO"),
             estado: a.attendanceState?.status || "Sin estado",
             documento: person?.document || '',
             aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim()
@@ -99,23 +96,41 @@ const filterAttendances = (
 };
 const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
     return {
-        id: graphqlData.id,
-        attendanceDate: graphqlData.attendanceDate,
+        id: graphqlData.id ?? '',
+        attendanceDate: graphqlData.attendanceDate ?? '',
         attendanceState: {
             id: graphqlData.attendanceState?.id ?? '',
             status: graphqlData.attendanceState?.status ?? '',
         },
-        competenceQuarter: graphqlData.competenceQuarter ?? '',
-        student: {
-            id: graphqlData.student?.id ?? '',
-            person: {
-                name: graphqlData.student?.person?.name ?? '',
-                lastname: graphqlData.student?.person?.lastname ?? '',
-                document: graphqlData.student?.person?.document ?? '',
+
+        student: graphqlData.student
+            ? {
+                id: graphqlData.student.id ?? '',
+                person: {
+                    name: graphqlData.student.person?.name ?? '',
+                    lastname: graphqlData.student.person?.lastname ?? '',
+                    document: graphqlData.student.person?.document ?? '',
+                },
             }
-        }
+            : undefined,
+        competenceQuarter: graphqlData.competenceQuarter
+            ? {
+                id: graphqlData.competenceQuarter.id ?? '',
+                competence: {
+                    name: graphqlData.competenceQuarter.competence?.name ?? '',
+                },
+            }
+            : undefined,
+
+        justification: graphqlData.justification
+            ? {
+                id: graphqlData.justification.id ?? '',
+                description: graphqlData.justification.description ?? '',
+                absenceDate: graphqlData.justification.absenceDate ?? '',
+            }
+            : undefined,
     };
-}
+};
 
 
 export const fetchAttendances = createAsyncThunk<
@@ -272,12 +287,27 @@ const initialState: AttendanceState = {
     studentAttendances: {
         data: [] as any[],
         loading: false,
-        error: null as string | null,
+        error: null,
         showForm: false,
     },
-    justifications: [] as any[],
+    justifications: [],
     justificationsLoading: false,
+    data: [],
+    loading: false,
+    error: null,
+    currentPage: 0,
+    totalItems: 0,
+    totalPages: 0,
+
+    // 👇 faltantes
+    transformedData: [],
+    filteredData: [],
+    filterOptions: {
+        searchTerm: '',
+        selectedFiltro: 'todo',
+    },
 };
+
 
 const attendanceSlice = createSlice({
     name: 'attendance',
@@ -289,12 +319,16 @@ const attendanceSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchAttendances.fulfilled, (state, action: PayloadAction<GetAttendancesQuery['allAttendances']>) => {
+            .addCase(fetchAttendances.fulfilled, (state, action) => {
                 const payload = action.payload;
                 if (payload?.data) {
                     state.data = payload.data
                         .filter((item): item is NonNullable<typeof item> => item !== null)
                         .map(transformGraphQLToAttendanceItem);
+
+                    state.transformedData = transformToComponentFormat(state.data);
+                    state.filteredData = filterAttendances(state.transformedData, state.filterOptions);
+
                     state.totalItems = payload.totalItems ?? 0;
                     state.totalPages = payload.totalPages ?? 0;
                     state.currentPage = payload.currentPage ?? 0;
@@ -327,9 +361,13 @@ const attendanceSlice = createSlice({
             })
             .addCase(fetchAttendanceAndCompetenceByStudent.fulfilled, (state, action) => {
                 const payload = action.payload;
+
                 if (payload?.data) {
-                    state.studentAttendances.data = payload.data.filter((item: any) => item !== null);
+                    state.studentAttendances.data = (payload.data || [])
+                        .filter((item: any) => item !== null)
+                        .map(transformGraphQLToAttendanceItem);
                 }
+
                 state.studentAttendances.loading = false;
                 state.studentAttendances.error = null;
             })

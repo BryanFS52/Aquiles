@@ -4,11 +4,11 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
 import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
-import JustificationTable from '@/components/features/justification/justificationsTable';
+import JustificationTable from '@components/features/justifications/justificationsTable';
 
 export const JustificationTableExample = () => {
   const dispatch = useDispatch<AppDispatch>();
-  
+
   // Datos de ejemplo de justificaciones
   const mockJustifications = [
     {
@@ -56,7 +56,7 @@ export const JustificationTableExample = () => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Ejemplo: Tabla de Justificaciones con Estados Dinámicos</h1>
-      
+
       <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
         <h2 className="text-lg font-semibold mb-2">Características:</h2>
         <ul className="list-disc list-inside space-y-1 text-sm">
@@ -98,13 +98,13 @@ const JustificationStatusList = () => {
       {justificationStatuses
         .filter(status => status.state)
         .map((status) => (
-          <div 
-            key={status.id} 
+          <div
+            key={status.id}
             className="p-2 bg-white dark:bg-gray-700 rounded border text-sm"
           >
-            <span className="font-medium">ID:</span> {status.id} | 
+            <span className="font-medium">ID:</span> {status.id} |
             <span className="font-medium"> Nombre:</span> {status.name} |
-            <span className="font-medium"> Estado:</span> 
+            <span className="font-medium"> Estado:</span>
             <span className={`ml-1 ${status.state ? 'text-green-600' : 'text-red-600'}`}>
               {status.state ? 'Activo' : 'Inactivo'}
             </span>
