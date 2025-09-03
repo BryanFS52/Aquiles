@@ -138,6 +138,10 @@ export default function ModalTeamInformation({
         e.preventDefault();
 
         if (!team) return;
+        if (!team.id) {
+            console.error("Team ID is missing");
+            return;
+        }
 
         if (!validateForm()) return;
 
@@ -154,6 +158,7 @@ export default function ModalTeamInformation({
             setLoading(false);
         }
     };
+
 
     const handleClose = () => {
         setErrors({});

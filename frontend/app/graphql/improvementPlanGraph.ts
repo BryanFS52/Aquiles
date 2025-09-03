@@ -20,9 +20,9 @@ export const GET_ALL_IMPROVEMENT_PLANS = gql`
         student {
           id
           person {
-            id
             name
             lastname
+            document
           }
         }
         teacherCompetence {
@@ -53,9 +53,9 @@ export const GET_IMPROVEMENT_PLAN_BY_ID = gql`
         student {
           id
           person {
-            id
             name
             lastname
+            document
           }
         }
         teacherCompetence {

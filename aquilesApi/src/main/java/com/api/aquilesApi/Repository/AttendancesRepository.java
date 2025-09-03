@@ -30,6 +30,17 @@ public interface AttendancesRepository extends JpaRepository<Attendance, Long> {
             Pageable pageable
     );
 
+    @Query("""
+    SELECT a FROM Attendance a
+    WHERE (:studentId IS NULL OR a.studentId = :studentId)
+      AND (:competenceQuarterId IS NULL OR a.competenceQuarter = :competenceQuarterId)
+""")
+    List<Attendance> findAllByStudentIdAndCompetenceQuarter(
+            @Param("studentId") Long studentId,
+            @Param("competenceQuarterId") Long competenceQuarterId
+    );
+
+
     // Finds all attendances that have a justification
     @Query("""
     SELECT a FROM Attendance a

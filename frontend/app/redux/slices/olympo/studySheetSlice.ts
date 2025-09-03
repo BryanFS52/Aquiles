@@ -1,11 +1,11 @@
 import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { GET_STUDY_SHEETS, GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER, GET_STUDY_SHEET_WITH_STUDENTS, GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM } from '@graphql/olympo/studySheetGraph'
+import { GET_STUDY_SHEETS, GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER, GET_STUDY_SHEET_WITH_STUDENTS, GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM, GET_STUDY_SHEET_BY_ID_WITH_ATTENDANCES } from '@graphql/olympo/studySheetGraph'
 import { createInitialPaginatedState } from '@type/slices/common/generic';
 import {
     StudySheet,
-    TeamsScrum,
     Student,
+    TeamsScrum,
     GetStudySheetsQuery,
     GetStudySheetsQueryVariables,
     GetStudySheetWithTeamScrumByIdQuery,
@@ -17,7 +17,9 @@ import {
     GetStudySheetWithStudentsQuery,
     GetStudySheetWithStudentsQueryVariables,
     StudySheetByTeacherIdWithTeamScrumQuery,
-    StudySheetByTeacherIdWithTeamScrumQueryVariables
+    StudySheetByTeacherIdWithTeamScrumQueryVariables,
+    GetStudySheetByIdWithAttendancesQuery,
+    GetStudySheetByIdWithAttendancesQueryVariables
 } from '@graphql/generated';
 
 // Función para transformar datos de GraphQL a StudySheet
@@ -89,6 +91,7 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet =
                     blood_type: ss.student?.person?.blood_type,
                     date_birth: ss.student?.person?.date_birth,
                 },
+                attendances: ss.student?.attendances || [], // <-- AGREGAR ESTA LÍNEA
             },
             studentStudySheetState: ss.studentStudySheetState || null,
         })) || [],
@@ -198,6 +201,18 @@ export const fetchStudySheetByTeacherIdWithTeamScrum = createAsyncThunk<StudyShe
             fetchPolicy: 'no-cache',
         });
         return data.allStudySheets;
+    }
+);
+
+export const fetchStudySheetByIdWithAttendances = createAsyncThunk<GetStudySheetByIdWithAttendancesQuery['studySheetById'], GetStudySheetByIdWithAttendancesQueryVariables>(
+    'studySheet/fetchByIdWithAttendances',
+    async ({ id, competenceId }) => {
+        const { data } = await clientLAN.query<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>({
+            query: GET_STUDY_SHEET_BY_ID_WITH_ATTENDANCES,
+            variables: { id, competenceId },
+            fetchPolicy: 'no-cache',
+        });
+        return data.studySheetById;
     }
 );
 
@@ -387,6 +402,26 @@ const studySheetSlice = createSlice({
             })
             .addCase(fetchStudySheetByTeacherIdWithTeamScrum.rejected, (state, action) => {
                 state.error = action.error.message ?? 'Error fetching study sheets by teacher with team scrum';
+                state.loading = false;
+            });
+        // Fetch StudySheetByIdWithAttendances
+        builder
+            .addCase(fetchStudySheetByIdWithAttendances.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchStudySheetByIdWithAttendances.fulfilled, (state, action) => {
+                const item = action.payload?.data;
+                if (item) {
+                    const transformed = transformGraphQLToStudySheetItem(item);
+                    state.data = [transformed];
+                } else {
+                    state.data = [];
+                }
+                state.loading = false;
+            })
+            .addCase(fetchStudySheetByIdWithAttendances.rejected, (state, action) => {
+                state.error = action.error.message ?? 'Error fetching study sheet by id with attendances';
                 state.loading = false;
             });
     }

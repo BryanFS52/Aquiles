@@ -79,7 +79,18 @@ public class AttendancesBusiness {
     }
 
 
-    public Page<AttendanceDto> findAllByCompetenceQuarterId(Long id, Pageable pageable) {
+
+    public List<Attendance> getAllByStudentIdAndCompetenceQuarter(Long studentId, Long competenceQuarterId) {
+        try {
+            return attendancesService.getAllByStudentIdAndCompetenceQuarter(studentId, competenceQuarterId);
+
+        } catch (Exception e) {
+            throw new CustomException("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    public List<AttendanceDto> findAllByCompetenceQuarterId(Long id) {
         try {
             Page<Attendance> attendanceList = attendancesService.findAllByCompetenceQuarterIdAndJustifications(id, pageable);
             return attendanceList.map(entity -> modelMapper.map(entity, AttendanceDto.class));

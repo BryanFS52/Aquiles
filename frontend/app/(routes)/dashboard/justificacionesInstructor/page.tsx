@@ -3,15 +3,16 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import { toast } from "react-toastify";
-import type { AppDispatch, RootState } from "@/redux/store";
+import { AppDispatch, RootState } from "@redux/store";
+import { fetchAllJustificationStatuses } from "@redux/slices/justificationStatusSlice";
 import PageTitle from "@components/UI/pageTitle";
+import { useLoader } from "@context/LoaderContext";
 import JustificationFilters from "@components/features/justifications/justificationsFilter";
 import JustificationTable from "@components/features/justifications/justificationsTable";
 import EmptyState from "@components/UI/emptyState";
 import {
-  setFilterOptions,
   goToPreviousPage,
+  setFilterOptions,
   goToNextPage,
   formatErrorMessage,
   generateFileName,
@@ -19,14 +20,6 @@ import {
   downloadBase64File,
   updateJustificationStatus,
 } from "@slice/justificationSlice";
-import {
-  selectJustifications,
-  selectJustificationsLoading,
-  selectJustificationsError,
-  selectHasJustifications
-} from "@slice/competenceQuarterJustificationsSlice";
-import { fetchAllJustificationStatuses } from "@/redux/slices/justificationStatusSlice";
-import { useLoader } from "@/context/LoaderContext";
 
 export default function JustificacionesInstructor() {
   const dispatch = useDispatch<AppDispatch>();
