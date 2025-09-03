@@ -4,11 +4,11 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { AppDispatch } from '@/redux/store';
-import { fetchStudySheetByTeacher, fetchStudySheetById } from '@slice/olympo/studySheetSlice';
+import { fetchStudySheetByTeacher, fetchStudySheetByIdWithAttendances } from '@slice/olympo/studySheetSlice';
 import { useLoader } from '@context/LoaderContext';
 import { StudySheetCard } from './StudySheetCard';
 import { ApprenticesModal } from './ApprenticesModal';
-import { StudySheet } from './types';
+import { StudySheetWithCompetence } from './types';
 import PageTitle from '@components/UI/pageTitle';
 import EmptyState from '@components/UI/emptyState';
 
@@ -18,13 +18,13 @@ export const FichasInstructorContainer: React.FC = () => {
     const { showLoader, hideLoader } = useLoader();
 
     // Local state
-    const [selectedFicha, setSelectedFicha] = useState<StudySheet | null>(null);
+    const [selectedFicha, setSelectedFicha] = useState<StudySheetWithCompetence | null>(null);
     const [isModalOpen, setModalOpen] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
 
     // Redux state
     const { data, loading } = useSelector((state: any) => state.studySheet);
-    const fichas: StudySheet[] = data || [];
+    const fichas: StudySheetWithCompetence[] = data || [];
 
     // Effects
     useEffect(() => {
@@ -40,7 +40,7 @@ export const FichasInstructorContainer: React.FC = () => {
     }, [loading, isTransitioning, showLoader, hideLoader]);
 
     // Handlers
-    const handleViewApprentices = (ficha: StudySheet) => {
+    const handleViewApprentices = (ficha: StudySheetWithCompetence) => {
         setSelectedFicha(ficha);
         setModalOpen(true);
     };
@@ -50,12 +50,17 @@ export const FichasInstructorContainer: React.FC = () => {
         setModalOpen(false);
     };
 
-    const handleTakeAttendance = async (studySheet: StudySheet) => {
+    const handleTakeAttendance = async (studySheet: StudySheetWithCompetence) => {
         if (!studySheet.id) return;
+
+        const competenceId = studySheet.competenceId ?? undefined;
 
         setIsTransitioning(true);
         try {
-            await dispatch(fetchStudySheetById({ id: parseInt(studySheet.id) }));
+            await dispatch(fetchStudySheetByIdWithAttendances({
+                id: parseInt(studySheet.id),
+                competenceId
+            }));
             router.push('/dashboard/asistencia');
         } catch (error) {
             console.error('Error al cargar la ficha:', error);
@@ -77,7 +82,7 @@ export const FichasInstructorContainer: React.FC = () => {
                         <PageTitle>Fichas del instructor</PageTitle>
 
                         <div className="space-y-6">
-                            {fichas.map((studySheet: StudySheet, index: number) => (
+                            {fichas.map((studySheet: StudySheetWithCompetence, index: number) => (
                                 <div key={studySheet.id || index} className={index === 0 ? '' : 'mt-6'}>
                                     <StudySheetCard
                                         studySheet={studySheet}

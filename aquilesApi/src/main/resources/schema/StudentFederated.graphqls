@@ -1,6 +1,6 @@
 type Student @key(fields: "id") @extends{
     id: ID @external
-    attendances : [Attendance]
+    attendances(competenceQuarterId : Long) : [Attendance]
     teamScrums: [TeamsScrum]
     profiles : [Profile]
     improvementPlans: [ImprovementPlan]

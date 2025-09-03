@@ -58,15 +58,20 @@ public class AttendancesResolver {
     @DgsData(parentType = "Student", field = "attendances")
     public List<Attendance> getAttendances(DgsDataFetchingEnvironment env) {
         Student student = env.getSource();
-        assert student != null;
-
         Long studentId = student.getId();
-        List<Attendance> attendanceDtoList = attendancesBusiness.findAllByStudentId(studentId);
-        if (attendanceDtoList == null || attendanceDtoList.isEmpty()) {
-            return Collections.emptyList();
+
+        Long competenceQuarterId = env.getArgument("competenceQuarterId");
+        List<Attendance> attendanceList;
+
+        if (competenceQuarterId != null) {
+            attendanceList = attendancesBusiness.getAllByStudentIdAndCompetenceQuarter(studentId, competenceQuarterId);
+        } else {
+            attendanceList = attendancesBusiness.findAllByStudentId(studentId);
         }
-        return attendanceDtoList;
+
+        return attendanceList != null ? attendanceList : Collections.emptyList();
     }
+
 
 
     @DgsData(parentType = "Attendance", field = "student")

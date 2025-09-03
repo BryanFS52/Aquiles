@@ -79,6 +79,17 @@ public class AttendancesBusiness {
     }
 
 
+
+    public List<Attendance> getAllByStudentIdAndCompetenceQuarter(Long studentId, Long competenceQuarterId) {
+        try {
+            return attendancesService.getAllByStudentIdAndCompetenceQuarter(studentId, competenceQuarterId);
+
+        } catch (Exception e) {
+            throw new CustomException("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     public List<AttendanceDto> findAllByCompetenceQuarterId(Long id) {
         try {
             List<Attendance> attendanceList = attendancesService.findAllByCompetenceQuarterId(id);

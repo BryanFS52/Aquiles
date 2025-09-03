@@ -2692,6 +2692,7 @@ export type ProcessMethodologyById = {
   message?: Maybe<Scalars['String']['output']>;
 };
 
+
 export type ProcessMethodologyDto = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   isUnique?: InputMaybe<Scalars['Boolean']['input']>;
@@ -3440,6 +3441,7 @@ export type QueryAllStudySheetsArgs = {
   idStudent?: InputMaybe<Scalars['Long']['input']>;
   idTeacher?: InputMaybe<Scalars['Long']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  onlyInstructor?: InputMaybe<Scalars['Boolean']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
   state?: InputMaybe<Scalars['Boolean']['input']>;
@@ -3739,6 +3741,11 @@ export type Student = {
   state?: Maybe<Scalars['Boolean']['output']>;
   studentStudySheets?: Maybe<Array<Maybe<StudentStudySheet>>>;
   teamScrums?: Maybe<Array<Maybe<TeamsScrum>>>;
+};
+
+
+export type StudentAttendancesArgs = {
+  competenceQuarterId?: InputMaybe<Scalars['Long']['input']>;
 };
 
 export type StudentDto = {
@@ -4642,6 +4649,14 @@ export type StudySheetByTeacherIdWithTeamScrumQueryVariables = Exact<{
 
 
 export type StudySheetByTeacherIdWithTeamScrumQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, journey?: { name?: string | null } | null, quarter?: Array<{ id?: string | null, name?: { extension?: string | null, number?: number | null } | null } | null> | null, trainingProject?: { name?: string | null, program?: { name?: string | null } | null } | null, teamsScrum?: Array<{ id?: string | null, teamName?: string | null, students?: Array<{ id?: string | null, person?: { lastname?: string | null, name?: string | null, document?: string | null } | null } | null> | null } | null> | null } | null> | null } | null };
+
+export type GetStudySheetByIdWithAttendancesQueryVariables = Exact<{
+  id: Scalars['Long']['input'];
+  competenceId?: InputMaybe<Scalars['Long']['input']>;
+}>;
+
+
+export type GetStudySheetByIdWithAttendancesQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, number?: number | null, numberStudents?: number | null, quarter?: Array<{ id?: string | null, name?: { number?: number | null, extension?: string | null } | null } | null> | null, trainingProject?: { id?: string | null, name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null, studentStudySheets?: Array<{ id?: string | null, student?: { id?: string | null, attendances?: Array<{ attendanceDate?: string | null, attendanceState?: { status?: string | null } | null } | null> | null, person?: { id?: string | null, document?: string | null, name?: string | null, lastname?: string | null, email?: string | null, phone?: string | null } | null } | null, studentStudySheetState?: { id?: string | null, name?: string | null } | null } | null> | null, teacherStudySheets?: Array<{ id?: string | null, competence?: { name?: string | null } | null } | null> | null } | null } | null };
 
 export type GetTeamsScrumsQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -7598,6 +7613,99 @@ export type StudySheetByTeacherIdWithTeamScrumQueryHookResult = ReturnType<typeo
 export type StudySheetByTeacherIdWithTeamScrumLazyQueryHookResult = ReturnType<typeof useStudySheetByTeacherIdWithTeamScrumLazyQuery>;
 export type StudySheetByTeacherIdWithTeamScrumSuspenseQueryHookResult = ReturnType<typeof useStudySheetByTeacherIdWithTeamScrumSuspenseQuery>;
 export type StudySheetByTeacherIdWithTeamScrumQueryResult = Apollo.QueryResult<StudySheetByTeacherIdWithTeamScrumQuery, StudySheetByTeacherIdWithTeamScrumQueryVariables>;
+export const GetStudySheetByIdWithAttendancesDocument = gql`
+    query GetStudySheetByIdWithAttendances($id: Long!, $competenceId: Long) {
+  studySheetById(id: $id) {
+    code
+    message
+    data {
+      id
+      number
+      numberStudents
+      quarter {
+        id
+        name {
+          number
+          extension
+        }
+      }
+      trainingProject {
+        id
+        name
+        program {
+          id
+          name
+        }
+      }
+      studentStudySheets {
+        id
+        student {
+          id
+          attendances(competenceQuarterId: $competenceId) {
+            attendanceDate
+            attendanceState {
+              status
+            }
+          }
+          id
+          person {
+            id
+            document
+            name
+            lastname
+            email
+            phone
+          }
+        }
+        studentStudySheetState {
+          id
+          name
+        }
+      }
+      teacherStudySheets {
+        id
+        competence {
+          name
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetStudySheetByIdWithAttendancesQuery__
+ *
+ * To run a query within a React component, call `useGetStudySheetByIdWithAttendancesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStudySheetByIdWithAttendancesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStudySheetByIdWithAttendancesQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      competenceId: // value for 'competenceId'
+ *   },
+ * });
+ */
+export function useGetStudySheetByIdWithAttendancesQuery(baseOptions: Apollo.QueryHookOptions<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables> & ({ variables: GetStudySheetByIdWithAttendancesQueryVariables; skip?: boolean; } | { skip: boolean; })) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>(GetStudySheetByIdWithAttendancesDocument, options);
+}
+export function useGetStudySheetByIdWithAttendancesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>(GetStudySheetByIdWithAttendancesDocument, options);
+}
+export function useGetStudySheetByIdWithAttendancesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>(GetStudySheetByIdWithAttendancesDocument, options);
+}
+export type GetStudySheetByIdWithAttendancesQueryHookResult = ReturnType<typeof useGetStudySheetByIdWithAttendancesQuery>;
+export type GetStudySheetByIdWithAttendancesLazyQueryHookResult = ReturnType<typeof useGetStudySheetByIdWithAttendancesLazyQuery>;
+export type GetStudySheetByIdWithAttendancesSuspenseQueryHookResult = ReturnType<typeof useGetStudySheetByIdWithAttendancesSuspenseQuery>;
+export type GetStudySheetByIdWithAttendancesQueryResult = Apollo.QueryResult<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>;
 export const GetTeamsScrumsDocument = gql`
     query GetTeamsScrums($page: Int, $size: Int) {
   allTeamsScrums(page: $page, size: $size) {
