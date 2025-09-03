@@ -77,9 +77,10 @@ export const FichasInstructorContainer: React.FC = () => {
 
         setIsTransitioning(true);
         try {
-            await dispatch(fetchJustificationsByCompetenceQuarter({ competenceQuarterId: parseInt("") }));
+            await dispatch(fetchJustificationsByCompetenceQuarter({ competenceQuarterId: 7 }));
             router.push('/dashboard/justificacionesInstructor/[competenceQuarterId]');
         } catch (error) {
+            console.log("olaa")
             console.error('Error al cargar las justificaciones:', error);
         } finally {
             setIsTransitioning(false);

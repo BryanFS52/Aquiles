@@ -47,8 +47,8 @@ export default function JustificacionesCoordinator() {
 
   useEffect(() => {
     dispatch(fetchJustifications({ page: 0, size: itemsPerPage }));
-    // Cargar los estados de justificación
-    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
+    // Cargar todos los estados de justificación disponibles
+    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 })); // Aumentar a 50 para obtener todos los estados
   }, [dispatch, localCurrentPage, itemsPerPage]);
 
   const handleFilterChange = (filterType: string, value: string) => {
