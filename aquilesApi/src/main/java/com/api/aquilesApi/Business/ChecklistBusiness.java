@@ -198,6 +198,14 @@ public class ChecklistBusiness {
             checklistAntes.setRemarks(checklistDto.getRemarks());
             checklistAntes.setStudySheets(checklistDto.getStudySheets());
             checklistAntes.setEvaluationCriteria(checklistDto.isEvaluationCriteria());
+            
+            // ✅ AGREGAR ACTUALIZACIÓN DE TRIMESTER Y COMPONENT
+            if (checklistDto.getTrimester() != null) {
+                checklistAntes.setTrimester(checklistDto.getTrimester());
+            }
+            if (checklistDto.getComponent() != null) {
+                checklistAntes.setComponent(checklistDto.getComponent());
+            }
 
             if (checklistDto.getInstructorSignature() != null) {
                 checklistAntes.setInstructorSignature(

@@ -28,6 +28,12 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
       setObservaciones(editingData.remarks || '')
       setDeletedItemIds([]) // ← Limpiar lista de eliminados al cargar datos de edición
       
+      // ← Log específico para trimester y component
+      console.log('🔍 MODAL: Setting form values from editingData:');
+      console.log('  trimester from editingData:', editingData.trimester, '-> setting to:', editingData.trimester?.toString() || '');
+      console.log('  component from editingData:', editingData.component, '-> setting to:', editingData.component || '');
+      console.log('  remarks from editingData:', editingData.remarks, '-> setting to:', editingData.remarks || '');
+      
       console.log("Loading items from editingData:", editingData.items) // Debug log
       
       // Cargar indicadores existentes si están disponibles
@@ -89,7 +95,11 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
 
       console.log('Modal submitting checklist data:', newChecklist); // Debug log
       console.log('Is editing mode:', isEditing); // Debug log
-      console.log('🚀 DETAILED INDICATORS BEING SENT:'); // Debug log
+      console.log('� MODAL: Current form state at submission:');
+      console.log('  trimestre state:', trimestre, '(type:', typeof trimestre, ')');
+      console.log('  componente state:', componente, '(type:', typeof componente, ')');
+      console.log('  observaciones state:', observaciones, '(type:', typeof observaciones, ')');
+      console.log('�🚀 DETAILED INDICATORS BEING SENT:'); // Debug log
       newChecklist.items.forEach((item, index) => {
         console.log(`  Item ${index + 1}: id=${item.id || 'NEW'}, code="${item.code}", indicator="${item.indicator}", active=${item.active}`); // Debug log
       });

@@ -94,6 +94,11 @@ export default function CoordinadorChecklistView() {
         console.log('Updating checklist with ID:', editingChecklist.id);
         console.log('Original editingChecklist:', editingChecklist);
         console.log('Incoming checklistData:', checklistData);
+        
+        // ← Log específico para trimester y component
+        console.log('🔍 FIELD VALUES COMPARISON:');
+        console.log('  trimester - original:', editingChecklist.trimester, ', incoming:', checklistData.trimester);
+        console.log('  component - original:', editingChecklist.component, ', incoming:', checklistData.component);
 
         // ← Procesar items eliminados si los hay
         if (checklistData.deletedItemIds && checklistData.deletedItemIds.length > 0) {
@@ -103,8 +108,8 @@ export default function CoordinadorChecklistView() {
         const updateData = {
           state: editingChecklist.state !== undefined ? editingChecklist.state : true,
           remarks: checklistData.remarks || "Sin observaciones",
-          trimester: checklistData.trimester || "1",
-          component: checklistData.component || "",
+          trimester: checklistData.trimester !== undefined ? checklistData.trimester : (editingChecklist.trimester || "1"),
+          component: checklistData.component !== undefined ? checklistData.component : (editingChecklist.component || ""),
           evaluationCriteria: editingChecklist.evaluationCriteria || false,
           instructorSignature: editingChecklist.instructorSignature || "No signature",
           studySheets: editingChecklist.studySheets || null,
@@ -118,6 +123,9 @@ export default function CoordinadorChecklistView() {
         };
 
         console.log('Final updateData being sent:', updateData);
+        console.log('🎯 FINAL VALUES BEING SENT:');
+        console.log('  trimester:', updateData.trimester, '(type:', typeof updateData.trimester, ')');
+        console.log('  component:', updateData.component, '(type:', typeof updateData.component, ')');
         console.log('🎯 DETAILED UPDATEDATA ITEMS:');
         updateData.items.forEach((item: any, index: number) => {
           console.log(`  UpdateData Item ${index + 1}: id=${item.id || 'NO_ID'}, code="${item.code}", indicator="${item.indicator}", active=${item.active}`);
