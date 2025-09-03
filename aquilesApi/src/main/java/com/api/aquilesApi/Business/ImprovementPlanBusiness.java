@@ -32,7 +32,7 @@ public class ImprovementPlanBusiness {
             PageRequest pageRequest = PageRequest.of(page, size);
             Page<ImprovementPlan> improvementPlanPage = improvementPlanService.findByFilter(pageRequest, teacherCompetence);
 
-            System.out.println("Total Attendances: " + improvementPlanPage.getTotalElements());
+            System.out.println("Total inprovementPlans: " + improvementPlanPage.getTotalElements());
 
             return improvementPlanPage.map(entity -> modelMapper.map(entity, ImprovementPlanDto.class));
         } catch (DataAccessException e) {

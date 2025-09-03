@@ -39,6 +39,7 @@ type ImprovementPlanPageId {
 extend type Query {
     allImprovementPlans(page: Int, size: Int, teacherCompetence : Long): ImprovementPlanPage
     improvementPlanById(id: Long!): ImprovementPlanPageId
+
 }
 
 extend type Mutation {

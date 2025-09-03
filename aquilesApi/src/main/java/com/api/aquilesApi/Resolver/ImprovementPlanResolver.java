@@ -24,6 +24,7 @@ public class ImprovementPlanResolver {
     @DgsQuery
     public Map<String, Object> allImprovementPlans(@InputArgument Integer page, @InputArgument Integer size, @InputArgument Long teacherCompetence) {
         try {
+            System.out.println(teacherCompetence);
             Page<ImprovementPlanDto> improvementPlanPage;
             if (teacherCompetence != null) {
                 improvementPlanPage = improvementPlanBusiness.findByFilter(page, size, teacherCompetence);

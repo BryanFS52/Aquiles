@@ -121,7 +121,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
     const handleSelectSheet = (sheet: NonNullable<StudySheet>) => {
         console.log('Ficha seleccionada:', sheet);
         // Navegar al historial de planes de mejoramiento
-        router.push('/HistorialPlanesMejoramientoInstructor');
+        router.push('./HistorialPlanesMejoramientoInstructor');
     };
 
     const formatDate = (dateString: string | null | undefined) => {
@@ -159,15 +159,6 @@ const PlanMejoramientoInstructor: React.FC = () => {
                 <div>
                     <PageTitle>Planes De Mejoramiento</PageTitle>
                 </div>
-                <button
-                    onClick={() => router.push('/HistorialPlanesMejoramientoInstructor')}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-lightGreen hover:from-primary/90 hover:to-lightGreen/90 dark:bg-gradient-to-r dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90 text-white rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-                >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Ver Historial
-                </button>
             </div>
 
             {/* Dashboard Stats */}
@@ -401,7 +392,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
                                     >
                                         <div className="flex items-center gap-1.5">
                                             <FiEye className="w-3.5 h-3.5" />
-                                            <span>Ver Ficha</span>
+                                            <span>Ver Historial</span>
                                         </div>
                                         <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                                     </button>

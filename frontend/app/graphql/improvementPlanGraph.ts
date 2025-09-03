@@ -2,8 +2,8 @@ import { gql } from '@apollo/client';
 
 // Queries and Mutations for ImprovementPlan
 export const GET_ALL_IMPROVEMENT_PLANS = gql`
-  query GetAllImprovementPlans($page: Int, $size: Int) {
-    allImprovementPlans(page: $page, size: $size) {
+  query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long) {
+    allImprovementPlans(page: $page, size: $size, teacherCompetence: $teacherCompetence) {
       code
       message
       date
@@ -11,21 +11,26 @@ export const GET_ALL_IMPROVEMENT_PLANS = gql`
       totalItems
       currentPage
       data {
+        id
         city
         date
         reason
-        state   
+        state
         qualification
-        teacherCompetence{
-            competence{
-                name
-            }
+        student {
+          id
+          person {
+            id
+            name
+            lastname
+          }
         }
-        student{
-            person{
-                id
-                name
-            }
+        teacherCompetence {
+          id
+          competence {
+            id
+            name
+          }
         }
       }
     }
@@ -33,7 +38,7 @@ export const GET_ALL_IMPROVEMENT_PLANS = gql`
 `;
 
 export const GET_IMPROVEMENT_PLAN_BY_ID = gql`
-  query GetImprovementPlanById($id: ID!) {
+  query GetImprovementPlanById($id: Long!) {
     improvementPlanById(id: $id) {
       code
       message
@@ -45,8 +50,21 @@ export const GET_IMPROVEMENT_PLAN_BY_ID = gql`
         reason
         state
         qualification
-        studentId
-        teacherCompetence
+        student {
+          id
+          person {
+            id
+            name
+            lastname
+          }
+        }
+        teacherCompetence {
+          id
+          competence {
+            id
+            name
+          }
+        }
       }
     }
   }
@@ -57,27 +75,24 @@ export const ADD_IMPROVEMENT_PLAN = gql`
     addImprovementPlan(input: $input) {
       code
       message
-      id
     }
   }
 `;
 
 export const UPDATE_IMPROVEMENT_PLAN = gql`
-  mutation UpdateImprovementPlan($id: ID!, $input: ImprovementPlanDto!) {
+  mutation UpdateImprovementPlan($id: Long!, $input: ImprovementPlanDto!) {
     updateImprovementPlan(id: $id, input: $input) {
       code
       message
-      id
     }
   }
 `;
 
 export const DELETE_IMPROVEMENT_PLAN = gql`
-  mutation DeleteImprovementPlan($id: ID!) {
+  mutation DeleteImprovementPlan($id: Long!) {
     deleteImprovementPlan(id: $id) {
       code
       message
-      id
     }
   }
 `;

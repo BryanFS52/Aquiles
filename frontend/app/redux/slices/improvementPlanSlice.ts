@@ -16,43 +16,36 @@ import {
     DeleteImprovementPlanMutationVariables
 } from '@graphql/generated'
 
-// Interface temporal para las variables de la query actualizada
-interface ImprovementPlanQueryVariables {
-    page?: number;
-    size?: number;
-}
-
-// Interface para el plan de mejoramiento con la nueva estructura
-interface ImprovementPlanWithDetails {
-    id: string;
-    city: string;
-    date: string;
-    reason: string;
-    state: boolean;
-    qualification?: string;
-    teacherCompetence?: {
-        competence?: {
-            name?: string;
-        };
-    };
-    student?: {
-        person?: {
-            id?: string;
-            name?: string;
-        };
-    };
-}
 
 // Función para transformar datos de GraphQL a ImprovementPlan
 const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPlan => {
-    return {
-        id: graphqlData.id,
-        city: graphqlData.city,
-        date: graphqlData.date,
-        reason: graphqlData.reason,
-        number: graphqlData.number,
-        state: graphqlData.state,
-    }
+  return {
+    id: graphqlData.id,
+    city: graphqlData.city,
+    date: graphqlData.date,
+    reason: graphqlData.reason,
+    qualification: graphqlData.qualification,
+    state: graphqlData.state,
+    student: graphqlData.student
+      ? {
+          id: graphqlData.student.id,
+          person: {
+            id: graphqlData.student.person?.id,
+            name: graphqlData.student.person?.name,
+            lastname: graphqlData.student.person?.lastname,
+          },
+        }
+      : null,
+    teacherCompetence: graphqlData.teacherCompetence
+      ? {
+          id: graphqlData.teacherCompetence.id,
+          competence: {
+            id: graphqlData.teacherCompetence.competence?.id,
+            name: graphqlData.teacherCompetence.competence?.name,
+          },
+        }
+      : null,
+  };
 };
 
 export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], GetAllImprovementPlansQueryVariables>(
