@@ -10,6 +10,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
   const [observaciones, setObservaciones] = useState('')
   const [items, setItems] = useState([{ indicador: '' }])
   const [isModalOpen, setIsOpen] = useState(false)
+  const [deletedItemIds, setDeletedItemIds] = useState([]) // ← Nuevo estado para rastrear items eliminados
 
   // Efecto para cargar datos de edición
   useEffect(() => {
@@ -25,6 +26,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
       setTrimestre(editingData.trimester?.toString() || '')
       setComponente(editingData.component || '')
       setObservaciones(editingData.remarks || '')
+      setDeletedItemIds([]) // ← Limpiar lista de eliminados al cargar datos de edición
       
       console.log("Loading items from editingData:", editingData.items) // Debug log
       
@@ -52,6 +54,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
       setComponente('')
       setObservaciones('')
       setItems([{ indicador: '' }])
+      setDeletedItemIds([]) // ← Limpiar items eliminados
     }
   }, [isEditing, editingData, isOpen]) // Reaccionar a cambios en editingData
 
@@ -73,13 +76,15 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
         studySheets: null,
         evaluations: null,
         component: componente,
-        associatedJuries: [],
+        associatedJuries: null, // ← Cambiar a null en lugar de array vacío
         items: items.map((item, index) => ({
-          ...(item.id && { id: item.id }), // ← Incluir ID si existe (modo edición)
+          ...(item.id && { id: parseInt(item.id) }), // ← Convertir ID a número
           code: `IND-${index + 1}`,
           indicator: item.indicador,
           active: true
-        }))
+        })),
+        // ← Agregar items eliminados para el backend (ya convertidos a números)
+        ...(isEditing && deletedItemIds.length > 0 && { deletedItemIds })
       }
 
       console.log('Modal submitting checklist data:', newChecklist); // Debug log
@@ -88,6 +93,11 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
       newChecklist.items.forEach((item, index) => {
         console.log(`  Item ${index + 1}: id=${item.id || 'NEW'}, code="${item.code}", indicator="${item.indicator}", active=${item.active}`); // Debug log
       });
+      
+      // ← Log de items eliminados
+      if (isEditing && deletedItemIds.length > 0) {
+        console.log('🗑️ DELETED ITEM IDs:', deletedItemIds); // Debug log
+      }
 
       if (onCreate) {
         // Usar la función onCreate que viene del componente padre (que maneja la creación automática de evaluación)
@@ -96,6 +106,9 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
         if (isEditing) {
           // En modo edición, NO limpiar el formulario - mantener los datos
           console.log('Update completed successfully, keeping form data...'); // Debug log
+          
+          // Limpiar lista de eliminados después de actualización exitosa
+          setDeletedItemIds([])
           
           // Cerrar modal después de actualización
           if (onClose) {
@@ -138,8 +151,25 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
   }
 
   const handleRemoveIndicador = (index) => {
+    const itemToRemove = items[index]
+    
+    // Si el item tiene ID (es un item existente), agregarlo a la lista de eliminados
+    if (itemToRemove.id && isEditing) {
+      console.log(`🗑️ Marking item for deletion: ${itemToRemove.id}`); // Debug log
+      // Convertir el ID a número para asegurar compatibilidad con el backend
+      const numericId = parseInt(itemToRemove.id);
+      if (!isNaN(numericId)) {
+        setDeletedItemIds(prev => [...prev, numericId])
+      } else {
+        console.error('Invalid item ID for deletion:', itemToRemove.id);
+      }
+    }
+    
+    // Eliminar el item de la lista actual
     const newItems = items.filter((_, i) => i !== index)
     setItems(newItems)
+    
+    console.log(`Item removed from index ${index}. Remaining items:`, newItems.length); // Debug log
   }
 
   const resetForm = () => {
@@ -147,6 +177,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
     setComponente('')
     setObservaciones('')
     setItems([{ indicador: '' }])
+    setDeletedItemIds([]) // ← Limpiar items eliminados
   }
 
   if (isOpen !== undefined) {
@@ -168,6 +199,14 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                 'Se creará automáticamente una evaluación vinculada a esta lista. El instructor podrá completarla desde su vista.'
               }
             </p>
+            {/* ← Mostrar alerta si hay items para eliminar */}
+            {isEditing && deletedItemIds.length > 0 && (
+              <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-red-800 dark:text-red-300 text-sm font-medium">
+                  🗑️ <strong>Atención:</strong> Se eliminarán {deletedItemIds.length} indicador(es) existente(s) al guardar.
+                </p>
+              </div>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
@@ -249,7 +288,10 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                       {items.length > 1 && (
                         <button
                           type="button"
-                          onClick={() => handleRemoveIndicador(index)}
+                          onClick={() => {
+                            console.log(`🗑️ Attempting to remove item at index ${index}:`, item); // Debug log
+                            handleRemoveIndicador(index)
+                          }}
                           className="flex-shrink-0 text-red-500 hover:text-red-700 transition-colors p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 font-semibold"
                           title="Eliminar indicador"
                         >

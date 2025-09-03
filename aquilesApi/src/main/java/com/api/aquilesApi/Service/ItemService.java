@@ -29,4 +29,12 @@ public class ItemService {
         item.setActive(active);
         return save(item);
     }
+
+    public void delete(Item item) {
+        itemRepository.delete(item);
+    }
+
+    public void deleteById(Long id) {
+        itemRepository.deleteById(id);
+    }
 }

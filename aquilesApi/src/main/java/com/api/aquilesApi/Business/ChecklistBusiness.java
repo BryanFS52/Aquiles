@@ -1,6 +1,7 @@
 package com.api.aquilesApi.Business;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 import java.util.List;
 import com.api.aquilesApi.Dto.ChecklistDto;
 import com.api.aquilesApi.Entity.Checklist;
@@ -12,6 +13,7 @@ import com.api.aquilesApi.Repository.ItemTypeRepository;
 import com.api.aquilesApi.Service.ChecklistExportService;
 import com.api.aquilesApi.Service.ChecklistService;
 import com.api.aquilesApi.Service.EvaluationsService;
+import com.api.aquilesApi.Service.ItemService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
@@ -29,6 +31,7 @@ public class ChecklistBusiness {
     private final ChecklistExportService exportService;
     private final ChecklistHistoryBusiness checklistHistoryBusiness;
     private final ItemTypeRepository itemTypeRepository;
+    private final ItemService itemService; // ← Agregar el servicio de items
 
     public ChecklistBusiness(
             ChecklistService checklistService,
@@ -37,7 +40,8 @@ public class ChecklistBusiness {
             EvaluationsService evaluationService, EvaluationsService evaluationsService,
             ChecklistExportService exportService,
             ChecklistHistoryBusiness checklistHistoryBusiness,
-            ItemTypeRepository itemTypeRepository
+            ItemTypeRepository itemTypeRepository,
+            ItemService itemService // ← Agregar parámetro
     ) {
         this.checklistService = checklistService;
         this.modelMapper = modelMapper;
@@ -45,6 +49,7 @@ public class ChecklistBusiness {
         this.exportService = exportService;
         this.checklistHistoryBusiness = checklistHistoryBusiness;
         this.itemTypeRepository = itemTypeRepository;
+        this.itemService = itemService; // ← Asignar dependencia
     }   
 
     // Find All
@@ -219,6 +224,27 @@ public class ChecklistBusiness {
                 if (existingItems == null) {
                     existingItems = new java.util.ArrayList<>();
                     checklistAntes.setItems(existingItems);
+                }
+
+                // 🗑️ ELIMINAR ITEMS MARCADOS PARA ELIMINACIÓN
+                if (checklistDto.getDeletedItemIds() != null && !checklistDto.getDeletedItemIds().isEmpty()) {
+                    System.out.println("🗑️ Processing item deletions: " + checklistDto.getDeletedItemIds());
+                    
+                    Iterator<Item> iterator = existingItems.iterator();
+                    while (iterator.hasNext()) {
+                        Item item = iterator.next();
+                        if (checklistDto.getDeletedItemIds().contains(item.getId())) {
+                            System.out.println("🗑️ Deleting item ID: " + item.getId() + " - '" + item.getIndicator() + "'");
+                            iterator.remove();
+                            // Eliminar también de la base de datos si es necesario
+                            try {
+                                itemService.delete(item);
+                                System.out.println("✅ Item deleted from database");
+                            } catch (Exception e) {
+                                System.err.println("❌ Error deleting item from database: " + e.getMessage());
+                            }
+                        }
+                    }
                 }
 
                 // Actualizar items existentes o crear nuevos

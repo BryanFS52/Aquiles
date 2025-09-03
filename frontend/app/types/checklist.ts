@@ -74,6 +74,7 @@ export interface ChecklistDto {
   evaluations?: EvaluationDto[];
   items?: ItemDto[];
   associatedJuries?: number[];
+  deletedItemIds?: number[]; // ← Campo para IDs de items a eliminar
 }
 
 export interface EvaluationDto {
@@ -84,6 +85,7 @@ export interface EvaluationDto {
 }
 
 export interface ItemDto {
+  id?: number; // ← Agregar ID para items existentes
   code?: string;
   indicator: string;
   active?: boolean;

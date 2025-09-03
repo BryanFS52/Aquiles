@@ -95,6 +95,11 @@ export default function CoordinadorChecklistView() {
         console.log('Original editingChecklist:', editingChecklist);
         console.log('Incoming checklistData:', checklistData);
 
+        // ← Procesar items eliminados si los hay
+        if (checklistData.deletedItemIds && checklistData.deletedItemIds.length > 0) {
+          console.log('🗑️ PROCESSING DELETED ITEMS:', checklistData.deletedItemIds);
+        }
+
         const updateData = {
           state: editingChecklist.state !== undefined ? editingChecklist.state : true,
           remarks: checklistData.remarks || "Sin observaciones",
@@ -105,14 +110,23 @@ export default function CoordinadorChecklistView() {
           studySheets: editingChecklist.studySheets || null,
           evaluations: editingChecklist.evaluations || null,
           associatedJuries: editingChecklist.associatedJuries || null,
-          items: checklistData.items ? transformItems(checklistData.items) : []
+          items: checklistData.items ? transformItems(checklistData.items) : [],
+          // ← Agregar items eliminados para el backend
+          ...(checklistData.deletedItemIds && checklistData.deletedItemIds.length > 0 && { 
+            deletedItemIds: checklistData.deletedItemIds 
+          })
         };
 
         console.log('Final updateData being sent:', updateData);
         console.log('🎯 DETAILED UPDATEDATA ITEMS:');
-        updateData.items.forEach((item, index) => {
+        updateData.items.forEach((item: any, index: number) => {
           console.log(`  UpdateData Item ${index + 1}: id=${item.id || 'NO_ID'}, code="${item.code}", indicator="${item.indicator}", active=${item.active}`);
         });
+        
+        // ← Log adicional para items eliminados
+        if (updateData.deletedItemIds && updateData.deletedItemIds.length > 0) {
+          console.log('🗑️ ITEMS TO DELETE BEING SENT TO BACKEND:', updateData.deletedItemIds);
+        }
 
         const result = await dispatch(updateChecklist({
           id: parseInt(editingChecklist.id),
