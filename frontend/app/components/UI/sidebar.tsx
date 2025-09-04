@@ -1,16 +1,22 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { FiAlignRight } from "react-icons/fi";
-import { IoClose } from "react-icons/io5";
 import { usePathname } from 'next/navigation';
-import { FaRegListAlt, FaLaptopCode, FaChalkboardTeacher } from 'react-icons/fa';
-import { BsPersonFillCheck } from 'react-icons/bs';
-import { HiUserGroup } from 'react-icons/hi2';
-import { FaChalkboardUser } from 'react-icons/fa6';
-import { GiNotebook } from 'react-icons/gi';
-import { PiStudentFill } from 'react-icons/pi';
-import { FaClipboardList } from 'react-icons/fa';
+import {
+    PiUsersDuotone,
+    PiClipboardTextDuotone,
+    PiUserCheckDuotone,
+    PiUsersThreeDuotone,
+    PiChalkboardDuotone,
+    PiBookDuotone,
+    PiChalkboardTeacherDuotone,
+    PiStudentDuotone,
+    PiClipboardDuotone,
+    PiCirclesFourDuotone,
+    PiListBulletsDuotone,
+    PiCaretDoubleLeftDuotone,
+} from "react-icons/pi";
+
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -33,23 +39,22 @@ interface SidebarProps {
 
 type RoleType = 'instructor' | 'aprendiz' | 'coordinador';
 
-// Íconos estáticos (originales, solo Planes de Mejoramiento usa FontAwesome)
-const IconFichas: React.ReactNode = <FaRegListAlt className='text-2xl' />;
-const IconProgramas: React.ReactNode = <FaLaptopCode className='text-2xl' />;
-const IconAsistencia: React.ReactNode = <BsPersonFillCheck className='text-2xl' />;
-const IconTeams: React.ReactNode = <HiUserGroup className='text-2xl' />;
-const IconSustentaciones: React.ReactNode = <FaChalkboardUser className='text-2xl' />;
-const IconJustificaciones: React.ReactNode = <GiNotebook className='text-2xl' />;
-const IconProfesor: React.ReactNode = <FaChalkboardTeacher className='text-2xl' />;
-const IconAprendices: React.ReactNode = <PiStudentFill className='text-2xl' />;
-const IconPlanesMejoramiento: React.ReactNode = <FaClipboardList className='text-2xl' />;
+// Íconos estáticos
+const IconFichas = <PiClipboardTextDuotone className="w-6 h-6 text-black dark:text-white" />;
+const IconProgramas = <PiCirclesFourDuotone className="w-6 h-6 text-black dark:text-white" />;
+const IconAsistencia = <PiUserCheckDuotone className="w-6 h-6 text-black dark:text-white" />;
+const IconTeams = <PiUsersThreeDuotone className="w-6 h-6 text-black dark:text-white" />;
+const IconSustentaciones = <PiChalkboardDuotone className="w-6 h-6 text-black dark:text-white" />;
+const IconJustificaciones = <PiBookDuotone className="w-6 h-6 text-black dark:text-white" />;
+const IconProfesor = <PiChalkboardTeacherDuotone className="w-6 h-6 text-black dark:text-white" />;
+const IconAprendices = <PiStudentDuotone className="w-6 h-6 text-black dark:text-white" />;
+const IconPlanesMejoramiento = <PiClipboardDuotone className="w-6 h-6 text-black dark:text-white" />;
+const IconCoordinaciones = <PiUsersDuotone className="w-6 h-6 text-black dark:text-white" />;
 
 // Configuración de menú por rol
 const MENU_CONFIG: MenuConfig = {
     instructor: [
         { href: "/dashboard/FichasInstructor", label: "Fichas", icon: IconFichas },
-        //{ href: "/dashboard/Programas", label: "Programas", icon: IconProgramas },
-        //{ href: "/dashboard/asistencia", label: "Asistencia", icon: IconAsistencia },
         { href: "/dashboard/teamScrum", label: "Teams", icon: IconTeams },
         { href: "/dashboard/ListaChequeoInstructor", label: "Sustentaciones", icon: IconSustentaciones },
         { href: "/dashboard/planesMejoramientoInstructor", label: "Planes de Mejoramiento", icon: IconPlanesMejoramiento },
@@ -65,6 +70,7 @@ const MENU_CONFIG: MenuConfig = {
         { href: "/dashboard/planesMejoramientoAprendiz", label: "Planes de Mejoramiento", icon: IconPlanesMejoramiento },
     ],
     coordinador: [
+        { href: "/dashboard/coordinacionesCoordinador", label: "Coordinaciones", icon: IconCoordinaciones },
         { href: "/dashboard/FichasCoordinador", label: "Fichas", icon: IconFichas },
         { href: "/dashboard/InstructoresCoordinador", label: "Instructores", icon: IconProfesor },
         { href: "/dashboard/ProgramasCoordinador", label: "Programas", icon: IconProgramas },
@@ -102,17 +108,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
 
     return (
         <>
-            {/* Overlay para móvil */}
-            <div
-                className={`
-          fixed inset-0 bg-black/50 z-40 
-          transition-opacity duration-300 
-          lg:hidden 
-          ${showMenu ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
-        `}
-                onClick={() => setShowMenu(false)}
-            />
-
             {/* Sidebar */}
             <aside
                 className={`
@@ -136,24 +131,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
                             alt="Logo Aquiles"
                             width={80}
                             height={80}
-                            className='
-                bg-gradient-to-r from-lime-600 to-lime-500 drop-shadow-xl pl-2 py-1 
-                w-[60px] h-[60px] lg:w-[70px] lg:h-[70px] xl:w-[80px] xl:h-[80px]
-                rounded-2xl border-2 border-darkGreen/30 
-                dark:from-shadowBlue dark:to-darkBlue 
-              '
+                            className="bg-gradient-to-r from-lime-600 to-lime-500 drop-shadow-xl pl-2 py-1 
+                         w-[60px] h-[60px] lg:w-[70px] lg:h-[70px] xl:w-[80px] xl:h-[80px]
+                         rounded-2xl border-2 border-darkGreen/30 
+                         dark:from-shadowBlue dark:to-darkBlue"
                         />
-                        <span className="
-              text-base lg:text-lg font-bold 
-              text-black dark:text-white 
-              tracking-wide drop-shadow-md leading-tight
-            ">
+                        <span className="text-base lg:text-lg font-bold text-black dark:text-white tracking-wide drop-shadow-md leading-tight">
                             PROYECTOS FORMATIVOS<br />
-                            <span className="
-                uppercase text-xs lg:text-[13px] 
-                text-darkGreen dark:text-blue-600
-                font-extrabold tracking-widest
-              ">
+                            <span className="uppercase text-xs lg:text-[13px] text-darkGreen dark:text-blue-600 font-extrabold tracking-widest">
                                 {role}
                             </span>
                         </span>
@@ -161,27 +146,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
 
                     {/* Selector temporal de rol */}
                     <div className="mb-6 lg:mb-8 flex items-center justify-center">
-                        <div className="
-              bg-gradient-to-r from-lime-600 to-lime-500 
-              dark:from-shadowBlue/90 dark:to-darkBlue/90 
-              rounded-xl shadow px-3 lg:px-4 py-2 
-              flex gap-2 items-center 
-              text-sm font-semibold text-white 
-              backdrop-blur-md border border-white/20
-            ">
+                        <div className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue/90 dark:to-darkBlue/90 rounded-xl shadow px-3 lg:px-4 py-2 flex gap-2 items-center text-sm font-semibold text-white backdrop-blur-md border border-white/20">
                             <span className="font-bold tracking-wide drop-shadow">Rol:</span>
                             <select
                                 value={role}
                                 onChange={handleRoleChange}
-                                className="
-                  rounded-lg px-2 lg:px-3 py-1 
-                  border-2 border-white/30 
-                  bg-white/90 dark:bg-darkBlue/80 
-                  text-black dark:text-white 
-                  font-bold shadow text-sm
-                  focus:outline-none focus:ring-2 focus:ring-darkGreen/60 
-                  transition-all duration-200
-                "
+                                className="rounded-lg px-2 lg:px-3 py-1 border-2 border-white/30 
+                           bg-white/90 dark:bg-darkBlue/80 text-black dark:text-white 
+                           font-bold shadow text-sm focus:outline-none focus:ring-2 focus:ring-darkGreen/60 transition-all duration-200"
                             >
                                 <option value="instructor">Instructor</option>
                                 <option value="aprendiz">Aprendiz</option>
@@ -194,7 +166,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
                     <nav>
                         <ul className="space-y-2">
                             {menuItems.map((item: MenuItem, idx: number) => {
-                                const isActive: boolean = pathname === item.href || pathname.startsWith(item.href + '/');
+                                const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
                                 return (
                                     <li key={idx}>
                                         <Link
@@ -237,17 +209,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
             <button
                 onClick={toggleMenu}
                 className='
-          fixed bottom-4 right-4 z-50 
-          text-white bg-gradient-to-br from-darkGreen to-shadowBlue 
-          p-3 text-2xl rounded-full shadow-2xl 
-          border-2 border-white/30 
-          lg:hidden 
-          transition-all duration-200 
-          hover:scale-110 active:scale-95
-        '
+                    fixed bottom-4 right-4 z-50 
+                    text-white bg-gradient-to-br from-darkGreen to-shadowBlue 
+                    p-3 text-2xl rounded-full shadow-2xl 
+                    border-2 border-white/30 
+                    lg:hidden 
+                    transition-all duration-200 
+                    hover:scale-110 active:scale-95
+                '
                 aria-label="Abrir menú"
             >
-                {showMenu ? <IoClose /> : <FiAlignRight />}
+                {showMenu ? <PiCaretDoubleLeftDuotone /> : <PiListBulletsDuotone />}
             </button>
         </>
     );
