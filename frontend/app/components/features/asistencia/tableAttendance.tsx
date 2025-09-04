@@ -4,8 +4,8 @@ import { BsQrCode } from "react-icons/bs";
 import { FaClipboardList } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { motion } from "framer-motion";
-import { StudySheet, Student } from '@/graphql/generated';
-import ModalQR from "@components/Modals/modalQR";
+import { StudySheet } from '@graphql/generated';
+import ModalQR from "@components/Modals/ModalQR";
 
 
 interface TableAttendanceProps {

@@ -3191,16 +3191,6 @@ export type ProcessMethodologyById = {
 };
 
 export type ProcessMethodologyDto = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  isActive?: InputMaybe<Scalars['Boolean']['input']>;
-  methodology?: InputMaybe<MethodologyDto>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  profiles?: InputMaybe<Array<InputMaybe<ProfileDto>>>;
-  settings?: InputMaybe<ProcessSettingsDto>;
-};
-
-export type ProcessMethodologyDto = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   isUnique?: InputMaybe<Scalars['Boolean']['input']>;
   profileId?: InputMaybe<Scalars['String']['input']>;
@@ -3527,12 +3517,6 @@ export type Query = {
   exportChecklistToExcel?: Maybe<Scalars['String']['output']>;
   exportChecklistToPdf?: Maybe<Scalars['String']['output']>;
   finalReportById?: Maybe<FinalReportPageId>;
-  findActiveCommittees?: Maybe<Array<Maybe<Committee>>>;
-  findCommitteesByAdministrativeId?: Maybe<Array<Maybe<Committee>>>;
-  findCommitteesByCoordinationId?: Maybe<Array<Maybe<Committee>>>;
-  findCommitteesByStudentId?: Maybe<Array<Maybe<Committee>>>;
-  findCommitteesByTeacherId?: Maybe<Array<Maybe<Committee>>>;
-  getNotificationById?: Maybe<NoticationAnswer>;
   improvementPlanActivityById?: Maybe<ImprovementPlanActivityPageId>;
   improvementPlanById?: Maybe<ImprovementPlanPageId>;
   improvementPlanDeliveryById?: Maybe<ImprovementPlanDeliveryPageId>;
@@ -3932,12 +3916,6 @@ export type QueryAllPhasesArgs = {
 };
 
 
-export type QueryAllProcessFlowStatusesArgs = {
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
 export type QueryAllProcessMethodologyArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   search?: InputMaybe<Scalars['String']['input']>;
@@ -4181,31 +4159,6 @@ export type QueryFinalReportByIdArgs = {
 };
 
 
-export type QueryFindCommitteesByAdministrativeIdArgs = {
-  administrativeId: Scalars['Long']['input'];
-};
-
-
-export type QueryFindCommitteesByCoordinationIdArgs = {
-  coordinationId: Scalars['Long']['input'];
-};
-
-
-export type QueryFindCommitteesByStudentIdArgs = {
-  studentId: Scalars['Long']['input'];
-};
-
-
-export type QueryFindCommitteesByTeacherIdArgs = {
-  teacherId: Scalars['Long']['input'];
-};
-
-
-export type QueryGetNotificationByIdArgs = {
-  id: Scalars['String']['input'];
-};
-
-
 export type QueryImprovementPlanActivityByIdArgs = {
   id: Scalars['Long']['input'];
 };
@@ -4390,7 +4343,6 @@ export type Student = {
   committees?: Maybe<Array<Maybe<Committee>>>;
   id?: Maybe<Scalars['ID']['output']>;
   improvementPlans?: Maybe<Array<Maybe<ImprovementPlan>>>;
-  novelties?: Maybe<Array<Maybe<Novelty>>>;
   person?: Maybe<Person>;
   profiles?: Maybe<Array<Maybe<Profile>>>;
   state?: Maybe<Scalars['Boolean']['output']>;
@@ -7083,17 +7035,17 @@ export const GetAllJustificationStatusDocument = gql`
  * });
  */
 export function useGetAllJustificationStatusQuery(baseOptions?: Apollo.QueryHookOptions<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>(GetAllJustificationStatusDocument, options);
-      }
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>(GetAllJustificationStatusDocument, options);
+}
 export function useGetAllJustificationStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>(GetAllJustificationStatusDocument, options);
-        }
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>(GetAllJustificationStatusDocument, options);
+}
 export function useGetAllJustificationStatusSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>(GetAllJustificationStatusDocument, options);
-        }
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>(GetAllJustificationStatusDocument, options);
+}
 export type GetAllJustificationStatusQueryHookResult = ReturnType<typeof useGetAllJustificationStatusQuery>;
 export type GetAllJustificationStatusLazyQueryHookResult = ReturnType<typeof useGetAllJustificationStatusLazyQuery>;
 export type GetAllJustificationStatusSuspenseQueryHookResult = ReturnType<typeof useGetAllJustificationStatusSuspenseQuery>;
@@ -7129,18 +7081,18 @@ export const GetJustificationStatusByIdDocument = gql`
  *   },
  * });
  */
-export function useGetJustificationStatusByIdQuery(baseOptions: Apollo.QueryHookOptions<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables> & ({ variables: GetJustificationStatusByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>(GetJustificationStatusByIdDocument, options);
-      }
+export function useGetJustificationStatusByIdQuery(baseOptions: Apollo.QueryHookOptions<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables> & ({ variables: GetJustificationStatusByIdQueryVariables; skip?: boolean; } | { skip: boolean; })) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>(GetJustificationStatusByIdDocument, options);
+}
 export function useGetJustificationStatusByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>(GetJustificationStatusByIdDocument, options);
-        }
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>(GetJustificationStatusByIdDocument, options);
+}
 export function useGetJustificationStatusByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>(GetJustificationStatusByIdDocument, options);
-        }
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>(GetJustificationStatusByIdDocument, options);
+}
 export type GetJustificationStatusByIdQueryHookResult = ReturnType<typeof useGetJustificationStatusByIdQuery>;
 export type GetJustificationStatusByIdLazyQueryHookResult = ReturnType<typeof useGetJustificationStatusByIdLazyQuery>;
 export type GetJustificationStatusByIdSuspenseQueryHookResult = ReturnType<typeof useGetJustificationStatusByIdSuspenseQuery>;
@@ -7174,9 +7126,9 @@ export type AddJustificationStatusMutationFn = Apollo.MutationFunction<AddJustif
  * });
  */
 export function useAddJustificationStatusMutation(baseOptions?: Apollo.MutationHookOptions<AddJustificationStatusMutation, AddJustificationStatusMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddJustificationStatusMutation, AddJustificationStatusMutationVariables>(AddJustificationStatusDocument, options);
-      }
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<AddJustificationStatusMutation, AddJustificationStatusMutationVariables>(AddJustificationStatusDocument, options);
+}
 export type AddJustificationStatusMutationHookResult = ReturnType<typeof useAddJustificationStatusMutation>;
 export type AddJustificationStatusMutationResult = Apollo.MutationResult<AddJustificationStatusMutation>;
 export type AddJustificationStatusMutationOptions = Apollo.BaseMutationOptions<AddJustificationStatusMutation, AddJustificationStatusMutationVariables>;
@@ -7210,9 +7162,9 @@ export type UpdateJustificationStatusMutationFn = Apollo.MutationFunction<Update
  * });
  */
 export function useUpdateJustificationStatusMutation(baseOptions?: Apollo.MutationHookOptions<UpdateJustificationStatusMutation, UpdateJustificationStatusMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateJustificationStatusMutation, UpdateJustificationStatusMutationVariables>(UpdateJustificationStatusDocument, options);
-      }
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<UpdateJustificationStatusMutation, UpdateJustificationStatusMutationVariables>(UpdateJustificationStatusDocument, options);
+}
 export type UpdateJustificationStatusMutationHookResult = ReturnType<typeof useUpdateJustificationStatusMutation>;
 export type UpdateJustificationStatusMutationResult = Apollo.MutationResult<UpdateJustificationStatusMutation>;
 export type UpdateJustificationStatusMutationOptions = Apollo.BaseMutationOptions<UpdateJustificationStatusMutation, UpdateJustificationStatusMutationVariables>;
@@ -7245,9 +7197,9 @@ export type DeleteJustificationStatusMutationFn = Apollo.MutationFunction<Delete
  * });
  */
 export function useDeleteJustificationStatusMutation(baseOptions?: Apollo.MutationHookOptions<DeleteJustificationStatusMutation, DeleteJustificationStatusMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteJustificationStatusMutation, DeleteJustificationStatusMutationVariables>(DeleteJustificationStatusDocument, options);
-      }
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<DeleteJustificationStatusMutation, DeleteJustificationStatusMutationVariables>(DeleteJustificationStatusDocument, options);
+}
 export type DeleteJustificationStatusMutationHookResult = ReturnType<typeof useDeleteJustificationStatusMutation>;
 export type DeleteJustificationStatusMutationResult = Apollo.MutationResult<DeleteJustificationStatusMutation>;
 export type DeleteJustificationStatusMutationOptions = Apollo.BaseMutationOptions<DeleteJustificationStatusMutation, DeleteJustificationStatusMutationVariables>;
@@ -7640,18 +7592,18 @@ export const GetJustificationByStudentIdDocument = gql`
  *   },
  * });
  */
-export function useGetJustificationByStudentIdQuery(baseOptions: Apollo.QueryHookOptions<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables> & ({ variables: GetJustificationByStudentIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>(GetJustificationByStudentIdDocument, options);
-      }
+export function useGetJustificationByStudentIdQuery(baseOptions: Apollo.QueryHookOptions<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables> & ({ variables: GetJustificationByStudentIdQueryVariables; skip?: boolean; } | { skip: boolean; })) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>(GetJustificationByStudentIdDocument, options);
+}
 export function useGetJustificationByStudentIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>(GetJustificationByStudentIdDocument, options);
-        }
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>(GetJustificationByStudentIdDocument, options);
+}
 export function useGetJustificationByStudentIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>(GetJustificationByStudentIdDocument, options);
-        }
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>(GetJustificationByStudentIdDocument, options);
+}
 export type GetJustificationByStudentIdQueryHookResult = ReturnType<typeof useGetJustificationByStudentIdQuery>;
 export type GetJustificationByStudentIdLazyQueryHookResult = ReturnType<typeof useGetJustificationByStudentIdLazyQuery>;
 export type GetJustificationByStudentIdSuspenseQueryHookResult = ReturnType<typeof useGetJustificationByStudentIdSuspenseQuery>;
@@ -7719,9 +7671,9 @@ export type UpdateStatusInJustificationMutationFn = Apollo.MutationFunction<Upda
  * });
  */
 export function useUpdateStatusInJustificationMutation(baseOptions?: Apollo.MutationHookOptions<UpdateStatusInJustificationMutation, UpdateStatusInJustificationMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateStatusInJustificationMutation, UpdateStatusInJustificationMutationVariables>(UpdateStatusInJustificationDocument, options);
-      }
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<UpdateStatusInJustificationMutation, UpdateStatusInJustificationMutationVariables>(UpdateStatusInJustificationDocument, options);
+}
 export type UpdateStatusInJustificationMutationHookResult = ReturnType<typeof useUpdateStatusInJustificationMutation>;
 export type UpdateStatusInJustificationMutationResult = Apollo.MutationResult<UpdateStatusInJustificationMutation>;
 export type UpdateStatusInJustificationMutationOptions = Apollo.BaseMutationOptions<UpdateStatusInJustificationMutation, UpdateStatusInJustificationMutationVariables>;

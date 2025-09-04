@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import { AppDispatch, RootState } from "@/redux/store";
+import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
 import { toast } from "react-toastify";
 import { AppDispatch, RootState } from "@redux/store";
 import PageTitle from "@components/UI/pageTitle";
@@ -92,6 +94,11 @@ export default function JustificacionesCoordinator() {
   };
 
   const handleStatusChange = (justificacionId: string, newStatusId: string) => {
+    console.log("🔄 Cambiando estado de justificación (Coordinador):", {
+      id: justificacionId,
+      newStatusId
+    });
+
     // Buscar el nombre del estado en la lista de estados disponibles
     const selectedStatus = justificationStatuses.find(status => status.id?.toString() === newStatusId);
     const statusName = selectedStatus?.name || "Estado actualizado";

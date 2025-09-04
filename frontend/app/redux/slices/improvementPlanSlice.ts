@@ -23,7 +23,9 @@ const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPla
         city: graphqlData.city,
         date: graphqlData.date,
         reason: graphqlData.reason,
-        number: graphqlData.number,
+        qualification: graphqlData.qualification,
+        student: graphqlData.student,
+        teacherCompetence: graphqlData.teacherCompetence,
         state: graphqlData.state,
     }
 };

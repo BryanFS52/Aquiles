@@ -76,7 +76,7 @@ export const addJustificationStatus = createAsyncThunk(
   }
 );
 
-export const updateJustificationStatusEntity = createAsyncThunk(
+export const updateJustificationStatus = createAsyncThunk(
   'justificationStatus/updateEntity',
   async ({ id, input }: { id: string; input: JustificationStatusDto }) => {
     const { data } = await clientLAN.mutate({
@@ -106,7 +106,7 @@ export const getStatusNameById = (
   if (!statusId || !justificationStatuses.length) {
     return "En proceso";
   }
-  
+
   const status = justificationStatuses.find(s => s.id === statusId);
   return status?.name || "En proceso";
 };
@@ -158,7 +158,7 @@ const justificationStatusSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'Error al obtener los estados de justificación';
       })
-      
+
       // Fetch By ID
       .addCase(fetchJustificationStatusById.pending, (state) => {
         state.loading = true;
@@ -172,7 +172,7 @@ const justificationStatusSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'Error al obtener el estado de justificación';
       })
-      
+
       // Add
       .addCase(addJustificationStatus.pending, (state) => {
         state.loading = true;
@@ -186,13 +186,13 @@ const justificationStatusSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'Error al agregar el estado de justificación';
       })
-      
+
       // Update
-      .addCase(updateJustificationStatusEntity.pending, (state) => {
+      .addCase(updateJustificationStatus.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(updateJustificationStatusEntity.fulfilled, (state, action) => {
+      .addCase(updateJustificationStatus.fulfilled, (state, action) => {
         state.loading = false;
         // Actualizar el estado específico localmente si existe
         if (action.meta.arg) {
@@ -203,11 +203,11 @@ const justificationStatusSlice = createSlice({
           }
         }
       })
-      .addCase(updateJustificationStatusEntity.rejected, (state, action) => {
+      .addCase(updateJustificationStatus.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Error al actualizar el estado de justificación';
       })
-      
+
       // Delete
       .addCase(deleteJustificationStatus.pending, (state) => {
         state.loading = true;
@@ -227,6 +227,12 @@ const justificationStatusSlice = createSlice({
   },
 });
 
-export const { } = justificationStatusSlice.actions;
+export const {
+  clearError,
+  clearCurrentJustificationStatus,
+  setCurrentPage,
+  updateLocalJustificationStatus
+} = justificationStatusSlice.actions;
+
 
 export default justificationStatusSlice.reducer;
