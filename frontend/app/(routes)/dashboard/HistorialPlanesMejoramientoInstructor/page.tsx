@@ -31,6 +31,10 @@ interface ImprovementPlan {
             name: string;
         };
     } | null;
+    faultType?: {
+        id: string;
+        name: string;
+    };
 }
 
 const HistorialPlanesMejoramientoInstructor = () => {
@@ -201,6 +205,23 @@ const HistorialPlanesMejoramientoInstructor = () => {
             )
         },
         {
+            key: 'faultType',
+            header: 'Tipo de Falta',
+            render: (row) => (
+                <div className="flex items-center gap-2">
+                    {row.faultType ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
+                            {row.faultType.name.toUpperCase()}
+                        </span>
+                    ) : (
+                        <span className="text-sm text-gray-500 dark:text-gray-400 italic">
+                            Sin tipo de falta
+                        </span>
+                    )}
+                </div>
+            )
+        },
+        {
             key: 'reason',
             header: 'Razón',
             render: (row) => (
@@ -226,6 +247,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
             (row.teacherCompetence?.competence?.name?.toLowerCase().includes(searchTerm)) ||
             (row.city?.toLowerCase().includes(searchTerm)) ||
             (row.reason?.toLowerCase().includes(searchTerm)) ||
+            (row.faultType?.name?.toLowerCase().includes(searchTerm)) ||
             (row.qualification?.toString().includes(searchTerm))
         );
     };
@@ -370,7 +392,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                     columns={columns}
                     data={improvementPlans || []}
                     pageSize={10}
-                    filterPlaceholder="Buscar por estudiante, competencia, ciudad..."
+                    filterPlaceholder="Buscar por estudiante, competencia, ciudad, tipo de falta..."
                     filterFunction={filterFunction}
                     className="shadow-lg"
                     isDarkMode={isDarkMode}

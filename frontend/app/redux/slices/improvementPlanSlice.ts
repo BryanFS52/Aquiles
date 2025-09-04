@@ -3,7 +3,8 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_IMPROVEMENT_PLANS, GET_IMPROVEMENT_PLAN_BY_ID, ADD_IMPROVEMENT_PLAN, UPDATE_IMPROVEMENT_PLAN, DELETE_IMPROVEMENT_PLAN } from '@graphql/improvementPlanGraph'
 import {
-    ImprovementPlan,
+    ImprovementPlan as BaseImprovementPlan,
+    ImprovementPlanFaultType,
     GetAllImprovementPlansQuery,
     GetAllImprovementPlansQueryVariables,
     GetImprovementPlanByIdQuery,
@@ -15,6 +16,11 @@ import {
     DeleteImprovementPlanMutation,
     DeleteImprovementPlanMutationVariables
 } from '@graphql/generated'
+
+// Tipo extendido para incluir faultType
+export interface ImprovementPlan extends Omit<BaseImprovementPlan, 'faultType'> {
+    faultType?: ImprovementPlanFaultType;
+}
 
 
 // Función para transformar datos de GraphQL a ImprovementPlan
@@ -45,6 +51,12 @@ const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPla
           },
         }
       : null,
+    faultType: graphqlData.faultType
+      ? {
+          id: graphqlData.faultType.id,
+          name: graphqlData.faultType.name,
+        }
+      : undefined,
   };
 };
 

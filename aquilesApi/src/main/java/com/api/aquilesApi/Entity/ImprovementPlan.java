@@ -44,7 +44,7 @@ public class ImprovementPlan implements Serializable {
     private Notifications notification;
 
     @OneToMany(mappedBy = "improvementPlan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ImprovementPlanActivity> activities;
+    private List<ImprovementPlanActivity> ImprovementPlanActivities;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
@@ -54,8 +54,8 @@ public class ImprovementPlan implements Serializable {
     )
     private List<ImprovementPlanEvidenceType> evidenceTypes;
 
-    @ManyToOne
-    @JoinColumn(name = "fault_type_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "fault_type_id", nullable = false)
     private ImprovementPlanFaultType faultType;
 
 }

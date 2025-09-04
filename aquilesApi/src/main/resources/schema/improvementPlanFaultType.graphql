@@ -1,6 +1,6 @@
 type ImprovementPlanFaultType {
-    id: ID!
-    name: String!
+    id: ID
+    name: String
 }
 
 input ImprovementPlanFaultTypeDto {

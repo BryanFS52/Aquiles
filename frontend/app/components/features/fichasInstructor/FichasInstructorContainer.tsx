@@ -69,19 +69,6 @@ export const FichasInstructorContainer: React.FC = () => {
         }
     };
 
-    const handleTakeJustification = async (studySheet: StudySheet) => {
-        if (!studySheet.id) return;
-
-        setIsTransitioning(true);
-        try {
-            await dispatch(fetchJustificationsByCompetenceQuarter({ competenceQuarterId: parseInt(studySheet.id) }));
-            router.push('/dashboard/justificacionesInstructor');
-        } catch (error) {
-            console.error('Error al cargar las justificaciones:', error);
-        } finally {
-            setIsTransitioning(false);
-        }
-    };
     // Early returns
     if (!loading && (!fichas || fichas.length === 0)) {
         return <EmptyState message="No se encontraron fichas disponibles." />;
@@ -101,9 +88,13 @@ export const FichasInstructorContainer: React.FC = () => {
                                         studySheet={studySheet}
                                         onViewApprentices={handleViewApprentices}
                                         onTakeAttendance={handleTakeAttendance}
-                                        onTakeJustification={handleTakeJustification}
-                                        onViewApprenticesJustifications={handleViewApprenticesJustifications}
                                         loading={loading}
+                                        onViewApprenticesJustifications={() => {
+                                            // TODO: implement handler for viewing apprentices justifications
+                                        }}
+                                        onTakeJustification={() => {
+                                            // TODO: implement handler for taking justification
+                                        }}
                                     />
                                 </div>
                             ))}

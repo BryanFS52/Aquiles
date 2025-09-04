@@ -14,6 +14,7 @@ import competenceQuarterJustificationsReducer from "@slice/competenceQuarterJust
 import profileReducer from "@slice/atlas/profileSlice";
 import processMethodologiesReducer from "@slice/atlas/processMethodologiesSlice";
 import generateQrReducer from "@redux/slices/generateQrSlice";
+import improvementPlanReducer from "@redux/slices/improvementPlanSlice"
 
 const store = configureStore({
     reducer: {
@@ -31,7 +32,8 @@ const store = configureStore({
         competenceQuarterJustifications: competenceQuarterJustificationsReducer,
         profile: profileReducer,
         processMethodologies: processMethodologiesReducer,
-        generateQr: generateQrReducer
+        generateQr: generateQrReducer,
+        improvementPlan: improvementPlanReducer
     }
 });
 
