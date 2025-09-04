@@ -19,6 +19,11 @@ export const AbsencesList: React.FC<AbsencesListProps> = ({
     absences,
     onShowForm,
 }) => {
+    const sortedAbsences = [...absences].sort((a, b) => {
+        const dateA = new Date(a.attendanceDate ?? '');
+        const dateB = new Date(b.attendanceDate ?? '');
+        return dateB.getTime() - dateA.getTime();
+    });
     return (
         <div className="bg-white dark:bg-[#002033] rounded-xl shadow-lg p-8 border border-gray-100 dark:border-gray-800">
             <div className="flex items-center mb-6">
@@ -35,10 +40,10 @@ export const AbsencesList: React.FC<AbsencesListProps> = ({
                 </div>
             </div>
 
-            {absences.length > 0 && (
+            {sortedAbsences.length > 0 && (
                 <div className="mb-6">
                     <div className="max-h-80 overflow-y-auto pr-2 space-y-4">
-                        {absences.map((attendance: Attendance, index) => (
+                        {sortedAbsences.map((attendance: Attendance, index) => (
                             <motion.div
                                 key={attendance.id}
                                 initial={{ opacity: 0, x: -20 }}
@@ -76,7 +81,7 @@ export const AbsencesList: React.FC<AbsencesListProps> = ({
                 </div>
             )}
 
-            {absences.length === 0 && (
+            {sortedAbsences.length === 0 && (
                 <div className="text-center py-12">
                     <motion.div
                         initial={{ scale: 0 }}

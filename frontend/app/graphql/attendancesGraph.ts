@@ -104,6 +104,7 @@ export const GET_ATTENDANCES_BY_COMPETENCE_QUARTER_AND_JUSTIFICATIONS = gql`
           justificationDate
           justificationFile
           justificationStatus {
+            id
             name
           }
         }
@@ -112,6 +113,11 @@ export const GET_ATTENDANCES_BY_COMPETENCE_QUARTER_AND_JUSTIFICATIONS = gql`
             name
             lastname
             document
+          }
+          studentStudySheets {
+            studySheet {
+              number
+            }
           }
         }
       }

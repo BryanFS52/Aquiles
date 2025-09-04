@@ -1,86 +1,84 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import { AppDispatch, RootState } from "@/redux/store";
-import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
+import { toast } from "react-toastify";
+import type { AppDispatch, RootState } from "@/redux/store";
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFilters from "@components/features/justifications/justificationsFilter";
 import JustificationTable from "@components/features/justifications/justificationsTable";
-import {
-  fetchJustifications,
-  setFilterOptions,
-  goToPreviousPage,
-  goToNextPage,
-  formatErrorMessage,
-  setLocalCurrentPage,
-  downloadBase64File,
-  generateFileName,
+import EmptyState from "@components/UI/emptyState";
+import { 
+  setCompetenceQuarterFilterOptions,
+  setCompetenceQuarterMultiFilter,
+  toggleCompetenceQuarterMultiFilter,
+  clearCompetenceQuarterMultiFilters,
   updateJustificationStatus,
-  toggleMultiFilter,
-  setMultiFilter,
-  clearMultiFilters,
+  formatErrorMessage,
+  generateFileName,
+  downloadBase64File,
+  fetchJustificationsByCompetenceQuarter,
+  setCompetenceQuarterMode,
   MultiFilterState,
-} from '@slice/justificationSlice';
+} from "@slice/justificationSlice";
+import { fetchAllJustificationStatuses } from "@/redux/slices/justificationStatusSlice";
+import { useLoader } from "@/context/LoaderContext";
+import { JustificacionesInstructorContainerProps } from "./types";
 
-
-export default function JustificacionesCoordinator() {
+export const JustificacionesInstructorContainer: React.FC<JustificacionesInstructorContainerProps> = ({ competenceQuarterId }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const { showLoader, hideLoader } = useLoader();
+
+  // Acceso directo al estado de Redux - usando los nuevos campos para competence quarter
+  const justificationState = useSelector((state: RootState) => state.justification);
+  
+  // Extraer propiedades del estado
   const {
-    filteredData,
+    competenceQuarterData: justifications,
+    competenceQuarterFilteredData: filteredData,
+    competenceQuarterFilterOptions: filterOptions,
     loading,
     error,
-    totalItems,
-    totalPages,
-    localCurrentPage,
-    filterOptions,
-    itemsPerPage
-  } = useSelector((state: RootState) => state.justification);
+    isCompetenceQuarterMode,
+  } = justificationState;
 
-  // Obtener los estados de justificación para mapear IDs a nombres
   const { justificationStatuses } = useSelector(
     (state: RootState) => state.justificationStatus
   );
-
-
+  
   useEffect(() => {
-    dispatch(fetchJustifications({ page: 0, size: itemsPerPage }));
-    // Cargar todos los estados de justificación disponibles
-    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 })); // Aumentar a 50 para obtener todos los estados
-  }, [dispatch, localCurrentPage, itemsPerPage]);
+    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
+    // Activar el modo competence quarter
+    dispatch(setCompetenceQuarterMode(true));
+  }, [dispatch]);
 
   const handleFilterChange = (filterType: string, value: string) => {
-    dispatch(setFilterOptions({ [filterType]: value }));
-    dispatch(setLocalCurrentPage(1));
+    dispatch(setCompetenceQuarterFilterOptions({ [filterType]: value }));
   };
-
+  
   const handleRefresh = () => {
-    dispatch(fetchJustifications({ page: localCurrentPage, size: itemsPerPage }));
+    // Aquí podrías agregar lógica para recargar datos específicos si es necesario
   };
 
   const handleMultiFilterChange = (field: keyof MultiFilterState, value: string) => {
-    dispatch(setMultiFilter({ field, value }));
-    dispatch(setLocalCurrentPage(1));
+    dispatch(setCompetenceQuarterMultiFilter({ field, value }));
   };
 
   const handleToggleMultiFilter = () => {
-    dispatch(toggleMultiFilter());
-    dispatch(setLocalCurrentPage(1));
+    dispatch(toggleCompetenceQuarterMultiFilter());
   };
 
   const handleClearMultiFilters = () => {
-    dispatch(clearMultiFilters());
-    dispatch(setLocalCurrentPage(1));
+    dispatch(clearCompetenceQuarterMultiFilters());
   };
 
-  const handlePreviousPage = () => {
-    dispatch(goToPreviousPage());
-  };
-
-  const handleNextPage = () => {
-    dispatch(goToNextPage());
-  };
+  useEffect(() => {
+    if (loading) {
+      showLoader();
+    } else {
+      hideLoader();
+    }
+  }, [loading, showLoader, hideLoader]);
 
   const handleDownloadFile = (justificacion: any) => {
     if (justificacion.archivoAdjunto) {
@@ -97,7 +95,9 @@ export default function JustificacionesCoordinator() {
 
     // Buscar la justificación actual para verificar si ya tiene el mismo estado
     const currentJustification = filteredData.find((j: any) => j.id.toString() === justificacionId);
-    const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.justificationStatus?.toString();
+
+    // Verificar si el estado ya es el mismo
+    const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.estado;
     
     if (currentStatusId === newStatusId) {
       return; // No hacer nada si el estado es el mismo
@@ -113,8 +113,6 @@ export default function JustificacionesCoordinator() {
         if (updateJustificationStatus.fulfilled.match(result)) {
           // Mostrar mensaje personalizado según el estado
           showJustificationStatusMessage(statusName);
-          
-          // Ya no necesitamos recargar ya que el estado se actualiza localmente
         } else {
           const error = result.payload as any;
           if (error?.code !== "500" || !error?.message?.includes("already has the specified status")) {
@@ -144,7 +142,7 @@ export default function JustificacionesCoordinator() {
         autoClose: 5000,
       });
     } else if (statusNameLower.includes('proceso') || statusNameLower.includes('pendiente') || statusNameLower.includes('revision')) {
-      toast.info(`Justificación está en proceso`, {
+      toast.info(`Justificación en proceso`, {
         position: "top-right",
         autoClose: 4000,
       });
@@ -157,9 +155,13 @@ export default function JustificacionesCoordinator() {
   };
 
   const errorMessage = formatErrorMessage(error);
-  const canGoNext = localCurrentPage < totalPages;
-  const canGoPrevious = localCurrentPage > 1;
-
+  
+  // Obtener el número de ficha de los datos disponibles
+  const studySheetNumber = filteredData?.[0]?.ficha || justifications?.[0]?.ficha || "Sin ficha";
+  
+  // Verificar si hay datos de justificaciones
+  const hasJustificationData = justifications && justifications.length > 0;
+  
   // Determinar si hay filtros aplicados
   const { selectedFiltro, searchTerm, enableMultiFilter, multiFilters } = filterOptions;
   const hasFiltersApplied = Boolean(
@@ -170,12 +172,13 @@ export default function JustificacionesCoordinator() {
 
   return (
     <div className="space-y-6">
-      <PageTitle>Justificaciones de aprendices</PageTitle>
+      <PageTitle>Justificaciones de la Ficha: {studySheetNumber}</PageTitle>
 
       {/* Filters */}
       <JustificationFilters
         filterOptions={filterOptions}
         loading={loading}
+        showMultiFilterToggle={false}
         onFilterChange={handleFilterChange}
         onMultiFilterChange={handleMultiFilterChange}
         onToggleMultiFilter={handleToggleMultiFilter}
@@ -185,52 +188,21 @@ export default function JustificacionesCoordinator() {
 
       {/* Error Message */}
       {errorMessage && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-red-600 dark:text-red-400">{errorMessage}</p>
-        </div>
+        <EmptyState message={errorMessage} />
       )}
 
       {/* Table with built-in empty states */}
       {!errorMessage && (
-        <>
-          <JustificationTable
-            filteredData={filteredData}
-            handleDownloadFile={handleDownloadFile}
-            handleStatusChange={handleStatusChange}
-            hasAnyData={totalItems > 0}
-            isLoading={loading}
-            hasError={Boolean(error)}
-            hasFiltersApplied={hasFiltersApplied}
-            isInstructorView={false}
-          />
-
-          {/* Pagination - solo mostrar si hay datos */}
-          {!loading && filteredData.length > 0 && (
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
-              <button
-                className="flex items-center px-4 py-2 text-sm font-medium text-black dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
-                onClick={handlePreviousPage}
-                disabled={!canGoPrevious}
-              >
-                <IoIosArrowBack className="mr-2" />
-                Anterior
-              </button>
-
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                Página {localCurrentPage} de {totalPages} ({totalItems} registros)
-              </span>
-
-              <button
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
-                onClick={handleNextPage}
-                disabled={!canGoNext}
-              >
-                Siguiente
-                <IoIosArrowForward className="ml-2" />
-              </button>
-            </div>
-          )}
-        </>
+        <JustificationTable
+          filteredData={filteredData}
+          handleDownloadFile={handleDownloadFile}
+          handleStatusChange={handleStatusChange}
+          hasAnyData={hasJustificationData}
+          isLoading={loading}
+          hasError={Boolean(error)}
+          hasFiltersApplied={hasFiltersApplied}
+          isInstructorView={true}
+        />
       )}
     </div>
   );

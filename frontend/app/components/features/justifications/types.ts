@@ -35,3 +35,8 @@ export interface JustificationsHistoricalProps {
     loading: boolean;
     onDownloadFile: (justification: any) => void;
 }
+
+// justifications instructor container props
+export interface JustificacionesInstructorContainerProps {
+    competenceQuarterId: number;
+}

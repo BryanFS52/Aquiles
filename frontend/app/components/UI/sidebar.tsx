@@ -54,6 +54,7 @@ const MENU_CONFIG: MenuConfig = {
         { href: "/dashboard/ListaChequeoInstructor", label: "Sustentaciones", icon: IconSustentaciones },
         { href: "/dashboard/planesMejoramientoInstructor", label: "Planes de Mejoramiento", icon: IconPlanesMejoramiento },
         { href: "/dashboard/justificacionesInstructor", label: "Justificaciones", icon: IconJustificaciones },
+        { href: "/dashboard/InstructorFollowUp", label: "Seguimiento", icon: IconJustificaciones },
     ],
     aprendiz: [
         { href: "/dashboard/FichaAprendiz", label: "Ficha", icon: IconFichas },
