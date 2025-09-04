@@ -72,17 +72,30 @@ public class AttendancesBusiness {
     // Get attendances by student ID
     public List<Attendance> findAllByStudentId(Long studentId) {
         try {
-             return attendancesService.findAllByStudentId(studentId);
+            return attendancesService.findAllByStudentId(studentId);
         } catch (Exception e) {
             throw new CustomException("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
 
-    public Page<AttendanceDto> findAllByCompetenceQuarterId(Long id, Pageable pageable) {
+
+    public List<Attendance> getAllByStudentIdAndCompetenceQuarter(Long studentId, Long competenceQuarterId) {
         try {
-            Page<Attendance> attendanceList = attendancesService.findAllByCompetenceQuarterIdAndJustifications(id, pageable);
-            return attendanceList.map(entity -> modelMapper.map(entity, AttendanceDto.class));
+            return attendancesService.getAllByStudentIdAndCompetenceQuarter(studentId, competenceQuarterId);
+
+        } catch (Exception e) {
+            throw new CustomException("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    public List<AttendanceDto> findAllByCompetenceQuarterId(Long id) {
+        try {
+            List<Attendance> attendanceList = attendancesService.findAllByCompetenceQuarterId(id);
+            return attendanceList.stream()
+                    .map(entity -> modelMapper.map(entity, AttendanceDto.class))
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             throw new CustomException("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

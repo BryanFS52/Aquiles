@@ -63,20 +63,13 @@ export default function AttendanceTable({
                   className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   <td className="px-6 py-4">
-                    <div className="flex items-center">{summary.documento}</div>
+                    <div className="flex items-center">{summary.student.person.document}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center">{summary.aprendiz}</div>
+                    <div className="flex items-center">{summary.student.person.name} {summary.student.person.lastname}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center font-semibold">
-                      {summary.cantidad}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center font-semibold">
-                      {summary.consecutivas ?? 0}
-                    </div>
+                    <div className="flex items-center">{summary.student.attendances.length}</div>
                   </td>
                   <td className="px-6 py-4">
                     <button 

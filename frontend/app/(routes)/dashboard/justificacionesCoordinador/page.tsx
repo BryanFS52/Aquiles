@@ -5,8 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
-import { toast } from "react-toastify";
-import { AppDispatch, RootState } from "@redux/store";
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFilters from "@components/features/justifications/justificationsFilter";
 import JustificationTable from "@components/features/justifications/justificationsTable";
@@ -25,7 +23,6 @@ import {
   clearMultiFilters,
   MultiFilterState,
 } from '@slice/justificationSlice';
-import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
 
 
 export default function JustificacionesCoordinator() {
@@ -98,18 +95,6 @@ export default function JustificacionesCoordinator() {
       id: justificacionId,
       newStatusId
     });
-
-    // Buscar el nombre del estado en la lista de estados disponibles
-    const selectedStatus = justificationStatuses.find(status => status.id?.toString() === newStatusId);
-    const statusName = selectedStatus?.name || "Estado actualizado";
-
-    // Buscar la justificación actual para verificar si ya tiene el mismo estado
-    const currentJustification = filteredData.find((j: any) => j.id.toString() === justificacionId);
-    const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.justificationStatus?.toString();
-    
-    if (currentStatusId === newStatusId) {
-      return; // No hacer nada si el estado es el mismo
-    }
 
     // Enviar directamente el statusId para usar la relación real
     dispatch(updateJustificationStatus({ 

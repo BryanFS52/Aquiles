@@ -142,6 +142,9 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
         startLective
         endLective
         state
+        journey{
+          name
+        }
         trainingProject {
           name
           program {
@@ -255,4 +258,64 @@ query studySheetByTeacherIdWithTeamScrum($idTeacher: Long, $page: Int, $size: In
       totalItems
     }
   }
+`;
+
+export const GET_STUDY_SHEET_BY_ID_WITH_ATTENDANCES = gql`
+query GetStudySheetByIdWithAttendances($id: Long!, $competenceId : Long) {
+  studySheetById(id: $id) {
+    code
+    message
+    data {
+      id
+      number
+      numberStudents
+      quarter {
+        id
+        name {
+          number
+          extension
+        }
+      }
+      trainingProject {
+        id
+        name
+        program {
+          id
+          name
+        }
+      }
+      studentStudySheets {
+        id
+        student {
+            id
+        attendances(competenceQuarterId :$competenceId ) {
+            attendanceDate
+            attendanceState{
+                status
+            }
+        }
+          id
+          person {
+            id
+            document
+            name
+            lastname
+            email
+            phone
+          }
+        }
+        studentStudySheetState {
+          id
+          name
+        }
+      }
+      teacherStudySheets {
+        id
+        competence {
+          name
+        }
+      }
+    }
+  }
+}
 `;

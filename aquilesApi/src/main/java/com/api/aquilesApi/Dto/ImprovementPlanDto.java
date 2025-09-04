@@ -36,6 +36,7 @@ public class ImprovementPlanDto {
     private Long teacherCompetence;
 
     // Relations
-    private List<ImprovementPlanActivityDto> improvementPlanActivityDto;
-    private ImprovementPlanFaultTypeDto improvementPlanFaultTypeDto;
+    private List<ImprovementPlanActivityDto> improvementPlanActivity;
+    private ImprovementPlanFaultTypeDto faultType;
+    private ImprovementPlanEvidenceMapDto improvementPlanEvidenceMapDto;
 }

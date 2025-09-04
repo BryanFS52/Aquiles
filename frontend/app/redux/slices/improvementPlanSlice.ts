@@ -3,7 +3,8 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_IMPROVEMENT_PLANS, GET_IMPROVEMENT_PLAN_BY_ID, ADD_IMPROVEMENT_PLAN, UPDATE_IMPROVEMENT_PLAN, DELETE_IMPROVEMENT_PLAN } from '@graphql/improvementPlanGraph'
 import {
-    ImprovementPlan,
+    ImprovementPlan as BaseImprovementPlan,
+    ImprovementPlanFaultType,
     GetAllImprovementPlansQuery,
     GetAllImprovementPlansQueryVariables,
     GetImprovementPlanByIdQuery,
@@ -16,18 +17,47 @@ import {
     DeleteImprovementPlanMutationVariables
 } from '@graphql/generated'
 
+// Tipo extendido para incluir faultType
+export interface ImprovementPlan extends Omit<BaseImprovementPlan, 'faultType'> {
+    faultType?: ImprovementPlanFaultType;
+}
+
+
 // Función para transformar datos de GraphQL a ImprovementPlan
 const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPlan => {
-    return {
-        id: graphqlData.id,
-        city: graphqlData.city,
-        date: graphqlData.date,
-        reason: graphqlData.reason,
-        qualification: graphqlData.qualification,
-        student: graphqlData.student,
-        teacherCompetence: graphqlData.teacherCompetence,
-        state: graphqlData.state,
-    }
+  return {
+    id: graphqlData.id,
+    city: graphqlData.city,
+    date: graphqlData.date,
+    reason: graphqlData.reason,
+    qualification: graphqlData.qualification,
+    state: graphqlData.state,
+    student: graphqlData.student
+      ? {
+          id: graphqlData.student.id,
+          person: {
+            id: graphqlData.student.person?.id,
+            name: graphqlData.student.person?.name,
+            lastname: graphqlData.student.person?.lastname,
+          },
+        }
+      : null,
+    teacherCompetence: graphqlData.teacherCompetence
+      ? {
+          id: graphqlData.teacherCompetence.id,
+          competence: {
+            id: graphqlData.teacherCompetence.competence?.id,
+            name: graphqlData.teacherCompetence.competence?.name,
+          },
+        }
+      : null,
+    faultType: graphqlData.faultType
+      ? {
+          id: graphqlData.faultType.id,
+          name: graphqlData.faultType.name,
+        }
+      : undefined,
+  };
 };
 
 export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], GetAllImprovementPlansQueryVariables>(

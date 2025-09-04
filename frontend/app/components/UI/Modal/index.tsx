@@ -19,8 +19,26 @@ const Modal: React.FC<ModalProps> = ({
     children,
     className = "",
 }) => {
-    // Por ahora usamos false como valor por defecto hasta implementar el contexto
-    const isDarkMode = false;
+    // Detectar modo oscuro usando la clase 'dark' en el documento
+    const [isDarkMode, setIsDarkMode] = React.useState(false);
+
+    React.useEffect(() => {
+        const checkDarkMode = () => {
+            setIsDarkMode(document.documentElement.classList.contains('dark'));
+        };
+        
+        // Verificar inicialmente
+        checkDarkMode();
+        
+        // Observar cambios en las clases del documento
+        const observer = new MutationObserver(checkDarkMode);
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+        
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         if (!isOpen) return;

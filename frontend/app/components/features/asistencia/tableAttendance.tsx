@@ -237,7 +237,7 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                                                     return (
                                                         <td
                                                             key={dayIndex}
-                                                            className={`px-0.5 sm:px-1 py-1.5 sm:py-2 border border-lightGray text-center text-xs sm:text-sm ${isWeekend ? 'bg-lightGray' : 'bg-white'}`}
+                                                            className="px-0.5 sm:px-1 py-1.5 sm:py-2 border border-lightGray text-center text-xs sm:text-sm bg-white"
                                                         >
                                                             <span className={getCellClassName(cellValue)}>
                                                                 {cellValue}

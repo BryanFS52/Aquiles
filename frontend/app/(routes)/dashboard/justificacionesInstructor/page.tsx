@@ -94,15 +94,16 @@ export default function JustificacionesInstructor() {
     const currentJustification = filteredData.find((j: any) => j.id.toString() === justificacionId);
 
     // Verificar si el estado ya es el mismo
-    const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.estado;
-    
+    const currentStatusId = currentJustification?.justificationStatus?.id?.toString() ||
+      currentJustification?.justificationStatusId?.toString();
+
     if (currentStatusId === newStatusId) {
       return; // No hacer nada si el estado es el mismo
     }
 
     // Enviar directamente el statusId para usar la relación real
-    dispatch(updateJustificationStatus({ 
-      id: justificacionId, 
+    dispatch(updateJustificationStatus({
+      id: justificacionId,
       statusId: newStatusId,
       statusName: statusName
     }))
@@ -110,6 +111,8 @@ export default function JustificacionesInstructor() {
         if (updateJustificationStatus.fulfilled.match(result)) {
           // Mostrar mensaje personalizado según el estado
           showJustificationStatusMessage(statusName);
+
+          // Ya no necesitamos recargar ya que el estado se actualiza localmente
         } else {
           const error = result.payload as any;
           if (error?.code !== "500" || !error?.message?.includes("already has the specified status")) {
@@ -127,7 +130,7 @@ export default function JustificacionesInstructor() {
   // Función para mostrar mensajes de estado de justificación
   const showJustificationStatusMessage = (statusName: string) => {
     const statusNameLower = statusName.toLowerCase();
-    
+
     if (statusNameLower.includes('aprobad') || statusNameLower.includes('acepta')) {
       toast.success(`Justificación aprobada`, {
         position: "top-right",
@@ -152,17 +155,34 @@ export default function JustificacionesInstructor() {
   };
 
   const errorMessage = formatErrorMessage(error);
-  
-  // Verificar si hay datos de justificaciones
-  const hasJustificationData = justifications && justifications.length > 0;
-  
-  // Determinar si hay filtros aplicados
-  const { selectedFiltro, searchTerm, enableMultiFilter, multiFilters } = filterOptions;
-  const hasFiltersApplied = Boolean(
-    selectedFiltro ||
-    searchTerm ||
-    (enableMultiFilter && Object.values(multiFilters).some(value => value))
-  );
+
+  // Determinar qué datos usar - simplificado usando selectores
+  const hasJustificationData = justificationsData && justificationsData.length > 0;
+  const isLoadingAny = loading || competenceQuarterLoading;
+
+  const canGoNext = hasCompetenceQuarterData ? false : localCurrentPage < totalPages;
+  const canGoPrevious = hasCompetenceQuarterData ? false : localCurrentPage > 1;
+
+  // Preparar datos para mostrar
+  let dataToShow = filteredData;
+  let totalItemsToShow = totalItems;
+  let hasDataToShow = hasJustificationData;
+
+  // Si tenemos datos de competence quarter, usarlos en su lugar
+  if (hasCompetenceQuarterData) {
+    dataToShow = competenceQuarterJustifications;
+    totalItemsToShow = competenceQuarterJustifications.length;
+    hasDataToShow = competenceQuarterJustifications.length > 0;
+  }
+
+  // Verificar si hay datos de justificaciones en el state
+  if (!isLoadingAny && !error && !competenceQuarterError && !hasDataToShow) {
+    return <EmptyState message="No se encontraron justificaciones para esta ficha. Selecciona una ficha desde el panel del instructor." />;
+  }
+
+  if (!isLoadingAny && !errorMessage && hasDataToShow && dataToShow.length === 0) {
+    return <EmptyState message="No se encontraron justificaciones que coincidan con los filtros aplicados." />;
+  }
 
   return (
     <div className="space-y-6">

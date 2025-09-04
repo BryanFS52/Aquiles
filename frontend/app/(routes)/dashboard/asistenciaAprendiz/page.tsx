@@ -3,16 +3,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { useRouter } from 'next/navigation';
-import { EventClickArg } from '@fullcalendar/core'
+import { EventClickArg } from '@fullcalendar/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@redux/store';
 import { fetchAttendanceAndCompetenceByStudent } from '@slice/attendanceSlice';
 import { Attendance } from '@graphql/generated';
 import { useLoader } from "@context/LoaderContext";
-import FullCalendar from '@fullcalendar/react'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import timeGridPlugin from '@fullcalendar/timegrid'
-import interactionPlugin from '@fullcalendar/interaction'
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
 import PageTitle from "@components/UI/pageTitle";
 import EmptyState from "@components/UI/emptyState";
 import Modal from "@components/UI/Modal";

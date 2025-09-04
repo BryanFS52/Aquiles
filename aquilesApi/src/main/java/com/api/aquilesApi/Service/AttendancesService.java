@@ -73,6 +73,10 @@ public class AttendancesService implements Idao<Attendance, Long> {
         return attendancesRepository.findAllByCompetenceQuarter(id);
     }
 
+
+    public List<Attendance> getAllByStudentIdAndCompetenceQuarter(Long studentId, Long competenceQuarterId) {
+        return attendancesRepository.findAllByStudentIdAndCompetenceQuarter(studentId, competenceQuarterId);
+    }
     // Filter attendances by student and/or state
     public Page<Attendance> findAllByFilter(Long studentId, Long attendanceState, Pageable pageable) {
         return attendancesRepository.findByStudentIdAndOrAttendanceStateId(studentId, attendanceState, pageable);

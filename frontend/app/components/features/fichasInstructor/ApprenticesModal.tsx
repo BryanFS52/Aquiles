@@ -43,7 +43,10 @@ export const ApprenticesModal: React.FC<ApprenticesModalProps> = ({
                                 >
                                     <div className="flex items-center space-x-3">
                                         <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                                            {displayName.charAt(0).toUpperCase()}
+                                            {/* Bolita con el gradiente del header: from-primary to-lime-500 */}
+                                            <div className="w-10 h-10 bg-gradient-to-r from-primary to-lime-500 rounded-full flex items-center justify-center text-white font-semibold border border-lime-500 shadow">
+                                                {displayName.charAt(0).toUpperCase()}
+                                            </div>
                                         </div>
                                         <div>
                                             <p className="font-medium text-gray-900 dark:text-white">

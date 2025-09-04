@@ -27,5 +27,10 @@ export interface StudySheetCardProps {
     loading?: boolean;
 }
 
-// Re-exportar tipos para facilitar el uso
+
+// Extiende el tipo StudySheet para agregar competenceId
+export interface StudySheetWithCompetence extends StudySheet {
+    competenceId?: number;
+}
+
 export type { StudySheet, Student, StudentStudySheet, Person };

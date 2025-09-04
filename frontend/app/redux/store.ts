@@ -13,6 +13,7 @@ import attendanceStateReducer from "@slice/attendanceStateSlice"
 import profileReducer from "@slice/atlas/profileSlice";
 import processMethodologiesReducer from "@slice/atlas/processMethodologiesSlice";
 import generateQrReducer from "@redux/slices/generateQrSlice";
+import improvementPlanReducer from "@redux/slices/improvementPlanSlice"
 import noveltyReducer from "@slice/themis/noveltySlice";
 import noveltyTypeReducer from "@slice/themis/noveltyTypeSlice";
 
@@ -31,6 +32,8 @@ const store = configureStore({
         attendanceState: attendanceStateReducer,
         profile: profileReducer,
         processMethodologies: processMethodologiesReducer,
+        generateQr: generateQrReducer,
+        improvementPlan: improvementPlanReducer
         generateQr: generateQrReducer
         processMethodologies: processMethodologiesReducer,
         novelty: noveltyReducer,

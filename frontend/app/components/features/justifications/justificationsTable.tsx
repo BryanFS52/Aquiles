@@ -145,13 +145,12 @@ export default function JustificationTable({
               </td>
               <td className="px-6 py-4">
                 <span
-                  className={`inline-flex items-center px-1.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${
-                    getCurrentStatusName(justificacion) === "Aceptado"
+                  className={`inline-flex items-center px-1.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${getCurrentStatusName(justificacion) === "Aceptado"
                       ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
                       : getCurrentStatusName(justificacion) === "Denegado"
-                      ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
-                      : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
-                  }`}
+                        ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400"
+                    }`}
                 >
                   {getCurrentStatusName(justificacion)}
                 </span>

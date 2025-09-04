@@ -22,9 +22,15 @@ public class ImprovementPlanResolver {
 
     // FindAll ImprovementPlan (GraphQL)
     @DgsQuery
-    public Map<String, Object> allImprovementPlans(@InputArgument Integer page, @InputArgument Integer size) {
+    public Map<String, Object> allImprovementPlans(@InputArgument Integer page, @InputArgument Integer size, @InputArgument Long teacherCompetence) {
         try {
-            Page<ImprovementPlanDto> improvementPlanPage = improvementPlanBusiness.findAll(page, size);
+            System.out.println(teacherCompetence);
+            Page<ImprovementPlanDto> improvementPlanPage;
+            if (teacherCompetence != null) {
+                improvementPlanPage = improvementPlanBusiness.findByFilter(page, size, teacherCompetence);
+            }else  {
+                improvementPlanPage = improvementPlanBusiness.findAll(page, size);
+            }
             return ResponseHttpApi.responseHttpFindAll(
                     improvementPlanPage.getContent(),
                     ResponseHttpApi.CODE_OK,

@@ -7,6 +7,7 @@ type ImprovementPlan {
     qualification: Boolean!
     student: Student
     teacherCompetence: TeacherStudySheet
+    faultType: ImprovementPlanFaultType
 }
 
 input ImprovementPlanDto {
@@ -17,6 +18,7 @@ input ImprovementPlanDto {
     qualification: Boolean!
     studentId: ID!
     teacherCompetence: ID!
+    faultTypeId: ID! # Nuevo campo obligatorio
 }
 
 type ImprovementPlanPage {
@@ -37,8 +39,9 @@ type ImprovementPlanPageId {
 }
 
 extend type Query {
-    allImprovementPlans(page: Int, size: Int): ImprovementPlanPage
+    allImprovementPlans(page: Int, size: Int, teacherCompetence : Long): ImprovementPlanPage
     improvementPlanById(id: Long!): ImprovementPlanPageId
+
 }
 
 extend type Mutation {
