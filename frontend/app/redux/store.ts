@@ -33,9 +33,7 @@ const store = configureStore({
         profile: profileReducer,
         processMethodologies: processMethodologiesReducer,
         generateQr: generateQrReducer,
-        improvementPlan: improvementPlanReducer
-        generateQr: generateQrReducer
-        processMethodologies: processMethodologiesReducer,
+        improvementPlan: improvementPlanReducer,
         novelty: noveltyReducer,
         noveltyType: noveltyTypeReducer
     }

@@ -48,14 +48,23 @@ const trainingProjectService = {
         try {
             const { data } = await clientLAN.query({
                 query: GET_TRAINING_PROJECT_BY_ID,
-                variables: { id },
+                variables: { page: 0, size: 100 },
                 fetchPolicy: 'network-only',
             });
 
-            if (data?.trainingProjectById?.code === '200' || data?.trainingProjectById?.code === 200) {
-                return data.trainingProjectById;
+            if (data?.allTrainingProjects?.code === '200' || data?.allTrainingProjects?.code === 200) {
+                // Buscar el proyecto específico en la lista de resultados
+                const project = data.allTrainingProjects.data.find(p => p.id.toString() === id.toString());
+                if (project) {
+                    return {
+                        ...data.allTrainingProjects,
+                        data: project
+                    };
+                } else {
+                    throw new Error('Training project not found');
+                }
             } else {
-                throw new Error(data?.trainingProjectById?.message || 'Error fetching training project');
+                throw new Error(data?.allTrainingProjects?.message || 'Error fetching training project');
             }
         } catch (error) {
             console.error('Error fetching training project by id:', error);

@@ -1013,6 +1013,7 @@ export type HeadquarterPage = {
 export type ImprovementPlan = {
   city: Scalars['String']['output'];
   date: Scalars['String']['output'];
+  faultType?: Maybe<ImprovementPlanFaultType>;
   id: Scalars['ID']['output'];
   qualification: Scalars['Boolean']['output'];
   reason: Scalars['String']['output'];
@@ -1084,6 +1085,7 @@ export type ImprovementPlanDeliveryPageId = {
 export type ImprovementPlanDto = {
   city: Scalars['String']['input'];
   date: Scalars['String']['input'];
+  faultTypeId: Scalars['ID']['input'];
   qualification: Scalars['Boolean']['input'];
   reason: Scalars['String']['input'];
   state: Scalars['Boolean']['input'];
@@ -1118,8 +1120,8 @@ export type ImprovementPlanEvidenceTypePageId = {
 };
 
 export type ImprovementPlanFaultType = {
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
+  id?: Maybe<Scalars['ID']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
 };
 
 export type ImprovementPlanFaultTypeDto = {
@@ -3191,6 +3193,16 @@ export type ProcessMethodologyById = {
 };
 
 export type ProcessMethodologyDto = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  methodology?: InputMaybe<MethodologyDto>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  profiles?: InputMaybe<Array<InputMaybe<ProfileDto>>>;
+  settings?: InputMaybe<ProcessSettingsDto>;
+};
+
+export type ProcessMethodologyDto = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   isUnique?: InputMaybe<Scalars['Boolean']['input']>;
   profileId?: InputMaybe<Scalars['String']['input']>;
@@ -3517,6 +3529,12 @@ export type Query = {
   exportChecklistToExcel?: Maybe<Scalars['String']['output']>;
   exportChecklistToPdf?: Maybe<Scalars['String']['output']>;
   finalReportById?: Maybe<FinalReportPageId>;
+  findActiveCommittees?: Maybe<Array<Maybe<Committee>>>;
+  findCommitteesByAdministrativeId?: Maybe<Array<Maybe<Committee>>>;
+  findCommitteesByCoordinationId?: Maybe<Array<Maybe<Committee>>>;
+  findCommitteesByStudentId?: Maybe<Array<Maybe<Committee>>>;
+  findCommitteesByTeacherId?: Maybe<Array<Maybe<Committee>>>;
+  getNotificationById?: Maybe<NoticationAnswer>;
   improvementPlanActivityById?: Maybe<ImprovementPlanActivityPageId>;
   improvementPlanById?: Maybe<ImprovementPlanPageId>;
   improvementPlanDeliveryById?: Maybe<ImprovementPlanDeliveryPageId>;
@@ -3917,6 +3935,12 @@ export type QueryAllPhasesArgs = {
 };
 
 
+export type QueryAllProcessFlowStatusesArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
 export type QueryAllProcessMethodologyArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   search?: InputMaybe<Scalars['String']['input']>;
@@ -4160,6 +4184,31 @@ export type QueryFinalReportByIdArgs = {
 };
 
 
+export type QueryFindCommitteesByAdministrativeIdArgs = {
+  administrativeId: Scalars['Long']['input'];
+};
+
+
+export type QueryFindCommitteesByCoordinationIdArgs = {
+  coordinationId: Scalars['Long']['input'];
+};
+
+
+export type QueryFindCommitteesByStudentIdArgs = {
+  studentId: Scalars['Long']['input'];
+};
+
+
+export type QueryFindCommitteesByTeacherIdArgs = {
+  teacherId: Scalars['Long']['input'];
+};
+
+
+export type QueryGetNotificationByIdArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type QueryImprovementPlanActivityByIdArgs = {
   id: Scalars['Long']['input'];
 };
@@ -4344,6 +4393,7 @@ export type Student = {
   committees?: Maybe<Array<Maybe<Committee>>>;
   id?: Maybe<Scalars['ID']['output']>;
   improvementPlans?: Maybe<Array<Maybe<ImprovementPlan>>>;
+  novelties?: Maybe<Array<Maybe<Novelty>>>;
   person?: Maybe<Person>;
   profiles?: Maybe<Array<Maybe<Profile>>>;
   state?: Maybe<Scalars['Boolean']['output']>;
@@ -5055,14 +5105,14 @@ export type GetAllImprovementPlansQueryVariables = Exact<{
 }>;
 
 
-export type GetAllImprovementPlansQuery = { allImprovementPlans?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, city: string, date: string, reason: string, state: boolean, qualification: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
+export type GetAllImprovementPlansQuery = { allImprovementPlans?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, city: string, date: string, reason: string, state: boolean, qualification: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null, faultType?: { id?: string | null, name?: string | null } | null } | null> | null } | null };
 
 export type GetImprovementPlanByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
 
 
-export type GetImprovementPlanByIdQuery = { improvementPlanById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id: string, city: string, date: string, reason: string, state: boolean, qualification: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null } | null };
+export type GetImprovementPlanByIdQuery = { improvementPlanById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id: string, city: string, date: string, reason: string, state: boolean, qualification: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null, faultType?: { id?: string | null, name?: string | null } | null } | null } | null };
 
 export type AddImprovementPlanMutationVariables = Exact<{
   input: ImprovementPlanDto;
@@ -5250,6 +5300,14 @@ export type GetStudySheetsQueryVariables = Exact<{
 
 export type GetStudySheetsQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, numberStudents?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, offer?: { name?: string | null } | null, journey?: { name?: string | null } | null, quarter?: Array<{ name?: { extension?: string | null, number?: number | null } | null } | null> | null, trainingProject?: { name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
 
+export type GetStudySheetsByTrainingProjectQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetStudySheetsByTrainingProjectQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, numberStudents?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, offer?: { name?: string | null } | null, journey?: { name?: string | null } | null, quarter?: Array<{ name?: { extension?: string | null, number?: number | null } | null } | null> | null, trainingProject?: { id?: string | null, name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
+
 export type GetStudySheetWithTeamScrumByIdQueryVariables = Exact<{
   id?: InputMaybe<Scalars['Long']['input']>;
 }>;
@@ -5296,6 +5354,33 @@ export type GetStudySheetByIdWithAttendancesQueryVariables = Exact<{
 
 
 export type GetStudySheetByIdWithAttendancesQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, number?: number | null, numberStudents?: number | null, quarter?: Array<{ id?: string | null, name?: { number?: number | null, extension?: string | null } | null } | null> | null, trainingProject?: { id?: string | null, name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null, studentStudySheets?: Array<{ id?: string | null, student?: { id?: string | null, attendances?: Array<{ attendanceDate?: string | null, attendanceState?: { status?: string | null } | null } | null> | null, person?: { id?: string | null, document?: string | null, name?: string | null, lastname?: string | null, email?: string | null, phone?: string | null } | null } | null, studentStudySheetState?: { id?: string | null, name?: string | null } | null } | null> | null, teacherStudySheets?: Array<{ id?: string | null, competence?: { name?: string | null } | null } | null> | null } | null } | null };
+
+export type GetAllTrainingProjectsQueryVariables = Exact<{
+  name?: InputMaybe<Scalars['String']['input']>;
+  idProgram?: InputMaybe<Scalars['Long']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetAllTrainingProjectsQuery = { allTrainingProjects?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, name?: string | null, description?: string | null, state?: boolean | null, program?: { id?: string | null, name?: string | null, description?: string | null, coordination?: { id?: string | null, name?: string | null } | null, trainingLevel?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
+
+export type GetTrainingProjectsByProgramQueryVariables = Exact<{
+  idProgram: Scalars['Long']['input'];
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetTrainingProjectsByProgramQuery = { allTrainingProjects?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, name?: string | null, description?: string | null, state?: boolean | null, program?: { id?: string | null, name?: string | null } | null } | null> | null } | null };
+
+export type GetTrainingProjectByIdQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetTrainingProjectByIdQuery = { allTrainingProjects?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, name?: string | null, description?: string | null, state?: boolean | null, program?: { id?: string | null, name?: string | null, description?: string | null, coordination?: { id?: string | null, name?: string | null } | null, trainingLevel?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
 
 export type GetTeamsScrumsQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -6812,6 +6897,10 @@ export const GetAllImprovementPlansDocument = gql`
           name
         }
       }
+      faultType {
+        id
+        name
+      }
     }
   }
 }
@@ -6878,6 +6967,10 @@ export const GetImprovementPlanByIdDocument = gql`
           id
           name
         }
+      }
+      faultType {
+        id
+        name
       }
     }
   }
@@ -7055,17 +7148,17 @@ export const GetAllJustificationStatusDocument = gql`
  * });
  */
 export function useGetAllJustificationStatusQuery(baseOptions?: Apollo.QueryHookOptions<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>(GetAllJustificationStatusDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>(GetAllJustificationStatusDocument, options);
+      }
 export function useGetAllJustificationStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useLazyQuery<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>(GetAllJustificationStatusDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>(GetAllJustificationStatusDocument, options);
+        }
 export function useGetAllJustificationStatusSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>) {
-  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
-  return Apollo.useSuspenseQuery<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>(GetAllJustificationStatusDocument, options);
-}
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAllJustificationStatusQuery, GetAllJustificationStatusQueryVariables>(GetAllJustificationStatusDocument, options);
+        }
 export type GetAllJustificationStatusQueryHookResult = ReturnType<typeof useGetAllJustificationStatusQuery>;
 export type GetAllJustificationStatusLazyQueryHookResult = ReturnType<typeof useGetAllJustificationStatusLazyQuery>;
 export type GetAllJustificationStatusSuspenseQueryHookResult = ReturnType<typeof useGetAllJustificationStatusSuspenseQuery>;
@@ -7101,18 +7194,18 @@ export const GetJustificationStatusByIdDocument = gql`
  *   },
  * });
  */
-export function useGetJustificationStatusByIdQuery(baseOptions: Apollo.QueryHookOptions<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables> & ({ variables: GetJustificationStatusByIdQueryVariables; skip?: boolean; } | { skip: boolean; })) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>(GetJustificationStatusByIdDocument, options);
-}
+export function useGetJustificationStatusByIdQuery(baseOptions: Apollo.QueryHookOptions<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables> & ({ variables: GetJustificationStatusByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>(GetJustificationStatusByIdDocument, options);
+      }
 export function useGetJustificationStatusByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useLazyQuery<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>(GetJustificationStatusByIdDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>(GetJustificationStatusByIdDocument, options);
+        }
 export function useGetJustificationStatusByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>) {
-  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
-  return Apollo.useSuspenseQuery<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>(GetJustificationStatusByIdDocument, options);
-}
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetJustificationStatusByIdQuery, GetJustificationStatusByIdQueryVariables>(GetJustificationStatusByIdDocument, options);
+        }
 export type GetJustificationStatusByIdQueryHookResult = ReturnType<typeof useGetJustificationStatusByIdQuery>;
 export type GetJustificationStatusByIdLazyQueryHookResult = ReturnType<typeof useGetJustificationStatusByIdLazyQuery>;
 export type GetJustificationStatusByIdSuspenseQueryHookResult = ReturnType<typeof useGetJustificationStatusByIdSuspenseQuery>;
@@ -7146,9 +7239,9 @@ export type AddJustificationStatusMutationFn = Apollo.MutationFunction<AddJustif
  * });
  */
 export function useAddJustificationStatusMutation(baseOptions?: Apollo.MutationHookOptions<AddJustificationStatusMutation, AddJustificationStatusMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<AddJustificationStatusMutation, AddJustificationStatusMutationVariables>(AddJustificationStatusDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddJustificationStatusMutation, AddJustificationStatusMutationVariables>(AddJustificationStatusDocument, options);
+      }
 export type AddJustificationStatusMutationHookResult = ReturnType<typeof useAddJustificationStatusMutation>;
 export type AddJustificationStatusMutationResult = Apollo.MutationResult<AddJustificationStatusMutation>;
 export type AddJustificationStatusMutationOptions = Apollo.BaseMutationOptions<AddJustificationStatusMutation, AddJustificationStatusMutationVariables>;
@@ -7182,9 +7275,9 @@ export type UpdateJustificationStatusMutationFn = Apollo.MutationFunction<Update
  * });
  */
 export function useUpdateJustificationStatusMutation(baseOptions?: Apollo.MutationHookOptions<UpdateJustificationStatusMutation, UpdateJustificationStatusMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<UpdateJustificationStatusMutation, UpdateJustificationStatusMutationVariables>(UpdateJustificationStatusDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateJustificationStatusMutation, UpdateJustificationStatusMutationVariables>(UpdateJustificationStatusDocument, options);
+      }
 export type UpdateJustificationStatusMutationHookResult = ReturnType<typeof useUpdateJustificationStatusMutation>;
 export type UpdateJustificationStatusMutationResult = Apollo.MutationResult<UpdateJustificationStatusMutation>;
 export type UpdateJustificationStatusMutationOptions = Apollo.BaseMutationOptions<UpdateJustificationStatusMutation, UpdateJustificationStatusMutationVariables>;
@@ -7217,9 +7310,9 @@ export type DeleteJustificationStatusMutationFn = Apollo.MutationFunction<Delete
  * });
  */
 export function useDeleteJustificationStatusMutation(baseOptions?: Apollo.MutationHookOptions<DeleteJustificationStatusMutation, DeleteJustificationStatusMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<DeleteJustificationStatusMutation, DeleteJustificationStatusMutationVariables>(DeleteJustificationStatusDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteJustificationStatusMutation, DeleteJustificationStatusMutationVariables>(DeleteJustificationStatusDocument, options);
+      }
 export type DeleteJustificationStatusMutationHookResult = ReturnType<typeof useDeleteJustificationStatusMutation>;
 export type DeleteJustificationStatusMutationResult = Apollo.MutationResult<DeleteJustificationStatusMutation>;
 export type DeleteJustificationStatusMutationOptions = Apollo.BaseMutationOptions<DeleteJustificationStatusMutation, DeleteJustificationStatusMutationVariables>;
@@ -7612,18 +7705,18 @@ export const GetJustificationByStudentIdDocument = gql`
  *   },
  * });
  */
-export function useGetJustificationByStudentIdQuery(baseOptions: Apollo.QueryHookOptions<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables> & ({ variables: GetJustificationByStudentIdQueryVariables; skip?: boolean; } | { skip: boolean; })) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>(GetJustificationByStudentIdDocument, options);
-}
+export function useGetJustificationByStudentIdQuery(baseOptions: Apollo.QueryHookOptions<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables> & ({ variables: GetJustificationByStudentIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>(GetJustificationByStudentIdDocument, options);
+      }
 export function useGetJustificationByStudentIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useLazyQuery<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>(GetJustificationByStudentIdDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>(GetJustificationByStudentIdDocument, options);
+        }
 export function useGetJustificationByStudentIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>) {
-  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
-  return Apollo.useSuspenseQuery<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>(GetJustificationByStudentIdDocument, options);
-}
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetJustificationByStudentIdQuery, GetJustificationByStudentIdQueryVariables>(GetJustificationByStudentIdDocument, options);
+        }
 export type GetJustificationByStudentIdQueryHookResult = ReturnType<typeof useGetJustificationByStudentIdQuery>;
 export type GetJustificationByStudentIdLazyQueryHookResult = ReturnType<typeof useGetJustificationByStudentIdLazyQuery>;
 export type GetJustificationByStudentIdSuspenseQueryHookResult = ReturnType<typeof useGetJustificationByStudentIdSuspenseQuery>;
@@ -7691,9 +7784,9 @@ export type UpdateStatusInJustificationMutationFn = Apollo.MutationFunction<Upda
  * });
  */
 export function useUpdateStatusInJustificationMutation(baseOptions?: Apollo.MutationHookOptions<UpdateStatusInJustificationMutation, UpdateStatusInJustificationMutationVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<UpdateStatusInJustificationMutation, UpdateStatusInJustificationMutationVariables>(UpdateStatusInJustificationDocument, options);
-}
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateStatusInJustificationMutation, UpdateStatusInJustificationMutationVariables>(UpdateStatusInJustificationDocument, options);
+      }
 export type UpdateStatusInJustificationMutationHookResult = ReturnType<typeof useUpdateStatusInJustificationMutation>;
 export type UpdateStatusInJustificationMutationResult = Apollo.MutationResult<UpdateStatusInJustificationMutation>;
 export type UpdateStatusInJustificationMutationOptions = Apollo.BaseMutationOptions<UpdateStatusInJustificationMutation, UpdateStatusInJustificationMutationVariables>;
@@ -8022,6 +8115,80 @@ export type GetStudySheetsQueryHookResult = ReturnType<typeof useGetStudySheetsQ
 export type GetStudySheetsLazyQueryHookResult = ReturnType<typeof useGetStudySheetsLazyQuery>;
 export type GetStudySheetsSuspenseQueryHookResult = ReturnType<typeof useGetStudySheetsSuspenseQuery>;
 export type GetStudySheetsQueryResult = Apollo.QueryResult<GetStudySheetsQuery, GetStudySheetsQueryVariables>;
+export const GetStudySheetsByTrainingProjectDocument = gql`
+    query GetStudySheetsByTrainingProject($page: Int, $size: Int) {
+  allStudySheets(page: $page, size: $size) {
+    date
+    code
+    message
+    data {
+      id
+      number
+      numberStudents
+      startLective
+      endLective
+      state
+      offer {
+        name
+      }
+      journey {
+        name
+      }
+      quarter {
+        name {
+          extension
+          number
+        }
+      }
+      trainingProject {
+        id
+        name
+        program {
+          id
+          name
+        }
+      }
+    }
+    currentPage
+    totalPages
+    totalItems
+  }
+}
+    `;
+
+/**
+ * __useGetStudySheetsByTrainingProjectQuery__
+ *
+ * To run a query within a React component, call `useGetStudySheetsByTrainingProjectQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStudySheetsByTrainingProjectQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStudySheetsByTrainingProjectQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useGetStudySheetsByTrainingProjectQuery(baseOptions?: Apollo.QueryHookOptions<GetStudySheetsByTrainingProjectQuery, GetStudySheetsByTrainingProjectQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetStudySheetsByTrainingProjectQuery, GetStudySheetsByTrainingProjectQueryVariables>(GetStudySheetsByTrainingProjectDocument, options);
+      }
+export function useGetStudySheetsByTrainingProjectLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetStudySheetsByTrainingProjectQuery, GetStudySheetsByTrainingProjectQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetStudySheetsByTrainingProjectQuery, GetStudySheetsByTrainingProjectQueryVariables>(GetStudySheetsByTrainingProjectDocument, options);
+        }
+export function useGetStudySheetsByTrainingProjectSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetStudySheetsByTrainingProjectQuery, GetStudySheetsByTrainingProjectQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetStudySheetsByTrainingProjectQuery, GetStudySheetsByTrainingProjectQueryVariables>(GetStudySheetsByTrainingProjectDocument, options);
+        }
+export type GetStudySheetsByTrainingProjectQueryHookResult = ReturnType<typeof useGetStudySheetsByTrainingProjectQuery>;
+export type GetStudySheetsByTrainingProjectLazyQueryHookResult = ReturnType<typeof useGetStudySheetsByTrainingProjectLazyQuery>;
+export type GetStudySheetsByTrainingProjectSuspenseQueryHookResult = ReturnType<typeof useGetStudySheetsByTrainingProjectSuspenseQuery>;
+export type GetStudySheetsByTrainingProjectQueryResult = Apollo.QueryResult<GetStudySheetsByTrainingProjectQuery, GetStudySheetsByTrainingProjectQueryVariables>;
 export const GetStudySheetWithTeamScrumByIdDocument = gql`
     query GetStudySheetWithTeamScrumById($id: Long) {
   studySheetById(id: $id) {
@@ -8480,22 +8647,216 @@ export const GetStudySheetByIdWithAttendancesDocument = gql`
  *   },
  * });
  */
-export function useGetStudySheetByIdWithAttendancesQuery(baseOptions: Apollo.QueryHookOptions<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables> & ({ variables: GetStudySheetByIdWithAttendancesQueryVariables; skip?: boolean; } | { skip: boolean; })) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>(GetStudySheetByIdWithAttendancesDocument, options);
-}
+export function useGetStudySheetByIdWithAttendancesQuery(baseOptions: Apollo.QueryHookOptions<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables> & ({ variables: GetStudySheetByIdWithAttendancesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>(GetStudySheetByIdWithAttendancesDocument, options);
+      }
 export function useGetStudySheetByIdWithAttendancesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useLazyQuery<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>(GetStudySheetByIdWithAttendancesDocument, options);
-}
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>(GetStudySheetByIdWithAttendancesDocument, options);
+        }
 export function useGetStudySheetByIdWithAttendancesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>) {
-  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
-  return Apollo.useSuspenseQuery<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>(GetStudySheetByIdWithAttendancesDocument, options);
-}
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>(GetStudySheetByIdWithAttendancesDocument, options);
+        }
 export type GetStudySheetByIdWithAttendancesQueryHookResult = ReturnType<typeof useGetStudySheetByIdWithAttendancesQuery>;
 export type GetStudySheetByIdWithAttendancesLazyQueryHookResult = ReturnType<typeof useGetStudySheetByIdWithAttendancesLazyQuery>;
 export type GetStudySheetByIdWithAttendancesSuspenseQueryHookResult = ReturnType<typeof useGetStudySheetByIdWithAttendancesSuspenseQuery>;
 export type GetStudySheetByIdWithAttendancesQueryResult = Apollo.QueryResult<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>;
+export const GetAllTrainingProjectsDocument = gql`
+    query GetAllTrainingProjects($name: String, $idProgram: Long, $page: Int, $size: Int) {
+  allTrainingProjects(
+    name: $name
+    idProgram: $idProgram
+    page: $page
+    size: $size
+  ) {
+    date
+    code
+    message
+    data {
+      id
+      name
+      description
+      state
+      program {
+        id
+        name
+        description
+        coordination {
+          id
+          name
+        }
+        trainingLevel {
+          id
+          name
+        }
+      }
+    }
+    currentPage
+    totalPages
+    totalItems
+  }
+}
+    `;
+
+/**
+ * __useGetAllTrainingProjectsQuery__
+ *
+ * To run a query within a React component, call `useGetAllTrainingProjectsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllTrainingProjectsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllTrainingProjectsQuery({
+ *   variables: {
+ *      name: // value for 'name'
+ *      idProgram: // value for 'idProgram'
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useGetAllTrainingProjectsQuery(baseOptions?: Apollo.QueryHookOptions<GetAllTrainingProjectsQuery, GetAllTrainingProjectsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllTrainingProjectsQuery, GetAllTrainingProjectsQueryVariables>(GetAllTrainingProjectsDocument, options);
+      }
+export function useGetAllTrainingProjectsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllTrainingProjectsQuery, GetAllTrainingProjectsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllTrainingProjectsQuery, GetAllTrainingProjectsQueryVariables>(GetAllTrainingProjectsDocument, options);
+        }
+export function useGetAllTrainingProjectsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllTrainingProjectsQuery, GetAllTrainingProjectsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAllTrainingProjectsQuery, GetAllTrainingProjectsQueryVariables>(GetAllTrainingProjectsDocument, options);
+        }
+export type GetAllTrainingProjectsQueryHookResult = ReturnType<typeof useGetAllTrainingProjectsQuery>;
+export type GetAllTrainingProjectsLazyQueryHookResult = ReturnType<typeof useGetAllTrainingProjectsLazyQuery>;
+export type GetAllTrainingProjectsSuspenseQueryHookResult = ReturnType<typeof useGetAllTrainingProjectsSuspenseQuery>;
+export type GetAllTrainingProjectsQueryResult = Apollo.QueryResult<GetAllTrainingProjectsQuery, GetAllTrainingProjectsQueryVariables>;
+export const GetTrainingProjectsByProgramDocument = gql`
+    query GetTrainingProjectsByProgram($idProgram: Long!, $page: Int, $size: Int) {
+  allTrainingProjects(idProgram: $idProgram, page: $page, size: $size) {
+    date
+    code
+    message
+    data {
+      id
+      name
+      description
+      state
+      program {
+        id
+        name
+      }
+    }
+    currentPage
+    totalPages
+    totalItems
+  }
+}
+    `;
+
+/**
+ * __useGetTrainingProjectsByProgramQuery__
+ *
+ * To run a query within a React component, call `useGetTrainingProjectsByProgramQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTrainingProjectsByProgramQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTrainingProjectsByProgramQuery({
+ *   variables: {
+ *      idProgram: // value for 'idProgram'
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useGetTrainingProjectsByProgramQuery(baseOptions: Apollo.QueryHookOptions<GetTrainingProjectsByProgramQuery, GetTrainingProjectsByProgramQueryVariables> & ({ variables: GetTrainingProjectsByProgramQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetTrainingProjectsByProgramQuery, GetTrainingProjectsByProgramQueryVariables>(GetTrainingProjectsByProgramDocument, options);
+      }
+export function useGetTrainingProjectsByProgramLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTrainingProjectsByProgramQuery, GetTrainingProjectsByProgramQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetTrainingProjectsByProgramQuery, GetTrainingProjectsByProgramQueryVariables>(GetTrainingProjectsByProgramDocument, options);
+        }
+export function useGetTrainingProjectsByProgramSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetTrainingProjectsByProgramQuery, GetTrainingProjectsByProgramQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetTrainingProjectsByProgramQuery, GetTrainingProjectsByProgramQueryVariables>(GetTrainingProjectsByProgramDocument, options);
+        }
+export type GetTrainingProjectsByProgramQueryHookResult = ReturnType<typeof useGetTrainingProjectsByProgramQuery>;
+export type GetTrainingProjectsByProgramLazyQueryHookResult = ReturnType<typeof useGetTrainingProjectsByProgramLazyQuery>;
+export type GetTrainingProjectsByProgramSuspenseQueryHookResult = ReturnType<typeof useGetTrainingProjectsByProgramSuspenseQuery>;
+export type GetTrainingProjectsByProgramQueryResult = Apollo.QueryResult<GetTrainingProjectsByProgramQuery, GetTrainingProjectsByProgramQueryVariables>;
+export const GetTrainingProjectByIdDocument = gql`
+    query GetTrainingProjectById($page: Int, $size: Int) {
+  allTrainingProjects(page: $page, size: $size) {
+    date
+    code
+    message
+    data {
+      id
+      name
+      description
+      state
+      program {
+        id
+        name
+        description
+        coordination {
+          id
+          name
+        }
+        trainingLevel {
+          id
+          name
+        }
+      }
+    }
+    currentPage
+    totalPages
+    totalItems
+  }
+}
+    `;
+
+/**
+ * __useGetTrainingProjectByIdQuery__
+ *
+ * To run a query within a React component, call `useGetTrainingProjectByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTrainingProjectByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTrainingProjectByIdQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useGetTrainingProjectByIdQuery(baseOptions?: Apollo.QueryHookOptions<GetTrainingProjectByIdQuery, GetTrainingProjectByIdQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetTrainingProjectByIdQuery, GetTrainingProjectByIdQueryVariables>(GetTrainingProjectByIdDocument, options);
+      }
+export function useGetTrainingProjectByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTrainingProjectByIdQuery, GetTrainingProjectByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetTrainingProjectByIdQuery, GetTrainingProjectByIdQueryVariables>(GetTrainingProjectByIdDocument, options);
+        }
+export function useGetTrainingProjectByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetTrainingProjectByIdQuery, GetTrainingProjectByIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetTrainingProjectByIdQuery, GetTrainingProjectByIdQueryVariables>(GetTrainingProjectByIdDocument, options);
+        }
+export type GetTrainingProjectByIdQueryHookResult = ReturnType<typeof useGetTrainingProjectByIdQuery>;
+export type GetTrainingProjectByIdLazyQueryHookResult = ReturnType<typeof useGetTrainingProjectByIdLazyQuery>;
+export type GetTrainingProjectByIdSuspenseQueryHookResult = ReturnType<typeof useGetTrainingProjectByIdSuspenseQuery>;
+export type GetTrainingProjectByIdQueryResult = Apollo.QueryResult<GetTrainingProjectByIdQuery, GetTrainingProjectByIdQueryVariables>;
 export const GetTeamsScrumsDocument = gql`
     query GetTeamsScrums($page: Int, $size: Int) {
   allTeamsScrums(page: $page, size: $size) {

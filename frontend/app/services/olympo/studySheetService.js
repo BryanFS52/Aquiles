@@ -48,16 +48,28 @@ const studySheetService = {
         }
     },
 
-    getStudySheetsByTrainingProject: async ({ idTrainingProject, page = 0, size = 10 }) => {
+    getStudySheetsByTrainingProject: async ({ idTrainingProject, page = 0, size = 100 }) => {
         try {
             const { data } = await clientLAN.query({
                 query: GET_STUDY_SHEETS_BY_TRAINING_PROJECT,
-                variables: { idTrainingProject, page, size },
+                variables: { page, size },
                 fetchPolicy: 'network-only',
             });
 
             if (data?.allStudySheets?.code === '200' || data?.allStudySheets?.code === 200) {
-                return data.allStudySheets;
+                // Filtrar las fichas que pertenecen específicamente a este proyecto formativo
+                const filteredSheets = data.allStudySheets.data.filter(sheet => 
+                    sheet.trainingProject?.id?.toString() === idTrainingProject.toString()
+                );
+                
+                const filteredData = {
+                    ...data.allStudySheets,
+                    data: filteredSheets,
+                    totalItems: filteredSheets.length,
+                    totalPages: Math.ceil(filteredSheets.length / size)
+                };
+                
+                return filteredData;
             } else {
                 throw new Error(data?.allStudySheets?.message || 'Error fetching study sheets by training project');
             }

@@ -1,4 +1,4 @@
-/*
+
 import { gql } from "@apollo/client";
 
 // Queries para Training Projects
@@ -58,8 +58,9 @@ export const GET_TRAINING_PROJECTS_BY_PROGRAM = gql`
 `;
 
 export const GET_TRAINING_PROJECT_BY_ID = gql`
-  query GetTrainingProjectById($id: Long!) {
-    trainingProjectById(id: $id) {
+  query GetTrainingProjectById($page: Int, $size: Int) {
+    allTrainingProjects(page: $page, size: $size) {
+      date
       code
       message
       data {
@@ -81,7 +82,10 @@ export const GET_TRAINING_PROJECT_BY_ID = gql`
           }
         }
       }
+      currentPage
+      totalPages
+      totalItems
     }
   }
 `;
-*/
+

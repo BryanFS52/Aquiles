@@ -94,9 +94,14 @@ export default function JustificacionesInstructor() {
     const currentJustification = filteredData.find((j: any) => j.id.toString() === justificacionId);
 
     // Verificar si el estado ya es el mismo
+<<<<<<< HEAD
+    const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.estado;
+    
+=======
     const currentStatusId = currentJustification?.justificationStatus?.id?.toString() ||
       currentJustification?.justificationStatusId?.toString();
 
+>>>>>>> origin/gabrielDev
     if (currentStatusId === newStatusId) {
       return; // No hacer nada si el estado es el mismo
     }
@@ -111,8 +116,11 @@ export default function JustificacionesInstructor() {
         if (updateJustificationStatus.fulfilled.match(result)) {
           // Mostrar mensaje personalizado según el estado
           showJustificationStatusMessage(statusName);
+<<<<<<< HEAD
+=======
 
           // Ya no necesitamos recargar ya que el estado se actualiza localmente
+>>>>>>> origin/gabrielDev
         } else {
           const error = result.payload as any;
           if (error?.code !== "500" || !error?.message?.includes("already has the specified status")) {
@@ -155,6 +163,19 @@ export default function JustificacionesInstructor() {
   };
 
   const errorMessage = formatErrorMessage(error);
+<<<<<<< HEAD
+  
+  // Verificar si hay datos de justificaciones
+  const hasJustificationData = justifications && justifications.length > 0;
+  
+  // Determinar si hay filtros aplicados
+  const { selectedFiltro, searchTerm, enableMultiFilter, multiFilters } = filterOptions;
+  const hasFiltersApplied = Boolean(
+    selectedFiltro ||
+    searchTerm ||
+    (enableMultiFilter && Object.values(multiFilters).some(value => value))
+  );
+=======
 
   // Determinar qué datos usar - simplificado usando selectores
   const hasJustificationData = justificationsData && justificationsData.length > 0;
@@ -183,6 +204,7 @@ export default function JustificacionesInstructor() {
   if (!isLoadingAny && !errorMessage && hasDataToShow && dataToShow.length === 0) {
     return <EmptyState message="No se encontraron justificaciones que coincidan con los filtros aplicados." />;
   }
+>>>>>>> origin/gabrielDev
 
   return (
     <div className="space-y-6">

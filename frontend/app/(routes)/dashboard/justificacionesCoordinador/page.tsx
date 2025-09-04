@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import { toast } from "react-toastify";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
 import PageTitle from "@components/UI/pageTitle";
@@ -95,6 +96,10 @@ export default function JustificacionesCoordinator() {
       id: justificacionId,
       newStatusId
     });
+
+    // Encontrar el nombre del estado basado en el ID
+    const status = justificationStatuses.find(s => s.id === newStatusId);
+    const statusName = status?.name || 'Estado desconocido';
 
     // Enviar directamente el statusId para usar la relación real
     dispatch(updateJustificationStatus({ 
