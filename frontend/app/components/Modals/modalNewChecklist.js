@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { addChecklist } from '@services/checkListService'
+import trainingProjectService from '@services/olympo/trainingProjectService'
+import studySheetService from '@services/olympo/studySheetService'
 
 export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingData = null, isEditing = false }) {
   const [trimestre, setTrimestre] = useState('')
@@ -11,6 +13,60 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
   const [items, setItems] = useState([{ indicador: '' }])
   const [isModalOpen, setIsOpen] = useState(false)
   const [deletedItemIds, setDeletedItemIds] = useState([]) // ← Nuevo estado para rastrear items eliminados
+  
+  // Estados para proyectos formativos y fichas
+  const [selectedTrainingProject, setSelectedTrainingProject] = useState('')
+  const [selectedStudySheets, setSelectedStudySheets] = useState([])
+  const [trainingProjects, setTrainingProjects] = useState([])
+  const [studySheets, setStudySheets] = useState([])
+  const [loadingProjects, setLoadingProjects] = useState(false)
+  const [loadingSheets, setLoadingSheets] = useState(false)
+
+  // Cargar proyectos formativos al abrir el modal
+  useEffect(() => {
+    if (isOpen) {
+      loadTrainingProjects()
+    }
+  }, [isOpen])
+
+  // Cargar fichas cuando se selecciona un proyecto formativo
+  useEffect(() => {
+    if (selectedTrainingProject) {
+      loadStudySheets(selectedTrainingProject)
+    } else {
+      setStudySheets([])
+      setSelectedStudySheets([])
+    }
+  }, [selectedTrainingProject])
+
+  const loadTrainingProjects = async () => {
+    setLoadingProjects(true)
+    try {
+      const response = await trainingProjectService.getAllTrainingProjects({ size: 100 })
+      setTrainingProjects(response.data || [])
+    } catch (error) {
+      console.error('Error loading training projects:', error)
+      toast.error('Error al cargar los proyectos formativos')
+    } finally {
+      setLoadingProjects(false)
+    }
+  }
+
+  const loadStudySheets = async (trainingProjectId) => {
+    setLoadingSheets(true)
+    try {
+      const response = await studySheetService.getStudySheetsByTrainingProject({ 
+        idTrainingProject: parseInt(trainingProjectId),
+        size: 100
+      })
+      setStudySheets(response.data || [])
+    } catch (error) {
+      console.error('Error loading study sheets:', error)
+      toast.error('Error al cargar las fichas de formación')
+    } finally {
+      setLoadingSheets(false)
+    }
+  }
 
   // Efecto para cargar datos de edición
   useEffect(() => {
@@ -27,6 +83,10 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
       setComponente(editingData.component || '')
       setObservaciones(editingData.remarks || '')
       setDeletedItemIds([]) // ← Limpiar lista de eliminados al cargar datos de edición
+      
+      // Cargar datos de proyecto formativo y fichas si existen
+      setSelectedTrainingProject(editingData.trainingProjectId?.toString() || '')
+      setSelectedStudySheets(editingData.studySheets ? editingData.studySheets.split(',') : [])
       
       // ← Log específico para trimester y component
       console.log('🔍 MODAL: Setting form values from editingData:');
@@ -61,6 +121,8 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
       setObservaciones('')
       setItems([{ indicador: '' }])
       setDeletedItemIds([]) // ← Limpiar items eliminados
+      setSelectedTrainingProject('')
+      setSelectedStudySheets([])
     }
   }, [isEditing, editingData, isOpen]) // Reaccionar a cambios en editingData
 
@@ -79,7 +141,8 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
         trimester: trimestre,
         instructorSignature: "No signature",
         evaluationCriteria: false,
-        studySheets: null,
+        studySheets: selectedStudySheets.length > 0 ? selectedStudySheets.join(',') : null,
+        trainingProjectId: selectedTrainingProject ? parseInt(selectedTrainingProject) : null,
         evaluations: null,
         component: componente,
         associatedJuries: null, // ← Cambiar a null en lugar de array vacío
@@ -182,12 +245,27 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
     console.log(`Item removed from index ${index}. Remaining items:`, newItems.length); // Debug log
   }
 
+  const handleTrainingProjectChange = (value) => {
+    setSelectedTrainingProject(value)
+    setSelectedStudySheets([]) // Limpiar fichas seleccionadas
+  }
+
+  const handleStudySheetChange = (sheetId, checked) => {
+    if (checked) {
+      setSelectedStudySheets(prev => [...prev, sheetId])
+    } else {
+      setSelectedStudySheets(prev => prev.filter(id => id !== sheetId))
+    }
+  }
+
   const resetForm = () => {
     setTrimestre('')
     setComponente('')
     setObservaciones('')
     setItems([{ indicador: '' }])
     setDeletedItemIds([]) // ← Limpiar items eliminados
+    setSelectedTrainingProject('')
+    setSelectedStudySheets([])
   }
 
   if (isOpen !== undefined) {
@@ -267,6 +345,60 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                 className="w-full px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 h-28 resize-none font-medium placeholder:text-gray-500 dark:placeholder:text-gray-400"
               />
             </div>
+
+            {/* Selector de Proyecto Formativo */}
+            <div className="space-y-2">
+              <label htmlFor="trainingProject" className="block text-sm font-bold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                Proyecto Formativo (Opcional)
+              </label>
+              <select
+                id="trainingProject"
+                value={selectedTrainingProject}
+                onChange={(e) => handleTrainingProjectChange(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
+                disabled={loadingProjects}
+              >
+                <option value="">Selecciona un proyecto formativo</option>
+                {trainingProjects.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.name} - {project.program?.name}
+                  </option>
+                ))}
+              </select>
+              {loadingProjects && (
+                <p className="text-sm text-gray-500 mt-1">Cargando proyectos formativos...</p>
+              )}
+            </div>
+
+            {/* Selector de Fichas de Formación */}
+            {selectedTrainingProject && (
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                  Fichas de Formación Asociadas
+                </label>
+                {loadingSheets ? (
+                  <p className="text-sm text-gray-500">Cargando fichas...</p>
+                ) : studySheets.length > 0 ? (
+                  <div className="max-h-32 overflow-y-auto border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl p-3 space-y-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700">
+                    {studySheets.map((sheet) => (
+                      <label key={sheet.id} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedStudySheets.includes(sheet.id.toString())}
+                          onChange={(e) => handleStudySheetChange(sheet.id.toString(), e.target.checked)}
+                          className="h-4 w-4 text-lime-600 focus:ring-lime-500 border-gray-300 rounded"
+                        />
+                        <span className="text-sm text-darkBlue dark:text-white">
+                          Ficha {sheet.number} - {sheet.journey?.name} ({sheet.numberStudents} estudiantes)
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500">No hay fichas disponibles para este proyecto formativo</p>
+                )}
+              </div>
+            )}
 
             <div className="space-y-6">
               <div className="flex items-center justify-between">

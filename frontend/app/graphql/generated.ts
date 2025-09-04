@@ -178,6 +178,7 @@ export type Checklist = {
 export type ChecklistDto = {
   associatedJuries?: InputMaybe<Array<InputMaybe<Scalars['Long']['input']>>>;
   component?: InputMaybe<Scalars['String']['input']>;
+  deletedItemIds?: InputMaybe<Array<InputMaybe<Scalars['Long']['input']>>>;
   evaluationCriteria: Scalars['Boolean']['input'];
   evaluationId?: InputMaybe<Scalars['Long']['input']>;
   evaluations?: InputMaybe<Array<InputMaybe<EvaluationDto>>>;
@@ -259,6 +260,7 @@ export type ClassTypePage = {
 
 export type Collaborator = {
   contractType?: Maybe<ContractType>;
+  coordination?: Maybe<Coordination>;
   endDate?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
   laborDepartment?: Maybe<LaborDepartment>;
@@ -269,6 +271,7 @@ export type Collaborator = {
 
 export type CollaboratorDto = {
   contractType?: InputMaybe<ContractTypeDto>;
+  coordination?: InputMaybe<CoordinationDto>;
   endDate?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
   laborDepartment?: InputMaybe<LaborDepartmentDto>;
@@ -318,20 +321,22 @@ export type CommitteeEmailResponse = {
 
 export type CommitteeEvent = {
   committee?: Maybe<Committee>;
+  coordinationName?: Maybe<Scalars['String']['output']>;
   date?: Maybe<Scalars['String']['output']>;
-  endHour?: Maybe<Scalars['String']['output']>;
+  hour?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
   minutes?: Maybe<Array<Maybe<Minute>>>;
-  startHour?: Maybe<Scalars['String']['output']>;
+  session?: Maybe<Scalars['String']['output']>;
 };
 
 export type CommitteeEventDto = {
-  committeeId?: InputMaybe<Scalars['ID']['input']>;
+  committee?: InputMaybe<CommitteeDto>;
+  coordinationName?: InputMaybe<Scalars['String']['input']>;
   date?: InputMaybe<Scalars['String']['input']>;
-  endHour?: InputMaybe<Scalars['String']['input']>;
+  hour?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
   minutes?: InputMaybe<Array<InputMaybe<MinuteDto>>>;
-  startHour?: InputMaybe<Scalars['String']['input']>;
+  session?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CommitteeEventInput = {
@@ -1009,17 +1014,133 @@ export type ImprovementPlan = {
   city: Scalars['String']['output'];
   date: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  number: Scalars['Int']['output'];
+  qualification: Scalars['Boolean']['output'];
   reason: Scalars['String']['output'];
   state: Scalars['Boolean']['output'];
+  student?: Maybe<Student>;
+  teacherCompetence?: Maybe<TeacherStudySheet>;
+};
+
+export type ImprovementPlanActivity = {
+  deliveryDate: Scalars['String']['output'];
+  deliveryFormat: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  improvementPlanId: Scalars['ID']['output'];
+  learningOutcome: Scalars['String']['output'];
+};
+
+export type ImprovementPlanActivityDto = {
+  deliveryDate: Scalars['String']['input'];
+  deliveryFormat: Scalars['String']['input'];
+  description: Scalars['String']['input'];
+  improvementPlanId: Scalars['ID']['input'];
+  learningOutcome: Scalars['String']['input'];
+};
+
+export type ImprovementPlanActivityPage = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<ImprovementPlanActivity>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ImprovementPlanActivityPageId = {
+  code?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<ImprovementPlanActivity>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+};
+
+export type ImprovementPlanDelivery = {
+  deliveryFormat: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+};
+
+export type ImprovementPlanDeliveryDto = {
+  deliveryFormat: Scalars['String']['input'];
+};
+
+export type ImprovementPlanDeliveryPage = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<ImprovementPlanDelivery>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ImprovementPlanDeliveryPageId = {
+  code?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<ImprovementPlanDelivery>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
 };
 
 export type ImprovementPlanDto = {
   city: Scalars['String']['input'];
   date: Scalars['String']['input'];
-  number: Scalars['Int']['input'];
+  qualification: Scalars['Boolean']['input'];
   reason: Scalars['String']['input'];
   state: Scalars['Boolean']['input'];
+  studentId: Scalars['ID']['input'];
+  teacherCompetence: Scalars['ID']['input'];
+};
+
+export type ImprovementPlanEvidenceType = {
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type ImprovementPlanEvidenceTypeDto = {
+  name: Scalars['String']['input'];
+};
+
+export type ImprovementPlanEvidenceTypePage = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<ImprovementPlanEvidenceType>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ImprovementPlanEvidenceTypePageId = {
+  code?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<ImprovementPlanEvidenceType>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+};
+
+export type ImprovementPlanFaultType = {
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type ImprovementPlanFaultTypeDto = {
+  name: Scalars['String']['input'];
+};
+
+export type ImprovementPlanFaultTypePage = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<ImprovementPlanFaultType>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ImprovementPlanFaultTypePageId = {
+  code?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<ImprovementPlanFaultType>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
 };
 
 export type ImprovementPlanPage = {
@@ -1399,6 +1520,7 @@ export type Mutation = {
   addCommitteeAndSendEmail: CommitteeEmailResponse;
   addCommitteeEvent?: Maybe<Response>;
   addCommitteeEventAndSendEmail: CommitteeEmailResponse;
+  addCommitteeEventsBulk?: Maybe<Response>;
   addCompany?: Maybe<Response>;
   addCompetence?: Maybe<Response>;
   addCondition?: Maybe<Response>;
@@ -1412,6 +1534,10 @@ export type Mutation = {
   addFinalReport?: Maybe<Response>;
   addHeadquarter?: Maybe<Response>;
   addImprovementPlan?: Maybe<Response>;
+  addImprovementPlanActivity?: Maybe<Response>;
+  addImprovementPlanDelivery?: Maybe<Response>;
+  addImprovementPlanEvidenceType?: Maybe<Response>;
+  addImprovementPlanFaultType?: Maybe<Response>;
   addIteration?: Maybe<StringResponse>;
   addJourney?: Maybe<Response>;
   addJury?: Maybe<Response>;
@@ -1480,6 +1606,10 @@ export type Mutation = {
   deleteFinalReport?: Maybe<Response>;
   deleteHeadquarter?: Maybe<Response>;
   deleteImprovementPlan?: Maybe<Response>;
+  deleteImprovementPlanActivity?: Maybe<Response>;
+  deleteImprovementPlanDelivery?: Maybe<Response>;
+  deleteImprovementPlanEvidenceType?: Maybe<Response>;
+  deleteImprovementPlanFaultType?: Maybe<Response>;
   deleteItem?: Maybe<ItemPageId>;
   deleteJourney?: Maybe<Response>;
   deleteJury?: Maybe<Response>;
@@ -1545,6 +1675,10 @@ export type Mutation = {
   updateFinalReport?: Maybe<Response>;
   updateHeadquarter?: Maybe<Response>;
   updateImprovementPlan?: Maybe<Response>;
+  updateImprovementPlanActivity?: Maybe<Response>;
+  updateImprovementPlanDelivery?: Maybe<Response>;
+  updateImprovementPlanEvidenceType?: Maybe<Response>;
+  updateImprovementPlanFaultType?: Maybe<Response>;
   updateItem?: Maybe<ItemPageId>;
   updateItemStatus?: Maybe<Response>;
   updateIteration?: Maybe<StringResponse>;
@@ -1664,6 +1798,11 @@ export type MutationAddCommitteeEventAndSendEmailArgs = {
 };
 
 
+export type MutationAddCommitteeEventsBulkArgs = {
+  input?: InputMaybe<Array<CommitteeEventDto>>;
+};
+
+
 export type MutationAddCompanyArgs = {
   input?: InputMaybe<CompanyDto>;
 };
@@ -1726,6 +1865,26 @@ export type MutationAddHeadquarterArgs = {
 
 export type MutationAddImprovementPlanArgs = {
   input?: InputMaybe<ImprovementPlanDto>;
+};
+
+
+export type MutationAddImprovementPlanActivityArgs = {
+  input?: InputMaybe<ImprovementPlanActivityDto>;
+};
+
+
+export type MutationAddImprovementPlanDeliveryArgs = {
+  input?: InputMaybe<ImprovementPlanDeliveryDto>;
+};
+
+
+export type MutationAddImprovementPlanEvidenceTypeArgs = {
+  input?: InputMaybe<ImprovementPlanEvidenceTypeDto>;
+};
+
+
+export type MutationAddImprovementPlanFaultTypeArgs = {
+  input?: InputMaybe<ImprovementPlanFaultTypeDto>;
 };
 
 
@@ -2072,6 +2231,26 @@ export type MutationDeleteHeadquarterArgs = {
 
 
 export type MutationDeleteImprovementPlanArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
+export type MutationDeleteImprovementPlanActivityArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
+export type MutationDeleteImprovementPlanDeliveryArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
+export type MutationDeleteImprovementPlanEvidenceTypeArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
+export type MutationDeleteImprovementPlanFaultTypeArgs = {
   id: Scalars['Long']['input'];
 };
 
@@ -2424,6 +2603,30 @@ export type MutationUpdateHeadquarterArgs = {
 export type MutationUpdateImprovementPlanArgs = {
   id: Scalars['Long']['input'];
   input?: InputMaybe<ImprovementPlanDto>;
+};
+
+
+export type MutationUpdateImprovementPlanActivityArgs = {
+  id: Scalars['Long']['input'];
+  input?: InputMaybe<ImprovementPlanActivityDto>;
+};
+
+
+export type MutationUpdateImprovementPlanDeliveryArgs = {
+  id: Scalars['Long']['input'];
+  input?: InputMaybe<ImprovementPlanDeliveryDto>;
+};
+
+
+export type MutationUpdateImprovementPlanEvidenceTypeArgs = {
+  id: Scalars['Long']['input'];
+  input?: InputMaybe<ImprovementPlanEvidenceTypeDto>;
+};
+
+
+export type MutationUpdateImprovementPlanFaultTypeArgs = {
+  id: Scalars['Long']['input'];
+  input?: InputMaybe<ImprovementPlanFaultTypeDto>;
 };
 
 
@@ -2995,6 +3198,10 @@ export type ProcessMethodologyDto = {
   name?: InputMaybe<Scalars['String']['input']>;
   profiles?: InputMaybe<Array<InputMaybe<ProfileDto>>>;
   settings?: InputMaybe<ProcessSettingsDto>;
+};
+
+export type ProcessMethodologyDto = {
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
   isUnique?: InputMaybe<Scalars['Boolean']['input']>;
   profileId?: InputMaybe<Scalars['String']['input']>;
   studentId?: InputMaybe<Scalars['Long']['input']>;
@@ -3228,6 +3435,10 @@ export type Query = {
   allFloorsByHeadquarterId?: Maybe<FloorPage>;
   allHeadquarters?: Maybe<HeadquarterPage>;
   allHeadquartersList?: Maybe<HeadquarterPage>;
+  allImprovementPlanActivities?: Maybe<ImprovementPlanActivityPage>;
+  allImprovementPlanDeliveries?: Maybe<ImprovementPlanDeliveryPage>;
+  allImprovementPlanEvidenceTypes?: Maybe<ImprovementPlanEvidenceTypePage>;
+  allImprovementPlanFaultTypes?: Maybe<ImprovementPlanFaultTypePage>;
   allImprovementPlans?: Maybe<ImprovementPlanPage>;
   allItems?: Maybe<ItemPageId>;
   allIterations?: Maybe<IterationPage>;
@@ -3309,7 +3520,9 @@ export type Query = {
   checklistHistoryId?: Maybe<Array<Maybe<ChecklistHistory>>>;
   committeeById?: Maybe<Committee>;
   committeeEventById?: Maybe<CommitteeEvent>;
+  evaluationByChecklist?: Maybe<EvaluationPageId>;
   evaluationById?: Maybe<EvaluationPageId>;
+  evaluationExistsForChecklist?: Maybe<EvaluationPageId>;
   evaluationsByChecklist?: Maybe<EvaluationPage>;
   exportChecklistToExcel?: Maybe<Scalars['String']['output']>;
   exportChecklistToPdf?: Maybe<Scalars['String']['output']>;
@@ -3320,7 +3533,11 @@ export type Query = {
   findCommitteesByStudentId?: Maybe<Array<Maybe<Committee>>>;
   findCommitteesByTeacherId?: Maybe<Array<Maybe<Committee>>>;
   getNotificationById?: Maybe<NoticationAnswer>;
+  improvementPlanActivityById?: Maybe<ImprovementPlanActivityPageId>;
   improvementPlanById?: Maybe<ImprovementPlanPageId>;
+  improvementPlanDeliveryById?: Maybe<ImprovementPlanDeliveryPageId>;
+  improvementPlanEvidenceTypeById?: Maybe<ImprovementPlanEvidenceTypePageId>;
+  improvementPlanFaultTypeById?: Maybe<ImprovementPlanFaultTypePageId>;
   itemById?: Maybe<ItemPageId>;
   juryById?: Maybe<JuriesPageId>;
   justificationById?: Maybe<JustificationPageId>;
@@ -3482,6 +3699,7 @@ export type QueryAllContractTypesArgs = {
 
 
 export type QueryAllCoordinationArgs = {
+  collaboratorId?: InputMaybe<Scalars['Long']['input']>;
   coordinationName?: InputMaybe<Scalars['String']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
@@ -3541,6 +3759,30 @@ export type QueryAllHeadquartersArgs = {
   size?: InputMaybe<Scalars['Int']['input']>;
   state?: InputMaybe<Scalars['Boolean']['input']>;
   trainingCenterId?: InputMaybe<Scalars['Long']['input']>;
+};
+
+
+export type QueryAllImprovementPlanActivitiesArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAllImprovementPlanDeliveriesArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAllImprovementPlanEvidenceTypesArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAllImprovementPlanFaultTypesArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -3786,6 +4028,7 @@ export type QueryAllStudySheetsArgs = {
   idStudent?: InputMaybe<Scalars['Long']['input']>;
   idTeacher?: InputMaybe<Scalars['Long']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  onlyInstructor?: InputMaybe<Scalars['Boolean']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
   state?: InputMaybe<Scalars['Boolean']['input']>;
@@ -3903,8 +4146,18 @@ export type QueryCommitteeEventByIdArgs = {
 };
 
 
+export type QueryEvaluationByChecklistArgs = {
+  checklistId: Scalars['Long']['input'];
+};
+
+
 export type QueryEvaluationByIdArgs = {
   id: Scalars['Long']['input'];
+};
+
+
+export type QueryEvaluationExistsForChecklistArgs = {
+  checklistId: Scalars['Long']['input'];
 };
 
 
@@ -3953,7 +4206,27 @@ export type QueryGetNotificationByIdArgs = {
 };
 
 
+export type QueryImprovementPlanActivityByIdArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
 export type QueryImprovementPlanByIdArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
+export type QueryImprovementPlanDeliveryByIdArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
+export type QueryImprovementPlanEvidenceTypeByIdArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
+export type QueryImprovementPlanFaultTypeByIdArgs = {
   id: Scalars['Long']['input'];
 };
 
@@ -4028,6 +4301,7 @@ export type QueryStateAttendanceByIdArgs = {
 
 export type QueryStudySheetByIdArgs = {
   id?: InputMaybe<Scalars['Long']['input']>;
+  teacherId?: InputMaybe<Scalars['Long']['input']>;
 };
 
 
@@ -4115,6 +4389,7 @@ export type Student = {
   attendances?: Maybe<Array<Maybe<Attendance>>>;
   committees?: Maybe<Array<Maybe<Committee>>>;
   id?: Maybe<Scalars['ID']['output']>;
+  improvementPlans?: Maybe<Array<Maybe<ImprovementPlan>>>;
   novelties?: Maybe<Array<Maybe<Novelty>>>;
   person?: Maybe<Person>;
   profiles?: Maybe<Array<Maybe<Profile>>>;
@@ -4258,6 +4533,7 @@ export type TeacherStudySheet = {
   attendances?: Maybe<Array<Maybe<Attendance>>>;
   competence?: Maybe<Competences>;
   id?: Maybe<Scalars['ID']['output']>;
+  improvementPlans?: Maybe<Array<Maybe<ImprovementPlan>>>;
   quarter?: Maybe<Quarter>;
   studySheet?: Maybe<StudySheet>;
   teacher?: Maybe<Teacher>;
@@ -4755,6 +5031,16 @@ export type ExportChecklistToExcelQueryVariables = Exact<{
 
 export type ExportChecklistToExcelQuery = { exportChecklistToExcel?: string | null };
 
+export type GetCoordinationByCollaboratorQueryVariables = Exact<{
+  collaboratorId: Scalars['Long']['input'];
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type GetCoordinationByCollaboratorQuery = { allCoordination?: { totalItems?: number | null, totalPages?: number | null, currentPage?: number | null, data?: Array<{ id?: string | null, name?: string | null, state?: boolean | null, teachers?: Array<{ id?: string | null, state?: boolean | null } | null> | null, trainingCenter?: { id?: string | null, name?: string | null } | null } | null> | null } | null };
+
 export type GetAllEvaluationsQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
@@ -4810,21 +5096,21 @@ export type GetAllImprovementPlansQueryVariables = Exact<{
 }>;
 
 
-export type GetAllImprovementPlansQuery = { allImprovementPlans?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, city: string, date: string, reason: string, number: number, state: boolean } | null> | null } | null };
+export type GetAllImprovementPlansQuery = { allImprovementPlans?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, city: string, date: string, reason: string, state: boolean, qualification: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
 
 export type GetImprovementPlanByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
 
 
-export type GetImprovementPlanByIdQuery = { improvementPlanById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id: string, city: string, date: string, reason: string, number: number, state: boolean } | null } | null };
+export type GetImprovementPlanByIdQuery = { improvementPlanById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id: string, city: string, date: string, reason: string, state: boolean, qualification: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null } | null };
 
 export type AddImprovementPlanMutationVariables = Exact<{
   input: ImprovementPlanDto;
 }>;
 
 
-export type AddImprovementPlanMutation = { addImprovementPlan?: { code?: string | null, message?: string | null, id?: any | null } | null };
+export type AddImprovementPlanMutation = { addImprovementPlan?: { code?: string | null, message?: string | null } | null };
 
 export type UpdateImprovementPlanMutationVariables = Exact<{
   id: Scalars['Long']['input'];
@@ -4832,14 +5118,14 @@ export type UpdateImprovementPlanMutationVariables = Exact<{
 }>;
 
 
-export type UpdateImprovementPlanMutation = { updateImprovementPlan?: { code?: string | null, message?: string | null, id?: any | null } | null };
+export type UpdateImprovementPlanMutation = { updateImprovementPlan?: { code?: string | null, message?: string | null } | null };
 
 export type DeleteImprovementPlanMutationVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
 
 
-export type DeleteImprovementPlanMutation = { deleteImprovementPlan?: { code?: string | null, message?: string | null, id?: any | null } | null };
+export type DeleteImprovementPlanMutation = { deleteImprovementPlan?: { code?: string | null, message?: string | null } | null };
 
 export type GetAllJustificationStatusQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -6167,6 +6453,69 @@ export type ExportChecklistToExcelQueryHookResult = ReturnType<typeof useExportC
 export type ExportChecklistToExcelLazyQueryHookResult = ReturnType<typeof useExportChecklistToExcelLazyQuery>;
 export type ExportChecklistToExcelSuspenseQueryHookResult = ReturnType<typeof useExportChecklistToExcelSuspenseQuery>;
 export type ExportChecklistToExcelQueryResult = Apollo.QueryResult<ExportChecklistToExcelQuery, ExportChecklistToExcelQueryVariables>;
+export const GetCoordinationByCollaboratorDocument = gql`
+    query GetCoordinationByCollaborator($collaboratorId: Long!, $page: Int, $size: Int, $state: Boolean) {
+  allCoordination(
+    collaboratorId: $collaboratorId
+    page: $page
+    size: $size
+    state: $state
+  ) {
+    data {
+      id
+      name
+      state
+      teachers {
+        id
+        state
+      }
+      trainingCenter {
+        id
+        name
+      }
+    }
+    totalItems
+    totalPages
+    currentPage
+  }
+}
+    `;
+
+/**
+ * __useGetCoordinationByCollaboratorQuery__
+ *
+ * To run a query within a React component, call `useGetCoordinationByCollaboratorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCoordinationByCollaboratorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCoordinationByCollaboratorQuery({
+ *   variables: {
+ *      collaboratorId: // value for 'collaboratorId'
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *      state: // value for 'state'
+ *   },
+ * });
+ */
+export function useGetCoordinationByCollaboratorQuery(baseOptions: Apollo.QueryHookOptions<GetCoordinationByCollaboratorQuery, GetCoordinationByCollaboratorQueryVariables> & ({ variables: GetCoordinationByCollaboratorQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetCoordinationByCollaboratorQuery, GetCoordinationByCollaboratorQueryVariables>(GetCoordinationByCollaboratorDocument, options);
+      }
+export function useGetCoordinationByCollaboratorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCoordinationByCollaboratorQuery, GetCoordinationByCollaboratorQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetCoordinationByCollaboratorQuery, GetCoordinationByCollaboratorQueryVariables>(GetCoordinationByCollaboratorDocument, options);
+        }
+export function useGetCoordinationByCollaboratorSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetCoordinationByCollaboratorQuery, GetCoordinationByCollaboratorQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetCoordinationByCollaboratorQuery, GetCoordinationByCollaboratorQueryVariables>(GetCoordinationByCollaboratorDocument, options);
+        }
+export type GetCoordinationByCollaboratorQueryHookResult = ReturnType<typeof useGetCoordinationByCollaboratorQuery>;
+export type GetCoordinationByCollaboratorLazyQueryHookResult = ReturnType<typeof useGetCoordinationByCollaboratorLazyQuery>;
+export type GetCoordinationByCollaboratorSuspenseQueryHookResult = ReturnType<typeof useGetCoordinationByCollaboratorSuspenseQuery>;
+export type GetCoordinationByCollaboratorQueryResult = Apollo.QueryResult<GetCoordinationByCollaboratorQuery, GetCoordinationByCollaboratorQueryVariables>;
 export const GetAllEvaluationsDocument = gql`
     query GetAllEvaluations($page: Int, $size: Int) {
   allEvaluations(page: $page, size: $size) {
@@ -6475,8 +6824,23 @@ export const GetAllImprovementPlansDocument = gql`
       city
       date
       reason
-      number
       state
+      qualification
+      student {
+        id
+        person {
+          name
+          lastname
+          document
+        }
+      }
+      teacherCompetence {
+        id
+        competence {
+          id
+          name
+        }
+      }
     }
   }
 }
@@ -6526,8 +6890,23 @@ export const GetImprovementPlanByIdDocument = gql`
       city
       date
       reason
-      number
       state
+      qualification
+      student {
+        id
+        person {
+          name
+          lastname
+          document
+        }
+      }
+      teacherCompetence {
+        id
+        competence {
+          id
+          name
+        }
+      }
     }
   }
 }
@@ -6570,7 +6949,6 @@ export const AddImprovementPlanDocument = gql`
   addImprovementPlan(input: $input) {
     code
     message
-    id
   }
 }
     `;
@@ -6605,7 +6983,6 @@ export const UpdateImprovementPlanDocument = gql`
   updateImprovementPlan(id: $id, input: $input) {
     code
     message
-    id
   }
 }
     `;
@@ -6641,7 +7018,6 @@ export const DeleteImprovementPlanDocument = gql`
   deleteImprovementPlan(id: $id) {
     code
     message
-    id
   }
 }
     `;
