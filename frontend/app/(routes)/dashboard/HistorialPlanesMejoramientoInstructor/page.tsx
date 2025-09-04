@@ -7,35 +7,10 @@ import type { AppDispatch } from "@redux/store"
 import { useDispatch, useSelector } from "react-redux"
 import {fetchImprovementPlans} from "@slice/improvementPlanSlice";
 import React, { useEffect } from "react";
-import { FiUser, FiMapPin, FiCalendar, FiFileText, FiStar, FiBook } from "react-icons/fi";
+import { FiMapPin, FiCalendar, FiFileText, FiStar, FiBook } from "react-icons/fi";
+import { ImprovementPlan } from "@/graphql/generated";
 
-interface ImprovementPlan {
-    id: string;
-    city: string;
-    date: string;
-    reason: string;
-    qualification: number;
-    state: boolean;
-    student: {
-        id: string;
-        person: {
-            id: string;
-            name: string;
-            lastname: string;
-        };
-    } | null;
-    teacherCompetence: {
-        id: string;
-        competence: {
-            id: string;
-            name: string;
-        };
-    } | null;
-    faultType?: {
-        id: string;
-        name: string;
-    };
-}
+
 
 const HistorialPlanesMejoramientoInstructor = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -211,7 +186,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                 <div className="flex items-center gap-2">
                     {row.faultType ? (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
-                            {row.faultType.name.toUpperCase()}
+                            {(row.faultType?.name ? row.faultType.name.toUpperCase() : 'SIN TIPO DE FALTA')}
                         </span>
                     ) : (
                         <span className="text-sm text-gray-500 dark:text-gray-400 italic">
