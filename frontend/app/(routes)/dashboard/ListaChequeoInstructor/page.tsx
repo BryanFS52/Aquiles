@@ -1559,7 +1559,7 @@ export default function InstructorChecklistView() {
                           <div className="bg-gradient-to-r from-green-100 to-green-50 dark:from-green-800 dark:to-green-900/50 p-6 rounded-2xl border border-green-200 dark:border-green-700 shadow-inner">
                             <p className="text-green-800 dark:text-green-200 text-center font-medium flex items-center justify-center gap-2">
                               <span className="text-2xl">✅</span>
-                              <strong>Evaluación Completada</strong> - Esta lista de chequeo ya tiene evaluación
+                              <strong>Evaluación Completada</strong> - Relación 1:1 establecida en la base de datos
                             </p>
                           </div>
 
@@ -1636,7 +1636,8 @@ export default function InstructorChecklistView() {
                             Esta lista no tiene evaluación
                           </h4>
                           <p className="text-lg text-gray-800 dark:text-gray-200 mb-8 max-w-2xl mx-auto leading-relaxed">
-                            Para evaluar esta lista de chequeo, haga clic en el botón de abajo para abrir el formulario de evaluación completo.
+                            Se creará automáticamente una <strong>evaluación única</strong> vinculada a esta lista de chequeo (relación 1:1 en la base de datos). 
+                            Complete los campos para establecer la evaluación final.
                           </p>
 
                           {/* Botón principal para crear evaluación */}

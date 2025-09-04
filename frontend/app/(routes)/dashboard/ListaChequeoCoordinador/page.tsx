@@ -97,25 +97,47 @@ export default function CoordinadorChecklistView() {
         console.log('Updating checklist with ID:', editingChecklist.id);
         console.log('Original editingChecklist:', editingChecklist);
         console.log('Incoming checklistData:', checklistData);
+        
+        // ← Log específico para trimester y component
+        console.log('🔍 FIELD VALUES COMPARISON:');
+        console.log('  trimester - original:', editingChecklist.trimester, ', incoming:', checklistData.trimester);
+        console.log('  component - original:', editingChecklist.component, ', incoming:', checklistData.component);
+
+        // ← Procesar items eliminados si los hay
+        if (checklistData.deletedItemIds && checklistData.deletedItemIds.length > 0) {
+          console.log('🗑️ PROCESSING DELETED ITEMS:', checklistData.deletedItemIds);
+        }
 
         const updateData = {
           state: editingChecklist.state !== undefined ? editingChecklist.state : true,
           remarks: checklistData.remarks || "Sin observaciones",
-          trimester: checklistData.trimester || "1",
-          component: checklistData.component || "",
+          trimester: checklistData.trimester !== undefined ? checklistData.trimester : (editingChecklist.trimester || "1"),
+          component: checklistData.component !== undefined ? checklistData.component : (editingChecklist.component || ""),
           evaluationCriteria: editingChecklist.evaluationCriteria || false,
           instructorSignature: editingChecklist.instructorSignature || "No signature",
           studySheets: editingChecklist.studySheets || null,
           evaluations: editingChecklist.evaluations || null,
           associatedJuries: editingChecklist.associatedJuries || null,
-          items: checklistData.items ? transformItems(checklistData.items) : []
+          items: checklistData.items ? transformItems(checklistData.items) : [],
+          // ← Agregar items eliminados para el backend
+          ...(checklistData.deletedItemIds && checklistData.deletedItemIds.length > 0 && { 
+            deletedItemIds: checklistData.deletedItemIds 
+          })
         };
 
         console.log('Final updateData being sent:', updateData);
+        console.log('🎯 FINAL VALUES BEING SENT:');
+        console.log('  trimester:', updateData.trimester, '(type:', typeof updateData.trimester, ')');
+        console.log('  component:', updateData.component, '(type:', typeof updateData.component, ')');
         console.log('🎯 DETAILED UPDATEDATA ITEMS:');
-        updateData.items.forEach((item, index) => {
+        updateData.items.forEach((item: any, index: number) => {
           console.log(`  UpdateData Item ${index + 1}: id=${item.id || 'NO_ID'}, code="${item.code}", indicator="${item.indicator}", active=${item.active}`);
         });
+        
+        // ← Log adicional para items eliminados
+        if (updateData.deletedItemIds && updateData.deletedItemIds.length > 0) {
+          console.log('🗑️ ITEMS TO DELETE BEING SENT TO BACKEND:', updateData.deletedItemIds);
+        }
 
         const result = await dispatch(updateChecklist({
           id: parseInt(editingChecklist.id),
@@ -183,51 +205,90 @@ export default function CoordinadorChecklistView() {
 
         if (result && result.code === "200") {
           const newChecklistId = result.id;
-          console.log("Checklist created with ID:", newChecklistId); // Debug log
+          console.log("✅ Checklist created successfully with ID:", newChecklistId); // Debug log
 
           if (newChecklistId) {
             // Crear automáticamente una evaluación para esta lista de chequeo usando Redux
             try {
               const evaluationInput = {
-                observations: "",
-                recommendations: "",
-                valueJudgment: "PENDIENTE",
-                checklistId: parseInt(newChecklistId) // Asegurar que es un número
+                observations: "", // Valores vacíos iniciales
+                recommendations: "", // El instructor los completará después
+                valueJudgment: "PENDIENTE", // Estado inicial
+                checklistId: parseInt(newChecklistId) // Asegurar que es un número entero
               };
 
-              console.log('=== CREATING EVALUATION ===');
-              console.log('Checklist ID:', newChecklistId);
-              console.log('Checklist ID type:', typeof newChecklistId);
-              console.log('Parsed Checklist ID:', parseInt(newChecklistId));
-              console.log('Creating evaluation with input:', evaluationInput);
+              console.log('=== CREATING AUTOMATIC EVALUATION ===');
+              console.log('📝 New Checklist ID:', newChecklistId, '(Type:', typeof newChecklistId, ')');
+              console.log('🔢 Parsed Checklist ID:', parseInt(newChecklistId), '(Type:', typeof parseInt(newChecklistId), ')');
+              console.log('📋 Evaluation Input:', evaluationInput);
+              console.log('🔗 This will create a 1:1 relationship in the database');
 
               const evaluationResponse = await dispatch(addEvaluation(evaluationInput)).unwrap();
-              console.log("Evaluation creation response:", evaluationResponse);
+              console.log("🎯 Evaluation creation response:", evaluationResponse);
 
               if (evaluationResponse && evaluationResponse.code === "200") {
-                console.log("✅ Evaluation created successfully with ID:", evaluationResponse.id);
-                toast.success("Lista de chequeo creada exitosamente con evaluación asignada")
+                console.log("✅ SUCCESS: Evaluation created with ID:", evaluationResponse.id);
+                console.log("🔗 SUCCESS: Evaluation linked to Checklist ID:", newChecklistId);
+                console.log("📊 Database now has: Checklist", newChecklistId, "↔ Evaluation", evaluationResponse.id);
+                
+                // Verificar que la relación se estableció correctamente
+                try {
+                  const { verifyChecklistEvaluationLink } = await import('@services/checkListService');
+                  console.log("🔍 Verifying the database relationship...");
+                  
+                  // Pequeña pausa para que la DB se actualice
+                  await new Promise(resolve => setTimeout(resolve, 500));
+                  
+                  const isLinked = await verifyChecklistEvaluationLink(parseInt(newChecklistId));
+                  
+                  if (isLinked) {
+                    console.log("✅ VERIFICATION SUCCESS: Relationship confirmed in database");
+                    toast.success("🎉 Lista de chequeo creada exitosamente")
+                    toast.success("✅ Evaluación asociada creada y vinculada correctamente")
+                  } else {
+                    console.log("⚠️ VERIFICATION WARNING: Evaluation created but relationship not confirmed");
+                    toast.success("Lista de chequeo creada exitosamente")
+                    toast.warning("⚠️ Evaluación creada pero la verificación de vínculo falló")
+                  }
+                } catch (verificationError) {
+                  console.warn("⚠️ Could not verify relationship:", verificationError);
+                  toast.success("🎉 Lista de chequeo creada exitosamente")
+                  toast.success("✅ Evaluación asociada creada automáticamente")
+                }
+                
+                // Pequeña pausa para mostrar ambos toasts
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
               } else {
-                console.log("❌ Evaluation creation failed:", evaluationResponse);
+                console.log("❌ PARTIAL SUCCESS: Checklist created but evaluation failed:", evaluationResponse);
                 toast.success("Lista de chequeo creada exitosamente")
-                toast.error("Error al crear la evaluación: " + (evaluationResponse?.message || "Error desconocido"))
+                toast.warning("⚠️ Evaluación no pudo crearse automáticamente: " + (evaluationResponse?.message || "Error desconocido"))
               }
             } catch (evaluationError: any) {
-              console.error("❌ Error creating evaluation:", evaluationError);
-              console.error("Error stack:", evaluationError);
+              console.error("❌ ERROR creating evaluation:", evaluationError);
+              console.error("Error details:", {
+                message: evaluationError.message,
+                stack: evaluationError.stack,
+                graphQLErrors: evaluationError.graphQLErrors,
+                networkError: evaluationError.networkError
+              });
+              
               toast.success("Lista de chequeo creada exitosamente")
-              toast.error("Error al crear la evaluación: " + (evaluationError.message || "Error desconocido"))
+              toast.error("❌ Error al crear la evaluación automática: " + (evaluationError.message || "Error desconocido"))
             }
           } else {
-            console.warn("No se pudo obtener el ID de la lista creada:", result);
+            console.warn("⚠️ WARNING: Checklist created but ID not returned:", result);
             toast.success("Lista de chequeo creada exitosamente")
-            toast.warning("No se pudo crear la evaluación automáticamente")
+            toast.warning("⚠️ No se pudo crear la evaluación automáticamente (ID no disponible)")
           }
 
           // Recargar la lista para mostrar el nuevo checklist
+          console.log("🔄 Reloading checklists to show new data...");
           await loadChecklists()
           setModalOpen(false)
+          console.log("✅ Creation process completed");
         } else {
+          console.log("❌ FAILED: Checklist creation failed:", result);
           toast.error(result?.message || "Error al crear la lista de chequeo")
         }
       }

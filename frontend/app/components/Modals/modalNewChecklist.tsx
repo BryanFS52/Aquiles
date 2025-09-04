@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { addChecklist } from '@services/checkListService'
+import trainingProjectService from '@services/olympo/trainingProjectService'
+import studySheetService from '@services/olympo/studySheetService'
 
 interface ChecklistItem {
   id?: string
@@ -35,6 +37,60 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
   const [observaciones, setObservaciones] = useState<string>('')
   const [items, setItems] = useState<{ indicador: string }[]>([{ indicador: '' }])
   const [isModalOpen, setIsOpen] = useState<boolean>(false)
+  
+  // Estados para proyectos formativos y fichas
+  const [selectedTrainingProject, setSelectedTrainingProject] = useState<string>('')
+  const [selectedStudySheets, setSelectedStudySheets] = useState<string[]>([])
+  const [trainingProjects, setTrainingProjects] = useState<any[]>([])
+  const [studySheets, setStudySheets] = useState<any[]>([])
+  const [loadingProjects, setLoadingProjects] = useState<boolean>(false)
+  const [loadingSheets, setLoadingSheets] = useState<boolean>(false)
+
+  // Cargar proyectos formativos al abrir el modal
+  useEffect(() => {
+    if (isOpen) {
+      loadTrainingProjects()
+    }
+  }, [isOpen])
+
+  // Cargar fichas cuando se selecciona un proyecto formativo
+  useEffect(() => {
+    if (selectedTrainingProject) {
+      loadStudySheets(selectedTrainingProject)
+    } else {
+      setStudySheets([])
+      setSelectedStudySheets([])
+    }
+  }, [selectedTrainingProject])
+
+  const loadTrainingProjects = async () => {
+    setLoadingProjects(true)
+    try {
+      const response = await trainingProjectService.getAllTrainingProjects({ size: 100 })
+      setTrainingProjects(response.data || [])
+    } catch (error) {
+      console.error('Error loading training projects:', error)
+      toast.error('Error al cargar los proyectos formativos')
+    } finally {
+      setLoadingProjects(false)
+    }
+  }
+
+  const loadStudySheets = async (trainingProjectId: string) => {
+    setLoadingSheets(true)
+    try {
+      const response = await studySheetService.getStudySheetsByTrainingProject({ 
+        idTrainingProject: parseInt(trainingProjectId),
+        size: 100
+      })
+      setStudySheets(response.data || [])
+    } catch (error) {
+      console.error('Error loading study sheets:', error)
+      toast.error('Error al cargar las fichas de formación')
+    } finally {
+      setLoadingSheets(false)
+    }
+  }
 
   // Efecto para cargar datos de edición
   useEffect(() => {
@@ -46,6 +102,10 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
       setTrimestre(editingData.trimester?.toString() || '')
       setComponente(editingData.component || '')
       setObservaciones(editingData.remarks || '')
+      
+      // Cargar datos de proyecto formativo y fichas si existen
+      setSelectedTrainingProject(editingData.trainingProjectId?.toString() || '')
+      setSelectedStudySheets(editingData.studySheets ? editingData.studySheets.split(',') : [])
       
       console.log("Loading items from editingData:", editingData.items) // Debug log
       
@@ -66,6 +126,8 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
       setComponente('')
       setObservaciones('')
       setItems([{ indicador: '' }])
+      setSelectedTrainingProject('')
+      setSelectedStudySheets([])
     }
   }, [isEditing, editingData, isOpen])
 
@@ -73,7 +135,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
     e.preventDefault()
 
     if (!trimestre || !componente || items.some(i => !i.indicador)) {
-      toast.error('Por favor, complete todos los campos.')
+      toast.error('Por favor, complete todos los campos obligatorios.')
       return
     }
 
@@ -84,7 +146,8 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
         trimester: trimestre,
         instructorSignature: "No signature",
         evaluationCriteria: false,
-        studySheets: null,
+        studySheets: selectedStudySheets.length > 0 ? selectedStudySheets.join(',') : null,
+        trainingProjectId: selectedTrainingProject ? parseInt(selectedTrainingProject) : null,
         evaluations: null,
         associatedJuries: null,
         component: componente,
@@ -120,11 +183,26 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
     setItems(newItems)
   }
 
+  const handleTrainingProjectChange = (value: string) => {
+    setSelectedTrainingProject(value)
+    setSelectedStudySheets([]) // Limpiar fichas seleccionadas
+  }
+
+  const handleStudySheetChange = (sheetId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedStudySheets(prev => [...prev, sheetId])
+    } else {
+      setSelectedStudySheets(prev => prev.filter(id => id !== sheetId))
+    }
+  }
+
   const resetForm = () => {
     setTrimestre('')
     setComponente('')
     setObservaciones('')
     setItems([{ indicador: '' }])
+    setSelectedTrainingProject('')
+    setSelectedStudySheets([])
   }
 
   if (isOpen !== undefined) {
@@ -136,10 +214,17 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
           <h2 className="text-2xl font-semibold text-gray-800">
             {isEditing ? 'Editar Lista de Chequeo' : 'Crear Lista de Chequeo'}
           </h2>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-blue-800 text-sm">
-              💡 <strong>Nota:</strong> Se creará automáticamente una evaluación vinculada a esta lista. El instructor podrá completarla desde su vista.
+          <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-blue-800 text-sm flex items-start space-x-2">
+              <span className="text-green-600 font-bold">✅</span>
+              <span>
+                <strong>Nuevo:</strong> Al crear esta lista de chequeo, se generará automáticamente una evaluación asociada en la base de datos. 
+                Esta evaluación estará disponible para que el instructor la complete con observaciones, recomendaciones y juicio de valor.
+              </span>
             </p>
+            <div className="mt-2 text-xs text-blue-600">
+              <strong>Relación:</strong> Lista de Chequeo ↔ Evaluación (1:1)
+            </div>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
@@ -180,6 +265,60 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00324d] h-24 resize-none"
                 />
               </div>
+
+              {/* Selector de Proyecto Formativo */}
+              <div>
+                <label htmlFor="trainingProject" className="block text-sm font-medium text-gray-700">
+                  Proyecto Formativo (Opcional)
+                </label>
+                <select
+                  id="trainingProject"
+                  value={selectedTrainingProject}
+                  onChange={(e) => handleTrainingProjectChange(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00324d]"
+                  disabled={loadingProjects}
+                >
+                  <option value="">Selecciona un proyecto formativo</option>
+                  {trainingProjects.map((project) => (
+                    <option key={project.id} value={project.id}>
+                      {project.name} - {project.program?.name}
+                    </option>
+                  ))}
+                </select>
+                {loadingProjects && (
+                  <p className="text-sm text-gray-500 mt-1">Cargando proyectos formativos...</p>
+                )}
+              </div>
+
+              {/* Selector de Fichas de Formación */}
+              {selectedTrainingProject && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Fichas de Formación Asociadas
+                  </label>
+                  {loadingSheets ? (
+                    <p className="text-sm text-gray-500">Cargando fichas...</p>
+                  ) : studySheets.length > 0 ? (
+                    <div className="max-h-32 overflow-y-auto border border-gray-300 rounded-md p-2 space-y-2">
+                      {studySheets.map((sheet) => (
+                        <label key={sheet.id} className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedStudySheets.includes(sheet.id.toString())}
+                            onChange={(e) => handleStudySheetChange(sheet.id.toString(), e.target.checked)}
+                            className="h-4 w-4 text-[#00324d] focus:ring-[#00324d] border-gray-300 rounded"
+                          />
+                          <span className="text-sm">
+                            Ficha {sheet.number} - {sheet.journey?.name} ({sheet.numberStudents} estudiantes)
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">No hay fichas disponibles para este proyecto formativo</p>
+                  )}
+                </div>
+              )}
             </div>
             <div className="space-y-4">
               {items.map((item, index) => (

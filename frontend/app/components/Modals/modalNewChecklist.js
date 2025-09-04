@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { addChecklist } from '@services/checkListService'
+import trainingProjectService from '@services/olympo/trainingProjectService'
+import studySheetService from '@services/olympo/studySheetService'
 
 export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingData = null, isEditing = false }) {
   const [trimestre, setTrimestre] = useState('')
@@ -10,6 +12,61 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
   const [observaciones, setObservaciones] = useState('')
   const [items, setItems] = useState([{ indicador: '' }])
   const [isModalOpen, setIsOpen] = useState(false)
+  const [deletedItemIds, setDeletedItemIds] = useState([]) // ← Nuevo estado para rastrear items eliminados
+  
+  // Estados para proyectos formativos y fichas
+  const [selectedTrainingProject, setSelectedTrainingProject] = useState('')
+  const [selectedStudySheets, setSelectedStudySheets] = useState([])
+  const [trainingProjects, setTrainingProjects] = useState([])
+  const [studySheets, setStudySheets] = useState([])
+  const [loadingProjects, setLoadingProjects] = useState(false)
+  const [loadingSheets, setLoadingSheets] = useState(false)
+
+  // Cargar proyectos formativos al abrir el modal
+  useEffect(() => {
+    if (isOpen) {
+      loadTrainingProjects()
+    }
+  }, [isOpen])
+
+  // Cargar fichas cuando se selecciona un proyecto formativo
+  useEffect(() => {
+    if (selectedTrainingProject) {
+      loadStudySheets(selectedTrainingProject)
+    } else {
+      setStudySheets([])
+      setSelectedStudySheets([])
+    }
+  }, [selectedTrainingProject])
+
+  const loadTrainingProjects = async () => {
+    setLoadingProjects(true)
+    try {
+      const response = await trainingProjectService.getAllTrainingProjects({ size: 100 })
+      setTrainingProjects(response.data || [])
+    } catch (error) {
+      console.error('Error loading training projects:', error)
+      toast.error('Error al cargar los proyectos formativos')
+    } finally {
+      setLoadingProjects(false)
+    }
+  }
+
+  const loadStudySheets = async (trainingProjectId) => {
+    setLoadingSheets(true)
+    try {
+      const response = await studySheetService.getStudySheetsByTrainingProject({ 
+        idTrainingProject: parseInt(trainingProjectId),
+        size: 100
+      })
+      setStudySheets(response.data || [])
+    } catch (error) {
+      console.error('Error loading study sheets:', error)
+      toast.error('Error al cargar las fichas de formación')
+    } finally {
+      setLoadingSheets(false)
+    }
+  }
 
   // Efecto para cargar datos de edición
   useEffect(() => {
@@ -25,6 +82,17 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
       setTrimestre(editingData.trimester?.toString() || '')
       setComponente(editingData.component || '')
       setObservaciones(editingData.remarks || '')
+      setDeletedItemIds([]) // ← Limpiar lista de eliminados al cargar datos de edición
+      
+      // Cargar datos de proyecto formativo y fichas si existen
+      setSelectedTrainingProject(editingData.trainingProjectId?.toString() || '')
+      setSelectedStudySheets(editingData.studySheets ? editingData.studySheets.split(',') : [])
+      
+      // ← Log específico para trimester y component
+      console.log('🔍 MODAL: Setting form values from editingData:');
+      console.log('  trimester from editingData:', editingData.trimester, '-> setting to:', editingData.trimester?.toString() || '');
+      console.log('  component from editingData:', editingData.component, '-> setting to:', editingData.component || '');
+      console.log('  remarks from editingData:', editingData.remarks, '-> setting to:', editingData.remarks || '');
       
       console.log("Loading items from editingData:", editingData.items) // Debug log
       
@@ -52,6 +120,9 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
       setComponente('')
       setObservaciones('')
       setItems([{ indicador: '' }])
+      setDeletedItemIds([]) // ← Limpiar items eliminados
+      setSelectedTrainingProject('')
+      setSelectedStudySheets([])
     }
   }, [isEditing, editingData, isOpen]) // Reaccionar a cambios en editingData
 
@@ -70,24 +141,36 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
         trimester: trimestre,
         instructorSignature: "No signature",
         evaluationCriteria: false,
-        studySheets: null,
+        studySheets: selectedStudySheets.length > 0 ? selectedStudySheets.join(',') : null,
+        trainingProjectId: selectedTrainingProject ? parseInt(selectedTrainingProject) : null,
         evaluations: null,
         component: componente,
-        associatedJuries: [],
+        associatedJuries: null, // ← Cambiar a null en lugar de array vacío
         items: items.map((item, index) => ({
-          ...(item.id && { id: item.id }), // ← Incluir ID si existe (modo edición)
+          ...(item.id && { id: parseInt(item.id) }), // ← Convertir ID a número
           code: `IND-${index + 1}`,
           indicator: item.indicador,
           active: true
-        }))
+        })),
+        // ← Agregar items eliminados para el backend (ya convertidos a números)
+        ...(isEditing && deletedItemIds.length > 0 && { deletedItemIds })
       }
 
       console.log('Modal submitting checklist data:', newChecklist); // Debug log
       console.log('Is editing mode:', isEditing); // Debug log
-      console.log('🚀 DETAILED INDICATORS BEING SENT:'); // Debug log
+      console.log('� MODAL: Current form state at submission:');
+      console.log('  trimestre state:', trimestre, '(type:', typeof trimestre, ')');
+      console.log('  componente state:', componente, '(type:', typeof componente, ')');
+      console.log('  observaciones state:', observaciones, '(type:', typeof observaciones, ')');
+      console.log('�🚀 DETAILED INDICATORS BEING SENT:'); // Debug log
       newChecklist.items.forEach((item, index) => {
         console.log(`  Item ${index + 1}: id=${item.id || 'NEW'}, code="${item.code}", indicator="${item.indicator}", active=${item.active}`); // Debug log
       });
+      
+      // ← Log de items eliminados
+      if (isEditing && deletedItemIds.length > 0) {
+        console.log('🗑️ DELETED ITEM IDs:', deletedItemIds); // Debug log
+      }
 
       if (onCreate) {
         // Usar la función onCreate que viene del componente padre (que maneja la creación automática de evaluación)
@@ -96,6 +179,9 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
         if (isEditing) {
           // En modo edición, NO limpiar el formulario - mantener los datos
           console.log('Update completed successfully, keeping form data...'); // Debug log
+          
+          // Limpiar lista de eliminados después de actualización exitosa
+          setDeletedItemIds([])
           
           // Cerrar modal después de actualización
           if (onClose) {
@@ -138,8 +224,38 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
   }
 
   const handleRemoveIndicador = (index) => {
+    const itemToRemove = items[index]
+    
+    // Si el item tiene ID (es un item existente), agregarlo a la lista de eliminados
+    if (itemToRemove.id && isEditing) {
+      console.log(`🗑️ Marking item for deletion: ${itemToRemove.id}`); // Debug log
+      // Convertir el ID a número para asegurar compatibilidad con el backend
+      const numericId = parseInt(itemToRemove.id);
+      if (!isNaN(numericId)) {
+        setDeletedItemIds(prev => [...prev, numericId])
+      } else {
+        console.error('Invalid item ID for deletion:', itemToRemove.id);
+      }
+    }
+    
+    // Eliminar el item de la lista actual
     const newItems = items.filter((_, i) => i !== index)
     setItems(newItems)
+    
+    console.log(`Item removed from index ${index}. Remaining items:`, newItems.length); // Debug log
+  }
+
+  const handleTrainingProjectChange = (value) => {
+    setSelectedTrainingProject(value)
+    setSelectedStudySheets([]) // Limpiar fichas seleccionadas
+  }
+
+  const handleStudySheetChange = (sheetId, checked) => {
+    if (checked) {
+      setSelectedStudySheets(prev => [...prev, sheetId])
+    } else {
+      setSelectedStudySheets(prev => prev.filter(id => id !== sheetId))
+    }
   }
 
   const resetForm = () => {
@@ -147,6 +263,9 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
     setComponente('')
     setObservaciones('')
     setItems([{ indicador: '' }])
+    setDeletedItemIds([]) // ← Limpiar items eliminados
+    setSelectedTrainingProject('')
+    setSelectedStudySheets([])
   }
 
   if (isOpen !== undefined) {
@@ -168,6 +287,14 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                 'Se creará automáticamente una evaluación vinculada a esta lista. El instructor podrá completarla desde su vista.'
               }
             </p>
+            {/* ← Mostrar alerta si hay items para eliminar */}
+            {isEditing && deletedItemIds.length > 0 && (
+              <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-red-800 dark:text-red-300 text-sm font-medium">
+                  🗑️ <strong>Atención:</strong> Se eliminarán {deletedItemIds.length} indicador(es) existente(s) al guardar.
+                </p>
+              </div>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
@@ -219,6 +346,60 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
               />
             </div>
 
+            {/* Selector de Proyecto Formativo */}
+            <div className="space-y-2">
+              <label htmlFor="trainingProject" className="block text-sm font-bold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                Proyecto Formativo (Opcional)
+              </label>
+              <select
+                id="trainingProject"
+                value={selectedTrainingProject}
+                onChange={(e) => handleTrainingProjectChange(e.target.value)}
+                className="w-full px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
+                disabled={loadingProjects}
+              >
+                <option value="">Selecciona un proyecto formativo</option>
+                {trainingProjects.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.name} - {project.program?.name}
+                  </option>
+                ))}
+              </select>
+              {loadingProjects && (
+                <p className="text-sm text-gray-500 mt-1">Cargando proyectos formativos...</p>
+              )}
+            </div>
+
+            {/* Selector de Fichas de Formación */}
+            {selectedTrainingProject && (
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                  Fichas de Formación Asociadas
+                </label>
+                {loadingSheets ? (
+                  <p className="text-sm text-gray-500">Cargando fichas...</p>
+                ) : studySheets.length > 0 ? (
+                  <div className="max-h-32 overflow-y-auto border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl p-3 space-y-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700">
+                    {studySheets.map((sheet) => (
+                      <label key={sheet.id} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedStudySheets.includes(sheet.id.toString())}
+                          onChange={(e) => handleStudySheetChange(sheet.id.toString(), e.target.checked)}
+                          className="h-4 w-4 text-lime-600 focus:ring-lime-500 border-gray-300 rounded"
+                        />
+                        <span className="text-sm text-darkBlue dark:text-white">
+                          Ficha {sheet.number} - {sheet.journey?.name} ({sheet.numberStudents} estudiantes)
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500">No hay fichas disponibles para este proyecto formativo</p>
+                )}
+              </div>
+            )}
+
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-bold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
@@ -249,7 +430,10 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                       {items.length > 1 && (
                         <button
                           type="button"
-                          onClick={() => handleRemoveIndicador(index)}
+                          onClick={() => {
+                            console.log(`🗑️ Attempting to remove item at index ${index}:`, item); // Debug log
+                            handleRemoveIndicador(index)
+                          }}
                           className="flex-shrink-0 text-red-500 hover:text-red-700 transition-colors p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 font-semibold"
                           title="Eliminar indicador"
                         >

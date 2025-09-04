@@ -132,18 +132,45 @@ export const deleteChecklist = async (id: number): Promise<ApiResponse> => {
 // Función auxiliar para vincular evaluaciones con checklists
 export const updateChecklistEvaluationLink = async (checklistId: number, evaluationId: number): Promise<ApiResponse> => {
   try {
-    console.log('Linking evaluation', evaluationId, 'to checklist', checklistId);
+    console.log('🔗 Linking evaluation', evaluationId, 'to checklist', checklistId);
     
     // Esta función puede ser implementada más adelante si el backend requiere vinculación explícita
-    // Por ahora, las evaluaciones se vinculan automáticamente por el campo checklistId
+    // Por ahora, las evaluaciones se vinculan automáticamente por el campo checklistId en la entidad Evaluation
     
     return {
       code: '200',
-      message: 'Evaluation linked successfully (automatic via checklistId)'
+      message: 'Evaluation linked successfully (automatic via checklistId foreign key)'
     } as ApiResponse;
     
   } catch (error) {
     console.error('Error linking evaluation to checklist:', error);
     throw error;
+  }
+};
+
+// Función para verificar que la evaluación se creó correctamente para un checklist
+export const verifyChecklistEvaluationLink = async (checklistId: number): Promise<boolean> => {
+  try {
+    console.log('🔍 Verifying evaluation exists for checklist:', checklistId);
+    
+    // Importar dinámicamente para evitar dependencias circulares
+    const { fetchEvaluationsByChecklist } = await import('@services/evaluationService');
+    
+    const evaluations = await fetchEvaluationsByChecklist(checklistId);
+    
+    if (evaluations && evaluations.data && evaluations.data.length > 0) {
+      console.log('✅ Verification successful - Found', evaluations.data.length, 'evaluation(s) for checklist', checklistId);
+      evaluations.data.forEach((evaluation, index) => {
+        console.log(`  Evaluation ${index + 1}: ID=${evaluation.id}, Status=${evaluation.valueJudgment}, ChecklistId=${evaluation.checklistId}`);
+      });
+      return true;
+    } else {
+      console.log('❌ Verification failed - No evaluations found for checklist', checklistId);
+      return false;
+    }
+    
+  } catch (error) {
+    console.error('❌ Error verifying evaluation link:', error);
+    return false;
   }
 };

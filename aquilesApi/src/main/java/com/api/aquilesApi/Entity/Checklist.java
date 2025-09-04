@@ -41,9 +41,6 @@ public class Checklist implements Serializable {
     @Column(name = "study_sheets")
     private Long studySheets;
 
-    @Column(name = "evaluations")
-    private Long evaluations;
-
     @Column(name = "trimester", length = 50)
     private String trimester;
 
@@ -55,9 +52,8 @@ public class Checklist implements Serializable {
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items;
 
-    // 2.Relation (1-1) con evaluations
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "evaluation_id", referencedColumnName = "id")
+    // 2.Relación (1-1) con evaluations - Un checklist tiene una única evaluación
+    @OneToOne(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private Evaluations evaluation;
 
     // 3.Relation (1-M) con Team

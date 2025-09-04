@@ -79,12 +79,11 @@ export default function AttendanceTable({
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <button 
+                    <button
                       onClick={() => onReportNovelty?.(summary.id)}
-                      className={`px-3 py-1 text-sm rounded transition-colors ${
-                        summary.cantidad >= 5 || summary.consecutivas >= 3
-                        ? 'bg-red-600 text-white hover:bg-red-700'
-                        : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
+                      className={`px-3 py-1 text-sm rounded transition-colors ${summary.cantidad >= 5 || summary.consecutivas >= 3
+                          ? 'bg-red-600 text-white hover:bg-red-700'
+                          : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
                       disabled={!(summary.cantidad >= 5 || summary.consecutivas >= 3)}
                       title={!(summary.cantidad >= 5 || summary.consecutivas >= 3)
                         ? 'Solo puedes reportar si tiene al menos 5 ausencias o 3 consecutivas.'

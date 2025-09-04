@@ -9,7 +9,7 @@ import { useLoader } from "@context/LoaderContext";
 import JustificationFilters from "@components/features/justifications/justificationsFilter";
 import JustificationTable from "@components/features/justifications/justificationsTable";
 import EmptyState from "@components/UI/emptyState";
-import { 
+import {
   setCompetenceQuarterFilterOptions,
   setCompetenceQuarterMultiFilter,
   toggleCompetenceQuarterMultiFilter,
@@ -31,7 +31,7 @@ export default function JustificacionesInstructor() {
 
   // Acceso directo al estado de Redux - usando los nuevos campos para competence quarter
   const justificationState = useSelector((state: RootState) => state.justification);
-  
+
   // Extraer propiedades del estado
   const {
     competenceQuarterData: justifications,
@@ -99,7 +99,7 @@ export default function JustificacionesInstructor() {
 
     // Verificar si el estado ya es el mismo
     const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.estado;
-    
+
     if (currentStatusId === newStatusId) {
       return; // No hacer nada si el estado es el mismo
     }
@@ -156,13 +156,13 @@ export default function JustificacionesInstructor() {
   };
 
   const errorMessage = formatErrorMessage(error);
-  
+
   // Obtener el número de ficha de los datos disponibles
   const studySheetNumber = filteredData?.[0]?.ficha || justifications?.[0]?.ficha || "Sin ficha";
-  
+
   // Verificar si hay datos de justificaciones
   const hasJustificationData = justifications && justifications.length > 0;
-  
+
   // Determinar si hay filtros aplicados
   const { selectedFiltro, searchTerm, enableMultiFilter, multiFilters } = filterOptions;
   const hasFiltersApplied = Boolean(

@@ -43,6 +43,7 @@ input ChecklistDto {
     evaluations: [EvaluationDto]
     items: [ItemDto]
     associatedJuries: [Long]
+    deletedItemIds: [Long]  # ← Campo para IDs de items a eliminar
 }
 
 extend type Query {

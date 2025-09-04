@@ -191,7 +191,7 @@ export const useTeamScrum = (studySheetId: number) => {
                         profileId: String(profile.id),
                         isActive: true,
                         isUnique: false
-                    }
+                    } as any
                 ]));
 
                 if (addProfileToStudent.rejected.match(res)) {
