@@ -2,7 +2,7 @@ import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { createInitialPaginatedState } from '@type/slices/common/generic'
 import { Coordination } from '@graphql/generated';
-import { GET_COORDINATION_BY_COLABORATOR_ID } from '@graphql/coordination/coordinationGraph';
+import { GET_COORDINATION_BY_COLABORATOR_ID } from '@graphql/olympo/coordinationGraph';
 
 export const transformGraphQLToCoordination = (graphqlData: any): Coordination => {
   return {
@@ -18,9 +18,9 @@ export const transformGraphQLToCoordination = (graphqlData: any): Coordination =
     })) || [],
     trainingCenter: graphqlData.trainingCenter
       ? {
-          id: graphqlData.trainingCenter.id,
-          name: graphqlData.trainingCenter.name,
-        }
+        id: graphqlData.trainingCenter.id,
+        name: graphqlData.trainingCenter.name,
+      }
       : null,
   };
 };
@@ -32,9 +32,9 @@ export const fetchCoordinationByColaborator = createAsyncThunk(
       query: GET_COORDINATION_BY_COLABORATOR_ID,
       variables: { collaboratorId, page, size, state },
     });
-    
+
     const transformedData = data.allCoordination.data.map(transformGraphQLToCoordination);
-    
+
     return {
       data: transformedData,
       totalItems: data.allCoordination.totalItems,
@@ -83,4 +83,4 @@ const coordinationSlice = createSlice({
   },
 });
 
-export const { clearCoordinations, setCurrentPage } = coordinationSlice.actions;export default coordinationSlice.reducer;
+export const { clearCoordinations, setCurrentPage } = coordinationSlice.actions; export default coordinationSlice.reducer;
