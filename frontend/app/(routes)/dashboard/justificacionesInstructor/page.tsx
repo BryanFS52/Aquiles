@@ -9,6 +9,7 @@ import { useLoader } from "@context/LoaderContext";
 import JustificationFilters from "@components/features/justifications/justificationsFilter";
 import JustificationTable from "@components/features/justifications/justificationsTable";
 import EmptyState from "@components/UI/emptyState";
+import { fetchAllJustificationStatuses } from "@redux/slices/justificationStatusSlice";
 import {
   setCompetenceQuarterFilterOptions,
   setCompetenceQuarterMultiFilter,
@@ -22,8 +23,6 @@ import {
   setCompetenceQuarterMode,
   MultiFilterState,
 } from "@slice/justificationSlice";
-import { fetchAllJustificationStatuses } from "@/redux/slices/justificationStatusSlice";
-import { useLoader } from "@/context/LoaderContext";
 
 export default function JustificacionesInstructor() {
   const dispatch = useDispatch<AppDispatch>();

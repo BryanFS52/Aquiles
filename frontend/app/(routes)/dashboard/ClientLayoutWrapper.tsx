@@ -19,7 +19,6 @@ const ClientLayoutWrapper: React.FC<ClientLayoutWrapperProps> = ({ children, ini
         return "aprendiz";
     };
 
-    // Inicializa el role desde localStorage si existe, si no usa el del servidor
     const getInitialUser = (): User => {
         if (typeof window !== 'undefined') {
             const storedRole = localStorage.getItem('sidebar-role');

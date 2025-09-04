@@ -1371,7 +1371,7 @@ export default function AsistenciaAprendiz() {
               {(selectedEvent.title === 'Ausente' || selectedEvent.title === 'Inasistencia') && (
                 <button
                   onClick={handleGoToJustifications}
-                  className="flex-1 px-4 py-2.5 text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-lg font-medium transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  className="flex-1 px-4 py-2.5 text-white bg-gradient-to-r  from-lime-600 to-green-600 hover:from-lime-700 hover:to-green-700 rounded-lg font-medium transition-all duration-200 focus:ring-lime-500/50 active:scale-95 flex items-center justify-center gap-2 min-w-[180px]"
                 >
                   Ir a Justificaciones
                 </button>

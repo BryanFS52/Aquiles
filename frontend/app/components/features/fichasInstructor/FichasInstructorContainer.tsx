@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import { AppDispatch } from '@/redux/store';
+import { AppDispatch } from '@redux/store';
 import { fetchStudySheetByTeacher, fetchStudySheetByIdWithAttendances } from '@slice/olympo/studySheetSlice';
 import { useLoader } from '@context/LoaderContext';
 import { StudySheetCard } from './StudySheetCard';
