@@ -13,7 +13,10 @@ import {
     PiStudentDuotone,
     PiClipboardDuotone,
     PiCirclesFourDuotone,
+    PiListBulletsDuotone,
+    PiCaretDoubleLeftDuotone,
 } from "react-icons/pi";
+
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -36,7 +39,7 @@ interface SidebarProps {
 
 type RoleType = 'instructor' | 'aprendiz' | 'coordinador';
 
-// Íconos estáticos (ahora todos con Phosphor Duotone)
+// Íconos estáticos
 const IconFichas = <PiClipboardTextDuotone className="w-6 h-6 text-black dark:text-white" />;
 const IconProgramas = <PiCirclesFourDuotone className="w-6 h-6 text-black dark:text-white" />;
 const IconAsistencia = <PiUserCheckDuotone className="w-6 h-6 text-black dark:text-white" />;
@@ -200,6 +203,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
                     </nav>
                 </div>
             </aside>
+
+            {/* Botón toggle para móvil */}
+            <button
+                onClick={toggleMenu}
+                className='
+                    fixed bottom-4 right-4 z-50 
+                    text-white bg-gradient-to-br from-darkGreen to-shadowBlue 
+                    p-3 text-2xl rounded-full shadow-2xl 
+                    border-2 border-white/30 
+                    lg:hidden 
+                    transition-all duration-200 
+                    hover:scale-110 active:scale-95
+                '
+                aria-label="Abrir menú"
+            >
+                {showMenu ? <PiCaretDoubleLeftDuotone /> : <PiListBulletsDuotone />}
+            </button>
         </>
     );
 };
