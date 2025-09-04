@@ -7,7 +7,7 @@ const initialUserData = {
   id: 2,
   name: 'Carlos Rodríguez',
   email: 'carlos.rodriguez@empresa.com',
-  role: 'Instructor'
+  role: 'instructor'
 };
 
 interface RootLayoutProps {

@@ -7,8 +7,7 @@ import { Notifications } from "@components/UI/notifications";
 import Link from "next/link";
 import Switch from '@components/UI/switch';
 import Image from "next/image";
-
-type RoleType = "Aprendiz" | "Instructor" | "Coordinador";
+import { RoleType } from '@type/roles';
 
 interface HeaderProps {
   role: RoleType;
@@ -60,15 +59,15 @@ export const Header: React.FC<HeaderProps> = ({ role: initialRole }) => {
 
   // Role-specific color/text
   const roleLabel: Record<RoleType, string> = {
-    Aprendiz: "Aprendiz",
-    Instructor: "Instructor",
-    Coordinador: "Coordinador",
+    aprendiz: "Aprendiz",
+    instructor: "Instructor",
+    coordinador: "Coordinador",
   };
 
   const roleColor: Record<RoleType, string> = {
-    Aprendiz: "text-black group-hover:text-darkBlue",
-    Instructor: "text-black  group-hover:text-darkBlue",
-    Coordinador: "text-black group-hover:text-darkBlue",
+    aprendiz: "text-black group-hover:text-darkBlue",
+    instructor: "text-black  group-hover:text-darkBlue",
+    coordinador: "text-black group-hover:text-darkBlue",
   };
 
   return (
