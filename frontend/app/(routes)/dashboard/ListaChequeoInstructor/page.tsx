@@ -44,6 +44,10 @@ export default function InstructorChecklistView() {
   const [isCreatingEvaluation, setIsCreatingEvaluation] = useState(false);
   const [showEvaluationForm, setShowEvaluationForm] = useState(false);
 
+  // Estados para la vista previa
+  const [showPreview, setShowPreview] = useState(false);
+  const [isFinalSaved, setIsFinalSaved] = useState(false);
+
   const itemsPerPage = 3;
 
   // Funciones auxiliares para extraer y estructurar datos de evaluaciones
@@ -53,11 +57,11 @@ export default function InstructorChecklistView() {
     try {
       const parsed = JSON.parse(evaluation.observations);
       if (parsed.itemStates && typeof parsed.itemStates === 'object') {
-        console.log('📋 Estados de items extraídos desde evaluación:', parsed.itemStates);
+        console.log('📋 Estados de items extraídos desde evaluación');
         return parsed.itemStates;
       }
     } catch (error) {
-      console.log('ℹ️ No se pudieron extraer estados de items desde observations');
+      // Error silencioso - no se pudieron extraer estados
     }
 
     return {};
@@ -66,17 +70,37 @@ export default function InstructorChecklistView() {
   const extractGeneralObservationsFromEvaluation = (evaluation: Evaluation) => {
     if (!evaluation.observations) return "";
 
+    // Si las observaciones no contienen caracteres JSON, asumir que son texto plano
+    if (!evaluation.observations.includes('{') && !evaluation.observations.includes('"')) {
+      return evaluation.observations.trim();
+    }
+
     try {
       const parsed = JSON.parse(evaluation.observations);
       if (parsed.generalObservations && typeof parsed.generalObservations === 'string') {
-        return parsed.generalObservations;
+        // Devolver solo el texto que el usuario digitó (formato anterior)
+        return parsed.generalObservations.trim();
+      }
+      
+      // Si no tiene generalObservations pero es JSON, devolver cadena vacía
+      if (typeof parsed === 'object') {
+        return "";
       }
     } catch (error) {
-      console.log('ℹ️ No se pudieron extraer observaciones generales, usando observations completo');
+      // Si no se puede parsear como JSON, verificar si contiene formato JSON
+      if (evaluation.observations.includes('itemStates') || 
+          evaluation.observations.includes('generalObservations') || 
+          evaluation.observations.startsWith('{')) {
+        // Es formato JSON pero no se pudo parsear, devolver cadena vacía
+        return "";
+      }
+      
+      // Es texto plano, usar el valor completo
+      return evaluation.observations.trim();
     }
 
-    // Si no se puede parsear como JSON, usar el valor completo
-    return evaluation.observations;
+    // Por defecto, devolver cadena vacía
+    return "";
   };
 
   // Cargar listas de chequeo activas y recuperar selección previa
@@ -110,6 +134,36 @@ export default function InstructorChecklistView() {
       localStorage.setItem('selectedChecklistId', selectedChecklist.id);
       console.log('💾 Guardando selección de checklist para persistencia:', selectedChecklist.id);
 
+      // Resetear estados de guardado al cambiar de checklist
+      setIsFinalSaved(false);
+      setShowPreview(false);
+
+      // Cargar estados guardados del localStorage
+      const savedItemStates = localStorage.getItem(`itemStates_${selectedChecklist.id}`);
+      if (savedItemStates) {
+        try {
+          const parsedStates = JSON.parse(savedItemStates);
+          setItemStates(parsedStates);
+          console.log('🔄 Estados de items cargados desde localStorage:', parsedStates);
+        } catch (error) {
+          console.warn('Error al cargar estados del localStorage:', error);
+        }
+      }
+
+      // Cargar datos de evaluación guardados del localStorage
+      const savedEvaluationData = localStorage.getItem(`evaluationData_${selectedChecklist.id}`);
+      if (savedEvaluationData) {
+        try {
+          const parsedEvaluationData = JSON.parse(savedEvaluationData);
+          setEvaluationObservations(parsedEvaluationData.observations || "");
+          setEvaluationRecommendations(parsedEvaluationData.recommendations || "");
+          setEvaluationJudgment(parsedEvaluationData.judgment || "PENDIENTE");
+          console.log('🔄 Datos de evaluación cargados desde localStorage:', parsedEvaluationData);
+        } catch (error) {
+          console.warn('Error al cargar datos de evaluación del localStorage:', error);
+        }
+      }
+
       // Siempre cargar desde la base de datos
       loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
     } else {
@@ -121,37 +175,64 @@ export default function InstructorChecklistView() {
       setEvaluationRecommendations("");
       setEvaluationJudgment("PENDIENTE");
       setItemStates({});
+      
+      // Resetear estados de guardado
+      setIsFinalSaved(false);
+      setShowPreview(false);
     }
   }, [selectedChecklist]);
 
   // Efecto para cargar datos de evaluación seleccionada INMEDIATAMENTE
   useEffect(() => {
     if (selectedEvaluation) {
-      console.log('🔄 Cargando datos de evaluación seleccionada:', selectedEvaluation);
-      console.log('📊 Detalles completos de selectedEvaluation:', {
-        id: selectedEvaluation.id,
-        observations: selectedEvaluation.observations,
-        recommendations: selectedEvaluation.recommendations,
-        valueJudgment: selectedEvaluation.valueJudgment,
-        checklistId: selectedEvaluation.checklistId,
-        allProperties: Object.keys(selectedEvaluation)
-      });
+      console.log('🔄 Cargando datos de evaluación seleccionada');
+      console.log('📊 ID de evaluación:', selectedEvaluation.id);
 
-      // Siempre cargar desde la base de datos
-      setEvaluationObservations(selectedEvaluation.observations || "");
+      // Cargar datos desde la base de datos
       setEvaluationRecommendations(selectedEvaluation.recommendations || "");
       setEvaluationJudgment(selectedEvaluation.valueJudgment || "PENDIENTE");
 
-      // Extraer estados de items desde observations
-      const itemStates = extractItemStatesFromEvaluation(selectedEvaluation);
-      setItemStates(itemStates);
-      console.log('📋 Estados de items cargados desde DB:', itemStates);
+      // Extraer estados de items y observaciones generales desde observations
+      const itemStatesFromDB = extractItemStatesFromEvaluation(selectedEvaluation);
+      const generalObservationsFromDB = extractGeneralObservationsFromEvaluation(selectedEvaluation);
+      
+      if (Object.keys(itemStatesFromDB).length > 0) {
+        setItemStates(itemStatesFromDB);
+        console.log('📋 Estados de items actualizados desde BD');
+        
+        // Limpiar localStorage ya que tenemos datos frescos de BD
+        if (selectedChecklist) {
+          localStorage.removeItem(`itemStates_${selectedChecklist.id}`);
+        }
+      }
+      
+      setEvaluationObservations(generalObservationsFromDB);
+      console.log('📝 Observaciones cargadas desde BD');
+      
+      // Limpiar localStorage de evaluación ya que tenemos datos frescos de BD
+      if (selectedChecklist) {
+        localStorage.removeItem(`evaluationData_${selectedChecklist.id}`);
+      }
     } else {
-      // Limpiar estados si no hay evaluación
-      setEvaluationObservations("");
-      setEvaluationRecommendations("");
-      setEvaluationJudgment("PENDIENTE");
-      setItemStates({});
+      // Solo limpiar si no hay datos en localStorage
+      if (selectedChecklist) {
+        const savedEvaluationData = localStorage.getItem(`evaluationData_${selectedChecklist.id}`);
+        if (!savedEvaluationData) {
+          setEvaluationObservations("");
+          setEvaluationRecommendations("");
+          setEvaluationJudgment("PENDIENTE");
+        }
+        
+        const savedItemStates = localStorage.getItem(`itemStates_${selectedChecklist.id}`);
+        if (!savedItemStates) {
+          setItemStates({});
+        }
+      } else {
+        setEvaluationObservations("");
+        setEvaluationRecommendations("");
+        setEvaluationJudgment("PENDIENTE");
+        setItemStates({});
+      }
     }
   }, [selectedEvaluation]);
 
@@ -167,6 +248,20 @@ export default function InstructorChecklistView() {
       console.warn('⚠️ Error en sincronización:', error);
     }
   };
+
+  // Auto-guardado para campos de evaluación
+  useEffect(() => {
+    if (selectedChecklist && (evaluationObservations || evaluationRecommendations || evaluationJudgment !== "PENDIENTE")) {
+      // Guardar datos de evaluación en localStorage para persistencia
+      const evaluationData = {
+        observations: evaluationObservations,
+        recommendations: evaluationRecommendations,
+        judgment: evaluationJudgment
+      };
+      localStorage.setItem(`evaluationData_${selectedChecklist.id}`, JSON.stringify(evaluationData));
+      console.log('💾 Datos de evaluación guardados en localStorage:', evaluationData);
+    }
+  }, [evaluationObservations, evaluationRecommendations, evaluationJudgment, selectedChecklist]);
 
 
 
@@ -237,11 +332,9 @@ export default function InstructorChecklistView() {
 
       // Cargar evaluaciones desde la base de datos
       const evaluationsResponse = await fetchEvaluationsByChecklist(checklistId);
-      console.log("Raw evaluations response:", evaluationsResponse);
 
       if (evaluationsResponse && evaluationsResponse.code === "200") {
         console.log("✅ Evaluations response successful");
-        console.log("Evaluations data:", evaluationsResponse.data);
 
         if (evaluationsResponse.data && evaluationsResponse.data.length > 0) {
           setEvaluations(evaluationsResponse.data);
@@ -249,7 +342,6 @@ export default function InstructorChecklistView() {
 
           // Seleccionar la primera evaluación
           const firstEvaluation = evaluationsResponse.data[0];
-          console.log("First evaluation details:", firstEvaluation);
 
           setSelectedEvaluation(firstEvaluation);
           console.log("✅ Evaluation loaded successfully");
@@ -271,7 +363,6 @@ export default function InstructorChecklistView() {
         if (alternativeResponse && alternativeResponse.code === "200" && alternativeResponse.data && alternativeResponse.data.length > 0) {
           setEvaluations(alternativeResponse.data);
           const firstEvaluation = alternativeResponse.data[0];
-          console.log("Alternative method evaluation details:", firstEvaluation);
 
           setSelectedEvaluation(firstEvaluation);
           console.log("✅ Evaluation loaded via alternative method");
@@ -396,6 +487,16 @@ export default function InstructorChecklistView() {
       }
     }));
     console.log("Updated item:", { id, field, value });
+    
+    // Guardar en localStorage para persistencia entre recargas
+    const updatedStates = {
+      ...itemStates,
+      [id]: {
+        ...itemStates[id],
+        [field]: value
+      }
+    };
+    localStorage.setItem(`itemStates_${selectedChecklist?.id}`, JSON.stringify(updatedStates));
   };
 
   const handleFileUpload = (
@@ -413,17 +514,20 @@ export default function InstructorChecklistView() {
   // Función para manejar el botón "Actualizar Evaluación"
   const handleUpdateEvaluationClick = () => {
     console.log('📝 Mostrando formulario para actualizar evaluación');
-    console.log('📊 Datos de selectedEvaluation:', selectedEvaluation);
+    console.log('📊 ID de evaluación:', selectedEvaluation?.id);
 
     // Cargar los datos de la evaluación existente en los campos del formulario
     if (selectedEvaluation) {
-      console.log('🔄 Llenando formulario con datos de BD:', {
-        observations: selectedEvaluation.observations,
+      // Extraer solo las observaciones generales (texto plano) del JSON
+      const generalObservations = extractGeneralObservationsFromEvaluation(selectedEvaluation);
+      
+      console.log('🔄 Llenando formulario con datos extraídos de BD:', {
+        observations: generalObservations,
         recommendations: selectedEvaluation.recommendations,
         valueJudgment: selectedEvaluation.valueJudgment
       });
 
-      setEvaluationObservations(selectedEvaluation.observations || "");
+      setEvaluationObservations(generalObservations);
       setEvaluationRecommendations(selectedEvaluation.recommendations || "");
       setEvaluationJudgment(selectedEvaluation.valueJudgment || "PENDIENTE");
     }
@@ -435,9 +539,10 @@ export default function InstructorChecklistView() {
   const handleCancelUpdate = () => {
     console.log('❌ Cancelando actualización de evaluación');
     setShowEvaluationForm(false);
-    // Restaurar datos originales
+    // Restaurar datos originales usando la función de extracción
     if (selectedEvaluation) {
-      setEvaluationObservations(selectedEvaluation.observations || "");
+      const generalObservations = extractGeneralObservationsFromEvaluation(selectedEvaluation);
+      setEvaluationObservations(generalObservations);
       setEvaluationRecommendations(selectedEvaluation.recommendations || "");
       setEvaluationJudgment(selectedEvaluation.valueJudgment || "PENDIENTE");
     }
@@ -469,15 +574,18 @@ export default function InstructorChecklistView() {
     try {
       console.log("=== GUARDANDO EVALUACIÓN EN BD ===");
       console.log("ID de evaluación:", selectedEvaluation.id);
+      
+      // Guardar solo las observaciones generales (texto plano) en la base de datos
+      // Los estados de items se manejan en localStorage únicamente
       console.log("Datos a guardar:", {
-        observations: evaluationObservations,
+        observations: evaluationObservations, // Solo texto plano
         recommendations: evaluationRecommendations,
         valueJudgment: evaluationJudgment
       });
 
       const response = await completeEvaluation(
         parseInt(selectedEvaluation.id),
-        evaluationObservations,
+        evaluationObservations, // Solo las observaciones en texto plano
         evaluationRecommendations,
         evaluationJudgment
       );
@@ -490,7 +598,7 @@ export default function InstructorChecklistView() {
         // Crear el objeto de evaluación actualizado con los datos que acabamos de guardar
         const updatedEvaluation = {
           ...selectedEvaluation,
-          observations: evaluationObservations,
+          observations: evaluationObservations, // Solo texto plano
           recommendations: evaluationRecommendations,
           valueJudgment: evaluationJudgment
         };
@@ -506,6 +614,12 @@ export default function InstructorChecklistView() {
             ? updatedEvaluation
             : evaluation
         ));
+
+        // Limpiar localStorage después del guardado exitoso en BD
+        if (selectedChecklist) {
+          localStorage.removeItem(`evaluationData_${selectedChecklist.id}`);
+          localStorage.removeItem(`itemStates_${selectedChecklist.id}`);
+        }
 
         console.log('✅ Datos guardados exitosamente en la base de datos');
 
@@ -524,6 +638,67 @@ export default function InstructorChecklistView() {
   };
 
   const handleSaveChecklist = async (): Promise<void> => {
+    if (!selectedChecklist) {
+      toast.error("No hay ninguna lista de chequeo seleccionada");
+      return;
+    }
+
+    // Verificar si hay datos de evaluación para crear/actualizar evaluación en BD
+    const hasEvaluationData = evaluationObservations.trim() || evaluationRecommendations.trim() || (evaluationJudgment && evaluationJudgment !== "PENDIENTE");
+    
+    if (hasEvaluationData) {
+      try {
+        toast.info("💾 Guardando evaluación en la base de datos...");
+        
+        if (selectedEvaluation) {
+          // Actualizar evaluación existente
+          console.log("Actualizando evaluación existente en BD...");
+          await handleCompleteEvaluation();
+        } else {
+          // Crear nueva evaluación
+          console.log("Creando nueva evaluación en BD...");
+          await handleCreateAndCompleteEvaluation();
+        }
+        
+        toast.success("✅ Evaluación guardada en la base de datos!");
+      } catch (error) {
+        console.error("Error al guardar evaluación:", error);
+        toast.error("❌ Error al guardar la evaluación en la base de datos");
+        return;
+      }
+    }
+
+    // Mostrar vista previa independientemente
+    setShowPreview(true);
+  };
+
+  // Nueva función para mostrar vista previa
+  const generatePreviewData = () => {
+    if (!selectedChecklist) return null;
+
+    const updatedItems = items.map(item => {
+      const itemState = itemStates[item.id] || { completed: item.completed, observations: item.observations };
+      return {
+        ...item,
+        completed: itemState.completed,
+        observations: itemState.observations
+      };
+    });
+
+    return {
+      checklist: selectedChecklist,
+      items: updatedItems,
+      evaluation: {
+        observations: evaluationObservations,
+        recommendations: evaluationRecommendations,
+        judgment: evaluationJudgment
+      },
+      hasEvaluationData: evaluationObservations.trim() || evaluationRecommendations.trim() || (evaluationJudgment && evaluationJudgment !== "PENDIENTE")
+    };
+  };
+
+  // Función para guardar definitivamente
+  const handleFinalSave = async (): Promise<void> => {
     if (!selectedChecklist) {
       toast.error("No hay ninguna lista de chequeo seleccionada");
       return;
@@ -561,14 +736,13 @@ export default function InstructorChecklistView() {
       };
 
       // Mostrar progreso del guardado
-      toast.info("💾 Guardando lista de chequeo...");
+      toast.info("💾 Guardando lista de chequeo definitivamente...");
 
       // Simular guardado exitoso por ahora
-      // TODO: Implementar la llamada real al backend cuando esté disponible
       console.log("Checklist data to save:", checklistData);
 
-      // Simular una pequeña demora para mostrar feedback
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Simular una demora para mostrar feedback
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Determinar si también necesitamos manejar la evaluación
       const hasEvaluationData = evaluationObservations.trim() || evaluationRecommendations.trim() || (evaluationJudgment && evaluationJudgment !== "PENDIENTE");
@@ -586,20 +760,42 @@ export default function InstructorChecklistView() {
             await handleCompleteEvaluation();
           }
         }
-        toast.success("✅ Lista de chequeo y evaluación guardadas exitosamente!");
+        toast.success("✅ Lista de chequeo y evaluación guardadas definitivamente!");
       } else if (hasEvaluationData) {
-        // No hay evaluación pero hay datos, preguntar si quiere crearla
-        toast.info("💡 Se detectaron datos de evaluación. Guarde primero la lista y luego use 'Crear Evaluación Completa'");
-        toast.success("📋 Lista de chequeo guardada exitosamente!");
+        // Crear evaluación si hay datos
+        toast.info("� Creando evaluación con los datos proporcionados...");
+        await handleCreateAndCompleteEvaluation();
+        toast.success("✅ Lista de chequeo y evaluación guardadas definitivamente!");
       } else {
         // Solo lista de chequeo sin evaluación
-        toast.success("📋 Lista de chequeo guardada exitosamente!");
+        toast.success("✅ Lista de chequeo guardada definitivamente!");
+      }
+
+      // Marcar como guardado definitivamente
+      setIsFinalSaved(true);
+      setShowPreview(false);
+
+      // Limpiar localStorage después del guardado definitivo
+      if (selectedChecklist) {
+        localStorage.removeItem(`evaluationData_${selectedChecklist.id}`);
+        localStorage.removeItem(`itemStates_${selectedChecklist.id}`);
       }
 
     } catch (error) {
       console.error("Error saving checklist:", error);
-      toast.error("❌ Error al guardar la lista de chequeo");
+      toast.error("❌ Error al guardar la lista de chequeo definitivamente");
     }
+  };
+
+  // Función para volver a editar desde vista previa
+  const handleBackToEdit = (): void => {
+    setShowPreview(false);
+  };
+
+  // Función para permitir modificaciones después del guardado final
+  const handleEnableModification = (): void => {
+    setIsFinalSaved(false);
+    toast.info("📝 Modo de edición habilitado. Los cambios se guardarán en localStorage hasta que vuelva a guardar definitivamente.");
   };
 
   // Función para exportar a PDF
@@ -679,9 +875,10 @@ export default function InstructorChecklistView() {
   // Función para abrir el modal de crear evaluación
   const handleOpenCreateEvaluationModal = () => {
     if (selectedEvaluation) {
-      // Si ya existe una evaluación, cargar sus datos
-      console.log('📋 Abriendo modal con datos de evaluación existente:', selectedEvaluation);
-      setEvaluationObservations(selectedEvaluation.observations || "");
+      // Si ya existe una evaluación, cargar sus datos usando la función de extracción
+      console.log('📋 Abriendo modal con datos de evaluación existente');
+      const generalObservations = extractGeneralObservationsFromEvaluation(selectedEvaluation);
+      setEvaluationObservations(generalObservations);
       setEvaluationRecommendations(selectedEvaluation.recommendations || "");
       setEvaluationJudgment(selectedEvaluation.valueJudgment || "PENDIENTE");
     } else {
@@ -868,11 +1065,13 @@ export default function InstructorChecklistView() {
       if (createResponse && createResponse.code === "200" && createResponse.id) {
         console.log("✅ Evaluación base creada con ID:", createResponse.id);
 
-        // Completar la evaluación inmediatamente
+        // Completar la evaluación inmediatamente con todos los datos
         console.log("Completando evaluación con datos...");
+        
+        // Guardar solo las observaciones generales (texto plano) en la base de datos
         const completeResponse = await completeEvaluation(
           parseInt(createResponse.id),
-          evaluationObservations,
+          evaluationObservations, // Solo texto plano
           evaluationRecommendations,
           evaluationJudgment
         );
@@ -881,12 +1080,18 @@ export default function InstructorChecklistView() {
         if (completeResponse && completeResponse.code === "200") {
           toast.success("🎉 ¡Evaluación creada y completada exitosamente!");
 
-          // Datos creados exitosamente
+          // Datos guardados exitosamente
           const savedData = {
-            observations: evaluationObservations,
+            observations: evaluationObservations, // Solo texto plano
             recommendations: evaluationRecommendations,
             valueJudgment: evaluationJudgment
           };
+
+          // Limpiar localStorage después del guardado exitoso en BD
+          if (selectedChecklist) {
+            localStorage.removeItem(`evaluationData_${selectedChecklist.id}`);
+            localStorage.removeItem(`itemStates_${selectedChecklist.id}`);
+          }
 
           // Sincronizar datos manteniendo los valores actuales
           await syncEvaluationDataAfterSave(parseInt(selectedChecklist.id), savedData);
@@ -1214,20 +1419,26 @@ export default function InstructorChecklistView() {
 
                 <button
                   onClick={handleSaveChecklist}
-                  disabled={!selectedChecklist}
-                  className={`hexagon-button flex items-center gap-3 px-6 py-4 rounded-full border-2 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${selectedChecklist
+                  disabled={!selectedChecklist || isFinalSaved}
+                  className={`hexagon-button flex items-center gap-3 px-6 py-4 rounded-full border-2 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${selectedChecklist && !isFinalSaved
                       ? 'border-lime-500 dark:border-shadowBlue bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue'
                       : 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
                     }`}
                 >
                   <Save className="w-5 h-5" />
-                  <span>Guardar Lista</span>
-                  {(evaluationObservations.trim() || evaluationRecommendations.trim()) && !selectedEvaluation && (
-                    <span className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs">
-                      Pendientes
-                    </span>
-                  )}
+                  <span>{isFinalSaved ? 'Lista Guardada' : 'Vista Previa y Guardar'}</span>
                 </button>
+
+                {/* Botón de modificar lista (aparece después del guardado final) */}
+                {isFinalSaved && (
+                  <button
+                    onClick={handleEnableModification}
+                    className="hexagon-button flex items-center gap-3 px-6 py-4 rounded-full border-2 border-blue-500 dark:border-blue-400 bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-500 dark:to-blue-600 text-white hover:from-blue-500 hover:to-blue-600 dark:hover:from-blue-400 dark:hover:to-blue-500 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                  >
+                    <Edit className="w-5 h-5" />
+                    <span>Modificar Lista</span>
+                  </button>
+                )}
               </div>
 
               <div className="flex items-center gap-4">
@@ -1352,16 +1563,19 @@ export default function InstructorChecklistView() {
                             </td>
                             <td className="hexagon-cell p-6 text-center">
                               <div className="flex justify-center space-x-6">
-                                <label className={`hexagon-choice flex items-center space-x-3 cursor-pointer p-3 rounded-2xl border-2 ${itemState.completed === true
+                                <label className={`hexagon-choice flex items-center space-x-3 cursor-pointer p-3 rounded-2xl border-2 ${
+                                  isFinalSaved ? 'opacity-50 cursor-not-allowed' : 
+                                  itemState.completed === true
                                     ? 'border-lime-500 dark:border-lime-500 bg-green-50 dark:bg-green-900/30 shadow-lg transform scale-105'
                                     : 'border-gray-300 dark:border-gray-600'
-                                  }`}>
+                                }`}>
                                   <input
                                     type="radio"
                                     name={`completed-${item.id}`}
                                     value="yes"
                                     onChange={() => handleItemChange(item.id, "completed", true)}
                                     checked={itemState.completed === true}
+                                    disabled={isFinalSaved}
                                     className="sr-only"
                                   />
                                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${itemState.completed === true ? 'bg-lime-500 text-white' : 'bg-gray-200 dark:bg-gray-600'
@@ -1373,16 +1587,19 @@ export default function InstructorChecklistView() {
                                     Sí
                                   </span>
                                 </label>
-                                <label className={`hexagon-choice flex items-center space-x-3 cursor-pointer p-3 rounded-2xl border-2 ${itemState.completed === false
+                                <label className={`hexagon-choice flex items-center space-x-3 cursor-pointer p-3 rounded-2xl border-2 ${
+                                  isFinalSaved ? 'opacity-50 cursor-not-allowed' : 
+                                  itemState.completed === false
                                     ? 'border-red-500 bg-red-50 dark:bg-red-900/30 shadow-lg transform scale-105'
                                     : 'border-gray-300 dark:border-gray-600'
-                                  }`}>
+                                }`}>
                                   <input
                                     type="radio"
                                     name={`completed-${item.id}`}
                                     value="no"
                                     onChange={() => handleItemChange(item.id, "completed", false)}
                                     checked={itemState.completed === false}
+                                    disabled={isFinalSaved}
                                     className="sr-only"
                                   />
                                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${itemState.completed === false ? 'bg-red-500 text-white' : 'bg-gray-200 dark:bg-gray-600'
@@ -1401,10 +1618,12 @@ export default function InstructorChecklistView() {
                                 <textarea
                                   value={itemState.observations || ""}
                                   onChange={(e) => handleItemChange(item.id, "observations", e.target.value)}
-                                  className="hexagon-textarea w-full p-4 border-2 border-gray-300 dark:border-gray-600 rounded-2xl min-h-[100px] bg-gradient-to-r from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 text-darkBlue dark:text-white focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue resize-vertical shadow-inner"
-                                  placeholder="Agregar observaciones detalladas sobre este item..."
+                                  disabled={isFinalSaved}
+                                  className={`hexagon-textarea w-full p-4 border-2 border-gray-300 dark:border-gray-600 rounded-2xl min-h-[100px] bg-gradient-to-r from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 text-darkBlue dark:text-white focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue resize-vertical shadow-inner transition-all duration-300 ${
+                                    isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
+                                  }`}
+                                  placeholder={isFinalSaved ? "Lista guardada definitivamente" : "Agregar observaciones detalladas sobre este item..."}
                                 />
-
                               </div>
                             </td>
                           </tr>
@@ -1482,9 +1701,12 @@ export default function InstructorChecklistView() {
                               <textarea
                                 value={evaluationObservations}
                                 onChange={(e) => setEvaluationObservations(e.target.value)}
-                                className="w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300"
+                                disabled={isFinalSaved}
+                                className={`w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300 ${
+                                  isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
                                 rows={4}
-                                placeholder="Ingrese sus observaciones generales sobre la evaluación..."
+                                placeholder={isFinalSaved ? "Evaluación guardada definitivamente" : "Ingrese sus observaciones generales sobre la evaluación..."}
                                 required
                               />
                             </div>
@@ -1499,9 +1721,12 @@ export default function InstructorChecklistView() {
                               <textarea
                                 value={evaluationRecommendations}
                                 onChange={(e) => setEvaluationRecommendations(e.target.value)}
-                                className="w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300"
+                                disabled={isFinalSaved}
+                                className={`w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300 ${
+                                  isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
                                 rows={4}
-                                placeholder="Ingrese sus recomendaciones para esta evaluación..."
+                                placeholder={isFinalSaved ? "Evaluación guardada definitivamente" : "Ingrese sus recomendaciones para esta evaluación..."}
                                 required
                               />
                             </div>
@@ -1517,7 +1742,10 @@ export default function InstructorChecklistView() {
                             <select
                               value={evaluationJudgment}
                               onChange={(e) => setEvaluationJudgment(e.target.value)}
-                              className="w-full px-6 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white font-semibold text-lg shadow-inner transition-all duration-300"
+                              disabled={isFinalSaved}
+                              className={`w-full px-6 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white font-semibold text-lg shadow-inner transition-all duration-300 ${
+                                isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
+                              }`}
                               required
                             >
                               <option value="">Seleccione un juicio de valor</option>
@@ -1533,21 +1761,24 @@ export default function InstructorChecklistView() {
                           <div className="flex justify-center space-x-6 mt-8">
                             <button
                               onClick={handleCancelUpdate}
-                              className="px-8 py-4 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white rounded-2xl transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                              disabled={isFinalSaved}
+                              className={`px-8 py-4 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white rounded-2xl transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                                isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
+                              }`}
                             >
                               <X className="w-5 h-5" />
                               <span>Cancelar</span>
                             </button>
                             <button
                               onClick={handleCompleteEvaluation}
-                              disabled={!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE"}
-                              className={`px-8 py-4 rounded-2xl transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${(!evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
+                              disabled={isFinalSaved || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE"}
+                              className={`px-8 py-4 rounded-2xl transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${(isFinalSaved || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
                                   ? 'bg-gray-400 cursor-not-allowed text-white'
                                   : 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white'
                                 }`}
                             >
                               <Save className="w-5 h-5" />
-                              <span>Guardar Cambios</span>
+                              <span>{isFinalSaved ? 'Guardado Definitivamente' : 'Guardar Cambios'}</span>
                             </button>
                           </div>
                         </div>
@@ -1558,7 +1789,7 @@ export default function InstructorChecklistView() {
                           <div className="bg-gradient-to-r from-green-100 to-green-50 dark:from-green-800 dark:to-green-900/50 p-6 rounded-2xl border border-green-200 dark:border-green-700 shadow-inner">
                             <p className="text-green-800 dark:text-green-200 text-center font-medium flex items-center justify-center gap-2">
                               <span className="text-2xl">✅</span>
-                              <strong>Evaluación Completada</strong> - Relación 1:1 establecida en la base de datos
+                              <strong>Evaluación Completada</strong>
                             </p>
                           </div>
 
@@ -1573,7 +1804,7 @@ export default function InstructorChecklistView() {
                               </div>
                               <div className="bg-gradient-to-r from-blue-50 to-white dark:from-blue-900/30 dark:to-gray-700 p-4 rounded-xl border border-blue-200 dark:border-blue-600">
                                 <p className="text-sm text-darkBlue dark:text-white leading-relaxed min-h-[80px]">
-                                  {selectedEvaluation.observations || "Sin observaciones"}
+                                  {selectedEvaluation ? extractGeneralObservationsFromEvaluation(selectedEvaluation) || "Sin observaciones" : "Sin observaciones"}
                                 </p>
                               </div>
                             </div>
@@ -1617,10 +1848,13 @@ export default function InstructorChecklistView() {
                           <div className="flex justify-center mt-8">
                             <button
                               onClick={handleUpdateEvaluationClick}
-                              className="px-10 py-4 bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white rounded-full transition-all duration-300 flex items-center space-x-4 font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
+                              disabled={isFinalSaved}
+                              className={`px-10 py-4 bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white rounded-full transition-all duration-300 flex items-center space-x-4 font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                                isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
+                              }`}
                             >
                               <Edit className="w-6 h-6" />
-                              <span>Actualizar Evaluación</span>
+                              <span>{isFinalSaved ? 'Evaluación Guardada' : 'Actualizar Evaluación'}</span>
                             </button>
                           </div>
                         </div>
@@ -1642,10 +1876,13 @@ export default function InstructorChecklistView() {
                           {/* Botón principal para crear evaluación */}
                           <button
                             onClick={handleOpenCreateEvaluationModal}
-                            className="px-12 py-6 bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white rounded-3xl transition-all duration-500 flex items-center space-x-4 mx-auto font-bold text-xl shadow-2xl hover:shadow-lime-600/20 dark:hover:shadow-shadowBlue/30 transform hover:scale-110"
+                            disabled={isFinalSaved}
+                            className={`px-12 py-6 bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white rounded-3xl transition-all duration-500 flex items-center space-x-4 mx-auto font-bold text-xl shadow-2xl hover:shadow-lime-600/20 dark:hover:shadow-shadowBlue/30 transform hover:scale-110 ${
+                              isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                           >
                             <Save className="w-8 h-8" />
-                            <span>Crear Evaluación</span>
+                            <span>{isFinalSaved ? 'Evaluación Guardada' : 'Crear Evaluación'}</span>
                           </button>
 
                           {/* Botón de debug con diseño hexagonal */}
@@ -1744,6 +1981,206 @@ export default function InstructorChecklistView() {
         )}
       </div>
 
+      {/* Modal de Vista Previa */}
+      {showPreview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Header del modal */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center space-x-3">
+                  <span className="text-4xl">👁️</span>
+                  <span>Vista Previa - Lista de Chequeo</span>
+                </h2>
+                <button
+                  onClick={handleBackToEdit}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <X className="w-8 h-8" />
+                </button>
+              </div>
+
+              {/* Contenido de la vista previa */}
+              {(() => {
+                const previewData = generatePreviewData();
+                if (!previewData) return null;
+
+                return (
+                  <div className="space-y-8">
+                    {/* Información del checklist */}
+                    <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 p-6 rounded-xl border border-blue-200 dark:border-blue-700">
+                      <h3 className="text-xl font-bold text-blue-900 dark:text-blue-100 mb-4 flex items-center gap-2">
+                        <span className="text-2xl">📋</span>
+                        Información de la Lista
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <span className="font-semibold text-blue-800 dark:text-blue-200">ID:</span>
+                          <span className="ml-2 text-blue-700 dark:text-blue-300">{previewData.checklist.id}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-blue-800 dark:text-blue-200">Trimestre:</span>
+                          <span className="ml-2 text-blue-700 dark:text-blue-300">{previewData.checklist.trimester || 'N/A'}</span>
+                        </div>
+                        <div>
+                          <span className="font-semibold text-blue-800 dark:text-blue-200">Componente:</span>
+                          <span className="ml-2 text-blue-700 dark:text-blue-300">{previewData.checklist.component || 'N/A'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Items del checklist */}
+                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-lg">
+                      <div className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue p-4">
+                        <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                          <span className="text-2xl">✅</span>
+                          Items Evaluados ({previewData.items.length})
+                        </h3>
+                      </div>
+                      <div className="p-4">
+                        <div className="space-y-4 max-h-96 overflow-y-auto">
+                          {previewData.items.map((item, index) => (
+                            <div key={item.id} className={`p-4 rounded-lg border ${
+                              item.completed === true 
+                                ? 'border-green-200 bg-green-50 dark:border-green-700 dark:bg-green-900/20' 
+                                : item.completed === false 
+                                  ? 'border-red-200 bg-red-50 dark:border-red-700 dark:bg-red-900/20'
+                                  : 'border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700'
+                            }`}>
+                              <div className="flex items-start gap-4">
+                                <div className="flex-shrink-0">
+                                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
+                                    item.completed === true 
+                                      ? 'bg-green-500' 
+                                      : item.completed === false 
+                                        ? 'bg-red-500'
+                                        : 'bg-gray-400'
+                                  }`}>
+                                    {item.completed === true ? '✓' : item.completed === false ? '✗' : '?'}
+                                  </div>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="font-bold text-gray-900 dark:text-gray-100">Item {item.id}:</span>
+                                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                                      item.completed === true 
+                                        ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200' 
+                                        : item.completed === false 
+                                          ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200'
+                                          : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                                    }`}>
+                                      {item.completed === true ? 'CUMPLE' : item.completed === false ? 'NO CUMPLE' : 'SIN EVALUAR'}
+                                    </span>
+                                  </div>
+                                  <p className="text-gray-700 dark:text-gray-300 mb-3">{item.indicator}</p>
+                                  {item.observations && (
+                                    <div className="bg-white dark:bg-gray-800 p-3 rounded border border-gray-200 dark:border-gray-600">
+                                      <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm">Observaciones:</span>
+                                      <p className="text-gray-700 dark:text-gray-300 text-sm mt-1">{item.observations}</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Evaluación (si existe) */}
+                    {previewData.hasEvaluationData && (
+                      <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 p-6 rounded-xl border border-purple-200 dark:border-purple-700">
+                        <h3 className="text-xl font-bold text-purple-900 dark:text-purple-100 mb-4 flex items-center gap-2">
+                          <span className="text-2xl">📊</span>
+                          Evaluación
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div>
+                            <h4 className="font-semibold text-purple-800 dark:text-purple-200 mb-2">Observaciones:</h4>
+                            <div className="bg-white dark:bg-gray-700 p-3 rounded border border-purple-200 dark:border-purple-600">
+                              <p className="text-gray-700 dark:text-gray-300 text-sm">
+                                {previewData.evaluation.observations || 'Sin observaciones'}
+                              </p>
+                            </div>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-purple-800 dark:text-purple-200 mb-2">Recomendaciones:</h4>
+                            <div className="bg-white dark:bg-gray-700 p-3 rounded border border-purple-200 dark:border-purple-600">
+                              <p className="text-gray-700 dark:text-gray-300 text-sm">
+                                {previewData.evaluation.recommendations || 'Sin recomendaciones'}
+                              </p>
+                            </div>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-purple-800 dark:text-purple-200 mb-2">Juicio de Valor:</h4>
+                            <div className="flex justify-center">
+                              <span className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg ${
+                                previewData.evaluation.judgment === 'EXCELENTE' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
+                                previewData.evaluation.judgment === 'BUENO' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' :
+                                previewData.evaluation.judgment === 'ACEPTABLE' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white' :
+                                previewData.evaluation.judgment === 'DEFICIENTE' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' :
+                                previewData.evaluation.judgment === 'RECHAZADO' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
+                                'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
+                              }`}>
+                                {previewData.evaluation.judgment || 'PENDIENTE'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Estadísticas */}
+                    <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 p-6 rounded-xl border border-gray-200 dark:border-gray-600">
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
+                        <span className="text-2xl">📈</span>
+                        Estadísticas
+                      </h3>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-green-600">{previewData.items.filter(item => item.completed === true).length}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Cumple</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-red-600">{previewData.items.filter(item => item.completed === false).length}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">No Cumple</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-gray-600">{previewData.items.filter(item => item.completed === null).length}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Sin Evaluar</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-blue-600">{previewData.items.filter(item => item.observations && item.observations.trim()).length}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">Con Observaciones</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Botones de acción */}
+                    <div className="flex justify-center space-x-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+                      <button
+                        onClick={handleBackToEdit}
+                        className="px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white rounded-2xl transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
+                        <Edit className="w-6 h-6" />
+                        <span>Volver a Editar</span>
+                      </button>
+                      <button
+                        onClick={handleFinalSave}
+                        className="px-8 py-4 bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white rounded-2xl transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                      >
+                        <Save className="w-6 h-6" />
+                        <span>Guardar Definitivamente</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal para crear evaluación */}
       {showCreateEvaluationModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
@@ -1783,7 +2220,10 @@ export default function InstructorChecklistView() {
                   <textarea
                     value={evaluationObservations}
                     onChange={(e) => setEvaluationObservations(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    disabled={isFinalSaved || isCreatingEvaluation}
+                    className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ${
+                      isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                     rows={4}
                     placeholder="Describa sus observaciones sobre la lista de chequeo..."
                     disabled={isCreatingEvaluation}
