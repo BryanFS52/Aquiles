@@ -2,6 +2,7 @@ package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.JustificationBusiness;
 import com.api.aquilesApi.Dto.JustificationDto;
+import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.DgsComponent;
 import org.springframework.data.domain.Page;
@@ -88,6 +89,11 @@ public class JustificationResolver {
                     result.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
+            );
+        } catch (CustomException e) {
+            return ResponseHttpApi.responseHttpError(
+                    e.getMessage(),
+                    HttpStatus.BAD_REQUEST
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(

@@ -30,6 +30,7 @@ import PageTitle from '@components/UI/pageTitle';
 import { AbsencesList } from './AbsencesList';
 import { JustificationFormModal } from './JustificationFormModal';
 import { JustificationsHistory } from './JustificationsHistory';
+import { TEMPORAL_APRENDIZ_ID } from '@/temporaryCredential';
 
 export const JustificationsContainer: React.FC = () => {
   const fileRef = useRef<File | null>(null);
@@ -70,12 +71,15 @@ export const JustificationsContainer: React.FC = () => {
   const currentAttendance = useSelector(
     (state: RootState) => state.justification.form.currentAttendance
   );
+  
+  // const para simplificar el uso del ID del estudiante
+  TEMPORAL_APRENDIZ_ID;
 
   // Effects
   useEffect(() => {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-    dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 }));
-    dispatch(fetchJustificationsByStudentId({ studentId: 2, page: 0, size: 10 }));
+    dispatch(fetchAttendancesByStudent({ id: TEMPORAL_APRENDIZ_ID, stateId: 2 }));
+    dispatch(fetchJustificationsByStudentId({ studentId: TEMPORAL_APRENDIZ_ID, page: 0, size: 10 }));
   }, [dispatch]);
 
   useEffect(() => {
@@ -195,12 +199,12 @@ export const JustificationsContainer: React.FC = () => {
         // No incluir justificationStatus ya que se asigna automáticamente en el backend
       };
 
-      console.log("🚀 Enviando justificación con datos:", formDataWithFile);
+      // console.log("🚀 Enviando justificación con datos:", formDataWithFile);
 
       await dispatch(addJustification(formDataWithFile)).unwrap();
 
       toast.success('¡Tu justificación ha sido enviada exitosamente!');
-      dispatch(fetchJustifications({ page: 0, size: 10 }));
+      dispatch(fetchJustificationsByStudentId({ studentId: TEMPORAL_APRENDIZ_ID, page: 0, size: 10 }));
       dispatch(resetForm());
       fileRef.current = null;
       base64Ref.current = '';
@@ -209,7 +213,7 @@ export const JustificationsContainer: React.FC = () => {
         topRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 200);
     } catch (error: any) {
-      console.error('Error al enviar justificación:', error);
+      // console.error('Error al enviar justificación:', error);
       const errorString = JSON.stringify(error);
       let toastMessage = 'Error inesperado al enviar la justificación.';
 
@@ -317,8 +321,8 @@ export const JustificationsContainer: React.FC = () => {
         <PageTitle>Justificaciones</PageTitle>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2">
-        <AnimatePresence mode="wait">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5" ref={formRef}>
+        <AnimatePresence mode='sync'>
           {!form.showForm && !shouldLoadModal && (
             <motion.div
               key="absences-list"

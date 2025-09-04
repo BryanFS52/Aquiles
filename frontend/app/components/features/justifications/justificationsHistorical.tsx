@@ -16,6 +16,30 @@ export default function JustificationsHistorical({
   loading,
   handleDownloadFile,
 }: JustificationsHistoricalProps) {
+  // Ordenar justificaciones por fecha de ausencia (más reciente primero)
+  const sortedData = [...data].sort((a, b) => {
+    // Función para convertir DD/MM/YYYY a Date
+    const parseDate = (dateString: string) => {
+      if (!dateString) return new Date(0);
+      
+      const parts = dateString.split('/');
+      if (parts.length === 3) {
+        const day = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1; // Los meses van de 0-11
+        const year = parseInt(parts[2]);
+        return new Date(year, month, day);
+      }
+      
+      // Fallback si no es formato DD/MM/YYYY
+      return new Date(dateString);
+    };
+
+    const dateA = parseDate(a.absenceDate);
+    const dateB = parseDate(b.absenceDate);
+    
+    return dateB.getTime() - dateA.getTime(); // Descendente (más reciente primero)
+  });
+
   const getStatusColor = (estado: string) => {
     const estadoLower = estado.toLowerCase();
     if (estadoLower.includes("aprobad") || estadoLower.includes("aceptad") || estadoLower.includes("activ")) {
@@ -85,7 +109,7 @@ export default function JustificationsHistorical({
                     </div>
                   </td>
                 </tr>
-              ) : !data || data.length === 0 ? (
+              ) : !sortedData || sortedData.length === 0 ? (
                 <tr>
                   <td
                     colSpan={4}
@@ -103,7 +127,7 @@ export default function JustificationsHistorical({
                   </td>
                 </tr>
               ) : (
-                data.map(
+                sortedData.map(
                   (
                     justification: TransformedJustificationItem,
                     index: number

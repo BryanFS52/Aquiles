@@ -33,6 +33,14 @@ export interface TransformedAttendanceItem {
     aprendiz: string;
 }
 
+export interface StudentSummary {
+    id: number;
+    documento: string;
+    aprendiz: string;
+    cantidad: number; // Total de ausencias e injustificadas
+    consecutivas: number;
+}
+
 interface StudentAttendances {
     data: Attendance[];
     loading: boolean;
@@ -45,6 +53,7 @@ interface AttendanceState extends ReturnType<typeof createInitialPaginatedState>
     transformedData: TransformedAttendanceItem[];
     filteredData: TransformedAttendanceItem[];
     filterOptions: FilterOptions;
+    attendanceSummary: StudentSummary[];
 }
 const transformToComponentFormat = (attendances: Attendance[]): TransformedAttendanceItem[] => {
     return attendances.map((a) => {
@@ -291,7 +300,11 @@ const initialState: AttendanceState = {
 const attendanceSlice = createSlice({
     name: 'attendance',
     initialState,
-    reducers: {},
+    reducers: {
+        updateAttendanceSummary: (state) => {
+            state.attendanceSummary = processAndSummarizeAttendances(state.data);
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchAttendances.pending, (state) => {
@@ -311,6 +324,8 @@ const attendanceSlice = createSlice({
                     state.totalItems = payload.totalItems ?? 0;
                     state.totalPages = payload.totalPages ?? 0;
                     state.currentPage = payload.currentPage ?? 0;
+                    // Procesar resumen de asistencias automáticamente
+                    state.attendanceSummary = processAndSummarizeAttendances(state.data);
                 }
                 state.loading = false;
             })
@@ -395,6 +410,6 @@ const attendanceSlice = createSlice({
     }
 });
 
-export const { } = attendanceSlice.actions;
+export const { updateAttendanceSummary } = attendanceSlice.actions;
 
 export default attendanceSlice.reducer;

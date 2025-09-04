@@ -6,11 +6,13 @@ import { FaRegFileAlt } from "react-icons/fa";
 interface AttendanceTableProps {
   data: any[];
   loading: boolean;
+  onReportNovelty?: (studentId?: number) => void;
 }
 
 export default function AttendanceTable({
   data,
-  loading
+  loading,
+  onReportNovelty
 }: AttendanceTableProps) {
   return (
     <motion.div
@@ -26,14 +28,15 @@ export default function AttendanceTable({
             <tr>
               <th className="px-6 py-4 font-medium">Documento</th>
               <th className="px-6 py-4 font-medium">Aprendiz</th>
-              <th className="px-6 py-4 font-medium">Cantidad de Ausencias</th>
+              <th className="px-6 py-4 font-medium">Ausencias e Injustificadas</th>
+              <th className="px-6 py-4 font-medium">Ausencias e Injustificadas consecutivas</th>
               <th className="px-6 py-4 font-medium">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {loading ? (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-darkGray dark:text-lightGray">
+                <td colSpan={5} className="px-6 py-8 text-center text-darkGray dark:text-lightGray">
                   <div className="flex flex-col items-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black dark:border-white"></div>
                     <p className="text-lg font-medium mt-4">Cargando Asistencias...</p>
@@ -42,7 +45,7 @@ export default function AttendanceTable({
               </tr>
             ) : !data || data.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-6 py-8 text-center text-darkGray dark:text-lightGray">
+                <td colSpan={5} className="px-6 py-8 text-center text-darkGray dark:text-lightGray">
                   <div className="flex flex-col items-center">
                     <FaRegFileAlt className="w-12 h-12 mb-4 opacity-50" />
                     <p className="text-lg font-medium mb-2">No hay ausencias</p>
@@ -66,11 +69,28 @@ export default function AttendanceTable({
                     <div className="flex items-center">{summary.student.person.name} {summary.student.person.lastname}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center">{summary.student.attendances.length}</div>
+                    <div className="flex items-center font-semibold">
+                      {summary.cantidad}
+                    </div>
                   </td>
-                  <td>
-                    <button className="text-blue-500 hover:underline">
-                      Reportar
+                  <td className="px-6 py-4">
+                    <div className="flex items-center font-semibold">
+                      {summary.consecutivas ?? 0}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <button 
+                      onClick={() => onReportNovelty?.(summary.id)}
+                      className={`px-3 py-1 text-sm rounded transition-colors ${
+                        summary.cantidad >= 5 || summary.consecutivas >= 3
+                        ? 'bg-red-600 text-white hover:bg-red-700'
+                        : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
+                      disabled={!(summary.cantidad >= 5 || summary.consecutivas >= 3)}
+                      title={!(summary.cantidad >= 5 || summary.consecutivas >= 3)
+                        ? 'Solo puedes reportar si tiene al menos 5 ausencias o 3 consecutivas.'
+                        : 'Reportar deserción'}
+                    >
+                      {summary.cantidad >= 5 || summary.consecutivas >= 3 ? 'Reportar' : 'Reportar'}
                     </button>
                   </td>
                 </motion.tr>

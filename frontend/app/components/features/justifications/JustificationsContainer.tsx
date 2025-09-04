@@ -205,7 +205,7 @@ export const JustificationsContainer: React.FC = () => {
         // No incluir justificationStatus ya que se asigna automáticamente en el backend
       };
 
-      console.log("🚀 Enviando justificación con datos:", formDataWithFile);
+      // console.log("🚀 Enviando justificación con datos:", formDataWithFile);
 
       await dispatch(addJustification(formDataWithFile)).unwrap();
 

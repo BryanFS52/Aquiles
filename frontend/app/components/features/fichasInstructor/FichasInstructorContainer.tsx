@@ -11,6 +11,7 @@ import { ApprenticesModal } from './ApprenticesModal';
 import { StudySheetWithCompetence } from './types';
 import PageTitle from '@components/UI/pageTitle';
 import EmptyState from '@components/UI/emptyState';
+import { TEMPORAL_INSTRUCTOR_ID } from '@/temporaryCredential';
 
 export const FichasInstructorContainer: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -26,9 +27,10 @@ export const FichasInstructorContainer: React.FC = () => {
     const { data, loading } = useSelector((state: any) => state.studySheet);
     const fichas: StudySheetWithCompetence[] = data || [];
 
+    TEMPORAL_INSTRUCTOR_ID
     // Effects
     useEffect(() => {
-        dispatch(fetchStudySheetByTeacher({ idTeacher: 1, page: 0, size: 5 }));
+        dispatch(fetchStudySheetByTeacher({ idTeacher: TEMPORAL_INSTRUCTOR_ID, page: 0, size: 5 }));
     }, [dispatch]);
 
     useEffect(() => {

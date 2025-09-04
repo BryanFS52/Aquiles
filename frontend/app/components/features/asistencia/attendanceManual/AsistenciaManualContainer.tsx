@@ -32,7 +32,9 @@ export const AsistenciaManualContainer: React.FC<AsistenciaManualContainerProps>
     const { showLoader, hideLoader } = useLoader()
 
     const studySheetObj = Array.isArray(studySheet) ? studySheet[0] : studySheet
-    const students = studySheetObj?.studentStudySheets || []
+    const students = useMemo(() => {
+        return studySheetObj?.studentStudySheets ?? [];
+    }, [studySheetObj?.studentStudySheets]);
 
     // Estados del componente
     const [attendance, setAttendance] = useState<Record<string | number, AttendanceStatus>>({})
