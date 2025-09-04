@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import type { AppDispatch, RootState } from "@/redux/store";
 import PageTitle from "@components/UI/pageTitle";
-import { useLoader } from "@context/LoaderContext";
 import JustificationFilters from "@components/features/justifications/justificationsFilter";
 import JustificationTable from "@components/features/justifications/justificationsTable";
 import EmptyState from "@components/UI/emptyState";
@@ -23,7 +22,7 @@ import {
   MultiFilterState,
 } from "@slice/justificationSlice";
 import { fetchAllJustificationStatuses } from "@/redux/slices/justificationStatusSlice";
-import { useLoader } from "@/context/LoaderContext";
+import { useLoader } from "@context/LoaderContext";
 
 export default function JustificacionesInstructor() {
   const dispatch = useDispatch<AppDispatch>();

@@ -78,6 +78,27 @@ const HistorialPlanesMejoramientoInstructor = () => {
         return 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30';
     };
 
+    // Función para obtener color de tipo de falta
+    const getFaultTypeColor = (faultTypeName: string) => {
+        const faultType = faultTypeName?.toLowerCase();
+        
+        if (faultType?.includes('grave') || faultType?.includes('muy grave')) {
+            return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+        } else if (faultType?.includes('leve')) {
+            return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+        } else if (faultType?.includes('académic') || faultType?.includes('competencia')) {
+            return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+        } else if (faultType?.includes('disciplinari')) {
+            return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+        } else if (faultType?.includes('asistencia')) {
+            return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
+        } else if (faultType?.includes('comportamiento')) {
+            return 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400';
+        } else {
+            return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+        }
+    };
+
     // Configuración de columnas para la tabla
     const columns: DataTableColumn<ImprovementPlan>[] = [
         {
@@ -146,9 +167,9 @@ const HistorialPlanesMejoramientoInstructor = () => {
             key: 'qualification',
             header: 'Calificación',
             render: (row) => (
-                <div className="flex items-center gap-2">
-                    <FiStar className="w-4 h-4 text-yellow-500 dark:text-yellow-400" />
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getQualificationColor(row.qualification)}`}>
+                <div className="flex items-center gap-2 whitespace-nowrap">
+                    <FiStar className="w-4 h-4 text-yellow-500 dark:text-yellow-400 flex-shrink-0" />
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${getQualificationColor(row.qualification)}`}>
                         {(
                             typeof row.qualification === "boolean" && row.qualification === false
                         ) || row.qualification === null || row.qualification === undefined
