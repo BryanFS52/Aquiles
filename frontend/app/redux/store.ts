@@ -16,6 +16,7 @@ import generateQrReducer from "@redux/slices/generateQrSlice";
 import improvementPlanReducer from "@redux/slices/improvementPlanSlice"
 import noveltyReducer from "@slice/themis/noveltySlice";
 import noveltyTypeReducer from "@slice/themis/noveltyTypeSlice";
+import coordinationReducer from "@slice/olympo/coordinationSlice";
 
 const store = configureStore({
     reducer: {
@@ -35,7 +36,8 @@ const store = configureStore({
         generateQr: generateQrReducer,
         improvementPlan: improvementPlanReducer,
         novelty: noveltyReducer,
-        noveltyType: noveltyTypeReducer
+        noveltyType: noveltyTypeReducer,
+        coordination: coordinationReducer
     }
 });
 
