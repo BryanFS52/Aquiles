@@ -68,7 +68,7 @@ export default function AttendanceTable({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 50 }}
       transition={{ duration: 0.5 }}
-      className="w-full px-0 sm:px-2 md:px-4 lg:px-6 xl:px-8"
+      className="w-full px-1 sm:px-2 md:px-4 lg:px-6 xl:px-8"
     >
       <div className="overflow-x-auto w-full">
         <DataTable
@@ -77,7 +77,7 @@ export default function AttendanceTable({
           isDarkMode={false}
           pageSize={8}
           filterPlaceholder="Buscar aprendiz o documento..."
-          className="w-full min-w-[600px] max-w-none"
+          className="w-full min-w-[340px] sm:min-w-[600px] max-w-none"
         />
         {loading && (
           <div className="flex flex-col items-center py-8">

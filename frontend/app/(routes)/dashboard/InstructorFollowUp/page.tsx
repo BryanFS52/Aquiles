@@ -78,14 +78,16 @@ export default function InstructorFollowUp() {
     };
 
     return (
-        <div>
+        <div className="space-y-4 sm:space-y-6 p-2 sm:p-4 md:p-6 lg:p-8">
             <PageTitle>Seguimiento de Ausencias</PageTitle>
 
-            <AttendanceTable
-                data={attendanceSummary}
-                loading={loading}
-                onReportNovelty={handleReportNovelty}
-            />
+            <div className="overflow-x-auto">
+                <AttendanceTable
+                    data={attendanceSummary}
+                    loading={loading}
+                    onReportNovelty={handleReportNovelty}
+                />
+            </div>
 
             {/* Modal de Novedad */}
             <NoveltyModal

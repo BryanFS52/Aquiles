@@ -26,17 +26,17 @@ const Modal: React.FC<ModalProps> = ({
         const checkDarkMode = () => {
             setIsDarkMode(document.documentElement.classList.contains('dark'));
         };
-        
+
         // Verificar inicialmente
         checkDarkMode();
-        
+
         // Observar cambios en las clases del documento
         const observer = new MutationObserver(checkDarkMode);
         observer.observe(document.documentElement, {
             attributes: true,
             attributeFilter: ['class']
         });
-        
+
         return () => observer.disconnect();
     }, []);
 
@@ -93,7 +93,7 @@ const Modal: React.FC<ModalProps> = ({
 
                     <button
                         onClick={onClose}
-                        className={`group relative rounded-xl p-2.5 transition-all duration-200 ${isDarkMode
+                        className={`group relative rounded-xl p-2.5 ml-2 sm:ml-4 transition-all duration-200 ${isDarkMode
                             ? "hover:bg-slate-700/70 hover:shadow-lg hover:shadow-slate-900/20 active:bg-slate-600/80"
                             : "hover:bg-gray-100/80 hover:shadow-lg hover:shadow-gray-900/10 active:bg-gray-200/60"
                             } hover:ring-opacity-20 transform ring-0 hover:scale-105 hover:ring-2 active:scale-95 ${isDarkMode ? "hover:ring-blue-400" : "hover:ring-lime-500"} `}

@@ -8,7 +8,6 @@ import PageTitle from '@components/UI/pageTitle';
 import Modal from '@components/UI/Modal';
 import { fetchStudySheetByTeacher } from '@redux/slices/olympo/studySheetSlice';
 import { AppDispatch } from '@redux/store';
-import Loader from '@components/UI/Loader';
 import EmptyState from '@components/UI/emptyState';
 import {
     StudySheet,
@@ -33,14 +32,14 @@ const PlanMejoramientoInstructor: React.FC = () => {
     const [selectedStudents, setSelectedStudents] = useState<NonNullable<StudentStudySheet>[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentSheet, setCurrentSheet] = useState<NonNullable<StudySheet> | null>(null);
-    
+
     // Estados para filtros
     const [filters, setFilters] = useState({
         ficha: '',
         jornada: '',
         programa: ''
     });
-    
+
     const { showLoader, hideLoader } = useLoader();
 
     // Redux state
@@ -49,15 +48,15 @@ const PlanMejoramientoInstructor: React.FC = () => {
 
     // Filtrar las fichas según los filtros aplicados
     const filteredStudySheets = studySheets.filter((sheet) => {
-        const matchesFicha = !filters.ficha || 
+        const matchesFicha = !filters.ficha ||
             sheet.number?.toString().toLowerCase().includes(filters.ficha.toLowerCase());
-        
-        const matchesJornada = !filters.jornada || 
+
+        const matchesJornada = !filters.jornada ||
             sheet.journey?.name?.toLowerCase().includes(filters.jornada.toLowerCase());
-        
-        const matchesPrograma = !filters.programa || 
+
+        const matchesPrograma = !filters.programa ||
             sheet.trainingProject?.program?.name?.toLowerCase().includes(filters.programa.toLowerCase());
-        
+
         return matchesFicha && matchesJornada && matchesPrograma;
     });
 
@@ -153,7 +152,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
         <div className="mx-auto px-4 py-8">
             {/* Estilos CSS personalizados */}
             <style jsx>{styles}</style>
-            
+
             {/* Título */}
             <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
@@ -212,7 +211,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
                             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
                         />
                     </div>
-                    
+
                     {/* Filtro por Jornada */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -238,7 +237,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                    
+
                     {/* Filtro por Programa */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -264,7 +263,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                    
+
                     {/* Botón limpiar filtros */}
                     <div className="flex items-end">
                         <button
@@ -275,7 +274,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
                         </button>
                     </div>
                 </div>
-                
+
                 {/* Contador de resultados */}
                 {(filters.ficha || filters.jornada || filters.programa) && (
                     <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
@@ -288,119 +287,119 @@ const PlanMejoramientoInstructor: React.FC = () => {
             {filteredStudySheets.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                     {filteredStudySheets.map((sheet) => (
-                    <div
-                        key={sheet.id}
-                        className="bg-white dark:bg-shadowBlue rounded-2xl shadow-md border border-lightGray dark:border-grayText overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-gray-50 dark:hover:bg-darkBlue"
-                    >
-                        {/* Header */}
-                        <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
-                            <div className="inline-block px-3 py-1.5 bg-gradient-to-r from-primary to-lightGreen dark:from-secondary dark:to-darkBlue rounded-xl text-white text-sm font-bold shadow-sm">
-                                Ficha N° {sheet.number || 'N/A'}
+                        <div
+                            key={sheet.id}
+                            className="bg-white dark:bg-shadowBlue rounded-2xl shadow-md border border-lightGray dark:border-grayText overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-gray-50 dark:hover:bg-darkBlue"
+                        >
+                            {/* Header */}
+                            <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
+                                <div className="inline-block px-3 py-1.5 bg-gradient-to-r from-primary to-lightGreen dark:from-secondary dark:to-darkBlue rounded-xl text-white text-sm font-bold shadow-sm">
+                                    Ficha N° {sheet.number || 'N/A'}
+                                </div>
+                                <span className={`inline-flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold shadow-sm ${sheet.state
+                                    ? 'bg-green-100 text-darkGreen border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800'
+                                    : 'bg-red-100 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800'
+                                    }`}>
+                                    <span className={`w-2.5 h-2.5 rounded-full ${sheet.state ? 'bg-green-500 dark:bg-green-400' : 'bg-red-500 dark:bg-red-400'}`}></span>
+                                    {sheet.state ? "Activa" : "Inactiva"}
+                                </span>
                             </div>
-                            <span className={`inline-flex items-center gap-2 px-2.5 py-1.5 rounded-xl text-xs font-semibold shadow-sm ${sheet.state
-                                ? 'bg-green-100 text-darkGreen border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800'
-                                : 'bg-red-100 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800'
-                                }`}>
-                                <span className={`w-2.5 h-2.5 rounded-full ${sheet.state ? 'bg-green-500 dark:bg-green-400' : 'bg-red-500 dark:bg-red-400'}`}></span>
-                                {sheet.state ? "Activa" : "Inactiva"}
-                            </span>
-                        </div>
 
-                        {/* Contenido */}
-                        <div className="p-4">
-                            <div className="flex flex-col gap-3">
-                                {/* Aprendices */}
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                                        <IoPeople className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            {/* Contenido */}
+                            <div className="p-4">
+                                <div className="flex flex-col gap-3">
+                                    {/* Aprendices */}
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                                            <IoPeople className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                                        </div>
+                                        <div>
+                                            <span className="text-gray-600 dark:text-gray-300 text-sm">Aprendices</span>
+                                            <p className="text-black dark:text-white font-semibold text-base">
+                                                {sheet.studentStudySheets?.length || 0}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <span className="text-gray-600 dark:text-gray-300 text-sm">Aprendices</span>
-                                        <p className="text-black dark:text-white font-semibold text-base">
-                                            {sheet.studentStudySheets?.length || 0}
-                                        </p>
-                                    </div>
-                                </div>
 
-                                {/* Jornada */}
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <FiClock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                                    {/* Jornada */}
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <FiClock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <span className="text-xs sm:text-sm text-grayText dark:text-white font-medium">Jornada</span>
+                                            <span className="text-sm text-black dark:text-white font-semibold uppercase block truncate" title={sheet.journey?.name ?? "Sin jornada"}>
+                                                {sheet.journey?.name ?? "Sin jornada"}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <span className="text-xs sm:text-sm text-grayText dark:text-white font-medium">Jornada</span>
-                                        <span className="text-sm text-black dark:text-white font-semibold uppercase block truncate" title={sheet.journey?.name ?? "Sin jornada"}>
-                                            {sheet.journey?.name ?? "Sin jornada"}
-                                        </span>
-                                    </div>
-                                </div>
 
-                                {/* Programa */}
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <FiTarget className="w-4 h-4 text-lightGreen dark:text-darkGreen" />
+                                    {/* Programa */}
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <FiTarget className="w-4 h-4 text-lightGreen dark:text-darkGreen" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <span className="text-gray-600 dark:text-gray-300 text-sm">Programa</span>
+                                            <p className="text-black dark:text-white font-semibold text-xs leading-tight uppercase truncate" title={sheet.trainingProject?.program?.name || 'Programa no especificado'}>
+                                                {sheet.trainingProject?.program?.name || 'Programa no especificado'}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <span className="text-gray-600 dark:text-gray-300 text-sm">Programa</span>
-                                        <p className="text-black dark:text-white font-semibold text-xs leading-tight uppercase truncate" title={sheet.trainingProject?.program?.name || 'Programa no especificado'}>
-                                            {sheet.trainingProject?.program?.name || 'Programa no especificado'}
-                                        </p>
-                                    </div>
-                                </div>
 
-                                {/* Etapa Lectiva (label + inicio/fin) */}
-                                <div className="flex items-start gap-3">
-                                    <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <FiCalendar className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <span className="text-xs sm:text-sm text-grayText dark:text-white font-medium">Etapa lectiva</span>
-                                        <div className="mt-1 grid grid-cols-2 gap-2">
-                                            <div>
-                                                <span className="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Inicio</span>
-                                                <span className="block text-xs sm:text-sm text-black dark:text-white font-semibold truncate" title={formatDate(sheet.startLective)}>
-                                                    {formatDate(sheet.startLective)}
-                                                </span>
+                                    {/* Etapa Lectiva (label + inicio/fin) */}
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <FiCalendar className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <span className="text-xs sm:text-sm text-grayText dark:text-white font-medium">Etapa lectiva</span>
+                                            <div className="mt-1 grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <span className="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Inicio</span>
+                                                    <span className="block text-xs sm:text-sm text-black dark:text-white font-semibold truncate" title={formatDate(sheet.startLective)}>
+                                                        {formatDate(sheet.startLective)}
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <span className="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Fin</span>
+                                                    <span className="block text-xs sm:text-sm text-black dark:text-white font-semibold truncate" title={formatDate(sheet.endLective)}>
+                                                        {formatDate(sheet.endLective)}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <span className="block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">Fin</span>
-                                                <span className="block text-xs sm:text-sm text-black dark:text-white font-semibold truncate" title={formatDate(sheet.endLective)}>
-                                                    {formatDate(sheet.endLective)}
-                                                </span>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Botones (más compactos y delgados) */}
-                            <div className="mt-3">
-                                <div className="grid grid-cols-2 gap-2">
-                                    <button
-                                        onClick={() => handleViewStudents(sheet)}
-                                        className="flex items-center justify-between w-full px-2 py-1.5 bg-primary hover:bg-primary/90 dark:bg-gradient-to-r dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90 text-white rounded-md transition-all duration-200 font-medium group shadow-sm hover:shadow-md text-xs"
-                                    >
-                                        <div className="flex items-center gap-1.5">
-                                            <IoPeople className="w-3.5 h-3.5" />
-                                            <span>Ver Aprendices</span>
-                                        </div>
-                                        <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                                    </button>
-                                    <button
-                                        onClick={() => handleSelectSheet(sheet)}
-                                        className="flex items-center justify-between w-full px-2 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-800 dark:hover:from-gray-600 dark:hover:to-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-all duration-200 font-medium group text-xs"
-                                    >
-                                        <div className="flex items-center gap-1.5">
-                                            <FiEye className="w-3.5 h-3.5" />
-                                            <span>Ver Historial</span>
-                                        </div>
-                                        <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                                    </button>
+                                {/* Botones (más compactos y delgados) */}
+                                <div className="mt-3">
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <button
+                                            onClick={() => handleViewStudents(sheet)}
+                                            className="flex items-center justify-between w-full px-2 py-1.5 bg-primary hover:bg-primary/90 dark:bg-gradient-to-r dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90 text-white rounded-md transition-all duration-200 font-medium group shadow-sm hover:shadow-md text-xs"
+                                        >
+                                            <div className="flex items-center gap-1.5">
+                                                <IoPeople className="w-3.5 h-3.5" />
+                                                <span>Ver Aprendices</span>
+                                            </div>
+                                            <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleSelectSheet(sheet)}
+                                            className="flex items-center justify-between w-full px-2 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-800 dark:hover:from-gray-600 dark:hover:to-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-all duration-200 font-medium group text-xs"
+                                        >
+                                            <div className="flex items-center gap-1.5">
+                                                <FiEye className="w-3.5 h-3.5" />
+                                                <span>Ver Historial</span>
+                                            </div>
+                                            <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
                 </div>
             ) : (
                 <div className="text-center py-12">
@@ -423,7 +422,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14L8 22" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14L12 22" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 14L16 22" />
-                                <circle cx="12" cy="12" r="2" stroke="currentColor" strokeWidth={2} fill="currentColor"/>
+                                <circle cx="12" cy="12" r="2" stroke="currentColor" strokeWidth={2} fill="currentColor" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 4L14 4" />
                             </svg>
                             Limpiar filtros
