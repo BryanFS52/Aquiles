@@ -1,4 +1,4 @@
-import { clientLAN } from '@lib/apollo-client'
+import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_CHECKLISTS, GET_CHECKLIST_BY_ID, ADD_CHECKLIST, UPDATE_CHECKLIST, DELETE_CHECKLIST } from '@graphql/checklistGraph'
@@ -36,7 +36,7 @@ const transformGraphQLToChecklistItem = (graphqlData: any): Checklist => {
 export const fetchChecklists = createAsyncThunk<GetAllChecklistsQuery['allChecklists'], GetAllChecklistsQueryVariables>(
     'checklist/fetchAll',
     async ({ page, size }) => {
-        const { data } = await clientLAN.query<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>({
+        const { data } = await client.query<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>({
             query: GET_ALL_CHECKLISTS,
             variables: { page, size },
             fetchPolicy: 'no-cache',
@@ -48,7 +48,7 @@ export const fetchChecklists = createAsyncThunk<GetAllChecklistsQuery['allCheckl
 export const fetchChecklistById = createAsyncThunk<GetChecklistByIdQuery['checklistById'], GetChecklistByIdQueryVariables>(
     'checklist/fetchById',
     async ({ id }) => {
-        const { data } = await clientLAN.query<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>({
+        const { data } = await client.query<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>({
             query: GET_CHECKLIST_BY_ID,
             variables: { id },
             fetchPolicy: 'no-cache', // Forzar recarga desde servidor
@@ -63,7 +63,7 @@ export const addChecklist = createAsyncThunk<AddChecklistMutation['addChecklist'
     'checklist/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<AddChecklistMutation, AddChecklistMutationVariables>({
+            const { data } = await client.mutate<AddChecklistMutation, AddChecklistMutationVariables>({
                 mutation: ADD_CHECKLIST,
                 variables: { input }
             });
@@ -90,7 +90,7 @@ export const updateChecklist = createAsyncThunk<UpdateChecklistMutation['updateC
             console.log('Input data:', input);
             console.log('Input items:', input.items);
             
-            const { data } = await clientLAN.mutate<UpdateChecklistMutation, UpdateChecklistMutationVariables>({
+            const { data } = await client.mutate<UpdateChecklistMutation, UpdateChecklistMutationVariables>({
                 mutation: UPDATE_CHECKLIST,
                 variables: { id, input },
             });
@@ -134,7 +134,7 @@ export const updateChecklistState = createAsyncThunk<UpdateChecklistMutation['up
                 items: currentChecklist?.items || []
             };
 
-            const { data } = await clientLAN.mutate<UpdateChecklistMutation, UpdateChecklistMutationVariables>({
+            const { data } = await client.mutate<UpdateChecklistMutation, UpdateChecklistMutationVariables>({
                 mutation: UPDATE_CHECKLIST,
                 variables: { id: parseInt(id), input },
             });
@@ -157,7 +157,7 @@ export const deleteChecklist = createAsyncThunk<string, string,
     'checklist/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<DeleteChecklistMutation, DeleteChecklistMutationVariables>({
+            const { data } = await client.mutate<DeleteChecklistMutation, DeleteChecklistMutationVariables>({
                 mutation: DELETE_CHECKLIST,
                 variables: { id },
             });

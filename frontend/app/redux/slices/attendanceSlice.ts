@@ -62,6 +62,9 @@ const transformToComponentFormat = (attendances: Attendance[]): TransformedAtten
 
         return {
             id: a.id,
+            // programa: "Sin programa", // Dato no disponible en AttendanceItem
+            // ficha: "Sin ficha", // Dato no disponible en AttendanceItem
+            // fecha: new Date(a.attendanceDate).toLocaleDateString("es-CO"),
             estado: a.attendanceState?.status || "Sin estado",
             documento: person?.document || '',
             aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim()
@@ -103,42 +106,95 @@ const filterAttendances = (
 };
 const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
     return {
-        id: graphqlData.id ?? '',
-        attendanceDate: graphqlData.attendanceDate ?? '',
+        id: graphqlData.id,
+        attendanceDate: graphqlData.attendanceDate,
         attendanceState: {
             id: graphqlData.attendanceState?.id ?? '',
             status: graphqlData.attendanceState?.status ?? '',
         },
-
-        student: graphqlData.student
-            ? {
-                id: graphqlData.student.id ?? '',
-                person: {
-                    name: graphqlData.student.person?.name ?? '',
-                    lastname: graphqlData.student.person?.lastname ?? '',
-                    document: graphqlData.student.person?.document ?? '',
-                },
-            }
-            : undefined,
-        competenceQuarter: graphqlData.competenceQuarter
-            ? {
-                id: graphqlData.competenceQuarter.id ?? '',
-                competence: {
-                    name: graphqlData.competenceQuarter.competence?.name ?? '',
-                },
-            }
-            : undefined,
-
-        justification: graphqlData.justification
-            ? {
-                id: graphqlData.justification.id ?? '',
-                description: graphqlData.justification.description ?? '',
-                absenceDate: graphqlData.justification.absenceDate ?? '',
-            }
-            : undefined,
+        competenceQuarter: graphqlData.competenceQuarter ?? '',
+        student: {
+            id: graphqlData.student?.id ?? '',
+            person: {
+                name: graphqlData.student?.person?.name ?? '',
+                lastname: graphqlData.student?.person?.lastname ?? '',
+                document: graphqlData.student?.person?.document ?? '',
+            },
+            studentStudySheets: graphqlData.student?.studentStudySheets ?? []
+        }
     };
-};
+}
 
+export const processAndSummarizeAttendances = (attendances: Attendance[]): StudentSummary[] => {
+    if (!attendances) return [];
+
+    // Agrupar asistencias por estudiante
+    const grouped: Record<string, Attendance[]> = {};
+    attendances.forEach(a => {
+        const studentId = a.student?.id;
+        if (!studentId) return;
+        if (!grouped[studentId]) grouped[studentId] = [];
+        grouped[studentId].push(a);
+    });
+
+    const result: StudentSummary[] = [];
+    Object.entries(grouped).forEach(([studentId, attendances]) => {
+        const person = attendances[0]?.student?.person;
+        // Filtrar ausencias e injustificadas
+        const absences = attendances.filter(a => {
+            const status = a.attendanceState?.status?.toLowerCase();
+            return (status === 'ausente' || status === 'injustificado') && !!a.attendanceDate;
+        });
+
+        // // Debug: log de estados encontrados para este estudiante
+        // if (attendances.length > 0) {
+        //     const person = attendances[0]?.student?.person;
+        //     const allStatuses = attendances.map(a => a.attendanceState?.status).filter(Boolean);
+        //     const uniqueStatuses = [...new Set(allStatuses)];
+        //     console.log(`Estados de asistencia para ${person?.name} ${person?.lastname}:`, uniqueStatuses);
+        //     console.log(`Total ausencias + injustificadas encontradas: ${absences.length}`);
+        // }
+        // Ordenar por fecha (solo si la fecha existe)
+        absences.sort((a, b) => {
+            const dateA = a.attendanceDate ? new Date(a.attendanceDate).getTime() : 0;
+            const dateB = b.attendanceDate ? new Date(b.attendanceDate).getTime() : 0;
+            return dateA - dateB;
+        });
+
+        // Detectar 3 ausencias seguidas
+        let maxConsecutive = 0;
+        let currentConsecutive = 1;
+        for (let i = 1; i < absences.length; i++) {
+            const prevDateStr = absences[i - 1].attendanceDate;
+            const currDateStr = absences[i].attendanceDate;
+            if (!prevDateStr || !currDateStr) {
+                currentConsecutive = 1;
+                continue;
+            }
+            const prevDate = new Date(prevDateStr);
+            const currDate = new Date(currDateStr);
+            // Si la ausencia es el día siguiente
+            if ((currDate.getTime() - prevDate.getTime()) <= 1000 * 60 * 60 * 24 + 1000 * 60 * 60 * 12) { // 1.5 días tolerancia
+                currentConsecutive++;
+                maxConsecutive = Math.max(maxConsecutive, currentConsecutive);
+            } else {
+                currentConsecutive = 1;
+            }
+        }
+        if (maxConsecutive === 0 && absences.length > 0) maxConsecutive = 1;
+
+        // Detectar si supera el límite (contando ausencias e injustificadas)
+        const totalAbsences = absences.length;
+        result.push({
+            id: parseInt(studentId),
+            documento: person?.document || '',
+            aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim(),
+            cantidad: totalAbsences, // Total de ausencias + injustificadas
+            consecutivas: maxConsecutive
+        });
+    });
+    return result;
+};
 
 export const fetchAttendances = createAsyncThunk<
     GetAttendancesQuery['allAttendances'],
@@ -275,27 +331,17 @@ const initialState: AttendanceState = {
     studentAttendances: {
         data: [] as any[],
         loading: false,
-        error: null,
+        error: null as string | null,
         showForm: false,
     },
-    justifications: [],
-    justificationsLoading: false,
-    data: [],
-    loading: false,
-    error: null,
-    currentPage: 0,
-    totalItems: 0,
-    totalPages: 0,
-
-    // 👇 faltantes
     transformedData: [],
     filteredData: [],
     filterOptions: {
-        searchTerm: '',
-        selectedFiltro: 'todo',
+        selectedFiltro: '',
+        searchTerm: ''
     },
+    attendanceSummary: []
 };
-
 
 const attendanceSlice = createSlice({
     name: 'attendance',
@@ -311,16 +357,12 @@ const attendanceSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchAttendances.fulfilled, (state, action) => {
+            .addCase(fetchAttendances.fulfilled, (state, action: PayloadAction<GetAttendancesQuery['allAttendances']>) => {
                 const payload = action.payload;
                 if (payload?.data) {
                     state.data = payload.data
                         .filter((item): item is NonNullable<typeof item> => item !== null)
                         .map(transformGraphQLToAttendanceItem);
-
-                    state.transformedData = transformToComponentFormat(state.data);
-                    state.filteredData = filterAttendances(state.transformedData, state.filterOptions);
-
                     state.totalItems = payload.totalItems ?? 0;
                     state.totalPages = payload.totalPages ?? 0;
                     state.currentPage = payload.currentPage ?? 0;
@@ -355,13 +397,10 @@ const attendanceSlice = createSlice({
             })
             .addCase(fetchAttendanceAndCompetenceByStudent.fulfilled, (state, action) => {
                 const payload = action.payload;
-
                 if (payload?.data) {
-                    state.studentAttendances.data = (payload.data || [])
-                        .filter((item: any) => item !== null)
-                        .map(transformGraphQLToAttendanceItem);
+                    const cleanData = payload.data.filter((item): item is NonNullable<typeof item> & { id: string } => !!item && !!item.id);
+                    state.studentAttendances.data = cleanData.map(transformGraphQLToAttendanceItem);
                 }
-
                 state.studentAttendances.loading = false;
                 state.studentAttendances.error = null;
             })

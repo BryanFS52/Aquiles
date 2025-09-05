@@ -1,5 +1,5 @@
 "use client"
-
+// Mal
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -22,7 +22,7 @@ const getAuthenticatedInstructorId = (): number => {
 
 export default function InstructorFollowUp() {
     const dispatch = useDispatch<AppDispatch>();
-    
+
     const {
         data: allAttendances,
         loading,
@@ -49,12 +49,12 @@ export default function InstructorFollowUp() {
         // Buscar las ausencias del estudiante en attendanceSummary
         const studentData = attendanceSummary.find((student: StudentSummary) => student.id === studentId);
         const absenceCount = studentData?.cantidad || 0;
-        
+
         // Obtener el ID del instructor autenticado
         const TEMPORAL_INSTRUCTOR_ID = getAuthenticatedInstructorId();
-        
+
         // console.log('Opening novelty modal with:', { studentId, TEMPORAL_INSTRUCTOR_ID, absenceCount });
-        
+
         try {
             await dispatch(openNoveltyModal({
                 studentId,
@@ -78,14 +78,16 @@ export default function InstructorFollowUp() {
     };
 
     return (
-        <div>
+        <div className="space-y-4 sm:space-y-6 p-2 sm:p-4 md:p-6 lg:p-8">
             <PageTitle>Seguimiento de Ausencias</PageTitle>
-            
-            <AttendanceTable
-                data={attendanceSummary}
-                loading={loading}
-                onReportNovelty={handleReportNovelty}
-            />
+
+            <div className="overflow-x-auto">
+                <AttendanceTable
+                    data={attendanceSummary}
+                    loading={loading}
+                    onReportNovelty={handleReportNovelty}
+                />
+            </div>
 
             {/* Modal de Novedad */}
             <NoveltyModal

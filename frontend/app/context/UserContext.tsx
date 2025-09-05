@@ -12,7 +12,7 @@ export interface User {
     documentNumber?: string;
 }
 
-type RoleType = "Aprendiz" | "Instructor" | "Coordinador";
+export type RoleType = "aprendiz" | "instructor" | "coordinador";
 
 // Interfaz para el contexto
 export interface UserContextType {

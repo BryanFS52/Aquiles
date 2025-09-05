@@ -28,7 +28,11 @@ public class Evaluations implements Serializable {
     @Column(name = "value_judgment", nullable = false, length = 60)
     private String valueJudgment;
 
-    @OneToOne(mappedBy = "evaluation")
+    // Relación uno a uno con Checklist - Esta evaluación pertenece a un único checklist
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "checklist_id", nullable = false, unique = true)
     private Checklist checklist;
+
+  
 
 }

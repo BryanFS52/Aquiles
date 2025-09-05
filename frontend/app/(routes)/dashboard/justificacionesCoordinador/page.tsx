@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
+import { toast } from "react-toastify";
 import { AppDispatch, RootState } from "@/redux/store";
 import { fetchAllJustificationStatuses } from '@/redux/slices/justificationStatusSlice';
 import PageTitle from "@components/UI/pageTitle";
@@ -98,14 +99,14 @@ export default function JustificacionesCoordinator() {
     // Buscar la justificación actual para verificar si ya tiene el mismo estado
     const currentJustification = filteredData.find((j: any) => j.id.toString() === justificacionId);
     const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.justificationStatus?.toString();
-    
+
     if (currentStatusId === newStatusId) {
       return; // No hacer nada si el estado es el mismo
     }
 
     // Enviar directamente el statusId para usar la relación real
-    dispatch(updateJustificationStatus({ 
-      id: justificacionId, 
+    dispatch(updateJustificationStatus({
+      id: justificacionId,
       statusId: newStatusId,
       statusName: statusName
     }))
@@ -113,7 +114,7 @@ export default function JustificacionesCoordinator() {
         if (updateJustificationStatus.fulfilled.match(result)) {
           // Mostrar mensaje personalizado según el estado
           showJustificationStatusMessage(statusName);
-          
+
           // Ya no necesitamos recargar ya que el estado se actualiza localmente
         } else {
           const error = result.payload as any;
@@ -132,7 +133,7 @@ export default function JustificacionesCoordinator() {
   // Función para mostrar mensajes de estado de justificación
   const showJustificationStatusMessage = (statusName: string) => {
     const statusNameLower = statusName.toLowerCase();
-    
+
     if (statusNameLower.includes('aprobad') || statusNameLower.includes('acepta')) {
       toast.success(`Justificación aprobada`, {
         position: "top-right",

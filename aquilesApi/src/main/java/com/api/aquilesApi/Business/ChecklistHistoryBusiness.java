@@ -68,7 +68,8 @@ public class ChecklistHistoryBusiness {
         dto.setEvaluationCriteria(checklist.isEvaluationCriteria());
         dto.setDateAssigned(checklist.getDateAssigned());
         dto.setStudySheets(checklist.getStudySheets());
-        dto.setEvaluations(checklist.getEvaluations());
+        // ✅ Extraer ID de la evaluación única (relación 1:1)
+        dto.setEvaluations(checklist.getEvaluation() != null ? checklist.getEvaluation().getId() : null);
         dto.setLearningOutcome(checklist.getLearningOutcome());
         return dto;
     }

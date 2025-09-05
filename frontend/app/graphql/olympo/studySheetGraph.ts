@@ -41,6 +41,47 @@ export const GET_STUDY_SHEETS = gql`
     }
 `;
 
+export const GET_STUDY_SHEETS_BY_TRAINING_PROJECT = gql`
+    query GetStudySheetsByTrainingProject($page: Int, $size: Int) {
+        allStudySheets(page: $page, size: $size) {
+            date
+            code
+            message
+            data {
+                id
+                number
+                numberStudents
+                startLective
+                endLective
+                state
+                offer {
+                    name
+                }
+                journey {
+                    name
+                }
+                quarter {
+                    name {
+                        extension
+                        number
+                    }
+                }
+                trainingProject {
+                    id
+                    name
+                    program {
+                        id
+                        name
+                    }
+                }
+            }
+            currentPage
+            totalPages
+            totalItems
+        }
+    }
+`;
+
 export const GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID = gql`
     query GetStudySheetWithTeamScrumById($id: Long) {
     studySheetById(id: $id) {

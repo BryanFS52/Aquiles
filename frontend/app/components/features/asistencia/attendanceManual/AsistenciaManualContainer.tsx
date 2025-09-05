@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import type { AppDispatch } from "@redux/store"
+import { AppDispatch } from "@redux/store"
 import { useDispatch, useSelector } from "react-redux"
 import { toast } from "react-toastify"
 import { Save } from "lucide-react"

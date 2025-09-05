@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { UserContext, User, UserContextType } from '@context/UserContext';
+import { RoleType } from '@/types/roles';
 import LayoutContent from './layoutComponent';
 
 interface ClientLayoutWrapperProps {
@@ -10,10 +11,31 @@ interface ClientLayoutWrapperProps {
 }
 
 const ClientLayoutWrapper: React.FC<ClientLayoutWrapperProps> = ({ children, initialUserData }) => {
-    const [user, setUser] = useState<User | null>(initialUserData);
+    const normalizeRole = (role?: string): RoleType => {
+        if (!role) return "aprendiz";
+        const lower = role.toLowerCase();
+        if (lower.includes("instructor")) return "instructor";
+        if (lower.includes("coordinador")) return "coordinador";
+        return "aprendiz";
+    };
+
+    const getInitialUser = (): User => {
+        if (typeof window !== 'undefined') {
+            const storedRole = localStorage.getItem('sidebar-role');
+            if (storedRole === 'instructor' || storedRole === 'aprendiz' || storedRole === 'coordinador') {
+                return { ...initialUserData, role: storedRole };
+            }
+        }
+        return { ...initialUserData, role: normalizeRole(initialUserData.role) };
+    };
+
+    const [user, setUser] = useState<User | null>(getInitialUser());
 
     const login = (userData: User) => {
-        setUser(userData);
+        setUser({
+            ...userData,
+            role: normalizeRole(userData.role),
+        });
     };
 
     const logout = () => {
@@ -24,9 +46,9 @@ const ClientLayoutWrapper: React.FC<ClientLayoutWrapperProps> = ({ children, ini
         user,
         setUser,
         isAuthenticated: user !== null,
-        role: (user?.role as "Aprendiz" | "Instructor" | "Coordinador") || "Aprendiz",
+        role: user?.role as RoleType,
         login,
-        logout
+        logout,
     };
 
     return (
