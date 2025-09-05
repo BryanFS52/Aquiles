@@ -1,6 +1,6 @@
 package com.api.aquilesApi.Business;
 
-import com.api.aquilesApi.Dto.ChecklistHistoryDTO;
+import com.api.aquilesApi.Dto.ChecklistHistoryDto;
 import com.api.aquilesApi.Entity.ChecklistHistory;
 import com.api.aquilesApi.Service.ChecklistHistoryService;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -9,8 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 @Component
 public class ChecklistHistoryBusiness {
@@ -43,12 +41,12 @@ public class ChecklistHistoryBusiness {
             history.setTeacher(teacher);
 
             if (antes != null) {
-                com.api.aquilesApi.Dto.ChecklistHistoryDTO dtoAntes = convertir(antes);
+                ChecklistHistoryDto dtoAntes = convertir(antes);
                 history.setDateBefore(objectMapper.writeValueAsString(dtoAntes));
             }
 
             if (despues != null) {
-                com.api.aquilesApi.Dto.ChecklistHistoryDTO dtoDespues = convertir(despues);
+                ChecklistHistoryDto dtoDespues = convertir(despues);
                 history.setDateAfter(objectMapper.writeValueAsString(dtoDespues));
             }
 
@@ -60,13 +58,13 @@ public class ChecklistHistoryBusiness {
         }
     }
 
-    private com.api.aquilesApi.Dto.ChecklistHistoryDTO convertir(com.api.aquilesApi.Entity.Checklist checklist) {
-        com.api.aquilesApi.Dto.ChecklistHistoryDTO dto = new com.api.aquilesApi.Dto.ChecklistHistoryDTO();
+    private ChecklistHistoryDto convertir(com.api.aquilesApi.Entity.Checklist checklist) {
+        ChecklistHistoryDto dto = new ChecklistHistoryDto();
         dto.setId(checklist.getId());
         dto.setState(checklist.getState());
         dto.setRemarks(checklist.getRemarks());
         dto.setEvaluationCriteria(checklist.isEvaluationCriteria());
-        dto.setDateAssigned(checklist.getDateAssigned());
+        dto.setDateAssigned(String.valueOf(checklist.getDateAssigned()));
         dto.setStudySheets(checklist.getStudySheets());
         // ✅ Extraer ID de la evaluación única (relación 1:1)
         dto.setEvaluations(checklist.getEvaluation() != null ? checklist.getEvaluation().getId() : null);
@@ -76,23 +74,22 @@ public class ChecklistHistoryBusiness {
     //validation object
 
 
-    //find all
-
-    public Page<ChecklistHistoryDTO> findAll(int page, int size) {
+    // Find all
+    public Page<ChecklistHistoryDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
             Page<ChecklistHistory> checklistHistoryPage = checklistHistoryService.findAll(pageRequest);
-            return checklistHistoryPage.map(checklistHistory -> modelMapper.map(checklistHistory, ChecklistHistoryDTO.class));
+            return checklistHistoryPage.map(checklistHistory -> modelMapper.map(checklistHistory, ChecklistHistoryDto.class));
         } catch (Exception e) {
             throw new CustomException("Error retrieving checklist history: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    //find by id
-    public ChecklistHistoryDTO findById(Long id) {
+    // Find by id
+    public ChecklistHistoryDto findById(Long id) {
         try {
             ChecklistHistory checklistHistory = checklistHistoryService.getById(id);
-            return modelMapper.map(checklistHistory, ChecklistHistoryDTO.class);
+            return modelMapper.map(checklistHistory, ChecklistHistoryDto.class);
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
@@ -100,21 +97,19 @@ public class ChecklistHistoryBusiness {
         }
     }
 
-
-    //add
-    public ChecklistHistoryDTO add(ChecklistHistoryDTO checklistHistoryDTO) {
+    // Add
+    public ChecklistHistoryDto add(ChecklistHistoryDto checklistHistoryDTO) {
         try {
             ChecklistHistory checklistHistory = modelMapper.map(checklistHistoryDTO, ChecklistHistory.class);
             checklistHistory = checklistHistoryService.add(checklistHistory);
-            return modelMapper.map(checklistHistory, ChecklistHistoryDTO.class);
+            return modelMapper.map(checklistHistory, ChecklistHistoryDto.class);
         } catch (Exception e) {
             throw new CustomException("Error adding checklist history: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-
-    //update
-    public void update(Long ChecklistHistoryId, ChecklistHistoryDTO checklistHistoryDTO) {
+    // Update
+    public void update(Long ChecklistHistoryId, ChecklistHistoryDto checklistHistoryDTO) {
         try {
             ChecklistHistory checklistHistory = modelMapper.map(checklistHistoryDTO, ChecklistHistory.class);
             checklistHistory.setId(checklistHistory.getId());
@@ -126,8 +121,7 @@ public class ChecklistHistoryBusiness {
         }
     }
 
-
-    //delete
+    // Delete
     public void delete(Long checklistHistoryId) {
         try {
             ChecklistHistory checklistHistory = checklistHistoryService.getById(checklistHistoryId);

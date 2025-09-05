@@ -160,9 +160,8 @@ public class JustificationBusiness {
         Justification justification = buildJustificationFromDto(dto, true);
         Attendance attendance = attendancesService.getById(dto.getAttendance().getId());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate attendanceDate = LocalDate.parse(attendance.getAttendanceDate(), formatter);
-        LocalDate justificationDate = LocalDate.parse(dto.getJustificationDate());
-        long daysBetween = ChronoUnit.DAYS.between(attendanceDate, justificationDate);
+
+        long daysBetween = ChronoUnit.DAYS.between(attendance.getAttendanceDate(), justification.getJustificationDate());
 
         if (daysBetween > 3) {
             throw new CustomException(

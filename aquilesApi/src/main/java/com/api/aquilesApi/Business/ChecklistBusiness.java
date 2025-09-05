@@ -1,15 +1,12 @@
 package com.api.aquilesApi.Business;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.List;
 import com.api.aquilesApi.Dto.ChecklistDto;
 import com.api.aquilesApi.Entity.Checklist;
 import com.api.aquilesApi.Entity.Evaluations;
-    import com.api.aquilesApi.Entity.Item;
+import com.api.aquilesApi.Entity.Item;
 import com.api.aquilesApi.Entity.ItemType;
-import com.api.aquilesApi.Repository.JuriesRepository;
 import com.api.aquilesApi.Repository.ItemTypeRepository;
+import com.api.aquilesApi.Repository.JuriesRepository;
 import com.api.aquilesApi.Service.ChecklistExportService;
 import com.api.aquilesApi.Service.ChecklistService;
 import com.api.aquilesApi.Service.EvaluationsService;
@@ -21,6 +18,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.List;
 
 @Service
 public class ChecklistBusiness {
@@ -214,11 +215,11 @@ public class ChecklistBusiness {
             }
 
             // 🔗 VINCULAR EVALUACIÓN SI SE PROPORCIONA evaluationId
-            if (checklistDto.getEvaluationId() != null) {
+            if (checklistDto.getEvaluation() != null) {
                 try {
-                    Evaluations evaluation = evaluationsService.getById(checklistDto.getEvaluationId());
+                    Evaluations evaluation = evaluationsService.getById(checklistDto.getEvaluation().getId());
                     checklistAntes.setEvaluation(evaluation);
-                    System.out.println("✅ Linked evaluation ID: " + checklistDto.getEvaluationId() + " to checklist");
+                    System.out.println("✅ Linked evaluation ID: " + checklistDto.getEvaluation() + " to checklist");
                 } catch (Exception e) {
                     System.err.println("❌ Error linking evaluation: " + e.getMessage());
                     // No lanzamos excepción para que el resto de la actualización continúe

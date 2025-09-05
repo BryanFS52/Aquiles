@@ -2,7 +2,7 @@ package com.api.aquilesApi.Resolver;
 
 
 import com.api.aquilesApi.Business.ChecklistHistoryBusiness;
-import com.api.aquilesApi.Dto.ChecklistHistoryDTO;
+import com.api.aquilesApi.Dto.ChecklistHistoryDto;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
@@ -26,7 +26,7 @@ public class ChecklistHistoryResolver {
     @DgsQuery
     public Map<String, Object> allChecklistHistory(@InputArgument("page") Integer page, @InputArgument("size") Integer size) {
         try {
-            Page<ChecklistHistoryDTO> checklistHistoryDTOPage = checklistHistoryBusiness.findAll(page, size);
+            Page<ChecklistHistoryDto> checklistHistoryDTOPage = checklistHistoryBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
                     checklistHistoryDTOPage.getContent(),
                     ResponseHttpApi.CODE_OK,
@@ -45,9 +45,9 @@ public class ChecklistHistoryResolver {
 
     // Add a new Checklist History
     @DgsMutation
-    public Map<String, Object> addChecklistHistory(@InputArgument(name = "input") ChecklistHistoryDTO checklistHistoryDTO) {
+    public Map<String, Object> addChecklistHistory(@InputArgument(name = "input") ChecklistHistoryDto checklistHistoryDTO) {
         try {
-            ChecklistHistoryDTO savedChecklistHistory = checklistHistoryBusiness.add(checklistHistoryDTO);
+            ChecklistHistoryDto savedChecklistHistory = checklistHistoryBusiness.add(checklistHistoryDTO);
             return ResponseHttpApi.responseHttpAction(
                     savedChecklistHistory.getId(),
                     ResponseHttpApi.CODE_OK,
@@ -63,7 +63,7 @@ public class ChecklistHistoryResolver {
 
     // Update a Checklist History
     @DgsMutation
-    public Map<String, Object> updateChecklistHistory(@InputArgument("id") Long id, @InputArgument("input") ChecklistHistoryDTO checklistHistoryDTO) {
+    public Map<String, Object> updateChecklistHistory(@InputArgument("id") Long id, @InputArgument("input") ChecklistHistoryDto checklistHistoryDTO) {
         try {
             checklistHistoryBusiness.update(id, checklistHistoryDTO);
             return ResponseHttpApi.responseHttpAction(

@@ -1,18 +1,18 @@
 package com.api.aquilesApi.Dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
-@Getter
-@Setter
-public class ChecklistHistoryDTO {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ChecklistHistoryDto {
     private Long id;
     private Boolean state;
     private String remarks;
     private boolean evaluationCriteria;
-    private Date dateAssigned;
+    private String dateAssigned;
     private Long studySheets;
     private Long evaluations;
     private Long learningOutcome;
