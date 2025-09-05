@@ -3,11 +3,12 @@ package com.api.aquilesApi.Resolver;
 import com.api.aquilesApi.Business.AttendancesBusiness;
 import com.api.aquilesApi.Dto.AttendanceDto;
 import com.api.aquilesApi.Dto.QRCodePayloadDto;
-import com.api.aquilesApi.Dto.Student;
-import com.api.aquilesApi.Entity.Attendance;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.api.aquilesApi.Utilities.QRCode.QrCodeGenerator;
-import com.netflix.graphql.dgs.*;
+import com.netflix.graphql.dgs.DgsComponent;
+import com.netflix.graphql.dgs.DgsMutation;
+import com.netflix.graphql.dgs.DgsQuery;
+import com.netflix.graphql.dgs.InputArgument;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
-import java.util.*;
+import java.util.Base64;
+import java.util.Map;
+import java.util.UUID;
 
 @DgsComponent
 public class AttendancesResolver {
@@ -27,59 +30,6 @@ public class AttendancesResolver {
         this.attendancesBusiness = attendancesBusiness;
         this.qrCodeGenerator = qrCodeGenerator;
         this.modelMapper = modelMapper;
-    }
-
-    // Olympus
-    @DgsEntityFetcher(name = "Student")
-    public Student getStudent(Map<String, Object> values) {
-        Long id = null;
-        if (values.get("id") instanceof String) {
-            id = Long.valueOf((String) values.get("id"));
-        } else if (values.get("id") instanceof Integer) {
-            id = ((Integer) values.get("id")).longValue();
-        } else if (values.get("id") instanceof Long) {
-            id = (Long) values.get("id");
-        }
-
-        if (id == null) return null;
-
-        Student student = new Student();
-        student.setId(id);
-        return student;
-    }
-
-    @DgsEntityFetcher(name = "Attendance")
-    public AttendanceDto getAttendance(Map<String, Object> values) {
-        String id = (String) values.get("id");
-        Long attendanceId = id != null ? Long.valueOf(id) : null;
-        return attendancesBusiness.findById(attendanceId);
-    }
-
-    @DgsData(parentType = "Student", field = "attendances")
-    public List<Attendance> getAttendances(DgsDataFetchingEnvironment env) {
-        Student student = env.getSource();
-        Long studentId = student.getId();
-
-        Long competenceQuarterId = env.getArgument("competenceQuarterId");
-        List<Attendance> attendanceList;
-
-        if (competenceQuarterId != null) {
-            attendanceList = attendancesBusiness.getAllByStudentIdAndCompetenceQuarter(studentId, competenceQuarterId);
-        } else {
-            attendanceList = attendancesBusiness.findAllByStudentId(studentId);
-        }
-
-        return attendanceList != null ? attendanceList : Collections.emptyList();
-    }
-
-
-
-    @DgsData(parentType = "Attendance", field = "student")
-    public Map<String, Object> studentReference(DgsDataFetchingEnvironment env) {
-        AttendanceDto attendanceDto = env.getSource();
-        assert attendanceDto != null;
-        if(attendanceDto.getStudentId() == null) return null;
-        return Map.of("id", attendanceDto.getStudentId().toString());
     }
 
     @DgsQuery

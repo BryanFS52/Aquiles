@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @NoArgsConstructor
@@ -28,7 +28,6 @@ public class Checklist implements Serializable {
     @Column(name = "remarks", nullable = false, length = 255)
     private String remarks;
 
-    
     @Column(name = "instructor_signature", nullable = false)
     private byte[] instructorSignature;
 
@@ -36,7 +35,7 @@ public class Checklist implements Serializable {
     private boolean evaluationCriteria;
 
     @Column(name = "date_assigned", length = 30)
-    private Date dateAssigned;
+    private LocalDate dateAssigned;
 
     @Column(name = "study_sheets")
     private Long studySheets;
@@ -56,9 +55,14 @@ public class Checklist implements Serializable {
     @OneToOne(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private Evaluations evaluation;
 
-    // 3.Relation (1-M) con Team
-    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TeamsScrum> teams;
+    // 3.Relation (M-M) con teamsScrum
+    @ManyToMany
+    @JoinTable(
+            name = "checklist_teams",
+            joinColumns = @JoinColumn(name = "checklist_id"),
+            inverseJoinColumns = @JoinColumn(name = "team_id")
+    )
+    private List<TeamsScrum> teamsScrum;
 
     // 4.Relation (1-M) con learningOutcome
     @Column(name = "learningOutcome_id")
@@ -71,7 +75,4 @@ public class Checklist implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "jury_id"))
     private List<Juries> juries;
 
-    // 6.Relation (1-M) con teamsScrum
-    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TeamsScrum> teamsScrum;
 }

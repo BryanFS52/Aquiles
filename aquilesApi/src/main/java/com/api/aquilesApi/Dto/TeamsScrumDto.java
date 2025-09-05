@@ -31,7 +31,7 @@ public class TeamsScrumDto {
     private String projectJustification;
 
     // Relations
-    private ChecklistDto checklist;
+    private List<ChecklistDto> checklist;
     private Long studySheetId;
     private List<TeamScrumMemberIdDto>  memberIds;
     private String processMethodologyId;
