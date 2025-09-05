@@ -201,8 +201,8 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
               lastname
               phone
               email
-              blood_type
-              date_birth
+              bloodType
+              dateBirth
             }
           }
           studentStudySheetState {
