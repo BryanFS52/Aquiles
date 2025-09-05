@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { Check, FileDown, Save, UploadCloud, X, AlertTriangle, Phone, Edit } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Check, FileDown, Save, UploadCloud, X, AlertTriangle, Phone, Edit, ArrowLeft } from "lucide-react";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import PageTitle from "@components/UI/pageTitle";
@@ -19,6 +20,7 @@ import {
 } from "@/types/checklist";
 
 export default function InstructorChecklistView() {
+  const router = useRouter();
   const [activeChecklists, setActiveChecklists] = useState<Checklist[]>([]);
   const [selectedChecklist, setSelectedChecklist] = useState<Checklist | null>(null);
   const [selectedTrimester, setSelectedTrimester] = useState<string>(() => {
@@ -1191,6 +1193,22 @@ export default function InstructorChecklistView() {
     }
   };
 
+  // Función para volver a la vista de selección de TeamScrum
+  const handleBackToSelection = () => {
+    // Limpiar localStorage de la sesión actual
+    localStorage.removeItem('selectedChecklistId');
+    if (selectedChecklist) {
+      localStorage.removeItem(`itemStates_${selectedChecklist.id}`);
+      localStorage.removeItem(`evaluationData_${selectedChecklist.id}`);
+    }
+    
+    // Mostrar mensaje de confirmación
+    toast.info("Regresando a la selección de TeamScrum...");
+    
+    // Navegar a la vista de selección
+    router.push('/dashboard/InstructorSelection');
+  };
+
   return (
     <div className="w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
       {/* Estilos CSS para el diseño hexagonal */}
@@ -1341,7 +1359,18 @@ export default function InstructorChecklistView() {
 
       {/* Contenido principal con diseño tipo panal */}
       <div className="p-6 space-y-8">
-        <PageTitle>Lista de Chequeo - Vista del Instructor</PageTitle>
+        <div className="flex items-center justify-between">
+          <PageTitle>Lista de Chequeo - Vista del Instructor</PageTitle>
+          
+          {/* Botón para volver a la selección de TeamScrum */}
+          <button
+            onClick={handleBackToSelection}
+            className="flex items-center space-x-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Cambiar Team Scrum</span>
+          </button>
+        </div>
 
         {/* Diseño cuadrado para información del centro */}
         <div className="relative">
@@ -1953,6 +1982,19 @@ export default function InstructorChecklistView() {
                             <Save className="w-8 h-8" />
                             <span>{isFinalSaved ? 'Evaluación Guardada' : 'Crear Evaluación'}</span>
                           </button>
+
+                          {/* Botón para volver a seleccionar TeamScrum - visible cuando la evaluación esté completada o guardada */}
+                          {(isFinalSaved || selectedEvaluation) && (
+                            <div className="mt-6">
+                              <button
+                                onClick={handleBackToSelection}
+                                className="px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white rounded-2xl transition-all duration-300 flex items-center space-x-3 mx-auto font-semibold text-lg shadow-lg hover:shadow-gray-500/20 transform hover:scale-105"
+                              >
+                                <ArrowLeft className="w-6 h-6" />
+                                <span>Evaluar Otro Team Scrum</span>
+                              </button>
+                            </div>
+                          )}
 
                           {/* Botón de debug con diseño hexagonal */}
 
