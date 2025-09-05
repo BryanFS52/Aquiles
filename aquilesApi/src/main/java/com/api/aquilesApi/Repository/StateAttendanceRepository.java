@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StateAttendanceRepository extends JpaRepository<AttendanceState, Long> {
-
+    boolean existsByStatus(String status);
 }
