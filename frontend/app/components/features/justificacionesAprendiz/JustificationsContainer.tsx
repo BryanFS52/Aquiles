@@ -321,8 +321,8 @@ export const JustificationsContainer: React.FC = () => {
         <PageTitle>Justificaciones</PageTitle>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2">
-        <AnimatePresence mode="wait">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5" ref={formRef}>
+        <AnimatePresence mode='sync'>
           {!form.showForm && !shouldLoadModal && (
             <motion.div
               key="absences-list"

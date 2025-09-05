@@ -122,7 +122,7 @@ export const openNoveltyModal = createAsyncThunk<
   'novelty/openNoveltyModal',
   async ({ studentId, teacherId, absenceCount, studentName, studentDocument, studentLastname }, { dispatch, rejectWithValue }) => {
     try {
-      console.log('Opening novelty modal for student:', { studentId, teacherId, absenceCount, studentName });
+      // console.log('Opening novelty modal for student:', { studentId, teacherId, absenceCount, studentName });
       
       // Validar que teacherId sea válido
       if (!teacherId || teacherId === 0) {
@@ -173,7 +173,7 @@ export const processFile = createAsyncThunk<
   'novelty/processFile',
   async (file, { rejectWithValue }) => {
     try {
-      console.log('Processing file:', file.name);
+      // console.log('Processing file:', file.name);
       
       return new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
@@ -256,13 +256,13 @@ export const submitNovelty = createAsyncThunk<
         teacherId: formData.teacherId,
       };
 
-      console.log('Submitting novelty with data:', {
-        ...noveltyData,
-        teacherId: formData.teacherId,
-        studentId: formData.studentId,
-        observation: formData.observation ? 'Present' : 'Missing',
-        noveltyType: formData.noveltyType.id ? 'Present' : 'Missing'
-      });
+      // console.log('Submitting novelty with data:', {
+      //   ...noveltyData,
+      //   teacherId: formData.teacherId,
+      //   studentId: formData.studentId,
+      //   observation: formData.observation ? 'Present' : 'Missing',
+      //   noveltyType: formData.noveltyType.id ? 'Present' : 'Missing'
+      // });
       
       const { data } = await clientLAN.mutate<AddNoveltyMutation, AddNoveltyMutationVariables>({
         mutation: ADD_NOVELTY,
@@ -275,7 +275,7 @@ export const submitNovelty = createAsyncThunk<
         throw new Error('No se recibió respuesta del servidor');
       }
 
-      console.log('Novelty submitted successfully:', data.addNovelty);
+      // console.log('Novelty submitted successfully:', data.addNovelty);
       return data.addNovelty;
     } catch (error: any) {
       console.error('Error submitting novelty:', error);

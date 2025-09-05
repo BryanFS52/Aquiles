@@ -15,7 +15,13 @@ query GetCoordinationByCollaborator($collaboratorId: Long!,$page: Int,$size: Int
       teachers{
         id
         state
-        
+        collaborator{
+            person{
+                name
+                lastname
+                document
+            }
+        }
       }
       trainingCenter {
         id

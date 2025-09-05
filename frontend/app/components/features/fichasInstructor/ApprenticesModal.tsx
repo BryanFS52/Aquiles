@@ -28,7 +28,7 @@ export const ApprenticesModal: React.FC<ApprenticesModalProps> = ({
                         Total de aprendices: <span className="font-semibold">{students.length}</span>
                     </div>
 
-                    <div className="grid gap-3">
+                    <div className="flex flex-col gap-2 sm:grid sm:grid-cols-1 sm:gap-3">
                         {students.map((student, index) => {
                             const person = student?.student?.person;
                             const displayName = person?.name && person?.lastname
@@ -39,34 +39,31 @@ export const ApprenticesModal: React.FC<ApprenticesModalProps> = ({
                             return (
                                 <div
                                     key={student?.student?.id || index}
-                                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600"
+                                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600"
                                 >
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
-                                            {/* Bolita con el gradiente del header: from-primary to-lime-500 */}
-                                            <div className="w-10 h-10 bg-gradient-to-r from-primary to-lime-500 rounded-full flex items-center justify-center text-white font-semibold border border-lime-500 shadow">
-                                                {displayName.charAt(0).toUpperCase()}
-                                            </div>
+                                    <div className="flex items-center gap-2 sm:gap-3 w-full">
+                                        <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-r from-primary to-lime-500 rounded-full flex items-center justify-center text-white font-semibold border border-lime-500 shadow text-base sm:text-lg">
+                                            {displayName.charAt(0).toUpperCase()}
                                         </div>
-                                        <div>
-                                            <p className="font-medium text-gray-900 dark:text-white">
+                                        <div className="min-w-0">
+                                            <p className="font-medium text-gray-900 dark:text-white text-sm sm:text-base truncate">
                                                 {displayName}
                                             </p>
                                             {person?.email && (
-                                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
                                                     {person.email}
                                                 </p>
                                             )}
                                             {person?.document && (
-                                                <p className="text-xs text-gray-400 dark:text-gray-500">
+                                                <p className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 truncate">
                                                     Doc: {person.document}
                                                 </p>
                                             )}
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center space-x-2">
-                                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${studentState === 'En formacion'
+                                    <div className="flex items-center mt-2 sm:mt-0 sm:ml-2 sm:flex-row">
+                                        <span className={`px-2 py-1 text-[10px] sm:text-xs font-medium rounded-full whitespace-nowrap ${studentState === 'En formacion'
                                             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
                                             : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
                                             }`}>

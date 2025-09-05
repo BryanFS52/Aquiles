@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import {
     PiUsersDuotone,
@@ -13,7 +13,11 @@ import {
     PiStudentDuotone,
     PiClipboardDuotone,
     PiCirclesFourDuotone,
+    PiListBulletsDuotone,
+    PiCaretDoubleLeftDuotone,
+    PiTargetDuotone
 } from "react-icons/pi";
+
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -34,9 +38,7 @@ interface SidebarProps {
     role?: string;
 }
 
-type RoleType = 'instructor' | 'aprendiz' | 'coordinador';
-
-// Íconos estáticos (ahora todos con Phosphor Duotone)
+// Íconos estáticos
 const IconFichas = <PiClipboardTextDuotone className="w-6 h-6 text-black dark:text-white" />;
 const IconProgramas = <PiCirclesFourDuotone className="w-6 h-6 text-black dark:text-white" />;
 const IconAsistencia = <PiUserCheckDuotone className="w-6 h-6 text-black dark:text-white" />;
@@ -47,6 +49,7 @@ const IconProfesor = <PiChalkboardTeacherDuotone className="w-6 h-6 text-black d
 const IconAprendices = <PiStudentDuotone className="w-6 h-6 text-black dark:text-white" />;
 const IconPlanesMejoramiento = <PiClipboardDuotone className="w-6 h-6 text-black dark:text-white" />;
 const IconCoordinaciones = <PiUsersDuotone className="w-6 h-6 text-black dark:text-white" />;
+const IconSeguimiento = <PiTargetDuotone className="w-6 h-6 text-black dark:text-white" />;
 
 // Configuración de menú por rol
 const MENU_CONFIG: MenuConfig = {
@@ -55,7 +58,8 @@ const MENU_CONFIG: MenuConfig = {
         { href: "/dashboard/teamScrum", label: "Teams", icon: IconTeams },
         { href: "/dashboard/ListaChequeoInstructor", label: "Sustentaciones", icon: IconSustentaciones },
         { href: "/dashboard/planesMejoramientoInstructor", label: "Planes de Mejoramiento", icon: IconPlanesMejoramiento },
-        { href: "/dashboard/InstructorFollowUp", label: "Seguimiento", icon: IconJustificaciones },
+        { href: "/dashboard/justificacionesInstructor", label: "Justificaciones", icon: IconJustificaciones },
+        { href: "/dashboard/InstructorFollowUp", label: "Seguimiento", icon: IconSeguimiento },
     ],
     aprendiz: [
         { href: "/dashboard/FichaAprendiz", label: "Ficha", icon: IconFichas },
@@ -86,9 +90,19 @@ const getMenuByRole = (role: string | undefined): MenuItem[] => {
 
 export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
     const [showMenu, setShowMenu] = useState<boolean>(false);
-    const [role, setRole] = useState<string>(initialRole || 'instructor');
+    const pathname = usePathname();
+    const [role, setRole] = useState<string>(() => {
+        if (typeof window !== "undefined") {
+            return localStorage.getItem("sidebar-role") || initialRole || "instructor";
+        }
+        return initialRole || "instructor";
+    });
+    // 🔹 Guardar rol en localStorage cada vez que cambie
+    useEffect(() => {
+        localStorage.setItem("sidebar-role", role);
+    }, [role]);
+
     const menuItems: MenuItem[] = useMemo(() => getMenuByRole(role), [role]);
-    const pathname: string = usePathname();
 
     const handleLinkClick = (): void => {
         if (window.innerWidth < 1024) setShowMenu(false);
@@ -134,7 +148,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
                         />
                         <span className="text-base lg:text-lg font-bold text-black dark:text-white tracking-wide drop-shadow-md leading-tight">
                             PROYECTOS FORMATIVOS<br />
-                            <span className="uppercase text-xs lg:text-[13px] text-darkGreen dark:text-blue-600 font-extrabold tracking-widest">
+                            <span className="text-xs lg:text-[13px] text-darkGreen dark:text-blue-600 font-extrabold tracking-widest">
                                 {role}
                             </span>
                         </span>
@@ -200,6 +214,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
                     </nav>
                 </div>
             </aside>
+
+            {/* Botón toggle para móvil */}
+            <button
+                onClick={toggleMenu}
+                className='
+                    fixed bottom-4 right-4 z-50 
+                    text-white bg-gradient-to-br from-darkGreen to-shadowBlue 
+                    p-3 text-2xl rounded-full shadow-2xl 
+                    border-2 border-white/30 
+                    lg:hidden 
+                    transition-all duration-200 
+                    hover:scale-110 active:scale-95
+                '
+                aria-label="Abrir menú"
+            >
+                {showMenu ? <PiCaretDoubleLeftDuotone /> : <PiListBulletsDuotone />}
+            </button>
         </>
     );
 };

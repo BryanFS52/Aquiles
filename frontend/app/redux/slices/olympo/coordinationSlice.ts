@@ -2,7 +2,7 @@ import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { createInitialPaginatedState } from '@type/slices/common/generic'
 import { Coordination } from '@graphql/generated';
-import { GET_COORDINATION_BY_COLABORATOR_ID } from '@graphql/coordination/coordinationGraph';
+import { GET_COORDINATION_BY_COLABORATOR_ID } from '@graphql/olympo/coordinationGraph';
 
 export const transformGraphQLToCoordination = (graphqlData: any): Coordination => {
   return {
@@ -15,12 +15,43 @@ export const transformGraphQLToCoordination = (graphqlData: any): Coordination =
     teachers: graphqlData.teachers?.map((t: any) => ({
       id: t.id,
       state: t.state,
+      collaborator: t.collaborator ? {
+        id: t.collaborator.id,
+        state: t.collaborator.state,
+        person: t.collaborator.person ? {
+          id: t.collaborator.person.id,
+          name: t.collaborator.person.name,
+          lastname: t.collaborator.person.lastname,
+          document: t.collaborator.person.document,
+          email: t.collaborator.person.email,
+          phone: t.collaborator.person.phone,
+          address: t.collaborator.person.address,
+          blood_type: t.collaborator.person.blood_type,
+          date_birth: t.collaborator.person.date_birth,
+          document_type: t.collaborator.person.document_type,
+          photo: t.collaborator.person.photo,
+          state: t.collaborator.person.state,
+          user: t.collaborator.person.user
+        } : null,
+        contractType: t.collaborator.contractType,
+        coordination: t.collaborator.coordination,
+        endDate: t.collaborator.endDate,
+        laborDepartment: t.collaborator.laborDepartment,
+        starDate: t.collaborator.starDate
+      } : null,
+      classTypes: t.classTypes || [],
+      committees: t.committees || [],
+      coordinations: t.coordinations || [],
+      novelties: t.novelties || [],
+      totalHours: t.totalHours
     })) || [],
     trainingCenter: graphqlData.trainingCenter
       ? {
-          id: graphqlData.trainingCenter.id,
-          name: graphqlData.trainingCenter.name,
-        }
+        id: graphqlData.trainingCenter.id,
+        name: graphqlData.trainingCenter.name,
+        state: graphqlData.trainingCenter.state,
+        township: graphqlData.trainingCenter.township
+      }
       : null,
   };
 };
@@ -32,9 +63,9 @@ export const fetchCoordinationByColaborator = createAsyncThunk(
       query: GET_COORDINATION_BY_COLABORATOR_ID,
       variables: { collaboratorId, page, size, state },
     });
-    
+
     const transformedData = data.allCoordination.data.map(transformGraphQLToCoordination);
-    
+
     return {
       data: transformedData,
       totalItems: data.allCoordination.totalItems,
@@ -83,4 +114,4 @@ const coordinationSlice = createSlice({
   },
 });
 
-export const { clearCoordinations, setCurrentPage } = coordinationSlice.actions;export default coordinationSlice.reducer;
+export const { clearCoordinations, setCurrentPage } = coordinationSlice.actions; export default coordinationSlice.reducer;

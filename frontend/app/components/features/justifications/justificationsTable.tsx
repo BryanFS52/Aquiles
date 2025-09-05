@@ -165,11 +165,13 @@ export default function JustificationTable({
                     className="px-3 py-2 text-xs font-medium bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200 min-w-[120px]"
                   >
                     <option value="">Seleccionar estado...</option>
-                    {getActiveStatuses(justificationStatuses).map((status) => (
-                      <option key={status.id} value={status.id}>
-                        {status.name}
-                      </option>
-                    ))}
+                    {getActiveStatuses(justificationStatuses)
+                      .filter(status => status.name !== "En proceso") // Excluir "En proceso"
+                      .map((status) => (
+                        <option key={status.id} value={status.id}>
+                          {status.name}
+                        </option>
+                      ))}
                   </select>
                   {loadingStatuses && (
                     <span className="text-xs text-gray-500 dark:text-gray-400">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Check, FileDown, Save, UploadCloud, X, AlertTriangle, Phone, Edit } from "lucide-react";
 import { toast } from "react-toastify";
 import Image from "next/image";
@@ -103,11 +103,7 @@ export default function InstructorChecklistView() {
     return "";
   };
 
-  // Cargar listas de chequeo activas y recuperar selección previa
-  useEffect(() => {
-    loadActiveChecklists();
-  }, []);
-
+  
   // Recuperar selección de checklist después de cargar las listas
   useEffect(() => {
     if (activeChecklists.length > 0 && !selectedChecklist) {
@@ -300,7 +296,7 @@ export default function InstructorChecklistView() {
     }
   };
 
-  const loadActiveChecklists = async (): Promise<void> => {
+  const loadActiveChecklists = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
       const response = await fetchAllChecklists(0, 100);
@@ -323,8 +319,13 @@ export default function InstructorChecklistView() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedChecklist, setActiveChecklists, setSelectedChecklist]);
 
+  // Cargar listas de chequeo activas y recuperar selección previa
+  useEffect(() => {
+    loadActiveChecklists();
+  }, [loadActiveChecklists]);
+  
   const loadEvaluationsForChecklist = async (checklistId: number): Promise<void> => {
     try {
       console.log("=== LOADING EVALUATIONS FROM DATABASE ===");

@@ -2,18 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import { AppDispatch, RootState } from "@redux/store";
-import { fetchAllJustificationStatuses } from "@redux/slices/justificationStatusSlice";
+import { toast } from "react-toastify";
+import type { AppDispatch, RootState } from "@/redux/store";
 import PageTitle from "@components/UI/pageTitle";
 import { useLoader } from "@context/LoaderContext";
 import JustificationFilters from "@components/features/justifications/justificationsFilter";
 import JustificationTable from "@components/features/justifications/justificationsTable";
 import EmptyState from "@components/UI/emptyState";
+import { fetchAllJustificationStatuses } from "@redux/slices/justificationStatusSlice";
 import {
-  goToPreviousPage,
-  setFilterOptions,
-  goToNextPage,
+  setCompetenceQuarterFilterOptions,
+  setCompetenceQuarterMultiFilter,
+  toggleCompetenceQuarterMultiFilter,
+  clearCompetenceQuarterMultiFilters,
+  updateJustificationStatus,
   formatErrorMessage,
   generateFileName,
   downloadBase64File,
@@ -28,7 +30,7 @@ export default function JustificacionesInstructor() {
 
   // Acceso directo al estado de Redux - usando los nuevos campos para competence quarter
   const justificationState = useSelector((state: RootState) => state.justification);
-  
+
   // Extraer propiedades del estado
   const {
     competenceQuarterData: justifications,
@@ -44,7 +46,8 @@ export default function JustificacionesInstructor() {
   );
 
   useEffect(() => {
-    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
+    // Cargar todos los estados de justificación disponibles
+    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 })); // Aumentar a 50 para obtener todos los estados
     // Activar el modo competence quarter
     dispatch(setCompetenceQuarterMode(true));
   }, [dispatch]);
@@ -94,14 +97,8 @@ export default function JustificacionesInstructor() {
     const currentJustification = filteredData.find((j: any) => j.id.toString() === justificacionId);
 
     // Verificar si el estado ya es el mismo
-<<<<<<< HEAD
     const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.estado;
-    
-=======
-    const currentStatusId = currentJustification?.justificationStatus?.id?.toString() ||
-      currentJustification?.justificationStatusId?.toString();
 
->>>>>>> origin/gabrielDev
     if (currentStatusId === newStatusId) {
       return; // No hacer nada si el estado es el mismo
     }
@@ -116,11 +113,6 @@ export default function JustificacionesInstructor() {
         if (updateJustificationStatus.fulfilled.match(result)) {
           // Mostrar mensaje personalizado según el estado
           showJustificationStatusMessage(statusName);
-<<<<<<< HEAD
-=======
-
-          // Ya no necesitamos recargar ya que el estado se actualiza localmente
->>>>>>> origin/gabrielDev
         } else {
           const error = result.payload as any;
           if (error?.code !== "500" || !error?.message?.includes("already has the specified status")) {
@@ -163,11 +155,13 @@ export default function JustificacionesInstructor() {
   };
 
   const errorMessage = formatErrorMessage(error);
-<<<<<<< HEAD
-  
+
+  // Obtener el número de ficha de los datos disponibles
+  const studySheetNumber = filteredData?.[0]?.ficha || justifications?.[0]?.ficha || "Sin ficha";
+
   // Verificar si hay datos de justificaciones
   const hasJustificationData = justifications && justifications.length > 0;
-  
+
   // Determinar si hay filtros aplicados
   const { selectedFiltro, searchTerm, enableMultiFilter, multiFilters } = filterOptions;
   const hasFiltersApplied = Boolean(
@@ -175,40 +169,10 @@ export default function JustificacionesInstructor() {
     searchTerm ||
     (enableMultiFilter && Object.values(multiFilters).some(value => value))
   );
-=======
-
-  // Determinar qué datos usar - simplificado usando selectores
-  const hasJustificationData = justificationsData && justificationsData.length > 0;
-  const isLoadingAny = loading || competenceQuarterLoading;
-
-  const canGoNext = hasCompetenceQuarterData ? false : localCurrentPage < totalPages;
-  const canGoPrevious = hasCompetenceQuarterData ? false : localCurrentPage > 1;
-
-  // Preparar datos para mostrar
-  let dataToShow = filteredData;
-  let totalItemsToShow = totalItems;
-  let hasDataToShow = hasJustificationData;
-
-  // Si tenemos datos de competence quarter, usarlos en su lugar
-  if (hasCompetenceQuarterData) {
-    dataToShow = competenceQuarterJustifications;
-    totalItemsToShow = competenceQuarterJustifications.length;
-    hasDataToShow = competenceQuarterJustifications.length > 0;
-  }
-
-  // Verificar si hay datos de justificaciones en el state
-  if (!isLoadingAny && !error && !competenceQuarterError && !hasDataToShow) {
-    return <EmptyState message="No se encontraron justificaciones para esta ficha. Selecciona una ficha desde el panel del instructor." />;
-  }
-
-  if (!isLoadingAny && !errorMessage && hasDataToShow && dataToShow.length === 0) {
-    return <EmptyState message="No se encontraron justificaciones que coincidan con los filtros aplicados." />;
-  }
->>>>>>> origin/gabrielDev
 
   return (
     <div className="space-y-6">
-      <PageTitle>Justificaciones de aprendices</PageTitle>
+      <PageTitle>Justificaciones de la Ficha: {studySheetNumber}</PageTitle>
 
       {/* Filters */}
       <JustificationFilters

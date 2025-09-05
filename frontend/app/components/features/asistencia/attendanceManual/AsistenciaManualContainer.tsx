@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import type { AppDispatch } from "@redux/store"
+import { AppDispatch } from "@redux/store"
 import { useDispatch, useSelector } from "react-redux"
 import { toast } from "react-toastify"
 import { Save } from "lucide-react"
@@ -32,7 +32,9 @@ export const AsistenciaManualContainer: React.FC<AsistenciaManualContainerProps>
     const { showLoader, hideLoader } = useLoader()
 
     const studySheetObj = Array.isArray(studySheet) ? studySheet[0] : studySheet
-    const students = studySheetObj?.studentStudySheets || []
+    const students = useMemo(() => {
+        return studySheetObj?.studentStudySheets ?? [];
+    }, [studySheetObj?.studentStudySheets]);
 
     // Estados del componente
     const [attendance, setAttendance] = useState<Record<string | number, AttendanceStatus>>({})

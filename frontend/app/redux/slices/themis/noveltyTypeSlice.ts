@@ -53,7 +53,7 @@ export const fetchNoveltyTypes = createAsyncThunk<
   'noveltyType/fetchNoveltyTypes',
   async ({ page = 0, size = 100 }, { rejectWithValue }) => {
     try {
-      console.log('Fetching novelty types:', { page, size });
+      // console.log('Fetching novelty types:', { page, size });
       
       const { data } = await clientLAN.query<GetNoveltyTypesQuery, GetNoveltyTypesQueryVariables>({
         query: GET_NOVELTYTYPE_LIST,
@@ -65,7 +65,7 @@ export const fetchNoveltyTypes = createAsyncThunk<
         throw new Error('No se recibieron tipos de novedad del servidor');
       }
 
-      console.log('Novelty types fetched successfully:', data.allNoveltyTypes);
+      // console.log('Novelty types fetched successfully:', data.allNoveltyTypes);
       return data.allNoveltyTypes;
     } catch (error: any) {
       console.error('Error fetching novelty types:', error);
@@ -114,7 +114,7 @@ const noveltyTypeSlice = createSlice({
         noveltyType.nameNovelty.toLowerCase().includes('deserción') ||
         noveltyType.nameNovelty.toLowerCase().includes('desercion')
       );
-      console.log('Filtered novelty types for Deserción:', state.filteredData);
+      // console.log('Filtered novelty types for Deserción:', state.filteredData);
     },
     resetFilter: (state) => {
       state.filteredData = state.data;

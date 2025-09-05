@@ -3,7 +3,7 @@
 import { Calendar, Search, Filter, BookOpen } from "lucide-react"
 import type { FilterOption, Competence } from "@type/pages/attendanceManual"
 import { useSelector } from "react-redux"
-import type { RootState } from "@/redux/store"
+import type { RootState } from "@redux/store"
 
 interface AttendanceControlsProps {
   selectedDate: string

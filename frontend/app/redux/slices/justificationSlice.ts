@@ -260,22 +260,17 @@ const transformToComponentFormat = (justifications: Justification[]): Transforme
 
         const booleanState = Boolean(j.state);
         
-        let estadoDisplay = "En proceso";
-        let justificationStatusId = undefined;
-        
-        if ((j as any).justificationStatus) {
-            estadoDisplay = (j as any).justificationStatus.name || "En proceso";
-            justificationStatusId = (j as any).justificationStatus.id?.toString();
-        } else {
-            estadoDisplay = "En proceso";
-        }
+        // Determinar el estado y ID basado en el nombre
+        const statusName = (j as any).justificationStatus?.name || "En proceso";
+        const statusId = (j as any).justificationStatus?.id?.toString() || 
+            (statusName === 'En proceso' ? 'default-en-proceso' : undefined);
         
         return {
             id: Number(j.id),
             ficha: studySheet?.studentStudySheetState?.toString() || "Sin ficha",
             absenceDate: formatDateSafely(j.absenceDate),
             justificationDate: formatDateSafely(j.justificationDate),
-            estado: estadoDisplay,  
+            estado: statusName,  
             state: booleanState, 
             justificationType: j.justificationType?.name ?? "Sin tipo",
             archivoAdjunto: j.justificationFile ?? "",
@@ -283,8 +278,8 @@ const transformToComponentFormat = (justifications: Justification[]): Transforme
             documento: person?.document || '',
             aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim(),
             attendanceId: j.attendance?.id?.toString(),
-            justificationStatusId: justificationStatusId,
-            justificationStatus: estadoDisplay
+            justificationStatusId: statusId,
+            justificationStatus: statusName
         };
     });
 };
@@ -463,6 +458,7 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
                 GetAttendancesByCompetenceQuarterAndJustificationsQuery,
                 GetAttendancesByCompetenceQuarterAndJustificationsQueryVariables
             >({
+                
                 query: GET_ATTENDANCES_BY_COMPETENCE_QUARTER_AND_JUSTIFICATIONS,
                 variables: { competenceQuarterId },
                 fetchPolicy: 'no-cache',
@@ -477,12 +473,18 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
                 const student = attendance.student;
                 const person = student?.person;
 
+                // Determinar el estado y ID basado en el nombre
+                const statusName = justification?.justificationStatus?.name || 'En proceso';
+                // Usar any temporalmente hasta que se regeneren los tipos de GraphQL
+                const statusId = (justification?.justificationStatus as any)?.id || 
+                    (statusName === 'En proceso' ? 'default-en-proceso' : undefined);
+
                 return {
                     id: Number(justification?.id || 0),
                     ficha: '', // Vacío para instructores
                     absenceDate: justification?.absenceDate || '',
                     justificationDate: justification?.justificationDate || '',
-                    estado: justification?.justificationStatus?.name || 'En proceso',
+                    estado: statusName,
                     state: true,
                     justificationType: 'Tipo no disponible',
                     archivoAdjunto: justification?.justificationFile || '',
@@ -490,8 +492,8 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
                     documento: person?.document || '',
                     aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim(),
                     attendanceId: attendance.id,
-                    justificationStatusId: undefined,
-                    justificationStatus: justification?.justificationStatus?.name || 'En proceso'
+                    justificationStatusId: statusId,
+                    justificationStatus: statusName
                 };
             });
         } catch (error) {

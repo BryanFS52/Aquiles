@@ -16,6 +16,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import PageTitle from "@components/UI/pageTitle";
 import EmptyState from "@components/UI/emptyState";
 import Modal from "@components/UI/Modal";
+import { TEMPORAL_APRENDIZ_ID } from "@/temporaryCredential";
 
 // Tipos TypeScript
 
@@ -934,8 +935,7 @@ export default function AsistenciaAprendiz() {
 
   // Cargar asistencias del estudiante al montar el componente
   useEffect(() => {
-    const studentId = 1; // ID hardcodeado como solicitas
-    dispatch(fetchAttendanceAndCompetenceByStudent({ id: studentId }));
+    dispatch(fetchAttendanceAndCompetenceByStudent({ id: TEMPORAL_APRENDIZ_ID }));
   }, [dispatch]);
 
   // Manejar el loader basado en el estado de loading
@@ -948,18 +948,18 @@ export default function AsistenciaAprendiz() {
   }, [loading, showLoader, hideLoader]);
 
   // Función para mapear el estado de la asistencia a un tipo de evento del calendario
-  const mapAttendanceStateToEventType = (status: string): string => {
+  const mapAttendanceStateToEventType = useCallback((status: string): string => {
     const statusMap: { [key: string]: string } = {
       'Presente': 'Asistencia',
       'Asistencia': 'Asistencia',
       'Inasistencia': 'Inasistencia',
-      'Ausente': 'Inasistencia', // Mapear "Ausente" a "Inasistencia"
+      'Ausente': 'Inasistencia',
       'Retardo': 'Retardo',
       'Justificacion': 'Justificacion',
       'Justificado': 'Justificacion'
     };
     return statusMap[status] || 'Asistencia';
-  };
+  }, []);
 
   // Función para obtener eventos filtrados y formatearlos para FullCalendar
   const getFilteredEvents = useCallback(() => {
@@ -1371,7 +1371,7 @@ export default function AsistenciaAprendiz() {
               {(selectedEvent.title === 'Ausente' || selectedEvent.title === 'Inasistencia') && (
                 <button
                   onClick={handleGoToJustifications}
-                  className="flex-1 px-4 py-2.5 text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-lg font-medium transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  className="flex-1 px-4 py-2.5 text-white bg-gradient-to-r  from-lime-600 to-green-600 hover:from-lime-700 hover:to-green-700 rounded-lg font-medium transition-all duration-200 focus:ring-lime-500/50 active:scale-95 flex items-center justify-center gap-2 min-w-[180px]"
                 >
                   Ir a Justificaciones
                 </button>
