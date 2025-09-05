@@ -56,7 +56,7 @@ const MENU_CONFIG: MenuConfig = {
     instructor: [
         { href: "/dashboard/FichasInstructor", label: "Fichas", icon: IconFichas },
         { href: "/dashboard/teamScrum", label: "Teams", icon: IconTeams },
-        { href: "/dashboard/ListaChequeoInstructor", label: "Sustentaciones", icon: IconSustentaciones },
+        { href: "/dashboard/InstructorSelection", label: "Sustentaciones", icon: IconSustentaciones },
         { href: "/dashboard/planesMejoramientoInstructor", label: "Planes de Mejoramiento", icon: IconPlanesMejoramiento },
         { href: "/dashboard/justificacionesInstructor", label: "Justificaciones", icon: IconJustificaciones },
         { href: "/dashboard/InstructorFollowUp", label: "Seguimiento", icon: IconSeguimiento },

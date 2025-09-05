@@ -31,7 +31,8 @@ function safeIdComparison(id1: any, id2: any): boolean {
 // Función para crear una evaluación automáticamente al crear una lista de chequeo
 export const createEvaluationForChecklist = async (
   checklistId: number, 
-  checklistData?: any
+  checklistData?: any,
+  teamScrumId?: number
 ): Promise<ApiResponse> => {
   try {
     // Asegurar que checklistId es un número entero válido
@@ -43,7 +44,8 @@ export const createEvaluationForChecklist = async (
       observations: "", // Iniciar como string vacío en lugar de null
       recommendations: "", // Iniciar como string vacío en lugar de null
       valueJudgment: "PENDIENTE", // Usar valor por defecto más específico
-      checklistId: numericChecklistId // Asegurar que sea un número entero
+      checklistId: numericChecklistId, // Asegurar que sea un número entero
+      teamScrumId: teamScrumId || undefined // Agregar teamScrumId si está disponible
     };
 
     console.log('Creating evaluation with input:', evaluationInput);
@@ -217,7 +219,10 @@ export const updateEvaluation = async (
 };
 
 // Función para crear una evaluación si no existe para un checklist específico
-export const createMissingEvaluationForChecklist = async (checklistId: number): Promise<ApiResponse | null> => {
+export const createMissingEvaluationForChecklist = async (
+  checklistId: number, 
+  teamScrumId?: number
+): Promise<ApiResponse | null> => {
   try {
     console.log('🔍 Checking if evaluation exists for checklist:', checklistId);
     
@@ -232,7 +237,7 @@ export const createMissingEvaluationForChecklist = async (checklistId: number): 
     console.log('📝 No evaluation found, creating new one for checklist:', checklistId);
     
     // No existe, crear una nueva
-    const newEvaluationResponse = await createEvaluationForChecklist(checklistId);
+    const newEvaluationResponse = await createEvaluationForChecklist(checklistId, undefined, teamScrumId);
     
     // Si la evaluación se creó exitosamente, intentar vincularla al checklist
     if (newEvaluationResponse && newEvaluationResponse.code === "200" && newEvaluationResponse.id) {
@@ -270,7 +275,8 @@ export const completeEvaluation = async (
   evaluationId: number,
   observations: string,
   recommendations: string,
-  valueJudgment: string
+  valueJudgment: string,
+  teamScrumId?: number
 ): Promise<ApiResponse> => {
   try {
     // Obtener los datos actuales de la evaluación para mantener el checklistId
@@ -280,7 +286,8 @@ export const completeEvaluation = async (
       observations: observations,
       recommendations: recommendations,
       valueJudgment: valueJudgment,
-      checklistId: currentEvaluation.data.checklistId // Mantener el checklistId existente
+      checklistId: currentEvaluation.data.checklistId, // Mantener el checklistId existente
+      teamScrumId: teamScrumId || currentEvaluation.data.teamScrumId // Usar teamScrumId proporcionado o mantener el existente
     };
 
     return await updateEvaluation(evaluationId, evaluationData);

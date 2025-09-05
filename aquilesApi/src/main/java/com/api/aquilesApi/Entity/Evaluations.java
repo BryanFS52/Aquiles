@@ -33,6 +33,10 @@ public class Evaluations implements Serializable {
     @JoinColumn(name = "checklist_id", nullable = false, unique = true)
     private Checklist checklist;
 
+    // Campo para asociar la evaluación a un team scrum específico
+    @Column(name = "team_scrum_id")
+    private Long teamScrumId;
+
   
 
 }

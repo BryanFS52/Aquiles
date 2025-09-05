@@ -28,6 +28,12 @@ export default function InstructorChecklistView() {
     }
     return "todos";
   });
+  
+  // Estados para el team scrum seleccionado
+  const [selectedTeamScrumId, setSelectedTeamScrumId] = useState<string | null>(null);
+  const [selectedTeamScrumName, setSelectedTeamScrumName] = useState<string>("");
+  const [selectedStudySheetNumber, setSelectedStudySheetNumber] = useState<string>("");
+  
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [firmaAnterior, setFirmaAnterior] = useState<string | null>(null);
   const [firmaNuevo, setFirmaNuevo] = useState<string | null>(null);
@@ -325,6 +331,30 @@ export default function InstructorChecklistView() {
   useEffect(() => {
     loadActiveChecklists();
   }, [loadActiveChecklists]);
+
+  // Recuperar información del team scrum seleccionado desde localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const teamScrumId = localStorage.getItem('selectedTeamScrumId');
+      const teamScrumName = localStorage.getItem('selectedTeamScrumName');
+      const studySheetNumber = localStorage.getItem('selectedStudySheetNumber');
+      
+      if (teamScrumId && teamScrumName) {
+        setSelectedTeamScrumId(teamScrumId);
+        setSelectedTeamScrumName(teamScrumName);
+        setSelectedStudySheetNumber(studySheetNumber || "");
+        console.log('🔄 Recuperando información del team scrum:', {
+          teamScrumId,
+          teamScrumName,
+          studySheetNumber
+        });
+      } else {
+        // Si no hay team scrum seleccionado, redirigir a la página de selección
+        console.log('❌ No hay team scrum seleccionado, redirigiendo a selección');
+        window.location.href = '/dashboard/InstructorSelection';
+      }
+    }
+  }, []);
   
   const loadEvaluationsForChecklist = async (checklistId: number): Promise<void> => {
     try {
@@ -581,14 +611,17 @@ export default function InstructorChecklistView() {
       console.log("Datos a guardar:", {
         observations: evaluationObservations, // Solo texto plano
         recommendations: evaluationRecommendations,
-        valueJudgment: evaluationJudgment
+        valueJudgment: evaluationJudgment,
+        teamScrumId: selectedTeamScrumId
       });
 
+      const teamScrumIdNumber = selectedTeamScrumId ? parseInt(selectedTeamScrumId) : undefined;
       const response = await completeEvaluation(
         parseInt(selectedEvaluation.id),
         evaluationObservations, // Solo las observaciones en texto plano
         evaluationRecommendations,
-        evaluationJudgment
+        evaluationJudgment,
+        teamScrumIdNumber
       );
 
       console.log("Respuesta del servidor:", response);
@@ -853,7 +886,8 @@ export default function InstructorChecklistView() {
     try {
       toast.info("🔄 Creando evaluación automáticamente...");
 
-      const response = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id));
+      const teamScrumIdNumber = selectedTeamScrumId ? parseInt(selectedTeamScrumId) : undefined;
+      const response = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id), teamScrumIdNumber);
 
       if (response && response.code === "200") {
         toast.success("✅ Evaluación creada exitosamente");
@@ -933,7 +967,8 @@ export default function InstructorChecklistView() {
       };
 
       // Crear la evaluación base usando createMissingEvaluationForChecklist
-      const newEvaluationResult = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id));
+      const teamScrumIdNumber = selectedTeamScrumId ? parseInt(selectedTeamScrumId) : undefined;
+      const newEvaluationResult = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id), teamScrumIdNumber);
 
       if (newEvaluationResult && newEvaluationResult.code === "200" && newEvaluationResult.id) {
         console.log('✅ Evaluación base creada con ID:', newEvaluationResult.id);
@@ -943,7 +978,8 @@ export default function InstructorChecklistView() {
           parseInt(newEvaluationResult.id),
           evaluationData.observations,
           evaluationData.recommendations,
-          evaluationData.valueJudgment
+          evaluationData.valueJudgment,
+          teamScrumIdNumber
         );
 
         console.log('Complete result:', completeResult);
@@ -1060,7 +1096,8 @@ export default function InstructorChecklistView() {
 
       // No existe evaluación, crear una nueva
       console.log("No existe evaluación, creando nueva...");
-      const createResponse = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id));
+      const teamScrumIdNumber = selectedTeamScrumId ? parseInt(selectedTeamScrumId) : undefined;
+      const createResponse = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id), teamScrumIdNumber);
       console.log("Create response:", createResponse);
 
       if (createResponse && createResponse.code === "200" && createResponse.id) {
@@ -1070,11 +1107,13 @@ export default function InstructorChecklistView() {
         console.log("Completando evaluación con datos...");
         
         // Guardar solo las observaciones generales (texto plano) en la base de datos
+        const teamScrumIdNumber = selectedTeamScrumId ? parseInt(selectedTeamScrumId) : undefined;
         const completeResponse = await completeEvaluation(
           parseInt(createResponse.id),
           evaluationObservations, // Solo texto plano
           evaluationRecommendations,
-          evaluationJudgment
+          evaluationJudgment,
+          teamScrumIdNumber
         );
         console.log("Complete response:", completeResponse);
 
@@ -1306,7 +1345,7 @@ export default function InstructorChecklistView() {
 
         {/* Diseño cuadrado para información del centro */}
         <div className="relative">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center justify-center">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-center justify-center">
             {/* Panel cuadrado 1 */}
             <div className="group relative">
               <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border-2 border-lime-500/30 dark:border-shadowBlue/50 shadow-2xl hover:shadow-lime-200 dark:hover:shadow-shadowBlue/30 transition-all duration-300 transform hover:scale-105 p-6 max-w-sm mx-auto">
@@ -1340,14 +1379,33 @@ export default function InstructorChecklistView() {
                     <span className="font-semibold text-darkBlue dark:text-white">Jornada:</span> Diurna
                   </p>
                   <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                    <p className="text-xs font-semibold text-lime-600 dark:text-lime-400">Ficha</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-300">2558735</p>
+                    <p className="text-xs font-semibold text-lime-600 dark:text-lime-400">Ficha N°</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-300">{selectedStudySheetNumber || "No disponible"}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Panel cuadrado 3 */}
+            {/* Panel cuadrado 3 - Team Scrum */}
+            <div className="group relative">
+              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border-2 border-blue-500/30 dark:border-blue-400/50 shadow-2xl hover:shadow-blue-200 dark:hover:shadow-blue-400/30 transition-all duration-300 transform hover:scale-105 p-6 max-w-sm mx-auto">
+                <div className="text-center">
+                  <div className="mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-500 dark:from-blue-400 dark:to-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                      <span className="text-white font-bold text-lg">👥</span>
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-bold text-darkBlue dark:text-white mb-2">Team Scrum</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{selectedTeamScrumName || "No seleccionado"}</p>
+                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                    <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">Evaluando</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-300">Equipo de desarrollo</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Panel cuadrado 4 */}
             <div className="group relative">
               <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border-2 border-lime-500/30 dark:border-shadowBlue/50 shadow-2xl hover:shadow-lime-200 dark:hover:shadow-shadowBlue/30 transition-all duration-300 transform hover:scale-105 p-6 max-w-sm mx-auto">
                 <div className="text-center">
@@ -1443,6 +1501,16 @@ export default function InstructorChecklistView() {
               </div>
 
               <div className="flex items-center gap-4">
+                <button
+                  onClick={() => window.location.href = '/dashboard/InstructorSelection'}
+                  className="hexagon-button flex items-center gap-3 px-5 py-3 rounded-full border-2 border-gray-500 bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-800 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  <span>Cambiar Team</span>
+                </button>
+
                 <div className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white px-4 py-2 rounded-full shadow-md">
                   <span className="text-sm font-semibold">
                     Activas: {activeChecklists.length} | Filtradas: {filteredChecklists.length}
@@ -2227,7 +2295,6 @@ export default function InstructorChecklistView() {
                     }`}
                     rows={4}
                     placeholder="Describa sus observaciones sobre la lista de chequeo..."
-                    disabled={isCreatingEvaluation}
                   />
                 </div>
 

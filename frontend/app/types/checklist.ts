@@ -12,6 +12,7 @@ export interface Evaluation {
   recommendations?: string;
   valueJudgment?: string;
   checklistId: number;
+  teamScrumId?: number;
 }
 
 export interface Checklist {
@@ -82,6 +83,7 @@ export interface EvaluationDto {
   recommendations?: string;
   valueJudgment?: string;
   checklistId: number;
+  teamScrumId?: number;
 }
 
 export interface ItemDto {

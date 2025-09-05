@@ -4,6 +4,7 @@ type Evaluation {
     recommendations: String
     valueJudgment: String
     checklistId: Long
+    teamScrumId: Long
 }
 
 type EvaluationPage {
@@ -28,6 +29,7 @@ input EvaluationDto {
     recommendations: String
     valueJudgment: String
     checklistId: Long
+    teamScrumId: Long
 }
 
 extend type Query {

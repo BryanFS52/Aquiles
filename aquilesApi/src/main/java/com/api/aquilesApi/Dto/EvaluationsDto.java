@@ -28,4 +28,7 @@ public class EvaluationsDto {
     // Foreign key obligatoria para establecer la relación 1:1
     @NotNull(message = "El ID del checklist es obligatorio para establecer la relación")
     private Long checklistId;
+
+    // Identificador del team scrum asociado a esta evaluación
+    private Long teamScrumId;
 }
