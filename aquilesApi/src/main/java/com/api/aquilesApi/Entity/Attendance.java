@@ -8,9 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -28,8 +27,7 @@ public class Attendance implements Serializable {
     private Long id;
 
     @Column(name = "attendance_date", nullable = false)
-
-    private Date attendanceDate;
+    private LocalDate attendanceDate;
 
     @Column (name = "student_id")
     private Long studentId;
@@ -51,11 +49,4 @@ public class Attendance implements Serializable {
     @ManyToMany(mappedBy = "attendances")
     private Set<Notifications> notifications;
 
-    public void setAttendanceDate(String attendanceDate) throws ParseException {
-        this.attendanceDate = formatter.parse(attendanceDate);
-    }
-
-    public String getAttendanceDate() {
-        return formatter.format(attendanceDate);
-    }
 }

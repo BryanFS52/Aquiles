@@ -8,7 +8,7 @@ import { fetchCoordinationByColaborator } from '@redux/slices/olympo/coordinatio
 import { Coordination } from '@graphql/generated';
 import { Card, CardGrid } from '@components/UI/Card';
 import DataTable from '@components/UI/DataTable';
-import Loader from '@components/UI/loader';
+import Loader from '@components/UI/Loader';
 import EmptyState from '@components/UI/emptyState';
 import {
     Users,
@@ -166,8 +166,8 @@ const CoordinacionesCoordinador: React.FC = () => {
             render: (coordination: Coordination) => (
                 <span
                     className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${coordination.state
-                            ? 'bg-lightGreen/10 text-lightGreen'
-                            : 'bg-red-100 text-red-600'
+                        ? 'bg-lightGreen/10 text-lightGreen'
+                        : 'bg-red-100 text-red-600'
                         }`}
                 >
                     {coordination.state ? <Check size={12} /> : <X size={12} />}
@@ -235,8 +235,8 @@ const CoordinacionesCoordinador: React.FC = () => {
                     <button
                         onClick={() => setViewMode('cards')}
                         className={`flex items-center justify-center gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all flex-1 sm:flex-none ${viewMode === 'cards'
-                                ? 'bg-primary text-white shadow-sm'
-                                : 'text-darkGray hover:text-primary hover:bg-gray-50'
+                            ? 'bg-primary text-white shadow-sm'
+                            : 'text-darkGray hover:text-primary hover:bg-gray-50'
                             }`}
                     >
                         <Grid3X3 size={14} className="sm:w-4 sm:h-4" />
@@ -245,8 +245,8 @@ const CoordinacionesCoordinador: React.FC = () => {
                     <button
                         onClick={() => setViewMode('table')}
                         className={`flex items-center justify-center gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all flex-1 sm:flex-none ${viewMode === 'table'
-                                ? 'bg-primary text-white shadow-sm'
-                                : 'text-darkGray hover:text-primary hover:bg-gray-50'
+                            ? 'bg-primary text-white shadow-sm'
+                            : 'text-darkGray hover:text-primary hover:bg-gray-50'
                             }`}
                     >
                         <List size={14} className="sm:w-4 sm:h-4" />

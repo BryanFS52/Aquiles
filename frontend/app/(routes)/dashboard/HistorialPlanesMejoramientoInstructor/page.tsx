@@ -148,7 +148,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
             render: (row) => (
                 <div className="flex items-center gap-2">
                     <FiStar className="w-4 h-4 text-yellow-500 dark:text-yellow-400" />
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getQualificationColor(row.qualification)}`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${getQualificationColor(row.qualification)}`}>
                         {(
                             typeof row.qualification === "boolean" && row.qualification === false
                         ) || row.qualification === null || row.qualification === undefined
@@ -182,19 +182,32 @@ const HistorialPlanesMejoramientoInstructor = () => {
         {
             key: 'faultType',
             header: 'Tipo de Falta',
-            render: (row) => (
-                <div className="flex items-center gap-2">
-                    {row.faultType ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
-                            {(row.faultType?.name ? row.faultType.name.toUpperCase() : 'SIN TIPO DE FALTA')}
-                        </span>
-                    ) : (
-                        <span className="text-sm text-gray-500 dark:text-gray-400 italic">
-                            Sin tipo de falta
-                        </span>
-                    )}
-                </div>
-            )
+            render: (row) => {
+                const getFaultTypeColor = (faultTypeName: string) => {
+                    const name = faultTypeName.toLowerCase();
+                    if (name.includes('academica') || name.includes('académica')) {
+                        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+                    } else if (name.includes('disciplinaria')) {
+                        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
+                    }
+                    // Color por defecto
+                    return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+                };
+
+                return (
+                    <div className="flex items-center gap-2">
+                        {row.faultType ? (
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getFaultTypeColor(row.faultType.name || '')}`}>
+                                {(row.faultType?.name ? row.faultType.name.toUpperCase() : 'SIN TIPO DE FALTA')}
+                            </span>
+                        ) : (
+                            <span className="text-sm text-gray-500 dark:text-gray-400 italic">
+                                Sin tipo de falta
+                            </span>
+                        )}
+                    </div>
+                );
+            }
         },
         {
             key: 'reason',
@@ -215,14 +228,47 @@ const HistorialPlanesMejoramientoInstructor = () => {
 
     // Función de filtro personalizada
     const filterFunction = (row: ImprovementPlan, filter: string) => {
-        const searchTerm = filter.toLowerCase();
+        const searchTerm = filter.toLowerCase().trim();
+        if (!searchTerm) return true;
+        
+        // Función auxiliar para normalizar texto (quitar tildes y convertir a minúsculas)
+        const normalizeText = (text: string) => {
+            return text.toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '');
+        };
+        
+        const normalizedSearch = normalizeText(searchTerm);
+        
         return (
-            (row.student?.person?.name?.toLowerCase().includes(searchTerm)) ||
-            (row.student?.person?.lastname?.toLowerCase().includes(searchTerm)) ||
-            (row.teacherCompetence?.competence?.name?.toLowerCase().includes(searchTerm)) ||
-            (row.city?.toLowerCase().includes(searchTerm)) ||
-            (row.reason?.toLowerCase().includes(searchTerm)) ||
-            (row.faultType?.name?.toLowerCase().includes(searchTerm)) ||
+            // Búsqueda en datos del estudiante
+            (row.student?.person?.name && normalizeText(row.student.person.name).includes(normalizedSearch)) ||
+            (row.student?.person?.lastname && normalizeText(row.student.person.lastname).includes(normalizedSearch)) ||
+            // Búsqueda en competencia
+            (row.teacherCompetence?.competence?.name && normalizeText(row.teacherCompetence.competence.name).includes(normalizedSearch)) ||
+            // Búsqueda en ciudad
+            (row.city && normalizeText(row.city).includes(normalizedSearch)) ||
+            // Búsqueda en razón
+            (row.reason && normalizeText(row.reason).includes(normalizedSearch)) ||
+            // Búsqueda en tipo de falta
+            (row.faultType?.name && normalizeText(row.faultType.name).includes(normalizedSearch)) ||
+            // Búsqueda por palabras clave específicas de tipo de falta
+            (row.faultType?.name && (
+                (normalizeText(row.faultType.name).includes('academica') && normalizedSearch.includes('academica')) ||
+                (normalizeText(row.faultType.name).includes('disciplinaria') && normalizedSearch.includes('disciplinaria'))
+            )) ||
+            // Búsqueda por estado de calificación
+            (normalizedSearch.includes('aprobado') && !normalizedSearch.includes('no') && (
+                (typeof row.qualification === "boolean" && row.qualification === true) ||
+                (typeof row.qualification === "number" && row.qualification >= 3.0)
+            )) ||
+            ((normalizedSearch.includes('no aprobado') || normalizedSearch.includes('noaprobado')) && (
+                (typeof row.qualification === "boolean" && row.qualification === false) ||
+                row.qualification === null || 
+                row.qualification === undefined ||
+                (typeof row.qualification === "number" && row.qualification < 3.0)
+            )) ||
+            // Búsqueda por calificación numérica
             (row.qualification?.toString().includes(searchTerm))
         );
     };
@@ -367,7 +413,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                     columns={columns}
                     data={improvementPlans || []}
                     pageSize={10}
-                    filterPlaceholder="Buscar por estudiante, competencia, ciudad, tipo de falta..."
+                    filterPlaceholder="Buscar..."
                     filterFunction={filterFunction}
                     className="shadow-lg"
                     isDarkMode={isDarkMode}

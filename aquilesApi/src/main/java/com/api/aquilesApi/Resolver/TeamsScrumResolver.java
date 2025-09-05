@@ -86,7 +86,7 @@ public class TeamsScrumResolver {
         }
     }
 
-    // Add profile to a student (GraphQL)
+    // Add a profile to a student (GraphQL)
     @DgsMutation
     public Map<String, Object> addProfileToStudent(@InputArgument(name = "input") List <ProcessMethodologyDto> processMethdologyDtos) {
         try {

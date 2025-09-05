@@ -41,9 +41,8 @@ public class TeamsScrum implements Serializable {
 
     // Relations
     // 1. Relation (M-1) con Checklist
-    @ManyToOne
-    @JoinColumn(name = "checklist_id", nullable = true)
-    private Checklist checklist;
+    @ManyToMany(mappedBy = "teamsScrum")
+    private List<Checklist> checklists;
 
     // 2. Relation (M-1) con studySheet
     @Column(name = "study_sheet_id")

@@ -7,7 +7,6 @@ import com.api.aquilesApi.Entity.AttendanceState;
 import com.api.aquilesApi.Service.AttendancesService;
 import com.api.aquilesApi.Service.StateAttendanceService;
 import com.api.aquilesApi.Utilities.CustomException;
-import com.api.aquilesApi.Utilities.Util;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -29,7 +28,6 @@ public class AttendancesBusiness {
     public AttendancesBusiness(
             AttendancesService attendancesService,
             StateAttendanceService stateAttendanceService,
-            Util util,
             ModelMapper modelMapper
     ) {
         this.attendancesService = attendancesService;
@@ -115,7 +113,7 @@ public class AttendancesBusiness {
     public AttendanceDto add(AttendanceDto attendanceDto) {
         try {
             Attendance attendance = new Attendance();
-            attendance.setAttendanceDate(attendanceDto.getAttendanceDate());
+
             AttendanceState attendanceState = stateAttendanceService.getById(attendanceDto.getAttendanceState().getId());
             attendance.setAttendanceState(attendanceState);
             attendance.setStudentId(attendanceDto.getStudentId());
