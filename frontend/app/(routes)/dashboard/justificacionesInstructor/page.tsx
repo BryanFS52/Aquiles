@@ -4,11 +4,14 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import type { AppDispatch, RootState } from "@/redux/store";
+import { useLoader } from "@context/LoaderContext";
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFilters from "@components/features/justifications/justificationsFilter";
 import JustificationTable from "@components/features/justifications/justificationsTable";
 import EmptyState from "@components/UI/emptyState";
 import { fetchAllJustificationStatuses } from "@redux/slices/justificationStatusSlice";
+import { fetchStudySheetByTeacher } from "@slice/olympo/studySheetSlice";
+import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
 import {
   setCompetenceQuarterFilterOptions,
   setCompetenceQuarterMultiFilter,
@@ -26,6 +29,10 @@ import {
 export default function JustificacionesInstructor() {
   const dispatch = useDispatch<AppDispatch>();
   const { showLoader, hideLoader } = useLoader();
+
+  // Estados locales para gestión de competencias
+  const [availableCompetences, setAvailableCompetences] = useState<Array<{id: string, name: string}>>([]);
+  const [selectedCompetenceId, setSelectedCompetenceId] = useState<string>('');
 
   // Acceso directo al estado de Redux - usando los nuevos campos para competence quarter
   const justificationState = useSelector((state: RootState) => state.justification);
@@ -49,10 +56,59 @@ export default function JustificacionesInstructor() {
     dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 })); // Aumentar a 50 para obtener todos los estados
     // Activar el modo competence quarter
     dispatch(setCompetenceQuarterMode(true));
+
+    // Cargar las fichas del instructor para obtener las competencias disponibles
+    const loadCompetences = async () => {
+      try {
+        const result = await dispatch(fetchStudySheetByTeacher({ 
+          idTeacher: TEMPORAL_INSTRUCTOR_ID, 
+          page: 0, 
+          size: 10 
+        }));
+        
+        if (fetchStudySheetByTeacher.fulfilled.match(result)) {
+          const studySheets = result.payload?.data || [];
+          
+          // Extraer competencias únicas de todas las fichas
+          const competencesSet = new Set<string>();
+          const competencesArray: Array<{id: string, name: string}> = [];
+          
+          studySheets.forEach((sheet: any) => {
+            if (sheet.teacherStudySheets) {
+              sheet.teacherStudySheets.forEach((tss: any) => {
+                if (tss.competence && tss.competence.id && tss.competence.name && !competencesSet.has(tss.competence.id)) {
+                  competencesSet.add(tss.competence.id);
+                  competencesArray.push({
+                    id: tss.competence.id,
+                    name: tss.competence.name
+                  });
+                }
+              });
+            }
+          });
+          
+          setAvailableCompetences(competencesArray);
+        }
+      } catch (error) {
+        console.error('Error loading competences:', error);
+      }
+    };
+
+    loadCompetences();
   }, [dispatch]);
 
   const handleFilterChange = (filterType: string, value: string) => {
     dispatch(setCompetenceQuarterFilterOptions({ [filterType]: value }));
+  };
+
+  const handleCompetenceChange = (competenceId: string) => {
+    setSelectedCompetenceId(competenceId);
+    if (competenceId) {
+      // Cargar justificaciones para la competencia seleccionada
+      dispatch(fetchJustificationsByCompetenceQuarter({ 
+        competenceQuarterId: parseInt(competenceId) 
+      }));
+    }
   };
 
   const handleRefresh = () => {
@@ -173,25 +229,52 @@ export default function JustificacionesInstructor() {
     <div className="space-y-6">
       <PageTitle>Justificaciones de la Ficha: {studySheetNumber}</PageTitle>
 
-      {/* Filters */}
-      <JustificationFilters
-        filterOptions={filterOptions}
-        loading={loading}
-        showMultiFilterToggle={false}
-        onFilterChange={handleFilterChange}
-        onMultiFilterChange={handleMultiFilterChange}
-        onToggleMultiFilter={handleToggleMultiFilter}
-        onClearMultiFilters={handleClearMultiFilters}
-        onRefresh={handleRefresh}
-      />
+      {/* Filters - solo mostrar si hay competencia seleccionada */}
+      {selectedCompetenceId && (
+        <JustificationFilters
+          filterOptions={filterOptions}
+          loading={loading}
+          showMultiFilterToggle={false}
+          onFilterChange={handleFilterChange}
+          onMultiFilterChange={handleMultiFilterChange}
+          onToggleMultiFilter={handleToggleMultiFilter}
+          onClearMultiFilters={handleClearMultiFilters}
+          onRefresh={handleRefresh}
+        />
+      )}
+      
+      {/* Competence Selector */}
+      < >
+        {/* <label htmlFor="competence-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Seleccionar Competencia:
+        </label> */}
+        <select
+          id="competence-select"
+          value={selectedCompetenceId}
+          onChange={(e) => handleCompetenceChange(e.target.value)}
+          className="w-full md:w-auto px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value=""> Seleccione una competencia </option>
+          {availableCompetences.map((competence) => (
+            <option key={competence.id} value={competence.id}>
+              {competence.name}
+            </option>
+          ))}
+        </select>
+      </>
 
       {/* Error Message */}
-      {errorMessage && (
+      {errorMessage && selectedCompetenceId && (
         <EmptyState message={errorMessage} />
       )}
 
-      {/* Table with built-in empty states */}
-      {!errorMessage && (
+      {/* Empty state when no competence is selected */}
+      {!selectedCompetenceId && (
+        <EmptyState message="Seleccione una competencia para ver las justificaciones." />
+      )}
+
+      {/* Table with built-in empty states - solo mostrar si hay competencia seleccionada */}
+      {!errorMessage && selectedCompetenceId && (
         <JustificationTable
           filteredData={filteredData}
           handleDownloadFile={handleDownloadFile}

@@ -192,6 +192,13 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
             name
           }
         }
+        teacherStudySheets {
+          id
+          competence {
+            id
+            name
+          }
+        }
         studentStudySheets {
           student {
             id
@@ -201,8 +208,8 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
               lastname
               phone
               email
-              bloodType
-              dateBirth
+              # bloodType
+              # dateBirth
             }
           }
           studentStudySheetState {
