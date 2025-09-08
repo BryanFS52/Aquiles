@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ItemTypeDto {
     private Long id;
-
     @NotBlank(message = "El nombre es obligatorio")
     @Size(max = 20, message = "El nombre no puede exceder los 20 caracteres")
     private String name;

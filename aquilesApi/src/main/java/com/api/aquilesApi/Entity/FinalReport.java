@@ -51,7 +51,7 @@ public class FinalReport implements Serializable {
     private Date createdAt;
 
     // Relations
-    // 1.Relation (1-1) con notifications
+    // 1.Relation (1-1) with notifications
     @OneToOne(mappedBy = "finalReport")
     private Notifications notification;
 }

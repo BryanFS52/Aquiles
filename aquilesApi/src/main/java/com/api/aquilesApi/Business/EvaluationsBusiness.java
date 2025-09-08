@@ -1,13 +1,11 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.EvaluationsDto;
-
 import com.api.aquilesApi.Entity.Evaluations;
 import com.api.aquilesApi.Service.ChecklistService;
 import com.api.aquilesApi.Service.EvaluationsService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -96,16 +94,7 @@ public class EvaluationsBusiness {
             evaluation.setObservations(evaluationsDto.getObservations());
             evaluation.setRecommendations(evaluationsDto.getRecommendations());
             evaluation.setValueJudgment(evaluationsDto.getValueJudgment());
-            
-            // Si se proporciona un checklistId, obtener la entidad Checklist del contexto de persistencia
-            if (evaluationsDto.getChecklistId() != null) {
-                try {
-                    // Obtener la entidad Checklist existente para asociarla
-                    evaluation.setChecklist(checklistService.getById(evaluationsDto.getChecklistId()));
-                } catch (Exception e) {
-                    throw new CustomException("Checklist with ID " + evaluationsDto.getChecklistId() + " not found", HttpStatus.BAD_REQUEST);
-                }
-            }
+
             
             Evaluations savedEvaluation = evaluationsService.save(evaluation);
             return modelMapper.map(savedEvaluation, EvaluationsDto.class);
@@ -124,19 +113,6 @@ public class EvaluationsBusiness {
             existingEvaluation.setObservations(evaluationsDto.getObservations());
             existingEvaluation.setRecommendations(evaluationsDto.getRecommendations());
             existingEvaluation.setValueJudgment(evaluationsDto.getValueJudgment());
-            
-            // Si se proporciona un checklistId diferente, actualizar la referencia
-            if (evaluationsDto.getChecklistId() != null) {
-                try {
-                    // Solo actualizar la referencia de checklist si cambió
-                    if (existingEvaluation.getChecklist() == null || 
-                        !existingEvaluation.getChecklist().getId().equals(evaluationsDto.getChecklistId())) {
-                        existingEvaluation.setChecklist(checklistService.getById(evaluationsDto.getChecklistId()));
-                    }
-                } catch (Exception e) {
-                    throw new CustomException("Checklist with ID " + evaluationsDto.getChecklistId() + " not found", HttpStatus.BAD_REQUEST);
-                }
-            }
             
             // Guardar la evaluación actualizada
             evaluationsService.update(existingEvaluation);

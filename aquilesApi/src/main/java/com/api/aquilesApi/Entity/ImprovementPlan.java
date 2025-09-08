@@ -36,16 +36,15 @@ public class ImprovementPlan implements Serializable {
     @Column(name = "qualification", nullable = false)
     private Boolean qualification;
 
-    // Relation
     private Long studentId;
     private Long teacherCompetence;
-    // Delete
-    @OneToOne(mappedBy = "improvementPlan", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Notifications notification;
 
+    // Relations
+    // 1. Relation (M-1) with improvementPlanActivity
     @OneToMany(mappedBy = "improvementPlan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImprovementPlanActivity> ImprovementPlanActivities;
 
+    // 2. Relation (M-M) with improvementPlanEvidenceMap
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "improvement_plan_evidence_map",
@@ -54,6 +53,7 @@ public class ImprovementPlan implements Serializable {
     )
     private List<ImprovementPlanEvidenceType> evidenceTypes;
 
+    // 3. Relation (M-1) with faultType
     @ManyToOne(optional = false)
     @JoinColumn(name = "fault_type_id", nullable = false)
     private ImprovementPlanFaultType faultType;

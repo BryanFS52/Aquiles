@@ -1,10 +1,7 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -16,6 +13,7 @@ import java.util.Base64;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Builder
 @Table(name = "justification")
 public class Justification implements Serializable {
     @Id
@@ -28,8 +26,6 @@ public class Justification implements Serializable {
     @Column(name = "justification_file", nullable = false)
     private byte[] justificationFile;
 
-
-
     @Column(name = "justification_date", nullable = false)
     private LocalDate justificationDate;
 
@@ -37,21 +33,21 @@ public class Justification implements Serializable {
     private Boolean state;
 
     // Relations
-    // 1.Relation (1-1) con notifications
+    // 1.Relation (1-1) with notifications
     @OneToOne(mappedBy = "justification")
     private Notifications notification;
 
-    // 2.Relation (M-1) con justificationType
+    // 2.Relation (M-1) with justificationType
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "justification_type_id", nullable = true)
     private JustificationType justificationType;
 
-    // 3. Relation (1-1) con attendance
+    // 3. Relation (1-1) with attendance
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "attendance_id", referencedColumnName = "id")
     private Attendance attendance;
 
-    // 4. Relation (M-1) con justificationStatus
+    // 4. Relation (M-1) with justificationStatus
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "justification_status_id", referencedColumnName = "id")
     private JustificationStatus justificationStatus;
@@ -63,8 +59,6 @@ public class Justification implements Serializable {
     public void setJustificationFile(byte[] justificationFile) {
         this.justificationFile = Base64.getDecoder().decode(justificationFile);
     }
-
-
 
     public void setJustificationDate(LocalDate date) {
         this.justificationDate = date;
@@ -81,6 +75,5 @@ public class Justification implements Serializable {
         }
         return null;
     }
-
 
 }

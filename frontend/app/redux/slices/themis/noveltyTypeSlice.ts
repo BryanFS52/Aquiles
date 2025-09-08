@@ -1,4 +1,4 @@
-/*
+
 import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload, GenericPaginatedState } from '@type/slices/common/generic'
@@ -55,7 +55,7 @@ export const fetchNoveltyTypes = createAsyncThunk<
   async ({ page = 0, size = 100 }, { rejectWithValue }) => {
     try {
       // console.log('Fetching novelty types:', { page, size });
-      
+
       const { data } = await clientLAN.query<GetNoveltyTypesQuery, GetNoveltyTypesQueryVariables>({
         query: GET_NOVELTYTYPE_LIST,
         variables: { page, size },
@@ -70,7 +70,7 @@ export const fetchNoveltyTypes = createAsyncThunk<
       return data.allNoveltyTypes;
     } catch (error: any) {
       console.error('Error fetching novelty types:', error);
-      
+
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
         const graphQLError = error.graphQLErrors[0];
         return rejectWithValue({
@@ -78,14 +78,14 @@ export const fetchNoveltyTypes = createAsyncThunk<
           message: graphQLError.message || 'Error al obtener tipos de novedad'
         });
       }
-      
+
       if (error.networkError) {
         return rejectWithValue({
           code: 'NETWORK_ERROR',
           message: 'Error de conexión. Verifique su conexión a internet.'
         });
       }
-      
+
       return rejectWithValue({
         code: 'UNKNOWN_ERROR',
         message: error.message || 'Error desconocido al obtener tipos de novedad'
@@ -111,7 +111,7 @@ const noveltyTypeSlice = createSlice({
     },
     filterByDesercion: (state) => {
       // Filtrar solo tipos de novedad que contengan "Deserción" en nameNovelty
-      state.filteredData = state.data.filter(noveltyType => 
+      state.filteredData = state.data.filter(noveltyType =>
         noveltyType.nameNovelty.toLowerCase().includes('deserción') ||
         noveltyType.nameNovelty.toLowerCase().includes('desercion')
       );
@@ -146,12 +146,11 @@ const noveltyTypeSlice = createSlice({
   }
 });
 
-export const { 
-  clearError, 
-  clearNoveltyTypes, 
-  filterByDesercion, 
-  resetFilter 
+export const {
+  clearError,
+  clearNoveltyTypes,
+  filterByDesercion,
+  resetFilter
 } = noveltyTypeSlice.actions;
 
 export default noveltyTypeSlice.reducer;
-*/

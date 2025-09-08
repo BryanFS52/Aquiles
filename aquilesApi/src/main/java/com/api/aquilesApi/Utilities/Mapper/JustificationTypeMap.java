@@ -15,7 +15,7 @@ import java.util.List;
 public interface JustificationTypeMap {
     JustificationTypeMap INSTANCE = Mappers.getMapper(JustificationTypeMap.class);
 
-    JustificationTypeDto EntityToDTO(JustificationTypeDto justificationType);
+    JustificationTypeDto EntityToDTO(JustificationType justificationType);
 
     JustificationType DTOToEntity(JustificationTypeDto justificationType);
 

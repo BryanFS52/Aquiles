@@ -13,7 +13,7 @@ import java.util.List;
 public interface JustificationMap {
     JustificationMap INSTANCE = Mappers.getMapper(JustificationMap.class);
 
-    JustificationDto EntityToDTO(JustificationDto justification);
+    JustificationDto EntityToDTO(Justification justification);
 
     Justification DTOToEntity(JustificationDto justification);
 
