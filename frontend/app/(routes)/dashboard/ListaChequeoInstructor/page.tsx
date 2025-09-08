@@ -1953,7 +1953,7 @@ export default function InstructorChecklistView() {
                               <div className="grid grid-cols-12 gap-4 items-start">
                                 {/* OBSERVACIONES */}
                                 <div className="col-span-4">
-                                  <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg border border-blue-200 dark:border-blue-600">
+                                  <div className="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-300 dark:border-gray-600">
                                     <p className="text-base text-gray-900 dark:text-white leading-relaxed break-words whitespace-pre-wrap overflow-wrap-anywhere evaluation-text">
                                       {selectedEvaluation ? extractGeneralObservationsFromEvaluation(selectedEvaluation) || "Sin observaciones" : "Sin observaciones"}
                                     </p>
@@ -1962,7 +1962,7 @@ export default function InstructorChecklistView() {
 
                                 {/* RECOMENDACIONES */}
                                 <div className="col-span-4">
-                                  <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-600">
+                                  <div className="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-300 dark:border-gray-600">
                                     <p className="text-base text-gray-900 dark:text-white leading-relaxed break-words whitespace-pre-wrap overflow-wrap-anywhere evaluation-text">
                                       {selectedEvaluation.recommendations || "Sin recomendaciones"}
                                     </p>
