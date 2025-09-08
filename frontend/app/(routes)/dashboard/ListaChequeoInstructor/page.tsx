@@ -479,54 +479,51 @@ export default function InstructorChecklistView() {
     {
       key: 'id',
       header: 'ITEM',
+      className: 'w-20 text-center',
       render: (row: SimulatedChecklistItem) => (
-        <div className="text-center">
-          <span className="text-gray-900 dark:text-white font-medium">#{row.id}</span>
-        </div>
+        <span className="text-gray-900 dark:text-white font-medium">#{row.id}</span>
       )
     },
     {
       key: 'indicator',
       header: 'DESCRIPCIÓN DEL INDICADOR',
+      className: 'min-w-[300px] text-left',
       render: (row: SimulatedChecklistItem) => (
-        <div className="text-left">
-          <p className="text-gray-900 dark:text-white font-medium leading-relaxed">
-            {row.indicator}
-          </p>
-        </div>
+        <p className="text-gray-900 dark:text-white font-medium leading-relaxed evaluation-text">
+          {row.indicator}
+        </p>
       )
     },
     {
       key: 'completed',
       header: 'CUMPLE',
+      className: 'w-32 text-center',
       render: (row: SimulatedChecklistItem) => {
         const itemState = itemStates[row.id] || { completed: row.completed, observations: row.observations };
         return (
-          <div className="text-center">
-            <div className="flex justify-center space-x-4">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name={`item-${row.id}`}
-                  checked={itemState.completed === true}
-                  onChange={() => handleItemChange(row.id, "completed", true)}
-                  disabled={isFinalSaved}
-                  className={`text-green-600 focus:ring-green-500 ${isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''}`}
-                />
-                <span className="text-sm font-medium text-green-600">Sí</span>
-              </label>
-              <label className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name={`item-${row.id}`}
-                  checked={itemState.completed === false}
-                  onChange={() => handleItemChange(row.id, "completed", false)}
-                  disabled={isFinalSaved}
-                  className={`text-red-600 focus:ring-red-500 ${isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''}`}
-                />
-                <span className="text-sm font-medium text-red-600">No</span>
-              </label>
-            </div>
+          <div className="flex justify-center space-x-2">
+            <label className="flex items-center space-x-1">
+              <input
+                type="radio"
+                name={`item-${row.id}`}
+                checked={itemState.completed === true}
+                onChange={() => handleItemChange(row.id, "completed", true)}
+                disabled={isFinalSaved}
+                className={`text-green-600 focus:ring-green-500 ${isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''}`}
+              />
+              <span className="text-sm font-medium text-green-600">Sí</span>
+            </label>
+            <label className="flex items-center space-x-1">
+              <input
+                type="radio"
+                name={`item-${row.id}`}
+                checked={itemState.completed === false}
+                onChange={() => handleItemChange(row.id, "completed", false)}
+                disabled={isFinalSaved}
+                className={`text-red-600 focus:ring-red-500 ${isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''}`}
+              />
+              <span className="text-sm font-medium text-red-600">No</span>
+            </label>
           </div>
         );
       }
@@ -534,21 +531,21 @@ export default function InstructorChecklistView() {
     {
       key: 'observations',
       header: 'OBSERVACIONES',
+      className: 'min-w-[250px] text-left',
       render: (row: SimulatedChecklistItem) => {
         const itemState = itemStates[row.id] || { completed: row.completed, observations: row.observations };
         return (
-          <div className="text-left">
-            <textarea
-              value={itemState.observations || ''}
-              onChange={(e) => handleItemChange(row.id, "observations", e.target.value)}
-              disabled={isFinalSaved}
-              className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none ${
-                isFinalSaved ? 'opacity-50 cursor-not-allowed' : 'focus:ring-2 focus:ring-blue-500 focus:border-transparent'
-              }`}
-              rows={2}
-              placeholder={isFinalSaved ? "Evaluación guardada" : "Escriba sus observaciones..."}
-            />
-          </div>
+          <textarea
+            value={itemState.observations || ''}
+            onChange={(e) => handleItemChange(row.id, "observations", e.target.value)}
+            disabled={isFinalSaved}
+            className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none break-words whitespace-pre-wrap ${
+              isFinalSaved ? 'opacity-50 cursor-not-allowed' : 'focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+            }`}
+            style={{ overflowWrap: 'anywhere' }}
+            rows={2}
+            placeholder={isFinalSaved ? "Evaluación guardada" : "Escriba sus observaciones..."}
+          />
         );
       }
     }
@@ -1440,6 +1437,30 @@ export default function InstructorChecklistView() {
         .gradient-secondary {
           background: linear-gradient(135deg, #01b001 0%, #0e324b 50%, #01b001 100%);
         }
+        
+        /* Estilos para manejo de texto largo en evaluaciones */
+        .evaluation-text {
+          word-wrap: break-word;
+          word-break: break-word;
+          overflow-wrap: break-word;
+          white-space: pre-wrap;
+          hyphens: auto;
+          -webkit-hyphens: auto;
+          -moz-hyphens: auto;
+          -ms-hyphens: auto;
+          max-width: 100%;
+          overflow-x: hidden;
+        }
+        
+        /* Soporte para navegadores más antiguos */
+        .evaluation-text {
+          -ms-word-break: break-all;
+          word-break: break-all;
+          word-break: break-word;
+          -webkit-hyphens: auto;
+          -moz-hyphens: auto;
+          hyphens: auto;
+        }
       `}</style>
 
       {/* Contenido principal con diseño tipo panal */}
@@ -1649,50 +1670,20 @@ export default function InstructorChecklistView() {
           />
         ) : (
           <>
-            {/* DataTable con diseño moderno como la imagen */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                    Lista de Chequeo
-                  </h2>
-                </div>
+            {/* DataTable con diseño moderno basado en la referencia */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Lista de Chequeo
+                </h2>
               </div>
-              <div className="p-0">
-                <DataTable
-                  data={currentItems}
-                  columns={checklistColumns}
-                  className=""
-                />
-              </div>
-            </div>
-
-            {/* Paginación con diseño moderno */}
-            <div className="flex justify-between items-center mt-6 px-6 py-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center space-x-3">
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  Mostrando {Math.min((currentPage - 1) * itemsPerPage + 1, selectedChecklist?.items?.length || 0)} - {Math.min(currentPage * itemsPerPage, selectedChecklist?.items?.length || 0)} de {selectedChecklist?.items?.length || 0} items
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700"
-                >
-                  Anterior
-                </button>
-                <span className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300">
-                  {currentPage} de {totalPages}
-                </span>
-                <button
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700"
-                >
-                  Siguiente
-                </button>
-              </div>
+              
+              <DataTable
+                data={items}
+                columns={checklistColumns}
+                pageSize={itemsPerPage}
+                className="w-full"
+              />
             </div>
 
             {/* Sección de Evaluación - Movida debajo de la tabla */}
@@ -1733,12 +1724,17 @@ export default function InstructorChecklistView() {
                                 value={evaluationObservations}
                                 onChange={(e) => setEvaluationObservations(e.target.value)}
                                 disabled={isFinalSaved}
-                                className={`w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300 ${
+                                className={`w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300 resize-vertical break-words overflow-wrap-anywhere ${
                                   isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
                                 }`}
                                 rows={4}
                                 placeholder={isFinalSaved ? "Evaluación guardada definitivamente" : "Ingrese sus observaciones generales sobre la evaluación..."}
                                 required
+                                style={{
+                                  wordWrap: 'break-word',
+                                  overflowWrap: 'break-word',
+                                  whiteSpace: 'pre-wrap'
+                                }}
                               />
                             </div>
 
@@ -1753,12 +1749,17 @@ export default function InstructorChecklistView() {
                                 value={evaluationRecommendations}
                                 onChange={(e) => setEvaluationRecommendations(e.target.value)}
                                 disabled={isFinalSaved}
-                                className={`w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300 ${
+                                className={`w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300 resize-vertical break-words overflow-wrap-anywhere ${
                                   isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
                                 }`}
                                 rows={4}
                                 placeholder={isFinalSaved ? "Evaluación guardada definitivamente" : "Ingrese sus recomendaciones para esta evaluación..."}
                                 required
+                                style={{
+                                  wordWrap: 'break-word',
+                                  overflowWrap: 'break-word',
+                                  whiteSpace: 'pre-wrap'
+                                }}
                               />
                             </div>
                           </div>
@@ -1781,11 +1782,9 @@ export default function InstructorChecklistView() {
                             >
                               <option value="">Seleccione un juicio de valor</option>
                               <option value="PENDIENTE">Pendiente</option>
-                              <option value="EXCELENTE">Excelente</option>
-                              <option value="BUENO">Bueno</option>
-                              <option value="ACEPTABLE">Aceptable</option>
-                              <option value="DEFICIENTE">Deficiente</option>
-                              <option value="RECHAZADO">Rechazado</option>
+                              <option value="APROBADO">Aprobado</option>
+                              <option value="NO APROBADO">No Aprobado</option>
+                              
                             </select>
                           </div>
 
@@ -1834,7 +1833,7 @@ export default function InstructorChecklistView() {
                                 <h4 className="text-lg font-bold text-darkBlue dark:text-white">Observaciones</h4>
                               </div>
                               <div className="bg-gradient-to-r from-blue-50 to-white dark:from-blue-900/30 dark:to-gray-700 p-4 rounded-xl border border-blue-200 dark:border-blue-600">
-                                <p className="text-sm text-darkBlue dark:text-white leading-relaxed min-h-[80px]">
+                                <p className="text-sm text-darkBlue dark:text-white leading-relaxed min-h-[80px] break-words whitespace-pre-wrap overflow-wrap-anywhere word-break-break-word evaluation-text">
                                   {selectedEvaluation ? extractGeneralObservationsFromEvaluation(selectedEvaluation) || "Sin observaciones" : "Sin observaciones"}
                                 </p>
                               </div>
@@ -1848,7 +1847,7 @@ export default function InstructorChecklistView() {
                                 <h4 className="text-lg font-bold text-darkBlue dark:text-white">Recomendaciones</h4>
                               </div>
                               <div className="bg-gradient-to-r from-green-50 to-white dark:from-green-900/30 dark:to-gray-700 p-4 rounded-xl border border-green-200 dark:border-green-600">
-                                <p className="text-sm text-darkBlue dark:text-white leading-relaxed min-h-[80px]">
+                                <p className="text-sm text-darkBlue dark:text-white leading-relaxed min-h-[80px] break-words whitespace-pre-wrap overflow-wrap-anywhere word-break-break-word evaluation-text">
                                   {selectedEvaluation.recommendations || "Sin recomendaciones"}
                                 </p>
                               </div>
@@ -1862,13 +1861,12 @@ export default function InstructorChecklistView() {
                                 <h4 className="text-lg font-bold text-darkBlue dark:text-white">Juicio de Valor</h4>
                               </div>
                               <div className="flex justify-center">
-                                <span className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg ${selectedEvaluation.valueJudgment === 'EXCELENTE' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
-                                    selectedEvaluation.valueJudgment === 'BUENO' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' :
-                                      selectedEvaluation.valueJudgment === 'ACEPTABLE' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white' :
-                                        selectedEvaluation.valueJudgment === 'DEFICIENTE' ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white' :
-                                          selectedEvaluation.valueJudgment === 'RECHAZADO' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
-                                            'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
-                                  }`}>
+                                <span className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg ${
+                                  selectedEvaluation.valueJudgment === 'APROBADO' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
+                                  selectedEvaluation.valueJudgment === 'NO APROBADO' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
+                                  selectedEvaluation.valueJudgment === 'PENDIENTE' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white' :
+                                  'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
+                                }`}>
                                   {selectedEvaluation.valueJudgment || "PENDIENTE"}
                                 </span>
                               </div>
@@ -2142,7 +2140,7 @@ export default function InstructorChecklistView() {
                           <div>
                             <h4 className="font-semibold text-purple-800 dark:text-purple-200 mb-2">Observaciones:</h4>
                             <div className="bg-white dark:bg-gray-700 p-3 rounded border border-purple-200 dark:border-purple-600">
-                              <p className="text-gray-700 dark:text-gray-300 text-sm">
+                              <p className="text-gray-700 dark:text-gray-300 text-sm break-words whitespace-pre-wrap overflow-wrap-anywhere word-break-break-word evaluation-text">
                                 {previewData.evaluation.observations || 'Sin observaciones'}
                               </p>
                             </div>
@@ -2150,7 +2148,7 @@ export default function InstructorChecklistView() {
                           <div>
                             <h4 className="font-semibold text-purple-800 dark:text-purple-200 mb-2">Recomendaciones:</h4>
                             <div className="bg-white dark:bg-gray-700 p-3 rounded border border-purple-200 dark:border-purple-600">
-                              <p className="text-gray-700 dark:text-gray-300 text-sm">
+                              <p className="text-gray-700 dark:text-gray-300 text-sm break-words whitespace-pre-wrap overflow-wrap-anywhere word-break-break-word evaluation-text">
                                 {previewData.evaluation.recommendations || 'Sin recomendaciones'}
                               </p>
                             </div>
@@ -2251,11 +2249,16 @@ export default function InstructorChecklistView() {
               value={evaluationObservations}
               onChange={(e) => setEvaluationObservations(e.target.value)}
               disabled={isFinalSaved || isCreatingEvaluation}
-              className={`w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300 ${
+              className={`w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300 resize-vertical break-words overflow-wrap-anywhere ${
                 isFinalSaved || isCreatingEvaluation ? 'opacity-50 cursor-not-allowed' : ''
               }`}
               rows={4}
               placeholder="Describa sus observaciones sobre la lista de chequeo..."
+              style={{
+                wordWrap: 'break-word',
+                overflowWrap: 'break-word',
+                whiteSpace: 'pre-wrap'
+              }}
             />
           </div>
 
@@ -2269,9 +2272,14 @@ export default function InstructorChecklistView() {
               value={evaluationRecommendations}
               onChange={(e) => setEvaluationRecommendations(e.target.value)}
               disabled={isCreatingEvaluation}
-              className="w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300"
+              className="w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300 resize-vertical break-words overflow-wrap-anywhere"
               rows={4}
               placeholder="Agregue sus recomendaciones..."
+              style={{
+                wordWrap: 'break-word',
+                overflowWrap: 'break-word',
+                whiteSpace: 'pre-wrap'
+              }}
             />
           </div>
         </div>
