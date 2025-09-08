@@ -1,3 +1,4 @@
+/*
 import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
@@ -431,3 +432,4 @@ export const selectIsLoading = (state: { novelty: NoveltyState }) => state.novel
 export const selectError = (state: { novelty: NoveltyState }) => state.novelty.error;
 
 export default noveltySlice.reducer;
+*/

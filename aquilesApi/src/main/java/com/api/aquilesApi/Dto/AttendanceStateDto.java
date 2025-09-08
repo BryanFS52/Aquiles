@@ -13,4 +13,5 @@ public class AttendanceStateDto {
 
     @NotNull(message = "El estado es obligatorio")
     private String status;
+
 }

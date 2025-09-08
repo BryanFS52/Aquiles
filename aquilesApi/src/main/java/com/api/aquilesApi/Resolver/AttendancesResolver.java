@@ -32,6 +32,25 @@ public class AttendancesResolver {
         this.modelMapper = modelMapper;
     }
 
+    // FindAll Attendances (GraphQL)
+    @DgsQuery
+    public Map<String, Object> allAttendances(@InputArgument Integer page, @InputArgument Integer size) {
+        try {
+            Page<AttendanceDto> attendancesDtoPage = attendancesBusiness.findAll(page, size);
+            return ResponseHttpApi.responseHttpFindAll(
+                    attendancesDtoPage.getContent(),
+                    ResponseHttpApi.CODE_OK,
+                    "Query ok",
+                    attendancesDtoPage.getTotalPages(),
+                    page,
+                    (int) attendancesDtoPage.getTotalElements()
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @DgsQuery
     public Map<String, Object> allAttendancesByStudentId(@InputArgument Long id, @InputArgument Long stateId, @InputArgument Integer page, @InputArgument Integer size) {
         try {
@@ -48,25 +67,6 @@ public class AttendancesResolver {
                     attendances.getSize(),
                     safePage,
                     attendances.getTotalPages()
-            );
-        } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    // FindAll Attendances (GraphQL)
-    @DgsQuery
-    public Map<String, Object> allAttendances(@InputArgument Integer page, @InputArgument Integer size) {
-        try {
-            Page<AttendanceDto> attendancesDtoPage = attendancesBusiness.findAll(page, size);
-            return ResponseHttpApi.responseHttpFindAll(
-                    attendancesDtoPage.getContent(),
-                    ResponseHttpApi.CODE_OK,
-                    "Query ok",
-                    attendancesDtoPage.getTotalPages(),
-                    page,
-                    (int) attendancesDtoPage.getTotalElements()
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(

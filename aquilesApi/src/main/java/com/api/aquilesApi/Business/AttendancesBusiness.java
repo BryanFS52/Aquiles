@@ -5,7 +5,7 @@ import com.api.aquilesApi.Dto.TeamsScrumDto;
 import com.api.aquilesApi.Entity.Attendance;
 import com.api.aquilesApi.Entity.AttendanceState;
 import com.api.aquilesApi.Service.AttendancesService;
-import com.api.aquilesApi.Service.StateAttendanceService;
+import com.api.aquilesApi.Service.AttendanceStateService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
@@ -22,16 +22,16 @@ import java.util.stream.Collectors;
 public class AttendancesBusiness {
 
     private final AttendancesService attendancesService;
-    private final StateAttendanceService stateAttendanceService;
+    private final AttendanceStateService attendanceStateService;
     private final ModelMapper modelMapper;
 
     public AttendancesBusiness(
             AttendancesService attendancesService,
-            StateAttendanceService stateAttendanceService,
+            AttendanceStateService attendanceStateService,
             ModelMapper modelMapper
     ) {
         this.attendancesService = attendancesService;
-        this.stateAttendanceService = stateAttendanceService;
+        this.attendanceStateService = attendanceStateService;
         this.modelMapper = modelMapper;
     }
 
@@ -39,7 +39,6 @@ public class AttendancesBusiness {
     private void validationObject(TeamsScrumDto teamsScrumDto) throws CustomException {
 
     }
-
 
     // Get all attendances (paginated)
     public Page<AttendanceDto> findAll(int page, int size) {
@@ -76,8 +75,7 @@ public class AttendancesBusiness {
         }
     }
 
-
-
+    // Get All attendance ByStudentIdAndCompetenceQuarter
     public List<Attendance> getAllByStudentIdAndCompetenceQuarter(Long studentId, Long competenceQuarterId) {
         try {
             return attendancesService.getAllByStudentIdAndCompetenceQuarter(studentId, competenceQuarterId);
@@ -114,7 +112,7 @@ public class AttendancesBusiness {
         try {
             Attendance attendance = new Attendance();
 
-            AttendanceState attendanceState = stateAttendanceService.getById(attendanceDto.getAttendanceState().getId());
+            AttendanceState attendanceState = attendanceStateService.getById(attendanceDto.getAttendanceState().getId());
             attendance.setAttendanceState(attendanceState);
             attendance.setStudentId(attendanceDto.getStudentId());
             attendance.setCompetenceQuarter(attendanceDto.getCompetenceQuarter());

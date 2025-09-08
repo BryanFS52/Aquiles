@@ -88,8 +88,8 @@ export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet =
                     document: ss.student?.person?.document,
                     email: ss.student?.person?.email,
                     phone: ss.student?.person?.phone,
-                    blood_type: ss.student?.person?.blood_type,
-                    date_birth: ss.student?.person?.date_birth,
+                    bloodType: ss.student?.person?.blood_type,
+                    dateBirth: ss.student?.person?.date_birth,
                 },
                 attendances: ss.student?.attendances || [], // <-- AGREGAR ESTA LÍNEA
             },

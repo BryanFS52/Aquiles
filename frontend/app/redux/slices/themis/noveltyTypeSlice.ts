@@ -1,3 +1,4 @@
+/*
 import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload, GenericPaginatedState } from '@type/slices/common/generic'
@@ -153,3 +154,4 @@ export const {
 } = noveltyTypeSlice.actions;
 
 export default noveltyTypeSlice.reducer;
+*/

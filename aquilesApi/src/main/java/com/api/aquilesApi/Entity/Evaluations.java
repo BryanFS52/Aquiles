@@ -33,6 +33,4 @@ public class Evaluations implements Serializable {
     @JoinColumn(name = "checklist_id", nullable = false, unique = true)
     private Checklist checklist;
 
-  
-
 }
