@@ -39,6 +39,7 @@ const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPla
             id: graphqlData.student.person?.id,
             name: graphqlData.student.person?.name,
             lastname: graphqlData.student.person?.lastname,
+            document: graphqlData.student.person?.document,
           },
         }
       : null,

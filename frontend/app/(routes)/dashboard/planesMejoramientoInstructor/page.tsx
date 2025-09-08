@@ -119,8 +119,43 @@ const PlanMejoramientoInstructor: React.FC = () => {
 
     const handleSelectSheet = (sheet: NonNullable<StudySheet>) => {
         console.log('Ficha seleccionada:', sheet);
-        // Navegar al historial de planes de mejoramiento
-        router.push('./HistorialPlanesMejoramientoInstructor');
+        
+        // Obtener los estudiantes de la ficha (misma lógica que el modal)
+        const validStudents = (sheet.studentStudySheets || []).filter((ss): ss is NonNullable<StudentStudySheet> => ss !== null);
+        const studentIds = validStudents.map(ss => ss.student?.id).filter(Boolean);
+        
+        console.log('Estudiantes de la ficha:', validStudents);
+        console.log('IDs de estudiantes:', studentIds);
+        
+        if (validStudents.length > 0) {
+            // Navegar pasando información completa de la ficha y estudiantes
+            const fichaData = {
+                fichaNumber: sheet.number,
+                studentIds: studentIds,
+                totalStudents: validStudents.length,
+                students: validStudents.map(ss => ({
+                    id: ss.student?.id,
+                    person: {
+                        name: ss.student?.person?.name,
+                        lastname: ss.student?.person?.lastname,
+                        document: ss.student?.person?.document,
+                        email: ss.student?.person?.email,
+                        phone: ss.student?.person?.phone
+                    },
+                    studentStudySheetState: ss.studentStudySheetState
+                }))
+            };
+            
+            // Convertir a string para pasar como query parameter
+            const fichaDataString = encodeURIComponent(JSON.stringify(fichaData));
+            const url = `./HistorialPlanesMejoramientoInstructor?fichaData=${fichaDataString}`;
+            
+            console.log('Navegando a:', url);
+            router.push(url);
+        } else {
+            // Si no hay estudiantes, navegar sin filtro
+            router.push(`./HistorialPlanesMejoramientoInstructor`);
+        }
     };
 
     const formatDate = (dateString: string | null | undefined) => {
