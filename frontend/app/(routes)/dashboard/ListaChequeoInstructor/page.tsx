@@ -2056,23 +2056,32 @@ export default function InstructorChecklistView() {
               </div>
             )}
 
-            {/* Sección de firmas con diseño hexagonal */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
-              {/* Firma Instructor Técnico Anterior */}
-              <div className="bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 p-6 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700">
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-white text-2xl">👨‍🏫</span>
+            {/* Sección de Firmas con cards individuales */}
+            <div className="mt-12 relative">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Firmas Digitales
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Card Instructor Técnico Anterior */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                  <div className="text-center mb-6">
+                    <div className="w-20 h-20 bg-gradient-to-r from-[#5cb800] to-[#8fd400] rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-white text-3xl">👨‍🏫</span>
+                    </div>
+                    <h4 className="text-xl font-bold text-gray-900 dark:text-white">
+                      Instructor Técnico Anterior
+                    </h4>
                   </div>
-                  <h3 className="text-xl font-bold text-darkBlue dark:text-white">Instructor Técnico Anterior</h3>
-                </div>
-                <div className="flex flex-col items-center">
-                  <label className="hexagon-upload flex flex-col items-center cursor-pointer mb-4 p-6 border-3 border-dashed border-[#0e324b] rounded-2xl w-full hover:border-[#01b001] hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-300 group">
-                    <UploadCloud className="w-12 h-12 text-[#0e324b] group-hover:text-[#01b001] transition-colors duration-300 mb-3 group-hover:animate-bounce" />
-                    <span className="font-semibold text-lg text-center text-[#0e324b] dark:text-white group-hover:text-[#01b001] transition-colors duration-300">
+                  
+                  <label className="flex flex-col items-center cursor-pointer p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg w-full hover:border-[#5cb800] hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-all duration-300 group">
+                    <UploadCloud className="w-16 h-16 text-gray-400 group-hover:text-[#5cb800] transition-colors duration-300 mb-4" />
+                    <span className="font-medium text-lg text-center text-gray-700 dark:text-gray-300 group-hover:text-[#5cb800] transition-colors duration-300 mb-2">
                       Subir Firma Digital
                     </span>
-                    <span className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       Formatos: JPG, PNG, GIF
                     </span>
                     <input
@@ -2082,37 +2091,39 @@ export default function InstructorChecklistView() {
                       className="hidden"
                     />
                   </label>
+                  
                   {firmaAnterior && (
-                    <div className="w-full flex justify-center">
-                      <div className="bg-white dark:bg-gray-700 p-4 rounded-2xl border-2 border-[#01b001] shadow-lg">
+                    <div className="mt-6 flex justify-center">
+                      <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm">
                         <Image
                           src={firmaAnterior}
                           alt="Firma instructor anterior"
-                          width={150}
-                          height={100}
-                          className="max-h-24 max-w-full object-contain rounded-lg"
+                          width={200}
+                          height={120}
+                          className="max-h-32 max-w-full object-contain rounded"
                         />
                       </div>
                     </div>
                   )}
                 </div>
-              </div>
 
-              {/* Firma Instructor Técnico Nuevo */}
-              <div className="bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 p-6 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700">
-                <div className="text-center mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-white text-2xl">👨‍💼</span>
+                {/* Card Instructor Técnico Nuevo */}
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                  <div className="text-center mb-6">
+                    <div className="w-20 h-20 bg-gradient-to-r from-[#5cb800] to-[#8fd400] rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-white text-3xl">👨‍💼</span>
+                    </div>
+                    <h4 className="text-xl font-bold text-gray-900 dark:text-white">
+                      Instructor Técnico Nuevo
+                    </h4>
                   </div>
-                  <h3 className="text-xl font-bold text-darkBlue dark:text-white">Instructor Técnico Nuevo</h3>
-                </div>
-                <div className="flex flex-col items-center">
-                  <label className="hexagon-upload flex flex-col items-center cursor-pointer mb-4 p-6 border-3 border-dashed border-[#0e324b] rounded-2xl w-full hover:border-[#01b001] hover:bg-green-50 dark:hover:bg-green-900/20 transition-all duration-300 group">
-                    <UploadCloud className="w-12 h-12 text-[#0e324b] group-hover:text-[#01b001] transition-colors duration-300 mb-3 group-hover:animate-bounce" />
-                    <span className="font-semibold text-lg text-center text-[#0e324b] dark:text-white group-hover:text-[#01b001] transition-colors duration-300">
+                  
+                  <label className="flex flex-col items-center cursor-pointer p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg w-full hover:border-[#5cb800] hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-all duration-300 group">
+                    <UploadCloud className="w-16 h-16 text-gray-400 group-hover:text-[#5cb800] transition-colors duration-300 mb-4" />
+                    <span className="font-medium text-lg text-center text-gray-700 dark:text-gray-300 group-hover:text-[#5cb800] transition-colors duration-300 mb-2">
                       Subir Firma Digital
                     </span>
-                    <span className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       Formatos: JPG, PNG, GIF
                     </span>
                     <input
@@ -2122,15 +2133,16 @@ export default function InstructorChecklistView() {
                       className="hidden"
                     />
                   </label>
+                  
                   {firmaNuevo && (
-                    <div className="w-full flex justify-center">
-                      <div className="bg-white dark:bg-gray-700 p-4 rounded-2xl border-2 border-[#01b001] shadow-lg">
+                    <div className="mt-6 flex justify-center">
+                      <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm">
                         <Image
                           src={firmaNuevo}
                           alt="Firma instructor nuevo"
-                          height={100}
-                          width={150}
-                          className="max-h-24 max-w-full object-contain rounded-lg"
+                          width={200}
+                          height={120}
+                          className="max-h-32 max-w-full object-contain rounded"
                         />
                       </div>
                     </div>
