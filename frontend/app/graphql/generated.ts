@@ -3542,6 +3542,7 @@ export type Query = {
   findCommitteesByCoordinationId?: Maybe<Array<Maybe<Committee>>>;
   findCommitteesByStudentId?: Maybe<Array<Maybe<Committee>>>;
   findCommitteesByTeacherId?: Maybe<Array<Maybe<Committee>>>;
+  generateMinuteDocx?: Maybe<Scalars['String']['output']>;
   getNotificationById?: Maybe<NoticationAnswer>;
   improvementPlanActivityById?: Maybe<ImprovementPlanActivityPageId>;
   improvementPlanById?: Maybe<ImprovementPlanPageId>;
@@ -4209,6 +4210,11 @@ export type QueryFindCommitteesByStudentIdArgs = {
 
 export type QueryFindCommitteesByTeacherIdArgs = {
   teacherId: Scalars['Long']['input'];
+};
+
+
+export type QueryGenerateMinuteDocxArgs = {
+  committeeEventId: Scalars['ID']['input'];
 };
 
 
@@ -5330,7 +5336,7 @@ export type StudySheetByTeacherQueryVariables = Exact<{
 }>;
 
 
-export type StudySheetByTeacherQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, journey?: { name?: string | null } | null, trainingProject?: { name?: string | null, program?: { name?: string | null } | null } | null, studentStudySheets?: Array<{ student?: { id?: string | null, person?: { document?: string | null, name?: string | null, lastname?: string | null, phone?: string | null, email?: string | null, bloodType?: string | null, dateBirth?: string | null } | null } | null, studentStudySheetState?: { name?: string | null } | null } | null> | null } | null> | null } | null };
+export type StudySheetByTeacherQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, journey?: { name?: string | null } | null, trainingProject?: { name?: string | null, program?: { name?: string | null } | null } | null, teacherStudySheets?: Array<{ id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null> | null, studentStudySheets?: Array<{ student?: { id?: string | null, person?: { document?: string | null, name?: string | null, lastname?: string | null, phone?: string | null, email?: string | null } | null } | null, studentStudySheetState?: { name?: string | null } | null } | null> | null } | null> | null } | null };
 
 export type GetStudySheetWithStudentsQueryVariables = Exact<{
   id: Scalars['Long']['input'];
@@ -8371,6 +8377,13 @@ export const StudySheetByTeacherDocument = gql`
           name
         }
       }
+      teacherStudySheets {
+        id
+        competence {
+          id
+          name
+        }
+      }
       studentStudySheets {
         student {
           id
@@ -8380,8 +8393,6 @@ export const StudySheetByTeacherDocument = gql`
             lastname
             phone
             email
-            bloodType
-            dateBirth
           }
         }
         studentStudySheetState {

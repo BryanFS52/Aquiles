@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -118,6 +119,7 @@ public class AttendancesBusiness {
             attendance.setAttendanceState(attendanceState);
             attendance.setStudentId(attendanceDto.getStudentId());
             attendance.setCompetenceQuarter(attendanceDto.getCompetenceQuarter());
+            attendance.setAttendanceDate(LocalDate.parse(attendanceDto.getAttendanceDate()));
 
             return modelMapper.map(attendancesService.save(attendance), AttendanceDto.class);
         } catch (Exception e) {
