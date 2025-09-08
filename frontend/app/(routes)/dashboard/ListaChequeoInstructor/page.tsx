@@ -1673,7 +1673,7 @@ export default function InstructorChecklistView() {
             {/* DataTable con diseño moderno basado en la referencia */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
               <div className="bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-secondary dark:to-blue-900 px-6 py-4">
-                <h2 className="text-xl font-bold text-white text-center">
+                <h2 className="text-2xl font-bold text-white text-center">
                   Lista de Chequeo
                 </h2>
               </div>
