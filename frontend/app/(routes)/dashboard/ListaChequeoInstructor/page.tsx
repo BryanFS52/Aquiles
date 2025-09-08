@@ -1671,19 +1671,146 @@ export default function InstructorChecklistView() {
         ) : (
           <>
             {/* DataTable con diseño moderno basado en la referencia */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-secondary dark:to-blue-900 px-6 py-4">
+                <h2 className="text-xl font-bold text-white text-center">
                   Lista de Chequeo
                 </h2>
               </div>
               
-              <DataTable
-                data={items}
-                columns={checklistColumns}
-                pageSize={itemsPerPage}
-                className="w-full"
-              />
+              <div className="overflow-x-auto">
+                <div className="min-w-full">
+                  {/* Headers personalizados con el diseño de la imagen */}
+                  <div className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                    <div className="grid grid-cols-12 gap-4 px-6 py-5 text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                      <div className="col-span-1 text-center">ITEM</div>
+                      <div className="col-span-5 text-left">DESCRIPCIÓN DEL INDICADOR</div>
+                      <div className="col-span-2 text-center">CUMPLE</div>
+                      <div className="col-span-4 text-left">OBSERVACIONES</div>
+                    </div>
+                  </div>
+                  
+                  {/* Contenido de la tabla */}
+                  <div className="divide-y divide-gray-200 dark:divide-gray-600">
+                    {currentItems.map((item, index) => {
+                      const itemState = itemStates[item.id] || { completed: item.completed, observations: item.observations };
+                      return (
+                        <div key={item.id} className="grid grid-cols-12 gap-4 px-6 py-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200">
+                          {/* ITEM */}
+                          <div className="col-span-1 flex items-center justify-center">
+                            <div className="w-8 h-8 bg-gradient-to-r from-[#5cb800] to-[#8fd400] rounded-full flex items-center justify-center">
+                              <span className="text-white font-semibold text-sm">{item.id}</span>
+                            </div>
+                          </div>
+                          
+                          {/* DESCRIPCIÓN DEL INDICADOR */}
+                          <div className="col-span-5 flex items-start">
+                            <p className="text-gray-900 dark:text-white font-medium leading-relaxed evaluation-text text-base">
+                              {item.indicator}
+                            </p>
+                          </div>
+                          
+                          {/* CUMPLE */}
+                          <div className="col-span-2 flex items-center justify-center">
+                            <div className="flex space-x-6">
+                              <label className={`flex items-center space-x-2 cursor-pointer transition-colors duration-200 ${
+                                isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
+                              }`}>
+                                <input
+                                  type="radio"
+                                  name={`item-${item.id}`}
+                                  checked={itemState.completed === true}
+                                  onChange={() => handleItemChange(item.id, "completed", true)}
+                                  disabled={isFinalSaved}
+                                  className={`w-5 h-5 text-green-600 focus:ring-green-500 focus:ring-2 border-gray-300 dark:border-gray-600 ${
+                                    isFinalSaved ? 'cursor-not-allowed' : ''
+                                  }`}
+                                />
+                                <span className={`text-base font-medium ${
+                                  itemState.completed === true 
+                                    ? 'text-green-700 dark:text-green-400' 
+                                    : 'text-gray-600 dark:text-gray-400'
+                                }`}>
+                                  Sí
+                                </span>
+                              </label>
+                              
+                              <label className={`flex items-center space-x-2 cursor-pointer transition-colors duration-200 ${
+                                isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
+                              }`}>
+                                <input
+                                  type="radio"
+                                  name={`item-${item.id}`}
+                                  checked={itemState.completed === false}
+                                  onChange={() => handleItemChange(item.id, "completed", false)}
+                                  disabled={isFinalSaved}
+                                  className={`w-5 h-5 text-red-600 focus:ring-red-500 focus:ring-2 border-gray-300 dark:border-gray-600 ${
+                                    isFinalSaved ? 'cursor-not-allowed' : ''
+                                  }`}
+                                />
+                                <span className={`text-base font-medium ${
+                                  itemState.completed === false 
+                                    ? 'text-red-700 dark:text-red-400' 
+                                    : 'text-gray-600 dark:text-gray-400'
+                                }`}>
+                                  No
+                                </span>
+                              </label>
+                            </div>
+                          </div>
+                          
+                          {/* OBSERVACIONES */}
+                          <div className="col-span-4 flex items-start">
+                            <textarea
+                              value={itemState.observations || ''}
+                              onChange={(e) => handleItemChange(item.id, "observations", e.target.value)}
+                              disabled={isFinalSaved}
+                              className={`w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none break-words whitespace-pre-wrap ${
+                                isFinalSaved ? 'opacity-50 cursor-not-allowed' : 'focus:ring-2 focus:ring-[#5cb800] focus:border-[#5cb800]'
+                              }`}
+                              style={{ overflowWrap: 'anywhere' }}
+                              rows={4}
+                              placeholder={isFinalSaved ? "Evaluación guardada" : "Escriba sus observaciones..."}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Paginación integrada */}
+                  {totalPages > 1 && (
+                    <div className="bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 px-6 py-4">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            Página <span className="font-medium text-gray-900 dark:text-white">{currentPage}</span> de <span className="font-medium text-gray-900 dark:text-white">{totalPages}</span>
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                          >
+                            Anterior
+                          </button>
+                          <div className="px-4 py-2 text-sm font-medium text-[#5cb800] dark:text-[#8fd400] bg-[#5cb800]/10 dark:bg-[#8fd400]/10 border border-[#5cb800]/30 dark:border-[#8fd400]/30 rounded-lg">
+                            {currentPage} / {totalPages}
+                          </div>
+                          <button
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                          >
+                            Siguiente
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Sección de Evaluación - Movida debajo de la tabla */}
