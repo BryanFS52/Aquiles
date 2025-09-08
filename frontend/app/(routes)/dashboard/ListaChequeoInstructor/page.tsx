@@ -1295,7 +1295,7 @@ export default function InstructorChecklistView() {
   };
 
   return (
-    <div className="w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+    <div className="w-full min-h-screen">
       {/* Estilos CSS para el diseño hexagonal */}
       <style jsx>{`
         /* Estilos para los hexágonos */
@@ -1462,7 +1462,7 @@ export default function InstructorChecklistView() {
           <Card 
             header={<div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm">🏢</span>
+                <span className="text-white text-sm"></span>
               </div>
             </div>}
             body={<div className="text-center">
@@ -1477,7 +1477,7 @@ export default function InstructorChecklistView() {
           <Card 
             header={<div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
               <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm">📚</span>
+                <span className="text-white text-sm"></span>
               </div>
             </div>}
             body={<div className="text-center">
@@ -1494,7 +1494,7 @@ export default function InstructorChecklistView() {
           <Card 
             header={<div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
               <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm">👥</span>
+                <span className="text-white text-sm"></span>
               </div>
             </div>}
             body={<div className="text-center">
@@ -1509,7 +1509,7 @@ export default function InstructorChecklistView() {
           <Card 
             header={<div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
               <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm">👨‍🏫</span>
+                <span className="text-white text-sm"></span>
               </div>
             </div>}
             body={<div className="text-center">
@@ -1598,16 +1598,6 @@ export default function InstructorChecklistView() {
               </div>
 
               <div className="flex items-center gap-4">
-                <button
-                  onClick={() => window.location.href = '/dashboard/InstructorSelection'}
-                  className="hexagon-button flex items-center gap-3 px-5 py-3 rounded-full border-2 border-gray-500 bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-800 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
-                  <span>Cambiar Team</span>
-                </button>
-
                 <div className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white px-4 py-2 rounded-full shadow-md">
                   <span className="text-sm font-semibold">
                     Activas: {activeChecklists.length} | Filtradas: {filteredChecklists.length}
