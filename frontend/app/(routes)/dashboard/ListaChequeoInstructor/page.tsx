@@ -6,6 +6,11 @@ import { Check, FileDown, Save, UploadCloud, X, AlertTriangle, Phone, Edit, Arro
 import { toast } from "react-toastify";
 import Image from "next/image";
 import PageTitle from "@components/UI/pageTitle";
+import { Card, CardGrid } from "@components/UI/Card";
+import DataTable from "@components/UI/DataTable";
+import { DataTableColumn } from "@components/UI/DataTable/types";
+import Modal from "@components/UI/Modal";
+import EmptyState from "@components/UI/emptyState";
 import { fetchAllChecklists, fetchChecklistById } from "@services/checkListService.js";
 import { fetchEvaluationsByChecklist, fetchEvaluationsByChecklistOld, completeEvaluation, createMissingEvaluationForChecklist, createEvaluationForChecklist } from "@services/evaluationService";
 import { exportChecklistToPdf, exportChecklistToExcel, downloadFileFromBase64 } from "@services/exportService";
@@ -468,6 +473,86 @@ export default function InstructorChecklistView() {
 
   const totalPages = Math.ceil(items.length / itemsPerPage);
   const currentItems = items.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  // Configuración de columnas para DataTable del checklist con diseño de la imagen
+  const checklistColumns: DataTableColumn<SimulatedChecklistItem>[] = [
+    {
+      key: 'id',
+      header: 'ITEM',
+      render: (row: SimulatedChecklistItem) => (
+        <div className="text-center">
+          <span className="text-gray-900 dark:text-white font-medium">#{row.id}</span>
+        </div>
+      )
+    },
+    {
+      key: 'indicator',
+      header: 'DESCRIPCIÓN DEL INDICADOR',
+      render: (row: SimulatedChecklistItem) => (
+        <div className="text-left">
+          <p className="text-gray-900 dark:text-white font-medium leading-relaxed">
+            {row.indicator}
+          </p>
+        </div>
+      )
+    },
+    {
+      key: 'completed',
+      header: 'CUMPLE',
+      render: (row: SimulatedChecklistItem) => {
+        const itemState = itemStates[row.id] || { completed: row.completed, observations: row.observations };
+        return (
+          <div className="text-center">
+            <div className="flex justify-center space-x-4">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  name={`item-${row.id}`}
+                  checked={itemState.completed === true}
+                  onChange={() => handleItemChange(row.id, "completed", true)}
+                  disabled={isFinalSaved}
+                  className={`text-green-600 focus:ring-green-500 ${isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''}`}
+                />
+                <span className="text-sm font-medium text-green-600">Sí</span>
+              </label>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  name={`item-${row.id}`}
+                  checked={itemState.completed === false}
+                  onChange={() => handleItemChange(row.id, "completed", false)}
+                  disabled={isFinalSaved}
+                  className={`text-red-600 focus:ring-red-500 ${isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''}`}
+                />
+                <span className="text-sm font-medium text-red-600">No</span>
+              </label>
+            </div>
+          </div>
+        );
+      }
+    },
+    {
+      key: 'observations',
+      header: 'OBSERVACIONES',
+      render: (row: SimulatedChecklistItem) => {
+        const itemState = itemStates[row.id] || { completed: row.completed, observations: row.observations };
+        return (
+          <div className="text-left">
+            <textarea
+              value={itemState.observations || ''}
+              onChange={(e) => handleItemChange(row.id, "observations", e.target.value)}
+              disabled={isFinalSaved}
+              className={`w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none ${
+                isFinalSaved ? 'opacity-50 cursor-not-allowed' : 'focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+              }`}
+              rows={2}
+              placeholder={isFinalSaved ? "Evaluación guardada" : "Escriba sus observaciones..."}
+            />
+          </div>
+        );
+      }
+    }
+  ];
 
   const handleTrimesterChange = (value: string): void => {
     setSelectedTrimester(value);
@@ -1372,91 +1457,74 @@ export default function InstructorChecklistView() {
           </button>
         </div>
 
-        {/* Diseño cuadrado para información del centro */}
-        <div className="relative">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-center justify-center">
-            {/* Panel cuadrado 1 */}
-            <div className="group relative">
-              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border-2 border-lime-500/30 dark:border-shadowBlue/50 shadow-2xl hover:shadow-lime-200 dark:hover:shadow-shadowBlue/30 transition-all duration-300 transform hover:scale-105 p-6 max-w-sm mx-auto">
-                <div className="text-center">
-                  <div className="mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
-                      <span className="text-white font-bold text-lg">🏢</span>
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-bold text-darkBlue dark:text-white mb-2">Centro de Formación</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 leading-tight">Centro de Servicios Financieros</p>
-                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                    <p className="text-xs font-semibold text-lime-600 dark:text-lime-400">Fecha</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-300">05/02/2024 - 05/05/2024</p>
-                  </div>
-                </div>
+        {/* Cards de información específica con diseño moderno */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card 
+            header={<div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm">🏢</span>
               </div>
-            </div>
-
-            {/* Panel cuadrado 2 */}
-            <div className="group relative">
-              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border-2 border-lime-600/30 dark:border-darkBlue/50 shadow-2xl hover:shadow-lime-300 dark:hover:shadow-darkBlue/30 transition-all duration-300 transform hover:scale-105 p-6 max-w-sm mx-auto">
-                <div className="text-center">
-                  <div className="mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-lime-600 to-lime-500 dark:from-darkBlue dark:to-shadowBlue rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
-                      <span className="text-white font-bold text-lg">📚</span>
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-bold text-darkBlue dark:text-white mb-2">Datos de Formación</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    <span className="font-semibold text-darkBlue dark:text-white">Jornada:</span> Diurna
-                  </p>
-                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                    <p className="text-xs font-semibold text-lime-600 dark:text-lime-400">Ficha N°</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-300">{selectedStudySheetNumber || "No disponible"}</p>
-                  </div>
-                </div>
+            </div>}
+            body={<div className="text-center">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Centro de Formación</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 leading-tight">Centro de Servicios Financieros</p>
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">Fecha</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300">05/02/2024 - 05/05/2024</p>
               </div>
-            </div>
-
-            {/* Panel cuadrado 3 - Team Scrum */}
-            <div className="group relative">
-              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border-2 border-blue-500/30 dark:border-blue-400/50 shadow-2xl hover:shadow-blue-200 dark:hover:shadow-blue-400/30 transition-all duration-300 transform hover:scale-105 p-6 max-w-sm mx-auto">
-                <div className="text-center">
-                  <div className="mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-500 dark:from-blue-400 dark:to-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
-                      <span className="text-white font-bold text-lg">👥</span>
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-bold text-darkBlue dark:text-white mb-2">Team Scrum</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{selectedTeamScrumName || "No seleccionado"}</p>
-                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                    <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">Evaluando</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-300">Equipo de desarrollo</p>
-                  </div>
-                </div>
+            </div>}
+          />
+          <Card 
+            header={<div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm">📚</span>
               </div>
-            </div>
-
-            {/* Panel cuadrado 4 */}
-            <div className="group relative">
-              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border-2 border-lime-500/30 dark:border-shadowBlue/50 shadow-2xl hover:shadow-lime-200 dark:hover:shadow-shadowBlue/30 transition-all duration-300 transform hover:scale-105 p-6 max-w-sm mx-auto">
-                <div className="text-center">
-                  <div className="mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
-                      <span className="text-white font-bold text-lg">👨‍🏫</span>
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-bold text-darkBlue dark:text-white mb-2">Instructor Calificador</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Juan Pérez</p>
-                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                    <p className="text-xs font-semibold text-lime-600 dark:text-lime-400">Lista Seleccionada</p>
-                    {selectedChecklist ? (
-                      <p className="text-xs text-gray-600 dark:text-gray-300 leading-tight">ID: {selectedChecklist.id} - {selectedChecklist.component || 'N/A'}</p>
-                    ) : (
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Ninguna lista seleccionada</p>
-                    )}
-                  </div>
-                </div>
+            </div>}
+            body={<div className="text-center">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Datos de Formación</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                <span className="font-semibold text-gray-900 dark:text-white">Jornada:</span> Diurna
+              </p>
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                <p className="text-xs font-semibold text-green-600 dark:text-green-400">Ficha N°</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300">{selectedStudySheetNumber || "No disponible"}</p>
               </div>
-            </div>
-          </div>
+            </div>}
+          />
+          <Card 
+            header={<div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm">👥</span>
+              </div>
+            </div>}
+            body={<div className="text-center">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Team Scrum</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{selectedTeamScrumName || "No seleccionado"}</p>
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                <p className="text-xs font-semibold text-purple-600 dark:text-purple-400">Evaluando</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300">Equipo de desarrollo</p>
+              </div>
+            </div>}
+          />
+          <Card 
+            header={<div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-sm">👨‍🏫</span>
+              </div>
+            </div>}
+            body={<div className="text-center">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Instructor Calificador</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Juan Pérez</p>
+              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                <p className="text-xs font-semibold text-orange-600 dark:text-orange-400">Lista Seleccionada</p>
+                {selectedChecklist ? (
+                  <p className="text-xs text-gray-600 dark:text-gray-300 leading-tight">ID: {selectedChecklist.id} - {selectedChecklist.component || 'N/A'}</p>
+                ) : (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Ninguna lista seleccionada</p>
+                )}
+              </div>
+            </div>}
+          />
         </div>
 
         {/* Controles de filtros y acciones con diseño hexagonal */}
@@ -1574,192 +1642,67 @@ export default function InstructorChecklistView() {
           </div>
         </div>
 
-        {/* Estado de carga o sin listas activas */}
+        {/* Estados de carga y vacío */}
         {loading ? (
-          <div className="flex justify-center items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-darkBlue dark:border-shadowBlue"></div>
-            <span className="ml-2 text-gray-600 dark:text-gray-400">Cargando listas de chequeo activas...</span>
-          </div>
+          <EmptyState 
+            message="Cargando listas de chequeo activas..."
+          />
         ) : filteredChecklists.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500 dark:text-gray-400 text-lg">
-              {selectedTrimester === "todos"
-                ? "No hay listas de chequeo activas disponibles"
-                : `No hay listas de chequeo activas para el trimestre ${selectedTrimester}`
-              }
-            </p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
-              Las listas de chequeo deben ser activadas desde la vista del coordinador
-            </p>
-          </div>
+          <EmptyState 
+            message={selectedTrimester === "todos" 
+              ? "No hay listas de chequeo activas disponibles. Las listas de chequeo deben ser activadas desde la vista del coordinador" 
+              : `No hay listas de chequeo activas para el trimestre ${selectedTrimester}. Las listas de chequeo deben ser activadas desde la vista del coordinador`}
+          />
         ) : !selectedChecklist ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500 dark:text-gray-400 text-lg">
-              Selecciona una lista de chequeo para comenzar la evaluación
-            </p>
-          </div>
+          <EmptyState 
+            message="Selecciona una lista de chequeo para comenzar la evaluación"
+          />
         ) : (
           <>
-            {/* Tabla principal con diseño hexagonals */}
-            <div className="relative">
-              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <div className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue p-6">
-                  <h2 className="text-2xl font-bold text-white text-center flex items-center justify-center gap-3">
-
+            {/* DataTable con diseño moderno como la imagen */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     Lista de Chequeo
-
                   </h2>
                 </div>
-
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm">
-                    <thead className="bg-gradient-to-r from-gray-400 to-gray-400 dark:from-gray-400">
-                      <tr>
-                        <th className="hexagon-cell text-xl font-bold p-6 text-center text-white">
-                          <div className="flex items-center justify-center gap-2">
-
-                            Item
-                          </div>
-                        </th>
-                        <th className="hexagon-cell text-xl font-bold p-6 text-left text-white">
-                          <div className="flex items-center gap-2">
-
-                            Indicadores y/o Variables
-                          </div>
-                        </th>
-                        <th className="hexagon-cell text-xl font-bold p-6 text-center text-white">
-                          <div className="flex items-center justify-center gap-2">
-
-                            Evaluación
-                          </div>
-                        </th>
-                        <th className="hexagon-cell text-xl font-bold p-6 text-left text-white">
-                          <div className="flex items-center gap-2">
-
-                            Observaciones
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                      {currentItems.map((item, index) => {
-                        const itemState = itemStates[item.id] || { completed: item.completed, observations: item.observations };
-                        return (
-                          <tr key={item.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-750'
-                            }`}>
-                            <td className="hexagon-cell p-6 text-center">
-                              <div className="w-12 h-12 bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue rounded-full flex items-center justify-center mx-auto shadow-lg">
-                                <span className="text-white font-bold text-lg">{item.id}</span>
-                              </div>
-                            </td>
-                            <td className="hexagon-cell p-6">
-                              <div className="bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-2xl border border-gray-200 dark:border-gray-600 shadow-inner">
-                                <p className="font-medium text-darkBlue dark:text-white leading-relaxed">
-                                  {item.indicator}
-                                </p>
-                              </div>
-                            </td>
-                            <td className="hexagon-cell p-6 text-center">
-                              <div className="flex justify-center space-x-6">
-                                <label className={`hexagon-choice flex items-center space-x-3 cursor-pointer p-3 rounded-2xl border-2 ${
-                                  isFinalSaved ? 'opacity-50 cursor-not-allowed' : 
-                                  itemState.completed === true
-                                    ? 'border-lime-500 dark:border-lime-500 bg-green-50 dark:bg-green-900/30 shadow-lg transform scale-105'
-                                    : 'border-gray-300 dark:border-gray-600'
-                                }`}>
-                                  <input
-                                    type="radio"
-                                    name={`completed-${item.id}`}
-                                    value="yes"
-                                    onChange={() => handleItemChange(item.id, "completed", true)}
-                                    checked={itemState.completed === true}
-                                    disabled={isFinalSaved}
-                                    className="sr-only"
-                                  />
-                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${itemState.completed === true ? 'bg-lime-500 text-white' : 'bg-gray-200 dark:bg-gray-600'
-                                    }`}>
-                                    <Check className="w-5 h-5" />
-                                  </div>
-                                  <span className={`font-semibold ${itemState.completed === true ? 'text-lime-600' : 'text-gray-600 dark:text-gray-400'
-                                    }`}>
-                                    Sí
-                                  </span>
-                                </label>
-                                <label className={`hexagon-choice flex items-center space-x-3 cursor-pointer p-3 rounded-2xl border-2 ${
-                                  isFinalSaved ? 'opacity-50 cursor-not-allowed' : 
-                                  itemState.completed === false
-                                    ? 'border-red-500 bg-red-50 dark:bg-red-900/30 shadow-lg transform scale-105'
-                                    : 'border-gray-300 dark:border-gray-600'
-                                }`}>
-                                  <input
-                                    type="radio"
-                                    name={`completed-${item.id}`}
-                                    value="no"
-                                    onChange={() => handleItemChange(item.id, "completed", false)}
-                                    checked={itemState.completed === false}
-                                    disabled={isFinalSaved}
-                                    className="sr-only"
-                                  />
-                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${itemState.completed === false ? 'bg-red-500 text-white' : 'bg-gray-200 dark:bg-gray-600'
-                                    }`}>
-                                    <X className="w-5 h-5" />
-                                  </div>
-                                  <span className={`font-semibold ${itemState.completed === false ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'
-                                    }`}>
-                                    No
-                                  </span>
-                                </label>
-                              </div>
-                            </td>
-                            <td className="hexagon-cell p-6">
-                              <div className="relative">
-                                <textarea
-                                  value={itemState.observations || ""}
-                                  onChange={(e) => handleItemChange(item.id, "observations", e.target.value)}
-                                  disabled={isFinalSaved}
-                                  className={`hexagon-textarea w-full p-4 border-2 border-gray-300 dark:border-gray-600 rounded-2xl min-h-[100px] bg-gradient-to-r from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 text-darkBlue dark:text-white focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue resize-vertical shadow-inner transition-all duration-300 ${
-                                    isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
-                                  }`}
-                                  placeholder={isFinalSaved ? "Lista guardada definitivamente" : "Agregar observaciones detalladas sobre este item..."}
-                                />
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+              </div>
+              <div className="p-0">
+                <DataTable
+                  data={currentItems}
+                  columns={checklistColumns}
+                  className=""
+                />
               </div>
             </div>
 
-            {/* Paginación con diseño hexagonsal */}
-            <div className="flex justify-center items-center space-x-6 mt-8">
-              <button
-                className={`hexagon-nav px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg ${currentPage === 1
-                    ? 'bg-gray-300 cursor-not-allowed text-gray-500'
-                    : 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white shadow-xl'
-                  }`}
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                ‹ Anterior
-              </button>
-              <div className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white px-6 py-3 rounded-full shadow-lg">
-                <span className="font-bold text-lg">
-                  Página {currentPage} de {totalPages}
+            {/* Paginación con diseño moderno */}
+            <div className="flex justify-between items-center mt-6 px-6 py-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Mostrando {Math.min((currentPage - 1) * itemsPerPage + 1, selectedChecklist?.items?.length || 0)} - {Math.min(currentPage * itemsPerPage, selectedChecklist?.items?.length || 0)} de {selectedChecklist?.items?.length || 0} items
                 </span>
               </div>
-              <button
-                className={`hexagon-nav px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg ${currentPage === totalPages
-                    ? 'bg-gray-300 cursor-not-allowed text-gray-500'
-                    : 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white shadow-xl'
-                  }`}
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-              >
-                Siguiente ›
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700"
+                >
+                  Anterior
+                </button>
+                <span className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300">
+                  {currentPage} de {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700"
+                >
+                  Siguiente
+                </button>
+              </div>
             </div>
 
             {/* Sección de Evaluación - Movida debajo de la tabla */}
@@ -1947,7 +1890,7 @@ export default function InstructorChecklistView() {
                             <button
                               onClick={handleUpdateEvaluationClick}
                               disabled={isFinalSaved}
-                              className={`px-10 py-4 bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white rounded-full transition-all duration-300 flex items-center space-x-4 font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                              className={`px-10 py-4 bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white rounded-full transition-all duration-300 flex items-center space-x-4 mx-auto font-bold text-xl shadow-2xl hover:shadow-lime-600/20 dark:hover:shadow-shadowBlue/30 transform hover:scale-110 ${
                                 isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
                               }`}
                             >
@@ -2156,7 +2099,7 @@ export default function InstructorChecklistView() {
                                 ? 'border-green-200 bg-green-50 dark:border-green-700 dark:bg-green-900/20' 
                                 : item.completed === false 
                                   ? 'border-red-200 bg-red-50 dark:border-red-700 dark:bg-red-900/20'
-                                  : 'border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700'
+                                  : 'border-gray-200 bg-gray-50 dark:bg-gray-700'
                             }`}>
                               <div className="flex items-start gap-4">
                                 <div className="flex-shrink-0">
@@ -2292,141 +2235,137 @@ export default function InstructorChecklistView() {
         </div>
       )}
 
-      {/* Modal para crear evaluación */}
-      {showCreateEvaluationModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              {/* Header del modal */}
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center space-x-2">
-                  <Save className="w-6 h-6 text-lime-600" />
-                  <span>Crear Evaluación</span>
-                </h2>
-                <button
-                  onClick={handleCloseCreateEvaluationModal}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                  disabled={isCreatingEvaluation}
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
+      {/* Modal para crear evaluación con diseño moderno */}
+      <Modal
+        isOpen={showCreateEvaluationModal}
+        onClose={handleCloseCreateEvaluationModal}
+        title="Crear Evaluación"
+        size="xxl"
+      >
+        {/* Información del checklist con diseño moderno */}
+        <Card
+          header={<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">📋 Lista de Chequeo: {selectedChecklist?.trimester ? `Trimestre ${selectedChecklist.trimester}` : 'Sin trimestre'}</h3>}
+          body={<p className="text-gray-700 dark:text-gray-300 text-sm">Complete los siguientes campos para crear la evaluación de esta lista de chequeo.</p>}
+          className="mb-6"
+        />
 
-              {/* Información del checklist */}
-              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-6">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                  📋 Lista de Chequeo: {selectedChecklist?.trimester ? `Trimestre ${selectedChecklist.trimester}` : 'Sin trimestre'}
-                </h3>
-                <p className="text-gray-700 dark:text-gray-300 text-sm">
-                  Complete los siguientes campos para crear la evaluación de esta lista de chequeo.
-                </p>
-              </div>
+        {/* Formulario de evaluación con diseño moderno */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="space-y-4">
+            <label className="block text-lg font-semibold text-darkBlue dark:text-white mb-2">
+              <span className="flex items-center gap-2">
+                📝 Observaciones: <span className="text-red-500">*</span>
+              </span>
+            </label>
+            <textarea
+              value={evaluationObservations}
+              onChange={(e) => setEvaluationObservations(e.target.value)}
+              disabled={isFinalSaved || isCreatingEvaluation}
+              className={`w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300 ${
+                isFinalSaved || isCreatingEvaluation ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              rows={4}
+              placeholder="Describa sus observaciones sobre la lista de chequeo..."
+            />
+          </div>
 
-              {/* Formulario de evaluación */}
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
-                    Observaciones: <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    value={evaluationObservations}
-                    onChange={(e) => setEvaluationObservations(e.target.value)}
-                    disabled={isFinalSaved || isCreatingEvaluation}
-                    className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ${
-                      isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                    rows={4}
-                    placeholder="Describa sus observaciones sobre la lista de chequeo..."
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
-                    Recomendaciones: <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    value={evaluationRecommendations}
-                    onChange={(e) => setEvaluationRecommendations(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                    rows={4}
-                    placeholder="Agregue sus recomendaciones..."
-                    disabled={isCreatingEvaluation}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
-                    Juicio de Valor: <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={evaluationJudgment}
-                    onChange={(e) => setEvaluationJudgment(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-lime-600 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                    disabled={isCreatingEvaluation}
-                  >
-                    <option value="">Seleccione un juicio de valor</option>
-                    <option value="EXCELENTE">Excelente</option>
-                    <option value="BUENO">Bueno</option>
-                    <option value="ACEPTABLE">Aceptable</option>
-                    <option value="DEFICIENTE">Deficiente</option>
-                    <option value="RECHAZADO">Rechazado</option>
-                  </select>
-                </div>
-
-                {/* Indicador de progreso */}
-                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Progreso:</p>
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="flex items-center">
-                      <span className={`w-3 h-3 rounded-full mr-2 ${evaluationObservations?.trim() ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                      <span className="text-xs font-medium text-gray-600 dark:text-gray-300">Observaciones</span>
-                    </div>
-                    <div className="flex items-center">
-                      <span className={`w-3 h-3 rounded-full mr-2 ${evaluationRecommendations?.trim() ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                      <span className="text-xs font-medium text-gray-600 dark:text-gray-300">Recomendaciones</span>
-                    </div>
-                    <div className="flex items-center">
-                      <span className={`w-3 h-3 rounded-full mr-2 ${evaluationJudgment && evaluationJudgment !== '' ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                      <span className="text-xs font-medium text-gray-600 dark:text-gray-300">Juicio de Valor</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Botones de acción */}
-              <div className="flex justify-end space-x-4 mt-8">
-                <button
-                  onClick={handleCloseCreateEvaluationModal}
-                  disabled={isCreatingEvaluation}
-                  className="px-6 py-3 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleCreateEvaluationFromModal}
-                  disabled={isCreatingEvaluation || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment}
-                  className={`px-8 py-3 rounded-lg transition-all duration-300 flex items-center space-x-2 font-semibold ${(isCreatingEvaluation || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment)
-                      ? 'bg-gray-400 cursor-not-allowed text-white'
-                      : 'bg-gradient-to-r from-lime-600 to-lime-500 hover:from-lime-500 hover:to-lime-600 text-white shadow-lg hover:shadow-xl'
-                    }`}
-                >
-                  {isCreatingEvaluation ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Creando...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="w-5 h-5" />
-                      <span>Crear Evaluación</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
+          <div className="space-y-4">
+            <label className="block text-lg font-semibold text-darkBlue dark:text-white mb-2">
+              <span className="flex items-center gap-2">
+                💡 Recomendaciones: <span className="text-red-500">*</span>
+              </span>
+            </label>
+            <textarea
+              value={evaluationRecommendations}
+              onChange={(e) => setEvaluationRecommendations(e.target.value)}
+              disabled={isCreatingEvaluation}
+              className="w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300"
+              rows={4}
+              placeholder="Agregue sus recomendaciones..."
+            />
           </div>
         </div>
-      )}
+
+        <div className="mb-6">
+          <label className="block text-lg font-semibold text-darkBlue dark:text-white mb-4">
+            <span className="flex items-center gap-2">
+              ⚖️ Juicio de Valor: <span className="text-red-500">*</span>
+            </span>
+          </label>
+          <select
+            value={evaluationJudgment}
+            onChange={(e) => setEvaluationJudgment(e.target.value)}
+            disabled={isCreatingEvaluation}
+            className="w-full px-6 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white font-semibold text-lg shadow-inner transition-all duration-300"
+          >
+            <option value="">Seleccione un juicio de valor</option>
+            <option value="EXCELENTE">Excelente</option>
+            <option value="BUENO">Bueno</option>
+            <option value="ACEPTABLE">Aceptable</option>
+            <option value="DEFICIENTE">Deficiente</option>
+            <option value="RECHAZADO">Rechazado</option>
+          </select>
+        </div>
+
+        {/* Indicador de progreso con diseño moderno */}
+        <Card
+          header={<h4 className="font-semibold text-gray-900 dark:text-gray-100">📊 Progreso de Evaluación</h4>}
+          body={
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30">
+                <div className={`w-4 h-4 rounded-full ${evaluationObservations?.trim() ? 'bg-green-500' : 'bg-gray-300'} transition-colors duration-300`}></div>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Observaciones</span>
+                {evaluationObservations?.trim() && <span className="text-green-500">✓</span>}
+              </div>
+              <div className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30">
+                <div className={`w-4 h-4 rounded-full ${evaluationRecommendations?.trim() ? 'bg-green-500' : 'bg-gray-300'} transition-colors duration-300`}></div>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Recomendaciones</span>
+                {evaluationRecommendations?.trim() && <span className="text-green-500">✓</span>}
+              </div>
+              <div className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30">
+                <div className={`w-4 h-4 rounded-full ${evaluationJudgment && evaluationJudgment !== '' ? 'bg-green-500' : 'bg-gray-300'} transition-colors duration-300`}></div>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Juicio de Valor</span>
+                {evaluationJudgment && evaluationJudgment !== '' && <span className="text-green-500">✓</span>}
+              </div>
+            </div>
+          }
+          className="mb-6"
+        />
+
+        {/* Botones de acción con diseño moderno */}
+        <div className="flex justify-center space-x-6 mt-8">
+          <button
+            onClick={handleCloseCreateEvaluationModal}
+            disabled={isCreatingEvaluation}
+            className={`px-8 py-4 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white rounded-2xl transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${
+              isCreatingEvaluation ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+          >
+            <X className="w-5 h-5" />
+            <span>Cancelar</span>
+          </button>
+          <button
+            onClick={handleCreateEvaluationFromModal}
+            disabled={isCreatingEvaluation || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment}
+            className={`px-8 py-4 rounded-2xl transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${(isCreatingEvaluation || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment)
+                ? 'bg-gray-400 cursor-not-allowed text-white'
+                : 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white'
+              }`}
+          >
+            {isCreatingEvaluation ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Creando...</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-5 h-5" />
+                <span>Crear Evaluación</span>
+              </>
+            )}
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }
