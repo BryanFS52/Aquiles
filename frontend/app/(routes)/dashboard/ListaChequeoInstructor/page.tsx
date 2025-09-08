@@ -1813,252 +1813,244 @@ export default function InstructorChecklistView() {
               </div>
             </div>
 
-            {/* Sección de Evaluación - Movida debajo de la tabla */}
+            {/* Sección de Evaluación con diseño de tabla */}
             {selectedChecklist && (
               <div className="mt-12 relative">
-                <div className="bg-gradient-to-br from-green-50 via-white to-green-50 dark:from-green-900/20 dark:via-gray-800 dark:to-green-900/20 rounded-3xl shadow-2xl border border-green-200 dark:border-green-800 overflow-hidden">
-                  <div className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue p-6">
-                    <h3 className="text-2xl font-bold text-white text-center flex items-center justify-center gap-3">
-
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  <div className="bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-secondary dark:to-blue-900 px-6 py-4">
+                    <h3 className="text-2xl font-bold text-white text-center">
                       Evaluación de Lista de Chequeo
-
                     </h3>
                   </div>
-
-                  <div className="p-8">
-                    {selectedEvaluation ? (
-                      // Vista cuando hay evaluación existente
-                      showEvaluationForm ? (
-                        // Mostrar formulario de actualización con diseño hexagonal
-                        <div className="space-y-6">
-                          {/* Estado de la evaluación */}
-                          <div className="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-800 dark:to-blue-900/50 p-6 rounded-2xl border border-blue-200 dark:border-blue-700 shadow-inner">
-                            <p className="text-blue-800 dark:text-blue-200 text-center font-medium flex items-center justify-center gap-2">
-
-                              <strong>Actualizar Evaluación:</strong> Modifique los campos que desee cambiar
-                            </p>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-4">
-                              <label className="block text-lg font-semibold text-darkBlue dark:text-white mb-2">
-                                <span className="flex items-center gap-2">
-
-                                  Observaciones: <span className="text-red-500">*</span>
-                                </span>
-                              </label>
-                              <textarea
-                                value={evaluationObservations}
-                                onChange={(e) => setEvaluationObservations(e.target.value)}
-                                disabled={isFinalSaved}
-                                className={`w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300 resize-vertical break-words overflow-wrap-anywhere ${
-                                  isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
-                                }`}
-                                rows={4}
-                                placeholder={isFinalSaved ? "Evaluación guardada definitivamente" : "Ingrese sus observaciones generales sobre la evaluación..."}
-                                required
-                                style={{
-                                  wordWrap: 'break-word',
-                                  overflowWrap: 'break-word',
-                                  whiteSpace: 'pre-wrap'
-                                }}
-                              />
+                  
+                  <div className="overflow-x-auto">
+                    <div className="min-w-full">
+                      {selectedEvaluation ? (
+                        // Vista cuando hay evaluación existente
+                        showEvaluationForm ? (
+                          // Mostrar formulario de actualización en formato tabla
+                          <div>
+                            {/* Estado de la evaluación */}
+                            <div className="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-800 dark:to-blue-900/50 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+                              <p className="text-blue-800 dark:text-blue-200 text-center font-medium">
+                                <strong>Actualizar Evaluación:</strong> Modifique los campos que desee cambiar
+                              </p>
                             </div>
 
-                            <div className="space-y-4">
-                              <label className="block text-lg font-semibold text-darkBlue dark:text-white mb-2">
-                                <span className="flex items-center gap-2">
+                            {/* Headers de la tabla */}
+                            <div className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                              <div className="grid grid-cols-12 gap-4 px-6 py-5 text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                <div className="col-span-4 text-left">OBSERVACIONES</div>
+                                <div className="col-span-4 text-left">RECOMENDACIONES</div>
+                                <div className="col-span-2 text-center">JUICIO DE VALOR</div>
+                                <div className="col-span-2 text-center">ACCIONES</div>
+                              </div>
+                            </div>
 
-                                  Recomendaciones: <span className="text-red-500">*</span>
-                                </span>
-                              </label>
-                              <textarea
-                                value={evaluationRecommendations}
-                                onChange={(e) => setEvaluationRecommendations(e.target.value)}
-                                disabled={isFinalSaved}
-                                className={`w-full px-4 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-inner transition-all duration-300 resize-vertical break-words overflow-wrap-anywhere ${
-                                  isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
-                                }`}
-                                rows={4}
-                                placeholder={isFinalSaved ? "Evaluación guardada definitivamente" : "Ingrese sus recomendaciones para esta evaluación..."}
-                                required
-                                style={{
-                                  wordWrap: 'break-word',
-                                  overflowWrap: 'break-word',
-                                  whiteSpace: 'pre-wrap'
-                                }}
-                              />
+                            {/* Contenido de la tabla */}
+                            <div className="px-6 py-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200">
+                              <div className="grid grid-cols-12 gap-4 items-start">
+                                {/* OBSERVACIONES */}
+                                <div className="col-span-4">
+                                  <textarea
+                                    value={evaluationObservations}
+                                    onChange={(e) => setEvaluationObservations(e.target.value)}
+                                    disabled={isFinalSaved}
+                                    className={`w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none break-words whitespace-pre-wrap ${
+                                      isFinalSaved ? 'opacity-50 cursor-not-allowed' : 'focus:ring-2 focus:ring-[#5cb800] focus:border-[#5cb800]'
+                                    }`}
+                                    style={{ overflowWrap: 'anywhere' }}
+                                    rows={4}
+                                    placeholder={isFinalSaved ? "Evaluación guardada definitivamente" : "Ingrese sus observaciones generales..."}
+                                    required
+                                  />
+                                </div>
+
+                                {/* RECOMENDACIONES */}
+                                <div className="col-span-4">
+                                  <textarea
+                                    value={evaluationRecommendations}
+                                    onChange={(e) => setEvaluationRecommendations(e.target.value)}
+                                    disabled={isFinalSaved}
+                                    className={`w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none break-words whitespace-pre-wrap ${
+                                      isFinalSaved ? 'opacity-50 cursor-not-allowed' : 'focus:ring-2 focus:ring-[#5cb800] focus:border-[#5cb800]'
+                                    }`}
+                                    style={{ overflowWrap: 'anywhere' }}
+                                    rows={4}
+                                    placeholder={isFinalSaved ? "Evaluación guardada definitivamente" : "Ingrese sus recomendaciones..."}
+                                    required
+                                  />
+                                </div>
+
+                                {/* JUICIO DE VALOR */}
+                                <div className="col-span-2 flex items-center justify-center">
+                                  <select
+                                    value={evaluationJudgment}
+                                    onChange={(e) => setEvaluationJudgment(e.target.value)}
+                                    disabled={isFinalSaved}
+                                    className={`w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium ${
+                                      isFinalSaved ? 'opacity-50 cursor-not-allowed' : 'focus:ring-2 focus:ring-[#5cb800] focus:border-[#5cb800]'
+                                    }`}
+                                    required
+                                  >
+                                    <option value="">Seleccionar...</option>
+                                    <option value="PENDIENTE">Pendiente</option>
+                                    <option value="APROBADO">Aprobado</option>
+                                    <option value="NO APROBADO">No Aprobado</option>
+                                  </select>
+                                </div>
+
+                                {/* ACCIONES */}
+                                <div className="col-span-2 flex items-center justify-center space-x-2">
+                                  <button
+                                    onClick={handleCancelUpdate}
+                                    disabled={isFinalSaved}
+                                    className={`px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-all duration-300 flex items-center space-x-2 text-sm font-medium ${
+                                      isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
+                                    }`}
+                                  >
+                                    <X className="w-4 h-4" />
+                                    <span>Cancelar</span>
+                                  </button>
+                                  <button
+                                    onClick={handleCompleteEvaluation}
+                                    disabled={isFinalSaved || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE"}
+                                    className={`px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2 text-sm font-medium ${(isFinalSaved || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
+                                        ? 'bg-gray-400 cursor-not-allowed text-white'
+                                        : 'bg-gradient-to-r from-[#5cb800] to-[#8fd400] hover:from-[#4a9600] hover:to-[#7bc300] text-white'
+                                      }`}
+                                  >
+                                    <Save className="w-4 h-4" />
+                                    <span>{isFinalSaved ? 'Guardado' : 'Guardar'}</span>
+                                  </button>
+                                </div>
+                              </div>
                             </div>
                           </div>
+                        ) : (
+                          // Mostrar vista de evaluación completada en formato tabla
+                          <div>
+                            {/* Estado de la evaluación */}
+                            <div className="bg-gradient-to-r from-green-100 to-green-50 dark:from-green-800 dark:to-green-900/50 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+                              <p className="text-green-800 dark:text-green-200 text-center font-medium flex items-center justify-center gap-2">
+                                <span className="text-2xl">✅</span>
+                                <strong>Evaluación Completada</strong>
+                              </p>
+                            </div>
 
-                          <div className="mt-6">
-                            <label className="block text-lg font-semibold text-darkBlue dark:text-white mb-4">
-                              <span className="flex items-center gap-2">
-                                <span className="text-xl">⚖️</span>
-                                Juicio de Valor: <span className="text-red-500">*</span>
-                              </span>
-                            </label>
-                            <select
-                              value={evaluationJudgment}
-                              onChange={(e) => setEvaluationJudgment(e.target.value)}
-                              disabled={isFinalSaved}
-                              className={`w-full px-6 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white font-semibold text-lg shadow-inner transition-all duration-300 ${
-                                isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
-                              }`}
-                              required
-                            >
-                              <option value="">Seleccione un juicio de valor</option>
-                              <option value="PENDIENTE">Pendiente</option>
-                              <option value="APROBADO">Aprobado</option>
-                              <option value="NO APROBADO">No Aprobado</option>
-                              
-                            </select>
-                          </div>
+                            {/* Headers de la tabla */}
+                            <div className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                              <div className="grid grid-cols-12 gap-4 px-6 py-5 text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                <div className="col-span-4 text-left">OBSERVACIONES</div>
+                                <div className="col-span-4 text-left">RECOMENDACIONES</div>
+                                <div className="col-span-2 text-center">JUICIO DE VALOR</div>
+                                <div className="col-span-2 text-center">ACCIONES</div>
+                              </div>
+                            </div>
 
-                          <div className="flex justify-center space-x-6 mt-8">
-                            <button
-                              onClick={handleCancelUpdate}
-                              disabled={isFinalSaved}
-                              className={`px-8 py-4 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white rounded-2xl transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${
-                                isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
-                              }`}
-                            >
-                              <X className="w-5 h-5" />
-                              <span>Cancelar</span>
-                            </button>
-                            <button
-                              onClick={handleCompleteEvaluation}
-                              disabled={isFinalSaved || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE"}
-                              className={`px-8 py-4 rounded-2xl transition-all duration-300 flex items-center space-x-3 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${(isFinalSaved || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
-                                  ? 'bg-gray-400 cursor-not-allowed text-white'
-                                  : 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white'
-                                }`}
-                            >
-                              <Save className="w-5 h-5" />
-                              <span>{isFinalSaved ? 'Guardado Definitivamente' : 'Guardar Cambios'}</span>
-                            </button>
+                            {/* Contenido de la tabla */}
+                            <div className="px-6 py-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200">
+                              <div className="grid grid-cols-12 gap-4 items-start">
+                                {/* OBSERVACIONES */}
+                                <div className="col-span-4">
+                                  <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg border border-blue-200 dark:border-blue-600">
+                                    <p className="text-base text-gray-900 dark:text-white leading-relaxed break-words whitespace-pre-wrap overflow-wrap-anywhere evaluation-text">
+                                      {selectedEvaluation ? extractGeneralObservationsFromEvaluation(selectedEvaluation) || "Sin observaciones" : "Sin observaciones"}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* RECOMENDACIONES */}
+                                <div className="col-span-4">
+                                  <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg border border-green-200 dark:border-green-600">
+                                    <p className="text-base text-gray-900 dark:text-white leading-relaxed break-words whitespace-pre-wrap overflow-wrap-anywhere evaluation-text">
+                                      {selectedEvaluation.recommendations || "Sin recomendaciones"}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* JUICIO DE VALOR */}
+                                <div className="col-span-2 flex items-center justify-center">
+                                  <span className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg ${
+                                    selectedEvaluation.valueJudgment === 'APROBADO' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
+                                    selectedEvaluation.valueJudgment === 'NO APROBADO' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
+                                    selectedEvaluation.valueJudgment === 'PENDIENTE' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white' :
+                                    'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
+                                  }`}>
+                                    {selectedEvaluation.valueJudgment || "PENDIENTE"}
+                                  </span>
+                                </div>
+
+                                {/* ACCIONES */}
+                                <div className="col-span-2 flex items-center justify-center">
+                                  <button
+                                    onClick={handleUpdateEvaluationClick}
+                                    disabled={isFinalSaved}
+                                    className={`px-4 py-2 bg-gradient-to-r from-[#5cb800] to-[#8fd400] hover:from-[#4a9600] hover:to-[#7bc300] text-white rounded-lg transition-all duration-300 flex items-center space-x-2 text-sm font-medium ${
+                                      isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
+                                    }`}
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                    <span>{isFinalSaved ? 'Guardada' : 'Actualizar'}</span>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                        </div>
+                        )
                       ) : (
-                        // Mostrar vista compacta con botón de actualizar
-                        <div className="space-y-6">
-                          {/* Estado de la evaluación */}
-                          <div className="bg-gradient-to-r from-green-100 to-green-50 dark:from-green-800 dark:to-green-900/50 p-6 rounded-2xl border border-green-200 dark:border-green-700 shadow-inner">
-                            <p className="text-green-800 dark:text-green-200 text-center font-medium flex items-center justify-center gap-2">
-                              <span className="text-2xl">✅</span>
-                              <strong>Evaluación Completada</strong>
-                            </p>
-                          </div>
-
-                          {/* Resumen de la evaluación con diseño hexagonal */}
-                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div className="bg-white dark:bg-gray-800 border-2 border-blue-200 dark:border-blue-700 rounded-2xl p-6 shadow-lg">
-                              <div className="text-center mb-4">
-                                <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                                  <span className="text-white text-xl">📝</span>
-                                </div>
-                                <h4 className="text-lg font-bold text-darkBlue dark:text-white">Observaciones</h4>
-                              </div>
-                              <div className="bg-gradient-to-r from-blue-50 to-white dark:from-blue-900/30 dark:to-gray-700 p-4 rounded-xl border border-blue-200 dark:border-blue-600">
-                                <p className="text-sm text-darkBlue dark:text-white leading-relaxed min-h-[80px] break-words whitespace-pre-wrap overflow-wrap-anywhere word-break-break-word evaluation-text">
-                                  {selectedEvaluation ? extractGeneralObservationsFromEvaluation(selectedEvaluation) || "Sin observaciones" : "Sin observaciones"}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="bg-white dark:bg-gray-800 border-2 border-green-200 dark:border-green-700 rounded-2xl p-6 shadow-lg">
-                              <div className="text-center mb-4">
-                                <div className="w-12 h-12 bg-lime-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                                  <span className="text-white text-xl">💡</span>
-                                </div>
-                                <h4 className="text-lg font-bold text-darkBlue dark:text-white">Recomendaciones</h4>
-                              </div>
-                              <div className="bg-gradient-to-r from-green-50 to-white dark:from-green-900/30 dark:to-gray-700 p-4 rounded-xl border border-green-200 dark:border-green-600">
-                                <p className="text-sm text-darkBlue dark:text-white leading-relaxed min-h-[80px] break-words whitespace-pre-wrap overflow-wrap-anywhere word-break-break-word evaluation-text">
-                                  {selectedEvaluation.recommendations || "Sin recomendaciones"}
-                                </p>
-                              </div>
-                            </div>
-
-                            <div className="bg-white dark:bg-gray-800 border-2 border-purple-200 dark:border-purple-700 rounded-2xl p-6 shadow-lg">
-                              <div className="text-center mb-4">
-                                <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                                  <span className="text-white text-xl">⚖️</span>
-                                </div>
-                                <h4 className="text-lg font-bold text-darkBlue dark:text-white">Juicio de Valor</h4>
-                              </div>
-                              <div className="flex justify-center">
-                                <span className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg ${
-                                  selectedEvaluation.valueJudgment === 'APROBADO' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
-                                  selectedEvaluation.valueJudgment === 'NO APROBADO' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
-                                  selectedEvaluation.valueJudgment === 'PENDIENTE' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white' :
-                                  'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
-                                }`}>
-                                  {selectedEvaluation.valueJudgment || "PENDIENTE"}
-                                </span>
-                              </div>
+                        // Vista cuando no hay evaluación
+                        <div>
+                          {/* Headers de la tabla */}
+                          <div className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+                            <div className="grid grid-cols-12 gap-4 px-6 py-5 text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                              <div className="col-span-12 text-center">EVALUACIÓN PENDIENTE</div>
                             </div>
                           </div>
 
-                          {/* Botón para actualizar evaluación */}
-                          <div className="flex justify-center mt-8">
-                            <button
-                              onClick={handleUpdateEvaluationClick}
-                              disabled={isFinalSaved}
-                              className={`px-10 py-4 bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white rounded-full transition-all duration-300 flex items-center space-x-4 mx-auto font-bold text-xl shadow-2xl hover:shadow-lime-600/20 dark:hover:shadow-shadowBlue/30 transform hover:scale-110 ${
-                                isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
-                              }`}
-                            >
-                              <Edit className="w-6 h-6" />
-                              <span>{isFinalSaved ? 'Evaluación Guardada' : 'Actualizar Evaluación'}</span>
-                            </button>
-                          </div>
-                        </div>
-                      )
-                    ) : (
-                      // Vista cuando no hay evaluación con diseño hexagonal
-                      <div className="text-center space-y-8">
-                        <div className="bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 p-8 rounded-3xl border-2 border-gray-200 dark:border-gray-600 shadow-inner">
+                          {/* Contenido de la tabla */}
+                          <div className="px-6 py-8 text-center">
+                            <div className="space-y-6">
+                              <div className="w-16 h-16 bg-gradient-to-r from-[#5cb800] to-[#8fd400] rounded-full flex items-center justify-center mx-auto">
+                                <span className="text-white text-2xl">📋</span>
+                              </div>
+                              <h4 className="text-2xl font-bold text-gray-900 dark:text-white">
+                                Esta lista no tiene evaluación
+                              </h4>
+                              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                                Se creará automáticamente una <strong>evaluación única</strong> vinculada a esta lista de chequeo (relación 1:1 en la base de datos). 
+                                Complete los campos para establecer la evaluación final.
+                              </p>
 
-                          <h4 className="text-2xl font-bold text-darkBlue dark:text-white mb-4 flex items-center justify-center gap-3">
-
-                            Esta lista no tiene evaluación
-                          </h4>
-                          <p className="text-lg text-gray-800 dark:text-gray-200 mb-8 max-w-2xl mx-auto leading-relaxed">
-                            Se creará automáticamente una <strong>evaluación única</strong> vinculada a esta lista de chequeo (relación 1:1 en la base de datos). 
-                            Complete los campos para establecer la evaluación final.
-                          </p>
-
-                          {/* Botón principal para crear evaluación */}
-                          <button
-                            onClick={handleOpenCreateEvaluationModal}
-                            disabled={isFinalSaved}
-                            className={`px-12 py-6 bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white rounded-3xl transition-all duration-500 flex items-center space-x-4 mx-auto font-bold text-xl shadow-2xl hover:shadow-lime-600/20 dark:hover:shadow-shadowBlue/30 transform hover:scale-110 ${
-                              isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
-                            }`}
-                          >
-                            <Save className="w-8 h-8" />
-                            <span>{isFinalSaved ? 'Evaluación Guardada' : 'Crear Evaluación'}</span>
-                          </button>
-
-                          {/* Botón para volver a seleccionar TeamScrum - visible cuando la evaluación esté completada o guardada */}
-                          {(isFinalSaved || selectedEvaluation) && (
-                            <div className="mt-6">
+                              {/* Botón principal para crear evaluación */}
                               <button
-                                onClick={handleBackToSelection}
-                                className="px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white rounded-2xl transition-all duration-300 flex items-center space-x-3 mx-auto font-semibold text-lg shadow-lg hover:shadow-gray-500/20 transform hover:scale-105"
+                                onClick={handleOpenCreateEvaluationModal}
+                                disabled={isFinalSaved}
+                                className={`px-8 py-4 bg-gradient-to-r from-[#5cb800] to-[#8fd400] hover:from-[#4a9600] hover:to-[#7bc300] text-white rounded-lg transition-all duration-300 flex items-center space-x-3 mx-auto font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                                  isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
                               >
-                                <ArrowLeft className="w-6 h-6" />
-                                <span>Evaluar Otro Team Scrum</span>
+                                <Save className="w-6 h-6" />
+                                <span>{isFinalSaved ? 'Evaluación Guardada' : 'Crear Evaluación'}</span>
                               </button>
+
+                              {/* Botón para volver a seleccionar TeamScrum */}
+                              {(isFinalSaved || selectedEvaluation) && (
+                                <div className="mt-6">
+                                  <button
+                                    onClick={handleBackToSelection}
+                                    className="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-all duration-300 flex items-center space-x-2 mx-auto font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+                                  >
+                                    <ArrowLeft className="w-5 h-5" />
+                                    <span>Evaluar Otro Team Scrum</span>
+                                  </button>
+                                </div>
+                              )}
                             </div>
-                          )}
-
-                          {/* Botón de debug con diseño hexagonal */}
-
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
