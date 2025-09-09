@@ -8,14 +8,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EvaluationsDto {
+public class EvaluationDto {
     private Long id;
 
-    // Observaciones pueden estar vacías inicialmente pero no nulas
     // @Size(max = 500, message = "Las observaciones no pueden exceder los 500 caracteres")
     private String observations;
 
-    // Recomendaciones pueden estar vacías inicialmente pero no nulas
     // @Size(max = 255, message = "Las recomendaciones no pueden exceder los 255 caracteres")
     private String recommendations;
 

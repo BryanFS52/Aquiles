@@ -10,11 +10,12 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
-@Service
+@Component
 public class ChecklistBusiness {
     private final ChecklistService checklistService;
 
@@ -75,7 +76,6 @@ public class ChecklistBusiness {
             throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
 
     // Update existing checklist
     public void update (Long checklistId, ChecklistDto checklistDto) {

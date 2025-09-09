@@ -21,7 +21,7 @@ public class ChecklistDto {
     // Relations
     private List<ItemDto> items;
 
-    private EvaluationsDto evaluation;
+    private EvaluationDto evaluation;
 
     private List<TeamsScrumDto> teamsScrum;
 

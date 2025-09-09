@@ -3,11 +3,9 @@ package com.api.aquilesApi.Resolver;
 
 
 import com.api.aquilesApi.Business.EvaluationsBusiness;
-import com.api.aquilesApi.Dto.EvaluationsDto;
-import com.api.aquilesApi.Service.EvaluationsService;
+import com.api.aquilesApi.Dto.EvaluationDto;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.*;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
@@ -27,7 +25,7 @@ public class EvaluationsResolver {
     @DgsQuery
     public Map<String, Object> allEvaluations(@InputArgument("page") Integer page, @InputArgument("size") Integer size) {
         try {
-            Page<EvaluationsDto> evaluationsDtoPage = evaluationsBusiness.findAll(page, size);
+            Page<EvaluationDto> evaluationsDtoPage = evaluationsBusiness.findAll(page, size);
             return ResponseHttpApi .responseHttpFindAll(
                     evaluationsDtoPage.getContent(),
                     ResponseHttpApi.CODE_OK,
@@ -46,9 +44,9 @@ public class EvaluationsResolver {
     @DgsQuery
     public Map<String, Object> evaluationById(@InputArgument("id") Long id) {
         try {
-            EvaluationsDto evaluationsDto = evaluationsBusiness.findById(id);
+            EvaluationDto evaluationDto = evaluationsBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
-                    evaluationsDto,
+                    evaluationDto,
                     ResponseHttpApi.CODE_OK,
                     "Query by id ok"
             );
@@ -62,7 +60,7 @@ public class EvaluationsResolver {
     @DgsQuery
     public Map<String, Object> evaluationsByChecklist(@InputArgument("checklistId") Long checklistId) {
         try {
-            List<EvaluationsDto> evaluations = evaluationsBusiness.findByChecklistId(checklistId);
+            List<EvaluationDto> evaluations = evaluationsBusiness.findByChecklistId(checklistId);
             return ResponseHttpApi.responseHttpFindAll(
                     evaluations,
                     ResponseHttpApi.CODE_OK,
@@ -82,7 +80,7 @@ public class EvaluationsResolver {
     @DgsQuery
     public Map<String, Object> evaluationByChecklist(@InputArgument("checklistId") Long checklistId) {
         try {
-            EvaluationsDto evaluation = evaluationsBusiness.findEvaluationByChecklistId(checklistId);
+            EvaluationDto evaluation = evaluationsBusiness.findEvaluationByChecklistId(checklistId);
             if (evaluation != null) {
                 return ResponseHttpApi.responseHttpFindId(
                         evaluation,
@@ -119,11 +117,11 @@ public class EvaluationsResolver {
     }
 
     @DgsMutation
-    public Map<String, Object> addEvaluation(@InputArgument("input") EvaluationsDto input) {
+    public Map<String, Object> addEvaluation(@InputArgument("input") EvaluationDto input) {
         try {
-            EvaluationsDto evaluationsDto = evaluationsBusiness.add(input);
+            EvaluationDto evaluationDto = evaluationsBusiness.add(input);
             return ResponseHttpApi.responseHttpAction(
-                    evaluationsDto.getId(),
+                    evaluationDto.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Evaluation created successfully"
             );
@@ -135,7 +133,7 @@ public class EvaluationsResolver {
     }
 
     @DgsMutation
-    public Map<String, Object> updateEvaluation(@InputArgument("id") Long id, @InputArgument("input") EvaluationsDto input) {
+    public Map<String, Object> updateEvaluation(@InputArgument("id") Long id, @InputArgument("input") EvaluationDto input) {
         try {
             evaluationsBusiness.update(id, input);
             return ResponseHttpApi.responseHttpAction(

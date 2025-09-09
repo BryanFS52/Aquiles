@@ -14,7 +14,7 @@ import java.util.Base64;
 @Setter
 @Entity
 @Table(name = "evaluations")
-public class Evaluations implements Serializable {
+public class Evaluation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -44,11 +44,11 @@ public class Evaluations implements Serializable {
     private TeamsScrum teamsScrum;
 
     // Custom methods to handle signature as Base64
-    public String getInstructorSignatureBase64() {
-        return instructorSignature != null ? Base64.getEncoder().encodeToString(instructorSignature) : null;
+    public byte[] getInstructorSignature() {
+        return Base64.getEncoder().encodeToString(instructorSignature).getBytes();
     }
 
-    public void setInstructorSignatureFromBase64(String base64Signature) {
-        this.instructorSignature = base64Signature != null ? Base64.getDecoder().decode(base64Signature) : null;
+    public void setInstructorSignature(byte[] instructorSignature) {
+        this.instructorSignature = Base64.getDecoder().decode(instructorSignature);
     }
 }

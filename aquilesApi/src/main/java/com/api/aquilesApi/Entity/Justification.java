@@ -75,5 +75,4 @@ public class Justification implements Serializable {
         }
         return null;
     }
-
 }
