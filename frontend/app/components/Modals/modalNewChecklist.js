@@ -139,7 +139,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
         state: false,
         remarks: observaciones || "Sin observaciones",
         trimester: trimestre,
-        instructorSignature: "No signature",
+        instructorSignature: JSON.stringify({}),
         evaluationCriteria: false,
         studySheets: selectedStudySheets.length > 0 ? selectedStudySheets.join(',') : null,
         trainingProjectId: selectedTrainingProject ? parseInt(selectedTrainingProject) : null,

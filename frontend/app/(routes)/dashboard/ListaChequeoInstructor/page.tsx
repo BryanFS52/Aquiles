@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Check, FileDown, Save, UploadCloud, X, AlertTriangle, Phone, Edit, ArrowLeft } from "lucide-react";
 import { toast } from "react-toastify";
@@ -15,6 +15,7 @@ import { fetchAllChecklists, fetchChecklistById } from "@services/checkListServi
 import { fetchEvaluationsByChecklist, fetchEvaluationsByChecklistOld, completeEvaluation, createMissingEvaluationForChecklist, createEvaluationForChecklist } from "@services/evaluationService";
 import { exportChecklistToPdf, exportChecklistToExcel, downloadFileFromBase64 } from "@services/exportService";
 import { GET_ALL_EVALUATIONS } from '@graphql/evaluationsGraph';
+import { UPDATE_CHECKLIST } from '@graphql/checklistGraph';
 import { clientLAN } from '@/lib/apollo-client';
 import {
   Checklist,
@@ -60,8 +61,59 @@ export default function InstructorChecklistView() {
   // Estados para la vista previa
   const [showPreview, setShowPreview] = useState(false);
   const [isFinalSaved, setIsFinalSaved] = useState(false);
+  
+  // Flag para controlar si el cambio de checklist fue por actualización de firmas
+  const [isSignatureUpdate, setIsSignatureUpdate] = useState(false);
+  
+  // Ref para rastrear qué tipo de actualización de firma está ocurriendo
+  const signatureUpdateRef = useRef<{ type: string; inProgress: boolean }>({ type: '', inProgress: false });
 
   const itemsPerPage = 3;
+
+  // Función para cargar firmas existentes desde el checklist
+  const loadExistingSignatures = (checklist: Checklist): void => {
+    // Limpiar firmas primero
+    setFirmaAnterior(null);
+    setFirmaNuevo(null);
+    
+    try {
+      if (checklist.instructorSignature && 
+          checklist.instructorSignature !== "No signature" && 
+          checklist.instructorSignature.trim() !== "") {
+        
+        // Intentar parsear como JSON
+        const signatures = JSON.parse(checklist.instructorSignature);
+        
+        console.log("Firmas cargadas desde BD:", signatures);
+        
+        // Si es un objeto con firmas separadas
+        if (typeof signatures === 'object' && signatures !== null) {
+          if (signatures.anterior) {
+            // Si es base64 puro, agregar prefijo para mostrar
+            const anteriorImage = signatures.anterior.startsWith('data:') 
+              ? signatures.anterior 
+              : `data:image/jpeg;base64,${signatures.anterior}`;
+            setFirmaAnterior(anteriorImage);
+            console.log("Firma anterior cargada");
+          }
+          
+          if (signatures.nuevo) {
+            // Si es base64 puro, agregar prefijo para mostrar
+            const nuevoImage = signatures.nuevo.startsWith('data:') 
+              ? signatures.nuevo 
+              : `data:image/jpeg;base64,${signatures.nuevo}`;
+            setFirmaNuevo(nuevoImage);
+            console.log("Firma nuevo cargada");
+          }
+        }
+      } else {
+        console.log("No hay firmas existentes para cargar");
+      }
+    } catch (error) {
+      // Si no es JSON válido, puede ser formato legacy o datos corruptos
+      console.log("No se pudo parsear firmas como JSON, iniciando limpio:", error);
+    }
+  };
 
   // Funciones auxiliares para extraer y estructurar datos de evaluaciones
   const extractItemStatesFromEvaluation = (evaluation: Evaluation) => {
@@ -138,6 +190,14 @@ export default function InstructorChecklistView() {
   // Auto-cargar evaluaciones cuando cambie el checklist seleccionado
   useEffect(() => {
     if (selectedChecklist) {
+      // Si es una actualización de firma, no recargar evaluaciones
+      if (isSignatureUpdate || signatureUpdateRef.current.inProgress) {
+        console.log("=== SIGNATURE UPDATE DETECTED - SKIPPING EVALUATION RELOAD ===");
+        console.log("isSignatureUpdate:", isSignatureUpdate);
+        console.log("signatureUpdateRef:", signatureUpdateRef.current);
+        return;
+      }
+
       console.log("=== CHECKLIST CHANGED - LOADING EVALUATIONS ===");
       // Guardar selección en localStorage para persistencia de navegación
       localStorage.setItem('selectedChecklistId', selectedChecklist.id);
@@ -146,6 +206,13 @@ export default function InstructorChecklistView() {
       // Resetear estados de guardado al cambiar de checklist
       setIsFinalSaved(false);
       setShowPreview(false);
+
+      // Inicializar estado del localStorage para el nuevo checklist
+      const previousFinalState = localStorage.getItem(`isFinalSaved_${selectedChecklist.id}`);
+      if (previousFinalState === 'true') {
+        setIsFinalSaved(true);
+        console.log('🔒 Estado de guardado definitivo restaurado para checklist:', selectedChecklist.id);
+      }
 
       // Cargar estados guardados del localStorage
       const savedItemStates = localStorage.getItem(`itemStates_${selectedChecklist.id}`);
@@ -157,6 +224,16 @@ export default function InstructorChecklistView() {
         } catch (error) {
           console.warn('Error al cargar estados del localStorage:', error);
         }
+      }
+
+      // Cargar estado de guardado definitivo desde localStorage
+      const savedFinalState = localStorage.getItem(`isFinalSaved_${selectedChecklist.id}`);
+      if (savedFinalState === 'true') {
+        setIsFinalSaved(true);
+        console.log('🔒 Estado de guardado definitivo restaurado para checklist:', selectedChecklist.id);
+      } else {
+        setIsFinalSaved(false);
+        console.log('🔓 Checklist en modo edición:', selectedChecklist.id);
       }
 
       // Cargar datos de evaluación guardados del localStorage
@@ -189,7 +266,7 @@ export default function InstructorChecklistView() {
       setIsFinalSaved(false);
       setShowPreview(false);
     }
-  }, [selectedChecklist]);
+  }, [selectedChecklist?.id]); // Solo depender del ID para evitar re-renders innecesarios
 
   // Efecto para cargar datos de evaluación seleccionada INMEDIATAMENTE
   useEffect(() => {
@@ -575,9 +652,14 @@ export default function InstructorChecklistView() {
         if (checklistResponse.code === "200" && checklistResponse.data) {
           console.log("Checklist details loaded:", checklistResponse.data);
           setSelectedChecklist(checklistResponse.data);
+          // Cargar firmas existentes si las hay
+          loadExistingSignatures(checklistResponse.data);
         } else {
           // Si no se pueden cargar los detalles, usar el checklist básico
           setSelectedChecklist(checklist || null);
+          if (checklist) {
+            loadExistingSignatures(checklist);
+          }
           console.warn("Could not load checklist details, using basic data");
         }
 
@@ -587,9 +669,15 @@ export default function InstructorChecklistView() {
         console.error("Error loading checklist details:", error);
         // En caso de error, usar el checklist básico y no mostrar error al usuario
         setSelectedChecklist(checklist || null);
+        if (checklist) {
+          loadExistingSignatures(checklist);
+        }
       }
     } else {
       setSelectedChecklist(null);
+      // Limpiar firmas cuando no hay checklist seleccionado
+      setFirmaAnterior(null);
+      setFirmaNuevo(null);
     }
   };
 
@@ -614,15 +702,187 @@ export default function InstructorChecklistView() {
     localStorage.setItem(`itemStates_${selectedChecklist?.id}`, JSON.stringify(updatedStates));
   };
 
-  const handleFileUpload = (
+  // Función para convertir archivo a base64 sin el prefijo data:
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = (e.target?.result as string).split(',')[1]; // Obtener solo el base64 sin prefijo
+        resolve(base64);
+      };
+      reader.onerror = () => reject(new Error('Error al convertir archivo'));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Función para guardar firma en la base de datos
+  const saveSignatureToDatabase = async (base64Data: string, signatureType: 'anterior' | 'nuevo'): Promise<void> => {
+    if (!selectedChecklist) {
+      toast.error("No hay lista de chequeo seleccionada");
+      return;
+    }
+
+    try {
+      // Marcar que estamos actualizando una firma ANTES de hacer cualquier cambio
+      console.log(`=== INICIANDO ACTUALIZACIÓN DE FIRMA ${signatureType.toUpperCase()} ===`);
+      setIsSignatureUpdate(true);
+      signatureUpdateRef.current = { type: signatureType, inProgress: true };
+      
+      toast.info(`💾 Guardando firma de instructor ${signatureType}...`);
+      
+      // Parsear las firmas existentes (si las hay)
+      let existingSignatures = {};
+      try {
+        const currentSignature = selectedChecklist.instructorSignature;
+        if (currentSignature && 
+            currentSignature !== "No signature" && 
+            currentSignature.trim() !== "" &&
+            currentSignature !== "{}" &&
+            currentSignature !== "{}") {
+          
+          // Intentar parsear como JSON
+          existingSignatures = JSON.parse(currentSignature);
+          console.log("Firmas existentes encontradas:", existingSignatures);
+        } else {
+          console.log("No hay firmas existentes, iniciando objeto vacío");
+        }
+      } catch (error) {
+        console.log("Error parseando firmas existentes, iniciando objeto vacío:", error);
+        existingSignatures = {};
+      }
+
+      // Actualizar con la nueva firma
+      const updatedSignatures = {
+        ...existingSignatures,
+        [signatureType]: base64Data,
+        lastUpdated: new Date().toISOString(),
+        updatedBy: "instructor" // Identificar quién actualizó
+      };
+
+      // Crear el objeto de datos para actualizar
+      // Manejar studySheets correctamente para GraphQL
+      let studySheetsData = null;
+      if (selectedChecklist.studySheets) {
+        if (Array.isArray(selectedChecklist.studySheets)) {
+          const validIds = selectedChecklist.studySheets.map((id: any) => parseInt(id.toString(), 10)).filter((id: number) => !isNaN(id));
+          studySheetsData = validIds.length > 0 ? validIds : null;
+        } else if (typeof selectedChecklist.studySheets === 'number') {
+          studySheetsData = [selectedChecklist.studySheets];
+        } else if (typeof selectedChecklist.studySheets === 'string') {
+          // Si es string, puede ser una lista separada por comas
+          const ids = (selectedChecklist.studySheets as string).split(',').map((id: string) => parseInt(id.trim(), 10)).filter((id: number) => !isNaN(id));
+          studySheetsData = ids.length > 0 ? ids : null;
+        }
+      }
+
+      const checklistData = {
+        state: selectedChecklist.state,
+        remarks: selectedChecklist.remarks || '',
+        instructorSignature: JSON.stringify(updatedSignatures), // Guardar como JSON
+        evaluationCriteria: selectedChecklist.evaluationCriteria || false,
+        trimester: selectedChecklist.trimester,
+        component: selectedChecklist.component || '',
+        studySheets: studySheetsData
+      };
+
+      console.log(`Guardando firma ${signatureType}:`, {
+        checklistId: selectedChecklist.id,
+        updatedSignatures,
+        checklistData,
+        studySheetsOriginal: selectedChecklist.studySheets,
+        studySheetsProcessed: studySheetsData
+      });
+
+      // Usar la mutación GraphQL existente para actualizar el checklist
+      const { data } = await clientLAN.mutate({
+        mutation: UPDATE_CHECKLIST,
+        variables: { 
+          id: parseInt(selectedChecklist.id), 
+          input: checklistData 
+        },
+      });
+
+      if (data?.updateChecklist?.code === "200") {
+        // NO actualizar el estado del selectedChecklist para evitar re-renderizado del useEffect
+        // Solo actualizar las firmas locales para la UI
+        if (signatureType === 'anterior') {
+          const anteriorImage = base64Data.startsWith('data:') 
+            ? base64Data 
+            : `data:image/jpeg;base64,${base64Data}`;
+          setFirmaAnterior(anteriorImage);
+        } else if (signatureType === 'nuevo') {
+          const nuevoImage = base64Data.startsWith('data:') 
+            ? base64Data 
+            : `data:image/jpeg;base64,${base64Data}`;
+          setFirmaNuevo(nuevoImage);
+        }
+
+        toast.success(`✅ Firma de instructor ${signatureType} guardada exitosamente`);
+        console.log("Firma guardada exitosamente sin resetear evaluación:", data.updateChecklist);
+        console.log(`=== FINALIZADA ACTUALIZACIÓN DE FIRMA ${signatureType.toUpperCase()} ===`);
+      } else {
+        throw new Error(data?.updateChecklist?.message || "Error al guardar firma");
+      }
+      
+    } catch (error) {
+      console.error(`Error guardando firma ${signatureType}:`, error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      toast.error(`❌ Error al guardar firma de instructor ${signatureType}: ${errorMessage}`);
+    } finally {
+      // Resetear los flags después de completar la operación
+      setTimeout(() => {
+        setIsSignatureUpdate(false);
+        signatureUpdateRef.current = { type: '', inProgress: false };
+        console.log("=== FLAGS DE FIRMA RESETEADOS ===");
+      }, 100);
+    }
+  };
+
+  const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
     setFile: React.Dispatch<React.SetStateAction<string | null>>
-  ): void => {
+  ): Promise<void> => {
     const file = event.target.files?.[0];
-    if (file) {
+    if (!file) return;
+
+    // Validar si está bloqueado por guardado definitivo
+    if (isFinalSaved) {
+      toast.error("No se pueden subir firmas. La lista ha sido guardada definitivamente");
+      return;
+    }
+
+    // Validaciones
+    if (!file.type.startsWith('image/')) {
+      toast.error("Por favor seleccione un archivo de imagen válido");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) { // 5MB máximo
+      toast.error("El archivo no puede ser mayor a 5MB");
+      return;
+    }
+
+    try {
+      // Mostrar la imagen localmente primero para feedback inmediato
       const reader = new FileReader();
-      reader.onload = (e) => setFile(e.target?.result as string);
+      reader.onload = (e) => {
+        setFile(e.target?.result as string);
+        console.log("Firma mostrada localmente para feedback inmediato");
+      };
       reader.readAsDataURL(file);
+
+      // Convertir a base64 para guardar en BD
+      const base64Data = await convertFileToBase64(file);
+      
+      // Determinar tipo de firma basado en la función setState
+      const signatureType = setFile === setFirmaAnterior ? 'anterior' : 'nuevo';
+      
+      // Guardar en base de datos (esto ya no resetea la evaluación)
+      await saveSignatureToDatabase(base64Data, signatureType);
+
+    } catch (error) {
+      console.error('Error procesando archivo:', error);
+      toast.error("Error al procesar el archivo de imagen");
     }
   };
 
@@ -840,16 +1100,31 @@ export default function InstructorChecklistView() {
         itemStates
       });
 
+      // Manejar studySheets correctamente para GraphQL
+      let studySheetsData = null;
+      if (selectedChecklist.studySheets) {
+        if (Array.isArray(selectedChecklist.studySheets)) {
+          const validIds = selectedChecklist.studySheets.map((id: any) => parseInt(id.toString(), 10)).filter((id: number) => !isNaN(id));
+          studySheetsData = validIds.length > 0 ? validIds : null;
+        } else if (typeof selectedChecklist.studySheets === 'number') {
+          studySheetsData = [selectedChecklist.studySheets];
+        } else if (typeof selectedChecklist.studySheets === 'string') {
+          // Si es string, puede ser una lista separada por comas
+          const ids = (selectedChecklist.studySheets as string).split(',').map((id: string) => parseInt(id.trim(), 10)).filter((id: number) => !isNaN(id));
+          studySheetsData = ids.length > 0 ? ids : null;
+        }
+      }
+
       // Crear un objeto con los datos actualizados del checklist
       const checklistData = {
         id: selectedChecklist.id,
         state: selectedChecklist.state,
         remarks: selectedChecklist.remarks || '',
-        instructorSignature: selectedChecklist.instructorSignature || '',
+        instructorSignature: selectedChecklist.instructorSignature || JSON.stringify({}),
         evaluationCriteria: selectedChecklist.evaluationCriteria || '',
         trimester: selectedChecklist.trimester,
         component: selectedChecklist.component || '',
-        studySheets: selectedChecklist.studySheets || [],
+        studySheets: studySheetsData,
         items: updatedItems
       };
 
@@ -893,8 +1168,12 @@ export default function InstructorChecklistView() {
       setIsFinalSaved(true);
       setShowPreview(false);
 
-      // Limpiar localStorage después del guardado definitivo
+      // Guardar el estado de guardado definitivo en localStorage
       if (selectedChecklist) {
+        localStorage.setItem(`isFinalSaved_${selectedChecklist.id}`, 'true');
+        console.log('💾 Estado de guardado definitivo guardado en localStorage');
+        
+        // Limpiar otros datos del localStorage después del guardado definitivo
         localStorage.removeItem(`evaluationData_${selectedChecklist.id}`);
         localStorage.removeItem(`itemStates_${selectedChecklist.id}`);
       }
@@ -913,6 +1192,13 @@ export default function InstructorChecklistView() {
   // Función para permitir modificaciones después del guardado final
   const handleEnableModification = (): void => {
     setIsFinalSaved(false);
+    
+    // Limpiar el estado del localStorage para permitir edición
+    if (selectedChecklist) {
+      localStorage.removeItem(`isFinalSaved_${selectedChecklist.id}`);
+      console.log('🔓 Estado de guardado definitivo eliminado del localStorage - modo edición habilitado');
+    }
+    
     toast.info("📝 Modo de edición habilitado. Los cambios se guardarán en localStorage hasta que vuelva a guardar definitivamente.");
   };
 
@@ -2059,9 +2345,12 @@ export default function InstructorChecklistView() {
             {/* Sección de Firmas con cards individuales */}
             <div className="mt-12 relative">
               <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                   Firmas Digitales
                 </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                  Sube las firmas digitales de los instructores. Las firmas se guardarán automáticamente en la base de datos al subirlas.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -2076,32 +2365,53 @@ export default function InstructorChecklistView() {
                     </h4>
                   </div>
                   
-                  <label className="flex flex-col items-center cursor-pointer p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg w-full hover:border-[#5cb800] hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-all duration-300 group">
-                    <UploadCloud className="w-16 h-16 text-gray-400 group-hover:text-[#5cb800] transition-colors duration-300 mb-4" />
-                    <span className="font-medium text-lg text-center text-gray-700 dark:text-gray-300 group-hover:text-[#5cb800] transition-colors duration-300 mb-2">
-                      Subir Firma Digital
+                  <label className={`flex flex-col items-center p-8 border-2 border-dashed rounded-lg w-full transition-all duration-300 group ${
+                    isFinalSaved 
+                      ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 cursor-not-allowed opacity-60' 
+                      : 'border-gray-300 dark:border-gray-600 cursor-pointer hover:border-[#5cb800] hover:bg-gray-50 dark:hover:bg-gray-700/30'
+                  }`}>
+                    <UploadCloud className={`w-16 h-16 transition-colors duration-300 mb-4 ${
+                      isFinalSaved 
+                        ? 'text-gray-300 dark:text-gray-600' 
+                        : 'text-gray-400 group-hover:text-[#5cb800]'
+                    }`} />
+                    <span className={`font-medium text-lg text-center transition-colors duration-300 mb-2 ${
+                      isFinalSaved 
+                        ? 'text-gray-400 dark:text-gray-500' 
+                        : 'text-gray-700 dark:text-gray-300 group-hover:text-[#5cb800]'
+                    }`}>
+                      {isFinalSaved ? 'Lista Guardada Definitivamente' : 'Subir Firma Digital'}
                     </span>
                     <span className="text-sm text-gray-500 dark:text-gray-400">
-                      Formatos: JPG, PNG, GIF
+                      {isFinalSaved ? 'Firmas bloqueadas' : 'Formatos: JPG, PNG, GIF'}
                     </span>
                     <input
                       type="file"
                       accept="image/*"
                       onChange={(e) => handleFileUpload(e, setFirmaAnterior)}
+                      disabled={isFinalSaved}
                       className="hidden"
                     />
                   </label>
                   
                   {firmaAnterior && (
-                    <div className="mt-6 flex justify-center">
-                      <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm">
-                        <Image
-                          src={firmaAnterior}
-                          alt="Firma instructor anterior"
-                          width={200}
-                          height={120}
-                          className="max-h-32 max-w-full object-contain rounded"
-                        />
+                    <div className="mt-6 space-y-3">
+                      <div className="flex justify-center">
+                        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm">
+                          <Image
+                            src={firmaAnterior}
+                            alt="Firma instructor anterior"
+                            width={200}
+                            height={120}
+                            className="max-h-32 max-w-full object-contain rounded"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                        <span className="text-green-600 dark:text-green-400 text-lg">✓</span>
+                        <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                          Firma guardada exitosamente
+                        </span>
                       </div>
                     </div>
                   )}
@@ -2118,32 +2428,53 @@ export default function InstructorChecklistView() {
                     </h4>
                   </div>
                   
-                  <label className="flex flex-col items-center cursor-pointer p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg w-full hover:border-[#5cb800] hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-all duration-300 group">
-                    <UploadCloud className="w-16 h-16 text-gray-400 group-hover:text-[#5cb800] transition-colors duration-300 mb-4" />
-                    <span className="font-medium text-lg text-center text-gray-700 dark:text-gray-300 group-hover:text-[#5cb800] transition-colors duration-300 mb-2">
-                      Subir Firma Digital
+                  <label className={`flex flex-col items-center p-8 border-2 border-dashed rounded-lg w-full transition-all duration-300 group ${
+                    isFinalSaved 
+                      ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 cursor-not-allowed opacity-60' 
+                      : 'border-gray-300 dark:border-gray-600 cursor-pointer hover:border-[#5cb800] hover:bg-gray-50 dark:hover:bg-gray-700/30'
+                  }`}>
+                    <UploadCloud className={`w-16 h-16 transition-colors duration-300 mb-4 ${
+                      isFinalSaved 
+                        ? 'text-gray-300 dark:text-gray-600' 
+                        : 'text-gray-400 group-hover:text-[#5cb800]'
+                    }`} />
+                    <span className={`font-medium text-lg text-center transition-colors duration-300 mb-2 ${
+                      isFinalSaved 
+                        ? 'text-gray-400 dark:text-gray-500' 
+                        : 'text-gray-700 dark:text-gray-300 group-hover:text-[#5cb800]'
+                    }`}>
+                      {isFinalSaved ? 'Lista Guardada Definitivamente' : 'Subir Firma Digital'}
                     </span>
                     <span className="text-sm text-gray-500 dark:text-gray-400">
-                      Formatos: JPG, PNG, GIF
+                      {isFinalSaved ? 'Firmas bloqueadas' : 'Formatos: JPG, PNG, GIF'}
                     </span>
                     <input
                       type="file"
                       accept="image/*"
                       onChange={(e) => handleFileUpload(e, setFirmaNuevo)}
+                      disabled={isFinalSaved}
                       className="hidden"
                     />
                   </label>
                   
                   {firmaNuevo && (
-                    <div className="mt-6 flex justify-center">
-                      <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm">
-                        <Image
-                          src={firmaNuevo}
-                          alt="Firma instructor nuevo"
-                          width={200}
-                          height={120}
-                          className="max-h-32 max-w-full object-contain rounded"
-                        />
+                    <div className="mt-6 space-y-3">
+                      <div className="flex justify-center">
+                        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm">
+                          <Image
+                            src={firmaNuevo}
+                            alt="Firma instructor nuevo"
+                            width={200}
+                            height={120}
+                            className="max-h-32 max-w-full object-contain rounded"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                        <span className="text-green-600 dark:text-green-400 text-lg">✓</span>
+                        <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                          Firma guardada exitosamente
+                        </span>
                       </div>
                     </div>
                   )}
