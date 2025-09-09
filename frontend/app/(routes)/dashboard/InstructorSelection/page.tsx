@@ -145,7 +145,7 @@ export default function InstructorSelection() {
 
   if (loading) {
     return (
-      <div className="w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+      <div className="w-full min-h-screen">
         <div className="p-6 space-y-8">
           <PageTitle>Selección de Ficha y Team Scrum</PageTitle>
           <div className="flex justify-center items-center py-16">
@@ -166,7 +166,7 @@ export default function InstructorSelection() {
 
   if (!studySheets.length) {
     return (
-      <div className="w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+      <div className="w-full min-h-screen">
         <div className="p-6 space-y-8">
           <PageTitle>Selección de Ficha y Team Scrum</PageTitle>
           <div className="flex justify-center items-center py-16">
@@ -192,34 +192,34 @@ export default function InstructorSelection() {
   }
 
   return (
-    <div className="w-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+    <div className="w-full min-h-screen">
       <div className="p-6 space-y-8">
         <PageTitle>Selección de Ficha y Team Scrum</PageTitle>
 
         {/* Indicador de pasos */}
         <div className="flex items-center justify-center space-x-4 mb-8">
-          <div className={`flex items-center space-x-2 ${step >= 1 ? 'text-lime-600 dark:text-shadowBlue' : 'text-gray-400'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
+          <div className={`flex items-center space-x-3 ${step >= 1 ? 'text-lime-600 dark:text-shadowBlue' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
               step >= 1 
-                ? 'bg-lime-600 dark:bg-shadowBlue border-lime-600 dark:border-shadowBlue text-white' 
-                : 'border-gray-300 text-gray-400'
+                ? 'bg-lime-600 dark:bg-shadowBlue text-white' 
+                : 'bg-gray-200 text-gray-400'
             }`}>
-              {step > 1 ? <FontAwesomeIcon icon={faCheckCircle} /> : '1'}
+              {step > 1 ? <FontAwesomeIcon icon={faCheckCircle} className="text-sm" /> : '1'}
             </div>
-            <span className="font-medium">Seleccionar Ficha</span>
+            <span className="font-medium text-sm">Seleccionar Ficha</span>
           </div>
           
-          <div className={`h-1 w-12 ${step >= 2 ? 'bg-lime-600 dark:bg-shadowBlue' : 'bg-gray-300'}`}></div>
+          <div className={`h-0.5 w-16 ${step >= 2 ? 'bg-lime-600 dark:bg-shadowBlue' : 'bg-gray-300'}`}></div>
           
-          <div className={`flex items-center space-x-2 ${step >= 2 ? 'text-lime-600 dark:text-shadowBlue' : 'text-gray-400'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
+          <div className={`flex items-center space-x-3 ${step >= 2 ? 'text-lime-600 dark:text-shadowBlue' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
               step >= 2 
-                ? 'bg-lime-600 dark:bg-shadowBlue border-lime-600 dark:border-shadowBlue text-white' 
-                : 'border-gray-300 text-gray-400'
+                ? 'bg-lime-600 dark:bg-shadowBlue text-white' 
+                : 'bg-gray-200 text-gray-400'
             }`}>
               2
             </div>
-            <span className="font-medium">Seleccionar Team Scrum</span>
+            <span className="font-medium text-sm">Seleccionar Team Scrum</span>
           </div>
         </div>
 
@@ -227,10 +227,10 @@ export default function InstructorSelection() {
         {step === 1 && (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-darkBlue dark:text-white mb-2">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 Selecciona la ficha a evaluar
               </h2>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
                 Estas son las fichas que tienes asignadas como instructor
               </p>
             </div>
@@ -240,40 +240,39 @@ export default function InstructorSelection() {
                 <div 
                   key={studySheet.id}
                   onClick={() => handleStudySheetSelection(studySheet)}
-                  className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-lime-500 dark:hover:border-shadowBlue shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group p-6"
+                  className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group p-6 border border-gray-100 dark:border-gray-700"
                 >
                   <div className="text-center">
-                    <div className="mb-4">
-                      <FontAwesomeIcon 
-                        icon={faBook} 
-                        className="text-4xl text-lime-600 dark:text-shadowBlue group-hover:scale-110 transition-transform duration-300" 
-                      />
+                    {/* Círculo con ícono */}
+                    <div className="mb-6">
+                      <div className="w-16 h-16 bg-lime-600 dark:bg-shadowBlue rounded-full flex items-center justify-center mx-auto">
+                        <FontAwesomeIcon 
+                          icon={faBook} 
+                          className="text-2xl text-white" 
+                        />
+                      </div>
                     </div>
                     
-                    <h3 className="text-xl font-bold text-darkBlue dark:text-white mb-2">
-                      Ficha N° {studySheet.number}
+                    {/* Título principal */}
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+                      Datos de Formación
                     </h3>
                     
-                    <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                      <p>
-                        <strong>Programa:</strong> {studySheet.trainingProject?.program?.name || 'N/A'}
-                      </p>
-                      <p>
-                        <strong>Proyecto:</strong> {studySheet.trainingProject?.name || 'N/A'}
-                      </p>
-                      <p>
-                        <strong>Trimestre:</strong> {studySheet.quarter?.name?.number || 'N/A'} - {studySheet.quarter?.name?.extension || 'N/A'}
-                      </p>
-                      <p className="flex items-center justify-center space-x-1">
-                        <FontAwesomeIcon icon={faUsers} />
-                        <span>{studySheet.teamsScrum?.length || 0} Teams Scrum</span>
-                      </p>
-                    </div>
-
-                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-                      <div className="flex items-center justify-center space-x-2 text-lime-600 dark:text-shadowBlue group-hover:text-lime-700 dark:group-hover:text-blue-400">
-                        <span className="font-medium">Seleccionar</span>
-                        <FontAwesomeIcon icon={faArrowRight} />
+                    {/* Información de la ficha */}
+                    <div className="space-y-3 text-sm">
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 mb-1">
+                          <strong>Jornada:</strong> {studySheet.quarter?.name?.extension || 'Diurna'}
+                        </p>
+                      </div>
+                      
+                      <div className="border-t border-gray-200 dark:border-gray-600 pt-3">
+                        <p className="text-lime-600 dark:text-shadowBlue font-semibold mb-1 text-xs">
+                          Ficha N°
+                        </p>
+                        <p className="text-lg font-bold text-gray-900 dark:text-white">
+                          {studySheet.number}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -287,10 +286,10 @@ export default function InstructorSelection() {
         {step === 2 && selectedStudySheet && (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-darkBlue dark:text-white mb-2">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 Selecciona el Team Scrum a evaluar
               </h2>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
                 Ficha N° {selectedStudySheet.number} - {selectedStudySheet.trainingProject?.name || 'Proyecto no especificado'}
               </p>
             </div>
@@ -321,53 +320,55 @@ export default function InstructorSelection() {
                     <div 
                       key={teamScrum.id}
                       onClick={() => handleTeamScrumSelection(teamScrum)}
-                      className={`bg-white dark:bg-gray-800 rounded-xl border-2 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group p-6 ${
+                      className={`bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer group p-6 border ${
                         selectedTeamScrum?.id === teamScrum.id
-                          ? 'border-lime-500 dark:border-shadowBlue bg-lime-50 dark:bg-blue-900/20'
-                          : 'border-gray-200 dark:border-gray-700 hover:border-lime-500 dark:hover:border-shadowBlue'
+                          ? 'border-lime-500 dark:border-shadowBlue bg-lime-50 dark:bg-shadowBlue/20'
+                          : 'border-gray-100 dark:border-gray-700'
                       }`}
                     >
                       <div className="text-center">
-                        <div className="mb-4">
-                          <FontAwesomeIcon 
-                            icon={faUserGroup} 
-                            className={`text-4xl group-hover:scale-110 transition-transform duration-300 ${
-                              selectedTeamScrum?.id === teamScrum.id
-                                ? 'text-lime-600 dark:text-shadowBlue'
-                                : 'text-gray-500 group-hover:text-lime-600 dark:group-hover:text-shadowBlue'
-                            }`} 
-                          />
+                        {/* Círculo con ícono */}
+                        <div className="mb-6">
+                          <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto ${
+                            selectedTeamScrum?.id === teamScrum.id
+                              ? 'bg-lime-600 dark:bg-shadowBlue'
+                              : 'bg-lime-600 dark:bg-shadowBlue'
+                          }`}>
+                            <FontAwesomeIcon 
+                              icon={faUserGroup} 
+                              className="text-2xl text-white" 
+                            />
+                          </div>
                         </div>
                         
-                        <h3 className="text-xl font-bold text-darkBlue dark:text-white mb-3">
-                          {teamScrum.teamName}
+                        {/* Título principal */}
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+                          Team Scrum
                         </h3>
                         
-                        <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                          <p className="flex items-center justify-center space-x-1">
-                            <FontAwesomeIcon icon={faUsers} />
-                            <span>{teamScrum.students.length} Integrantes</span>
-                          </p>
+                        {/* Información del team */}
+                        <div className="space-y-3 text-sm">
+                          <div>
+                            <p className="text-gray-600 dark:text-gray-400 mb-1">
+                              <strong>Equipo:</strong> {teamScrum.teamName}
+                            </p>
+                          </div>
                           
-                          {teamScrum.students.length > 0 && (
-                            <div className="mt-3">
-                              <p className="font-medium mb-1">Integrantes:</p>
-                              <div className="text-xs space-y-1">
-                                {teamScrum.students.map((student) => (
-                                  <div key={student.id}>
-                                    {student.person.name} {student.person.lastname}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
+                          <div className="border-t border-gray-200 dark:border-gray-600 pt-3">
+                            <p className="text-lime-600 dark:text-shadowBlue font-semibold mb-1 text-xs">
+                              Integrantes
+                            </p>
+                            <p className="text-lg font-bold text-gray-900 dark:text-white">
+                              {teamScrum.students.length}
+                            </p>
+                          </div>
                         </div>
 
                         {selectedTeamScrum?.id === teamScrum.id && (
-                          <div className="mt-4 pt-4 border-t border-lime-200 dark:border-blue-600">
+                          <div className="mt-4 pt-4 border-t border-lime-200 dark:border-shadowBlue/60">
                             <div className="flex items-center justify-center space-x-2 text-lime-600 dark:text-shadowBlue">
                               <FontAwesomeIcon icon={faCheckCircle} />
-                              <span className="font-medium">Seleccionado</span>
+                              <span className="font-medium text-xs">Seleccionado</span>
                             </div>
                           </div>
                         )}
