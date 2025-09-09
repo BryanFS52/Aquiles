@@ -352,31 +352,41 @@ const HistorialPlanesMejoramientoInstructor = () => {
         return (
             <div className="mx-auto px-4 py-8">
                 <div className="space-y-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div>
-                            <div className="flex items-center gap-3 mb-2">
-                                {fichaData && (
-                                    <button
-                                        onClick={() => router.back()}
-                                        className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen transition-colors duration-200"
-                                    >
-                                        <FiArrowLeft className="w-4 h-4 mr-1" />
-                                        Volver a Fichas
-                                    </button>
-                                )}
-                            </div>
-                            <PageTitle>
-                                {fichaData 
-                                    ? `Planes de Mejoramiento - Ficha N° ${fichaData.fichaNumber}`
-                                    : `Historial De Planes De Mejoramiento`
-                                }
-                            </PageTitle>
+                    <div>
+                        <div className="flex items-center gap-3 mb-2">
                             {fichaData && (
-                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                                    Mostrando planes de mejoramiento de {fichaData.totalStudents} estudiantes de la ficha N° {fichaData.fichaNumber}
-                                </p>
+                                <button
+                                    onClick={() => router.back()}
+                                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen transition-colors duration-200"
+                                >
+                                    <FiArrowLeft className="w-4 h-4 mr-1" />
+                                    Volver a Fichas
+                                </button>
                             )}
                         </div>
+                        <PageTitle>
+                            {fichaData 
+                                ? `Planes de Mejoramiento - Ficha N° ${fichaData.fichaNumber}`
+                                : `Historial De Planes De Mejoramiento`
+                            }
+                        </PageTitle>
+                        {/* Botón debajo del título, con degradado verde */}
+                        <div className="mt-4">
+                            <Link href={fichaData 
+                                ? `./FormularioPlanesDeMejoramiento?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}`
+                                : "./FormularioPlanesDeMejoramiento"
+                            }>
+                                <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-lightGreen transition-colors duration-200 shadow-lg">
+                                    <FiPlus className="w-4 h-4 mr-2" />
+                                    Crear Nuevo Plan de Mejoramiento
+                                </button>
+                            </Link>
+                        </div>
+                        {fichaData && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                                Mostrando planes de mejoramiento de {fichaData.totalStudents} estudiantes de la ficha N° {fichaData.fichaNumber}
+                            </p>
+                        )}
                     </div>
 
                     {/* Dashboard Stats - Estado vacío */}
@@ -428,16 +438,15 @@ const HistorialPlanesMejoramientoInstructor = () => {
     return (
         <div className="mx-auto px-4 py-8">
             <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                        <PageTitle>Historial De Planes De Mejoramiento</PageTitle>
-                    </div>
-                    <div className="flex gap-3">
+                <div>
+                    <PageTitle>Historial De Planes De Mejoramiento</PageTitle>
+                    {/* Botón debajo del título, con degradado verde */}
+                    <div className="mt-4">
                         <Link href={fichaData 
                             ? `./FormularioPlanesDeMejoramiento?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}`
                             : "./FormularioPlanesDeMejoramiento"
                         }>
-                            <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-primary hover:bg-primary/90 dark:bg-lightGreen dark:hover:bg-lightGreen/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-lightGreen transition-colors duration-200">
+                            <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-lightGreen transition-colors duration-200 shadow-lg">
                                 <FiPlus className="w-4 h-4 mr-2" />
                                 Crear Nuevo Plan de Mejoramiento
                             </button>

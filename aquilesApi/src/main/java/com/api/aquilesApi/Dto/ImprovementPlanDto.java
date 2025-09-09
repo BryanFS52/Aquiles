@@ -35,6 +35,7 @@ public class ImprovementPlanDto {
     // @NotNull(message = "La competencia del instructor es obligatoria")
     private Long teacherCompetence;
 
+
     // Relations
     private List<ImprovementPlanActivityDto> improvementPlanActivity;
     private ImprovementPlanFaultTypeDto faultType;
