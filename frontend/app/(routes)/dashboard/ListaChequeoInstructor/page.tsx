@@ -14,9 +14,10 @@ import EmptyState from "@components/UI/emptyState";
 import { fetchAllChecklists, fetchChecklistById } from "@services/checkListService.js";
 import { fetchEvaluationsByChecklist, fetchEvaluationsByChecklistOld, completeEvaluation, createMissingEvaluationForChecklist, createEvaluationForChecklist } from "@services/evaluationService";
 import { exportChecklistToPdf, exportChecklistToExcel, downloadFileFromBase64 } from "@services/exportService";
-import { GET_ALL_EVALUATIONS } from '@graphql/evaluationsGraph';
-import { UPDATE_CHECKLIST } from '@graphql/checklistGraph';
-import { clientLAN } from '@/lib/apollo-client';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/redux/store';
+import { fetchAllEvaluationsDebug } from '@/redux/slices/evaluationSlice';
+import { updateChecklistSignature, fetchChecklistById as fetchChecklistByIdRedux } from '@/redux/slices/checklistSlice';
 import {
   Checklist,
   Evaluation,
@@ -27,6 +28,15 @@ import {
 
 export default function InstructorChecklistView() {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+  
+  // Redux selectors
+  const evaluationState = useSelector((state: RootState) => state.evaluation);
+  const checklistState = useSelector((state: RootState) => state.checklist);
+  
+  // Selector para obtener errores de Redux
+  const reduxError = evaluationState.error || checklistState.error;
+  
   const [activeChecklists, setActiveChecklists] = useState<Checklist[]>([]);
   const [selectedChecklist, setSelectedChecklist] = useState<Checklist | null>(null);
   const [selectedTrimester, setSelectedTrimester] = useState<string>(() => {
@@ -349,37 +359,51 @@ export default function InstructorChecklistView() {
     }
   }, [evaluationObservations, evaluationRecommendations, evaluationJudgment, selectedChecklist]);
 
+  // Manejar errores de Redux
+  useEffect(() => {
+    if (reduxError) {
+      console.error('Redux error detected:', reduxError);
+      if (typeof reduxError === 'string') {
+        toast.error(`Error: ${reduxError}`);
+      } else if (reduxError && typeof reduxError === 'object' && 'message' in reduxError) {
+        toast.error(`Error: ${reduxError.message}`);
+      }
+    }
+  }, [reduxError]);
 
 
-  // Función de debugging para ver todas las evaluaciones
+
+  // Función de debugging para ver todas las evaluaciones usando Redux
   const debugAllEvaluations = async (): Promise<void> => {
     try {
-      console.log("=== DEBUGGING ALL EVALUATIONS ===");
-      const { data } = await clientLAN.query({
-        query: GET_ALL_EVALUATIONS,
-        variables: { page: 0, size: 100 },
-        fetchPolicy: 'no-cache',
-      });
+      console.log("=== DEBUGGING ALL EVALUATIONS VIA REDUX ===");
+      const result = await dispatch(fetchAllEvaluationsDebug({ page: 0, size: 100 }));
 
-      console.log("All evaluations in database:", data);
-      if (data.allEvaluations && data.allEvaluations.data) {
-        console.log("Total evaluations found:", data.allEvaluations.data.length);
-        data.allEvaluations.data.forEach((evaluation: any, index: number) => {
-          console.log(`Evaluation ${index + 1}:`, {
-            id: evaluation.id,
-            checklistId: evaluation.checklistId,
-            observations: evaluation.observations,
-            recommendations: evaluation.recommendations,
-            valueJudgment: evaluation.valueJudgment
+      if (fetchAllEvaluationsDebug.fulfilled.match(result)) {
+        const data = result.payload;
+        console.log("All evaluations in database:", data);
+        
+        if (data && data.data) {
+          console.log("Total evaluations found:", data.data.length);
+          data.data.forEach((evaluation: any, index: number) => {
+            console.log(`Evaluation ${index + 1}:`, {
+              id: evaluation.id,
+              checklistId: evaluation.checklistId,
+              observations: evaluation.observations,
+              recommendations: evaluation.recommendations,
+              valueJudgment: evaluation.valueJudgment
+            });
           });
-        });
 
-        if (selectedChecklist) {
-          const matchingEvaluations = data.allEvaluations.data.filter(
-            (evaluation: any) => evaluation.checklistId == selectedChecklist.id
-          );
-          console.log(`Evaluations matching checklist ${selectedChecklist.id}:`, matchingEvaluations);
+          if (selectedChecklist) {
+            const matchingEvaluations = data.data.filter(
+              (evaluation: any) => evaluation.checklistId == selectedChecklist.id
+            );
+            console.log(`Evaluations matching checklist ${selectedChecklist.id}:`, matchingEvaluations);
+          }
         }
+      } else {
+        console.error("Error debugging evaluations:", result.payload);
       }
     } catch (error) {
       console.error("Error debugging evaluations:", error);
@@ -715,7 +739,7 @@ export default function InstructorChecklistView() {
     });
   };
 
-  // Función para guardar firma en la base de datos
+  // Función para guardar firma en la base de datos usando Redux
   const saveSignatureToDatabase = async (base64Data: string, signatureType: 'anterior' | 'nuevo'): Promise<void> => {
     if (!selectedChecklist) {
       toast.error("No hay lista de chequeo seleccionada");
@@ -793,18 +817,14 @@ export default function InstructorChecklistView() {
         studySheetsProcessed: studySheetsData
       });
 
-      // Usar la mutación GraphQL existente para actualizar el checklist
-      const { data } = await clientLAN.mutate({
-        mutation: UPDATE_CHECKLIST,
-        variables: { 
-          id: parseInt(selectedChecklist.id), 
-          input: checklistData 
-        },
-      });
+      // Usar Redux en lugar de GraphQL directo
+      const result = await dispatch(updateChecklistSignature({
+        id: parseInt(selectedChecklist.id),
+        checklistData
+      }));
 
-      if (data?.updateChecklist?.code === "200") {
-        // NO actualizar el estado del selectedChecklist para evitar re-renderizado del useEffect
-        // Solo actualizar las firmas locales para la UI
+      if (updateChecklistSignature.fulfilled.match(result)) {
+        // Actualizar las firmas locales para la UI
         if (signatureType === 'anterior') {
           const anteriorImage = base64Data.startsWith('data:') 
             ? base64Data 
@@ -818,10 +838,13 @@ export default function InstructorChecklistView() {
         }
 
         toast.success(`✅ Firma de instructor ${signatureType} guardada exitosamente`);
-        console.log("Firma guardada exitosamente sin resetear evaluación:", data.updateChecklist);
+        console.log("Firma guardada exitosamente sin resetear evaluación:", result.payload);
         console.log(`=== FINALIZADA ACTUALIZACIÓN DE FIRMA ${signatureType.toUpperCase()} ===`);
+        
+        // Opcionalmente recargar el checklist para obtener datos actualizados
+        // await dispatch(fetchChecklistByIdRedux({ id: parseInt(selectedChecklist.id) }));
       } else {
-        throw new Error(data?.updateChecklist?.message || "Error al guardar firma");
+        throw new Error(result.payload?.message || "Error al guardar firma");
       }
       
     } catch (error) {

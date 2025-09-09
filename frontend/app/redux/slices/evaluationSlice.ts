@@ -42,6 +42,21 @@ export const fetchEvaluationsAllByChecklist = createAsyncThunk<
     }
 );
 
+export const fetchAllEvaluationsDebug = createAsyncThunk<
+    GetAllEvaluationsQuery['allEvaluations'],
+    { page: number; size: number }
+>(
+    'evaluations/fetchAllEvaluationsDebug',
+    async ({ page, size }) => {
+        const { data } = await client.query<GetAllEvaluationsQuery, GetAllEvaluationsQueryVariables>({
+            query: GET_ALL_EVALUATIONS,
+            variables: { page, size },
+            fetchPolicy: 'no-cache',
+        });
+        return data.allEvaluations;
+    }
+);
+
 export const fetchEvaluationById = createAsyncThunk<
     GetEvaluationByIdQuery['evaluationById'],
     GetEvaluationByIdQueryVariables
@@ -154,6 +169,25 @@ const evaluationSlice = createSlice({
                 state.loading = false;
             })
             .addCase(fetchEvaluationsAllByChecklist.rejected, (state, action) => {
+                state.error = action.error.message || 'Error fetching evaluations';
+                state.loading = false;
+            })
+            // fetchAllEvaluationsDebug
+            .addCase(fetchAllEvaluationsDebug.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchAllEvaluationsDebug.fulfilled, (state, action: PayloadAction<GetAllEvaluationsQuery['allEvaluations']>) => {
+                if (action.payload?.data) {
+                    state.data = action.payload.data
+                        .filter((item): item is NonNullable<typeof item> => item !== null)
+                        .map(ttransformGraphQLToAttendanceItem);
+                    state.totalItems = action.payload.totalItems ?? 0;
+                    state.totalPages = action.payload.totalPages ?? 0;
+                    state.currentPage = action.payload.currentPage ?? 0;
+                }
+                state.loading = false;
+            })
+            .addCase(fetchAllEvaluationsDebug.rejected, (state, action) => {
                 state.error = action.error.message || 'Error fetching evaluations';
                 state.loading = false;
             })

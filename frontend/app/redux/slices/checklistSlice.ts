@@ -151,6 +151,39 @@ export const updateChecklistState = createAsyncThunk<UpdateChecklistMutation['up
     }
 );
 
+export const updateChecklistSignature = createAsyncThunk<UpdateChecklistMutation['updateChecklist'], 
+    { id: number; checklistData: any },
+    { rejectValue: { code: string; message: string } }
+>(
+    'checklist/updateSignature',
+    async ({ id, checklistData }, { rejectWithValue }) => {
+        try {
+            console.log('=== REDUX UPDATE CHECKLIST SIGNATURE ===');
+            console.log('ID:', id);
+            console.log('Checklist data:', checklistData);
+            
+            const { data } = await client.mutate<UpdateChecklistMutation, UpdateChecklistMutationVariables>({
+                mutation: UPDATE_CHECKLIST,
+                variables: { id, input: checklistData },
+            });
+
+            console.log('GraphQL signature update response:', data);
+            
+            const res = data?.updateChecklist;
+            if (!res || res.code !== '200') {
+                console.log('Signature update failed with response:', res);
+                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
+            }
+
+            console.log('✅ Signature update successful in Redux:', res);
+            return res;
+        } catch (error: any) {
+            console.error('Error updating checklist signature:', error);
+            return rejectWithValue({ code: '500', message: error.message });
+        }
+    }
+);
+
 export const deleteChecklist = createAsyncThunk<string, string,
     { rejectValue: { code: string; message: string } }
 >(
@@ -272,6 +305,27 @@ const checklistSlice = createSlice({
                 const payload = action.payload as RejectedPayload;
                 const { code, message } = payload || {};
                 state.error = { code, message };
+            })
+            // updateChecklistSignature
+            .addCase(updateChecklistSignature.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(updateChecklistSignature.fulfilled, (state, action) => {
+                console.log('=== REDUX SIGNATURE UPDATE FULFILLED ===');
+                console.log('Signature update completed successfully');
+                
+                state.loading = false;
+                state.error = null;
+                
+                // La mutación solo devuelve { code, message, id }, no los datos completos
+                // El componente debe recargar los datos del checklist para obtener la firma actualizada
+                console.log('✅ Signature update successful - component should refetch data');
+            })
+            .addCase(updateChecklistSignature.rejected, (state, action) => {
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
+                state.error = { code, message };
+                state.loading = false;
             })
             // deleteChecklist
             .addCase(deleteChecklist.fulfilled, (state, action: PayloadAction<string>) => {
