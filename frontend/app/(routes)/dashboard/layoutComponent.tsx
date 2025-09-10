@@ -17,6 +17,7 @@ const LayoutContent: React.FC<LayoutContentProps> = ({ children }) => {
     const { user, role } = useUser();
 
     // Normalizar: si llega "Instructor" -> "instructor"
+    // Usar valor por defecto consistente durante hidratación
     const normalizedRole: RoleType = (user?.role?.toLowerCase() as RoleType) || role || "instructor";
 
     return (

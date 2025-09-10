@@ -39,13 +39,8 @@ export default function InstructorChecklistView() {
   
   const [activeChecklists, setActiveChecklists] = useState<Checklist[]>([]);
   const [selectedChecklist, setSelectedChecklist] = useState<Checklist | null>(null);
-  const [selectedTrimester, setSelectedTrimester] = useState<string>(() => {
-    // Recuperar trimestre guardado o usar "todos" por defecto
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('selectedTrimester') || "todos";
-    }
-    return "todos";
-  });
+  const [selectedTrimester, setSelectedTrimester] = useState<string>("todos");
+  const [isClientMounted, setIsClientMounted] = useState(false);
   
   // Estados para el team scrum seleccionado
   const [selectedTeamScrumId, setSelectedTeamScrumId] = useState<string | null>(null);
@@ -204,6 +199,8 @@ export default function InstructorChecklistView() {
 
   // Auto-cargar evaluaciones cuando cambie el checklist seleccionado
   useEffect(() => {
+    if (!isClientMounted) return; // Esperar a que se monte el cliente
+    
     if (selectedChecklist) {
       // Si es una actualización de firma, no recargar evaluaciones
       if (isSignatureUpdate || signatureUpdateRef.current.inProgress) {
@@ -269,7 +266,9 @@ export default function InstructorChecklistView() {
       loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
     } else {
       // Si no hay checklist, limpiar localStorage y datos
-      localStorage.removeItem('selectedChecklistId');
+      if (isClientMounted) {
+        localStorage.removeItem('selectedChecklistId');
+      }
       setEvaluations([]);
       setSelectedEvaluation(null);
       setEvaluationObservations("");
@@ -281,7 +280,7 @@ export default function InstructorChecklistView() {
       setIsFinalSaved(false);
       setShowPreview(false);
     }
-  }, [selectedChecklist?.id]); // Solo depender del ID para evitar re-renders innecesarios
+  }, [selectedChecklist?.id, isClientMounted]); // Agregar isClientMounted como dependencia
 
   // Efecto para cargar datos de evaluación seleccionada INMEDIATAMENTE
   useEffect(() => {
@@ -398,6 +397,8 @@ export default function InstructorChecklistView() {
 
   // Auto-guardado para campos de evaluación
   useEffect(() => {
+    if (!isClientMounted) return; // Solo ejecutar en cliente
+    
     if (selectedChecklist && (evaluationObservations || evaluationRecommendations || evaluationJudgment !== "PENDIENTE")) {
       // Guardar datos de evaluación en localStorage para persistencia
       const evaluationData = {
@@ -408,7 +409,7 @@ export default function InstructorChecklistView() {
       localStorage.setItem(`evaluationData_${selectedChecklist.id}`, JSON.stringify(evaluationData));
       console.log('💾 Datos de evaluación guardados en localStorage:', evaluationData);
     }
-  }, [evaluationObservations, evaluationRecommendations, evaluationJudgment, selectedChecklist]);
+  }, [evaluationObservations, evaluationRecommendations, evaluationJudgment, selectedChecklist, isClientMounted]);
 
   // Manejar errores de Redux
   useEffect(() => {
@@ -429,6 +430,17 @@ export default function InstructorChecklistView() {
         clearTimeout(saveItemsDebounceRef.current);
       }
     };
+  }, []);
+
+  // Manejo de hidratación del cliente - cargar datos de localStorage después del mount
+  useEffect(() => {
+    setIsClientMounted(true);
+    
+    // Cargar trimestre desde localStorage
+    const savedTrimester = localStorage.getItem('selectedTrimester');
+    if (savedTrimester) {
+      setSelectedTrimester(savedTrimester);
+    }
   }, []);
 
 
@@ -502,27 +514,27 @@ export default function InstructorChecklistView() {
 
   // Recuperar información del team scrum seleccionado desde localStorage
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const teamScrumId = localStorage.getItem('selectedTeamScrumId');
-      const teamScrumName = localStorage.getItem('selectedTeamScrumName');
-      const studySheetNumber = localStorage.getItem('selectedStudySheetNumber');
-      
-      if (teamScrumId && teamScrumName) {
-        setSelectedTeamScrumId(teamScrumId);
-        setSelectedTeamScrumName(teamScrumName);
-        setSelectedStudySheetNumber(studySheetNumber || "");
-        console.log('🔄 Recuperando información del team scrum:', {
-          teamScrumId,
-          teamScrumName,
-          studySheetNumber
-        });
-      } else {
-        // Si no hay team scrum seleccionado, redirigir a la página de selección
-        console.log('❌ No hay team scrum seleccionado, redirigiendo a selección');
-        window.location.href = '/dashboard/InstructorSelection';
-      }
+    if (!isClientMounted) return; // Esperar a que se monte el cliente
+    
+    const teamScrumId = localStorage.getItem('selectedTeamScrumId');
+    const teamScrumName = localStorage.getItem('selectedTeamScrumName');
+    const studySheetNumber = localStorage.getItem('selectedStudySheetNumber');
+    
+    if (teamScrumId && teamScrumName) {
+      setSelectedTeamScrumId(teamScrumId);
+      setSelectedTeamScrumName(teamScrumName);
+      setSelectedStudySheetNumber(studySheetNumber || "");
+      console.log('🔄 Recuperando información del team scrum:', {
+        teamScrumId,
+        teamScrumName,
+        studySheetNumber
+      });
+    } else {
+      // Si no hay team scrum seleccionado, redirigir a la página de selección
+      console.log('❌ No hay team scrum seleccionado, redirigiendo a selección');
+      window.location.href = '/dashboard/InstructorSelection';
     }
-  }, []);
+  }, [isClientMounted]);
   
   const loadEvaluationsForChecklist = async (checklistId: number): Promise<void> => {
     try {
@@ -1705,6 +1717,18 @@ export default function InstructorChecklistView() {
     // Navegar a la vista de selección
     router.push('/dashboard/InstructorSelection');
   };
+
+  // Mostrar loader durante la hidratación del cliente
+  if (!isClientMounted) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+          <p className="text-gray-600 dark:text-gray-400">Cargando aplicación...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen">

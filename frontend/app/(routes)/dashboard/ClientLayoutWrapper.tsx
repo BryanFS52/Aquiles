@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserContext, User, UserContextType } from '@context/UserContext';
 import { RoleType } from '@/types/roles';
 import LayoutContent from './layoutComponent';
@@ -19,17 +19,23 @@ const ClientLayoutWrapper: React.FC<ClientLayoutWrapperProps> = ({ children, ini
         return "aprendiz";
     };
 
-    const getInitialUser = (): User => {
-        if (typeof window !== 'undefined') {
-            const storedRole = localStorage.getItem('sidebar-role');
-            if (storedRole === 'instructor' || storedRole === 'aprendiz' || storedRole === 'coordinador') {
-                return { ...initialUserData, role: storedRole };
-            }
-        }
-        return { ...initialUserData, role: normalizeRole(initialUserData.role) };
-    };
+    // Inicializar con datos del servidor para evitar hidratación
+    const [user, setUser] = useState<User | null>(() => ({
+        ...initialUserData,
+        role: normalizeRole(initialUserData.role)
+    }));
 
-    const [user, setUser] = useState<User | null>(getInitialUser());
+    const [isClientMounted, setIsClientMounted] = useState(false);
+
+    // Cargar rol desde localStorage después del montaje del cliente
+    useEffect(() => {
+        setIsClientMounted(true);
+        
+        const storedRole = localStorage.getItem('sidebar-role');
+        if (storedRole === 'instructor' || storedRole === 'aprendiz' || storedRole === 'coordinador') {
+            setUser(prevUser => prevUser ? { ...prevUser, role: storedRole } : null);
+        }
+    }, []);
 
     const login = (userData: User) => {
         setUser({

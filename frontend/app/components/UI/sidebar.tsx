@@ -91,16 +91,26 @@ const getMenuByRole = (role: string | undefined): MenuItem[] => {
 export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
     const [showMenu, setShowMenu] = useState<boolean>(false);
     const pathname = usePathname();
-    const [role, setRole] = useState<string>(() => {
-        if (typeof window !== "undefined") {
-            return localStorage.getItem("sidebar-role") || initialRole || "instructor";
-        }
-        return initialRole || "instructor";
-    });
-    // 🔹 Guardar rol en localStorage cada vez que cambie
+    const [isClientMounted, setIsClientMounted] = useState(false);
+    const [role, setRole] = useState<string>(initialRole || "instructor");
+
+    // Inicializar después del montaje del cliente
     useEffect(() => {
-        localStorage.setItem("sidebar-role", role);
-    }, [role]);
+        setIsClientMounted(true);
+        
+        // Cargar rol desde localStorage solo después del montaje
+        const savedRole = localStorage.getItem("sidebar-role");
+        if (savedRole) {
+            setRole(savedRole);
+        }
+    }, []);
+
+    // 🔹 Guardar rol en localStorage cada vez que cambie (solo en cliente)
+    useEffect(() => {
+        if (isClientMounted) {
+            localStorage.setItem("sidebar-role", role);
+        }
+    }, [role, isClientMounted]);
 
     const menuItems: MenuItem[] = useMemo(() => getMenuByRole(role), [role]);
 
@@ -149,7 +159,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
                         <span className="text-base lg:text-lg font-bold text-black dark:text-white tracking-wide drop-shadow-md leading-tight">
                             PROYECTOS FORMATIVOS<br />
                             <span className="text-xs lg:text-[13px] text-darkGreen dark:text-blue-600 font-extrabold tracking-widest">
-                                {role}
+                                {isClientMounted ? role : (initialRole || "instructor")}
                             </span>
                         </span>
                     </div>
@@ -159,7 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
                         <div className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue/90 dark:to-darkBlue/90 rounded-xl shadow px-3 lg:px-4 py-2 flex gap-2 items-center text-sm font-semibold text-white backdrop-blur-md border border-white/20">
                             <span className="font-bold tracking-wide drop-shadow">Rol:</span>
                             <select
-                                value={role}
+                                value={isClientMounted ? role : (initialRole || "instructor")}
                                 onChange={handleRoleChange}
                                 className="rounded-lg px-2 lg:px-3 py-1 border-2 border-white/30 
                            bg-white/90 dark:bg-darkBlue/80 text-black dark:text-white 
