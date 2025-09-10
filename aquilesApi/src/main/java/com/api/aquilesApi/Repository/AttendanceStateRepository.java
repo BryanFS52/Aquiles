@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface StateAttendanceRepository extends JpaRepository<AttendanceState, Long> {
+public interface AttendanceStateRepository extends JpaRepository<AttendanceState, Long> {
     boolean existsByStatus(String status);
 }

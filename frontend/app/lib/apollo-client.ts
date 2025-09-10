@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
 const client = new ApolloClient({
     link: new HttpLink({
-        uri: 'http://localhost:8080/aquiles/graphql',
+        uri: 'http://localhost:8081/aquiles/graphql',
     }),
     cache: new InMemoryCache({
         addTypename: false
