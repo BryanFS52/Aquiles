@@ -23,13 +23,17 @@ public class ImprovementPlanActivityResolver {
     @DgsQuery
     public Map<String, Object> allImprovementPlanActivities(@InputArgument Integer page, @InputArgument Integer size) {
         try {
-            Page<ImprovementPlanActivityDto> pageResult = business.findAll(page, size);
+            // Valores por defecto si no se proporcionan
+            int pageNumber = page != null ? page : 0;
+            int pageSize = size != null ? size : 10;
+
+            Page<ImprovementPlanActivityDto> pageResult = business.findAll(pageNumber, pageSize);
             return ResponseHttpApi.responseHttpFindAll(
                     pageResult.getContent(),
                     ResponseHttpApi.CODE_OK,
                     "Query ok",
                     pageResult.getTotalPages(),
-                    page,
+                    pageNumber,
                     (int) pageResult.getTotalElements()
             );
         } catch (Exception e) {
@@ -43,6 +47,13 @@ public class ImprovementPlanActivityResolver {
     @DgsQuery
     public Map<String, Object> improvementPlanActivityById(@InputArgument Long id) {
         try {
+            if (id == null) {
+                return ResponseHttpApi.responseHttpError(
+                        "ID parameter is required",
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+
             ImprovementPlanActivityDto dto = business.findById(id);
             return ResponseHttpApi.responseHttpFindId(dto, ResponseHttpApi.CODE_OK, "Query by id ok");
         } catch (Exception e) {
@@ -56,6 +67,13 @@ public class ImprovementPlanActivityResolver {
     @DgsMutation
     public Map<String, Object> addImprovementPlanActivity(@InputArgument(name = "input") ImprovementPlanActivityDto dto) {
         try {
+            if (dto == null) {
+                return ResponseHttpApi.responseHttpError(
+                        "Input parameter is required",
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+
             ImprovementPlanActivityDto saved = business.add(dto);
             return ResponseHttpApi.responseHttpAction(saved.getId(), ResponseHttpApi.CODE_OK, "Add ok");
         } catch (Exception e) {
@@ -69,6 +87,20 @@ public class ImprovementPlanActivityResolver {
     @DgsMutation
     public Map<String, Object> updateImprovementPlanActivity(@InputArgument Long id, @InputArgument(name = "input") ImprovementPlanActivityDto dto) {
         try {
+            if (id == null) {
+                return ResponseHttpApi.responseHttpError(
+                        "ID parameter is required",
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+
+            if (dto == null) {
+                return ResponseHttpApi.responseHttpError(
+                        "Input parameter is required",
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+
             business.update(id, dto);
             return ResponseHttpApi.responseHttpAction(id, ResponseHttpApi.CODE_OK, "Update ok");
         } catch (Exception e) {
@@ -82,6 +114,13 @@ public class ImprovementPlanActivityResolver {
     @DgsMutation
     public Map<String, Object> deleteImprovementPlanActivity(@InputArgument Long id) {
         try {
+            if (id == null) {
+                return ResponseHttpApi.responseHttpError(
+                        "ID parameter is required",
+                        HttpStatus.BAD_REQUEST
+                );
+            }
+
             business.delete(id);
             return ResponseHttpApi.responseHttpAction(id, ResponseHttpApi.CODE_OK, "Delete ok");
         } catch (Exception e) {

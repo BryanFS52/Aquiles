@@ -7,14 +7,34 @@ import type { AppDispatch } from "@redux/store"
 import { useDispatch, useSelector } from "react-redux"
 import {fetchImprovementPlans} from "@slice/improvementPlanSlice";
 import React, { useEffect } from "react";
-import { FiMapPin, FiCalendar, FiFileText, FiStar, FiBook } from "react-icons/fi";
+import { FiMapPin, FiCalendar, FiFileText, FiStar, FiBook, FiPlus, FiArrowLeft } from "react-icons/fi";
 import { ImprovementPlan } from "@/graphql/generated";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 
 
 const HistorialPlanesMejoramientoInstructor = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const { data: improvementPlans, loading, error } = useSelector((state: any) => state.improvementPlan);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const { data: allImprovementPlans, loading, error } = useSelector((state: any) => state.improvementPlan);
+
+    // Obtener datos de la ficha desde los query parameters
+    const fichaDataString = searchParams.get('fichaData');
+    const fichaData = fichaDataString ? JSON.parse(decodeURIComponent(fichaDataString)) : null;
+    
+    // Filtrar planes de mejoramiento por estudiantes de la ficha
+    const improvementPlans = React.useMemo(() => {
+        if (!fichaData || !allImprovementPlans) {
+            return allImprovementPlans || [];
+        }
+        
+        // Filtrar planes donde el studentId esté en la lista de estudiantes de la ficha
+        return allImprovementPlans.filter((plan: ImprovementPlan) => 
+            plan.student?.id && fichaData.studentIds.includes(plan.student.id)
+        );
+    }, [allImprovementPlans, fichaData]);
 
     // Detectar modo oscuro
     const [isDarkMode, setIsDarkMode] = React.useState(false);
@@ -50,7 +70,13 @@ const HistorialPlanesMejoramientoInstructor = () => {
     }, []);
 
     useEffect(() => {
-        dispatch(fetchImprovementPlans({ page: 0, size: 50 }));
+        console.log('fichaData en HistorialPlanesMejoramientoInstructor:', fichaData);
+        
+        // Traer todos los planes de mejoramiento y filtrar del lado del cliente
+        dispatch(fetchImprovementPlans({ 
+            page: 0, 
+            size: 100 // Aumentamos el tamaño para asegurar que traiga todos
+        }));
     }, [dispatch]);
 
     // Función para formatear fecha en horizontal
@@ -96,6 +122,17 @@ const HistorialPlanesMejoramientoInstructor = () => {
                             }
                         </p>
                     </div>
+                </div>
+            )
+        },
+        {
+            key: 'document',
+            header: 'Documento',
+            render: (row) => (
+                <div className="text-center">
+                    <span className="text-sm font-medium text-gray-700 dark:text-white font-mono">
+                        {row.student?.person?.document || 'Sin documento'}
+                    </span>
                 </div>
             )
         },
@@ -244,6 +281,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
             // Búsqueda en datos del estudiante
             (row.student?.person?.name && normalizeText(row.student.person.name).includes(normalizedSearch)) ||
             (row.student?.person?.lastname && normalizeText(row.student.person.lastname).includes(normalizedSearch)) ||
+            (row.student?.person?.document && row.student.person.document.includes(searchTerm)) ||
             // Búsqueda en competencia
             (row.teacherCompetence?.competence?.name && normalizeText(row.teacherCompetence.competence.name).includes(normalizedSearch)) ||
             // Búsqueda en ciudad
@@ -314,10 +352,41 @@ const HistorialPlanesMejoramientoInstructor = () => {
         return (
             <div className="mx-auto px-4 py-8">
                 <div className="space-y-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <div>
-                            <PageTitle>Historial De Planes De Mejoramiento</PageTitle>
+                    <div>
+                        <div className="flex items-center gap-3 mb-2">
+                            {fichaData && (
+                                <button
+                                    onClick={() => router.back()}
+                                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen transition-colors duration-200"
+                                >
+                                    <FiArrowLeft className="w-4 h-4 mr-1" />
+                                    Volver a Fichas
+                                </button>
+                            )}
                         </div>
+                        <PageTitle>
+                            {fichaData 
+                                ? `Planes de Mejoramiento - Ficha N° ${fichaData.fichaNumber}`
+                                : `Historial De Planes De Mejoramiento`
+                            }
+                        </PageTitle>
+                        {/* Botón debajo del título, con degradado verde */}
+                        <div className="mt-4">
+                            <Link href={fichaData 
+                                ? `./FormularioPlanesDeMejoramiento?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}`
+                                : "./FormularioPlanesDeMejoramiento"
+                            }>
+                                <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-lightGreen transition-colors duration-200 shadow-lg">
+                                    <FiPlus className="w-4 h-4 mr-2" />
+                                    Crear Nuevo Plan de Mejoramiento
+                                </button>
+                            </Link>
+                        </div>
+                        {fichaData && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                                Mostrando planes de mejoramiento de {fichaData.totalStudents} estudiantes de la ficha N° {fichaData.fichaNumber}
+                            </p>
+                        )}
                     </div>
 
                     {/* Dashboard Stats - Estado vacío */}
@@ -354,7 +423,10 @@ const HistorialPlanesMejoramientoInstructor = () => {
                                 No se encontraron planes de mejoramiento
                             </h3>
                             <p className="text-gray-600 dark:text-gray-400 mb-4">
-                                Aún no hay planes de mejoramiento registrados en el sistema.
+                                {fichaData 
+                                    ? `No hay planes de mejoramiento registrados para los estudiantes de la ficha N° ${fichaData.fichaNumber}.`
+                                    : 'Aún no hay planes de mejoramiento registrados en el sistema.'
+                                }
                             </p>
                         </div>
                     </div>
@@ -366,9 +438,19 @@ const HistorialPlanesMejoramientoInstructor = () => {
     return (
         <div className="mx-auto px-4 py-8">
             <div className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                        <PageTitle>Historial De Planes De Mejoramiento</PageTitle>
+                <div>
+                    <PageTitle>Historial De Planes De Mejoramiento</PageTitle>
+                    {/* Botón debajo del título, con degradado verde */}
+                    <div className="mt-4">
+                        <Link href={fichaData 
+                            ? `./FormularioPlanesDeMejoramiento?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}`
+                            : "./FormularioPlanesDeMejoramiento"
+                        }>
+                            <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-lightGreen transition-colors duration-200 shadow-lg">
+                                <FiPlus className="w-4 h-4 mr-2" />
+                                Crear Nuevo Plan de Mejoramiento
+                            </button>
+                        </Link>
                     </div>
                 </div>
 
