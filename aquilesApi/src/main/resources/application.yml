@@ -1,6 +1,6 @@
 server:
-  port: 8080
-# Cambia 8081 por el puerto que prefieras
+port: 8080
+
 spring:
   application:
     name: aquilesApi

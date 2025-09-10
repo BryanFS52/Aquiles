@@ -17,6 +17,8 @@ import improvementPlanReducer from "@redux/slices/improvementPlanSlice"
 import noveltyReducer from "@slice/themis/noveltySlice";
 import noveltyTypeReducer from "@slice/themis/noveltyTypeSlice";
 import coordinationReducer from "@slice/olympo/coordinationSlice";
+import faultTypeReducer from "@slice/faultTypeSlice";
+
 
 const store = configureStore({
     reducer: {
@@ -37,7 +39,8 @@ const store = configureStore({
         improvementPlan: improvementPlanReducer,
         novelty: noveltyReducer,
         noveltyType: noveltyTypeReducer,
-        coordination: coordinationReducer
+        coordination: coordinationReducer,
+        faultType: faultTypeReducer,
     }
 });
 

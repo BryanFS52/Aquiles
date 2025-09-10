@@ -2,6 +2,7 @@ import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_IMPROVEMENT_PLANS, GET_IMPROVEMENT_PLAN_BY_ID, ADD_IMPROVEMENT_PLAN, UPDATE_IMPROVEMENT_PLAN, DELETE_IMPROVEMENT_PLAN } from '@graphql/improvementPlanGraph'
+import { GET_TEACHER_COMPETENCES_BY_STUDY_SHEET } from '@graphql/olympo/studySheetGraph'
 import {
     ImprovementPlan as BaseImprovementPlan,
     ImprovementPlanFaultType,
@@ -20,6 +21,15 @@ import {
 // Tipo extendido para incluir faultType
 export interface ImprovementPlan extends Omit<BaseImprovementPlan, 'faultType'> {
     faultType?: ImprovementPlanFaultType;
+}
+
+// Tipo para competencias del instructor
+export interface TeacherCompetence {
+    id: string;
+    competence: {
+        id: string;
+        name: string;
+    };
 }
 
 
@@ -151,7 +161,31 @@ export const deleteImprovementPlan = createAsyncThunk<string, string,
     }
 );
 
-const initialState = createInitialPaginatedState<ImprovementPlan>();
+// Nuevo thunk para obtener competencias del instructor por ficha
+export const fetchTeacherCompetencesByStudySheet = createAsyncThunk<TeacherCompetence[], { studySheetId: string; teacherId: string }>(
+    'improvementPlan/fetchTeacherCompetencesByStudySheet',
+    async ({ studySheetId, teacherId }) => {
+        const { data } = await clientLAN.query({
+            query: GET_TEACHER_COMPETENCES_BY_STUDY_SHEET,
+            variables: { id: parseInt(studySheetId), teacherId: parseInt(teacherId) },
+            fetchPolicy: 'no-cache',
+        });
+        
+        return data.studySheetById?.data?.teacherStudySheets?.map((item: any) => ({
+            id: item.id,
+            competence: {
+                id: item.competence.id,
+                name: item.competence.name,
+            },
+        })) || [];
+    }
+);
+
+const initialState = {
+    ...createInitialPaginatedState<ImprovementPlan>(),
+    teacherCompetences: [] as TeacherCompetence[],
+    loadingCompetences: false,
+};
 const improvementPlanSlice = createSlice({
     name: 'improvementPlan',
     initialState,
@@ -233,6 +267,18 @@ const improvementPlanSlice = createSlice({
                 const payload = action.payload as RejectedPayload;
                 const { code, message } = payload || {};
                 state.error = { code, message };
+            })
+            // fetchTeacherCompetencesByStudySheet
+            .addCase(fetchTeacherCompetencesByStudySheet.pending, (state) => {
+                state.loadingCompetences = true;
+            })
+            .addCase(fetchTeacherCompetencesByStudySheet.fulfilled, (state, action: PayloadAction<TeacherCompetence[]>) => {
+                state.teacherCompetences = action.payload;
+                state.loadingCompetences = false;
+            })
+            .addCase(fetchTeacherCompetencesByStudySheet.rejected, (state, action) => {
+                state.error = action.error.message || 'Error fetching teacher competences';
+                state.loadingCompetences = false;
             });
     }
 });

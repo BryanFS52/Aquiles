@@ -1,24 +1,24 @@
 type ImprovementPlan {
-    id: ID!
-    city: String!
-    date: String!
-    reason: String!
-    state: Boolean!
-    qualification: Boolean!
+    id: ID
+    city: String
+    date: String
+    reason: String
+    state: Boolean
+    qualification: Boolean
     student: Student
     teacherCompetence: TeacherStudySheet
     faultType: ImprovementPlanFaultType
 }
 
 input ImprovementPlanDto {
-    city: String!
-    date: String!
-    reason: String!
-    state: Boolean!
-    qualification: Boolean!
-    studentId: ID!
-    teacherCompetence: ID!
-    faultTypeId: ID! # Nuevo campo obligatorio
+    city: String
+    date: String
+    reason: String
+    state: Boolean
+    qualification: Boolean
+    studentId: ID
+    teacherCompetence: ID
+    faultType: ImprovementPlanFaultTypeDto
 }
 
 type ImprovementPlanPage {

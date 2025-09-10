@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import PageTitle from '@components/UI/pageTitle';
 import Modal from '@components/UI/Modal';
 import { fetchStudySheetByTeacher } from '@redux/slices/olympo/studySheetSlice';
+import { fetchTeacherCompetencesByStudySheet } from '@redux/slices/improvementPlanSlice';
 import { AppDispatch } from '@redux/store';
 import EmptyState from '@components/UI/emptyState';
 import {
@@ -32,6 +33,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
     const [selectedStudents, setSelectedStudents] = useState<NonNullable<StudentStudySheet>[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentSheet, setCurrentSheet] = useState<NonNullable<StudySheet> | null>(null);
+    const [loadingSheetSelection, setLoadingSheetSelection] = useState(false);
 
     // Estados para filtros
     const [filters, setFilters] = useState({
@@ -44,6 +46,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
 
     // Redux state
     const { data, loading, error } = useSelector((state: any) => state.studySheet);
+    const { teacherCompetences, loadingCompetences } = useSelector((state: any) => state.improvementPlan);
     const studySheets: NonNullable<StudySheet>[] = (data || []).filter((sheet: StudySheet): sheet is NonNullable<StudySheet> => sheet !== null);
 
     // Filtrar las fichas según los filtros aplicados
@@ -117,8 +120,27 @@ const PlanMejoramientoInstructor: React.FC = () => {
         setIsModalOpen(true);
     };
 
-    const handleSelectSheet = (sheet: NonNullable<StudySheet>) => {
+    const handleSelectSheet = async (sheet: NonNullable<StudySheet>) => {
         console.log('Ficha seleccionada:', sheet);
+        
+        setLoadingSheetSelection(true);
+        
+        // Primero cargar las competencias de esta ficha
+        const teacherId = 1; // Obtener el ID del instructor actual
+        let currentCompetences: any[] = [];
+        
+        try {
+            const competencesResult = await dispatch(fetchTeacherCompetencesByStudySheet({
+                studySheetId: sheet.id?.toString() || '',
+                teacherId: teacherId.toString()
+            })).unwrap();
+            
+            currentCompetences = competencesResult || [];
+            console.log('Competencias cargadas para la ficha:', currentCompetences);
+        } catch (error) {
+            console.error('Error al cargar competencias:', error);
+            currentCompetences = [];
+        }
         
         // Obtener los estudiantes de la ficha (misma lógica que el modal)
         const validStudents = (sheet.studentStudySheets || []).filter((ss): ss is NonNullable<StudentStudySheet> => ss !== null);
@@ -128,11 +150,16 @@ const PlanMejoramientoInstructor: React.FC = () => {
         console.log('IDs de estudiantes:', studentIds);
         
         if (validStudents.length > 0) {
-            // Navegar pasando información completa de la ficha y estudiantes
+            // Navegar pasando información completa de la ficha, estudiantes Y competencias
             const fichaData = {
+                id: sheet.id,
                 fichaNumber: sheet.number,
                 studentIds: studentIds,
                 totalStudents: validStudents.length,
+                quarter: (sheet.quarter && sheet.quarter[0]) ? {
+                    id: sheet.quarter[0].id,
+                    name: sheet.quarter[0].name
+                } : null,
                 students: validStudents.map(ss => ({
                     id: ss.student?.id,
                     person: {
@@ -143,7 +170,9 @@ const PlanMejoramientoInstructor: React.FC = () => {
                         phone: ss.student?.person?.phone
                     },
                     studentStudySheetState: ss.studentStudySheetState
-                }))
+                })),
+                // Incluir las competencias que acabamos de cargar
+                teacherCompetences: currentCompetences
             };
             
             // Convertir a string para pasar como query parameter
@@ -151,8 +180,12 @@ const PlanMejoramientoInstructor: React.FC = () => {
             const url = `./HistorialPlanesMejoramientoInstructor?fichaData=${fichaDataString}`;
             
             console.log('Navegando a:', url);
+            console.log('Datos de la ficha con competencias:', fichaData);
+            
+            setLoadingSheetSelection(false);
             router.push(url);
         } else {
+            setLoadingSheetSelection(false);
             // Si no hay estudiantes, navegar sin filtro
             router.push(`./HistorialPlanesMejoramientoInstructor`);
         }
@@ -422,13 +455,24 @@ const PlanMejoramientoInstructor: React.FC = () => {
                                         </button>
                                         <button
                                             onClick={() => handleSelectSheet(sheet)}
-                                            className="flex items-center justify-between w-full px-2 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-800 dark:hover:from-gray-600 dark:hover:to-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-all duration-200 font-medium group text-xs"
+                                            disabled={loadingSheetSelection}
+                                            className={`flex items-center justify-between w-full px-2 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-800 dark:hover:from-gray-600 dark:hover:to-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-all duration-200 font-medium group text-xs ${
+                                                loadingSheetSelection ? 'opacity-50 cursor-not-allowed' : ''
+                                            }`}
                                         >
                                             <div className="flex items-center gap-1.5">
-                                                <FiEye className="w-3.5 h-3.5" />
-                                                <span>Ver Historial</span>
+                                                {loadingSheetSelection ? (
+                                                    <div className="inline-block animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-gray-600 dark:border-gray-300"></div>
+                                                ) : (
+                                                    <FiEye className="w-3.5 h-3.5" />
+                                                )}
+                                                <span>
+                                                    {loadingSheetSelection ? 'Cargando...' : 'Ver Historial'}
+                                                </span>
                                             </div>
-                                            <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                                            {!loadingSheetSelection && (
+                                                <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                                            )}
                                         </button>
                                     </div>
                                 </div>
