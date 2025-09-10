@@ -3,10 +3,6 @@ type ImprovementPlanFaultType {
     name: String
 }
 
-input ImprovementPlanFaultTypeDto {
-    name: String!
-}
-
 type ImprovementPlanFaultTypePage {
     code: String
     data: [ImprovementPlanFaultType]
@@ -15,6 +11,11 @@ type ImprovementPlanFaultTypePage {
     totalItems: Int
     currentPage: Int
     message: String
+}
+
+input ImprovementPlanFaultTypeDto {
+    id: ID
+    name: String
 }
 
 type ImprovementPlanFaultTypePageId {
