@@ -24,8 +24,7 @@ public class ChecklistService implements Idao<Checklist, Long> {
 
     @Override
     public Checklist getById(Long id) {
-        return checklistRepository.findById(id)
-                .orElseThrow(() -> new CustomException("CheckList with id " + id + " not found", HttpStatus.NO_CONTENT));
+        return checklistRepository.findById(id).orElseThrow(() -> new CustomException("CheckList with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
     @Override

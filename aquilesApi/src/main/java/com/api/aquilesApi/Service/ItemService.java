@@ -20,9 +20,7 @@ public class ItemService implements Idao<Item, Long> {
 
     // Get all Item paginated
     @Override
-    public Page<Item> findAll(PageRequest pageRequest) {
-        return itemRepository.findAll(pageRequest);
-    }
+    public Page<Item> findAll(PageRequest pageRequest) { return itemRepository.findAll(pageRequest);}
 
     // Get Item by ID or throw exception if not found
     @Override
@@ -37,7 +35,7 @@ public class ItemService implements Idao<Item, Long> {
         this.itemRepository.save(entity);
     }
 
-    // Save a Item (create or update)
+    // Save an Item (create or update)
     @Override
     public Item save(Item entity) {
         return itemRepository.save(entity);

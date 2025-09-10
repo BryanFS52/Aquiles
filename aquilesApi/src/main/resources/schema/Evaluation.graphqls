@@ -37,9 +37,6 @@ input EvaluationDto {
 extend type Query {
     allEvaluations(page: Int, size: Int): EvaluationPage
     evaluationById(id: Long!): EvaluationPageId
-    evaluationsByChecklist(checklistId: Long!): EvaluationPage
-    evaluationByChecklist(checklistId: Long!): EvaluationPageId
-    evaluationExistsForChecklist(checklistId: Long!): EvaluationPageId
 }
 
 extend type Mutation {

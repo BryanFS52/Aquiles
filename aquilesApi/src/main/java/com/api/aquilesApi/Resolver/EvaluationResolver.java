@@ -15,13 +15,14 @@ import java.util.Map;
 
 @DgsComponent
 
-public class EvaluationsResolver {
+public class EvaluationResolver {
     private final EvaluationsBusiness evaluationsBusiness;
 
-    public EvaluationsResolver(EvaluationsBusiness evaluationsBusiness) {
+    public EvaluationResolver(EvaluationsBusiness evaluationsBusiness) {
         this.evaluationsBusiness = evaluationsBusiness;
     }
 
+    // Get all evaluations with pagination
     @DgsQuery
     public Map<String, Object> allEvaluations(@InputArgument("page") Integer page, @InputArgument("size") Integer size) {
         try {
@@ -40,7 +41,7 @@ public class EvaluationsResolver {
         }
     }
 
-
+    // Get evaluation by ID
     @DgsQuery
     public Map<String, Object> evaluationById(@InputArgument("id") Long id) {
         try {
@@ -53,65 +54,6 @@ public class EvaluationsResolver {
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error retrieving evaluation: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
-    }
-
-    @DgsQuery
-    public Map<String, Object> evaluationsByChecklist(@InputArgument("checklistId") Long checklistId) {
-        try {
-            List<EvaluationDto> evaluations = evaluationsBusiness.findByChecklistId(checklistId);
-            return ResponseHttpApi.responseHttpFindAll(
-                    evaluations,
-                    ResponseHttpApi.CODE_OK,
-                    "Query ok",
-                    1, // totalPages
-                    0, // currentPage
-                    evaluations.size() // totalElements
-            );
-        } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error retrieving evaluations by checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
-    }
-
-    // Nuevo endpoint para obtener la evaluación única de un checklist (relación 1:1)
-    @DgsQuery
-    public Map<String, Object> evaluationByChecklist(@InputArgument("checklistId") Long checklistId) {
-        try {
-            EvaluationDto evaluation = evaluationsBusiness.findEvaluationByChecklistId(checklistId);
-            if (evaluation != null) {
-                return ResponseHttpApi.responseHttpFindId(
-                        evaluation,
-                        ResponseHttpApi.CODE_OK,
-                        "Evaluation found for checklist"
-                );
-            } else {
-                return ResponseHttpApi.responseHttpError(
-                        "No evaluation found for checklist ID: " + checklistId, HttpStatus.NOT_FOUND
-                );
-            }
-        } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error retrieving evaluation by checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
-    }
-
-    // Endpoint para verificar si existe evaluación para un checklist
-    @DgsQuery
-    public Map<String, Object> evaluationExistsForChecklist(@InputArgument("checklistId") Long checklistId) {
-        try {
-            boolean exists = evaluationsBusiness.existsByChecklistId(checklistId);
-            return ResponseHttpApi.responseHttpFindId(
-                    Map.of("exists", exists, "checklistId", checklistId),
-                    ResponseHttpApi.CODE_OK,
-                    exists ? "Evaluation exists for checklist" : "No evaluation found for checklist"
-            );
-        } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error checking evaluation existence: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
@@ -163,5 +105,4 @@ public class EvaluationsResolver {
             );
         }
     }
-
 }

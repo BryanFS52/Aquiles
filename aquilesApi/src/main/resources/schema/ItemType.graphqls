@@ -3,6 +3,16 @@ type ItemType {
     name: String
 }
 
+type ItemTypePage {
+    data: [ItemType]
+    code: String
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
 type ItemTypePageId {
     data: [ItemType]
     date: String
@@ -16,12 +26,12 @@ input ItemTypeDto {
 }
 
 extend type Query {
-    allItemTypes(page: Int, size: Int): ItemTypePageId
+    allItemTypes(page: Int, size: Int): ItemTypePage
     itemTypeById(id: Long!): ItemTypePageId
 }
 
 extend type Mutation {
-    createItemType(itemType: ItemTypeDto!): ItemTypePageId
-    updateItemType(id: Long!, itemType: ItemTypeDto!): ItemTypePageId
-    deleteItemType(id: Long!): ItemTypePageId
+    addItemType(input: ItemTypeDto!): Response
+    updateItemType(id: Long!, input: ItemTypeDto!): Response
+    deleteItemType(id: Long!): Response
 }
