@@ -13,7 +13,7 @@ export const GET_NOVELTYTYPE_LIST = gql`
       data {
         id
         nameNovelty
-        isActive
+        isActive  
         description
         procedureDescription
       }

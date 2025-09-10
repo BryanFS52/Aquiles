@@ -62,10 +62,10 @@ const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPla
 
 export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], GetAllImprovementPlansQueryVariables>(
     'improvementPlan/fetchAll',
-    async ({ page, size }) => {
+    async ({ page, size, teacherCompetence }) => {
         const { data } = await clientLAN.query<GetAllImprovementPlansQuery, GetAllImprovementPlansQueryVariables>({
             query: GET_ALL_IMPROVEMENT_PLANS,
-            variables: { page, size },
+            variables: { page, size, teacherCompetence },
             fetchPolicy: 'no-cache',
         });
         return data.allImprovementPlans;

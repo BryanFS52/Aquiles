@@ -1,5 +1,5 @@
 server:
-  port: 8080  # Cambia 8081 por el puerto que prefieras
+  port: 8081  # Cambia 8081 por el puerto que prefieras
 
 spring:
   application:
