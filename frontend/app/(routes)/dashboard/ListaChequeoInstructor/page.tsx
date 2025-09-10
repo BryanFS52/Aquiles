@@ -16,7 +16,7 @@ import { fetchEvaluationsByChecklist, fetchEvaluationsByChecklistOld, completeEv
 import { exportChecklistToPdf, exportChecklistToExcel, downloadFileFromBase64 } from "@services/exportService";
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
-import { fetchAllEvaluationsDebug } from '@/redux/slices/evaluationSlice';
+import { fetchAllEvaluationsDebug, updateEvaluationItemStates } from '@/redux/slices/evaluationSlice';
 import { updateChecklistSignature, fetchChecklistById as fetchChecklistByIdRedux } from '@/redux/slices/checklistSlice';
 import {
   Checklist,
@@ -62,6 +62,8 @@ export default function InstructorChecklistView() {
   const [evaluationJudgment, setEvaluationJudgment] = useState<string>("PENDIENTE");
   const [loading, setLoading] = useState<boolean>(true);
   const [itemStates, setItemStates] = useState<{ [key: number]: { completed: boolean | null, observations: string } }>({});
+  const [isSavingItems, setIsSavingItems] = useState<boolean>(false);
+  const [pendingChanges, setPendingChanges] = useState<boolean>(false);
 
   // Estados para el modal de creación de evaluación
   const [showCreateEvaluationModal, setShowCreateEvaluationModal] = useState(false);
@@ -77,6 +79,9 @@ export default function InstructorChecklistView() {
   
   // Ref para rastrear qué tipo de actualización de firma está ocurriendo
   const signatureUpdateRef = useRef<{ type: string; inProgress: boolean }>({ type: '', inProgress: false });
+  
+  // Ref para debounce de guardado automático de items
+  const saveItemsDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const itemsPerPage = 3;
 
@@ -345,6 +350,52 @@ export default function InstructorChecklistView() {
     }
   };
 
+  // Función para guardar automáticamente los estados de items en la base de datos
+  const saveItemStatesToDatabase = async (updatedItemStates: { [key: number]: { completed: boolean | null, observations: string } }) => {
+    if (!selectedEvaluation || !selectedChecklist) {
+      console.log('❌ No se puede guardar: falta evaluación o checklist seleccionado');
+      return;
+    }
+
+    if (isFinalSaved) {
+      console.log('❌ No se puede guardar: evaluación ya está guardada definitivamente');
+      return;
+    }
+
+    try {
+      setIsSavingItems(true);
+      console.log('💾 Guardando estados de items automáticamente en BD...');
+      
+      // Crear o actualizar evaluación con los nuevos estados de items
+      const result = await dispatch(updateEvaluationItemStates({
+        id: parseInt(selectedEvaluation.id),
+        itemStates: updatedItemStates,
+        generalObservations: evaluationObservations,
+        recommendations: evaluationRecommendations,
+        valueJudgment: evaluationJudgment
+      }));
+
+      if (updateEvaluationItemStates.fulfilled.match(result)) {
+        console.log('✅ Estados de items guardados automáticamente en BD');
+        setPendingChanges(false); // Limpiar indicador de cambios pendientes
+        // Mostrar un toast sutil solo la primera vez o cada cierto tiempo
+        toast.success('💾 Cambios guardados automáticamente', { 
+          position: "bottom-right", 
+          autoClose: 2000,
+          hideProgressBar: true 
+        });
+      } else {
+        console.warn('⚠️ Error al guardar estados de items automáticamente:', result.payload);
+        toast.error('❌ Error al guardar cambios automáticamente');
+      }
+    } catch (error) {
+      console.error('❌ Error guardando estados de items automáticamente:', error);
+      toast.error('❌ Error al guardar cambios automáticamente');
+    } finally {
+      setIsSavingItems(false);
+    }
+  };
+
   // Auto-guardado para campos de evaluación
   useEffect(() => {
     if (selectedChecklist && (evaluationObservations || evaluationRecommendations || evaluationJudgment !== "PENDIENTE")) {
@@ -370,6 +421,15 @@ export default function InstructorChecklistView() {
       }
     }
   }, [reduxError]);
+
+  // Limpiar timeout al desmontar componente
+  useEffect(() => {
+    return () => {
+      if (saveItemsDebounceRef.current) {
+        clearTimeout(saveItemsDebounceRef.current);
+      }
+    };
+  }, []);
 
 
 
@@ -706,16 +766,7 @@ export default function InstructorChecklistView() {
   };
 
   const handleItemChange = (id: number, field: string, value: any): void => {
-    setItemStates(prev => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        [field]: value
-      }
-    }));
-    console.log("Updated item:", { id, field, value });
-    
-    // Guardar en localStorage para persistencia entre recargas
+    // Actualizar estado local inmediatamente para feedback visual
     const updatedStates = {
       ...itemStates,
       [id]: {
@@ -723,7 +774,54 @@ export default function InstructorChecklistView() {
         [field]: value
       }
     };
+    
+    setItemStates(updatedStates);
+    console.log("Updated item:", { id, field, value });
+    
+    // Guardar en localStorage para persistencia entre recargas
     localStorage.setItem(`itemStates_${selectedChecklist?.id}`, JSON.stringify(updatedStates));
+    
+    // Cancelar guardado previo si existe
+    if (saveItemsDebounceRef.current) {
+      clearTimeout(saveItemsDebounceRef.current);
+    }
+    
+    // Programar guardado automático en BD después de 2 segundos de inactividad
+    if (selectedEvaluation) {
+      setPendingChanges(true); // Marcar que hay cambios pendientes
+      
+      saveItemsDebounceRef.current = setTimeout(() => {
+        console.log('⏰ Ejecutando guardado automático de estados de items...');
+        saveItemStatesToDatabase(updatedStates);
+      }, 2000); // 2 segundos de debounce
+      
+      console.log('🕐 Guardado automático programado en 2 segundos...');
+    } else {
+      // Si no hay evaluación, crear una automáticamente y luego guardar
+      console.log('⚠️ No hay evaluación seleccionada, creando una automáticamente...');
+      setPendingChanges(true);
+      
+      saveItemsDebounceRef.current = setTimeout(async () => {
+        console.log('⏰ Creando evaluación y guardando estados de items...');
+        try {
+          // Crear evaluación automáticamente
+          if (selectedChecklist) {
+            await handleCreateMissingEvaluation();
+            // Esperar un poco y luego intentar guardar
+            setTimeout(() => {
+              if (selectedEvaluation) {
+                saveItemStatesToDatabase(updatedStates);
+              }
+            }, 1500);
+          }
+        } catch (error) {
+          console.error('Error creando evaluación automática:', error);
+          setPendingChanges(false);
+        }
+      }, 3000); // Un poco más de tiempo para crear evaluación
+      
+      console.log('🕐 Creación de evaluación y guardado programados...');
+    }
   };
 
   // Función para convertir archivo a base64 sin el prefijo data:
@@ -1287,6 +1385,14 @@ export default function InstructorChecklistView() {
 
         // Recargar las evaluaciones para mostrar la nueva
         await loadEvaluationsForChecklist(parseInt(selectedChecklist.id));
+        
+        // Si hay estados de items pendientes, guardarlos automáticamente
+        if (Object.keys(itemStates).length > 0) {
+          console.log('🔄 Guardando estados de items pendientes en la nueva evaluación...');
+          setTimeout(() => {
+            saveItemStatesToDatabase(itemStates);
+          }, 1000); // Dar tiempo para que se cargue la evaluación
+        }
       } else if (response === null) {
         toast.info("ℹ️ Ya existe una evaluación para esta lista de chequeo");
         // Intentar recargar las evaluaciones por si no se habían cargado correctamente
@@ -1775,7 +1881,33 @@ export default function InstructorChecklistView() {
       {/* Contenido principal con diseño tipo panal */}
       <div className="p-6 space-y-8">
         <div className="flex items-center justify-between">
-          <PageTitle>Lista de Chequeo - Vista del Instructor</PageTitle>
+          <div className="flex items-center space-x-4">
+            <PageTitle>Lista de Chequeo - Vista del Instructor</PageTitle>
+            
+            {/* Indicador de guardado automático */}
+            {isSavingItems ? (
+              <div className="flex items-center space-x-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full border border-blue-300 dark:border-blue-600">
+                <div className="animate-spin w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">
+                  Guardando cambios...
+                </span>
+              </div>
+            ) : pendingChanges ? (
+              <div className="flex items-center space-x-2 px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 rounded-full border border-yellow-300 dark:border-yellow-600">
+                <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+                <span className="text-sm text-yellow-700 dark:text-yellow-300 font-medium">
+                  Cambios pendientes
+                </span>
+              </div>
+            ) : selectedEvaluation && Object.keys(itemStates).length > 0 ? (
+              <div className="flex items-center space-x-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 rounded-full border border-green-300 dark:border-green-600">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-sm text-green-700 dark:text-green-300 font-medium">
+                  Cambios guardados
+                </span>
+              </div>
+            ) : null}
+          </div>
           
           {/* Botón para volver a la selección de TeamScrum */}
           <button

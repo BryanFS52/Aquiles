@@ -120,6 +120,52 @@ export const updateEvaluation = createAsyncThunk<UpdateEvaluationMutation['updat
             return rejectWithValue({ code: '500', message: error.message });
         }
     }
+);
+
+export const updateEvaluationItemStates = createAsyncThunk<UpdateEvaluationMutation['updateEvaluation'], 
+    { id: number; itemStates: any; generalObservations?: string; recommendations?: string; valueJudgment?: string },
+    { rejectValue: { code: string; message: string } }
+>(
+    'evaluations/updateItemStates',
+    async ({ id, itemStates, generalObservations, recommendations, valueJudgment }, { rejectWithValue }) => {
+        try {
+            console.log('=== UPDATING EVALUATION ITEM STATES ===');
+            console.log('Evaluation ID:', id);
+            console.log('Item states:', itemStates);
+            console.log('General observations:', generalObservations);
+
+            // Crear el JSON estructurado que incluye tanto los estados de items como las observaciones generales
+            const observationsData = {
+                itemStates: itemStates,
+                generalObservations: generalObservations || ""
+            };
+
+            const input = {
+                observations: JSON.stringify(observationsData),
+                recommendations: recommendations || "",
+                valueJudgment: valueJudgment || "PENDIENTE"
+            };
+
+            console.log('Update input:', input);
+
+            const { data } = await client.mutate<UpdateEvaluationMutation, UpdateEvaluationMutationVariables>({
+                mutation: UPDATE_EVALUATION,
+                variables: { id, input },
+            });
+
+            const res = data?.updateEvaluation;
+            if (!res || res.code !== '200') {
+                console.error('Update failed with response:', res);
+                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
+            }
+
+            console.log('✅ Item states updated successfully in database');
+            return res;
+        } catch (error: any) {
+            console.error('Error updating item states:', error);
+            return rejectWithValue({ code: '500', message: error.message });
+        }
+    }
 );  
 
 export const deleteEvaluation = createAsyncThunk<string, string,
@@ -240,6 +286,23 @@ const evaluationSlice = createSlice({
                 const payload = action.payload as RejectedPayload;
                 const { code, message } = payload || {};
                 state.error = { code, message };
+            })
+            // updateEvaluationItemStates
+            .addCase(updateEvaluationItemStates.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(updateEvaluationItemStates.fulfilled, (state, action: PayloadAction<UpdateEvaluationMutation['updateEvaluation']>) => {
+                console.log('=== ITEM STATES UPDATE FULFILLED ===');
+                state.loading = false;
+                state.error = null;
+                console.log('✅ Item states saved to database successfully');
+            })
+            .addCase(updateEvaluationItemStates.rejected, (state, action) => {
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
+                state.error = { code, message };
+                state.loading = false;
+                console.error('❌ Failed to save item states to database:', payload);
             })
             // deleteEvaluation
             .addCase(deleteEvaluation.fulfilled, (state, action: PayloadAction<string>) => {
