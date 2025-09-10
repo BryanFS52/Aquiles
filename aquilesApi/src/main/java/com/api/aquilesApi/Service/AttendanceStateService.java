@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Service;
 
 import com.api.aquilesApi.Entity.AttendanceState;
-import com.api.aquilesApi.Repository.StateAttendanceRepository;
+import com.api.aquilesApi.Repository.AttendanceStateRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.springframework.data.domain.Page;
@@ -11,41 +11,41 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AttendanceStateService implements Idao<AttendanceState, Long> {
-    private final StateAttendanceRepository StateAttendanceRepository;
+    private final AttendanceStateRepository AttendanceStateRepository;
 
-    public AttendanceStateService(StateAttendanceRepository stateAttendanceRepository) {
-        StateAttendanceRepository = stateAttendanceRepository;
+    public AttendanceStateService(AttendanceStateRepository stateAttendanceRepository) {
+        AttendanceStateRepository = stateAttendanceRepository;
     }
 
     @Override
     public Page<AttendanceState> findAll(PageRequest pageRequest) {
-        return StateAttendanceRepository.findAll(pageRequest);
+        return AttendanceStateRepository.findAll(pageRequest);
     }
 
     @Override
     public AttendanceState getById(Long id) {
-        return StateAttendanceRepository.findById(id).orElseThrow(() ->
+        return AttendanceStateRepository.findById(id).orElseThrow(() ->
                 new CustomException("State Attendance with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
     @Override
     public void update(AttendanceState entity) {
-        this.StateAttendanceRepository.save(entity);
+        this.AttendanceStateRepository.save(entity);
     }
 
     @Override
     public AttendanceState save(AttendanceState entity) {
-        return StateAttendanceRepository.save(entity);
+        return AttendanceStateRepository.save(entity);
     }
 
     @Override
     public void delete(AttendanceState entity) {
-        this.StateAttendanceRepository.delete(entity);
+        this.AttendanceStateRepository.delete(entity);
     }
 
     @Override
     public void create(AttendanceState entity) {
-        this.StateAttendanceRepository.save(entity);
+        this.AttendanceStateRepository.save(entity);
     }
 
 }
