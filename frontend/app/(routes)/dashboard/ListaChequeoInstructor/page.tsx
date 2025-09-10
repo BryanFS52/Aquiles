@@ -46,6 +46,7 @@ export default function InstructorChecklistView() {
   const [selectedTeamScrumId, setSelectedTeamScrumId] = useState<string | null>(null);
   const [selectedTeamScrumName, setSelectedTeamScrumName] = useState<string>("");
   const [selectedStudySheetNumber, setSelectedStudySheetNumber] = useState<string>("");
+  const [selectedStudySheetId, setSelectedStudySheetId] = useState<string>("");
   
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [firmaAnterior, setFirmaAnterior] = useState<string | null>(null);
@@ -127,16 +128,27 @@ export default function InstructorChecklistView() {
 
   // Funciones auxiliares para extraer y estructurar datos de evaluaciones
   const extractItemStatesFromEvaluation = (evaluation: Evaluation) => {
-    if (!evaluation.observations) return {};
+    console.log('🔍 Extracting item states from evaluation:', evaluation.id);
+    console.log('📝 Raw observations:', evaluation.observations);
+    
+    if (!evaluation.observations) {
+      console.log('❌ No observations found in evaluation');
+      return {};
+    }
 
     try {
       const parsed = JSON.parse(evaluation.observations);
+      console.log('📊 Parsed observations:', parsed);
+      
       if (parsed.itemStates && typeof parsed.itemStates === 'object') {
-        console.log('📋 Estados de items extraídos desde evaluación');
+        console.log('✅ Item states found:', parsed.itemStates);
         return parsed.itemStates;
+      } else {
+        console.log('❌ No itemStates object found in parsed observations');
       }
     } catch (error) {
-      // Error silencioso - no se pudieron extraer estados
+      console.log('❌ Error parsing observations as JSON:', error.message);
+      console.log('Raw observations text:', evaluation.observations);
     }
 
     return {};
@@ -297,13 +309,16 @@ export default function InstructorChecklistView() {
       const generalObservationsFromDB = extractGeneralObservationsFromEvaluation(selectedEvaluation);
       
       if (Object.keys(itemStatesFromDB).length > 0) {
+        console.log('📋 Setting item states from DB:', itemStatesFromDB);
         setItemStates(itemStatesFromDB);
-        console.log('📋 Estados de items actualizados desde BD');
+        console.log('✅ Estados de items actualizados desde BD');
         
         // Limpiar localStorage ya que tenemos datos frescos de BD
         if (selectedChecklist) {
           localStorage.removeItem(`itemStates_${selectedChecklist.id}`);
         }
+      } else {
+        console.log('❌ No item states found from DB, keeping current state');
       }
       
       setEvaluationObservations(generalObservationsFromDB);
@@ -485,18 +500,50 @@ export default function InstructorChecklistView() {
   const loadActiveChecklists = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
+      
+      // Obtener la ficha del instructor desde localStorage
+      const instructorStudySheetId = localStorage.getItem('selectedStudySheetId');
+      const instructorStudySheetNumber = localStorage.getItem('selectedStudySheetNumber');
+      console.log("🔍 Instructor study sheet:", { id: instructorStudySheetId, number: instructorStudySheetNumber });
+      
       const response = await fetchAllChecklists(0, 100);
       console.log("Raw checklists response:", response); // Debug log
 
       if (response.code === "200" && response.data) {
         // Filtrar solo las listas activas
-        const activeLists = response.data.filter((checklist: Checklist) => checklist.state === true);
-        console.log("Active checklists found:", activeLists); // Debug log
-        console.log("Trimester values:", activeLists.map(cl => ({ id: cl.id, trimester: cl.trimester, type: typeof cl.trimester }))); // Debug log
+        let activeLists = response.data.filter((checklist: Checklist) => checklist.state === true);
+        console.log("All active checklists:", activeLists.length);
+        
+        // Si el instructor tiene una ficha asignada, filtrar por esa ficha
+        if (instructorStudySheetId) {
+          activeLists = activeLists.filter((checklist: Checklist) => {
+            if (!checklist.studySheets) {
+              console.log(`❌ Checklist ${checklist.id} has no study sheets assigned`);
+              return false;
+            }
+            
+            // studySheets es un string con IDs separados por comas
+            const assignedSheets = checklist.studySheets.split(',').map(s => s.trim());
+            const isAssigned = assignedSheets.includes(instructorStudySheetId);
+            
+            console.log(`🔍 Checklist ${checklist.id}: assigned sheets [${assignedSheets.join(', ')}], instructor sheet ID: ${instructorStudySheetId}, match: ${isAssigned}`);
+            
+            return isAssigned;
+          });
+          
+          console.log(`✅ Filtered checklists for instructor's sheet (ID: ${instructorStudySheetId}, Number: ${instructorStudySheetNumber}):`, activeLists.length);
+        } else {
+          console.log("⚠️ No instructor study sheet ID found, showing all active checklists");
+        }
+
+        console.log("Final active checklists:", activeLists); // Debug log
+        console.log("Trimester values:", activeLists.map(cl => ({ id: cl.id, trimester: cl.trimester, studySheets: cl.studySheets }))); // Debug log
 
         setActiveChecklists(activeLists);
         if (activeLists.length > 0 && !selectedChecklist) {
           setSelectedChecklist(activeLists[0]);
+        } else if (activeLists.length === 0 && instructorStudySheetId) {
+          toast.info(`No hay listas de chequeo asignadas a tu ficha de formación (Ficha ${instructorStudySheetNumber})`);
         }
       }
     } catch (error) {
@@ -507,10 +554,13 @@ export default function InstructorChecklistView() {
     }
   }, [selectedChecklist, setActiveChecklists, setSelectedChecklist]);
 
-  // Cargar listas de chequeo activas y recuperar selección previa
+  // Cargar listas de chequeo activas después de que se establezca la información del instructor
   useEffect(() => {
-    loadActiveChecklists();
-  }, [loadActiveChecklists]);
+    if (isClientMounted && selectedStudySheetId) {
+      console.log('🔄 Loading checklists for instructor sheet:', { id: selectedStudySheetId, number: selectedStudySheetNumber });
+      loadActiveChecklists();
+    }
+  }, [isClientMounted, selectedStudySheetId, loadActiveChecklists]);
 
   // Recuperar información del team scrum seleccionado desde localStorage
   useEffect(() => {
@@ -519,51 +569,69 @@ export default function InstructorChecklistView() {
     const teamScrumId = localStorage.getItem('selectedTeamScrumId');
     const teamScrumName = localStorage.getItem('selectedTeamScrumName');
     const studySheetNumber = localStorage.getItem('selectedStudySheetNumber');
+    const studySheetId = localStorage.getItem('selectedStudySheetId');
     
     if (teamScrumId && teamScrumName) {
+      const previousStudySheetId = selectedStudySheetId;
+      
       setSelectedTeamScrumId(teamScrumId);
       setSelectedTeamScrumName(teamScrumName);
       setSelectedStudySheetNumber(studySheetNumber || "");
+      setSelectedStudySheetId(studySheetId || "");
+      
       console.log('🔄 Recuperando información del team scrum:', {
         teamScrumId,
         teamScrumName,
-        studySheetNumber
+        studySheetNumber,
+        studySheetId,
+        previousStudySheetId
       });
+      
+      // Si cambió la ficha del instructor, recargar las listas de chequeo
+      if (previousStudySheetId !== studySheetId && previousStudySheetId !== undefined) {
+        console.log('🔄 Study sheet changed, reloading checklists');
+        loadActiveChecklists();
+      }
     } else {
       // Si no hay team scrum seleccionado, redirigir a la página de selección
       console.log('❌ No hay team scrum seleccionado, redirigiendo a selección');
       window.location.href = '/dashboard/InstructorSelection';
     }
-  }, [isClientMounted]);
+  }, [isClientMounted, selectedStudySheetId, loadActiveChecklists]);
   
   const loadEvaluationsForChecklist = async (checklistId: number): Promise<void> => {
     try {
       console.log("=== LOADING EVALUATIONS FROM DATABASE ===");
-      console.log("Checklist ID:", checklistId);
+      console.log("Checklist ID:", checklistId, "Type:", typeof checklistId);
 
       // Cargar evaluaciones desde la base de datos
       const evaluationsResponse = await fetchEvaluationsByChecklist(checklistId);
+      console.log("🔍 Raw evaluations response:", evaluationsResponse);
 
       if (evaluationsResponse && evaluationsResponse.code === "200") {
         console.log("✅ Evaluations response successful");
+        console.log("📊 Response data:", evaluationsResponse.data);
 
         if (evaluationsResponse.data && evaluationsResponse.data.length > 0) {
           setEvaluations(evaluationsResponse.data);
           console.log("✅ Found evaluations:", evaluationsResponse.data.length);
+          console.log("🔍 First evaluation details:", evaluationsResponse.data[0]);
 
           // Seleccionar la primera evaluación
           const firstEvaluation = evaluationsResponse.data[0];
 
           setSelectedEvaluation(firstEvaluation);
-          console.log("✅ Evaluation loaded successfully");
+          console.log("✅ Evaluation loaded successfully, observations:", firstEvaluation.observations);
           return;
         } else {
-          console.log("⚠️ No evaluations found in main response, trying alternative method...");
+          console.log("⚠️ No evaluations found in main response, data is empty or null");
+          console.log("Data value:", evaluationsResponse.data);
         }
       } else {
-        console.log("⚠️ Main evaluations response failed, trying alternative method...");
+        console.log("⚠️ Main evaluations response failed");
         console.log("Response code:", evaluationsResponse?.code);
         console.log("Response message:", evaluationsResponse?.message);
+        console.log("Full response:", evaluationsResponse);
       }
 
       // Si llegamos aquí, intentar con la función alternativa
@@ -636,13 +704,20 @@ export default function InstructorChecklistView() {
     }
 
     // Mapear los items reales del checklist a nuestro formato
-    return selectedChecklist.items.map((item, index) => ({
-      id: parseInt(item.id || (index + 1).toString()),
-      indicator: item.indicator,
-      completed: null, // Estado inicial
-      observations: "" // Observaciones iniciales vacías
-    }));
-  }, [selectedChecklist]);
+    return selectedChecklist.items.map((item, index) => {
+      const itemId = parseInt(item.id || (index + 1).toString());
+      
+      // Obtener el estado desde itemStates (datos de BD) o valores por defecto
+      const itemState = itemStates[itemId];
+      
+      return {
+        id: itemId,
+        indicator: item.indicator,
+        completed: itemState ? itemState.completed : null, // Usar datos de BD si existen
+        observations: itemState ? itemState.observations : "" // Usar observaciones de BD si existen
+      };
+    });
+  }, [selectedChecklist, itemStates]); // Agregar itemStates como dependencia
 
   const totalPages = Math.ceil(items.length / itemsPerPage);
   const currentItems = items.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
