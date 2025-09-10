@@ -1,6 +1,6 @@
 package com.api.aquilesApi.Resolver;
 
-import com.api.aquilesApi.Business.StateAttendancesBusiness;
+import com.api.aquilesApi.Business.AttendanceStateBusiness;
 import com.api.aquilesApi.Dto.AttendanceStateDto;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.DgsComponent;
@@ -12,35 +12,26 @@ import org.springframework.http.HttpStatus;
 import java.util.Map;
 
 @DgsComponent
-public class StateAttendanceResolver {
-    private final StateAttendancesBusiness stateAttendancesBusiness;
+public class AttendanceStateResolver {
+    private final AttendanceStateBusiness attendanceStateBusiness;
 
-    public StateAttendanceResolver(StateAttendancesBusiness stateAttendancesBusiness) {
-        this.stateAttendancesBusiness = stateAttendancesBusiness;
+    public AttendanceStateResolver(AttendanceStateBusiness attendanceStateBusiness) {
+        this.attendanceStateBusiness = attendanceStateBusiness;
     }
 
     // FindAll StateAttendance (GraphQL)
     @DgsQuery
     public Map<String , Object> allStateAttendances (@InputArgument Integer page, @InputArgument Integer size) {
         try {
-            Page<AttendanceStateDto> stateAttendanceDtoPage  = stateAttendancesBusiness.findAll(page, size);
-            if (!stateAttendanceDtoPage.isEmpty()){
-                return  ResponseHttpApi.responseHttpFindAll(
-                        stateAttendanceDtoPage.getContent(),
-                        ResponseHttpApi.CODE_OK,
-                        "Successfully Completed",
-                        stateAttendanceDtoPage.getSize(),
-                        stateAttendanceDtoPage.getTotalPages(),
-                        (int) stateAttendanceDtoPage.getTotalElements());
-            } else {
-                return  ResponseHttpApi.responseHttpFindAll(
-                        null,
-                        ResponseHttpApi.NO_CONTENT,
-                        "State Attendance not found",
-                        0,
-                        0,
-                        0);
-            }
+            Page<AttendanceStateDto> stateAttendanceDtoPage  = attendanceStateBusiness.findAll(page, size);
+            return ResponseHttpApi.responseHttpFindAll(
+                    stateAttendanceDtoPage.getContent(),
+                    ResponseHttpApi.CODE_OK,
+                    "Query Ok",
+                    stateAttendanceDtoPage.getTotalPages(),
+                    page,
+                    (int) stateAttendanceDtoPage.getTotalElements()
+            );
         } catch (Exception e){
             return  ResponseHttpApi.responseHttpError(
                     "Error getting StateAttendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -51,7 +42,7 @@ public class StateAttendanceResolver {
     @DgsQuery
     public Map<String , Object> stateAttendanceById(@InputArgument Long id){
         try {
-            AttendanceStateDto attendanceStateDto = this.stateAttendancesBusiness.findById(id);
+            AttendanceStateDto attendanceStateDto = this.attendanceStateBusiness.findById(id);
             return  ResponseHttpApi.responseHttpFindId(
                     attendanceStateDto,
                     ResponseHttpApi.CODE_OK,
@@ -66,7 +57,7 @@ public class StateAttendanceResolver {
     @DgsMutation
     public Map<String , Object> addStateAttendance(@InputArgument(name = "input") AttendanceStateDto attendanceStateDto){
         try {
-            AttendanceStateDto attendanceStateDto1 = stateAttendancesBusiness.add(attendanceStateDto);
+            AttendanceStateDto attendanceStateDto1 = attendanceStateBusiness.add(attendanceStateDto);
             return  ResponseHttpApi.responseHttpAction(
                     attendanceStateDto1.getId(),
                     ResponseHttpApi.CODE_OK,
@@ -82,7 +73,7 @@ public class StateAttendanceResolver {
     @DgsMutation
     public Map<String, Object> updateStateAttendance(@InputArgument Long id, @InputArgument(name = "input") AttendanceStateDto attendanceStateDto) {
         try {
-            stateAttendancesBusiness.update(id, attendanceStateDto);
+            attendanceStateBusiness.update(id, attendanceStateDto);
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
@@ -98,7 +89,7 @@ public class StateAttendanceResolver {
     @DgsMutation
     public Map<String, Object> deleteStateAttendance(@InputArgument Long id) {
         try {
-            stateAttendancesBusiness.delete(id);
+            attendanceStateBusiness.delete(id);
             return  ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,

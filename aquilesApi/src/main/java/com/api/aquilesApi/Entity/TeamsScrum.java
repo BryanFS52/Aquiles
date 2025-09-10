@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -40,23 +40,31 @@ public class TeamsScrum implements Serializable {
     private String projectJustification;
 
     // Relations
-    // 1. Relation (M-1) con Checklist
+    // 1. Relation (M-M) with Checklist
     @ManyToMany(mappedBy = "teamsScrum")
     private List<Checklist> checklists;
 
-    // 2. Relation (M-1) con studySheet
+    // 2. Relation (M-1) with studySheet
     @Column(name = "study_sheet_id")
     private Long studySheetId;
 
-    // 3. Relation (M-M) con apprentice
+    // 3. Relation (M-M) with a student
     @ElementCollection
     @CollectionTable(
             name = "team_scrum_members",
             joinColumns = @JoinColumn(name = "team_id")
     )
-    private List<TeamScrumMemberId>memberIds = new ArrayList<>();
+    private List<TeamScrumMemberId>memberIds;
 
-    // 4. Relation con (M-1) processMethodology (Atlas)
+    // 4. Relation (M-1) with processMethodology (Atlas)
     @Column(name = "process_methodology_id", nullable = true)
     private String processMethodologyId;
+
+    // 5. Relation (1-M) with checklistQualification
+    @OneToMany(mappedBy = "teamsScrum", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChecklistQualification> checklistQualifications;
+
+    // 6. Relation (1-M) with evaluations
+    @OneToMany(mappedBy = "teamsScrum", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Evaluation> evaluations;
 }

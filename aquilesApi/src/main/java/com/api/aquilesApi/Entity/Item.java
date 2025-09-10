@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,14 +31,17 @@ public class Item implements Serializable {
     private Boolean active = true;
 
     // Relations
-    // 1. Relation (M-1) con itemType
+    // 1. Relation (M-1) with itemType
     @ManyToOne
     @JoinColumn(name = "item_type_id", nullable = false)
     private ItemType itemType;
 
-    // 2. Relation (M-1) con checklist
-    @ManyToOne
-    @JoinColumn(name = "checklist_id", nullable = false)
-    private Checklist checklist;
+    // 2. Relation (M-M) with checklist
+    @ManyToMany(mappedBy = "items")
+    private List<Checklist> checklists;
+
+    // 3. Relation (1-M) with checklistQualification
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChecklistQualification> checklistQualifications;
 
 }

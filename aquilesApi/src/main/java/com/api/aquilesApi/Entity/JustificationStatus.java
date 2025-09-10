@@ -26,6 +26,8 @@ public class JustificationStatus implements Serializable {
     @Column(name = "state")
     private boolean state;
 
+    // Relations
+    // 1. Relation (1-M) with justification
     @OneToMany(mappedBy = "justificationStatus", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Justification> justificationsList;
 }

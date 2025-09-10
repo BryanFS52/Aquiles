@@ -3,7 +3,9 @@ type Evaluation {
     observations: String
     recommendations: String
     valueJudgment: String
-    checklistId: Long
+    instructorSignature: String
+    checklist: Checklist
+    teamsScrum: TeamsScrum
 }
 
 type EvaluationPage {
@@ -27,15 +29,14 @@ input EvaluationDto {
     observations: String
     recommendations: String
     valueJudgment: String
-    checklistId: Long
+    instructorSignature: String
+    checklist: ChecklistDto
+    teamsScrum: TeamsScrumDto
 }
 
 extend type Query {
     allEvaluations(page: Int, size: Int): EvaluationPage
     evaluationById(id: Long!): EvaluationPageId
-    evaluationsByChecklist(checklistId: Long!): EvaluationPage
-    evaluationByChecklist(checklistId: Long!): EvaluationPageId
-    evaluationExistsForChecklist(checklistId: Long!): EvaluationPageId
 }
 
 extend type Mutation {

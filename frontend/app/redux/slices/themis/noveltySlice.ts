@@ -1,3 +1,4 @@
+
 import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
@@ -26,7 +27,7 @@ export interface NoveltyDto {
   processFlowStatus: ProcessFlowStatusDto;
   studentId: number;
   teacherId: number;
-//   administrativeId: number;
+  //   administrativeId: number;
 }
 
 // Interface para el formulario del modal
@@ -109,9 +110,9 @@ const initialState: NoveltyState = {
 // Async thunk para validar ausencias y abrir modal
 export const openNoveltyModal = createAsyncThunk<
   StudentAbsenceData,
-  { 
-    studentId: number; 
-    teacherId: number; 
+  {
+    studentId: number;
+    teacherId: number;
     absenceCount: number;
     studentName?: string;
     studentDocument?: string;
@@ -123,7 +124,7 @@ export const openNoveltyModal = createAsyncThunk<
   async ({ studentId, teacherId, absenceCount, studentName, studentDocument, studentLastname }, { dispatch, rejectWithValue }) => {
     try {
       // console.log('Opening novelty modal for student:', { studentId, teacherId, absenceCount, studentName });
-      
+
       // Validar que teacherId sea válido
       if (!teacherId || teacherId === 0) {
         return rejectWithValue({
@@ -131,9 +132,9 @@ export const openNoveltyModal = createAsyncThunk<
           message: 'ID del instructor no válido. Por favor, inicie sesión nuevamente.'
         });
       }
-      
+
       const canReportDesertion = absenceCount >= 3;
-      
+
       if (!canReportDesertion) {
         return rejectWithValue({
           code: 'INSUFFICIENT_ABSENCES',
@@ -174,7 +175,7 @@ export const processFile = createAsyncThunk<
   async (file, { rejectWithValue }) => {
     try {
       // console.log('Processing file:', file.name);
-      
+
       return new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -207,7 +208,7 @@ export const submitNovelty = createAsyncThunk<
     try {
       const { novelty } = getState();
       const { formData, selectedStudentAbsences } = novelty;
-      
+
       // Validaciones
       if (!formData.observation.trim()) {
         return rejectWithValue({
@@ -215,7 +216,7 @@ export const submitNovelty = createAsyncThunk<
           message: 'La observación es requerida'
         });
       }
-      
+
       if (!formData.noveltyType.id.trim()) {
         return rejectWithValue({
           code: 'VALIDATION_ERROR',
@@ -263,7 +264,7 @@ export const submitNovelty = createAsyncThunk<
       //   observation: formData.observation ? 'Present' : 'Missing',
       //   noveltyType: formData.noveltyType.id ? 'Present' : 'Missing'
       // });
-      
+
       const { data } = await clientLAN.mutate<AddNoveltyMutation, AddNoveltyMutationVariables>({
         mutation: ADD_NOVELTY,
         variables: {
@@ -279,7 +280,7 @@ export const submitNovelty = createAsyncThunk<
       return data.addNovelty;
     } catch (error: any) {
       console.error('Error submitting novelty:', error);
-      
+
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
         const graphQLError = error.graphQLErrors[0];
         return rejectWithValue({
@@ -287,14 +288,14 @@ export const submitNovelty = createAsyncThunk<
           message: graphQLError.message || 'Error al enviar la novedad'
         });
       }
-      
+
       if (error.networkError) {
         return rejectWithValue({
           code: 'NETWORK_ERROR',
           message: 'Error de conexión. Verifique su conexión a internet.'
         });
       }
-      
+
       return rejectWithValue({
         code: 'UNKNOWN_ERROR',
         message: error.message || 'Error desconocido al enviar la novedad'
@@ -314,7 +315,7 @@ const noveltySlice = createSlice({
       state.selectedStudentAbsences = null;
       state.error = null;
     },
-    
+
     // Form management
     updateFormField: (state, action: PayloadAction<{ field: keyof NoveltyFormData; value: any }>) => {
       const { field, value } = action.payload;
@@ -324,11 +325,11 @@ const noveltySlice = createSlice({
         (state.formData as any)[field] = value;
       }
     },
-    
+
     setNoveltyFiles: (state, action: PayloadAction<string>) => {
       state.formData.noveltyFiles = action.payload;
     },
-    
+
     initializeForm: (state, action: PayloadAction<{ studentId: number; teacherId: number }>) => {
       const { studentId, teacherId } = action.payload;
       state.formData = {
@@ -337,16 +338,16 @@ const noveltySlice = createSlice({
         teacherId,
       };
     },
-    
+
     // Error management
     clearError: (state) => {
       state.error = null;
     },
-    
+
     clearSubmitSuccess: (state) => {
       state.submitSuccess = false;
     },
-    
+
     resetNoveltyState: (state) => {
       return initialState;
     }
@@ -373,7 +374,7 @@ const noveltySlice = createSlice({
         state.error = action.payload || { message: 'Error al abrir modal' };
         state.modalOpen = false;
       })
-      
+
       // Process file
       .addCase(processFile.pending, (state) => {
         state.loading = true;
@@ -386,7 +387,7 @@ const noveltySlice = createSlice({
         state.loading = false;
         state.error = action.payload || { message: 'Error al procesar archivo' };
       })
-      
+
       // Submit novelty
       .addCase(submitNovelty.pending, (state) => {
         state.loading = true;
@@ -409,21 +410,21 @@ const noveltySlice = createSlice({
   }
 });
 
-export const { 
+export const {
   closeModal,
   updateFormField,
   setNoveltyFiles,
   initializeForm,
-  clearError, 
-  clearSubmitSuccess, 
-  resetNoveltyState 
+  clearError,
+  clearSubmitSuccess,
+  resetNoveltyState
 } = noveltySlice.actions;
 
 // Selectores útiles
 export const selectNoveltyState = (state: { novelty: NoveltyState }) => state.novelty;
-export const selectCanReportDesertion = (state: { novelty: NoveltyState }) => 
+export const selectCanReportDesertion = (state: { novelty: NoveltyState }) =>
   state.novelty.selectedStudentAbsences?.canReportDesertion ?? false;
-export const selectStudentAbsenceCount = (state: { novelty: NoveltyState }) => 
+export const selectStudentAbsenceCount = (state: { novelty: NoveltyState }) =>
   state.novelty.selectedStudentAbsences?.absenceCount ?? 0;
 export const selectIsModalOpen = (state: { novelty: NoveltyState }) => state.novelty.modalOpen;
 export const selectFormData = (state: { novelty: NoveltyState }) => state.novelty.formData;

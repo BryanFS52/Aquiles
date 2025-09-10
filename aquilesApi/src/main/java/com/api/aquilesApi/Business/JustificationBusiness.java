@@ -28,16 +28,16 @@ public class JustificationBusiness {
     private final AttendancesService attendancesService;
     private final JustificationTypeService justificationTypeService;
     private final JustificationStatusService justificationStatusService;
-    private final StateAttendanceService  stateAttendanceService;
+    private final AttendanceStateService attendanceStateService;
     private final ModelMapper modelMapper;
 
     public JustificationBusiness(JustificationService justificationService, AttendancesService attendancesService, JustificationTypeService
-            justificationTypeService, JustificationStatusService justificationStatusService, StateAttendanceService stateAttendanceService, ModelMapper modelMapper) {
+            justificationTypeService, JustificationStatusService justificationStatusService, AttendanceStateService attendanceStateService, ModelMapper modelMapper) {
         this.justificationService = justificationService;
         this.attendancesService = attendancesService;
         this.justificationTypeService = justificationTypeService;
         this.justificationStatusService = justificationStatusService;
-        this.stateAttendanceService = stateAttendanceService;
+        this.attendanceStateService = attendanceStateService;
         this.modelMapper = modelMapper;
     }
 
@@ -189,7 +189,7 @@ public class JustificationBusiness {
             Justification existing = justificationService.getById(id);
             JustificationStatus justificationStatus = justificationStatusService.getById(statusId);
             if (Objects.equals(justificationStatus.getName(), "Aceptado")){
-                AttendanceState attendanceState = stateAttendanceService.getById(3L);
+                AttendanceState attendanceState = attendanceStateService.getById(3L);
                 existing.getAttendance().setAttendanceState(attendanceState);
             }
 //            if (Objects.equals(justificationStatus.getName(), "Denegado")){

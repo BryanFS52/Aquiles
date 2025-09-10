@@ -11,10 +11,9 @@ import java.util.List;
 
 @Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,uses = {FIleMapper.class})
 public interface JustificationMap {
-
     JustificationMap INSTANCE = Mappers.getMapper(JustificationMap.class);
 
-    JustificationDto EntityToDTO(JustificationDto justification);
+    JustificationDto EntityToDTO(Justification justification);
 
     Justification DTOToEntity(JustificationDto justification);
 

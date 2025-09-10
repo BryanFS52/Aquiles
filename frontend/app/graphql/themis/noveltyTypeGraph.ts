@@ -1,3 +1,4 @@
+
 import { gql } from "@apollo/client";
 
 export const GET_NOVELTYTYPE_LIST = gql`

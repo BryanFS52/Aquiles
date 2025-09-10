@@ -24,12 +24,29 @@ import java.util.UUID;
 public class AttendancesResolver {
     private final AttendancesBusiness attendancesBusiness;
     private final QrCodeGenerator qrCodeGenerator;
-    private final ModelMapper modelMapper;
 
-    public AttendancesResolver(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator, ModelMapper modelMapper) {
+    public AttendancesResolver(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator) {
         this.attendancesBusiness = attendancesBusiness;
         this.qrCodeGenerator = qrCodeGenerator;
-        this.modelMapper = modelMapper;
+    }
+
+    // FindAll Attendances (GraphQL)
+    @DgsQuery
+    public Map<String, Object> allAttendances(@InputArgument Integer page, @InputArgument Integer size) {
+        try {
+            Page<AttendanceDto> attendancesDtoPage = attendancesBusiness.findAll(page, size);
+            return ResponseHttpApi.responseHttpFindAll(
+                    attendancesDtoPage.getContent(),
+                    ResponseHttpApi.CODE_OK,
+                    "Query ok",
+                    attendancesDtoPage.getTotalPages(),
+                    page,
+                    (int) attendancesDtoPage.getTotalElements()
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DgsQuery
@@ -48,25 +65,6 @@ public class AttendancesResolver {
                     attendances.getSize(),
                     safePage,
                     attendances.getTotalPages()
-            );
-        } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    // FindAll Attendances (GraphQL)
-    @DgsQuery
-    public Map<String, Object> allAttendances(@InputArgument Integer page, @InputArgument Integer size) {
-        try {
-            Page<AttendanceDto> attendancesDtoPage = attendancesBusiness.findAll(page, size);
-            return ResponseHttpApi.responseHttpFindAll(
-                    attendancesDtoPage.getContent(),
-                    ResponseHttpApi.CODE_OK,
-                    "Query ok",
-                    attendancesDtoPage.getTotalPages(),
-                    page,
-                    (int) attendancesDtoPage.getTotalElements()
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
@@ -100,9 +98,9 @@ public class AttendancesResolver {
             return ResponseHttpApi.responseHttpAction(
                     attendanceDto1.getId(),
                     ResponseHttpApi.CODE_OK,
-                    "Add ok"
+                    "Attendance created successfully"
             );
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error adding Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
@@ -117,7 +115,7 @@ public class AttendancesResolver {
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
-                    "Update ok"
+                    "Attendance updated successfully"
             );
         }
         catch (Exception e) {
@@ -135,7 +133,7 @@ public class AttendancesResolver {
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
-                    "Delete ok"
+                    "Attendance deleted successfully"
             );
         }
         catch (Exception e) {
