@@ -7,7 +7,9 @@ type Checklist {
     component: String
     instructorSignature: String
     evaluationCriteria: Boolean
-    studySheets: Long 
+    studySheets: String 
+    trainingProjectId: Long
+    trainingProjectName: String
     evaluations: Evaluation
     items: [Item]
     associatedJuries: [Juries]
@@ -38,7 +40,9 @@ input ChecklistDto {
     component: String
     instructorSignature: String!
     evaluationCriteria: Boolean!
-    studySheets: Long
+    studySheets: String
+    trainingProjectId: Long
+    trainingProjectName: String
     evaluationId: Long
     evaluations: [EvaluationDto]
     items: [ItemDto]
@@ -59,4 +63,5 @@ extend type Mutation {
     updateChecklist(id: Long!, input: ChecklistDto): Response
     deleteChecklist(id: Long!): Response
     updateItemStatus(itemId: Long!, active: Boolean!): Response
+    refreshTrainingProjectName(checklistId: Long!): Response
 }

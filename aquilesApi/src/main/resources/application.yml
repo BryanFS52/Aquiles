@@ -60,3 +60,7 @@ spring:
 
 frontend:
   url: https://7d12-179-1-218-161.ngrok-free.app
+
+olympo:
+  microservice:
+    url: http://localhost:8081

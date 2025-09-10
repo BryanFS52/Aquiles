@@ -134,8 +134,15 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
+    // Validaciones básicas
     if (!trimestre || !componente || items.some(i => !i.indicador)) {
       toast.error('Por favor, complete todos los campos obligatorios.')
+      return
+    }
+
+    // Validación: Si hay un proyecto formativo seleccionado, debe tener al menos una ficha
+    if (selectedTrainingProject && selectedStudySheets.length === 0) {
+      toast.error('Debe seleccionar al menos una ficha de formación para el proyecto formativo seleccionado.')
       return
     }
 
@@ -269,7 +276,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
               {/* Selector de Proyecto Formativo */}
               <div>
                 <label htmlFor="trainingProject" className="block text-sm font-medium text-gray-700">
-                  Proyecto Formativo (Opcional)
+                  Proyecto Formativo
                 </label>
                 <select
                   id="trainingProject"
@@ -281,10 +288,15 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                   <option value="">Selecciona un proyecto formativo</option>
                   {trainingProjects.map((project) => (
                     <option key={project.id} value={project.id}>
-                      {project.name} - {project.program?.name}
+                      {project.name} - {project.program?.name || 'Sin programa'}
                     </option>
                   ))}
                 </select>
+                {trainingProjects.length === 0 && !loadingProjects && (
+                  <p className="text-sm text-amber-600 mt-1">
+                    ⚠️ No hay proyectos formativos disponibles
+                  </p>
+                )}
                 {loadingProjects && (
                   <p className="text-sm text-gray-500 mt-1">Cargando proyectos formativos...</p>
                 )}
@@ -294,7 +306,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
               {selectedTrainingProject && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Fichas de Formación Asociadas
+                    Fichas de Formación Asociadas <span className="text-red-500">*</span>
                   </label>
                   {loadingSheets ? (
                     <p className="text-sm text-gray-500">Cargando fichas...</p>
@@ -316,6 +328,11 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                     </div>
                   ) : (
                     <p className="text-sm text-gray-500">No hay fichas disponibles para este proyecto formativo</p>
+                  )}
+                  {studySheets.length > 0 && (
+                    <p className="text-xs text-blue-600 mt-2">
+                      <strong>Nota:</strong> Debe seleccionar al menos una ficha para continuar.
+                    </p>
                   )}
                 </div>
               )}

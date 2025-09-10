@@ -11,6 +11,7 @@ import com.api.aquilesApi.Service.ChecklistExportService;
 import com.api.aquilesApi.Service.ChecklistService;
 import com.api.aquilesApi.Service.EvaluationsService;
 import com.api.aquilesApi.Service.ItemService;
+import com.api.aquilesApi.Service.TrainingProjectService;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
@@ -33,6 +34,7 @@ public class ChecklistBusiness {
     private final ChecklistHistoryBusiness checklistHistoryBusiness;
     private final ItemTypeRepository itemTypeRepository;
     private final ItemService itemService; // ← Agregar el servicio de items
+    private final TrainingProjectService trainingProjectService;
 
     public ChecklistBusiness(
             ChecklistService checklistService,
@@ -42,7 +44,8 @@ public class ChecklistBusiness {
             ChecklistExportService exportService,
             ChecklistHistoryBusiness checklistHistoryBusiness,
             ItemTypeRepository itemTypeRepository,
-            ItemService itemService // ← Agregar parámetro
+            ItemService itemService, // ← Agregar parámetro
+            TrainingProjectService trainingProjectService
     ) {
         this.checklistService = checklistService;
         this.modelMapper = modelMapper;
@@ -51,6 +54,7 @@ public class ChecklistBusiness {
         this.checklistHistoryBusiness = checklistHistoryBusiness;
         this.itemTypeRepository = itemTypeRepository;
         this.itemService = itemService; // ← Asignar dependencia
+        this.trainingProjectService = trainingProjectService;
     }   
 
     // Find All
@@ -71,6 +75,29 @@ public class ChecklistBusiness {
                 ChecklistDto dto = modelMapper.map(entity, ChecklistDto.class);
                 dto.setTrimester(entity.getTrimester());
                 dto.setComponent(entity.getComponent());
+                dto.setTrainingProjectId(entity.getTrainingProjectId());
+                
+                // Enriquecer con el nombre del proyecto formativo si no está presente
+                if (entity.getTrainingProjectId() != null) {
+                    String projectName = entity.getTrainingProjectName();
+                    if (projectName == null || projectName.trim().isEmpty()) {
+                        try {
+                            projectName = trainingProjectService.getTrainingProjectName(entity.getTrainingProjectId());
+                            if (projectName != null) {
+                                // Actualizar la entidad con el nombre obtenido para futuras consultas
+                                entity.setTrainingProjectName(projectName);
+                                // No necesitamos save aquí ya que es solo para la consulta actual
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Warning: Could not fetch training project name for ID " + 
+                                             entity.getTrainingProjectId() + ": " + e.getMessage());
+                        }
+                    }
+                    dto.setTrainingProjectName(projectName);
+                } else {
+                    dto.setTrainingProjectName(entity.getTrainingProjectName());
+                }
+                
                 return dto;
             });
         } catch (DataAccessException e) {
@@ -90,6 +117,29 @@ public class ChecklistBusiness {
             ChecklistDto dto = modelMapper.map(checklist, ChecklistDto.class);
             dto.setTrimester(checklist.getTrimester());
             dto.setComponent(checklist.getComponent());
+            dto.setTrainingProjectId(checklist.getTrainingProjectId());
+            
+            // Enriquecer con el nombre del proyecto formativo si no está presente
+            if (checklist.getTrainingProjectId() != null) {
+                String projectName = checklist.getTrainingProjectName();
+                if (projectName == null || projectName.trim().isEmpty()) {
+                    try {
+                        projectName = trainingProjectService.getTrainingProjectName(checklist.getTrainingProjectId());
+                        if (projectName != null) {
+                            // Actualizar la entidad para futuras consultas
+                            checklist.setTrainingProjectName(projectName);
+                            checklistService.save(checklist); // Guardar el nombre para evitar consultas futuras
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Warning: Could not fetch training project name for ID " + 
+                                         checklist.getTrainingProjectId() + ": " + e.getMessage());
+                    }
+                }
+                dto.setTrainingProjectName(projectName);
+            } else {
+                dto.setTrainingProjectName(checklist.getTrainingProjectName());
+            }
+            
             return dto;
         } catch (CustomException e) {
             throw e;
@@ -109,6 +159,23 @@ public class ChecklistBusiness {
             checklist.setComponent(checklistDto.getComponent());
             checklist.setEvaluationCriteria(checklistDto.isEvaluationCriteria());
             checklist.setStudySheets(checklistDto.getStudySheets());
+            checklist.setTrainingProjectId(checklistDto.getTrainingProjectId());
+            
+            // Si no se proporciona el nombre del proyecto pero sí el ID, intentar obtenerlo
+            if (checklistDto.getTrainingProjectId() != null) {
+                String projectName = checklistDto.getTrainingProjectName();
+                if (projectName == null || projectName.trim().isEmpty()) {
+                    try {
+                        projectName = trainingProjectService.getTrainingProjectName(checklistDto.getTrainingProjectId());
+                    } catch (Exception e) {
+                        System.err.println("Warning: Could not fetch training project name for ID " + 
+                                         checklistDto.getTrainingProjectId() + ": " + e.getMessage());
+                    }
+                }
+                checklist.setTrainingProjectName(projectName);
+            } else {
+                checklist.setTrainingProjectName(checklistDto.getTrainingProjectName());
+            }
 
             // 🔧 Conversión manual del String a byte[] para instructorSignature
             if (checklistDto.getInstructorSignature() != null) {
@@ -170,6 +237,8 @@ public class ChecklistBusiness {
             // Mapeo manual de los campos que pueden no estar mapeándose correctamente
             result.setTrimester(saved.getTrimester());
             result.setComponent(saved.getComponent());
+            result.setTrainingProjectId(saved.getTrainingProjectId());
+            result.setTrainingProjectName(saved.getTrainingProjectName());
             return result;
         } catch (Exception e) {
             throw new CustomException("Error creating checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -206,6 +275,27 @@ public class ChecklistBusiness {
             }
             if (checklistDto.getComponent() != null) {
                 checklistAntes.setComponent(checklistDto.getComponent());
+            }
+            if (checklistDto.getTrainingProjectId() != null) {
+                checklistAntes.setTrainingProjectId(checklistDto.getTrainingProjectId());
+            }
+            // Manejar actualización del proyecto formativo y su nombre
+            if (checklistDto.getTrainingProjectId() != null) {
+                checklistAntes.setTrainingProjectId(checklistDto.getTrainingProjectId());
+                
+                // Si no se proporciona el nombre pero sí el ID, intentar obtenerlo
+                String projectName = checklistDto.getTrainingProjectName();
+                if (projectName == null || projectName.trim().isEmpty()) {
+                    try {
+                        projectName = trainingProjectService.getTrainingProjectName(checklistDto.getTrainingProjectId());
+                    } catch (Exception e) {
+                        System.err.println("Warning: Could not fetch training project name for ID " + 
+                                         checklistDto.getTrainingProjectId() + ": " + e.getMessage());
+                    }
+                }
+                checklistAntes.setTrainingProjectName(projectName);
+            } else if (checklistDto.getTrainingProjectName() != null) {
+                checklistAntes.setTrainingProjectName(checklistDto.getTrainingProjectName());
             }
 
             if (checklistDto.getInstructorSignature() != null) {

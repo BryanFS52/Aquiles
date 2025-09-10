@@ -13,7 +13,9 @@ public class ChecklistHistoryDto {
     private String remarks;
     private boolean evaluationCriteria;
     private String dateAssigned;
-    private Long studySheets;
+    private String studySheets;
+    private Long trainingProjectId;
+    private String trainingProjectName;
     private Long evaluations;
     private Long learningOutcome;
 }

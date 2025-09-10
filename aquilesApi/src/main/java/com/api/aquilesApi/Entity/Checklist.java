@@ -37,14 +37,20 @@ public class Checklist implements Serializable {
     @Column(name = "date_assigned", length = 30)
     private LocalDate dateAssigned;
 
-    @Column(name = "study_sheets")
-    private Long studySheets;
+    @Column(name = "study_sheets", length = 500)
+    private String studySheets;
 
     @Column(name = "trimester", length = 50)
     private String trimester;
 
     @Column(name = "component", length = 100)
     private String component;
+
+    @Column(name = "training_project_id")
+    private Long trainingProjectId;
+
+    @Column(name = "training_project_name", length = 255)
+    private String trainingProjectName;
 
     // Relations
     // 1.Relation (1-M) con item

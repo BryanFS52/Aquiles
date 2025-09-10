@@ -34,6 +34,10 @@ public class ChecklistDto {
 
     private String component;
 
+    private Long trainingProjectId;
+    
+    private String trainingProjectName;
+
     // Relations - Relación 1:1 con Evaluación
     // @NotNull(message = "Los jurados asociados son obligatorios") // ← Removido: no siempre son obligatorios
     private Set<Long> associatedJuries;
@@ -42,7 +46,7 @@ public class ChecklistDto {
     private EvaluationsDto evaluation; // Objeto completo para respuestas
     
     private TeamsScrumDto teamsScrum;
-    private Long studySheets;
+    private String studySheets;
     private List<ItemDto> items;
     private List<Long> deletedItemIds; // ← Lista de IDs de items a eliminar
 }

@@ -1,7 +1,7 @@
 import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
-import { GET_ALL_CHECKLISTS, GET_CHECKLIST_BY_ID, ADD_CHECKLIST, UPDATE_CHECKLIST, DELETE_CHECKLIST } from '@graphql/checklistGraph'
+import { GET_ALL_CHECKLISTS_COORDINATOR, GET_CHECKLIST_BY_ID_COORDINATOR, ADD_CHECKLIST, UPDATE_CHECKLIST, DELETE_CHECKLIST } from '@graphql/checklistGraph'
 import {
     Checklist,
     GetAllChecklistsQuery,
@@ -27,6 +27,8 @@ const transformGraphQLToChecklistItem = (graphqlData: any): Checklist => {
         instructorSignature: graphqlData.instructorSignature,
         evaluationCriteria: graphqlData.evaluationCriteria,
         studySheets: graphqlData.studySheets,
+        trainingProjectId: graphqlData.trainingProjectId,
+        trainingProjectName: graphqlData.trainingProjectName,
         associatedJuries: graphqlData.associatedJuries,
         items: graphqlData.items || [],
         evaluations: graphqlData.evaluations || []
@@ -37,7 +39,7 @@ export const fetchChecklists = createAsyncThunk<GetAllChecklistsQuery['allCheckl
     'checklist/fetchAll',
     async ({ page, size }) => {
         const { data } = await client.query<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>({
-            query: GET_ALL_CHECKLISTS,
+            query: GET_ALL_CHECKLISTS_COORDINATOR,
             variables: { page, size },
             fetchPolicy: 'no-cache',
         });
@@ -49,7 +51,7 @@ export const fetchChecklistById = createAsyncThunk<GetChecklistByIdQuery['checkl
     'checklist/fetchById',
     async ({ id }) => {
         const { data } = await client.query<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>({
-            query: GET_CHECKLIST_BY_ID,
+            query: GET_CHECKLIST_BY_ID_COORDINATOR,
             variables: { id },
             fetchPolicy: 'no-cache', // Forzar recarga desde servidor
         });

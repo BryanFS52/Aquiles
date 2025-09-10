@@ -156,4 +156,28 @@ public class ChecklistResolver {
             );
         }
     }
+
+    // Refresh training project name for a checklist
+    @DgsMutation
+    public Map<String, Object> refreshTrainingProjectName(@InputArgument Long checklistId) {
+        try {
+            ChecklistDto checklist = checklistBusiness.findById(checklistId);
+            if (checklist.getTrainingProjectId() != null) {
+                // This will automatically refresh the training project name
+                return ResponseHttpApi.responseHttpAction(
+                        checklistId,
+                        ResponseHttpApi.CODE_OK,
+                        "Training project name refreshed successfully"
+                );
+            } else {
+                return ResponseHttpApi.responseHttpError(
+                        "Checklist has no training project associated", HttpStatus.BAD_REQUEST
+                );
+            }
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error refreshing training project name: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }

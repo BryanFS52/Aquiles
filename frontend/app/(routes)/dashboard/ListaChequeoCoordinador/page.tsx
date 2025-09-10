@@ -8,6 +8,7 @@ import { AppDispatch, RootState } from "@redux/store"
 import { addEvaluation } from "@slice/evaluationSlice"
 import CrearListaChequeo from "@components/Modals/modalNewChecklist"
 import PageTitle from "@components/UI/pageTitle"
+import checklistEnhancementService from "@services/checklistEnhancementService"
 import {
   fetchChecklists,
   fetchChecklistById,
@@ -39,6 +40,9 @@ interface Checklist {
   remarks?: string
   trimester?: string
   component?: string
+  trainingProjectId?: number
+  trainingProjectName?: string
+  studySheets?: string
   items?: ChecklistItem[]
   [key: string]: any
 }
@@ -52,26 +56,42 @@ export default function CoordinadorChecklistView() {
   const [checklistToDelete, setChecklistToDelete] = useState<string | null>(null)
   const [editingChecklist, setEditingChecklist] = useState<Checklist | null>(null)
   const [isEditing, setIsEditing] = useState<boolean>(false)
+  const [enrichedChecklists, setEnrichedChecklists] = useState<any[]>([])
+  const [enrichmentLoading, setEnrichmentLoading] = useState<boolean>(false)
   
   
   const loadChecklists = useCallback(async (): Promise<void> => {
     try {
-    console.log("🔄 Loading checklists with force refresh...") // Debug log
-    const result = await dispatch(
-      fetchChecklists({ page: 0, size: 100 })
-    ).unwrap()
+      console.log("🔄 Loading checklists with force refresh...") // Debug log
+      const result = await dispatch(
+        fetchChecklists({ page: 0, size: 100 })
+      ).unwrap()
+      
       console.log('loadChecklists Redux result:', result) // Debug log
+      
       if (result?.data) {
         console.log('loadChecklists data count:', result.data.length) // Debug log
         console.log('First checklist sample:', result.data[0]) // Debug log
-        if (result.data[0] && result.data[0].items) {
-          console.log('First checklist items:', result.data[0].items) // Debug log
+        
+        // Enriquecer los checklists con información adicional
+        setEnrichmentLoading(true)
+        try {
+          const enriched = await checklistEnhancementService.enrichChecklists(result.data)
+          console.log('✅ Checklists enriched:', enriched.length) // Debug log
+          setEnrichedChecklists(enriched)
+        } catch (enrichmentError) {
+          console.warn('⚠️ Error enriching checklists, using basic data:', enrichmentError)
+          setEnrichedChecklists(result.data)
+        } finally {
+          setEnrichmentLoading(false)
         }
+        
         console.log('✅ Checklists loaded successfully'); // Debug log
       }
     } catch (error) {
       console.error("❌ Error loading checklists:", error)
       toast.error("Error al cargar las listas de chequeo")
+      setEnrichmentLoading(false)
     }
   }, [dispatch])
   
@@ -115,7 +135,8 @@ export default function CoordinadorChecklistView() {
           component: checklistData.component !== undefined ? checklistData.component : (editingChecklist.component || ""),
           evaluationCriteria: editingChecklist.evaluationCriteria || false,
           instructorSignature: editingChecklist.instructorSignature || JSON.stringify({}),
-          studySheets: editingChecklist.studySheets || null,
+          studySheets: checklistData.studySheets || editingChecklist.studySheets || null,
+          trainingProjectId: checklistData.trainingProjectId || (editingChecklist as any).trainingProjectId || null,
           evaluations: editingChecklist.evaluations || null,
           associatedJuries: editingChecklist.associatedJuries || null,
           items: checklistData.items ? transformItems(checklistData.items) : [],
@@ -174,7 +195,7 @@ export default function CoordinadorChecklistView() {
             console.log("Updated checklist items:", updatedChecklistInState.items); // Debug log
             console.log("🔍 DETAILED FINAL ITEMS AFTER UPDATE:"); // Debug log
             if (updatedChecklistInState.items) {
-              updatedChecklistInState.items.forEach((item, index) => {
+              updatedChecklistInState.items.forEach((item: any, index: number) => {
                 if (item) {
                   console.log(`  Final Item ${index + 1}: id=${item.id}, indicator="${item.indicator}", active=${item.active}`); // Debug log
                 }
@@ -194,7 +215,8 @@ export default function CoordinadorChecklistView() {
           component: checklistData.component || "",
           evaluationCriteria: false,
           instructorSignature: JSON.stringify({}),
-          studySheets: null,
+          studySheets: checklistData.studySheets || null,
+          trainingProjectId: checklistData.trainingProjectId || null,
           evaluations: null,
           associatedJuries: null,
           items: checklistData.items ? transformItems(checklistData.items) : []
@@ -385,8 +407,22 @@ export default function CoordinadorChecklistView() {
     setConfirmModalOpen(true)
   }
 
+  // Función auxiliar para formatear las fichas
+  const getFormattedStudySheets = (studySheets: string): string => {
+    if (!studySheets) return 'Sin fichas asociadas'
+    
+    const sheetIds = studySheets.split(',')
+    if (sheetIds.length === 1) {
+      return `Ficha ${sheetIds[0]}`
+    }
+    return `${sheetIds.length} fichas asociadas`
+  }
+
+  // Usar checklists enriquecidos si están disponibles, sino usar los datos de Redux
+  const checklistsToUse = enrichedChecklists.length > 0 ? enrichedChecklists : checklists;
+  
   // Normalizar id a string para evitar exclusión por tipo
-  const normalizedChecklists = checklists.map(c => ({
+  const normalizedChecklists = checklistsToUse.map(c => ({
     ...c,
     id: c.id != null ? c.id.toString() : ''
   }));
@@ -440,10 +476,12 @@ export default function CoordinadorChecklistView() {
         </button>
       </div>
 
-      {loading ? (
+      {(loading || enrichmentLoading) ? (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lime-600 dark:border-shadowBlue"></div>
-          <span className="ml-2 text-gray-600 dark:text-gray-400">Cargando listas de chequeo...</span>
+          <span className="ml-2 text-gray-600 dark:text-gray-400">
+            {enrichmentLoading ? "Cargando información de proyectos y fichas..." : "Cargando listas de chequeo..."}
+          </span>
         </div>
       ) : (
         <div className="mt-6 overflow-visible">
@@ -507,6 +545,18 @@ export default function CoordinadorChecklistView() {
 
                         {/* Contenido de la tarjeta */}
                         <div className="p-6 space-y-4">
+                          {/* Proyecto Formativo */}
+                          <div>
+                            <span className="text-xs font-semibold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                              Proyecto Formativo
+                            </span>
+                            <p className="text-sm text-darkBlue dark:text-white mt-1 font-medium">
+                              {(checklist as any).trainingProjectName || (
+                                <span className="text-gray-500 italic">Sin proyecto asociado</span>
+                              )}
+                            </p>
+                          </div>
+
                           {/* Componente */}
                           <div>
                             <span className="text-xs font-semibold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
@@ -515,6 +565,28 @@ export default function CoordinadorChecklistView() {
                             <p className="text-sm text-darkBlue dark:text-white mt-1 font-medium">
                               {checklist.component || 'N/A'}
                             </p>
+                          </div>
+
+                          {/* Fichas asociadas */}
+                          <div>
+                            <span className="text-xs font-semibold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                              Fichas Asociadas
+                            </span>
+                            <div className="mt-1">
+                              {(checklist as any).studySheets ? (
+                                (checklist as any).formattedStudySheets ? (
+                                  <div className="text-xs text-darkBlue dark:text-white">
+                                    {(checklist as any).formattedStudySheets}
+                                  </div>
+                                ) : (
+                                  <span className="inline-block px-3 py-1 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-800/20 dark:to-blue-600/20 text-blue-800 dark:text-blue-300 rounded-full text-xs font-bold border border-blue-300 dark:border-blue-500/30">
+                                    {getFormattedStudySheets((checklist as any).studySheets)}
+                                  </span>
+                                )
+                              ) : (
+                                <span className="text-gray-500 italic text-sm">Sin fichas asociadas</span>
+                              )}
+                            </div>
                           </div>
 
                           {/* Indicadores */}
