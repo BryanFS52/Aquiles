@@ -86,11 +86,11 @@ public class JustificationBusiness {
             JustificationType justificationType = justificationTypeService.getById(dto.getJustificationType().getId());
             long daysBetween = ChronoUnit.DAYS.between(attendance.getAttendanceDate(), justification.getJustificationDate());
 
-        JustificationStatus statusEnProceso = justificationStatusService.getById(3L);
-        if (!"En proceso".equals(statusEnProceso.getName())) {
-            throw new CustomException("El estado L3 no es 'En proceso'", HttpStatus.BAD_REQUEST);
-        }
-        justification.setJustificationStatus(statusEnProceso);
+            JustificationStatus statusEnProceso = justificationStatusService.getById(3L);
+            if (!"En proceso".equals(statusEnProceso.getName())) {
+                throw new CustomException("El estado L3 no es 'En proceso'", HttpStatus.BAD_REQUEST);
+            }
+            justification.setJustificationStatus(statusEnProceso);
 
             if (daysBetween > 3) {
                 throw new CustomException(

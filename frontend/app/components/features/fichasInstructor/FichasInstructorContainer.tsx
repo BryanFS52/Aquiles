@@ -72,7 +72,7 @@ export const FichasInstructorContainer: React.FC = () => {
     };
 
     const handleTakeJustification = (studySheet: StudySheetWithCompetence) => {
-        router.push('/dashboard/justificacionesInstructor');
+        router.push('/dashboard/justificacionesInstructor/[competenceQuarterId]');
     };
 
     // Early returns
