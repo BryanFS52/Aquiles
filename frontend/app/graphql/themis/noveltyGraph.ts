@@ -1,4 +1,4 @@
-/*
+
 import { gql } from '@apollo/client';
 
 export const ADD_NOVELTY = gql`
@@ -10,4 +10,3 @@ export const ADD_NOVELTY = gql`
     }
   }
 `;
-*/

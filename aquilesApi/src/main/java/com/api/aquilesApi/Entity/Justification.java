@@ -5,8 +5,6 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Base64;
 
 @Getter
 @Setter
@@ -28,6 +26,9 @@ public class Justification implements Serializable {
 
     @Column(name = "justification_date", nullable = false)
     private LocalDate justificationDate;
+
+    @Column(name = "absence_date")
+    private String absenceDate;
 
     @Column(name = "state", nullable = false)
     private Boolean state;
@@ -52,27 +53,4 @@ public class Justification implements Serializable {
     @JoinColumn(name = "justification_status_id", referencedColumnName = "id")
     private JustificationStatus justificationStatus;
 
-    public byte[] getJustificationFile() {
-        return Base64.getEncoder().encodeToString(justificationFile).getBytes();
-    }
-
-    public void setJustificationFile(byte[] justificationFile) {
-        this.justificationFile = Base64.getDecoder().decode(justificationFile);
-    }
-
-    public void setJustificationDate(LocalDate date) {
-        this.justificationDate = date;
-    }
-
-    public void setJustificationDate(String dateStr) {
-        this.justificationDate = LocalDate.parse(dateStr);
-    }
-
-    public String getFormattedJustificationDate() {
-        if (this.justificationDate != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            return this.justificationDate.format(formatter);
-        }
-        return null;
-    }
 }

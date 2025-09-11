@@ -9,7 +9,6 @@ import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -149,7 +148,7 @@ public class AttendancesResolver {
     @DgsMutation
     public QRCodePayloadDto generateQRCode() throws Exception {
         String sessionId = UUID.randomUUID().toString();
-        String qrUrl = frontendUrl + "/FormularioQRAsistencia?session=" + sessionId;
+        String qrUrl = frontendUrl + "/dashboard/FormularioQRAsistencia?session=" + sessionId;
 
         byte[] qrCode = qrCodeGenerator.generateQRCodeImage(qrUrl);
         String qrCodeBase64 = Base64.getEncoder().encodeToString(qrCode);

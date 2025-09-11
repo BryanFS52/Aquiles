@@ -31,7 +31,7 @@ const LayoutContent: React.FC<LayoutContentProps> = ({ children }) => {
                     {/* Contenido principal */}
                     <section className="flex-1 flex flex-col min-h-screen w-full lg:w-[calc(100%-300px)] min-w-0">
                         {/* Header */}
-                        <div className="w-full flex-shrink-0 lg:pl-0">
+                        <div className="w-full flex-shrink-0 lg:pl-0 overflow-hidden">
                             <Header role={normalizedRole} />
                         </div>
 
