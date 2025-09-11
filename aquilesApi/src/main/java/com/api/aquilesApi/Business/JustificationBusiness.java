@@ -1,25 +1,19 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.JustificationDto;
-import com.api.aquilesApi.Entity.Attendance;
-import com.api.aquilesApi.Entity.AttendanceState;
-import com.api.aquilesApi.Entity.Justification;
-import com.api.aquilesApi.Entity.JustificationStatus;
+import com.api.aquilesApi.Entity.*;
 import com.api.aquilesApi.Service.*;
 import com.api.aquilesApi.Utilities.CustomException;
-import org.modelmapper.ModelMapper;
+import com.api.aquilesApi.Utilities.Mapper.JustificationMap;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Component
 public class JustificationBusiness {
@@ -29,139 +23,68 @@ public class JustificationBusiness {
     private final JustificationTypeService justificationTypeService;
     private final JustificationStatusService justificationStatusService;
     private final AttendanceStateService attendanceStateService;
-    private final ModelMapper modelMapper;
+
 
     public JustificationBusiness(JustificationService justificationService, AttendancesService attendancesService, JustificationTypeService
-            justificationTypeService, JustificationStatusService justificationStatusService, AttendanceStateService attendanceStateService, ModelMapper modelMapper) {
+            justificationTypeService, JustificationStatusService justificationStatusService, AttendanceStateService attendanceStateService) {
         this.justificationService = justificationService;
         this.attendancesService = attendancesService;
         this.justificationTypeService = justificationTypeService;
         this.justificationStatusService = justificationStatusService;
         this.attendanceStateService = attendanceStateService;
-        this.modelMapper = modelMapper;
+
     }
 
-    // Validation Object
-    public void ValidationObject(JustificationDto dto) {
-        if (dto.getAbsenceDate() == null || dto.getAbsenceDate().isEmpty())
-            throw new CustomException("Absence date is required", HttpStatus.BAD_REQUEST);
-
-        if (dto.getAttendance() == null || dto.getAttendance().getId() == null)
-            throw new CustomException("Attendance ID is required", HttpStatus.BAD_REQUEST);
-
-        if (dto.getJustificationType() == null || dto.getJustificationType().getId() == null)
-            throw new CustomException("Justification Type ID is required", HttpStatus.BAD_REQUEST);
-
-        if (dto.getJustificationStatus() != null && dto.getJustificationStatus().getId() == null)
-            throw new CustomException("If justification status is provided, its ID is required", HttpStatus.BAD_REQUEST);
-
-        if (dto.getDescription() == null || dto.getDescription().trim().isEmpty())
-            throw new CustomException("Description is required", HttpStatus.BAD_REQUEST);
-    }
-
-    // Validation for status update only
-    private void validateStatusUpdate(Long id, Long statusId) {
-        if (id == null || id <= 0) {
-            throw new CustomException("Justification ID is required and must be positive", HttpStatus.BAD_REQUEST);
-        }
-        if (statusId == null || statusId <= 0) {
-            throw new CustomException("Status ID is required and must be positive", HttpStatus.BAD_REQUEST);
-        }
-
-        // Verificar que la justificación existe
-        Justification existingJustification = justificationService.getById(id);
-        if (existingJustification == null) {
-            throw new CustomException("Justification with ID " + id + " not found", HttpStatus.NOT_FOUND);
-        }
-
-        // Verificar que el estado existe
+   public Page<JustificationDto> findAll(Integer page, Integer size) {
+        PageRequest pageRequest =  PageRequest.of(page, size);
         try {
-            justificationStatusService.getById(statusId);
+            Page<Justification> justification = justificationService.findAll(pageRequest);
+            System.out.println("JESUS");
+            System.out.println(justification.getTotalElements());
+            return JustificationMap.INSTANCE.EntityToDTOs(justification);
+
         } catch (Exception e) {
-            throw new CustomException("Justification Status with ID " + statusId + " not found", HttpStatus.NOT_FOUND);
-        }
-
-        // Validar que el estado no sea el mismo actual
-        if (existingJustification.getJustificationStatus() != null &&
-                existingJustification.getJustificationStatus().getId().equals(statusId)) {
-            throw new CustomException("Justification already has the specified status", HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    // Map Entity to DTO
-    private JustificationDto mapToDto(Justification justification) {
-        JustificationDto dto = modelMapper.map(justification, JustificationDto.class);
-
-        dto.setJustificationDate(justification.getFormattedJustificationDate());
-        return dto;
-    }
-
-    // Build Entity from DTO
-    private Justification buildJustificationFromDto(JustificationDto dto, boolean isNew) {
-        Justification justification = new Justification();
-
-
-        justification.setJustificationDate(isNew ? LocalDate.now().toString() : dto.getJustificationDate());
-        justification.setDescription(dto.getDescription());
-        justification.setState(dto.getState());
-
-        Optional.ofNullable(dto.getJustificationFile()).ifPresent(file -> {
-            try {
-                justification.setJustificationFile(file.getBytes());
-            } catch (Exception e) {
-                throw new CustomException("Error processing file: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-            }
-        });
-
-        justification.setAttendance(attendancesService.getById(dto.getAttendance().getId()));
-        justification.setJustificationType(justificationTypeService.getById(dto.getJustificationType().getId()));
-
-        if (dto.getJustificationStatus() != null) {
-            justification.setJustificationStatus(
-                    justificationStatusService.getById(dto.getJustificationStatus().getId())
-            );
-        } else {
-            justification.setJustificationStatus(null);
-        }
-
-        return justification;
-    }
-
-    // Find All
-    public Page<JustificationDto> findAll(Integer page, Integer size) {
-        int validPage = Optional.ofNullable(page).filter(p -> p >= 0).orElse(0);
-        int validSize = Optional.ofNullable(size).filter(s -> s > 0).orElse(10);
-
-        try {
-            return justificationService.findAll(PageRequest.of(validPage, validSize)).map(this::mapToDto);
-        } catch (DataAccessException e) {
+            System.err.println("EL DIABLO");
+            System.err.println(e.getMessage());
+            System.out.println(e.getMessage());
+            e.printStackTrace();
             throw new CustomException("Database error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     // Find By ID
     public JustificationDto findById(Long id) {
-        return mapToDto(justificationService.getById(id));
+        try {
+            Justification justification = justificationService.getById(id);
+            return  JustificationMap.INSTANCE.EntityToDTO(justification);
+        } catch (Exception e) {
+            throw new CustomException("Justification error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // Find By attendance by Student ID
     public List<JustificationDto> findByStudentId(Long studentId) {
         try {
             List<Justification> justifications = justificationService.findByStudentId(studentId);
-            return justifications.stream().map(this::mapToDto).toList();
-        } catch (DataAccessException e) {
+            return  JustificationMap.INSTANCE.EntityToDTOs(justifications);
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new CustomException("Database error retrieving Justifications by Student ID: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     // Add
     public JustificationDto add(JustificationDto dto) {
-        ValidationObject(dto);
-        Justification justification = buildJustificationFromDto(dto, true);
-        Attendance attendance = attendancesService.getById(dto.getAttendance().getId());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
 
-        long daysBetween = ChronoUnit.DAYS.between(attendance.getAttendanceDate(), justification.getJustificationDate());
+            Justification justification =  new Justification();
+            JustificationMap.INSTANCE.updateEntity(dto, justification);
+
+            Attendance attendance = attendancesService.getById(dto.getAttendance().getId());
+            System.out.println(dto.getAttendance().getId());
+
+            JustificationType justificationType = justificationTypeService.getById(dto.getJustificationType().getId());
+            long daysBetween = ChronoUnit.DAYS.between(attendance.getAttendanceDate(), justification.getJustificationDate());
 
         JustificationStatus statusEnProceso = justificationStatusService.getById(3L);
         if (!"En proceso".equals(statusEnProceso.getName())) {
@@ -169,28 +92,33 @@ public class JustificationBusiness {
         }
         justification.setJustificationStatus(statusEnProceso);
 
-        if (daysBetween > 3) {
-            throw new CustomException(
+            if (daysBetween > 3) {
+                throw new CustomException(
                     "La justificación no puede superar los 3 días desde la fecha de asistencia",
                     HttpStatus.BAD_REQUEST
-            );
+                );
+            }
+            justification.setAttendance(attendance);
+            justification.setJustificationType(justificationType);
+            return JustificationMap.INSTANCE.EntityToDTO(justificationService.save(justification));
+        } catch (Exception e) {
+
+            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        return mapToDto(justificationService.save(justification));
     }
 
     // Update
     public void update(Long id, JustificationDto dto) {
-        ValidationObject(dto);
+
         Justification existing = justificationService.getById(id);
-        Justification updated = buildJustificationFromDto(dto, false);
-        updated.setId(existing.getId());
-        justificationService.save(updated);
+        JustificationMap.INSTANCE.updateEntity(dto, existing);
+        existing.setId(existing.getId());
+        justificationService.save(existing);
     }
 
     // Update Justification Status Only
     public void UpdateStatusInJustification(Long id, Long statusId) {
         try {
-            validateStatusUpdate(id, statusId);
 
             Justification existing = justificationService.getById(id);
             JustificationStatus justificationStatus = justificationStatusService.getById(statusId);

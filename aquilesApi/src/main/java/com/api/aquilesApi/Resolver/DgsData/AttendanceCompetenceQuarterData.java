@@ -2,21 +2,16 @@ package com.api.aquilesApi.Resolver.DgsData;
 
 import com.api.aquilesApi.Dto.AttendanceDto;
 import com.api.aquilesApi.Entity.Attendance;
+import com.api.aquilesApi.Utilities.Mapper.AttendanceMap;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsData;
 import com.netflix.graphql.dgs.DgsDataFetchingEnvironment;
-import org.modelmapper.ModelMapper;
 
 import java.util.Map;
 
 @DgsComponent
 public class AttendanceCompetenceQuarterData {
 
-    private final ModelMapper modelMapper;
-
-    public AttendanceCompetenceQuarterData( ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
-    }
 
     @DgsData(parentType = "Attendance")
     public Map<String, Object> competenceQuarter(DgsDataFetchingEnvironment env) {
@@ -27,7 +22,8 @@ public class AttendanceCompetenceQuarterData {
 
             Attendance attendance;
             if (source instanceof AttendanceDto) {
-                attendance = modelMapper.map((AttendanceDto) source, Attendance.class);
+                System.out.println("ola");
+                attendance = AttendanceMap.INSTANCE.DTOToEntity((AttendanceDto) source);
             } else {
                 attendance = (Attendance) source;
             }
