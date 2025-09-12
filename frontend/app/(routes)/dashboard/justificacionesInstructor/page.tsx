@@ -46,7 +46,7 @@ export default function JustificacionesInstructor() {
 
   useEffect(() => {
     // Cargar todos los estados de justificación disponibles
-    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 })); // Aumentar a 50 para obtener todos los estados
+    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
     // Activar el modo competence quarter
     dispatch(setCompetenceQuarterMode(true));
   }, [dispatch]);

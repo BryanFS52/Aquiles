@@ -100,18 +100,42 @@ export const addImprovementPlan = createAsyncThunk<AddImprovementPlanMutation['a
     'improvementPlan/add',
     async (input, { rejectWithValue }) => {
         try {
+            console.log('Enviando datos al GraphQL:', input);
+            
             const { data } = await clientLAN.mutate<AddImprovementPlanMutation, AddImprovementPlanMutationVariables>({
                 mutation: ADD_IMPROVEMENT_PLAN,
                 variables: { input }
             });
+            
+            console.log('Respuesta del GraphQL:', data);
+            
             const res = data?.addImprovementPlan;
 
-            if (!res || res.code !== '200') {
-                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
+            if (!res) {
+                return rejectWithValue({ code: '500', message: 'No se recibió respuesta del servidor' });
             }
+
+            if (res.code !== '200') {
+                return rejectWithValue({ 
+                    code: res.code ?? '500', 
+                    message: res.message ?? 'Error desconocido en el servidor' 
+                });
+            }
+            
             return res;
         } catch (error: any) {
-            return rejectWithValue({ code: '500', message: error.message });
+            console.error('Error en la mutación GraphQL:', error);
+            
+            let errorMessage = 'Error desconocido';
+            if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+                errorMessage = error.graphQLErrors[0].message;
+            } else if (error.networkError) {
+                errorMessage = 'Error de conexión con el servidor';
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            
+            return rejectWithValue({ code: '500', message: errorMessage });
         }
     }
 );

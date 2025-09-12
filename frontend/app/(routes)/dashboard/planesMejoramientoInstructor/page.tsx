@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLoader } from '@context/LoaderContext';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import PageTitle from '@components/UI/pageTitle';
 import Modal from '@components/UI/Modal';
 import { fetchStudySheetByTeacher } from '@redux/slices/olympo/studySheetSlice';
@@ -33,7 +34,6 @@ const PlanMejoramientoInstructor: React.FC = () => {
     const [selectedStudents, setSelectedStudents] = useState<NonNullable<StudentStudySheet>[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentSheet, setCurrentSheet] = useState<NonNullable<StudySheet> | null>(null);
-    const [loadingSheetSelection, setLoadingSheetSelection] = useState(false);
 
     // Estados para filtros
     const [filters, setFilters] = useState({
@@ -98,11 +98,23 @@ const PlanMejoramientoInstructor: React.FC = () => {
     };
 
     useEffect(() => {
-        dispatch(fetchStudySheetByTeacher({
-            idTeacher: 1,
-            page: 0,
-            size: 10
-        }));
+        const loadData = async () => {
+            try {
+                await dispatch(fetchStudySheetByTeacher({
+                    idTeacher: 1,
+                    page: 0,
+                    size: 50 // Aumentado para obtener más fichas
+                })).unwrap();
+            } catch (error) {
+                console.error('Error al cargar fichas:', error);
+                toast.error('Error al cargar las fichas de estudio', {
+                    position: "top-right",
+                    autoClose: 4000,
+                });
+            }
+        };
+        
+        loadData();
     }, [dispatch]);
 
     useEffect(() => {
@@ -123,7 +135,8 @@ const PlanMejoramientoInstructor: React.FC = () => {
     const handleSelectSheet = async (sheet: NonNullable<StudySheet>) => {
         console.log('Ficha seleccionada:', sheet);
         
-        setLoadingSheetSelection(true);
+        // Usar el loader global en lugar de estado local
+        showLoader();
         
         // Primero cargar las competencias de esta ficha
         const teacherId = 1; // Obtener el ID del instructor actual
@@ -139,6 +152,10 @@ const PlanMejoramientoInstructor: React.FC = () => {
             console.log('Competencias cargadas para la ficha:', currentCompetences);
         } catch (error) {
             console.error('Error al cargar competencias:', error);
+            toast.error('Error al cargar las competencias de la ficha', {
+                position: "top-right",
+                autoClose: 4000,
+            });
             currentCompetences = [];
         }
         
@@ -182,10 +199,14 @@ const PlanMejoramientoInstructor: React.FC = () => {
             console.log('Navegando a:', url);
             console.log('Datos de la ficha con competencias:', fichaData);
             
-            setLoadingSheetSelection(false);
+            hideLoader();
             router.push(url);
         } else {
-            setLoadingSheetSelection(false);
+            hideLoader();
+            toast.warning('Esta ficha no tiene estudiantes asignados', {
+                position: "top-right",
+                autoClose: 4000,
+            });
             // Si no hay estudiantes, navegar sin filtro
             router.push(`./HistorialPlanesMejoramientoInstructor`);
         }
@@ -455,22 +476,22 @@ const PlanMejoramientoInstructor: React.FC = () => {
                                         </button>
                                         <button
                                             onClick={() => handleSelectSheet(sheet)}
-                                            disabled={loadingSheetSelection}
+                                            disabled={loading}
                                             className={`flex items-center justify-between w-full px-2 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-800 dark:hover:from-gray-600 dark:hover:to-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-all duration-200 font-medium group text-xs ${
-                                                loadingSheetSelection ? 'opacity-50 cursor-not-allowed' : ''
+                                                loading ? 'opacity-50 cursor-not-allowed' : ''
                                             }`}
                                         >
                                             <div className="flex items-center gap-1.5">
-                                                {loadingSheetSelection ? (
+                                                {loading ? (
                                                     <div className="inline-block animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-gray-600 dark:border-gray-300"></div>
                                                 ) : (
                                                     <FiEye className="w-3.5 h-3.5" />
                                                 )}
                                                 <span>
-                                                    {loadingSheetSelection ? 'Cargando...' : 'Ver Historial'}
+                                                    Ver Historial
                                                 </span>
                                             </div>
-                                            {!loadingSheetSelection && (
+                                            {!loading && (
                                                 <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                                             )}
                                         </button>

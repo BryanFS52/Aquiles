@@ -75,7 +75,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
         // Traer todos los planes de mejoramiento y filtrar del lado del cliente
         dispatch(fetchImprovementPlans({ 
             page: 0, 
-            size: 100 // Aumentamos el tamaño para asegurar que traiga todos
+            size: 5 
         }));
     }, [dispatch]);
 
@@ -353,23 +353,21 @@ const HistorialPlanesMejoramientoInstructor = () => {
             <div className="mx-auto px-4 py-8">
                 <div className="space-y-6">
                     <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            {fichaData && (
-                                <button
-                                    onClick={() => router.back()}
-                                    className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen transition-colors duration-200"
-                                >
-                                    <FiArrowLeft className="w-4 h-4 mr-1" />
-                                    Volver a Fichas
-                                </button>
-                            )}
-                        </div>
                         <PageTitle>
                             {fichaData 
                                 ? `Planes de Mejoramiento - Ficha N° ${fichaData.fichaNumber}`
                                 : `Historial De Planes De Mejoramiento`
                             }
                         </PageTitle>
+                        {fichaData && (
+                            <button
+                                onClick={() => router.back()}
+                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen transition-colors duration-200 mt-2"
+                            >
+                                <FiArrowLeft className="w-4 h-4 mr-1" />
+                                Volver a Fichas
+                            </button>
+                        )}
                         {/* Botón debajo del título, con degradado verde */}
                         <div className="mt-4">
                             <Link href={fichaData 
@@ -440,6 +438,13 @@ const HistorialPlanesMejoramientoInstructor = () => {
             <div className="space-y-6">
                 <div>
                     <PageTitle>Historial De Planes De Mejoramiento</PageTitle>
+                    <button
+                        onClick={() => router.back()}
+                        className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen transition-colors duration-200 mt-2"
+                    >
+                        <FiArrowLeft className="w-4 h-4 mr-1" />
+                        Volver
+                    </button>
                     {/* Botón debajo del título, con degradado verde */}
                     <div className="mt-4">
                         <Link href={fichaData 
@@ -494,7 +499,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                 <DataTable<ImprovementPlan>
                     columns={columns}
                     data={improvementPlans || []}
-                    pageSize={10}
+                    pageSize={5}
                     filterPlaceholder="Buscar..."
                     filterFunction={filterFunction}
                     className="shadow-lg"

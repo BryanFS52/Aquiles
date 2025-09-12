@@ -33,7 +33,7 @@ public class ImprovementPlan implements Serializable {
     @Column(name = "state", nullable = false)
     private Boolean state;
 
-    @Column(name = "qualification", nullable = false)
+    @Column(name = "qualification", nullable = true)
     private Boolean qualification;
 
     // Relation
