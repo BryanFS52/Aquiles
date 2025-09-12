@@ -306,3 +306,89 @@ input {
   height: 800px;
   max-height: 90vh;
 }
+
+/* Estilos adicionales para tablas en modo oscuro */
+.dark table {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+}
+
+.dark thead {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+.dark tbody tr {
+  background-color: #1e293b !important;
+  color: #ffffff !important;
+  border-color: rgba(75, 85, 99, 0.3) !important;
+}
+
+.dark tbody tr:hover {
+  background-color: rgba(0, 83, 134, 0.3) !important;
+}
+
+.dark th {
+  color: #ffffff !important;
+  background-color: #0f172a !important;
+  border-color: rgba(75, 85, 99, 0.3) !important;
+}
+
+.dark td {
+  color: #ffffff !important;
+  border-color: rgba(75, 85, 99, 0.3) !important;
+}
+
+/* Estilos para scrollbars en modo oscuro */
+.dark .scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+  border-radius: 3px;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280;
+}
+
+/* Mejoras para cards en modo oscuro */
+.dark .card-instructor-item {
+  background-color: rgba(55, 65, 81, 0.8) !important;
+  border-color: rgba(75, 85, 99, 0.6) !important;
+  color: #ffffff !important;
+}
+
+.dark .card-instructor-item:hover {
+  background-color: rgba(75, 85, 99, 0.8) !important;
+}
+
+/* Clases de scrollbar personalizado */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #9ca3af;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280;
+}

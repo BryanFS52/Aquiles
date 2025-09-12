@@ -88,7 +88,7 @@ export const SingleFilterMode = ({
         {/* Multi-filter Toggle Button - Compact */}
         {showMultiFilterToggle && (
           <div className="flex-shrink-0">
-            <div className="bg-gray-50 px-3 py-2 rounded-lg border">
+            <div className="bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600">
               <ToggleSwitch
                 isActive={enableMultiFilter}
                 onClick={onToggleMultiFilter}

@@ -158,7 +158,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
                         />
                         <span className="text-base lg:text-lg font-bold text-black dark:text-dark-text tracking-wide drop-shadow-md leading-tight">
                             PROYECTOS FORMATIVOS<br />
-                            <span className="text-xs lg:text-[13px] text-darkGreen dark:text-lightGreen font-extrabold tracking-widest">
+                            <span className="text-xs lg:text-[13px] text-darkGreen dark:text-blue-300 font-extrabold tracking-widest">
                                 {isClientMounted ? role : (initialRole || "instructor")}
                             </span>
                         </span>
