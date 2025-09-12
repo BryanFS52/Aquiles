@@ -39,17 +39,17 @@ interface SidebarProps {
 }
 
 // Íconos estáticos
-const IconFichas = <PiClipboardTextDuotone className="w-6 h-6 text-black dark:text-white" />;
-const IconProgramas = <PiCirclesFourDuotone className="w-6 h-6 text-black dark:text-white" />;
-const IconAsistencia = <PiUserCheckDuotone className="w-6 h-6 text-black dark:text-white" />;
-const IconTeams = <PiUsersThreeDuotone className="w-6 h-6 text-black dark:text-white" />;
-const IconSustentaciones = <PiChalkboardDuotone className="w-6 h-6 text-black dark:text-white" />;
-const IconJustificaciones = <PiBookDuotone className="w-6 h-6 text-black dark:text-white" />;
-const IconProfesor = <PiChalkboardTeacherDuotone className="w-6 h-6 text-black dark:text-white" />;
-const IconAprendices = <PiStudentDuotone className="w-6 h-6 text-black dark:text-white" />;
-const IconPlanesMejoramiento = <PiClipboardDuotone className="w-6 h-6 text-black dark:text-white" />;
-const IconCoordinaciones = <PiUsersDuotone className="w-6 h-6 text-black dark:text-white" />;
-const IconSeguimiento = <PiTargetDuotone className="w-6 h-6 text-black dark:text-white" />;
+const IconFichas = <PiClipboardTextDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
+const IconProgramas = <PiCirclesFourDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
+const IconAsistencia = <PiUserCheckDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
+const IconTeams = <PiUsersThreeDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
+const IconSustentaciones = <PiChalkboardDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
+const IconJustificaciones = <PiBookDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
+const IconProfesor = <PiChalkboardTeacherDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
+const IconAprendices = <PiStudentDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
+const IconPlanesMejoramiento = <PiClipboardDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
+const IconCoordinaciones = <PiUsersDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
+const IconSeguimiento = <PiTargetDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
 
 // Configuración de menú por rol
 const MENU_CONFIG: MenuConfig = {
@@ -134,13 +134,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
           fixed top-0 left-0 z-50 h-screen
           w-[280px] sm:w-[300px]
           lg:w-full lg:max-w-[300px]
-          bg-white/95 dark:bg-gray-900
+          bg-white/95 dark:bg-gradient-to-b dark:from-dark-sidebar dark:to-dark-sidebarGradient
           shadow-2xl lg:shadow-none
           transition-transform duration-300
           ${showMenu ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0
           flex flex-col justify-between
-          border-r border-darkGreen/10 dark:border-shadowBlue/30
+          border-r border-darkGreen/10 dark:border-dark-border
         `}
             >
                 <div className="p-4 lg:p-6 xl:p-7 overflow-y-auto">
@@ -154,11 +154,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
                             className="bg-gradient-to-r from-lime-600 to-lime-500 drop-shadow-xl pl-2 py-1 
                          w-[60px] h-[60px] lg:w-[70px] lg:h-[70px] xl:w-[80px] xl:h-[80px]
                          rounded-2xl border-2 border-darkGreen/30 
-                         dark:from-shadowBlue dark:to-darkBlue"
+                         dark:from-dark-sidebar dark:to-shadowBlue"
                         />
-                        <span className="text-base lg:text-lg font-bold text-black dark:text-white tracking-wide drop-shadow-md leading-tight">
+                        <span className="text-base lg:text-lg font-bold text-black dark:text-dark-text tracking-wide drop-shadow-md leading-tight">
                             PROYECTOS FORMATIVOS<br />
-                            <span className="text-xs lg:text-[13px] text-darkGreen dark:text-blue-600 font-extrabold tracking-widest">
+                            <span className="text-xs lg:text-[13px] text-darkGreen dark:text-lightGreen font-extrabold tracking-widest">
                                 {isClientMounted ? role : (initialRole || "instructor")}
                             </span>
                         </span>
@@ -166,13 +166,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
 
                     {/* Selector temporal de rol */}
                     <div className="mb-6 lg:mb-8 flex items-center justify-center">
-                        <div className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue/90 dark:to-darkBlue/90 rounded-xl shadow px-3 lg:px-4 py-2 flex gap-2 items-center text-sm font-semibold text-white backdrop-blur-md border border-white/20">
+                        <div className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-dark-sidebar rounded-xl shadow px-3 lg:px-4 py-2 flex gap-2 items-center text-sm font-semibold text-white backdrop-blur-md border border-white/20">
                             <span className="font-bold tracking-wide drop-shadow">Rol:</span>
                             <select
                                 value={isClientMounted ? role : (initialRole || "instructor")}
                                 onChange={handleRoleChange}
-                                className="rounded-lg px-2 lg:px-3 py-1 border-2 border-white/30 
-                           bg-white/90 dark:bg-darkBlue/80 text-black dark:text-white 
+                                className="sidebar-select rounded-lg px-2 lg:px-3 py-1 border-2 border-white/30 
+                           bg-white/90 text-gray-900 dark:bg-dark-card dark:text-dark-text dark:border-dark-border
                            font-bold shadow text-sm focus:outline-none focus:ring-2 focus:ring-darkGreen/60 transition-all duration-200"
                             >
                                 <option value="instructor">Instructor</option>
@@ -203,9 +203,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
                         dark:before:bg-gradient-to-r dark:before:from-shadowBlue dark:before:to-darkBlue
                         hover:text-white
                         ${isActive
-                                                    ? 'before:opacity-100 bg-gradient-to-r from-lime-600 to-lime-500 dark:bg-gradient-to-r dark:from-shadowBlue dark:to-darkBlue  text-white shadow-md pl-4'
+                                                    ? 'before:opacity-100 bg-gradient-to-r from-lime-600 to-lime-500 dark:bg-gradient-to-r dark:from-shadowBlue dark:to-darkBlue text-white shadow-md pl-4'
                                                     : 'hover:pl-4'}
-                        text- dark:text-white
+                        text-black dark:text-dark-text
                       `}
                                             onClick={handleLinkClick}
                                             aria-current={isActive ? 'page' : undefined}

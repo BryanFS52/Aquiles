@@ -757,9 +757,9 @@ export default function InstructorChecklistView() {
                 checked={itemState.completed === true}
                 onChange={() => handleItemChange(row.id, "completed", true)}
                 disabled={isFinalSaved}
-                className={`text-green-600 focus:ring-green-500 ${isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`text-blue-600 focus:ring-blue-500 ${isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''}`}
               />
-              <span className="text-sm font-medium text-green-600">Sí</span>
+              <span className="text-sm font-medium text-blue-600">Sí</span>
             </label>
             <label className="flex items-center space-x-1">
               <input
@@ -1999,9 +1999,9 @@ export default function InstructorChecklistView() {
                 </span>
               </div>
             ) : selectedEvaluation && Object.keys(itemStates).length > 0 ? (
-              <div className="flex items-center space-x-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 rounded-full border border-green-300 dark:border-green-600">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-green-700 dark:text-green-300 font-medium">
+              <div className="flex items-center space-x-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full border border-blue-300 dark:border-blue-600">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">
                   Cambios guardados
                 </span>
               </div>
@@ -2036,8 +2036,8 @@ export default function InstructorChecklistView() {
             </div>}
           />
           <Card 
-            header={<div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
-              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+            header={<div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                 <span className="text-white text-sm"></span>
               </div>
             </div>}
@@ -2047,7 +2047,7 @@ export default function InstructorChecklistView() {
                 <span className="font-semibold text-gray-900 dark:text-white">Jornada:</span> Diurna
               </p>
               <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                <p className="text-xs font-semibold text-green-600 dark:text-green-400">Ficha N°</p>
+                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400">Ficha N°</p>
                 <p className="text-xs text-gray-600 dark:text-gray-300">{selectedStudySheetNumber || "No disponible"}</p>
               </div>
             </div>}
@@ -2138,7 +2138,7 @@ export default function InstructorChecklistView() {
                   onClick={handleSaveChecklist}
                   disabled={!selectedChecklist || isFinalSaved}
                   className={`hexagon-button flex items-center gap-3 px-6 py-4 rounded-full border-2 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${selectedChecklist && !isFinalSaved
-                      ? 'border-lime-500 dark:border-shadowBlue bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue'
+                      ? 'border-blue-500 dark:border-shadowBlue bg-gradient-to-r from-blue-600 to-blue-500 dark:from-shadowBlue dark:to-darkBlue text-white hover:from-blue-500 hover:to-blue-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue'
                       : 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
                     }`}
                 >
@@ -2159,7 +2159,7 @@ export default function InstructorChecklistView() {
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white px-4 py-2 rounded-full shadow-md">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-500 dark:from-shadowBlue dark:to-darkBlue text-white px-4 py-2 rounded-full shadow-md">
                   <span className="text-sm font-semibold">
                     Activas: {activeChecklists.length} | Filtradas: {filteredChecklists.length}
                   </span>
@@ -2169,7 +2169,7 @@ export default function InstructorChecklistView() {
                   onClick={handleExportPDF}
                   disabled={!selectedChecklist}
                   className={`hexagon-export flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${selectedChecklist
-                      ? 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-500 dark:from-shadowBlue dark:to-darkBlue text-white hover:from-blue-500 hover:to-blue-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue'
                       : 'bg-gray-400 text-gray-200 cursor-not-allowed'
                     }`}
                 >
@@ -2181,7 +2181,7 @@ export default function InstructorChecklistView() {
                   onClick={handleExportExcel}
                   disabled={!selectedChecklist}
                   className={`hexagon-export flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${selectedChecklist
-                      ? 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-500 dark:from-shadowBlue dark:to-darkBlue text-white hover:from-blue-500 hover:to-blue-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue'
                       : 'bg-gray-400 text-gray-200 cursor-not-allowed'
                     }`}
                 >
@@ -2262,13 +2262,13 @@ export default function InstructorChecklistView() {
                                   checked={itemState.completed === true}
                                   onChange={() => handleItemChange(item.id, "completed", true)}
                                   disabled={isFinalSaved}
-                                  className={`w-5 h-5 text-green-600 focus:ring-green-500 focus:ring-2 border-gray-300 dark:border-gray-600 ${
+                                  className={`w-5 h-5 text-blue-600 focus:ring-blue-500 focus:ring-2 border-gray-300 dark:border-gray-600 ${
                                     isFinalSaved ? 'cursor-not-allowed' : ''
                                   }`}
                                 />
                                 <span className={`text-base font-medium ${
                                   itemState.completed === true 
-                                    ? 'text-green-700 dark:text-green-400' 
+                                    ? 'text-blue-700 dark:text-blue-400' 
                                     : 'text-gray-600 dark:text-gray-400'
                                 }`}>
                                   Sí
@@ -2471,8 +2471,8 @@ export default function InstructorChecklistView() {
                           // Mostrar vista de evaluación completada en formato tabla
                           <div>
                             {/* Estado de la evaluación */}
-                            <div className="bg-gradient-to-r from-green-100 to-green-50 dark:from-green-800 dark:to-green-900/50 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-                              <p className="text-green-800 dark:text-green-200 text-center font-medium flex items-center justify-center gap-2">
+                            <div className="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-800 dark:to-blue-900/50 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+                              <p className="text-blue-800 dark:text-blue-200 text-center font-medium flex items-center justify-center gap-2">
                                 <span className="text-2xl">✅</span>
                                 <strong>Evaluación Completada</strong>
                               </p>
@@ -2512,7 +2512,7 @@ export default function InstructorChecklistView() {
                                 {/* JUICIO DE VALOR */}
                                 <div className="col-span-2 flex items-center justify-center">
                                   <span className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg ${
-                                    selectedEvaluation.valueJudgment === 'APROBADO' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
+                                    selectedEvaluation.valueJudgment === 'APROBADO' ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white' :
                                     selectedEvaluation.valueJudgment === 'NO APROBADO' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
                                     selectedEvaluation.valueJudgment === 'PENDIENTE' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white' :
                                     'bg-gradient-to-r from-gray-500 to-gray-600 text-white'

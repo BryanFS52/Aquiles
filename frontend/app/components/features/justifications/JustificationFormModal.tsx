@@ -31,18 +31,18 @@ export const JustificationFormModal: React.FC<JustificationFormModalProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -30, scale: 0.95 }}
             transition={{ duration: 0.5, ease: 'easeInOut' }}
-            className="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 dark:border-gray-800 dark:bg-[#002033]"
+            className="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 dark:border-dark-border dark:bg-dark-card dark:text-dark-text"
         >
             <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                    <div className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 p-3 rounded-full shadow-lg">
+                    <div className="bg-gradient-to-r dark:from-shadowBlue dark:to-darkBlue from-primary to-lime-500 p-3 rounded-full shadow-lg">
                         <FaRegListAlt className="text-2xl text-white" />
                     </div>
                     <div className="ml-4">
-                        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-dark-text">
                             Formulario de Justificación
                         </h2>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">
+                        <p className="text-gray-600 dark:text-dark-textSecondary text-sm">
                             Completa los datos para justificar tu ausencia
                         </p>
                     </div>

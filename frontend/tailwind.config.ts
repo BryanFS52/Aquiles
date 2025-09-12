@@ -32,10 +32,23 @@ const config: Config = {
         'darkGray': '#5e5c5c',
         'lightGreen': '#39A900',
         'darkGreen': '#007832',
-        'darkBackground': '#dfdddd',
+        'darkBackground': '#001829',
         'white': '#ffffff',
         'grayText': '#9ca3af',
         'black': '#000000',
+        // Colores específicos para modo oscuro con el color correcto #00304d
+        'dark': {
+          'sidebar': '#00304d',        // Color principal más oscuro
+          'sidebarGradient': '#001829', // Para degradados
+          'main': '#001829',           // Fondo principal muy oscuro
+          'card': '#1e293b',           // Tarjetas en azul grisáceo
+          'cardHover': '#334155',      // Hover de tarjetas
+          'text': '#ffffff',           // Texto principal blanco
+          'textSecondary': '#94a3b8',  // Texto secundario gris claro
+          'border': '#334155',         // Bordes sutiles
+          'accent': '#0ea5e9',         // Azul de acento para elementos activos
+          'accentHover': '#0284c7',    // Hover del acento
+        }
       },
       keyframes: {
         showContent: {

@@ -92,7 +92,7 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
                         Cerrar
                     </button>
                     <button
-                        className="group relative bg-gradient-to-r from-lime-600 to-green-600 hover:from-lime-700 hover:to-green-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg focus:outline-none focus:ring-4 focus:ring-lime-500/50 active:scale-95 flex items-center justify-center gap-2 min-w-[180px]"
+                        className="group relative bg-gradient-to-r from-blue-600 to-blue-700 dark:from-shadowBlue dark:to-darkBlue hover:from-blue-700 hover:to-blue-800 dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500/50 active:scale-95 flex items-center justify-center gap-2 min-w-[180px]"
                         onClick={sendAttendanceEmail}
                         disabled={loading}
                     >

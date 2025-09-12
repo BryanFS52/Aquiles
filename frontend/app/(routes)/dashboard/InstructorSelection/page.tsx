@@ -198,7 +198,7 @@ export default function InstructorSelection() {
 
         {/* Indicador de pasos */}
         <div className="flex items-center justify-center space-x-4 mb-8">
-          <div className={`flex items-center space-x-3 ${step >= 1 ? 'text-lime-600 dark:text-shadowBlue' : 'text-gray-400'}`}>
+          <div className={`flex items-center space-x-3 ${step >= 1 ? 'text-lime-600 dark:text-blue-400' : 'text-gray-400'}`}>
             <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
               step >= 1 
                 ? 'bg-lime-600 dark:bg-shadowBlue text-white' 
@@ -211,7 +211,7 @@ export default function InstructorSelection() {
           
           <div className={`h-0.5 w-16 ${step >= 2 ? 'bg-lime-600 dark:bg-shadowBlue' : 'bg-gray-300'}`}></div>
           
-          <div className={`flex items-center space-x-3 ${step >= 2 ? 'text-lime-600 dark:text-shadowBlue' : 'text-gray-400'}`}>
+          <div className={`flex items-center space-x-3 ${step >= 2 ? 'text-lime-600 dark:text-blue-400' : 'text-gray-400'}`}>
             <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
               step >= 2 
                 ? 'bg-lime-600 dark:bg-shadowBlue text-white' 
@@ -267,7 +267,7 @@ export default function InstructorSelection() {
                       </div>
                       
                       <div className="border-t border-gray-200 dark:border-gray-600 pt-3">
-                        <p className="text-lime-600 dark:text-shadowBlue font-semibold mb-1 text-xs">
+                        <p className="text-lime-600 dark:text-blue-300 font-semibold mb-1 text-xs">
                           Ficha N°
                         </p>
                         <p className="text-lg font-bold text-gray-900 dark:text-white">
@@ -355,7 +355,7 @@ export default function InstructorSelection() {
                           </div>
                           
                           <div className="border-t border-gray-200 dark:border-gray-600 pt-3">
-                            <p className="text-lime-600 dark:text-shadowBlue font-semibold mb-1 text-xs">
+                            <p className="text-lime-600 dark:text-blue-300 font-semibold mb-1 text-xs">
                               Integrantes
                             </p>
                             <p className="text-lg font-bold text-gray-900 dark:text-white">
@@ -366,7 +366,7 @@ export default function InstructorSelection() {
 
                         {selectedTeamScrum?.id === teamScrum.id && (
                           <div className="mt-4 pt-4 border-t border-lime-200 dark:border-shadowBlue/60">
-                            <div className="flex items-center justify-center space-x-2 text-lime-600 dark:text-shadowBlue">
+                            <div className="flex items-center justify-center space-x-2 text-lime-600 dark:text-blue-300">
                               <FontAwesomeIcon icon={faCheckCircle} />
                               <span className="font-medium text-xs">Seleccionado</span>
                             </div>

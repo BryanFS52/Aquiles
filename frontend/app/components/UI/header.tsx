@@ -71,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({ role: initialRole }) => {
   };
 
   return (
-    <header className="h-[60px] sm:h-[7vh] md:h-[10vh] w-full flex items-center bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-secondary dark:to-blue-900 px-2 md:px-6">
+    <header className="h-[60px] sm:h-[7vh] md:h-[10vh] w-full flex items-center bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue px-2 md:px-6">
       {/* Logo SENA a la izquierda */}
       <div className="flex items-center flex-shrink-0 min-w-[80px] md:min-w-[140px]">
         <Image
@@ -104,7 +104,7 @@ export const Header: React.FC<HeaderProps> = ({ role: initialRole }) => {
           <ul>
             <li
               ref={buttonRef}
-              className="h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 xl:h-11 xl:w-11 flex items-center justify-center rounded-full bg-white dark:bg-shadowBlue hover:bg-lightGray dark:hover:bg-darkBlue transition-all duration-300 shadow-md cursor-pointer group border border-darkGreen/20 dark:border-shadowBlue/40"
+              className="h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 xl:h-11 xl:w-11 flex items-center justify-center rounded-full bg-white dark:bg-dark-card hover:bg-lightGray dark:hover:bg-dark-cardHover transition-all duration-300 shadow-md cursor-pointer group border border-darkGreen/20 dark:border-dark-border"
               onClick={toggleMenu}
               role="button"
               tabIndex={0}
@@ -148,11 +148,11 @@ export const Header: React.FC<HeaderProps> = ({ role: initialRole }) => {
         {/* Perfil */}
         <Link
           href="/dashboard/perfil"
-          className="group flex items-center font-semibold text-black dark:text-white gap-1 sm:gap-3 py-1 px-1 sm:py-2 sm:px-3 lg:px-4 bg-transparent dark:bg-darkBlue rounded-lg shadow-lg border border-darkGreen/20 dark:border-shadowBlue/40 min-w-0"
+          className="group flex items-center font-semibold text-black dark:text-dark-text gap-1 sm:gap-3 py-1 px-1 sm:py-2 sm:px-3 lg:px-4 bg-transparent dark:bg-dark-card rounded-lg shadow-lg border border-darkGreen/20 dark:border-dark-border min-w-0"
         >
           {/* Texto del usuario - Solo visible en pantallas medianas y grandes */}
           <div className="hidden sm:flex flex-col text-end min-w-0">
-            <span className="text-[10px] sm:text-xs lg:text-base text-black dark:text-white truncate">
+            <span className="text-[10px] sm:text-xs lg:text-base text-black dark:text-dark-text truncate">
               Diego Boada
             </span>
             <span className="text-[10px] lg:text-sm text-white/80 dark:text-lightGreen truncate">

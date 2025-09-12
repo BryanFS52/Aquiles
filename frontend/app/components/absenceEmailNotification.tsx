@@ -14,7 +14,7 @@ const Notification: React.FC<NotificationProps> = ({ studentName, date }) => {
         <Image src={logoSena} alt="Logo Sena" className="w-16 h-16 mx-auto" />
       </div>
       <div className="p-6">
-        <h1 className="text-xl font-bold text-[#40b003]">
+        <h1 className="text-xl font-bold text-[#0ea5e9] dark:text-[#0284c7]">
           Notificación de Inasistencia a Clase y Solicitud de Justificación
         </h1>
         <p className="mt-4">Hola, {studentName}:</p>

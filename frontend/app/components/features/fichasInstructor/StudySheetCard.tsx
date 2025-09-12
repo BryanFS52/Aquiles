@@ -17,7 +17,7 @@ export const StudySheetCard: React.FC<StudySheetCardProps> = ({
             {/* Sección de Aprendices */}
             <div className="flex flex-col items-center">
                 <div
-                    className="bg-gradient-to-r from-primary to-lime-500 rounded-2xl h-20 w-20 flex items-center justify-center border-4 border-black/50 dark:border-white shadow-lg hover:scale-105 cursor-pointer transition"
+                    className="bg-gradient-to-r from-primary to-lime-500 dark:from-shadowBlue dark:to-darkBlue rounded-2xl h-20 w-20 flex items-center justify-center border-4 border-black/50 dark:border-white shadow-lg hover:scale-105 cursor-pointer transition"
                     onClick={() => onViewApprentices(studySheet)}
                     role="button"
                     tabIndex={0}
@@ -47,7 +47,7 @@ export const StudySheetCard: React.FC<StudySheetCardProps> = ({
                 <div className="w-full md:w-auto mt-4 md:mt-0 md:ml-auto text-center p-1">
                     <button
                         onClick={() => onTakeAttendance(studySheet)}
-                        className="group relative bg-gradient-to-r from-lime-600 to-green-600 hover:from-lime-700 hover:to-green-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg focus:outline-none focus:ring-4 focus:ring-lime-500/50 active:scale-95 flex items-center justify-center gap-2 min-w-[180px]"
+                        className="group relative bg-gradient-to-r from-lime-600 to-green-600 hover:from-lime-700 hover:to-green-700 dark:from-shadowBlue dark:to-darkBlue dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg focus:outline-none focus:ring-4 focus:ring-lime-500/50 dark:focus:ring-shadowBlue/50 active:scale-95 flex items-center justify-center gap-2 min-w-[180px]"
                         disabled={loading}
                     >
                         <svg
@@ -71,7 +71,7 @@ export const StudySheetCard: React.FC<StudySheetCardProps> = ({
                 <div className="w-full md:w-auto mt-4 md:mt-0 md:ml-auto text-center p-1">
                     <button
                         onClick={() => onTakeJustification(studySheet)}
-                        className="group relative bg-gradient-to-r from-lime-600 to-green-600 hover:from-lime-700 hover:to-green-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg focus:outline-none focus:ring-4 focus:ring-lime-500/50 active:scale-95 flex items-center justify-center gap-2 min-w-[180px]"
+                        className="group relative bg-gradient-to-r from-lime-600 to-green-600 hover:from-lime-700 hover:to-green-700 dark:from-shadowBlue dark:to-darkBlue dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg focus:outline-none focus:ring-4 focus:ring-lime-500/50 dark:focus:ring-shadowBlue/50 active:scale-95 flex items-center justify-center gap-2 min-w-[180px]"
                         disabled={loading}
                     >
                         <svg

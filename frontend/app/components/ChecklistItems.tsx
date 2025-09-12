@@ -69,7 +69,7 @@ export default function ChecklistItems({ items, onItemUpdate }: ChecklistItemsPr
             key={item.id}
             className={`p-4 border rounded-lg transition-all duration-200 ${
               item.active 
-                ? 'border-green-200 bg-green-50' 
+                ? 'border-blue-200 bg-blue-50' 
                 : 'border-gray-200 bg-gray-50'
             }`}
           >
@@ -81,7 +81,7 @@ export default function ChecklistItems({ items, onItemUpdate }: ChecklistItemsPr
                   </span>
                   <span className={`text-xs font-medium px-2 py-1 rounded ${
                     item.active 
-                      ? 'text-green-700 bg-green-200' 
+                      ? 'text-blue-700 bg-blue-200' 
                       : 'text-gray-700 bg-gray-200'
                   }`}>
                     {item.active ? 'Activo' : 'Inactivo'}
@@ -99,7 +99,7 @@ export default function ChecklistItems({ items, onItemUpdate }: ChecklistItemsPr
                   disabled={loadingItems.has(item.id)}
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                     item.active
-                      ? 'bg-green-600 focus:ring-green-500'
+                      ? 'bg-blue-600 focus:ring-blue-500'
                       : 'bg-gray-200 focus:ring-gray-500'
                   } ${loadingItems.has(item.id) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >

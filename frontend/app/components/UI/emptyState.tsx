@@ -39,13 +39,13 @@ const EmptyState: React.FC<EmptyStateProps> = ({
                 </div>
 
                 {/* Texto elegante */}
-                <p className="text-xl font-medium text-gray-500 dark:text-gray-300">{message}</p>
+                <p className="text-xl font-medium text-gray-500 dark:text-dark-textSecondary">{message}</p>
 
                 {/* Línea decorativa o mini animación sutil */}
                 <div className="flex space-x-2">
-                    <div className="w-2 h-2 bg-slate-500/60 rounded-full animate-bounce-soft animation-delay-0"></div>
-                    <div className="w-3 h-3 bg-gray-500/70 rounded-full animate-bounce-soft animation-delay-300"></div>
-                    <div className="w-2 h-2 bg-slate-600/60 rounded-full animate-bounce-soft animation-delay-600"></div>
+                    <div className="w-2 h-2 bg-slate-500/60 dark:bg-blue-400/60 rounded-full animate-bounce-soft animation-delay-0"></div>
+                    <div className="w-3 h-3 bg-gray-500/70 dark:bg-blue-500/70 rounded-full animate-bounce-soft animation-delay-300"></div>
+                    <div className="w-2 h-2 bg-slate-600/60 dark:bg-blue-400/60 rounded-full animate-bounce-soft animation-delay-600"></div>
                 </div>
             </div>
         </div>
