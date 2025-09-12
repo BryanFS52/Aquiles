@@ -88,6 +88,31 @@ public class AttendancesResolver {
         }
     }
 
+    // FindAll Attendances By CompetenceQuarterId With Justifications (GraphQL)
+    @DgsQuery
+    public Map<String, Object> allAttendanceByCompetenceQuarterIdWithJustifications( @InputArgument Long competenceQuarterId, @InputArgument Integer page, @InputArgument Integer size) {
+        try {
+            int safePage = (page != null) ? page : 0;
+            int safeSize = (size != null) ? size : 10;
+
+            Pageable pageable = PageRequest.of(safePage, safeSize);
+            Page<AttendanceDto> attendances = attendancesBusiness.findAllByCompetenceQuarterId(competenceQuarterId, pageable);
+
+            return ResponseHttpApi.responseHttpFindAll(
+                    attendances.getContent(),
+                    ResponseHttpApi.CODE_OK,
+                    "Query by competence quarter id ok",
+                    attendances.getSize(),
+                    safePage,
+                    attendances.getTotalPages()
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     // Add a new Attendance (GraphQL)
     @DgsMutation
     public Map<String, Object> addAttendance(@InputArgument(name = "input") AttendanceDto attendanceDto) {

@@ -84,9 +84,9 @@ public class AttendancesBusiness {
     }
 
     // Get attendances by competence quarter ID
-    public List<AttendanceDto> findAllByCompetenceQuarterId(Long id) {
+    public Page<AttendanceDto> findAllByCompetenceQuarterId(Long id, Pageable pageable) {
         try {
-            List<Attendance> attendanceList = attendancesService.findAllByCompetenceQuarterId(id);
+            Page<Attendance> attendanceList = attendancesService.findAllByCompetenceQuarterIdAndJustifications(id, pageable);
             return AttendanceMap.INSTANCE.EntityToDTOs(attendanceList);
         } catch (Exception e) {
             throw new CustomException("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
