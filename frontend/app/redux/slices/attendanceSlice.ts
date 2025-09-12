@@ -91,6 +91,8 @@ const filterAttendances = (
 
     return data.filter((j) => {
         switch (selectedFiltro) {
+            // Casos comentados porque estos campos no están disponibles en TransformedAttendanceItem
+            // Si necesitas estos filtros, debes agregar los campos correspondientes a la interfaz
             // case "programa":
             //     return j.programa.toLowerCase().includes(searchTerm.toLowerCase());
             // case "ficha":
@@ -99,6 +101,10 @@ const filterAttendances = (
             //     return j.fecha.includes(searchTerm);
             case "estado":
                 return j.estado.toLowerCase().includes(searchTerm.toLowerCase());
+            case "documento":
+                return j.documento.toLowerCase().includes(searchTerm.toLowerCase());
+            case "aprendiz":
+                return j.aprendiz.toLowerCase().includes(searchTerm.toLowerCase());
             default:
                 return true;
         }

@@ -7,12 +7,14 @@ import { AsistenciaManualContainer } from '@/components/features/asistencia/atte
 const AttendanceManualContent: React.FC = () => {
     const searchParams = useSearchParams();
     const competenceId = searchParams.get('competenceId');
+    const studySheetId = searchParams.get('studySheetId');
     const isDarkMode = false;
 
     return (
         <AsistenciaManualContainer 
           isDarkMode={isDarkMode} 
-          competenceId={competenceId} 
+          competenceId={competenceId}
+          studySheetId={studySheetId}
         />
     );
 };

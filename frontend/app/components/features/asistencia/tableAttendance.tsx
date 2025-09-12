@@ -3,6 +3,7 @@ import { GoSearch } from "react-icons/go";
 import { BsQrCode } from "react-icons/bs";
 import { FaClipboardList } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { FaCheck, FaTimes, FaClock, FaExclamationTriangle } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { StudySheet } from '@graphql/generated';
 import ModalQR from "@components/Modals/ModalQR";
@@ -30,6 +31,45 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
     useEffect(() => {
         setFilteredStudents(studySheetData?.studentStudySheets || []);
     }, [studySheetData]);
+
+    // Función para obtener el icono y estilo según el estado de asistencia
+    const getAttendanceIcon = (status: string) => {
+        switch (status?.toLowerCase()) {
+            case 'presente':
+                return <FaCheck className="text-green-500" title="Presente" />;
+            case 'ausente':
+                return <FaTimes className="text-red-500" title="Ausente" />;
+            case 'retardo':
+                return <FaClock className="text-yellow-500" title="Retardo" />;
+            case 'justificado':
+                return <FaExclamationTriangle className="text-blue-500" title="Justificado" />;
+            default:
+                return null;
+        }
+    };
+
+    // Función para obtener asistencia por fecha específica
+    const getAttendanceByDate = (attendances: any[], targetDate: string) => {
+        if (!attendances) return null;
+        return attendances.find((attendance: any) => 
+            attendance.attendanceDate === targetDate
+        );
+    };
+
+    // Función para generar las fechas de la semana actual basada en el trimestre
+    const generateWeekDates = (weekOffset: number = 0) => {
+        const today = new Date();
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay() + 1 + (weekOffset * 7)); // Lunes de la semana
+        
+        const dates = [];
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(startOfWeek);
+            date.setDate(startOfWeek.getDate() + i);
+            dates.push(date.toISOString().split('T')[0]); // Formato YYYY-MM-DD
+        }
+        return dates;
+    };
 
     const handleAttendanceClick = (): void => setAlertVisible(true);
 
@@ -218,39 +258,63 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                                                 {studentStudySheet.student?.person?.name || 'N/A'} {studentStudySheet.student?.person?.lastname || ''}
                                             </div>
                                         </td>
-                                        {[...Array(4)].map((_, weekIndex) => (
-                                            <React.Fragment key={weekIndex}>
-                                                {[...Array(7)].map((_, dayIndex) => {
-                                                    const isWeekend = dayIndex === 5 || dayIndex === 6;
-                                                    const cellValue: string = '';
+                                        {[...Array(4)].map((_, weekIndex) => {
+                                            const weekDates = generateWeekDates(weekIndex);
+                                            return (
+                                                <React.Fragment key={weekIndex}>
+                                                    {weekDates.map((date, dayIndex) => {
+                                                        const isWeekend = dayIndex === 5 || dayIndex === 6;
+                                                        const attendance = getAttendanceByDate(
+                                                            studentStudySheet.student?.attendances || [], 
+                                                            date
+                                                        );
+                                                        const attendanceIcon = attendance 
+                                                            ? getAttendanceIcon(attendance.attendanceState?.status)
+                                                            : null;
 
-                                                    const getCellClassName = (value: string): string => {
-                                                        switch (value) {
-                                                            case '✓': return 'text-lightGreen font-bold';
-                                                            case 'R': return 'text-yellow-500 font-bold';
-                                                            case 'X': return 'text-red-500 font-bold';
-                                                            case 'J': return 'text-blue-500 font-bold';
-                                                            default: return 'text-darkGray';
-                                                        }
-                                                    };
-
-                                                    return (
-                                                        <td
-                                                            key={dayIndex}
-                                                            className="px-0.5 sm:px-1 py-1.5 sm:py-2 border border-lightGray text-center text-xs sm:text-sm bg-white"
-                                                        >
-                                                            <span className={getCellClassName(cellValue)}>
-                                                                {cellValue}
-                                                            </span>
-                                                        </td>
-                                                    );
-                                                })}
-                                            </React.Fragment>
-                                        ))}
+                                                        return (
+                                                            <td
+                                                                key={`${weekIndex}-${dayIndex}-${date}`}
+                                                                className={`px-0.5 sm:px-1 py-1.5 sm:py-2 border border-lightGray text-center text-xs sm:text-sm ${
+                                                                    isWeekend ? 'bg-gray-100' : 'bg-white'
+                                                                }`}
+                                                            >
+                                                                <div className="flex justify-center items-center h-4 w-full">
+                                                                    {attendanceIcon}
+                                                                </div>
+                                                            </td>
+                                                        );
+                                                    })}
+                                                </React.Fragment>
+                                            );
+                                        })}
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                {/* Leyenda de iconos */}
+                <div className="bg-white border border-lightGray rounded-xl shadow-sm p-4">
+                    <h3 className="text-sm font-semibold text-darkGray mb-3">Leyenda de Asistencia:</h3>
+                    <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
+                        <div className="flex items-center gap-2">
+                            <FaCheck className="text-green-500" />
+                            <span className="text-xs sm:text-sm text-darkGray">Presente</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <FaTimes className="text-red-500" />
+                            <span className="text-xs sm:text-sm text-darkGray">Ausente</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <FaClock className="text-yellow-500" />
+                            <span className="text-xs sm:text-sm text-darkGray">Retardo</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <FaExclamationTriangle className="text-blue-500" />
+                            <span className="text-xs sm:text-sm text-darkGray">Justificado</span>
+                        </div>
                     </div>
                 </div>
             </div>
