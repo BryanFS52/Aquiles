@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { FaRegFileAlt } from "react-icons/fa";
+import { useState, useEffect } from "react";
 import DataTable from "@components/UI/DataTable";
 
 interface AttendanceTableProps {
@@ -15,6 +16,26 @@ export default function AttendanceTable({
   loading,
   onReportNovelty
 }: AttendanceTableProps) {
+  // Auto-detect dark mode
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDarkMode(document.documentElement.classList.contains('dark'));
+    };
+
+    // Check initial state
+    checkDarkMode();
+
+    // Listen for changes
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
   // Definir columnas para DataTable
   const columns = [
     {
@@ -74,7 +95,7 @@ export default function AttendanceTable({
         <DataTable
           columns={columns}
           data={data}
-          isDarkMode={false}
+          isDarkMode={isDarkMode}
           pageSize={8}
           filterPlaceholder="Buscar aprendiz o documento..."
           className="w-full min-w-[340px] sm:min-w-[600px] max-w-none"
