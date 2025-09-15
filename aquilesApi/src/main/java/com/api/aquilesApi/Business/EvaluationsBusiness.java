@@ -11,9 +11,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 
 
 @Component
@@ -34,8 +31,8 @@ public class EvaluationsBusiness {
     public Page<EvaluationDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Evaluation> evaluationsPage = evaluationService.findAll(pageRequest);
-        return evaluationsPage.map(evaluation -> modelMapper.map(evaluation, EvaluationDto.class));
+            Page<Evaluation> evaluationsPage = evaluationService.findAll(pageRequest);
+            return EvaluationMap.INSTANCE.EntityToDTOs(evaluationsPage);
         } catch (Exception e) {
             throw new CustomException("Error retrieving evaluations: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -45,7 +42,7 @@ public class EvaluationsBusiness {
     public EvaluationDto findById(Long id) {
         try {
             Evaluation evaluation = evaluationService.getById(id);
-            return modelMapper.map(evaluation, EvaluationDto.class);
+            return EvaluationMap.INSTANCE.EntityToDTO(evaluation);
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
@@ -53,17 +50,17 @@ public class EvaluationsBusiness {
         }
     }
 
-    // Find By Checklist Id - Relación 1:1
-    public List<EvaluationDto> findByChecklistId(Long checklistId) {
+    /*
+    // Find By Checklist Id
+    public EvaluationDto findByChecklistId(Long id) {
         try {
-            List<Evaluation> evaluations = evaluationService.findByChecklistId(checklistId);
-            return evaluations.stream()
-                    .map(evaluation -> modelMapper.map(evaluation, EvaluationDto.class))
-                    .collect(Collectors.toList());
+            Evaluation evaluation = evaluationService.getById(id);
+            return EvaluationMap.INSTANCE.EntityToDTO(evaluation);
         } catch (Exception e) {
-            throw new CustomException("Error retrieving evaluations for checklist ID " + checklistId + ": " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Error retrieving evaluations for checklist ID: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+     */
 
     // Nuevo método para obtener la evaluación única de un checklist (relación 1:1)
     public EvaluationDto findEvaluationByChecklistId(Long checklistId) {
@@ -100,16 +97,10 @@ public class EvaluationsBusiness {
     // Update
     public void update(Long evaluationId,  EvaluationDto evaluationDto) {
         try {
-            // Obtener la evaluación existente del contexto de persistencia
-            Evaluation existingEvaluation = evaluationService.getById(evaluationId);
-            
-            // Actualizar solo los campos necesarios manualmente para evitar problemas con el mapeo
-            existingEvaluation.setObservations(evaluationDto.getObservations());
-            existingEvaluation.setRecommendations(evaluationDto.getRecommendations());
-            existingEvaluation.setValueJudgment(evaluationDto.getValueJudgment());
-            
-            // Guardar la evaluación actualizada
-            evaluationService.update(existingEvaluation);
+          evaluationDto.setId(evaluationId);
+            Evaluation evaluation = evaluationService.getById(evaluationId);
+            EvaluationMap.INSTANCE.updateEvaluation(evaluationDto, evaluation);
+            evaluationService.save(evaluation);
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {

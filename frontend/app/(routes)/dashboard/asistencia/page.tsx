@@ -28,8 +28,13 @@ function AttendanceContent() {
 
     // Usar la ficha seleccionada para asistencia si está disponible, de lo contrario usar la primera del array
     const studySheet = selectedForAttendance || (studySheets.length > 0 ? studySheets[0] : undefined);
+    
     const students = (studySheet?.studentStudySheets as any[])?.filter(
-        (s: any) => s?.state === "Activo"
+        (s: any) => {
+            // Aceptar diferentes estados activos
+            const stateName = s?.studentStudySheetState?.name;
+            return stateName === "Activo" || stateName === "En formacion" || s?.state === "Activo";
+        }
     ) || [];
 
     const activeStudents = students.length;

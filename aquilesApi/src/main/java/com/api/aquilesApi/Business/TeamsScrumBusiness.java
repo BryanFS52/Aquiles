@@ -92,7 +92,7 @@ public class TeamsScrumBusiness {
             List<TeamsScrum> entities = teamScrumService.findByStudySheetId(studySheetId);
             return TeamScrumMap.INSTANCE.EntityToDTOs(entities);
         } catch (Exception e) {
-            throw new CustomException("Error al obtener TeamsScrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException("Error getting TeamsScrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

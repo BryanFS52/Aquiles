@@ -49,25 +49,118 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
     };
 
     // Función para obtener asistencia por fecha específica
-    const getAttendanceByDate = (attendances: any[], targetDate: string) => {
+    const getAttendanceByDate = (attendances: any[], targetDate: string, isFirstCall = false) => {
+        
+        // Si la fecha está vacía, no hay datos
+        if (!targetDate || targetDate === '') return null;
+        
+        // Solo mostrar log detallado en la primera llamada de cada estudiante
+        if (isFirstCall && attendances && attendances.length > 0) {
+            console.log('🔍 Available attendance dates for student:', attendances.map(a => ({
+                date: a.attendanceDate,
+                status: a.attendanceState?.status,
+                fullObject: a
+            })));
+            console.log('🔍 Looking for dates like:', targetDate);
+        }
+        
         if (!attendances) return null;
-        return attendances.find((attendance: any) => 
+        const result = attendances.find((attendance: any) => 
             attendance.attendanceDate === targetDate
         );
+        return result;
     };
+
+    // Función para obtener el día de la semana de una fecha (0=Lunes, 1=Martes, ..., 6=Domingo)
+    const getDayOfWeekIndex = (dateStr: string) => {
+        // Crear la fecha usando los componentes individuales para evitar problemas de zona horaria
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const date = new Date(year, month - 1, day); // month - 1 porque los meses en JS van de 0-11
+        
+        const jsDay = date.getDay(); // JavaScript: 0=Domingo, 1=Lunes, ..., 6=Sábado
+        
+        // Convertir a nuestro formato: 0=Lunes, 1=Martes, ..., 6=Domingo
+        const ourDay = jsDay === 0 ? 6 : jsDay - 1;
+        
+        // Verificar algunos casos específicos según tu calendario
+        const dayNames = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+        console.log(`🔍 Fecha ${dateStr} cae en: ${dayNames[ourDay]} (índice ${ourDay}) - JS day: ${jsDay}`);
+        
+        return ourDay;
+    };
+
+    // Función para obtener todas las fechas únicas de asistencia de todos los estudiantes
+    const getAllAttendanceDates = () => {
+        const allDates = new Set<string>();
+        
+        filteredStudents?.forEach((studentStudySheet: any) => {
+            const attendances = studentStudySheet.student?.attendances || [];
+            attendances.forEach((attendance: any) => {
+                if (attendance.attendanceDate) {
+                    allDates.add(attendance.attendanceDate);
+                }
+            });
+        });
+        
+        // Convertir a array y ordenar cronológicamente
+        const sortedDates = Array.from(allDates).sort();
+        return sortedDates;
+    };
+
+    // Función para crear estructura de semanas basada en los días reales de la semana
+    const createWeeksFromData = () => {
+        const uniqueDates = getAllAttendanceDates();
+        
+        if (uniqueDates.length === 0) {
+            // Si no hay datos, crear 4 semanas vacías
+            return [[], [], [], []];
+        }
+        
+        // Agrupar fechas por semanas basándose en el día real de la semana
+        const weeksMap = new Map<string, string[]>();
+        
+        uniqueDates.forEach(dateStr => {
+            const date = new Date(dateStr);
+            
+            // Calcular el lunes de la semana para esta fecha
+            const dayIndex = getDayOfWeekIndex(dateStr);
+            
+            // Encontrar el lunes de esta semana
+            const mondayDate = new Date(date);
+            mondayDate.setDate(date.getDate() - dayIndex);
+            
+            const weekKey = mondayDate.toISOString().split('T')[0];
+            
+            if (!weeksMap.has(weekKey)) {
+                weeksMap.set(weekKey, new Array(7).fill(''));
+            }
+            
+            const week = weeksMap.get(weekKey)!;
+            // Poner la fecha en el índice correcto según el día de la semana
+            week[dayIndex] = dateStr;
+        });
+        
+        // Convertir el mapa a array y ordenar por semana
+        const sortedWeeks = Array.from(weeksMap.entries())
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([_, week]) => week);
+        
+        // Asegurar que tenemos exactamente 4 semanas
+        while (sortedWeeks.length < 4) {
+            sortedWeeks.push(new Array(7).fill(''));
+        }
+        
+        console.log('🔍 Created weeks from data (correctly indexed by day):', sortedWeeks);
+        return sortedWeeks.slice(0, 4);
+    };
+
+    // Obtener las fechas dinámicamente
+    const weeklyDates = createWeeksFromData();
 
     // Función para generar las fechas de la semana actual basada en el trimestre
     const generateWeekDates = (weekOffset: number = 0) => {
-        const today = new Date();
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - today.getDay() + 1 + (weekOffset * 7)); // Lunes de la semana
-        
-        const dates = [];
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(startOfWeek);
-            date.setDate(startOfWeek.getDate() + i);
-            dates.push(date.toISOString().split('T')[0]); // Formato YYYY-MM-DD
-        }
+        const dates = weeklyDates[weekOffset] || new Array(7).fill('');
+        console.log(`🔍 Generated week ${weekOffset + 1} dates:`, dates);
         return dates;
     };
 
@@ -264,9 +357,17 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                                                 <React.Fragment key={weekIndex}>
                                                     {weekDates.map((date, dayIndex) => {
                                                         const isWeekend = dayIndex === 5 || dayIndex === 6;
+                                                        const studentAttendances = studentStudySheet.student?.attendances || [];
+                                                        
+                                                        // Solo mostrar log una vez por estudiante (primer día)
+                                                        if (dayIndex === 0 && weekIndex === 0) {
+                                                            console.log('🔍 Student attendances for', studentStudySheet.student?.person?.name, ':', studentAttendances);
+                                                        }
+                                                        
                                                         const attendance = getAttendanceByDate(
-                                                            studentStudySheet.student?.attendances || [], 
-                                                            date
+                                                            studentAttendances, 
+                                                            date,
+                                                            dayIndex === 0 && weekIndex === 0 // isFirstCall
                                                         );
                                                         const attendanceIcon = attendance 
                                                             ? getAttendanceIcon(attendance.attendanceState?.status)
