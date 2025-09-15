@@ -454,6 +454,8 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
     'justifications/fetchByCompetenceQuarter',
     async ({ competenceQuarterId }, { rejectWithValue }) => {
         try {
+            console.log("🚀 Iniciando fetchJustificationsByCompetenceQuarter con competenceQuarterId:", competenceQuarterId);
+            
             const { data } = await clientLAN.query<
                 GetAttendancesByCompetenceQuarterAndJustificationsQuery,
                 GetAttendancesByCompetenceQuarterAndJustificationsQueryVariables
@@ -464,14 +466,54 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
                 fetchPolicy: 'no-cache',
             });
 
+            console.log("📡 Respuesta completa del GraphQL:", data);
+            console.log("📡 allAttendanceByCompetenceQuarterIdWithJustifications:", data.allAttendanceByCompetenceQuarterIdWithJustifications);
+
             const rawData = data.allAttendanceByCompetenceQuarterIdWithJustifications?.data || [];
             const cleanData = rawData.filter((item): item is NonNullable<typeof item> => item !== null);
             
-            // Transformar los datos para vista de instructor (sin ficha ni programa)
-            return cleanData.map((attendance) => {
+            console.log("🔍 fetchJustificationsByCompetenceQuarter - Datos recibidos:");
+            console.log("📊 Raw data length:", rawData.length);
+            console.log("📊 Clean data length:", cleanData.length);
+            console.log("📋 Raw data completa:", rawData);
+            
+            // Log detallado de cada elemento antes del mapeo
+            console.log("🔍 Análisis detallado de los datos recibidos:");
+            rawData.forEach((item, index) => {
+                console.log(`📋 Raw item ${index + 1}:`, {
+                    id: item?.id,
+                    hasJustification: !!item?.justification,
+                    justificationId: item?.justification?.id,
+                    absenceDate: item?.justification?.absenceDate,
+                    justificationDate: item?.justification?.justificationDate,
+                    studentDocument: item?.student?.person?.document,
+                    studentName: `${item?.student?.person?.name || ''} ${item?.student?.person?.lastname || ''}`.trim(),
+                    fichaNumber: item?.student?.studentStudySheets?.[0]?.studySheet?.number,
+                    completeItem: item
+                });
+            });
+            
+            // Transformar los datos para vista de instructor (con ficha del estudiante)
+            const transformedData = cleanData.map((attendance, index) => {
                 const justification = attendance.justification;
                 const student = attendance.student;
                 const person = student?.person;
+
+                console.log(`🔍 Procesando attendance ${index + 1}:`, {
+                    attendanceId: attendance.id,
+                    hasJustification: !!justification,
+                    justificationId: justification?.id,
+                    hasStudent: !!student,
+                    studentStudySheets: student?.studentStudySheets,
+                    fichaNumber: student?.studentStudySheets?.[0]?.studySheet?.number,
+                    isValidJustification: !!(justification && justification.id)
+                });
+
+                // Solo procesar si hay justificación válida
+                if (!justification || !justification.id) {
+                    console.warn(`⚠️ Attendance ${attendance.id} no tiene justificación válida - omitiendo`);
+                    return null;
+                }
 
                 // Determinar el estado y ID basado en el nombre
                 const statusName = justification?.justificationStatus?.name || 'En proceso';
@@ -479,9 +521,9 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
                 const statusId = (justification?.justificationStatus as any)?.id || 
                     (statusName === 'En proceso' ? 'default-en-proceso' : undefined);
 
-                return {
+                const transformedItem = {
                     id: Number(justification?.id || 0),
-                    ficha: '', // Vacío para instructores
+                    ficha: attendance.student?.studentStudySheets?.[0]?.studySheet?.number?.toString() || '', // Extraer número de ficha del estudiante
                     absenceDate: justification?.absenceDate || '',
                     justificationDate: justification?.justificationDate || '',
                     estado: statusName,
@@ -495,7 +537,20 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
                     justificationStatusId: statusId,
                     justificationStatus: statusName
                 };
-            });
+                
+                console.log(`✅ Item transformado ${index + 1}:`, transformedItem);
+                return transformedItem;
+            }).filter(item => item !== null) as TransformedJustificationItem[]; // Filtrar elementos nulos
+            
+            console.log("📊 Total items transformados válidos:", transformedData.length);
+            console.log("📋 Resumen de transformación:", transformedData.map(item => ({
+                id: item.id,
+                ficha: item.ficha,
+                documento: item.documento,
+                aprendiz: item.aprendiz
+            })));
+            
+            return transformedData;
         } catch (error) {
             console.error("Error al obtener justificaciones por competence quarter", error);
             return rejectWithValue({ message: (error as Error).message || 'Unknown error' });
@@ -1142,3 +1197,72 @@ export const {
 } = justificationSlice.actions;
 
 export default justificationSlice.reducer;
+
+// Función temporal de debugging para comparar consultas
+export const debugCompareJustifications = createAsyncThunk<
+    { byCompetence: any[], allJustifications: any[] },
+    { competenceQuarterId: number }
+>(
+    'justifications/debugCompare',
+    async ({ competenceQuarterId }, { rejectWithValue }) => {
+        try {
+            console.log("🐛 DEBUG: Iniciando comparación de consultas para competencia:", competenceQuarterId);
+            
+            // Primera consulta: por competencia y quarter
+            const { data: competenceData } = await clientLAN.query<
+                GetAttendancesByCompetenceQuarterAndJustificationsQuery,
+                GetAttendancesByCompetenceQuarterAndJustificationsQueryVariables
+            >({
+                query: GET_ATTENDANCES_BY_COMPETENCE_QUARTER_AND_JUSTIFICATIONS,
+                variables: { competenceQuarterId },
+                fetchPolicy: 'no-cache',
+            });
+            
+            // Segunda consulta: todas las justificaciones
+            const { data: allData } = await clientLAN.query<GetAllJustificationsQuery, GetAllJustificationsQueryVariables>({
+                query: GET_ALL_JUSTIFICATIONS,
+                variables: { page: 0, size: 100 },
+                fetchPolicy: 'no-cache',
+            });
+
+            const byCompetence = competenceData.allAttendanceByCompetenceQuarterIdWithJustifications?.data || [];
+            const allJustifications = allData.allJustifications?.data || [];
+            
+            console.log("🐛 DEBUG: Resultados de comparación:");
+            console.log("📊 Por competencia:", byCompetence.length, "elementos");
+            console.log("📊 Todas las justificaciones:", allJustifications.length, "elementos");
+            
+            console.log("🔍 Elementos por competencia:", byCompetence);
+            console.log("🔍 Todas las justificaciones:", allJustifications);
+            
+            // Comparar IDs de justificaciones
+            const competenceJustificationIds = byCompetence
+                .filter(item => item?.justification?.id)
+                .map(item => item!.justification!.id);
+            
+            const allJustificationIds = allJustifications
+                .filter(item => item != null)
+                .map(item => item!.id);
+            
+            console.log("🆔 IDs por competencia:", competenceJustificationIds);
+            console.log("🆔 Todos los IDs:", allJustificationIds);
+            
+            // Encontrar IDs que están en todas pero no en por competencia
+            const missingIds = allJustificationIds.filter(id => !competenceJustificationIds.includes(id));
+            console.log("❌ IDs faltantes en consulta por competencia:", missingIds);
+            
+            if (missingIds.length > 0) {
+                console.log("🔍 Justificaciones faltantes completas:");
+                missingIds.forEach(id => {
+                    const missing = allJustifications.find(j => j != null && j!.id === id);
+                    console.log(`❌ Justificación faltante ${id}:`, missing);
+                });
+            }
+            
+            return { byCompetence, allJustifications };
+        } catch (error) {
+            console.error("🐛 DEBUG: Error en comparación:", error);
+            return rejectWithValue({ message: (error as Error).message });
+        }
+    }
+);
