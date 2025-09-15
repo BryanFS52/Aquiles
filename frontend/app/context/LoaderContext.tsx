@@ -23,7 +23,9 @@ export const LoaderProvider = ({ children }: { children: ReactNode }) => {
         const startTime = loaderStartTime.current;
         if (startTime) {
             const elapsedTime = Date.now() - startTime;
-            const remainingTime = 1000 - elapsedTime;
+            // Tiempo mínimo muy reducido para transiciones más fluidas
+            const minimumTime = 150; // Reducido de 300ms a 150ms
+            const remainingTime = minimumTime - elapsedTime;
 
             if (remainingTime > 0) {
                 setTimeout(() => setLoading(false), remainingTime);

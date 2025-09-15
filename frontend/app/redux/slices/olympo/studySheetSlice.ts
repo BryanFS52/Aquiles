@@ -218,13 +218,17 @@ export const fetchStudySheetByIdWithAttendances = createAsyncThunk<GetStudySheet
 
 interface ExtendedStudySheetState extends ReturnType<typeof createInitialPaginatedState < StudySheet >> {
     dataForStudents: Record<string, Student[]>,
-    dataForTeamScrums: TeamsScrum[]
+    dataForTeamScrums: TeamsScrum[],
+    selectedForAttendance: StudySheet | null, // Nueva propiedad para la ficha seleccionada para asistencia
+    loadingAttendanceSheet: boolean // Estado de carga específico para ficha de asistencia
 }
 
 const initialState: ExtendedStudySheetState = {
     ...createInitialPaginatedState<StudySheet>(),
     dataForStudents: {},
     dataForTeamScrums: [],
+    selectedForAttendance: null,
+    loadingAttendanceSheet: false,
 };
 
 const studySheetSlice = createSlice({
@@ -237,9 +241,15 @@ const studySheetSlice = createSlice({
             state.error = null;
             state.dataForStudents = {};
             state.dataForTeamScrums = [];
+            state.selectedForAttendance = null;
+            state.loadingAttendanceSheet = false;
             state.currentPage = 0;
             state.totalItems = 0;
             state.totalPages = 0;
+        },
+        clearAttendanceSelection: (state) => {
+            state.selectedForAttendance = null;
+            state.loadingAttendanceSheet = false;
         }
     },
     extraReducers: (builder) => {
@@ -407,26 +417,28 @@ const studySheetSlice = createSlice({
         // Fetch StudySheetByIdWithAttendances
         builder
             .addCase(fetchStudySheetByIdWithAttendances.pending, (state) => {
-                state.loading = true;
+                state.loadingAttendanceSheet = true;
                 state.error = null;
             })
             .addCase(fetchStudySheetByIdWithAttendances.fulfilled, (state, action) => {
                 const item = action.payload?.data;
                 if (item) {
                     const transformed = transformGraphQLToStudySheetItem(item);
-                    state.data = [transformed];
+                    // Guardamos la ficha seleccionada para asistencia sin afectar la lista principal
+                    state.selectedForAttendance = transformed;
                 } else {
-                    state.data = [];
+                    state.selectedForAttendance = null;
                 }
-                state.loading = false;
+                state.loadingAttendanceSheet = false;
             })
             .addCase(fetchStudySheetByIdWithAttendances.rejected, (state, action) => {
                 state.error = action.error.message ?? 'Error fetching study sheet by id with attendances';
-                state.loading = false;
+                state.loadingAttendanceSheet = false;
+                state.selectedForAttendance = null;
             });
     }
 });
 
-export const { clearStudySheetState } = studySheetSlice.actions;
+export const { clearStudySheetState, clearAttendanceSelection } = studySheetSlice.actions;
 
 export default studySheetSlice.reducer;

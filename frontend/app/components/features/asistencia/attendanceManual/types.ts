@@ -1,6 +1,7 @@
 export interface AsistenciaManualContainerProps {
     isDarkMode?: boolean;
     competenceId?: string | null;
+    studySheetId?: string | null;
 }
 
 // Re-exportar tipos existentes para centralizar

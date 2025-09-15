@@ -3,6 +3,7 @@ import { GoSearch } from "react-icons/go";
 import { BsQrCode } from "react-icons/bs";
 import { FaClipboardList } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { FaCheck, FaTimes, FaClock, FaExclamationTriangle } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { StudySheet } from '@graphql/generated';
 import ModalQR from "@components/Modals/ModalQR";
@@ -30,6 +31,138 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
     useEffect(() => {
         setFilteredStudents(studySheetData?.studentStudySheets || []);
     }, [studySheetData]);
+
+    // Función para obtener el icono y estilo según el estado de asistencia
+    const getAttendanceIcon = (status: string) => {
+        switch (status?.toLowerCase()) {
+            case 'presente':
+                return <FaCheck className="text-green-500" title="Presente" />;
+            case 'ausente':
+                return <FaTimes className="text-red-500" title="Ausente" />;
+            case 'retardo':
+                return <FaClock className="text-yellow-500" title="Retardo" />;
+            case 'justificado':
+                return <FaExclamationTriangle className="text-blue-500" title="Justificado" />;
+            default:
+                return null;
+        }
+    };
+
+    // Función para obtener asistencia por fecha específica
+    const getAttendanceByDate = (attendances: any[], targetDate: string, isFirstCall = false) => {
+        
+        // Si la fecha está vacía, no hay datos
+        if (!targetDate || targetDate === '') return null;
+        
+        // Solo mostrar log detallado en la primera llamada de cada estudiante
+        if (isFirstCall && attendances && attendances.length > 0) {
+            console.log('🔍 Available attendance dates for student:', attendances.map(a => ({
+                date: a.attendanceDate,
+                status: a.attendanceState?.status,
+                fullObject: a
+            })));
+            console.log('🔍 Looking for dates like:', targetDate);
+        }
+        
+        if (!attendances) return null;
+        const result = attendances.find((attendance: any) => 
+            attendance.attendanceDate === targetDate
+        );
+        return result;
+    };
+
+    // Función para obtener el día de la semana de una fecha (0=Lunes, 1=Martes, ..., 6=Domingo)
+    const getDayOfWeekIndex = (dateStr: string) => {
+        // Crear la fecha usando los componentes individuales para evitar problemas de zona horaria
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const date = new Date(year, month - 1, day); // month - 1 porque los meses en JS van de 0-11
+        
+        const jsDay = date.getDay(); // JavaScript: 0=Domingo, 1=Lunes, ..., 6=Sábado
+        
+        // Convertir a nuestro formato: 0=Lunes, 1=Martes, ..., 6=Domingo
+        const ourDay = jsDay === 0 ? 6 : jsDay - 1;
+        
+        // Verificar algunos casos específicos según tu calendario
+        const dayNames = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+        console.log(`🔍 Fecha ${dateStr} cae en: ${dayNames[ourDay]} (índice ${ourDay}) - JS day: ${jsDay}`);
+        
+        return ourDay;
+    };
+
+    // Función para obtener todas las fechas únicas de asistencia de todos los estudiantes
+    const getAllAttendanceDates = () => {
+        const allDates = new Set<string>();
+        
+        filteredStudents?.forEach((studentStudySheet: any) => {
+            const attendances = studentStudySheet.student?.attendances || [];
+            attendances.forEach((attendance: any) => {
+                if (attendance.attendanceDate) {
+                    allDates.add(attendance.attendanceDate);
+                }
+            });
+        });
+        
+        // Convertir a array y ordenar cronológicamente
+        const sortedDates = Array.from(allDates).sort();
+        return sortedDates;
+    };
+
+    // Función para crear estructura de semanas basada en los días reales de la semana
+    const createWeeksFromData = () => {
+        const uniqueDates = getAllAttendanceDates();
+        
+        if (uniqueDates.length === 0) {
+            // Si no hay datos, crear 4 semanas vacías
+            return [[], [], [], []];
+        }
+        
+        // Agrupar fechas por semanas basándose en el día real de la semana
+        const weeksMap = new Map<string, string[]>();
+        
+        uniqueDates.forEach(dateStr => {
+            const date = new Date(dateStr);
+            
+            // Calcular el lunes de la semana para esta fecha
+            const dayIndex = getDayOfWeekIndex(dateStr);
+            
+            // Encontrar el lunes de esta semana
+            const mondayDate = new Date(date);
+            mondayDate.setDate(date.getDate() - dayIndex);
+            
+            const weekKey = mondayDate.toISOString().split('T')[0];
+            
+            if (!weeksMap.has(weekKey)) {
+                weeksMap.set(weekKey, new Array(7).fill(''));
+            }
+            
+            const week = weeksMap.get(weekKey)!;
+            // Poner la fecha en el índice correcto según el día de la semana
+            week[dayIndex] = dateStr;
+        });
+        
+        // Convertir el mapa a array y ordenar por semana
+        const sortedWeeks = Array.from(weeksMap.entries())
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([_, week]) => week);
+        
+        // Asegurar que tenemos exactamente 4 semanas
+        while (sortedWeeks.length < 4) {
+            sortedWeeks.push(new Array(7).fill(''));
+        }
+        
+        console.log('🔍 Created weeks from data (correctly indexed by day):', sortedWeeks);
+        return sortedWeeks.slice(0, 4);
+    };
+
+    // Obtener las fechas dinámicamente
+    const weeklyDates = createWeeksFromData();
+
+    // Función para generar las fechas de la semana actual basada en el trimestre
+    const generateWeekDates = (weekOffset: number = 0) => {
+        const dates = weeklyDates[weekOffset] || new Array(7).fill('');
+        console.log(`🔍 Generated week ${weekOffset + 1} dates:`, dates);
+        return dates;
+    };
 
     const handleAttendanceClick = (): void => setAlertVisible(true);
 
@@ -218,39 +351,71 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                                                 {studentStudySheet.student?.person?.name || 'N/A'} {studentStudySheet.student?.person?.lastname || ''}
                                             </div>
                                         </td>
-                                        {[...Array(4)].map((_, weekIndex) => (
-                                            <React.Fragment key={weekIndex}>
-                                                {[...Array(7)].map((_, dayIndex) => {
-                                                    const isWeekend = dayIndex === 5 || dayIndex === 6;
-                                                    const cellValue: string = '';
-
-                                                    const getCellClassName = (value: string): string => {
-                                                        switch (value) {
-                                                            case '✓': return 'text-lightGreen font-bold';
-                                                            case 'R': return 'text-yellow-500 font-bold';
-                                                            case 'X': return 'text-red-500 font-bold';
-                                                            case 'J': return 'text-blue-500 font-bold';
-                                                            default: return 'text-darkGray';
+                                        {[...Array(4)].map((_, weekIndex) => {
+                                            const weekDates = generateWeekDates(weekIndex);
+                                            return (
+                                                <React.Fragment key={weekIndex}>
+                                                    {weekDates.map((date, dayIndex) => {
+                                                        const isWeekend = dayIndex === 5 || dayIndex === 6;
+                                                        const studentAttendances = studentStudySheet.student?.attendances || [];
+                                                        
+                                                        // Solo mostrar log una vez por estudiante (primer día)
+                                                        if (dayIndex === 0 && weekIndex === 0) {
+                                                            console.log('🔍 Student attendances for', studentStudySheet.student?.person?.name, ':', studentAttendances);
                                                         }
-                                                    };
+                                                        
+                                                        const attendance = getAttendanceByDate(
+                                                            studentAttendances, 
+                                                            date,
+                                                            dayIndex === 0 && weekIndex === 0 // isFirstCall
+                                                        );
+                                                        const attendanceIcon = attendance 
+                                                            ? getAttendanceIcon(attendance.attendanceState?.status)
+                                                            : null;
 
-                                                    return (
-                                                        <td
-                                                            key={dayIndex}
-                                                            className="px-0.5 sm:px-1 py-1.5 sm:py-2 border border-lightGray text-center text-xs sm:text-sm bg-white"
-                                                        >
-                                                            <span className={getCellClassName(cellValue)}>
-                                                                {cellValue}
-                                                            </span>
-                                                        </td>
-                                                    );
-                                                })}
-                                            </React.Fragment>
-                                        ))}
+                                                        return (
+                                                            <td
+                                                                key={`${weekIndex}-${dayIndex}-${date}`}
+                                                                className={`px-0.5 sm:px-1 py-1.5 sm:py-2 border border-lightGray text-center text-xs sm:text-sm ${
+                                                                    isWeekend ? 'bg-gray-100' : 'bg-white'
+                                                                }`}
+                                                            >
+                                                                <div className="flex justify-center items-center h-4 w-full">
+                                                                    {attendanceIcon}
+                                                                </div>
+                                                            </td>
+                                                        );
+                                                    })}
+                                                </React.Fragment>
+                                            );
+                                        })}
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                {/* Leyenda de iconos */}
+                <div className="bg-white border border-lightGray rounded-xl shadow-sm p-4">
+                    <h3 className="text-sm font-semibold text-darkGray mb-3">Leyenda de Asistencia:</h3>
+                    <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
+                        <div className="flex items-center gap-2">
+                            <FaCheck className="text-green-500" />
+                            <span className="text-xs sm:text-sm text-darkGray">Presente</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <FaTimes className="text-red-500" />
+                            <span className="text-xs sm:text-sm text-darkGray">Ausente</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <FaClock className="text-yellow-500" />
+                            <span className="text-xs sm:text-sm text-darkGray">Retardo</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <FaExclamationTriangle className="text-blue-500" />
+                            <span className="text-xs sm:text-sm text-darkGray">Justificado</span>
+                        </div>
                     </div>
                 </div>
             </div>

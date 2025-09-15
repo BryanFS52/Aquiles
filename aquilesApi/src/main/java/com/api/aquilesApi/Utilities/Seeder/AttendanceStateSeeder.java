@@ -19,6 +19,7 @@ public class AttendanceStateSeeder implements CommandLineRunner {
         createStateIfNotExists("Presente");
         createStateIfNotExists("Ausente");
         createStateIfNotExists("Justificado");
+        createStateIfNotExists("Retardo");
         createStateIfNotExists("Injustificado");
     }
 
