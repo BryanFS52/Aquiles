@@ -455,7 +455,7 @@ export default function CoordinadorChecklistView() {
             id="trimestre-select"
             value={selectedTrimestre}
             onChange={(e) => setSelectedTrimestre(e.target.value)}
-            className="px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-full focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
+            className="px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-full focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
           >
             <option value="todos">Todos los Trimestres</option>
             <option value="1">Primer Trimestre</option>
@@ -547,10 +547,10 @@ export default function CoordinadorChecklistView() {
                         <div className="p-6 space-y-4">
                           {/* Proyecto Formativo */}
                           <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-blue-400 uppercase tracking-wide">
+                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Proyecto Formativo
                             </span>
-                            <p className="text-sm text-darkBlue dark:text-white mt-1 font-medium">
+                            <p className="text-sm text-gray-700 dark:text-white mt-1 font-medium">
                               {(checklist as any).trainingProjectName || (
                                 <span className="text-gray-500 italic">Sin proyecto asociado</span>
                               )}
@@ -559,27 +559,27 @@ export default function CoordinadorChecklistView() {
 
                           {/* Componente */}
                           <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-blue-400 uppercase tracking-wide">
+                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Componente
                             </span>
-                            <p className="text-sm text-darkBlue dark:text-white mt-1 font-medium">
+                            <p className="text-sm text-gray-700 dark:text-white mt-1 font-medium">
                               {checklist.component || 'N/A'}
                             </p>
                           </div>
 
                           {/* Fichas asociadas */}
                           <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-blue-400 uppercase tracking-wide">
+                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Fichas Asociadas
                             </span>
                             <div className="mt-1">
                               {(checklist as any).studySheets ? (
                                 (checklist as any).formattedStudySheets ? (
-                                  <div className="text-xs text-darkBlue dark:text-white">
+                                  <div className="text-xs text-gray-700 dark:text-white">
                                     {(checklist as any).formattedStudySheets}
                                   </div>
                                 ) : (
-                                  <span className="inline-block px-3 py-1 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-800/20 dark:to-blue-600/20 text-blue-800 dark:text-blue-300 rounded-full text-xs font-bold border border-blue-300 dark:border-blue-500/30">
+                                  <span className="inline-block px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-blue-800/20 dark:to-blue-600/20 text-gray-800 dark:text-blue-300 rounded-full text-xs font-bold border border-gray-300 dark:border-blue-500/30">
                                     {getFormattedStudySheets((checklist as any).studySheets)}
                                   </span>
                                 )
@@ -591,11 +591,11 @@ export default function CoordinadorChecklistView() {
 
                           {/* Indicadores */}
                           <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-blue-400 uppercase tracking-wide">
+                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Indicadores
                             </span>
                             <div className="mt-1">
-                              <span className="inline-block px-3 py-1 bg-gradient-to-r from-lime-100 to-lime-200 dark:from-shadowBlue/20 dark:to-darkBlue/20 text-lime-800 dark:text-blue-300 rounded-full text-xs font-bold border border-lime-300 dark:border-shadowBlue/30">
+                              <span className="inline-block px-3 py-1 bg-gradient-to-r from-lime-100 to-lime-200 dark:from-shadowBlue/20 dark:to-darkBlue/20 text-lime-800 dark:text-gray-300 rounded-full text-xs font-bold border border-lime-300 dark:border-shadowBlue/30">
                                 {checklist.items ? checklist.items.length : 0} indicadores
                               </span>
                             </div>
@@ -603,7 +603,7 @@ export default function CoordinadorChecklistView() {
 
                           {/* Estado */}
                           <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-blue-400 uppercase tracking-wide">
+                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Estado
                             </span>
                             <div className="mt-2 flex items-center">
@@ -621,7 +621,7 @@ export default function CoordinadorChecklistView() {
                                 />
                               </button>
                               <span className={`ml-3 text-xs font-bold ${checklist.state
-                                ? 'text-lime-600 dark:text-blue-400'
+                                ? 'text-lime-600 dark:text-gray-300'
                                 : 'text-gray-500 dark:text-gray-400'
                                 }`}>
                                 {checklist.state ? 'Activo' : 'Inactivo'}
@@ -631,7 +631,7 @@ export default function CoordinadorChecklistView() {
 
                           {/* Observaciones */}
                           <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-blue-400 uppercase tracking-wide">
+                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Competencia
                             </span>
                             <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2 leading-relaxed">

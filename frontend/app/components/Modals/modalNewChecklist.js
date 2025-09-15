@@ -275,13 +275,13 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
       <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 p-4">
         <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-3xl space-y-8 max-h-[90vh] overflow-y-auto border-2 border-lime-500/30 dark:border-shadowBlue/50">
           <div className="text-center">
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue bg-clip-text text-transparent">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-lime-600 to-lime-500 dark:from-blue-400 dark:to-blue-300 bg-clip-text text-transparent">
               {isEditing ? 'Editar Lista de Chequeo' : 'Crear Lista de Chequeo'}
             </h2>
           </div>
           
           <div className="bg-gradient-to-r from-lime-50 to-lime-100 dark:from-shadowBlue/10 dark:to-darkBlue/10 border-2 border-lime-200 dark:border-shadowBlue/30 rounded-xl p-4">
-            <p className="text-lime-800 dark:text-lime-300 text-sm font-medium">
+            <p className="text-lime-800 dark:text-gray-300 text-sm font-medium">
               💡 <strong>Nota:</strong> {isEditing ? 
                 'Los cambios se guardarán automáticamente. Puede cerrar este modal cuando termine.' : 
                 'Se creará automáticamente una evaluación vinculada a esta lista. El instructor podrá completarla desde su vista.'
@@ -300,14 +300,14 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label htmlFor="trimestre" className="block text-sm font-bold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                <label htmlFor="trimestre" className="block text-sm font-bold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                   Trimestre
                 </label>
                 <select
                   id="trimestre"
                   value={trimestre}
                   onChange={(e) => setTrimestre(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
+                  className="w-full px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
                 >
                   <option value="">Selecciona un trimestre</option>
                   {[...Array(7)].map((_, i) => (
@@ -317,14 +317,14 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="componente" className="block text-sm font-bold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                <label htmlFor="componente" className="block text-sm font-bold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                   Componente
                 </label>
                 <select
                   id="componente"
                   value={componente}
                   onChange={(e) => setComponente(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
+                  className="w-full px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
                 >
                   <option value="">Selecciona un componente</option>
                   <option value="academico">Académico</option>
@@ -334,7 +334,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="observaciones" className="block text-sm font-bold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+              <label htmlFor="observaciones" className="block text-sm font-bold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                 Competencia
               </label>
               <textarea
@@ -342,20 +342,20 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                 value={observaciones}
                 onChange={(e) => setObservaciones(e.target.value)}
                 placeholder="Describe la competencia asociada a esta lista de chequeo..."
-                className="w-full px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 h-28 resize-none font-medium placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                className="w-full px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 h-28 resize-none font-medium placeholder:text-gray-500 dark:placeholder:text-gray-400"
               />
             </div>
 
             {/* Selector de Proyecto Formativo */}
             <div className="space-y-2">
-              <label htmlFor="trainingProject" className="block text-sm font-bold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+              <label htmlFor="trainingProject" className="block text-sm font-bold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                 Proyecto Formativo (Opcional)
               </label>
               <select
                 id="trainingProject"
                 value={selectedTrainingProject}
                 onChange={(e) => handleTrainingProjectChange(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
+                className="w-full px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
                 disabled={loadingProjects}
               >
                 <option value="">Selecciona un proyecto formativo</option>
@@ -373,7 +373,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
             {/* Selector de Fichas de Formación */}
             {selectedTrainingProject && (
               <div className="space-y-2">
-                <label className="block text-sm font-bold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                <label className="block text-sm font-bold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                   Fichas de Formación Asociadas
                 </label>
                 {loadingSheets ? (
@@ -386,9 +386,9 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                           type="checkbox"
                           checked={selectedStudySheets.includes(sheet.id.toString())}
                           onChange={(e) => handleStudySheetChange(sheet.id.toString(), e.target.checked)}
-                          className="h-4 w-4 text-lime-600 focus:ring-lime-500 border-gray-300 rounded"
+                          className="h-4 w-4 text-lime-600 focus:ring-lime-500 dark:text-blue-600 dark:focus:ring-blue-500 border-gray-300 rounded"
                         />
-                        <span className="text-sm text-darkBlue dark:text-white">
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
                           Ficha {sheet.number} - {sheet.journey?.name} ({sheet.numberStudents} estudiantes)
                         </span>
                       </label>
@@ -402,7 +402,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
 
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                <h3 className="text-lg font-bold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                   Indicadores de Evaluación
                 </h3>
                 <button
@@ -425,7 +425,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                         value={item.indicador}
                         onChange={(e) => handleIndicadorChange(index, e.target.value)}
                         placeholder={`Describe el indicador ${index + 1} de evaluación...`}
-                        className="flex-1 px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-white dark:bg-gray-800 text-darkBlue dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 h-24 resize-none font-medium placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                        className="flex-1 px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-white dark:bg-gray-800 text-gray-700 dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 h-24 resize-none font-medium placeholder:text-gray-500 dark:placeholder:text-gray-400"
                       />
                       {items.length > 1 && (
                         <button
@@ -461,7 +461,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                   resetForm()
                   onClose()
                 }}
-                className="sm:w-auto px-8 py-4 text-gray-600 dark:text-gray-400 hover:text-darkBlue dark:hover:text-white border-2 border-gray-300 dark:border-gray-600 hover:border-lime-500 dark:hover:border-shadowBlue rounded-xl transition-all duration-300 font-semibold bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+                className="sm:w-auto px-8 py-4 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white border-2 border-gray-300 dark:border-gray-600 hover:border-lime-500 dark:hover:border-shadowBlue rounded-xl transition-all duration-300 font-semibold bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 Cancelar
               </button>
@@ -477,7 +477,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
     <div>
       <button
         onClick={() => setIsOpen(true)}
-        className="bg-[#00324d] text-white px-4 py-2 rounded hover:bg-[#40b003] transition-colors"
+        className="bg-[#00324d] text-white px-4 py-2 rounded hover:bg-lime-600 dark:hover:bg-darkBlue transition-colors"
       >
         Crear Lista de Chequeo
       </button>
