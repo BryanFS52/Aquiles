@@ -92,22 +92,12 @@ export const FichasInstructorContainer: React.FC = () => {
     };
 
     const handleTakeJustification = (studySheet: StudySheetWithCompetence) => {
-        console.log("🔄 FichasInstructorContainer: Navegando a justificaciones");
-        console.log("📋 Datos de la ficha seleccionada:", {
-            id: studySheet.id,
-            competenceId: studySheet.competenceId,
-            number: studySheet.number,
-            teacherStudySheets: studySheet.teacherStudySheets
-        });
-
         // Si hay competenceId, navegar directamente a esa competencia con la ficha
         if (studySheet.competenceId) {
             const competenceQuarterId = studySheet.competenceId;
-            console.log("🎯 Navegando con competenceQuarterId:", competenceQuarterId, "y ficha:", studySheet.number);
             router.push(`/dashboard/justificacionesInstructor/${competenceQuarterId}?ficha=${studySheet.number}`);
         } else {
             // Si no hay competenceId, navegar a la página de selección con el número de ficha
-            console.log("🔄 No hay competenceId específico, navegando a selector de competencias de la ficha:", studySheet.number);
             router.push(`/dashboard/justificacionesInstructor?ficha=${studySheet.number}`);
         }
     };

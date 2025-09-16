@@ -53,8 +53,6 @@ export default function InstructorFollowUp() {
         // Obtener el ID del instructor autenticado
         const TEMPORAL_INSTRUCTOR_ID = getAuthenticatedInstructorId();
 
-        // console.log('Opening novelty modal with:', { studentId, TEMPORAL_INSTRUCTOR_ID, absenceCount });
-
         try {
             await dispatch(openNoveltyModal({
                 studentId,

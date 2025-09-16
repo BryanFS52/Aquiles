@@ -9,10 +9,6 @@ export default function JustificationInstructorPage() {
     const competenceQuarterId = Number(params.competenceQuarterId);
     const fichaNumber = searchParams.get('ficha');
 
-    console.log("🔄 JustificationInstructorPage: Parámetros recibidos:", params);
-    console.log("🎯 competenceQuarterId extraído:", competenceQuarterId);
-    console.log("📋 fichaNumber extraído:", fichaNumber);
-
     return <JustificacionesInstructorContainer 
         competenceQuarterId={competenceQuarterId} 
         fichaNumber={fichaNumber} 

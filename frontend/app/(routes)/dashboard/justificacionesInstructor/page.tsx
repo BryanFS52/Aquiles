@@ -39,10 +39,7 @@ export default function JustificacionesInstructorSelector() {
   useEffect(() => {
     const loadCompetences = async () => {
       try {
-        setLoading(true);
-        console.log("🔄 Cargando competencias disponibles para justificaciones...");
-        console.log("📋 Filtrando por ficha específica:", fichaNumber);
-        
+        setLoading(true);        
         const result = await dispatch(fetchStudySheetByTeacher({ 
           idTeacher: TEMPORAL_INSTRUCTOR_ID, 
           page: 0, 
@@ -54,8 +51,6 @@ export default function JustificacionesInstructorSelector() {
           
           // Filtrar por ficha específica
           const filteredSheets = studySheets.filter((sheet: any) => sheet.number.toString() === fichaNumber);
-          
-          console.log("📊 Fichas después del filtro:", filteredSheets.length);
           
           // Extraer todas las competencias de la ficha específica
           const allCompetences: CompetenceOption[] = [];
@@ -78,14 +73,13 @@ export default function JustificacionesInstructorSelector() {
           const competencesArray = allCompetences
             .sort((a, b) => a.name.localeCompare(b.name));
           
-          console.log("✅ Competencias cargadas:", competencesArray.length);
           setAvailableCompetences(competencesArray);
           setError(null);
         } else {
           setError("Error al cargar las competencias disponibles");
         }
       } catch (error) {
-        console.error('❌ Error loading competences:', error);
+        console.error('Error loading competences:', error);
         setError("Error al cargar las competencias disponibles");
       } finally {
         setLoading(false);
@@ -96,7 +90,6 @@ export default function JustificacionesInstructorSelector() {
   }, [dispatch, fichaNumber]);
 
   const handleCompetenceSelect = (competence: CompetenceOption) => {
-    console.log("🎯 Navegando a justificaciones para competencia:", competence.originalCompetenceId || competence.id, "en ficha:", competence.studySheetNumber);
     const competenceId = competence.originalCompetenceId || competence.id;
     router.push(`/dashboard/justificacionesInstructor/${competenceId}?ficha=${competence.studySheetNumber}`);
   };
@@ -167,14 +160,6 @@ export default function JustificacionesInstructorSelector() {
         <PageTitle onBack={handleBackToFichas}>
           Seleccionar Competencia para Justificaciones
         </PageTitle>
-        {/* <div className="flex justify-center">
-          <button
-            onClick={handleBackToFichas}
-            className="px-4 py-2 bg-primary dark:bg-secondary text-white rounded-md hover:bg-primary/90 dark:hover:bg-secondary/90 transition-colors duration-200"
-          >
-            Volver a Fichas Instructor
-          </button>
-        </div> */}
         <EmptyState message="No se encontró ficha" />
       </div>
     );

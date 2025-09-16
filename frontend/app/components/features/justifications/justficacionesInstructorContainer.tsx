@@ -44,11 +44,6 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
   const router = useRouter();
   const { showLoader, hideLoader } = useLoader();
 
-  console.log("🔄 JustificacionesInstructorContainer iniciado con:", {
-    competenceQuarterId,
-    fichaNumber
-  });
-
   // Estados locales para gestión de competencias
   const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
   const [selectedCompetenceId, setSelectedCompetenceId] = useState<string>(competenceQuarterId?.toString() || '');
@@ -82,7 +77,6 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
     const loadCompetences = async () => {
       try {
         setIsLoadingCompetences(true);
-        console.log("🔄 Cargando competencias disponibles para justificaciones...");
         
         const result = await dispatch(fetchStudySheetByTeacher({ 
           idTeacher: TEMPORAL_INSTRUCTOR_ID, 
@@ -116,7 +110,6 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
           const competencesArray = Array.from(competencesMap.values())
             .sort((a, b) => a.name.localeCompare(b.name));
           
-          console.log("✅ Competencias cargadas:", competencesArray.length);
           setAvailableCompetences(competencesArray);
           
           // Si hay un competenceQuarterId de prop, verificar que exista en la lista
@@ -125,15 +118,15 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
             if (exists) {
               setSelectedCompetenceId(competenceQuarterId.toString());
             } else {
-              console.warn("⚠️ La competencia especificada no se encuentra en las disponibles");
+              // Warning handled silently
             }
           }
           
         } else {
-          console.error("❌ Error al cargar las competencias");
+          // Error handled silently
         }
       } catch (error) {
-        console.error('❌ Error loading competences:', error);
+        // Error handled silently
       } finally {
         setIsLoadingCompetences(false);
       }
@@ -147,15 +140,13 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
     if (selectedCompetenceId && !isLoadingCompetences) {
       const competenceId = parseInt(selectedCompetenceId);
       if (!isNaN(competenceId)) {
-        console.log("📋 Cargando justificaciones para competencia:", competenceId, "ficha:", fichaNumber);
         dispatch(fetchJustificationsByCompetenceQuarter({ competenceQuarterId: competenceId }))
           .unwrap()
           .then((data) => {
-            console.log("✅ Justificaciones cargadas:", data.length, "items");
-            console.log("📊 Muestra de datos recibidos:", data.slice(0, 2));
+            // Data loaded successfully
           })
           .catch((error) => {
-            console.error("❌ Error al cargar justificaciones:", error);
+            // Error handled silently
           });
       }
     }
@@ -164,14 +155,6 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
   // Efecto para filtrar por ficha cuando sea necesario
   useEffect(() => {
     if (fichaNumber && filteredData) {
-      console.log("🔍 Filtrando justificaciones por ficha:", fichaNumber);
-      console.log("📊 Datos originales:", filteredData.length);
-      
-      // Inspeccionar la estructura del primer elemento para debugging
-      if (filteredData.length > 0) {
-        console.log("🔍 Estructura del primer elemento:", Object.keys(filteredData[0]));
-        console.log("🔍 Primer elemento completo:", filteredData[0]);
-      }
       
       const filtered = filteredData.filter((item: any) => {
         // Buscar el número de ficha - ahora debería estar en el campo 'ficha'
@@ -184,25 +167,11 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
         
         const matches = itemFichaNumber?.toString() === fichaNumber;
         
-        console.log("🔍 Item:", item.id, {
-          ficha: item.ficha,
-          fichaNumero: item.fichaNumero,
-          studySheetNumber: item.studySheetNumber,
-          numeroFicha: item.numeroFicha,
-          studySheetNested: item.studySheet?.number,
-          attendanceStudySheet: item.attendance?.studySheet?.number,
-          itemFichaNumber,
-          fichaTarget: fichaNumber,
-          matches
-        });
-        
         return matches;
       });
       
-      console.log("📊 Datos filtrados por ficha:", filtered.length, "de", filteredData.length, "total");
       setFichaFilteredData(filtered);
     } else {
-      console.log("🔍 No hay filtro de ficha o no hay datos - usando todos los datos");
       setFichaFilteredData(filteredData || []);
     }
   }, [filteredData, fichaNumber]);
@@ -233,7 +202,6 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
   };
 
   const handleCompetenceChange = (competenceId: string) => {
-    console.log("🔄 Cambiando competencia seleccionada a:", competenceId);
     setSelectedCompetenceId(competenceId);
     
     // Actualizar la URL para reflejar la nueva competencia, manteniendo el parámetro de ficha
@@ -250,12 +218,11 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
     const competenceIdNum = parseInt(selectedCompetenceId);
     if (isNaN(competenceIdNum)) return;
     
-    console.log("🐛 Iniciando comparación de debugging...");
     try {
       const result = await dispatch(debugCompareJustifications({ competenceQuarterId: competenceIdNum }));
-      console.log("🐛 Resultado de debugging:", result);
+      // Debug result processed silently
     } catch (error) {
-      console.error("🐛 Error en debugging:", error);
+      // Error handled silently
     }
   };
 
@@ -265,20 +232,16 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
     const competenceIdNum = parseInt(selectedCompetenceId);
     if (isNaN(competenceIdNum)) return;
 
-    console.log("🔄 Refrescando justificaciones para competencia:", selectedCompetenceId);
-    
     try {
       const data = await dispatch(fetchJustificationsByCompetenceQuarter({ 
         competenceQuarterId: competenceIdNum 
       })).unwrap();
       
-      console.log("✅ Justificaciones refrescadas:", data.length, "items");
       toast.success("Datos actualizados correctamente", {
         position: "top-right",
         autoClose: 3000,
       });
     } catch (error) {
-      console.error("❌ Error al refrescar justificaciones:", error);
       toast.error("Error al actualizar los datos", {
         position: "top-right",
         autoClose: 5000,
@@ -316,7 +279,7 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
         }
       })
       .catch((error) => {
-        console.error("❌ Error inesperado al actualizar el estado:", error);
+        console.error("Error inesperado al actualizar el estado:", error);
       });
   };
 
