@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { UserContext, User, UserContextType } from '@context/UserContext';
-import { RoleType } from '@/types/roles';
+import { UserContext, User, UserContextType } from '../../context/UserContext';
+import { RoleType } from '../../types/roles';
 import LayoutContent from './layoutComponent';
 
 interface ClientLayoutWrapperProps {
