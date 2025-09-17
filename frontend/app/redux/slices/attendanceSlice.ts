@@ -127,7 +127,15 @@ const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
                 document: graphqlData.student?.person?.document ?? '',
             },
             studentStudySheets: graphqlData.student?.studentStudySheets ?? []
-        }
+        },
+        justification: graphqlData.justification ? {
+            id: graphqlData.justification.id,
+            description: graphqlData.justification.description,
+            justificationStatus: graphqlData.justification.justificationStatus ? {
+                id: graphqlData.justification.justificationStatus.id,
+                name: graphqlData.justification.justificationStatus.name,
+            } : null
+        } : null
     };
 }
 
