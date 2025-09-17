@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
-import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
+import { fetchAttendancesWithJustificationsByStudentId } from '@slice/attendanceSlice';
 import {
   fetchJustifications,
   showForm,
@@ -78,7 +78,7 @@ export const JustificationsContainer: React.FC = () => {
   // Effects
   useEffect(() => {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-    dispatch(fetchAttendancesByStudent({ id: TEMPORAL_APRENDIZ_ID, stateId: 2 }));
+    dispatch(fetchAttendancesWithJustificationsByStudentId({ id: TEMPORAL_APRENDIZ_ID, stateId: 2 }));
     dispatch(fetchJustificationsByStudentId({ studentId: TEMPORAL_APRENDIZ_ID, page: 0, size: 10 }));
   }, [dispatch]);
 

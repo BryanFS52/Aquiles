@@ -53,7 +53,7 @@ export const AbsencesList: React.FC<AbsencesListProps> = ({
                                     transition={{ delay: index * 0.1 }}
                                     className={`group hover:shadow-md transition-all duration-300 p-4 rounded-xl relative overflow-hidden ${
                                         isProcessing
-                                            ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 dark:bg-gradient-to-r dark:from-yellow-300 dark:to-amber-100 dark:border-yellow-800'
+                                            ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 dark:bg-gradient-to-r dark:from-orange-300 dark:to-amber-100 dark:border-amber-800'
                                             : 'bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 dark:bg-gradient-to-r dark:from-red-300 dark:to-orange-100 dark:border-red-800'
                                     }`}
                                 >
@@ -65,7 +65,7 @@ export const AbsencesList: React.FC<AbsencesListProps> = ({
                                 <div className="relative flex items-center justify-between">
                                     <div className="flex items-center">
                                         <div className={`p-2 rounded-lg shadow-md ${
-                                            isProcessing ? 'bg-yellow-500' : 'bg-red-500'
+                                            isProcessing ? 'bg-amber-600 dark:bg-yellow-700' : 'bg-red-500'
                                         }`}>
                                             <FaCalendarDay className="text-white text-lg" />
                                         </div>
@@ -92,7 +92,7 @@ export const AbsencesList: React.FC<AbsencesListProps> = ({
                                                 disabled={isProcessing}
                                                 className={`font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center text-sm shadow-lg transform ${
                                                     isProcessing
-                                                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                                                        ? 'bg-gradient-to-r from-amber-600 to-amber-400 dark:from-yellow-700 dark:to-yellow-600 text-white cursor-not-allowed border border-yellow-400'
                                                         : 'bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 text-white hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0'
                                                 }`}
                                             >

@@ -1,6 +1,6 @@
 import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph';
+import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE, GET_ATTENDANCES_WITH_JUSTIFICATIONS_BY_STUDENT } from '@graphql/attendancesGraph';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import {
     Attendance,
@@ -16,6 +16,8 @@ import {
     DeleteAttendanceMutationVariables,
     AllAttendancesByStudentIdQuery,
     AllAttendancesByStudentIdQueryVariables,
+    AllAttendancesWithJustificationsByStudentIdQuery,
+    AllAttendancesWithJustificationsByStudentIdQueryVariables,
 } from '@graphql/generated';
 
 interface FilterOptions {
@@ -255,6 +257,24 @@ export const fetchAttendancesByStudent = createAsyncThunk<
     }
 );
 
+// fetch para allAttendancesWithJustificationsByStudentId
+export const fetchAttendancesWithJustificationsByStudentId = createAsyncThunk<AllAttendancesWithJustificationsByStudentIdQuery['allAttendancesByStudentId'], AllAttendancesWithJustificationsByStudentIdQueryVariables>(
+    'attendance/fetchWithJustificationsByStudent',
+    async ({ id }, { rejectWithValue }) => {
+        try {
+            const { data } = await clientLAN.query<AllAttendancesWithJustificationsByStudentIdQuery, AllAttendancesWithJustificationsByStudentIdQueryVariables>({
+                query: GET_ATTENDANCES_WITH_JUSTIFICATIONS_BY_STUDENT,
+                variables: { id },
+                fetchPolicy: 'no-cache',
+            });
+            return data.allAttendancesByStudentId;
+        } catch (error) {
+            console.error("Error al obtener asistencias con justificaciones por estudiante", error);
+            return rejectWithValue({ message: (error as Error).message || 'Unknown error' });
+        }
+    }
+);
+
 export const fetchAttendanceAndCompetenceByStudent = createAsyncThunk<GetAttendancesAndCompetenceByStudentIdQuery['allAttendancesByStudentId'], GetAttendancesAndCompetenceByStudentIdQueryVariables>(
     'attendance/fetchWithCompetence',
     async ({ id }, { rejectWithValue }) => {
@@ -404,6 +424,28 @@ const attendanceSlice = createSlice({
             .addCase(fetchAttendancesByStudent.rejected, (state, action) => {
                 state.studentAttendances.loading = false;
                 state.studentAttendances.error = (action.payload as RejectedPayload)?.message ?? action.error.message ?? 'Error al cargar asistencias del estudiante';
+            })
+            .addCase(fetchAttendancesWithJustificationsByStudentId.pending, (state) => {
+                state.studentAttendances.loading = true;
+                state.studentAttendances.error = null;
+            })
+            .addCase(fetchAttendancesWithJustificationsByStudentId.fulfilled, (
+                state,
+                action: PayloadAction<AllAttendancesWithJustificationsByStudentIdQuery['allAttendancesByStudentId']>
+            ) => {
+                const payload = action.payload;
+                if (payload?.data) {
+                    const cleanData = payload.data.filter((item): item is NonNullable<typeof item> & { id: string } => !!item && !!item.id);
+                    state.studentAttendances.data = cleanData.map(transformGraphQLToAttendanceItem);
+                } else {
+                    state.studentAttendances.data = [];
+                }
+                state.studentAttendances.loading = false;
+                state.studentAttendances.error = null;
+            })
+            .addCase(fetchAttendancesWithJustificationsByStudentId.rejected, (state, action) => {
+                state.studentAttendances.loading = false;
+                state.studentAttendances.error = (action.payload as RejectedPayload)?.message ?? action.error.message ?? 'Error al cargar asistencias con justificaciones del estudiante';
             })
             .addCase(fetchAttendanceAndCompetenceByStudent.pending, (state) => {
                 state.studentAttendances.loading = true;

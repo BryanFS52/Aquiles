@@ -7,7 +7,7 @@ import { FaCalendarDay, FaRegListAlt, FaCheckCircle } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
-import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
+import { fetchAttendancesWithJustificationsByStudentId } from '@slice/attendanceSlice';
 import { AppDispatch, RootState } from '@/redux/store';
 import { Attendance } from '@graphql/generated';
 import PageTitle from '@components/UI/pageTitle';
@@ -84,7 +84,7 @@ export const JustificationsContainer: React.FC = () => {
   // Effects
   useEffect(() => {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-    dispatch(fetchAttendancesByStudent({ id: 2, stateId: 2 }));
+    dispatch(fetchAttendancesWithJustificationsByStudentId({ id: 2, stateId: 2 }));
     dispatch(fetchJustifications({ page: 0, size: 10 }));
   }, [dispatch]);
 
