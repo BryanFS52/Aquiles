@@ -170,7 +170,6 @@ export const GET_STUDY_SHEET_BY_ID = gql`
   }
 `;
 
-
 export const GET_STUDY_SHEET_BY_TEACHER = gql`
   query studySheetByTeacher($idTeacher: Long, $page: Int, $size: Int) {
     allStudySheets(page: $page, size: $size, idTeacher: $idTeacher) {
@@ -258,6 +257,25 @@ export const GET_STUDY_SHEET_WITH_STUDENTS = gql`
       }
     }
   }
+`;
+
+export const GET_TEACHER_COMPETENCES_BY_STUDY_SHEET = gql`
+query GetCStudySheets($id: Long, $teacherId : Long) {
+  studySheetById(id: $id, teacherId : $teacherId) {
+    code
+    message
+    data {
+      id
+      teacherStudySheets {
+        id
+        competence {
+          id
+          name
+        }
+      }
+    }
+  }
+}
 `;
 
 export const GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM = gql`

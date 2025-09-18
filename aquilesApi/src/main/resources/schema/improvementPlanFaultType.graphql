@@ -1,6 +1,7 @@
 type ImprovementPlanFaultType {
     id: ID
     name: String
+    teacherCompetence: TeacherStudySheet
 }
 
 type ImprovementPlanFaultTypePage {

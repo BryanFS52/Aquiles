@@ -4,15 +4,27 @@ import PageTitle from "@components/UI/pageTitle";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FiArrowLeft, FiUser, FiUsers, FiMapPin, FiCalendar, FiFileText, FiStar, FiBook, FiSave, FiX, FiCheckCircle, FiAlertTriangle } from "react-icons/fi";
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "@redux/store";
+import { fetchFaultTypes } from "@slice/faultTypeSlice";
+import { addImprovementPlan } from "@slice/improvementPlanSlice";
+import { toast } from "react-toastify";
+import { useLoader } from "@context/LoaderContext";
 
 export default function FormularioPlanesDeMejoramientoPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const dispatch = useDispatch<AppDispatch>();
+    const { showLoader, hideLoader } = useLoader();
+
+    // Selectors de Redux
+    const { data: faultTypes, loading: faultTypesLoading } = useSelector((state: any) => state.faultType);
 
     // Estado del formulario
     const [selectedStudent, setSelectedStudent] = useState('');
-    const [students, setStudents] = useState<any[]>([]);
+        const [students, setStudents] = useState<any[]>([]);
     const [fichaData, setFichaData] = useState<any>(null);
+    const [competencies, setCompetencies] = useState<any[]>([]);
     const [formData, setFormData] = useState({
         // Datos del estudiante
         studentName: '',
@@ -25,11 +37,10 @@ export default function FormularioPlanesDeMejoramientoPage() {
         date: new Date().toISOString().split('T')[0],
         teacherCompetenceId: '',
         faultTypeId: '',
-        qualification: '',
+        qualification: false,
         state: true
     });
-    const [competencies, setCompetencies] = useState<any[]>([]);
-    const [faultTypes, setFaultTypes] = useState<any[]>([]);
+
     const [isLoading, setIsLoading] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
@@ -87,21 +98,31 @@ export default function FormularioPlanesDeMejoramientoPage() {
         }
     }, [fichaData]);
 
-    // Cargar competencias y tipos de falta (datos mock por ahora)
+    // Cargar competencias de la ficha y tipos de falta
     useEffect(() => {
-        // Mock data - en una aplicación real, esto vendría de la API
-        setCompetencies([
-            { id: '1', name: 'Competencia de Programación' },
-            { id: '2', name: 'Competencia de Base de Datos' },
-            { id: '3', name: 'Competencia de Redes' },
-            { id: '4', name: 'Competencia de Análisis y Diseño' }
-        ]);
+        const loadInitialData = async () => {
+            try {
+                // Usar las competencias reales de la ficha seleccionada
+                if (fichaData && fichaData.teacherCompetences) {
+                    console.log('Cargando competencias de la ficha:', fichaData.teacherCompetences);
+                    setCompetencies(fichaData.teacherCompetences);
+                } else {
+                    // Si no hay competencias de la ficha, usar array vacío
+                    setCompetencies([]);
+                }
 
-        setFaultTypes([
-            { id: '1', name: 'Falta Académica' },
-            { id: '2', name: 'Falta Disciplinaria' }
-        ]);
-    }, []);
+                await dispatch(fetchFaultTypes({ page: 0, size: 10})).unwrap();
+            } catch (error) {
+                console.error('Error al cargar tipos de falta:', error);
+                toast.error('Error al cargar los tipos de falta', {
+                    position: "top-right",
+                    autoClose: 4000,
+                });
+            }
+        };
+
+        loadInitialData();
+    }, [dispatch, fichaData]);
 
     // Obtener datos del estudiante seleccionado
     const getSelectedStudentData = () => {
@@ -146,21 +167,141 @@ export default function FormularioPlanesDeMejoramientoPage() {
     // Manejar envío del formulario
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedStudent) return;
+        
+        if (!selectedStudent) {
+            toast.error('Por favor selecciona un estudiante', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        // Validaciones adicionales
+        if (!formData.teacherCompetenceId) {
+            toast.error('Por favor selecciona una competencia', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.faultTypeId) {
+            toast.error('Por favor selecciona un tipo de falta', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.city.trim()) {
+            toast.error('Por favor ingresa la ciudad', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.reason.trim()) {
+            toast.error('Por favor describe la razón del plan de mejoramiento', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        // Verificaciones adicionales antes de enviar
+        if (!selectedStudent || selectedStudent === '') {
+            toast.error('Error: No se ha seleccionado un estudiante válido', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.teacherCompetenceId || formData.teacherCompetenceId === '') {
+            toast.error('Error: No se ha seleccionado una competencia válida', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.faultTypeId || formData.faultTypeId === '') {
+            toast.error('Error: No se ha seleccionado un tipo de falta válido', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
 
         setIsLoading(true);
 
         try {
-            // Simular llamada a la API
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            const improvementPlanData = {
+                studentId: selectedStudent,
+                city: formData.city,
+                date: formData.date, // formato "YYYY-MM-DD"
+                reason: formData.reason,
+                state: formData.state,
+                qualification: false, // Siempre false ya que no se puede calificar al crear
+                teacherCompetence: formData.teacherCompetenceId,
+                faultType: { id: formData.faultTypeId }
+            };
 
+            // Logs corregidos para evitar errores de acceso
+            console.log('=== DATOS ANTES DE ENVIAR ===');
+            console.log('selectedStudent:', selectedStudent);
+            console.log('formData completo:', formData);
+            console.log('improvementPlanData final:', improvementPlanData);
+            console.log('Tipos de datos:');
+            console.log('- studentId:', typeof improvementPlanData.studentId, '=', improvementPlanData.studentId);
+            console.log('- teacherCompetence:', typeof improvementPlanData.teacherCompetence, '=', improvementPlanData.teacherCompetence);
+            console.log('- faultType:', improvementPlanData.faultType);
+            console.log('- qualification:', typeof improvementPlanData.qualification, '=', improvementPlanData.qualification);
+            console.log('===============================');
+
+            const result = await dispatch(addImprovementPlan(improvementPlanData)).unwrap();
+            console.log('Resultado del guardado:', result);
             setShowSuccess(true);
+            toast.success('Plan de mejoramiento guardado exitosamente', {
+                position: "top-right",
+                autoClose: 3000,
+            });
             setTimeout(() => {
                 setShowSuccess(false);
                 router.back();
-            }, 2000);
+            }, 1500);
         } catch (error) {
-            console.error('Error al guardar:', error);
+            console.error('Error completo:', error);
+            console.error('Error al guardar plan de mejoramiento:', {
+                error: error,
+                message: (error as any)?.message || 'Error desconocido',
+                code: (error as any)?.code || 'Sin código',
+                graphQLErrors: (error as any)?.graphQLErrors || [],
+                networkError: (error as any)?.networkError || null,
+                formData: formData
+            });
+            
+            let errorMessage = 'Error desconocido';
+            
+            // Manejar errores de GraphQL
+            if ((error as any)?.graphQLErrors && (error as any).graphQLErrors.length > 0) {
+                errorMessage = (error as any).graphQLErrors[0].message;
+            }
+            // Manejar errores de red
+            else if ((error as any)?.networkError) {
+                errorMessage = `Error de conexión: ${(error as any).networkError.message}`;
+            }
+            // Manejar otros errores
+            else if ((error as any)?.message) {
+                errorMessage = (error as any).message;
+            }
+            
+            // Mostrar error al usuario
+            toast.error(`Error al guardar el plan de mejoramiento: ${errorMessage}`, {
+                position: "top-right",
+                autoClose: 6000,
+            });
         } finally {
             setIsLoading(false);
         }
@@ -168,38 +309,24 @@ export default function FormularioPlanesDeMejoramientoPage() {
 
     return (
         <div className="mx-auto px-4 py-8">
-            {/* Notificación de éxito */}
-            {showSuccess && (
-                <div className="fixed top-4 right-4 z-50 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg p-4 shadow-lg animate-pulse">
-                    <div className="flex items-center">
-                        <FiCheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-2" />
-                        <span className="text-green-800 dark:text-green-400 font-medium">
-                            Plan de mejoramiento guardado exitosamente
-                        </span>
-                    </div>
-                </div>
-            )}
-
             <div className="space-y-6">
                 {/* Header */}
                 <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        {fichaData && (
-                            <button
-                                onClick={() => router.back()}
-                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen transition-colors duration-200"
-                            >
-                                <FiArrowLeft className="w-4 h-4 mr-1" />
-                                Volver al Historial
-                            </button>
-                        )}
-                    </div>
                     <PageTitle>
                         {fichaData
                             ? `Crear Plan de Mejoramiento - Ficha N° ${fichaData.fichaNumber}`
                             : `Formulario De Planes De Mejoramiento`
                         }
                     </PageTitle>
+                    {fichaData && (
+                        <button
+                            onClick={() => router.back()}
+                            className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen transition-colors duration-200 mt-2"
+                        >
+                            <FiArrowLeft className="w-4 h-4 mr-1" />
+                            Volver al Historial
+                        </button>
+                    )}
                 </div>
 
                 {/* Contenedor del formulario */}
@@ -311,11 +438,17 @@ export default function FormularioPlanesDeMejoramientoPage() {
                                             onChange={(e) => handleInputChange('teacherCompetenceId', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
                                             required
+                                            disabled={!competencies || competencies.length === 0}
                                         >
-                                            <option value="">Seleccionar competencia...</option>
-                                            {competencies.map((comp) => (
+                                            <option value="">
+                                                {!competencies || competencies.length === 0 
+                                                    ? 'No hay competencias disponibles para esta ficha'
+                                                    : 'Seleccionar competencia...'
+                                                }
+                                            </option>
+                                            {competencies?.map((comp: any) => (
                                                 <option key={comp.id} value={comp.id}>
-                                                    {comp.name.toUpperCase()}
+                                                    {comp.competence?.name?.toUpperCase() || comp.name?.toUpperCase() || 'Competencia sin nombre'}
                                                 </option>
                                             ))}
                                         </select>
@@ -332,9 +465,12 @@ export default function FormularioPlanesDeMejoramientoPage() {
                                             onChange={(e) => handleInputChange('faultTypeId', e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
                                             required
+                                            disabled={faultTypesLoading}
                                         >
-                                            <option value="">Seleccionar tipo de falta...</option>
-                                            {faultTypes.map((type) => (
+                                            <option value="">
+                                                {faultTypesLoading ? 'Cargando tipos de fallas...' : 'Seleccionar tipo de falta...'}
+                                            </option>
+                                            {faultTypes?.map((type: any) => (
                                                 <option key={type.id} value={type.id}>
                                                     {type.name.toUpperCase()}
                                                 </option>
@@ -371,38 +507,6 @@ export default function FormularioPlanesDeMejoramientoPage() {
                                             placeholder="Ingrese la ciudad..."
                                             required
                                         />
-                                    </div>
-
-                                    {/* Calificación */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            <FiStar className="w-4 h-4 inline mr-2" />
-                                            Calificación
-                                        </label>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <button
-                                                type="button"
-                                                onClick={() => handleInputChange('qualification', 'aprobado')}
-                                                className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 border ${formData.qualification === 'aprobado'
-                                                    ? 'bg-green-500 text-white border-green-500 shadow-lg'
-                                                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-green-50 dark:hover:bg-green-900/20'
-                                                    }`}
-                                            >
-                                                <FiCheckCircle className="w-4 h-4 inline mr-2" />
-                                                Aprobado
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => handleInputChange('qualification', 'no_aprobado')}
-                                                className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 border ${formData.qualification === 'no_aprobado'
-                                                    ? 'bg-red-500 text-white border-red-500 shadow-lg'
-                                                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-red-50 dark:hover:bg-red-900/20'
-                                                    }`}
-                                            >
-                                                <FiX className="w-4 h-4 inline mr-2" />
-                                                No Aprobado
-                                            </button>
-                                        </div>
                                     </div>
                                 </div>
 
