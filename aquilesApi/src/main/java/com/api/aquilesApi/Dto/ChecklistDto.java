@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -35,10 +36,6 @@ public class ChecklistDto {
     private TeamsScrumDto teamsScrum;
     private String studySheets;
     private List<ItemDto> items;
-
-    private EvaluationDto evaluation;
-
-    private List<TeamsScrumDto> teamsScrum;
 
     private List<ChecklistQualificationDto> checklistQualifications;
 }

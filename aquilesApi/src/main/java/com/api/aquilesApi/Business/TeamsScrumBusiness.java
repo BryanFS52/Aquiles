@@ -153,7 +153,7 @@ public class TeamsScrumBusiness {
             // El checklist se creará por separado cuando sea necesario
             
             TeamsScrum savedTeamsScrum = teamScrumService.save(teamsScrum);
-            return modelMapper.map(savedTeamsScrum, TeamsScrumDto.class);
+            return TeamScrumMap.INSTANCE.EntityToDTO(savedTeamsScrum);
 
         } catch (Exception e) {
             throw new CustomException("Error al registrar el team scrum: " + e.getMessage(), HttpStatus.BAD_REQUEST);
