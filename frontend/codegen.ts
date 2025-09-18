@@ -2,7 +2,7 @@ import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
     documents: ['app/graphql/**/*.{ts,tsx,js,jsx}'],
-    schema: 'https://resulting-approaches-icon-ease.trycloudflare.com/graphql',
+    schema: 'https://fancy-viii-statistics-were.trycloudflare.com/graphql',
     generates: {
         'app/graphql/generated.ts': {
             plugins: [
