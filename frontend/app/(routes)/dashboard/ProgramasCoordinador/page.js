@@ -11,7 +11,7 @@ import { GrUserSettings } from 'react-icons/gr';
 import { LiaLanguageSolid } from 'react-icons/lia';
 import { toast } from "react-toastify";
 import PageTitle from '@components/UI/pageTitle';
-import programService from '@services/olympo/programService';
+import { programService } from '@redux/slices/olympo/programSlice';
 
 const ITEMS_PER_PAGE = 4;
 

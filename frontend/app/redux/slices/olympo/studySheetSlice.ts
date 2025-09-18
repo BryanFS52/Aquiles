@@ -1,6 +1,6 @@
 import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { GET_STUDY_SHEETS, GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER, GET_STUDY_SHEET_WITH_STUDENTS, GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM, GET_STUDY_SHEET_BY_ID_WITH_ATTENDANCES } from '@graphql/olympo/studySheetGraph'
+import { GET_STUDY_SHEETS, GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER, GET_STUDY_SHEET_WITH_STUDENTS, GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM, GET_STUDY_SHEET_BY_ID_WITH_ATTENDANCES, GET_STUDY_SHEETS_BY_TRAINING_PROJECT } from '@graphql/olympo/studySheetGraph'
 import { createInitialPaginatedState } from '@type/slices/common/generic';
 import {
     StudySheet,
@@ -21,6 +21,95 @@ import {
     GetStudySheetByIdWithAttendancesQuery,
     GetStudySheetByIdWithAttendancesQueryVariables
 } from '@graphql/generated';
+
+// Service methods integrated into slice
+interface GetStudySheetsServiceParams {
+    name?: string;
+    idJourney?: number;
+    page?: number;
+    size?: number;
+}
+
+interface GetStudySheetsByTrainingProjectParams {
+    idTrainingProject: number;
+    page?: number;
+    size?: number;
+}
+
+const studySheetService = {
+    getStudySheets: async ({ name, idJourney, page = 0, size = 10 }: GetStudySheetsServiceParams = {}) => {
+        try {
+            const { data } = await clientLAN.query({
+                query: GET_STUDY_SHEETS,
+                variables: { name, idJourney, page, size },
+                fetchPolicy: 'network-only',
+            });
+
+            if (data?.allStudySheets?.code === '200' || data?.allStudySheets?.code === 200) {
+                return data.allStudySheets;
+            } else {
+                throw new Error(data?.allStudySheets?.message || 'Error fetching study sheets');
+            }
+        } catch (error) {
+            console.error('Error fetching study sheets:', error);
+            throw error;
+        }
+    },
+
+    getStudySheetById: async (id: number) => {
+        try {
+            const { data } = await clientLAN.query({
+                query: GET_STUDY_SHEET_BY_ID,
+                variables: { id },
+                fetchPolicy: 'network-only',
+            });
+
+            const response = data?.studySheetById;
+
+            if (response?.code === '200' || response?.code === 200) {
+                return response.data;
+            } else {
+                throw new Error(response?.message || 'Error obteniendo la ficha');
+            }
+        } catch (error: any) {
+            const status = error.networkError?.statusCode || 500;
+            const message = `[${status}] Error de red o microservicio inactivo`;
+            console.error('Error Apollo:', message, error);
+            throw new Error(message);
+        }
+    },
+
+    getStudySheetsByTrainingProject: async ({ idTrainingProject, page = 0, size = 100 }: GetStudySheetsByTrainingProjectParams) => {
+        try {
+            const { data } = await clientLAN.query({
+                query: GET_STUDY_SHEETS_BY_TRAINING_PROJECT,
+                variables: { page, size },
+                fetchPolicy: 'network-only',
+            });
+
+            if (data?.allStudySheets?.code === '200' || data?.allStudySheets?.code === 200) {
+                // Filtrar las fichas que pertenecen específicamente a este proyecto formativo
+                const filteredSheets = data.allStudySheets.data.filter((sheet: any) => 
+                    sheet.trainingProject?.id?.toString() === idTrainingProject.toString()
+                );
+                
+                const filteredData = {
+                    ...data.allStudySheets,
+                    data: filteredSheets,
+                    totalItems: filteredSheets.length,
+                    totalPages: Math.ceil(filteredSheets.length / size)
+                };
+                
+                return filteredData;
+            } else {
+                throw new Error(data?.allStudySheets?.message || 'Error fetching study sheets by training project');
+            }
+        } catch (error) {
+            console.error('Error fetching study sheets by training project:', error);
+            throw error;
+        }
+    }
+};
 
 // Función para transformar datos de GraphQL a StudySheet
 export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet => {
@@ -428,5 +517,8 @@ const studySheetSlice = createSlice({
 });
 
 export const { clearStudySheetState } = studySheetSlice.actions;
+
+// Export service methods for compatibility
+export { studySheetService };
 
 export default studySheetSlice.reducer;

@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { addChecklist } from '@services/checkListService'
-import trainingProjectService from '@services/olympo/trainingProjectService'
-import studySheetService from '@services/olympo/studySheetService'
+import { trainingProjectService } from '@redux/slices/olympo/trainingProjectSlice'
+import { studySheetService } from '@redux/slices/olympo/studySheetSlice'
 
 export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingData = null, isEditing = false }) {
   const [trimestre, setTrimestre] = useState('')

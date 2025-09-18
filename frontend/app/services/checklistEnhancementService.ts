@@ -1,5 +1,5 @@
-import studySheetService from './olympo/studySheetService';
-import trainingProjectService from './olympo/trainingProjectService';
+import { studySheetService } from '../redux/slices/olympo/studySheetSlice';
+import { trainingProjectService } from '../redux/slices/olympo/trainingProjectSlice';
 
 /**
  * Servicio para enriquecer los datos de checklists con información de proyectos formativos y fichas
