@@ -237,18 +237,18 @@ export default function FormularioPlanesDeMejoramientoPage() {
         setIsLoading(true);
 
         try {
-          const improvementPlanData = {
-  studentId: selectedStudent,
-  city: formData.city,
-  date: formData.date, // asegúrate de que vaya en formato "YYYY-MM-DD"
-  reason: formData.reason,
-  state: formData.state,
-  qualification: false, // Siempre false ya que no se puede calificar al crear
-  teacherCompetence: formData.teacherCompetenceId,
-  faultTypeId: formData.faultTypeId // Enviado como string, como requiere ImprovementPlanDto
-};
+            const improvementPlanData = {
+                studentId: selectedStudent,
+                city: formData.city,
+                date: formData.date, // formato "YYYY-MM-DD"
+                reason: formData.reason,
+                state: formData.state,
+                qualification: false, // Siempre false ya que no se puede calificar al crear
+                teacherCompetence: formData.teacherCompetenceId,
+                faultType: { id: formData.faultTypeId }
+            };
 
-
+            // Logs corregidos para evitar errores de acceso
             console.log('=== DATOS ANTES DE ENVIAR ===');
             console.log('selectedStudent:', selectedStudent);
             console.log('formData completo:', formData);
@@ -256,7 +256,7 @@ export default function FormularioPlanesDeMejoramientoPage() {
             console.log('Tipos de datos:');
             console.log('- studentId:', typeof improvementPlanData.studentId, '=', improvementPlanData.studentId);
             console.log('- teacherCompetence:', typeof improvementPlanData.teacherCompetence, '=', improvementPlanData.teacherCompetence);
-            console.log('- faultTypeId:', typeof improvementPlanData.faultTypeId, '=', improvementPlanData.faultTypeId);
+            console.log('- faultType:', improvementPlanData.faultType);
             console.log('- qualification:', typeof improvementPlanData.qualification, '=', improvementPlanData.qualification);
             console.log('===============================');
 
