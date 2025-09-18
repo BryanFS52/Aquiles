@@ -3,6 +3,17 @@ type Item {
     code: String!
     indicator: String!
     active: Boolean!
+    itemType: ItemType
+}
+
+type ItemPage {
+    data: [Item]
+    code: String
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
 }
 
 type ItemPageId {
@@ -17,15 +28,16 @@ input ItemDto {
     code: String!
     indicator: String!
     active: Boolean
+    itemType: ItemTypeDto
 }
 
 extend type Query {
-    allItems(page: Int, size: Int): ItemPageId
+    allItems(page: Int, size: Int): ItemPage
     itemById(id: Long!): ItemPageId
 }
 
 extend type Mutation {
-    createItem(item: ItemDto!): ItemPageId
-    updateItem(id: Long!, item: ItemDto!): ItemPageId
-    deleteItem(id: Long!): ItemPageId
+    addItem(input: ItemDto): Response
+    updateItem(id: Long!, input: ItemDto): Response
+    deleteItem(id: Long!): Response
 }

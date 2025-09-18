@@ -1,10 +1,7 @@
 type ImprovementPlanFaultType {
     id: ID
     name: String
-}
-
-input ImprovementPlanFaultTypeDto {
-    name: String!
+    teacherCompetence: TeacherStudySheet
 }
 
 type ImprovementPlanFaultTypePage {
@@ -15,6 +12,11 @@ type ImprovementPlanFaultTypePage {
     totalItems: Int
     currentPage: Int
     message: String
+}
+
+input ImprovementPlanFaultTypeDto {
+    id: ID
+    name: String
 }
 
 type ImprovementPlanFaultTypePageId {

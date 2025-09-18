@@ -14,7 +14,7 @@ import java.util.List;
 public interface ImprovementPlanMap {
     ImprovementPlanMap INSTANCE = Mappers.getMapper(ImprovementPlanMap.class);
 
-    ImprovementPlanDto EntityToDto(ImprovementPlanDto improvementPlan);
+    ImprovementPlanDto EntityToDto(ImprovementPlan improvementPlan);
 
     ImprovementPlan DtoToEntity(ImprovementPlanDto improvementPlan);
 

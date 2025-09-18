@@ -14,16 +14,16 @@ import java.util.List;
 public interface TeamScrumMap {
     TeamScrumMap INSTANCE = Mappers.getMapper(TeamScrumMap.class);
 
-    TeamsScrumDto EntityToDto(TeamsScrumDto teamsScrum);
+    TeamsScrumDto EntityToDTO(TeamsScrum teamsScrum);
 
     TeamsScrum DtoToEntity(TeamsScrumDto teamsScrum);
 
-    List<TeamsScrumDto> EntityToDtoList(List<TeamsScrum> teamsScrums);
+    List<TeamsScrumDto> EntityToDTOs(List<TeamsScrum> teamsScrums);
 
     void updateTeamScrum(TeamsScrumDto teamsScrumDto, @MappingTarget TeamsScrum teamsScrum);
 
-    default Page<TeamsScrumDto> EntityToDtoList(Page<TeamsScrum> teamsScrums) {
-        List<TeamsScrumDto> dtos = EntityToDtoList(teamsScrums.getContent());
+    default Page<TeamsScrumDto> EntityToDTOs(Page<TeamsScrum> teamsScrums) {
+        List<TeamsScrumDto> dtos = EntityToDTOs(teamsScrums.getContent());
         return new PageImpl<>(dtos, teamsScrums.getPageable(), teamsScrums.getTotalElements());
     }
 }

@@ -26,6 +26,6 @@ public class FollowUpAction implements Serializable {
     private String description;
 
     // Relations
-    // Relation (1-1) student
+    // Relation (1-1) with student
     private Long studentId;
 }

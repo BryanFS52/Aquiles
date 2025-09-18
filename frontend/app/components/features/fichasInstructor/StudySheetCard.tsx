@@ -87,7 +87,7 @@ export const StudySheetCard: React.FC<StudySheetCardProps> = ({
                             )}
                         </svg>
                         <span className="relative">
-                            {loading ? 'Procesando...' : 'Ver Justificacion'}
+                            {loading ? 'Procesando...' : 'Ver Justificaciones'}
                         </span>
                         <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </button>

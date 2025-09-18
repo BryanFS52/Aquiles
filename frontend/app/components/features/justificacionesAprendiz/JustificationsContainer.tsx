@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
-import { fetchAttendancesByStudent } from '@slice/attendanceSlice';
+import { fetchAttendancesWithJustificationsByStudentId } from '@slice/attendanceSlice';
 import {
   fetchJustifications,
   showForm,
@@ -78,7 +78,7 @@ export const JustificationsContainer: React.FC = () => {
   // Effects
   useEffect(() => {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-    dispatch(fetchAttendancesByStudent({ id: TEMPORAL_APRENDIZ_ID, stateId: 2 }));
+    dispatch(fetchAttendancesWithJustificationsByStudentId({ id: TEMPORAL_APRENDIZ_ID, stateId: 2 }));
     dispatch(fetchJustificationsByStudentId({ studentId: TEMPORAL_APRENDIZ_ID, page: 0, size: 10 }));
   }, [dispatch]);
 
@@ -133,7 +133,7 @@ export const JustificationsContainer: React.FC = () => {
         const reader = new FileReader();
         reader.onloadend = () => {
           const result = reader.result as string;
-          const base64 = result.split(',')[1];
+          const base64 = result.split(',')[1].replace(/\s/g, '');
           resolve(base64);
         };
         reader.onerror = () => reject('Error al leer el archivo.');
@@ -198,8 +198,6 @@ export const JustificationsContainer: React.FC = () => {
         },
         // No incluir justificationStatus ya que se asigna automáticamente en el backend
       };
-
-      // console.log("🚀 Enviando justificación con datos:", formDataWithFile);
 
       await dispatch(addJustification(formDataWithFile)).unwrap();
 

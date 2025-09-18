@@ -7,14 +7,12 @@ import com.api.aquilesApi.Entity.TeamScrumMemberId;
 import com.api.aquilesApi.Entity.TeamsScrum;
 import com.api.aquilesApi.Service.TeamScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
-import org.modelmapper.ModelMapper;
+import com.api.aquilesApi.Utilities.Mapper.TeamScrumMap;
+import com.api.aquilesApi.Utilities.Mapper.TeamScrumMemberIdMap;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,16 +20,14 @@ import java.util.stream.Collectors;
 public class TeamsScrumBusiness {
 
     private final TeamScrumService teamScrumService;
-    private final ModelMapper modelMapper;
 
-    public TeamsScrumBusiness(TeamScrumService teamScrumService, ModelMapper modelMapper) {
+    public TeamsScrumBusiness(TeamScrumService teamScrumService) {
         this.teamScrumService = teamScrumService;
-        this.modelMapper = modelMapper;
     }
 
     // Validation Object
     private void validationObject(TeamsScrumDto teamsScrumDto) throws CustomException {
-        // Validar que memberIds no sea null y que no tenga más de 4 miembros
+        // Validate que memberIds no sea null y que no tenga más de 4 members
         if (teamsScrumDto.getMemberIds() != null && teamsScrumDto.getMemberIds().size() > 4) {
             throw new CustomException("A Team Scrum can have a maximum of 4 members.", HttpStatus.BAD_REQUEST);
         }
@@ -49,24 +45,20 @@ public class TeamsScrumBusiness {
             );
 
             if (studentResult) {
-                throw new CustomException("Some of the selected students are already assigned to a Team Scrum within this study sheet.", HttpStatus.CONFLICT);
+                throw new CustomException(
+                        "Some of the selected students are already assigned to a Team Scrum within this study sheet.",
+                        HttpStatus.CONFLICT
+                );
             }
         }
     }
-
 
     // Find All
     public Page<TeamsScrumDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<TeamsScrum> teamsScrumEntityPage = teamScrumService.findAll(pageRequest);
-
-            List<TeamsScrumDto> teamsScrumDtoList = teamsScrumEntityPage.getContent()
-                    .stream()
-                    .map(entity -> modelMapper.map(entity, TeamsScrumDto.class))
-                    .collect(Collectors.toList());
-
-            return new PageImpl<>(teamsScrumDtoList, pageRequest, teamsScrumEntityPage.getTotalElements());
+            Page<TeamsScrum> teamsScrumPage = teamScrumService.findAll(pageRequest);
+            return TeamScrumMap.INSTANCE.EntityToDTOs(teamsScrumPage);
         } catch (Exception e) {
             throw new CustomException("Error retrieving TeamScrums: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -76,10 +68,7 @@ public class TeamsScrumBusiness {
     public TeamsScrumDto findById(Long id) {
         try {
             TeamsScrum teamsScrum = teamScrumService.getById(id);
-            modelMapper.typeMap(TeamsScrum.class, TeamsScrumDto.class)
-                    .addMapping(TeamsScrum::getId, TeamsScrumDto::setId);
-
-            return modelMapper.map(teamsScrum, TeamsScrumDto.class);
+            return TeamScrumMap.INSTANCE.EntityToDTO(teamsScrum);
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
@@ -91,11 +80,19 @@ public class TeamsScrumBusiness {
     public List<TeamsScrumDto> findAllByStudentId(Long studentId) {
         try {
             List<TeamsScrum> teamsScrumList = teamScrumService.findAllByStudentId(studentId);
-            return teamsScrumList.stream()
-                    .map(entity -> modelMapper.map(entity, TeamsScrumDto.class))
-                    .collect(Collectors.toList());
+            return TeamScrumMap.INSTANCE.EntityToDTOs(teamsScrumList);
         } catch (Exception e) {
             throw new CustomException("Error Getting Team Scrum By Id: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Find By StudySheetId
+    public List<TeamsScrumDto> findAllByStudySheetId(Long studySheetId) {
+        try {
+            List<TeamsScrum> entities = teamScrumService.findByStudySheetId(studySheetId);
+            return TeamScrumMap.INSTANCE.EntityToDTOs(entities);
+        } catch (Exception e) {
+            throw new CustomException("Error getting TeamsScrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -168,11 +165,10 @@ public class TeamsScrumBusiness {
         try {
             teamsScrumDto.setId(teamScrumId);
             validationObject(teamsScrumDto);
-
             TeamsScrum teamsScrum = teamScrumService.getById(teamScrumId);
-            modelMapper.map(teamsScrumDto, teamsScrum);
+            TeamScrumMap.INSTANCE.EntityToDTO(teamsScrum);
 
-            // Validación explícita de memberIds
+            // Validation explicit de memberIds
             if (teamsScrumDto.getMemberIds() != null) {
                 List<TeamScrumMemberId> memberIds = teamsScrumDto.getMemberIds()
                         .stream()
@@ -184,33 +180,23 @@ public class TeamsScrumBusiness {
 
             teamScrumService.save(teamsScrum);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new CustomException("Error Updating Team Scrum: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
+    // Add Profile to Student
     public List<TeamScrumMemberIdDto> addProfileToStudent(List<ProcessMethodologyDto> teamScrumMemberIds) {
         try {
             Long teamScrumId = teamScrumMemberIds.get(0).getTeamScrumId();
             TeamsScrum teamsScrum = teamScrumService.getById(teamScrumId);
 
-            System.out.println("=== DEBUG: Members before assignment ===");
-            teamsScrum.getMemberIds().forEach(m ->
-                    System.out.println("StudentId: " + m.getStudentId() + " | ProfileId: " + m.getProfileId())
-            );
-            System.out.println("=======================================");
-
             for (ProcessMethodologyDto dto : teamScrumMemberIds) {
-                System.out.println(">>> Processing DTO: studentId=" + dto.getStudentId() +
-                        ", profileId=" + dto.getProfileId());
-
-                // Validation: Profile is unique across students
+                // Validation Profile is unique
                 if (Boolean.TRUE.equals(dto.getIsUnique())) {
                     boolean profileAlreadyExists = teamsScrum.getMemberIds().stream()
                             .anyMatch(m -> dto.getProfileId().equals(m.getProfileId()) &&
                                     !m.getStudentId().equals(dto.getStudentId()));
 
-                    System.out.println(" - Profile unique check: " + profileAlreadyExists);
                     if (profileAlreadyExists) {
                         throw new CustomException("This profile is unique", HttpStatus.CONFLICT);
                     }
@@ -223,43 +209,24 @@ public class TeamsScrumBusiness {
                                 && !m.getProfileId().isEmpty()
                                 && !m.getProfileId().equals(dto.getProfileId()));
 
-                System.out.println(" - Student already has different profile? " + studentAlreadyHasDifferentProfile);
-
                 if (studentAlreadyHasDifferentProfile) {
                     throw new CustomException("This student already has a different profile assigned", HttpStatus.CONFLICT);
                 }
 
-                // Assign (or replace) profile to the student
+                // Assign profile to student
                 teamsScrum.getMemberIds().stream()
                         .filter(m -> m.getStudentId().equals(dto.getStudentId()))
                         .findFirst()
-                        .ifPresent(m -> {
-                            System.out.println(" - Assigning profile " + dto.getProfileId() +
-                                    " to student " + dto.getStudentId());
-                            m.setProfileId(dto.getProfileId());
-                        });
+                        .ifPresent(m -> m.setProfileId(dto.getProfileId()));
             }
-            System.out.println("=== DEBUG: Members before SAVE ===");
-            teamsScrum.getMemberIds().forEach(m ->
-                    System.out.println("StudentId: " + m.getStudentId() +
-                            " | ProfileId: " + m.getProfileId() +
-                            " | Hash: " + m.hashCode())
-            );
-            System.out.println("==================================");
 
-            // Save updated team
             teamScrumService.save(teamsScrum);
-
-            // Return updated member DTOs
-            return teamsScrum.getMemberIds().stream()
-                    .map(m -> modelMapper.map(m, TeamScrumMemberIdDto.class))
-                    .collect(Collectors.toList());
+            return TeamScrumMemberIdMap.INSTANCE.EntityToDTOs(teamsScrum.getMemberIds());
 
         } catch (Exception e) {
             throw new CustomException("Error Adding Profile to Student: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
     // Delete
     public void delete(Long teamScrumId) {
         try {
@@ -270,19 +237,5 @@ public class TeamsScrumBusiness {
         } catch (Exception e) {
             throw new CustomException("Error Deleting Team Scrum: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-    }
-
-    // Find By StudySheetId
-    public List<TeamsScrumDto> findAllByStudySheetId(Long studySheetId) {
-        List<TeamsScrum> entities = teamScrumService.findByStudySheetId(studySheetId);
-        List<TeamsScrumDto> dtos = new ArrayList<>();
-        if (entities != null) {
-            for (TeamsScrum entity : entities) {
-                TeamsScrumDto dto = modelMapper.map(entity, TeamsScrumDto.class);
-                System.out.println("✅ DTO mapeado: " + dto);
-                dtos.add(dto);
-            }
-        }
-        return dtos;
     }
 }

@@ -1,75 +1,104 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import { useLoader } from "@/context/LoaderContext";
-import type { AppDispatch, RootState } from "@/redux/store";
+import { useDispatch } from "react-redux";
+import { useRouter, useSearchParams } from "next/navigation";
+import type { AppDispatch } from "@/redux/store";
 import PageTitle from "@components/UI/pageTitle";
-import JustificationFilters from "@components/features/justifications/justificationsFilter";
-import JustificationTable from "@components/features/justifications/justificationsTable";
 import EmptyState from "@components/UI/emptyState";
-import { fetchAllJustificationStatuses } from "@redux/slices/justificationStatusSlice";
-import {
-  setCompetenceQuarterFilterOptions,
-  setCompetenceQuarterMultiFilter,
-  toggleCompetenceQuarterMultiFilter,
-  clearCompetenceQuarterMultiFilters,
-  updateJustificationStatus,
-  formatErrorMessage,
-  generateFileName,
-  downloadBase64File,
-  fetchJustificationsByCompetenceQuarter,
-  setCompetenceQuarterMode,
-  MultiFilterState,
-} from "@slice/justificationSlice";
+import { useLoader } from "@context/LoaderContext";
+import { Card, CardGrid } from "@components/UI/Card";
+import { fetchStudySheetByTeacher } from "@slice/olympo/studySheetSlice";
+import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
+import { BookOpen, ArrowRight } from "lucide-react";
 
-export default function JustificacionesInstructor() {
+interface CompetenceOption {
+  id: string;
+  name: string;
+  studySheetNumber?: number;
+  originalCompetenceId?: string; // ID original de la competencia
+}
+
+export default function JustificacionesInstructorSelector() {
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { showLoader, hideLoader } = useLoader();
+  
+  // Obtener el número de ficha desde los parámetros de búsqueda
+  const fichaNumber = searchParams.get('ficha');
+  
+  const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Acceso directo al estado de Redux - usando los nuevos campos para competence quarter
-  const justificationState = useSelector((state: RootState) => state.justification);
-
-  // Extraer propiedades del estado
-  const {
-    competenceQuarterData: justifications,
-    competenceQuarterFilteredData: filteredData,
-    competenceQuarterFilterOptions: filterOptions,
-    loading,
-    error,
-    isCompetenceQuarterMode,
-  } = justificationState;
-
-  const { justificationStatuses } = useSelector(
-    (state: RootState) => state.justificationStatus
-  );
+  const handleBackToFichas = () => {
+    router.push('/dashboard/FichasInstructor');
+  };
 
   useEffect(() => {
-    // Cargar todos los estados de justificación disponibles
-    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 })); // Aumentar a 50 para obtener todos los estados
-    // Activar el modo competence quarter
-    dispatch(setCompetenceQuarterMode(true));
-  }, [dispatch]);
+    const loadCompetences = async () => {
+      try {
+        setLoading(true);        
+        const result = await dispatch(fetchStudySheetByTeacher({ 
+          idTeacher: TEMPORAL_INSTRUCTOR_ID, 
+          page: 0, 
+          size: 20 
+        }));
+        
+        if (fetchStudySheetByTeacher.fulfilled.match(result)) {
+          const studySheets = result.payload?.data || [];
+          
+          // Filtrar por ficha específica
+          const filteredSheets = studySheets.filter((sheet: any) => sheet.number.toString() === fichaNumber);
+          
+          // Extraer todas las competencias de la ficha específica
+          const allCompetences: CompetenceOption[] = [];
+          
+          filteredSheets.forEach((sheet: any) => {
+            if (sheet.teacherStudySheets) {
+              sheet.teacherStudySheets.forEach((tss: any) => {
+                if (tss.competence && tss.competence.id && tss.competence.name) {
+                  allCompetences.push({
+                    id: tss.competence.id, // Usar ID original
+                    name: tss.competence.name,
+                    studySheetNumber: sheet.number,
+                    originalCompetenceId: tss.competence.id
+                  });
+                }
+              });
+            }
+          });
+          
+          const competencesArray = allCompetences
+            .sort((a, b) => a.name.localeCompare(b.name));
+          
+          setAvailableCompetences(competencesArray);
+          setError(null);
+        } else {
+          setError("Error al cargar las competencias disponibles");
+        }
+      } catch (error) {
+        console.error('Error loading competences:', error);
+        setError("Error al cargar las competencias disponibles");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleFilterChange = (filterType: string, value: string) => {
-    dispatch(setCompetenceQuarterFilterOptions({ [filterType]: value }));
+    loadCompetences();
+  }, [dispatch, fichaNumber]);
+
+  const handleCompetenceSelect = (competence: CompetenceOption) => {
+    const competenceId = competence.originalCompetenceId || competence.id;
+    router.push(`/dashboard/justificacionesInstructor/${competenceId}?ficha=${competence.studySheetNumber}`);
   };
 
-  const handleRefresh = () => {
-    // Aquí podrías agregar lógica para recargar datos específicos si es necesario
-  };
-
-  const handleMultiFilterChange = (field: keyof MultiFilterState, value: string) => {
-    dispatch(setCompetenceQuarterMultiFilter({ field, value }));
-  };
-
-  const handleToggleMultiFilter = () => {
-    dispatch(toggleCompetenceQuarterMultiFilter());
-  };
-
-  const handleClearMultiFilters = () => {
-    dispatch(clearCompetenceQuarterMultiFilters());
+  const getPageTitle = () => {
+    if (fichaNumber) {
+      return `Competencias de la Ficha ${fichaNumber}`;
+    }
+    return "Seleccionar Competencia para Justificaciones";
   };
 
   useEffect(() => {
@@ -80,130 +109,125 @@ export default function JustificacionesInstructor() {
     }
   }, [loading, showLoader, hideLoader]);
 
-  const handleDownloadFile = (justificacion: any) => {
-    if (justificacion.archivoAdjunto) {
-      const mimeType = justificacion.archivoMime || "application/octet-stream";
-      const fileName = generateFileName(justificacion.id, mimeType);
-      downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
-    }
-  };
-
-  const handleStatusChange = (justificacionId: string, newStatusId: string) => {
-    // Buscar el nombre del estado en la lista de estados disponibles
-    const selectedStatus = justificationStatuses.find(status => status.id?.toString() === newStatusId);
-    const statusName = selectedStatus?.name || "Estado actualizado";
-
-    // Buscar la justificación actual para verificar si ya tiene el mismo estado
-    const currentJustification = filteredData.find((j: any) => j.id.toString() === justificacionId);
-
-    // Verificar si el estado ya es el mismo
-    const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.estado;
-
-    if (currentStatusId === newStatusId) {
-      return; // No hacer nada si el estado es el mismo
-    }
-
-    // Enviar directamente el statusId para usar la relación real
-    dispatch(updateJustificationStatus({
-      id: justificacionId,
-      statusId: newStatusId,
-      statusName: statusName
-    }))
-      .then((result) => {
-        if (updateJustificationStatus.fulfilled.match(result)) {
-          // Mostrar mensaje personalizado según el estado
-          showJustificationStatusMessage(statusName);
-        } else {
-          const error = result.payload as any;
-          if (error?.code !== "500" || !error?.message?.includes("already has the specified status")) {
-            // Solo mostrar error si no es el caso de estado duplicado (para debugging)
-            // console.error("❌ Error al actualizar el estado:", error);
-          }
-        }
-      })
-      .catch((error) => {
-        // Error inesperado (para debugging)
-        // console.error("❌ Error inesperado al actualizar el estado:", error);
-      });
-  };
-
-  // Función para mostrar mensajes de estado de justificación
-  const showJustificationStatusMessage = (statusName: string) => {
-    const statusNameLower = statusName.toLowerCase();
-
-    if (statusNameLower.includes('aprobad') || statusNameLower.includes('acepta')) {
-      toast.success(`Justificación aprobada`, {
-        position: "top-right",
-        autoClose: 5000,
-      });
-    } else if (statusNameLower.includes('denegad') || statusNameLower.includes('rechaza') || statusNameLower.includes('no acepta')) {
-      toast.error(`Justificación denegada`, {
-        position: "top-right",
-        autoClose: 5000,
-      });
-    } else if (statusNameLower.includes('proceso') || statusNameLower.includes('pendiente') || statusNameLower.includes('revision')) {
-      toast.info(`Justificación en proceso`, {
-        position: "top-right",
-        autoClose: 4000,
-      });
-    } else {
-      toast.info(`Estado actualizado: ${statusName}`, {
-        position: "top-right",
-        autoClose: 3000,
-      });
-    }
-  };
-
-  const errorMessage = formatErrorMessage(error);
-
-  // Obtener el número de ficha de los datos disponibles
-  const studySheetNumber = filteredData?.[0]?.ficha || justifications?.[0]?.ficha || "Sin ficha";
-
-  // Verificar si hay datos de justificaciones
-  const hasJustificationData = justifications && justifications.length > 0;
-
-  // Determinar si hay filtros aplicados
-  const { selectedFiltro, searchTerm, enableMultiFilter, multiFilters } = filterOptions;
-  const hasFiltersApplied = Boolean(
-    selectedFiltro ||
-    searchTerm ||
-    (enableMultiFilter && Object.values(multiFilters).some(value => value))
+  // Función para renderizar cada card de competencia
+  const renderCompetenceCard = (competence: CompetenceOption) => (
+    <Card
+      className="hover:shadow-xl hover:scale-105 cursor-pointer transition-all duration-300 group"
+      header={
+        <div className="flex items-center justify-between">
+          <BookOpen className="h-6 w-6 text-primary dark:text-secondary group-hover:scale-110 transition-transform duration-200" />
+          {competence.studySheetNumber && (
+            <span className="text-xs bg-primary/10 dark:bg-secondary/10 text-primary dark:text-secondary px-2 py-1 rounded-full">
+              Ficha: {competence.studySheetNumber}
+            </span>
+          )}
+        </div>
+      }
+      body={
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 group-hover:text-primary dark:group-hover:text-secondary transition-colors duration-200">
+            {competence.name}
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Ver y gestionar justificaciones para esta competencia
+          </p>
+        </div>
+      }
+      footer={
+        <button
+          onClick={() => handleCompetenceSelect(competence)}
+          className="w-full flex items-center justify-center gap-2 bg-primary dark:bg-secondary text-white px-4 py-2 rounded-lg hover:bg-primary/90 dark:hover:bg-secondary/90 transition-colors duration-200 group-hover:scale-105"
+        >
+          Ver Justificaciones
+          <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
+        </button>
+      }
+    />
   );
+
+  // Función de filtro personalizada para las competencias
+  const filterCompetences = (competence: CompetenceOption, filter: string): boolean => {
+    return (
+      competence.name.toLowerCase().includes(filter.toLowerCase()) ||
+      (competence.studySheetNumber ? competence.studySheetNumber.toString().includes(filter) : false)
+    );
+  };
+
+  // Si no hay ficha especificada, mostrar mensaje de error
+  if (!fichaNumber) {
+    return (
+      <div className="space-y-6">
+        <PageTitle onBack={handleBackToFichas}>
+          Seleccionar Competencia para Justificaciones
+        </PageTitle>
+        <EmptyState message="No se encontró ficha" />
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+          <PageTitle onBack={handleBackToFichas}>
+          {getPageTitle()}
+        </PageTitle>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+          <PageTitle onBack={handleBackToFichas}>
+          {getPageTitle()}
+        </PageTitle>
+        <EmptyState message={error} />
+        <div className="flex justify-center">
+          <button
+            onClick={handleBackToFichas}
+            className="px-4 py-2 bg-primary dark:bg-secondary text-white rounded-md hover:bg-primary/90 dark:hover:bg-secondary/90 transition-colors duration-200"
+          >
+            Volver a Fichas Instructor
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (availableCompetences.length === 0) {
+    return (
+      <div className="space-y-6">
+          <PageTitle onBack={handleBackToFichas}>
+          {getPageTitle()}
+        </PageTitle>
+        <EmptyState message={`No se encontraron competencias disponibles para la ficha ${fichaNumber}.`} />
+        <div className="flex justify-center">
+          <button
+            onClick={handleBackToFichas}
+            className="px-4 py-2 bg-primary dark:bg-secondary text-white rounded-md hover:bg-primary/90 dark:hover:bg-secondary/90 transition-colors duration-200"
+          >
+            Volver a Fichas Instructor
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <PageTitle>Justificaciones de la Ficha: {studySheetNumber}</PageTitle>
-
-      {/* Filters */}
-      <JustificationFilters
-        filterOptions={filterOptions}
-        loading={loading}
-        showMultiFilterToggle={false}
-        onFilterChange={handleFilterChange}
-        onMultiFilterChange={handleMultiFilterChange}
-        onToggleMultiFilter={handleToggleMultiFilter}
-        onClearMultiFilters={handleClearMultiFilters}
-        onRefresh={handleRefresh}
+        <PageTitle onBack={handleBackToFichas}>
+        {getPageTitle()}
+      </PageTitle>
+      
+      <CardGrid
+        items={availableCompetences}
+        renderCard={renderCompetenceCard}
+        pageSize={9}
+        columns={3}
+        filterPlaceholder="Buscar por nombre de competencia..."
+        filterFunction={filterCompetences}
+        className="mt-6"
       />
-
-      {/* Error Message */}
-      {errorMessage && (
-        <EmptyState message={errorMessage} />
-      )}
-
-      {/* Table with built-in empty states */}
-      {!errorMessage && (
-        <JustificationTable
-          filteredData={filteredData}
-          handleDownloadFile={handleDownloadFile}
-          handleStatusChange={handleStatusChange}
-          hasAnyData={hasJustificationData}
-          isLoading={loading}
-          hasError={Boolean(error)}
-          hasFiltersApplied={hasFiltersApplied}
-          isInstructorView={true}
-        />
-      )}
     </div>
   );
 }

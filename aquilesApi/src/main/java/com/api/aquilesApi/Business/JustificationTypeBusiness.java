@@ -34,10 +34,8 @@ public class JustificationTypeBusiness {
 
             return justificationtypeEntityPage.map(entity -> modelMapper.map(entity, JustificationTypeDto.class));
         } catch (DataAccessException e) {
-            // Manejo específico para errores de acceso a datos
             throw new CustomException("Error retrieving justification due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            // Manejo genérico para cualquier otra excepción
             throw new CustomException("An unexpected error occurred while retrieving justification.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

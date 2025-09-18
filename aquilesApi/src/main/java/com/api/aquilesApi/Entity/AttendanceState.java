@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -22,9 +22,5 @@ public class AttendanceState implements Serializable {
 
     @Column (name = "status")
     private String status;
-
-    // Relations
-    @OneToMany(mappedBy = "attendanceState" ,cascade = CascadeType.ALL ,  fetch = FetchType.LAZY)
-    private List<Attendance> attendancesEntityList;
 
 }

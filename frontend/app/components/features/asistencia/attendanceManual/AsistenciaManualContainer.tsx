@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { toast } from "react-toastify"
 import { Save } from "lucide-react"
 import { addAttendance } from "@slice/attendanceSlice"
+import { fetchStudySheetByIdWithAttendances } from "@slice/olympo/studySheetSlice"
 import { AttendanceHeader } from "./attendanceManualHeader"
 import { AttendanceStatsSection } from "./attendanceStatsCard"
 import { CourseInfoSection } from "./courseInfo"
@@ -25,13 +26,21 @@ import type {
 
 export const AsistenciaManualContainer: React.FC<AsistenciaManualContainerProps> = ({
     isDarkMode = false,
-    competenceId = null
+    competenceId = null,
+    studySheetId = null
 }) => {
     const dispatch = useDispatch<AppDispatch>()
-    const { data: studySheet, loading, error } = useSelector((state: any) => state.studySheet)
+    const { 
+        data: studySheet, 
+        selectedForAttendance, 
+        loading, 
+        loadingAttendanceSheet, 
+        error 
+    } = useSelector((state: any) => state.studySheet)
     const { showLoader, hideLoader } = useLoader()
 
-    const studySheetObj = Array.isArray(studySheet) ? studySheet[0] : studySheet
+    // Usar la ficha seleccionada para asistencia si está disponible, de lo contrario usar la primera del array
+    const studySheetObj = selectedForAttendance || (Array.isArray(studySheet) ? studySheet[0] : studySheet)
     const students = useMemo(() => {
         return studySheetObj?.studentStudySheets ?? [];
     }, [studySheetObj?.studentStudySheets]);
@@ -71,12 +80,29 @@ export const AsistenciaManualContainer: React.FC<AsistenciaManualContainerProps>
     }, [competenceId, competences])
 
     useEffect(() => {
-        if (loading) {
+        // Mostrar loader cuando está cargando la ficha de asistencia o la carga general
+        if (loading || loadingAttendanceSheet) {
             showLoader()
         } else {
-            hideLoader()
+            // Solo ocultar el loader si tenemos datos o hay un error
+            if (studySheetObj || error) {
+                hideLoader()
+            }
         }
-    }, [loading, showLoader, hideLoader])
+    }, [loading, loadingAttendanceSheet, studySheetObj, error, showLoader, hideLoader])
+
+    // Efecto para cargar la ficha desde la URL si no está disponible en Redux
+    useEffect(() => {
+        if (studySheetId && !selectedForAttendance && !loadingAttendanceSheet) {
+            const id = parseInt(studySheetId);
+            const competenceIdNum = competenceId ? parseInt(competenceId) : undefined;
+            
+            dispatch(fetchStudySheetByIdWithAttendances({
+                id,
+                competenceId: competenceIdNum
+            }));
+        }
+    }, [studySheetId, competenceId, selectedForAttendance, loadingAttendanceSheet, dispatch]);
 
     useEffect(() => {
         if (students.length > 0) {
@@ -196,10 +222,54 @@ export const AsistenciaManualContainer: React.FC<AsistenciaManualContainerProps>
     const attendancePercentage = getAttendancePercentage(stats)
 
     if (error) return <ErrorState error={error} />
-    if (!students.length) return <EmptyStudentsState />
+    
+    // Si estamos cargando y no hay datos, mantener el loader
+    if ((loading || loadingAttendanceSheet) && !studySheetObj) {
+        return null; // El loader global se encarga de mostrar la pantalla de carga
+    }
+    
+    // Mostrar estado de carga específico solo si hay studySheetId en URL pero no hay ficha disponible
+    if (studySheetId && !studySheetObj && !error && !(loading || loadingAttendanceSheet)) {
+        return (
+            <div className={`min-h-screen flex items-center justify-center transition-colors bg-transparent`}>
+                <div className="text-center">
+                    <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        No se pudo cargar la información de la ficha.
+                    </p>
+                    <button 
+                        onClick={() => window.location.href = '/dashboard/FichasInstructor'}
+                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                        Volver a Fichas del Instructor
+                    </button>
+                </div>
+            </div>
+        )
+    }
+    
+    // Mostrar mensaje si no hay ficha disponible y no hay parámetros de URL
+    if (!studySheetObj && !error && !studySheetId && !(loading || loadingAttendanceSheet)) {
+        return (
+            <div className={`min-h-screen flex items-center justify-center transition-colors bg-transparent`}>
+                <div className="text-center">
+                    <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        No se encontró información de la ficha. Por favor, selecciona una ficha desde la página de Fichas del Instructor.
+                    </p>
+                    <button 
+                        onClick={() => window.location.href = '/dashboard/FichasInstructor'}
+                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                        Ir a Fichas del Instructor
+                    </button>
+                </div>
+            </div>
+        )
+    }
+    
+    if (!students.length && studySheetObj) return <EmptyStudentsState />
 
     return (
-        <div className={`min-h-screen transition-colors ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
+        <div className={`min-h-screen transition-colors ${isDarkMode ? 'bg-transparent' : 'bg-transparent'
             }`}>
             <AttendanceHeader studySheet={studySheet} />
 

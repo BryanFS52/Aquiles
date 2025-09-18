@@ -2,31 +2,24 @@ package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.ChecklistDto;
 import com.api.aquilesApi.Entity.Checklist;
-import com.api.aquilesApi.Entity.Evaluations;
-import com.api.aquilesApi.Entity.Item;
-import com.api.aquilesApi.Entity.ItemType;
-import com.api.aquilesApi.Repository.ItemTypeRepository;
-import com.api.aquilesApi.Repository.JuriesRepository;
-import com.api.aquilesApi.Service.ChecklistExportService;
 import com.api.aquilesApi.Service.ChecklistService;
 import com.api.aquilesApi.Service.EvaluationsService;
 import com.api.aquilesApi.Service.ItemService;
 import com.api.aquilesApi.Service.TrainingProjectService;
 import com.api.aquilesApi.Utilities.CustomException;
+import com.api.aquilesApi.Utilities.Mapper.ChecklistMap;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.List;
+import java.util.ArrayList;
 
-@Service
+@Component
 public class ChecklistBusiness {
-
     private final ChecklistService checklistService;
     private final ModelMapper modelMapper;
     private final EvaluationsService evaluationsService;
@@ -101,14 +94,14 @@ public class ChecklistBusiness {
                 return dto;
             });
         } catch (DataAccessException e) {
-            throw new CustomException("Error retrieving checklist due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException("Error retrieving attendances due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            throw new CustomException("An unexpected error occurred while retrieving checklist.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException("An unexpected error occurred while retrieving attendances.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // Find By Id
-    public ChecklistDto findById(Long id) {
+    // Get a checklist by ID
+    public ChecklistDto findById(Long id){
         try {
             Checklist checklist = checklistService.getById(id);
             if (checklist.getInstructorSignature() != null) {
@@ -148,10 +141,9 @@ public class ChecklistBusiness {
         }
     }
 
-    // Add
+    // Add a new checklist
     public ChecklistDto add(ChecklistDto checklistDto) {
         try {
-            // Paso 1: crear checklist manualmente para evitar problemas con el mapeo de items
             Checklist checklist = new Checklist();
             checklist.setState(checklistDto.getState());
             checklist.setRemarks(checklistDto.getRemarks());
@@ -241,7 +233,7 @@ public class ChecklistBusiness {
             result.setTrainingProjectName(saved.getTrainingProjectName());
             return result;
         } catch (Exception e) {
-            throw new CustomException("Error creating checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -407,65 +399,19 @@ public class ChecklistBusiness {
             );
 
         } catch (Exception e) {
-            System.err.println("❌ Error updating checklist: " + e.getMessage());
-            e.printStackTrace();
-            throw new CustomException("Error Updating Checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Error Updating Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    // Delete
-    public void delete(Long attendanceId) {
+    // Delete checklist
+    public void delete(Long checklistId) {
         try {
-            // ⭐ OBTENER EL CHECKLIST ANTES DE ELIMINARLO
-            Checklist checklistAntes = checklistService.getById(attendanceId);
-            
-            // Eliminar el checklist
-            checklistService.delete(checklistAntes);
-            
-            // ⭐ GUARDAR HISTORIAL DE ELIMINACIÓN
-            checklistHistoryBusiness.guardarHistorial(
-                "Checklist eliminado", 
-                checklistAntes, 
-                null, 
-                "Sistema" // Puedes cambiar esto por el usuario actual
-            );
-            
+            Checklist checklist = checklistService.getById(checklistId);
+            checklistService.delete(checklist);
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
             throw new CustomException("Error Deleting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-    }
-
-    // Export documents
-    // Export PDF
-    public String exportChecklistPdf(Long checklistId) {
-        Checklist checklist = checklistService.getById(checklistId);
-        return exportService.exportPdfBase64(checklist);
-    }
-
-    // Export Excel
-    public String exportChecklistExcel(Long checklistId) {
-        Checklist checklist = checklistService.getById(checklistId);
-        return exportService.exportExcelBase64(checklist);
-    }
-
-    // Helper method to get or create default ItemType
-    private ItemType getOrCreateDefaultItemType(String trimester) {
-        // Intentar obtener un ItemType existente para el trimestre
-        List<ItemType> existingTypes = itemTypeRepository.findAll();
-        
-        // Buscar un ItemType que coincida con el trimestre
-        for (ItemType itemType : existingTypes) {
-            if (trimester.equals(itemType.getTrimester())) {
-                return itemType;
-            }
-        }
-        
-        // Si no hay ninguno para este trimestre, crear uno nuevo
-        ItemType newItemType = new ItemType();
-        newItemType.setName("Default");
-        newItemType.setTrimester(trimester);
-        return itemTypeRepository.save(newItemType);
     }
 }

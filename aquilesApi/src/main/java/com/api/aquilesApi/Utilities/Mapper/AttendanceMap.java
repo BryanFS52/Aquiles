@@ -14,7 +14,7 @@ import java.util.List;
 public interface AttendanceMap {
     AttendanceMap INSTANCE = Mappers.getMapper(AttendanceMap.class);
 
-    AttendanceDto EntityToDTO(AttendanceDto attendance);
+    AttendanceDto EntityToDTO(Attendance attendance);
 
     Attendance DTOToEntity(AttendanceDto attendance);
 
@@ -25,6 +25,5 @@ public interface AttendanceMap {
     default Page<AttendanceDto> EntityToDTOs(Page<Attendance> attendances) {
         List<AttendanceDto> dtos = EntityToDTOs(attendances.getContent());
         return new PageImpl<>(dtos, attendances.getPageable(), attendances.getTotalElements());
-
     }
 }

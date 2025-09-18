@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -13,19 +12,7 @@ import java.util.Set;
 public class ChecklistDto {
     private Long id;
 
-    // @NotNull(message = "El estado es obligatorio")
     private Boolean state;
-
-    // @NotNull(message = "Las observaciones son obligatorias")
-    // @Size(max = 255, message = "Las observaciones no pueden exceder los 255 caracteres")
-    private String remarks;
-
-    // @NotNull(message = "La firma del instructor es obligatoria") // ← Removido: la firma puede ser opcional inicialmente
-    // @Size(max = 255, message = "La firma del instructor no puede exceder los 255 caracteres")
-    private String instructorSignature;
-
-    // @NotNull(message = "El criterio de evaluación es obligatorio") // ← Removido: puede ser opcional inicialmente
-    private boolean evaluationCriteria;
 
     private String dateAssigned;
 
@@ -48,5 +35,10 @@ public class ChecklistDto {
     private TeamsScrumDto teamsScrum;
     private String studySheets;
     private List<ItemDto> items;
-    private List<Long> deletedItemIds; // ← Lista de IDs de items a eliminar
+
+    private EvaluationDto evaluation;
+
+    private List<TeamsScrumDto> teamsScrum;
+
+    private List<ChecklistQualificationDto> checklistQualifications;
 }

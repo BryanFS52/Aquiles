@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useMemo, useEffect } from "react"
-import { X, Users, Crown, Code, Database, GitBranch, ChevronDown, User, BarChart3, CheckCircle, Clock, Target, TrendingUp, UserCheck, Settings } from "lucide-react"
+import { X, Users, Crown, Code, Database, GitBranch, ChevronDown, User, BarChart3, CheckCircle, Clock, Target, TrendingUp, UserCheck, Settings, XCircle } from "lucide-react"
 import { TeamsScrum, Student, Profile } from "@graphql/generated"
 import Modal from "@components/UI/Modal"
 
@@ -188,32 +188,32 @@ const HierarchyNode = ({
     return (
         <div className="group">
             {/* Tarjeta elegante pero compacta */}
-            <div className={`relative bg-white rounded-xl border p-4 shadow-sm hover:shadow-md transition-all duration-300 ${selectedRole ? 'cursor-pointer hover:bg-blue-50/30 hover:border-blue-200' : 'hover:bg-gray-50'
-                } ${isManager ? 'border-l-4 border-l-yellow-400 bg-gradient-to-r from-yellow-50/50 to-white' : 'border-gray-200'} w-full max-w-sm mx-auto`}>
+            <div className={`relative bg-white rounded-lg sm:rounded-xl border p-2 sm:p-4 shadow-sm hover:shadow-md transition-all duration-300 ${selectedRole ? 'cursor-pointer hover:bg-blue-50/30 hover:border-blue-200' : 'hover:bg-gray-50'
+                } ${isManager ? 'border-l-4 border-l-yellow-400 bg-gradient-to-r from-yellow-50/50 to-white' : 'border-gray-200'} w-full mx-auto`}>
 
                 {/* Efecto sutil de fondo */}
-                <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-100/20 to-transparent rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute top-0 right-0 w-8 h-8 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-100/20 to-transparent rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
                 <div className="relative">
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center justify-between mb-1.5 sm:mb-3">
                         {/* Info del miembro */}
-                        <div className="flex items-center space-x-3 flex-1">
-                            <div className="relative">
-                                <div className={`w-10 h-10 ${config.bg} rounded-xl flex items-center justify-center text-white font-semibold text-xs shadow-md ring-2 ring-white ring-opacity-80`}>
+                        <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                            <div className="relative flex-shrink-0">
+                                <div className={`w-6 h-6 sm:w-10 sm:h-10 ${config.bg} rounded-md sm:rounded-xl flex items-center justify-center text-white font-semibold text-xs shadow-md ring-2 ring-white ring-opacity-80`}>
                                     {initials}
                                 </div>
                                 {isManager && (
                                     <div className="absolute -top-0.5 -right-0.5 bg-yellow-400 rounded-full p-0.5 shadow-sm">
-                                        <Crown className="w-2.5 h-2.5 text-yellow-800" />
+                                        <Crown className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 text-yellow-800" />
                                     </div>
                                 )}
                             </div>
                             <div className="flex-1 min-w-0">
-                                <h4 className="font-semibold text-gray-900 text-sm truncate">
+                                <h4 className="font-semibold text-gray-900 text-xs sm:text-sm truncate">
                                     {`${member.person?.name || ''} ${member.person?.lastname || ''}`}
                                 </h4>
-                                <div className="flex items-center space-x-1.5 mt-0.5">
-                                    <RoleIcon className="w-3 h-3 text-gray-400" />
+                                <div className="flex items-center space-x-1 mt-0.5">
+                                    <RoleIcon className="w-2 h-2 sm:w-3 sm:h-3 text-gray-400 flex-shrink-0" />
                                     <p className="text-xs text-gray-600 truncate">
                                         {role}
                                     </p>
@@ -222,26 +222,26 @@ const HierarchyNode = ({
                         </div>
 
                         {/* Status y acciones */}
-                        <div className="flex flex-col items-end space-y-1">
+                        <div className="flex flex-col items-end space-y-1 flex-shrink-0">
                             {selectedRole && (
-                                <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse shadow-sm"></div>
+                                <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-blue-500 rounded-full animate-pulse shadow-sm"></div>
                             )}
                             <div className="flex items-center space-x-1">
-                                <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                                <span className="text-xs text-gray-500">Online</span>
+                                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-400 rounded-full"></div>
+                                <span className="text-xs text-gray-500 hidden sm:inline">Online</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Rol actual con estilo mejorado */}
                     {(member as any).assignedProfile && (member as any).assignedProfile !== "Sin Rol" && (
-                        <div className="mb-3 p-2.5 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100/50">
+                        <div className="mb-1.5 sm:mb-3 p-1.5 sm:p-2.5 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100/50">
                             <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-1.5">
-                                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                                <div className="flex items-center space-x-1 sm:space-x-1.5">
+                                    <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full"></div>
                                     <span className="text-xs font-medium text-green-700">Rol Asignado</span>
                                 </div>
-                                <span className="text-xs font-semibold text-green-800 bg-white/60 px-2 py-0.5 rounded">
+                                <span className="text-xs font-semibold text-green-800 bg-white/60 px-1 sm:px-2 py-0.5 rounded truncate max-w-20 sm:max-w-none">
                                     {(member as any).assignedProfile}
                                 </span>
                             </div>
@@ -258,27 +258,32 @@ const HierarchyNode = ({
                                     alert('Por favor, selecciona un rol primero.')
                                 }
                             }}
-                            className={`w-full py-2.5 px-3 text-xs font-medium rounded-lg transition-all duration-300 ${selectedRole && !isAssigning
+                            className={`w-full py-1.5 sm:py-2.5 px-2 sm:px-3 text-xs font-medium rounded-lg transition-all duration-300 ${selectedRole && !isAssigning
                                 ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-sm hover:shadow-md transform hover:-translate-y-0.5'
                                 : 'bg-gray-100 text-gray-500 cursor-not-allowed'
                                 }`}
                             disabled={!selectedRole || isAssigning}
                         >
-                            <div className="flex items-center justify-center space-x-1.5">
+                            <div className="flex items-center justify-center space-x-1 sm:space-x-1.5">
                                 {isAssigning ? (
                                     <>
-                                        <div className="animate-spin rounded-full h-3 w-3 border-b border-white"></div>
-                                        <span>Asignando...</span>
+                                        <div className="animate-spin rounded-full h-2 w-2 sm:h-3 sm:w-3 border-b border-white"></div>
+                                        <span className="hidden sm:inline">Asignando...</span>
+                                        <span className="sm:hidden">...</span>
                                     </>
                                 ) : selectedRole ? (
                                     <>
-                                        <UserCheck className="w-3 h-3" />
-                                        <span>Asignar {selectedRole.name}</span>
+                                        <UserCheck className="w-2 h-2 sm:w-3 sm:h-3" />
+                                        <span className="truncate">
+                                            <span className="hidden sm:inline">Asignar </span>
+                                            {selectedRole.name}
+                                        </span>
                                     </>
                                 ) : (
                                     <>
-                                        <Target className="w-3 h-3" />
-                                        <span>Selecciona un rol</span>
+                                        <Target className="w-2 h-2 sm:w-3 sm:h-3" />
+                                        <span className="hidden sm:inline">Selecciona un rol</span>
+                                        <span className="sm:hidden">Seleccionar</span>
                                     </>
                                 )}
                             </div>
@@ -381,29 +386,29 @@ const TeamHierarchy = ({
         <div className="pt-4">
             {/* Lista compacta de miembros */}
             {studentsWithRole && studentsWithRole.length > 0 && (
-                <div className="mt-0 border-t border-gray-200 pt-6">
+                <div className="mt-0 border-t border-gray-200 pt-3 sm:pt-6">
                     {/* Header compacto */}
-                    <div className="mb-6 text-center">
-                        <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-gray-50 to-blue-50 px-4 py-3 rounded-xl border border-gray-100 shadow-sm">
-                            <div className="p-1.5 bg-blue-100 rounded-lg">
-                                <Users className="w-4 h-4 text-blue-600" />
+                    <div className="mb-3 sm:mb-6 text-center">
+                        <div className="inline-flex items-center space-x-2 sm:space-x-3 bg-gradient-to-r from-gray-50 to-blue-50 px-2 sm:px-4 py-1.5 sm:py-3 rounded-lg sm:rounded-xl border border-gray-100 shadow-sm">
+                            <div className="p-1 sm:p-1.5 bg-blue-100 rounded-md sm:rounded-lg">
+                                <Users className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
                             </div>
-                            <div>
-                                <h3 className="text-base font-semibold text-gray-900">
+                            <div className="min-w-0 flex-1">
+                                <h3 className="text-xs sm:text-base font-semibold text-gray-900 truncate">
                                     Miembros del Equipo
                                 </h3>
-                                <p className="text-xs text-gray-600">
+                                <p className="text-xs text-gray-600 hidden sm:block">
                                     {studentsWithRole.length} personas • Gestiona roles
                                 </p>
                             </div>
-                            <div className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                            <div className="bg-blue-500 text-white text-xs font-bold px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full flex-shrink-0">
                                 {studentsWithRole.length}
                             </div>
                         </div>
                     </div>
 
                     {/* Grid compacto */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 max-w-5xl mx-auto">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 max-w-6xl mx-auto">
                         {studentsWithRole.map((student: any, index: number) =>
                             student ? (
                                 <div
@@ -523,36 +528,36 @@ export const ModalComposition = ({
             isOpen={isOpen}
             onClose={onClose}
             title={
-                <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-gradient-to-br from-lime-500 to-lime-600 rounded-xl shadow-lg">
-                        <GitBranch className="w-6 h-6 text-white drop-shadow-sm" />
+                <div className="flex items-center space-x-2 sm:space-x-4">
+                    <div className="p-2 sm:p-3 bg-gradient-to-br from-lime-500 to-lime-600 rounded-lg sm:rounded-xl shadow-lg">
+                        <GitBranch className="w-4 h-4 sm:w-6 sm:h-6 text-white drop-shadow-sm" />
                     </div>
-                    <div>
-                        <span className="text-xl font-bold text-gray-900 tracking-tight">Organigrama del Equipo</span>
-                        <p className="text-gray-600 text-sm mt-1 font-medium">Estructura jerárquica y organización</p>
+                    <div className="min-w-0 flex-1">
+                        <span className="text-base sm:text-xl font-bold text-gray-900 tracking-tight block truncate">Organigrama del Equipo</span>
+                        <p className="text-gray-600 text-xs sm:text-sm mt-0.5 sm:mt-1 font-medium hidden sm:block">Estructura jerárquica y organización</p>
                     </div>
                 </div>
             }
             size="xxl"
-            className="max-h-[90vh] w-full max-w-5xl mx-auto"
+            className="max-h-[85vh] sm:max-h-[90vh] w-full max-w-sm sm:max-w-5xl mx-auto"
         >
-            <div className="max-h-[70vh] overflow-y-auto px-3 py-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            <div className="max-h-[65vh] sm:max-h-[70vh] overflow-y-auto px-2 sm:px-3 py-1 sm:py-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 {/* Stats con elementos innovadores pero manteniendo colores */}
-                <div className="relative overflow-hidden px-6 py-6 bg-gradient-to-r from-white to-gray-50 border border-gray-100 rounded-xl mb-6 shadow-sm">
+                <div className="relative overflow-hidden px-2 sm:px-6 py-2 sm:py-6 bg-gradient-to-r from-white to-gray-50 border border-gray-100 rounded-lg sm:rounded-xl mb-3 sm:mb-6 shadow-sm">
                     {/* Elementos decorativos sutiles */}
-                    <div className="absolute top-0 right-0 w-20 h-20 bg-gray-100 rounded-full blur-xl opacity-30 animate-pulse"></div>
-                    <div className="absolute bottom-0 left-0 w-16 h-16 bg-blue-50 rounded-full blur-xl opacity-40 animate-bounce"></div>
+                    <div className="absolute top-0 right-0 w-12 h-12 sm:w-20 sm:h-20 bg-gray-100 rounded-full blur-xl opacity-30 animate-pulse"></div>
+                    <div className="absolute bottom-0 left-0 w-8 h-8 sm:w-16 sm:h-16 bg-blue-50 rounded-full blur-xl opacity-40 animate-bounce"></div>
 
-                    <div className="relative grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div className="relative grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6">
                         <div className="text-center group relative">
                             <div className="absolute inset-0 bg-gray-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105"></div>
                             <div className="relative">
-                                <div className="text-sm text-gray-500 font-medium mb-2 flex items-center justify-center space-x-1">
-                                    <Users className="w-4 h-4" />
+                                <div className="text-xs sm:text-sm text-gray-500 font-medium mb-1 flex items-center justify-center space-x-1">
+                                    <Users className="w-3 h-3 sm:w-4 sm:h-4" />
                                     <span>Total</span>
                                 </div>
-                                <div className="text-2xl font-bold text-gray-900 transition-transform duration-200 group-hover:scale-110">{teamStats.total}</div>
-                                <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
+                                <div className="text-lg sm:text-2xl font-bold text-gray-900 transition-transform duration-200 group-hover:scale-110">{teamStats.total}</div>
+                                <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
                                     <div className="bg-gray-600 h-1 rounded-full transition-all duration-1000" style={{ width: '100%' }}></div>
                                 </div>
                             </div>
@@ -560,41 +565,42 @@ export const ModalComposition = ({
                         <div className="text-center group relative">
                             <div className="absolute inset-0 bg-green-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105"></div>
                             <div className="relative">
-                                <div className="text-sm text-gray-500 font-medium mb-2 flex items-center justify-center space-x-1">
-                                    <CheckCircle className="w-4 h-4" />
-                                    <span>Con Roles</span>
+                                <div className="text-xs sm:text-sm text-gray-500 font-medium mb-1 flex items-center justify-center space-x-1">
+                                    <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                                    <span className="hidden sm:inline">Con Roles</span>
+                                    <span className="sm:hidden">Roles</span>
                                 </div>
-                                <div className="text-2xl font-bold text-green-600 transition-transform duration-200 group-hover:scale-110">{teamStats.withRoles}</div>
-                                <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
-                                    <div className="bg-green-600 h-1 rounded-full transition-all duration-1000"
-                                        style={{ width: `${teamStats.total > 0 ? (teamStats.withRoles / teamStats.total) * 100 : 0}%` }}></div>
+                                <div className="text-lg sm:text-2xl font-bold text-green-600 transition-transform duration-200 group-hover:scale-110">{teamStats.withRoles}</div>
+                                <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
+                                    <div className="bg-green-500 h-1 rounded-full transition-all duration-1000" style={{ width: `${teamStats.total > 0 ? (teamStats.withRoles / teamStats.total) * 100 : 0}%` }}></div>
                                 </div>
                             </div>
                         </div>
                         <div className="text-center group relative">
                             <div className="absolute inset-0 bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105"></div>
                             <div className="relative">
-                                <div className="text-sm text-gray-500 font-medium mb-2 flex items-center justify-center space-x-1">
-                                    <Clock className="w-4 h-4" />
-                                    <span>Sin Roles</span>
+                                <div className="text-xs sm:text-sm text-gray-500 font-medium mb-1 flex items-center justify-center space-x-1">
+                                    <XCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                                    <span className="hidden sm:inline">Sin Roles</span>
+                                    <span className="sm:hidden">Sin</span>
                                 </div>
-                                <div className="text-2xl font-bold text-red-600 transition-transform duration-200 group-hover:scale-110">{teamStats.withoutRoles}</div>
-                                <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
-                                    <div className="bg-red-600 h-1 rounded-full transition-all duration-1000"
-                                        style={{ width: `${teamStats.total > 0 ? (teamStats.withoutRoles / teamStats.total) * 100 : 0}%` }}></div>
+                                <div className="text-lg sm:text-2xl font-bold text-red-600 transition-transform duration-200 group-hover:scale-110">{teamStats.withoutRoles}</div>
+                                <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
+                                    <div className="bg-red-500 h-1 rounded-full transition-all duration-1000" style={{ width: `${teamStats.total > 0 ? (teamStats.withoutRoles / teamStats.total) * 100 : 0}%` }}></div>
                                 </div>
                             </div>
                         </div>
                         <div className="text-center group relative">
                             <div className="absolute inset-0 bg-blue-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:scale-105"></div>
                             <div className="relative">
-                                <div className="text-sm text-gray-500 font-medium mb-2 flex items-center justify-center space-x-1">
-                                    <Target className="w-4 h-4" />
-                                    <span>Roles Únicos</span>
+                                <div className="text-xs sm:text-sm text-gray-500 font-medium mb-1 flex items-center justify-center space-x-1">
+                                    <Target className="w-3 h-3 sm:w-4 sm:h-4" />
+                                    <span className="hidden sm:inline">Únicos</span>
+                                    <span className="sm:hidden">Únicos</span>
                                 </div>
-                                <div className="text-2xl font-bold text-blue-600 transition-transform duration-200 group-hover:scale-110">{teamStats.uniqueRoles}</div>
-                                <div className="w-full bg-gray-200 rounded-full h-1 mt-2">
-                                    <div className="bg-blue-600 h-1 rounded-full transition-all duration-1000" style={{ width: '85%' }}></div>
+                                <div className="text-lg sm:text-2xl font-bold text-blue-600 transition-transform duration-200 group-hover:scale-110">{teamStats.uniqueRoles}</div>
+                                <div className="w-full bg-gray-200 rounded-full h-1 mt-1">
+                                    <div className="bg-blue-500 h-1 rounded-full transition-all duration-1000" style={{ width: `${profiles.length > 0 ? (teamStats.uniqueRoles / profiles.length) * 100 : 0}%` }}></div>
                                 </div>
                             </div>
                         </div>
@@ -603,38 +609,39 @@ export const ModalComposition = ({
 
                 {/* Perfiles Disponibles con elementos innovadores pero manteniendo colores */}
                 {profiles.length > 0 ? (
-                    <div className="relative overflow-hidden px-6 py-5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl mb-6 shadow-sm">
+                    <div className="relative overflow-hidden px-2 sm:px-6 py-2 sm:py-5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-lg sm:rounded-xl mb-3 sm:mb-6 shadow-sm">
                         {/* Elementos decorativos sutiles */}
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-blue-100 rounded-full blur-xl opacity-20 animate-pulse"></div>
-                        <div className="absolute bottom-0 left-0 w-20 h-20 bg-indigo-100 rounded-full blur-xl opacity-30 animate-bounce"></div>
+                        <div className="absolute top-0 right-0 w-16 h-16 sm:w-24 sm:h-24 bg-blue-100 rounded-full blur-xl opacity-20 animate-pulse"></div>
+                        <div className="absolute bottom-0 left-0 w-12 h-12 sm:w-20 sm:h-20 bg-indigo-100 rounded-full blur-xl opacity-30 animate-bounce"></div>
 
                         <div className="relative">
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
-                                <div className="flex items-center space-x-3 mb-2 sm:mb-0">
-                                    <div className="relative group">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-4">
+                                <div className="flex items-center space-x-2 sm:space-x-3 mb-2 sm:mb-0 min-w-0 flex-1">
+                                    <div className="relative group flex-shrink-0">
                                         <div className="absolute inset-0 bg-blue-200 rounded-lg blur opacity-0 group-hover:opacity-50 transition-all duration-300"></div>
-                                        <div className="relative p-2 bg-blue-100 rounded-lg transform group-hover:scale-110 transition-all duration-300">
-                                            <User className="w-5 h-5 text-blue-600" />
+                                        <div className="relative p-1.5 sm:p-2 bg-blue-100 rounded-lg transform group-hover:scale-110 transition-all duration-300">
+                                            <User className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                                         </div>
                                     </div>
-                                    <div>
-                                        <span className="text-base font-semibold text-gray-700 flex items-center space-x-2">
-                                            <Settings className="w-4 h-4" />
-                                            <span>Roles Disponibles para Asignar</span>
+                                    <div className="min-w-0 flex-1">
+                                        <span className="text-sm sm:text-base font-semibold text-gray-700 flex items-center space-x-1 sm:space-x-2 truncate">
+                                            <Settings className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                            <span className="truncate">Roles Disponibles</span>
+                                            <span className="hidden sm:inline">para Asignar</span>
                                         </span>
-                                        <p className="text-xs text-gray-500 mt-1">Selecciona y asigna roles a los miembros</p>
+                                        <p className="text-xs text-gray-500 mt-0.5 sm:mt-1 hidden sm:block">Selecciona y asigna roles a los miembros</p>
                                     </div>
                                 </div>
-                                <div className="relative group">
+                                <div className="relative group flex-shrink-0">
                                     <div className="absolute inset-0 bg-blue-200 rounded-full blur opacity-0 group-hover:opacity-50 transition-all duration-300 animate-pulse"></div>
-                                    <span className="relative text-xs font-semibold text-blue-700 bg-blue-200 px-3 py-2 rounded-full shadow-sm transform group-hover:scale-105 transition-all duration-300 flex items-center space-x-1">
-                                        <TrendingUp className="w-3 h-3" />
+                                    <span className="relative text-xs font-semibold text-blue-700 bg-blue-200 px-2 sm:px-3 py-1 sm:py-2 rounded-full shadow-sm transform group-hover:scale-105 transition-all duration-300 flex items-center space-x-1">
+                                        <TrendingUp className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                                         <span>{profiles.length} opciones</span>
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="flex flex-wrap gap-3 justify-center">
+                            <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
                                 {profiles.map((profile, index) => (
                                     <div
                                         key={profile.id}
@@ -643,16 +650,16 @@ export const ModalComposition = ({
                                             animationDelay: `${index * 0.1}s`
                                         }}
                                     >
-                                        <div className="absolute inset-0 bg-white rounded-xl blur opacity-0 group-hover:opacity-50 transition-all duration-300"></div>
-                                        <div className={`relative inline-flex items-center px-4 py-3 rounded-xl text-sm font-medium border border-opacity-20 shadow-sm hover:shadow-lg transition-all duration-200 ${getProfileColor(profile.name || '')}`}>
-                                            <div className={`w-3 h-3 rounded-full mr-3 ${getProfileDotColor(profile.name || '')} shadow-sm animate-pulse`}></div>
-                                            <span className="truncate max-w-[120px] font-medium">{profile.name}</span>
-                                            <span className="ml-3 text-xs opacity-75 hidden md:inline bg-white bg-opacity-50 px-2 py-1 rounded-full">
+                                        <div className="absolute inset-0 bg-white rounded-lg sm:rounded-xl blur opacity-0 group-hover:opacity-50 transition-all duration-300"></div>
+                                        <div className={`relative inline-flex items-center px-2 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium border border-opacity-20 shadow-sm hover:shadow-lg transition-all duration-200 ${getProfileColor(profile.name || '')}`}>
+                                            <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-2 sm:mr-3 ${getProfileDotColor(profile.name || '')} shadow-sm animate-pulse`}></div>
+                                            <span className="truncate max-w-[80px] sm:max-w-[120px] font-medium">{profile.name}</span>
+                                            <span className="ml-2 sm:ml-3 text-xs opacity-75 hidden lg:inline bg-white bg-opacity-50 px-1 sm:px-2 py-0.5 sm:py-1 rounded-full">
                                                 {profile.description}
                                             </span>
 
                                             {/* Efecto de brillo sutil */}
-                                            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/10 to-transparent transform skew-x-12 group-hover:animate-pulse"></div>
+                                            <div className="absolute inset-0 rounded-lg sm:rounded-xl bg-gradient-to-r from-transparent via-white/10 to-transparent transform skew-x-12 group-hover:animate-pulse"></div>
                                         </div>
                                     </div>
                                 ))}
@@ -660,15 +667,16 @@ export const ModalComposition = ({
                         </div>
                     </div>
                 ) : (
-                    <div className="px-6 py-5 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-100 rounded-xl mb-6 shadow-sm">
-                        <div className="flex items-center space-x-3">
-                            <div className="p-2 bg-yellow-100 rounded-lg">
-                                <User className="w-5 h-5 text-yellow-600" />
+                    <div className="px-2 sm:px-6 py-2 sm:py-5 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-100 rounded-lg sm:rounded-xl mb-3 sm:mb-6 shadow-sm">
+                        <div className="flex items-center space-x-2 sm:space-x-3">
+                            <div className="p-1 sm:p-2 bg-yellow-100 rounded-lg flex-shrink-0">
+                                <User className="w-3 h-3 sm:w-5 sm:h-5 text-yellow-600" />
                             </div>
-                            <div>
-                                <span className="text-base font-semibold text-yellow-700">Sin perfiles disponibles</span>
-                                <p className="text-sm text-yellow-600 mt-1 font-medium">
-                                    No hay perfiles configurados para la metodología de proceso seleccionada en este equipo.
+                            <div className="min-w-0 flex-1">
+                                <span className="text-xs sm:text-base font-semibold text-yellow-700 block truncate">Sin perfiles disponibles</span>
+                                <p className="text-xs text-yellow-600 mt-0.5 font-medium">
+                                    No hay perfiles configurados.
+                                    <span className="hidden sm:inline"> para la metodología de proceso seleccionada en este equipo.</span>
                                 </p>
                             </div>
                         </div>
@@ -676,31 +684,32 @@ export const ModalComposition = ({
                 )}
 
                 {/* Main Content */}
-                <div className="px-1 py-1">
-                    <div className="space-y-8">
+                <div className="px-0 sm:px-1 py-0 sm:py-1">
+                    <div className="space-y-3 sm:space-y-8">
                         {/* Panel de Roles Disponibles */}
-                        <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-lg border border-gray-100">
-                            <div className="flex items-center space-x-3 mb-6">
-                                <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md">
-                                    <User className="w-6 h-6 text-white drop-shadow-sm" />
+                        <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg sm:rounded-2xl p-2 sm:p-6 shadow-lg border border-gray-100">
+                            <div className="flex items-center space-x-2 sm:space-x-3 mb-3 sm:mb-6">
+                                <div className="p-1.5 sm:p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-md sm:rounded-xl shadow-md">
+                                    <User className="w-3 h-3 sm:w-6 sm:h-6 text-white drop-shadow-sm" />
                                 </div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-gray-800 tracking-tight flex items-center space-x-2">
-                                        <BarChart3 className="w-5 h-5" />
-                                        <span>Roles Disponibles para Asignar</span>
+                                <div className="min-w-0 flex-1">
+                                    <h3 className="text-sm sm:text-lg font-bold text-gray-800 tracking-tight flex items-center space-x-1 sm:space-x-2 truncate">
+                                        <BarChart3 className="w-3 h-3 sm:w-5 sm:h-5 flex-shrink-0" />
+                                        <span className="truncate">Roles Disponibles</span>
+                                        <span className="hidden sm:inline">para Asignar</span>
                                     </h3>
-                                    <p className="text-sm text-gray-600 font-medium">Selecciona un rol y asígnalo a un miembro</p>
+                                    <p className="text-xs sm:text-sm text-gray-600 font-medium hidden sm:block">Selecciona un rol y asígnalo a un miembro</p>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
                                 {profiles.map((profile) => {
                                     const profileColors = generateProfileColors(profile.name || '')
                                     return (
                                         <div
                                             key={profile.id}
                                             onClick={() => setSelectedRole(profile)}
-                                            className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${selectedRole?.id === profile.id
+                                            className={`p-2 sm:p-4 rounded-md sm:rounded-xl border-2 cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${selectedRole?.id === profile.id
                                                 ? `border-solid shadow-xl ring-4 ring-opacity-30 scale-105`
                                                 : 'border-dashed hover:border-solid'
                                                 } ${profileColors.bg} hover:opacity-95 ${selectedRole?.id === profile.id ? `ring-4 ring-offset-2` : ''
@@ -710,17 +719,17 @@ export const ModalComposition = ({
                                             }}
                                         >
                                             <div className="flex items-center justify-between">
-                                                <div className="flex items-center space-x-3">
-                                                    <div className={`w-5 h-5 rounded-full ${getProfileDotColor(profile.name || '')} shadow-md ring-2 ring-white`}></div>
+                                                <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                                                    <div className={`w-3 h-3 sm:w-5 sm:h-5 rounded-full ${getProfileDotColor(profile.name || '')} shadow-md ring-2 ring-white flex-shrink-0`}></div>
                                                     <div className="flex-1 min-w-0">
-                                                        <h4 className={`font-bold text-sm ${profileColors.text} truncate tracking-tight`}>{profile.name}</h4>
-                                                        <p className="text-xs text-gray-600 truncate font-medium mt-1">{profile.description}</p>
+                                                        <h4 className={`font-bold text-xs sm:text-sm ${profileColors.text} truncate tracking-tight`}>{profile.name}</h4>
+                                                        <p className="text-xs text-gray-600 truncate font-medium mt-0.5 hidden sm:block">{profile.description}</p>
                                                     </div>
                                                 </div>
                                                 {selectedRole?.id === profile.id && (
                                                     <div className="text-green-600 flex-shrink-0 animate-pulse">
-                                                        <div className="p-1 bg-green-100 rounded-full">
-                                                            <CheckCircle className="w-5 h-5" />
+                                                        <div className="p-0.5 sm:p-1 bg-green-100 rounded-full">
+                                                            <CheckCircle className="w-3 h-3 sm:w-5 sm:h-5" />
                                                         </div>
                                                     </div>
                                                 )}
@@ -731,31 +740,31 @@ export const ModalComposition = ({
                             </div>
 
                             {/* Instrucciones */}
-                            <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 shadow-sm">
+                            <div className="mt-3 sm:mt-6 p-2 sm:p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl border border-blue-100 shadow-sm">
                                 {selectedRole ? (
-                                    <div className="text-sm text-blue-700 flex items-center space-x-3">
-                                        <div className="p-2 bg-green-100 rounded-lg">
-                                            <CheckCircle className="w-5 h-5 text-green-600" />
+                                    <div className="text-xs sm:text-sm text-blue-700 flex items-center space-x-2 sm:space-x-3">
+                                        <div className="p-1 sm:p-2 bg-green-100 rounded-md sm:rounded-lg flex-shrink-0">
+                                            <CheckCircle className="w-3 h-3 sm:w-5 sm:h-5 text-green-600" />
                                         </div>
-                                        <div>
-                                            <p className="font-bold mb-1 flex items-center space-x-1">
-                                                <UserCheck className="w-4 h-4" />
-                                                <span>Rol seleccionado: {selectedRole.name}</span>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="font-bold mb-0.5 sm:mb-1 flex items-center space-x-1 truncate">
+                                                <UserCheck className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                                <span className="truncate">Rol: {selectedRole.name}</span>
                                             </p>
-                                            <p className="text-xs font-medium">Ahora haz clic en un miembro del equipo para asignárselo.</p>
+                                            <p className="text-xs font-medium">Haz clic en un miembro para asignárselo.</p>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="text-sm text-blue-700 flex items-center space-x-3">
-                                        <div className="p-2 bg-blue-100 rounded-lg">
-                                            <Settings className="w-5 h-5 text-blue-600" />
+                                    <div className="text-xs sm:text-sm text-blue-700 flex items-center space-x-2 sm:space-x-3">
+                                        <div className="p-1 sm:p-2 bg-blue-100 rounded-md sm:rounded-lg flex-shrink-0">
+                                            <Settings className="w-3 h-3 sm:w-5 sm:h-5 text-blue-600" />
                                         </div>
-                                        <div>
-                                            <p className="font-bold mb-1 flex items-center space-x-1">
-                                                <Target className="w-4 h-4" />
+                                        <div className="min-w-0 flex-1">
+                                            <p className="font-bold mb-0.5 sm:mb-1 flex items-center space-x-1">
+                                                <Target className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                                                 <span>Instrucciones:</span>
                                             </p>
-                                            <p className="text-xs font-medium">Selecciona un rol y luego haz clic en un miembro del equipo para asignárselo.</p>
+                                            <p className="text-xs font-medium">Selecciona un rol y luego haz clic en un miembro.</p>
                                         </div>
                                     </div>
                                 )}
@@ -763,7 +772,7 @@ export const ModalComposition = ({
                         </div>
 
                         {/* Panel de Miembros del Equipo */}
-                        <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-lg border border-gray-100">
+                        <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg sm:rounded-2xl p-2 sm:p-6 shadow-lg border border-gray-100">
                             <TeamHierarchy
                                 teamData={teamData}
                                 profiles={profiles}

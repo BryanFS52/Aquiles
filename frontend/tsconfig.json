@@ -73,6 +73,9 @@
       "@redux/*": [
         "./app/redux/*"
       ],
+      "@templates/*": [
+        "./templates/*"
+      ]
     }
   },
   "include": [

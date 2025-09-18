@@ -1,5 +1,6 @@
 package com.api.aquilesApi.Dto;
 
+import com.api.aquilesApi.Dto.Light.JustificationDTOLight;
 import  lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,16 +16,15 @@ public class AttendanceDto {
     private String attendanceDate;
 
     // @NotNull(message = "")
-    private AttendanceStateDto attendanceState;
-
-    // @NotNull(message = "")
     private Long studentId;
 
     // @NotNull(message = "")
     private Long competenceQuarter;
 
     // @NotNull(message = "")
-    private JustificationDto justification;
+    private JustificationDTOLight justification;
 
+    // @NotNull(message = "")
+    private AttendanceStateDto attendanceState;
 
 }
