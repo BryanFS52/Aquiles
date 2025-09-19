@@ -1,6 +1,6 @@
 // src/components/ReportComponent.js
 import React, { useState } from 'react';
-import { downloadReportPDF } from '@services/PDFService';
+import { downloadReportPDF } from '../redux/slices/exportSlice';
 
 const ReportComponent = () => {
     const [error, setError] = useState(null);

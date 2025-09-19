@@ -13,7 +13,7 @@ import Modal from "@components/UI/Modal";
 import EmptyState from "@components/UI/emptyState";
 import { checkListService } from "@redux/slices/checklistSlice";
 import { evaluationService } from "@redux/slices/evaluationSlice";
-import { exportChecklistToPdf, exportChecklistToExcel, downloadFileFromBase64 } from "@services/exportService";
+import { exportService } from "@redux/slices/exportSlice";
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
 import { fetchAllEvaluationsDebug, updateEvaluationItemStates } from '@/redux/slices/evaluationSlice';
@@ -1419,10 +1419,10 @@ export default function InstructorChecklistView() {
     try {
       toast.info("📄 Generando PDF...");
 
-      const base64Data = await exportChecklistToPdf(parseInt(selectedChecklist.id));
+      const base64Data = await exportService.exportChecklistToPdf(parseInt(selectedChecklist.id));
       const fileName = `checklist_${selectedChecklist.id}_trimestre_${selectedChecklist.trimester || 'NA'}.pdf`;
 
-      downloadFileFromBase64(base64Data, fileName, 'application/pdf');
+      exportService.downloadFileFromBase64(base64Data, fileName, 'application/pdf');
 
       toast.success("📥 PDF descargado exitosamente");
     } catch (error) {
@@ -1441,10 +1441,10 @@ export default function InstructorChecklistView() {
     try {
       toast.info("📊 Generando Excel...");
 
-      const base64Data = await exportChecklistToExcel(parseInt(selectedChecklist.id));
+      const base64Data = await exportService.exportChecklistToExcel(parseInt(selectedChecklist.id));
       const fileName = `checklist_${selectedChecklist.id}_trimestre_${selectedChecklist.trimester || 'NA'}.xlsx`;
 
-      downloadFileFromBase64(base64Data, fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      exportService.downloadFileFromBase64(base64Data, fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
       toast.success("📥 Excel descargado exitosamente");
     } catch (error) {

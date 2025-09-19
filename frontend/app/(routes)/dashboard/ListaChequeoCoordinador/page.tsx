@@ -8,7 +8,7 @@ import { AppDispatch, RootState } from "@redux/store"
 import { addEvaluation } from "@slice/evaluationSlice"
 import CrearListaChequeo from "@components/Modals/modalNewChecklist"
 import PageTitle from "@components/UI/pageTitle"
-import checklistEnhancementService from "@services/checklistEnhancementService"
+import { checklistEnhancementService } from "@redux/slices/checklistEnhancementSlice"
 import {
   fetchChecklists,
   fetchChecklistById,
