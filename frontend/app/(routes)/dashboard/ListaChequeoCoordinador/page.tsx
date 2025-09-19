@@ -62,34 +62,25 @@ export default function CoordinadorChecklistView() {
   
   const loadChecklists = useCallback(async (): Promise<void> => {
     try {
-      console.log("🔄 Loading checklists with force refresh...") // Debug log
       const result = await dispatch(
         fetchChecklists({ page: 0, size: 100 })
       ).unwrap()
       
-      console.log('loadChecklists Redux result:', result) // Debug log
-      
       if (result?.data) {
-        console.log('loadChecklists data count:', result.data.length) // Debug log
-        console.log('First checklist sample:', result.data[0]) // Debug log
-        
         // Enriquecer los checklists con información adicional
         setEnrichmentLoading(true)
         try {
           const enriched = await checklistEnhancementService.enrichChecklists(result.data)
-          console.log('✅ Checklists enriched:', enriched.length) // Debug log
           setEnrichedChecklists(enriched)
         } catch (enrichmentError) {
-          console.warn('⚠️ Error enriching checklists, using basic data:', enrichmentError)
+          console.warn('Error enriching checklists, using basic data:', enrichmentError)
           setEnrichedChecklists(result.data)
         } finally {
           setEnrichmentLoading(false)
         }
-        
-        console.log('✅ Checklists loaded successfully'); // Debug log
       }
     } catch (error) {
-      console.error("❌ Error loading checklists:", error)
+      console.error("Error loading checklists:", error)
       toast.error("Error al cargar las listas de chequeo")
       setEnrichmentLoading(false)
     }
@@ -113,19 +104,10 @@ export default function CoordinadorChecklistView() {
     try {
       if (isEditing && editingChecklist) {
         // Actualizar checklist existente
-        console.log('=== UPDATING CHECKLIST ===');
-        console.log('Updating checklist with ID:', editingChecklist.id);
-        console.log('Original editingChecklist:', editingChecklist);
-        console.log('Incoming checklistData:', checklistData);
         
-        // ← Log específico para trimester y component
-        console.log('🔍 FIELD VALUES COMPARISON:');
-        console.log('  trimester - original:', editingChecklist.trimester, ', incoming:', checklistData.trimester);
-        console.log('  component - original:', editingChecklist.component, ', incoming:', checklistData.component);
-
-        // ← Procesar items eliminados si los hay
+        // Procesar items eliminados si los hay
         if (checklistData.deletedItemIds && checklistData.deletedItemIds.length > 0) {
-          console.log('🗑️ PROCESSING DELETED ITEMS:', checklistData.deletedItemIds);
+          // Items will be processed for deletion
         }
 
         const updateData = {
@@ -140,70 +122,38 @@ export default function CoordinadorChecklistView() {
           evaluations: editingChecklist.evaluations || null,
           associatedJuries: editingChecklist.associatedJuries || null,
           items: checklistData.items ? transformItems(checklistData.items) : [],
-          // ← Agregar items eliminados para el backend
+          // Agregar items eliminados para el backend
           ...(checklistData.deletedItemIds && checklistData.deletedItemIds.length > 0 && { 
             deletedItemIds: checklistData.deletedItemIds 
           })
         };
-
-        console.log('Final updateData being sent:', updateData);
-        console.log('🎯 FINAL VALUES BEING SENT:');
-        console.log('  trimester:', updateData.trimester, '(type:', typeof updateData.trimester, ')');
-        console.log('  component:', updateData.component, '(type:', typeof updateData.component, ')');
-        console.log('🎯 DETAILED UPDATEDATA ITEMS:');
-        updateData.items.forEach((item: any, index: number) => {
-          console.log(`  UpdateData Item ${index + 1}: id=${item.id || 'NO_ID'}, code="${item.code}", indicator="${item.indicator}", active=${item.active}`);
-        });
-        
-        // ← Log adicional para items eliminados
-        if (updateData.deletedItemIds && updateData.deletedItemIds.length > 0) {
-          console.log('🗑️ ITEMS TO DELETE BEING SENT TO BACKEND:', updateData.deletedItemIds);
-        }
 
         const result = await dispatch(updateChecklist({
           id: parseInt(editingChecklist.id),
           input: updateData
         })).unwrap();
 
-        console.log("Update result:", result); // Debug log
-
         if (result && result.code === "200") {
-          console.log("✅ Update successful, refreshing specific checklist data..."); // Debug log
           toast.success("Lista de chequeo actualizada exitosamente");
 
           // Pequeño delay para asegurar que la DB se actualice
           await new Promise(resolve => setTimeout(resolve, 1000));
 
           // Primero recargar el checklist específico por ID para forzar una actualización
-          console.log("📡 Fetching updated checklist by ID...");
           await dispatch(fetchChecklistById({ id: parseInt(editingChecklist.id) })).unwrap();
 
           // Luego recargar toda la lista para asegurar consistencia
-          console.log("📡 Reloading full checklist data...");
           await loadChecklists();
 
           // Cerrar el modal
           handleCloseModal();
 
-          console.log("✅ Data refreshed and modal closed"); // Debug log
-          console.log("📊 Final checklist data after update:"); // Debug log
-
           // Buscar el checklist actualizado en los datos actuales
           const updatedChecklistInState = normalizedChecklists.find(c => c.id === editingChecklist.id);
-          console.log("Updated checklist in state:", updatedChecklistInState); // Debug log
           if (updatedChecklistInState) {
-            console.log("Updated checklist items:", updatedChecklistInState.items); // Debug log
-            console.log("🔍 DETAILED FINAL ITEMS AFTER UPDATE:"); // Debug log
-            if (updatedChecklistInState.items) {
-              updatedChecklistInState.items.forEach((item: any, index: number) => {
-                if (item) {
-                  console.log(`  Final Item ${index + 1}: id=${item.id}, indicator="${item.indicator}", active=${item.active}`); // Debug log
-                }
-              });
-            }
+            // Checklist updated successfully
           }
         } else {
-          console.log("❌ Update failed:", result); // Debug log
           toast.error(result?.message || "Error al actualizar la lista de chequeo");
         }
       } else {
@@ -223,11 +173,9 @@ export default function CoordinadorChecklistView() {
         };
 
         const result = await dispatch(addChecklist(newChecklistData)).unwrap();
-        console.log("Create result:", result); // Debug log
 
         if (result && result.code === "200") {
           const newChecklistId = result.id;
-          console.log("✅ Checklist created successfully with ID:", newChecklistId); // Debug log
 
           if (newChecklistId) {
             // Crear automáticamente una evaluación para esta lista de chequeo usando Redux
@@ -239,24 +187,14 @@ export default function CoordinadorChecklistView() {
                 checklistId: parseInt(newChecklistId) // Asegurar que es un número entero
               };
 
-              console.log('=== CREATING AUTOMATIC EVALUATION ===');
-              console.log('📝 New Checklist ID:', newChecklistId, '(Type:', typeof newChecklistId, ')');
-              console.log('🔢 Parsed Checklist ID:', parseInt(newChecklistId), '(Type:', typeof parseInt(newChecklistId), ')');
-              console.log('📋 Evaluation Input:', evaluationInput);
-              console.log('🔗 This will create a 1:1 relationship in the database');
+
 
               const evaluationResponse = await dispatch(addEvaluation(evaluationInput)).unwrap();
-              console.log("🎯 Evaluation creation response:", evaluationResponse);
 
               if (evaluationResponse && evaluationResponse.code === "200") {
-                console.log("✅ SUCCESS: Evaluation created with ID:", evaluationResponse.id);
-                console.log("🔗 SUCCESS: Evaluation linked to Checklist ID:", newChecklistId);
-                console.log("📊 Database now has: Checklist", newChecklistId, "↔ Evaluation", evaluationResponse.id);
-                
                 // Verificar que la relación se estableció correctamente
                 try {
                   const { checkListService } = await import('@redux/slices/checklistSlice');
-                  console.log("🔍 Verifying the database relationship...");
                   
                   // Pequeña pausa para que la DB se actualice
                   await new Promise(resolve => setTimeout(resolve, 500));
@@ -264,53 +202,37 @@ export default function CoordinadorChecklistView() {
                   const isLinked = await checkListService.updateChecklistEvaluationLink(parseInt(newChecklistId), parseInt(evaluationResponse.id));
                   
                   if (isLinked) {
-                    console.log("✅ VERIFICATION SUCCESS: Relationship confirmed in database");
-                    toast.success("🎉 Lista de chequeo creada exitosamente")
-                    toast.success("✅ Evaluación asociada creada y vinculada correctamente")
-                  } else {
-                    console.log("⚠️ VERIFICATION WARNING: Evaluation created but relationship not confirmed");
                     toast.success("Lista de chequeo creada exitosamente")
-                    toast.warning("⚠️ Evaluación creada pero la verificación de vínculo falló")
+                    toast.success("Evaluación asociada creada y vinculada correctamente")
+                  } else {
+                    toast.success("Lista de chequeo creada exitosamente")
+                    toast.warning("Evaluación creada pero la verificación de vínculo falló")
                   }
                 } catch (verificationError) {
-                  console.warn("⚠️ Could not verify relationship:", verificationError);
-                  toast.success("🎉 Lista de chequeo creada exitosamente")
-                  toast.success("✅ Evaluación asociada creada automáticamente")
+                  toast.success("Lista de chequeo creada exitosamente")
+                  toast.success("Evaluación asociada creada automáticamente")
                 }
                 
                 // Pequeña pausa para mostrar ambos toasts
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
               } else {
-                console.log("❌ PARTIAL SUCCESS: Checklist created but evaluation failed:", evaluationResponse);
                 toast.success("Lista de chequeo creada exitosamente")
-                toast.warning("⚠️ Evaluación no pudo crearse automáticamente: " + (evaluationResponse?.message || "Error desconocido"))
+                toast.warning("Evaluación no pudo crearse automáticamente: " + (evaluationResponse?.message || "Error desconocido"))
               }
             } catch (evaluationError: any) {
-              console.error("❌ ERROR creating evaluation:", evaluationError);
-              console.error("Error details:", {
-                message: evaluationError.message,
-                stack: evaluationError.stack,
-                graphQLErrors: evaluationError.graphQLErrors,
-                networkError: evaluationError.networkError
-              });
-              
               toast.success("Lista de chequeo creada exitosamente")
-              toast.error("❌ Error al crear la evaluación automática: " + (evaluationError.message || "Error desconocido"))
+              toast.error("Error al crear la evaluación automática: " + (evaluationError.message || "Error desconocido"))
             }
           } else {
-            console.warn("⚠️ WARNING: Checklist created but ID not returned:", result);
             toast.success("Lista de chequeo creada exitosamente")
-            toast.warning("⚠️ No se pudo crear la evaluación automáticamente (ID no disponible)")
+            toast.warning("No se pudo crear la evaluación automáticamente (ID no disponible)")
           }
 
           // Recargar la lista para mostrar el nuevo checklist
-          console.log("🔄 Reloading checklists to show new data...");
           await loadChecklists()
           setModalOpen(false)
-          console.log("✅ Creation process completed");
         } else {
-          console.log("❌ FAILED: Checklist creation failed:", result);
           toast.error(result?.message || "Error al crear la lista de chequeo")
         }
       }
@@ -349,14 +271,9 @@ export default function CoordinadorChecklistView() {
   }
 
   const handleCloseModal = (): void => {
-    console.log("handleCloseModal called, isEditing:", isEditing) // Debug log
-
     setModalOpen(false)
     setIsEditing(false)
     setEditingChecklist(null)
-
-    // Limpiar cualquier cache o estado temporal
-    console.log("Modal closed, states cleared") // Debug log
   }
 
   const handleOpenCreateModal = (): void => {
@@ -367,33 +284,20 @@ export default function CoordinadorChecklistView() {
 
   const handleOpenEditModal = async (checklist: any): Promise<void> => {
     try {
-      console.log("Opening edit modal for checklist:", checklist.id) // Debug log
-
       // Obtener el checklist completo con todos sus items/indicadores usando Redux
       await dispatch(fetchChecklistById({ id: parseInt(checklist.id) })).unwrap();
 
       // Buscar el checklist transformado en el estado de Redux
       const updatedChecklist = checklists.find(item => item.id === checklist.id);
-      console.log("Updated checklist from Redux state:", updatedChecklist) // Debug log
 
       if (updatedChecklist) {
-        console.log("=== OPENING EDIT MODAL ==="); // Debug log
-        console.log("Checklist items being passed to modal:", updatedChecklist.items) // Debug log
-        console.log("🔍 DETAILED ITEMS BEING PASSED TO MODAL:"); // Debug log
         if (updatedChecklist.items) {
-          updatedChecklist.items.forEach((item, index) => {
-            if (item) {
-              console.log(`  Item ${index + 1}: id=${item.id}, indicator="${item.indicator}", active=${item.active}`); // Debug log
-            }
-          });
+          // Process items for modal
         }
         setIsEditing(true)
         setEditingChecklist(updatedChecklist as any)
         setModalOpen(true)
-        console.log("Edit modal opened successfully"); // Debug log
-        console.log("=== END OPENING EDIT MODAL ==="); // Debug log
       } else {
-        console.log("Checklist not found in Redux state after fetch") // Debug log
         toast.error("Error al obtener los detalles del checklist")
       }
     } catch (error: any) {
@@ -431,7 +335,6 @@ export default function CoordinadorChecklistView() {
     .filter((checklist) => {
       // Filtrar checklists inválidos
       if (!checklist || checklist.id == null || checklist.id === '') {
-        console.warn("Filtering out invalid checklist:", checklist); // Debug log
         return false;
       }
 
@@ -501,8 +404,7 @@ export default function CoordinadorChecklistView() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
                 {filteredChecklists.map((checklist) => {
                   // Debug log para cada checklist en el render
-                  console.log(`Rendering checklist ${checklist.id}:`, checklist);
-                  console.log(`Checklist ${checklist.id} items:`, checklist.items);
+                  // Rendering checklist card
 
                   // Verificación de seguridad adicional
                   if (!checklist || !checklist.id) {

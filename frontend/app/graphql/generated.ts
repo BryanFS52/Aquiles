@@ -169,7 +169,9 @@ export type Checklist = {
   items?: Maybe<Array<Maybe<Item>>>;
   remarks?: Maybe<Scalars['String']['output']>;
   state?: Maybe<Scalars['Boolean']['output']>;
-  studySheets?: Maybe<Scalars['Long']['output']>;
+  studySheets?: Maybe<Scalars['String']['output']>;
+  trainingProjectId?: Maybe<Scalars['Long']['output']>;
+  trainingProjectName?: Maybe<Scalars['String']['output']>;
   trimester?: Maybe<Scalars['String']['output']>;
 };
 
@@ -184,7 +186,9 @@ export type ChecklistDto = {
   items?: InputMaybe<Array<InputMaybe<ItemDto>>>;
   remarks: Scalars['String']['input'];
   state: Scalars['Boolean']['input'];
-  studySheets?: InputMaybe<Scalars['Long']['input']>;
+  studySheets?: InputMaybe<Scalars['String']['input']>;
+  trainingProjectId?: InputMaybe<Scalars['Long']['input']>;
+  trainingProjectName?: InputMaybe<Scalars['String']['input']>;
   trimester: Scalars['String']['input'];
 };
 
@@ -257,6 +261,7 @@ export type ClassTypePage = {
 };
 
 export type Collaborator = {
+  administrative?: Maybe<Administrative>;
   contractType?: Maybe<ContractType>;
   coordination?: Maybe<Coordination>;
   endDate?: Maybe<Scalars['String']['output']>;
@@ -265,6 +270,7 @@ export type Collaborator = {
   person?: Maybe<Person>;
   starDate?: Maybe<Scalars['String']['output']>;
   state?: Maybe<Scalars['Boolean']['output']>;
+  teacher?: Maybe<Teacher>;
 };
 
 export type CollaboratorDto = {
@@ -1514,6 +1520,7 @@ export type Mutation = {
   deleteTrainingLevel?: Maybe<Response>;
   deleteTrainingProject?: Maybe<Response>;
   generateQRCode?: Maybe<QrCodePayload>;
+  refreshTrainingProjectName?: Maybe<Response>;
   sendNotification?: Maybe<Scalars['String']['output']>;
   updateAdministrative?: Maybe<Response>;
   updateAdministrativeType?: Maybe<Response>;
@@ -2175,6 +2182,11 @@ export type MutationDeleteTrainingProjectArgs = {
 };
 
 
+export type MutationRefreshTrainingProjectNameArgs = {
+  checklistId: Scalars['Long']['input'];
+};
+
+
 export type MutationSendNotificationArgs = {
   emailRequest: EmailRequest;
 };
@@ -2618,6 +2630,7 @@ export type PageResponseTownshipDto = {
 export type Person = {
   address?: Maybe<Scalars['String']['output']>;
   bloodType?: Maybe<Scalars['String']['output']>;
+  collaborator?: Maybe<Collaborator>;
   dateBirth?: Maybe<Scalars['String']['output']>;
   document?: Maybe<Scalars['String']['output']>;
   documentType?: Maybe<DocumentType>;
@@ -2628,6 +2641,7 @@ export type Person = {
   phone?: Maybe<Scalars['String']['output']>;
   photo?: Maybe<Scalars['String']['output']>;
   state?: Maybe<Scalars['Boolean']['output']>;
+  student?: Maybe<Student>;
   user?: Maybe<User>;
 };
 
@@ -3492,6 +3506,7 @@ export type QueryAllTeacherStudySheetTypeArgs = {
 
 
 export type QueryAllTeachersArgs = {
+  coordinationId?: InputMaybe<Scalars['Long']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   personName?: InputMaybe<Scalars['String']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
@@ -4354,14 +4369,44 @@ export type GetAllChecklistsQueryVariables = Exact<{
 }>;
 
 
-export type GetAllChecklistsQuery = { allChecklists?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: any | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean } | null> | null } | null> | null } | null };
+export type GetAllChecklistsQuery = { allChecklists?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: string | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean } | null> | null } | null> | null } | null };
 
 export type GetChecklistByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
 
 
-export type GetChecklistByIdQuery = { checklistById?: { code?: string | null, date?: string | null, message?: string | null, data?: { id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: any | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean } | null> | null, evaluations?: { id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null, associatedJuries?: Array<{ id: string } | null> | null } | null } | null };
+export type GetChecklistByIdQuery = { checklistById?: { code?: string | null, date?: string | null, message?: string | null, data?: { id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: string | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean } | null> | null, evaluations?: { id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null, associatedJuries?: Array<{ id: string } | null> | null } | null } | null };
+
+export type GetAllChecklistsCoordinatorQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetAllChecklistsCoordinatorQuery = { allChecklists?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: string | null, trainingProjectId?: any | null, trainingProjectName?: string | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean } | null> | null } | null> | null } | null };
+
+export type GetChecklistByIdCoordinatorQueryVariables = Exact<{
+  id: Scalars['Long']['input'];
+}>;
+
+
+export type GetChecklistByIdCoordinatorQuery = { checklistById?: { code?: string | null, date?: string | null, message?: string | null, data?: { id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: string | null, trainingProjectId?: any | null, trainingProjectName?: string | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean } | null> | null, evaluations?: { id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null, associatedJuries?: Array<{ id: string } | null> | null } | null } | null };
+
+export type GetAllChecklistsInstructorQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetAllChecklistsInstructorQuery = { allChecklists?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: string | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean } | null> | null } | null> | null } | null };
+
+export type GetChecklistByIdInstructorQueryVariables = Exact<{
+  id: Scalars['Long']['input'];
+}>;
+
+
+export type GetChecklistByIdInstructorQuery = { checklistById?: { code?: string | null, date?: string | null, message?: string | null, data?: { id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: string | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean } | null> | null, evaluations?: { id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null, associatedJuries?: Array<{ id: string } | null> | null } | null } | null };
 
 export type AddChecklistMutationVariables = Exact<{
   input: ChecklistDto;
@@ -5641,6 +5686,270 @@ export type GetChecklistByIdQueryHookResult = ReturnType<typeof useGetChecklistB
 export type GetChecklistByIdLazyQueryHookResult = ReturnType<typeof useGetChecklistByIdLazyQuery>;
 export type GetChecklistByIdSuspenseQueryHookResult = ReturnType<typeof useGetChecklistByIdSuspenseQuery>;
 export type GetChecklistByIdQueryResult = Apollo.QueryResult<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>;
+export const GetAllChecklistsCoordinatorDocument = gql`
+    query GetAllChecklistsCoordinator($page: Int, $size: Int) {
+  allChecklists(page: $page, size: $size) {
+    date
+    code
+    message
+    currentPage
+    totalPages
+    totalItems
+    data {
+      id
+      state
+      remarks
+      instructorSignature
+      evaluationCriteria
+      trimester
+      component
+      studySheets
+      trainingProjectId
+      trainingProjectName
+      items {
+        id
+        code
+        indicator
+        active
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAllChecklistsCoordinatorQuery__
+ *
+ * To run a query within a React component, call `useGetAllChecklistsCoordinatorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllChecklistsCoordinatorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllChecklistsCoordinatorQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useGetAllChecklistsCoordinatorQuery(baseOptions?: Apollo.QueryHookOptions<GetAllChecklistsCoordinatorQuery, GetAllChecklistsCoordinatorQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllChecklistsCoordinatorQuery, GetAllChecklistsCoordinatorQueryVariables>(GetAllChecklistsCoordinatorDocument, options);
+      }
+export function useGetAllChecklistsCoordinatorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllChecklistsCoordinatorQuery, GetAllChecklistsCoordinatorQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllChecklistsCoordinatorQuery, GetAllChecklistsCoordinatorQueryVariables>(GetAllChecklistsCoordinatorDocument, options);
+        }
+export function useGetAllChecklistsCoordinatorSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllChecklistsCoordinatorQuery, GetAllChecklistsCoordinatorQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAllChecklistsCoordinatorQuery, GetAllChecklistsCoordinatorQueryVariables>(GetAllChecklistsCoordinatorDocument, options);
+        }
+export type GetAllChecklistsCoordinatorQueryHookResult = ReturnType<typeof useGetAllChecklistsCoordinatorQuery>;
+export type GetAllChecklistsCoordinatorLazyQueryHookResult = ReturnType<typeof useGetAllChecklistsCoordinatorLazyQuery>;
+export type GetAllChecklistsCoordinatorSuspenseQueryHookResult = ReturnType<typeof useGetAllChecklistsCoordinatorSuspenseQuery>;
+export type GetAllChecklistsCoordinatorQueryResult = Apollo.QueryResult<GetAllChecklistsCoordinatorQuery, GetAllChecklistsCoordinatorQueryVariables>;
+export const GetChecklistByIdCoordinatorDocument = gql`
+    query GetChecklistByIdCoordinator($id: Long!) {
+  checklistById(id: $id) {
+    code
+    date
+    message
+    data {
+      id
+      state
+      remarks
+      instructorSignature
+      evaluationCriteria
+      trimester
+      component
+      studySheets
+      trainingProjectId
+      trainingProjectName
+      items {
+        id
+        code
+        indicator
+        active
+      }
+      evaluations {
+        id
+        observations
+        recommendations
+        valueJudgment
+        checklistId
+      }
+      associatedJuries {
+        id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetChecklistByIdCoordinatorQuery__
+ *
+ * To run a query within a React component, call `useGetChecklistByIdCoordinatorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetChecklistByIdCoordinatorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetChecklistByIdCoordinatorQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetChecklistByIdCoordinatorQuery(baseOptions: Apollo.QueryHookOptions<GetChecklistByIdCoordinatorQuery, GetChecklistByIdCoordinatorQueryVariables> & ({ variables: GetChecklistByIdCoordinatorQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetChecklistByIdCoordinatorQuery, GetChecklistByIdCoordinatorQueryVariables>(GetChecklistByIdCoordinatorDocument, options);
+      }
+export function useGetChecklistByIdCoordinatorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetChecklistByIdCoordinatorQuery, GetChecklistByIdCoordinatorQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetChecklistByIdCoordinatorQuery, GetChecklistByIdCoordinatorQueryVariables>(GetChecklistByIdCoordinatorDocument, options);
+        }
+export function useGetChecklistByIdCoordinatorSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetChecklistByIdCoordinatorQuery, GetChecklistByIdCoordinatorQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetChecklistByIdCoordinatorQuery, GetChecklistByIdCoordinatorQueryVariables>(GetChecklistByIdCoordinatorDocument, options);
+        }
+export type GetChecklistByIdCoordinatorQueryHookResult = ReturnType<typeof useGetChecklistByIdCoordinatorQuery>;
+export type GetChecklistByIdCoordinatorLazyQueryHookResult = ReturnType<typeof useGetChecklistByIdCoordinatorLazyQuery>;
+export type GetChecklistByIdCoordinatorSuspenseQueryHookResult = ReturnType<typeof useGetChecklistByIdCoordinatorSuspenseQuery>;
+export type GetChecklistByIdCoordinatorQueryResult = Apollo.QueryResult<GetChecklistByIdCoordinatorQuery, GetChecklistByIdCoordinatorQueryVariables>;
+export const GetAllChecklistsInstructorDocument = gql`
+    query GetAllChecklistsInstructor($page: Int, $size: Int) {
+  allChecklists(page: $page, size: $size) {
+    date
+    code
+    message
+    currentPage
+    totalPages
+    totalItems
+    data {
+      id
+      state
+      remarks
+      instructorSignature
+      evaluationCriteria
+      trimester
+      component
+      studySheets
+      items {
+        id
+        code
+        indicator
+        active
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAllChecklistsInstructorQuery__
+ *
+ * To run a query within a React component, call `useGetAllChecklistsInstructorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllChecklistsInstructorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllChecklistsInstructorQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useGetAllChecklistsInstructorQuery(baseOptions?: Apollo.QueryHookOptions<GetAllChecklistsInstructorQuery, GetAllChecklistsInstructorQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllChecklistsInstructorQuery, GetAllChecklistsInstructorQueryVariables>(GetAllChecklistsInstructorDocument, options);
+      }
+export function useGetAllChecklistsInstructorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllChecklistsInstructorQuery, GetAllChecklistsInstructorQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllChecklistsInstructorQuery, GetAllChecklistsInstructorQueryVariables>(GetAllChecklistsInstructorDocument, options);
+        }
+export function useGetAllChecklistsInstructorSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllChecklistsInstructorQuery, GetAllChecklistsInstructorQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAllChecklistsInstructorQuery, GetAllChecklistsInstructorQueryVariables>(GetAllChecklistsInstructorDocument, options);
+        }
+export type GetAllChecklistsInstructorQueryHookResult = ReturnType<typeof useGetAllChecklistsInstructorQuery>;
+export type GetAllChecklistsInstructorLazyQueryHookResult = ReturnType<typeof useGetAllChecklistsInstructorLazyQuery>;
+export type GetAllChecklistsInstructorSuspenseQueryHookResult = ReturnType<typeof useGetAllChecklistsInstructorSuspenseQuery>;
+export type GetAllChecklistsInstructorQueryResult = Apollo.QueryResult<GetAllChecklistsInstructorQuery, GetAllChecklistsInstructorQueryVariables>;
+export const GetChecklistByIdInstructorDocument = gql`
+    query GetChecklistByIdInstructor($id: Long!) {
+  checklistById(id: $id) {
+    code
+    date
+    message
+    data {
+      id
+      state
+      remarks
+      instructorSignature
+      evaluationCriteria
+      trimester
+      component
+      studySheets
+      items {
+        id
+        code
+        indicator
+        active
+      }
+      evaluations {
+        id
+        observations
+        recommendations
+        valueJudgment
+        checklistId
+      }
+      associatedJuries {
+        id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetChecklistByIdInstructorQuery__
+ *
+ * To run a query within a React component, call `useGetChecklistByIdInstructorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetChecklistByIdInstructorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetChecklistByIdInstructorQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetChecklistByIdInstructorQuery(baseOptions: Apollo.QueryHookOptions<GetChecklistByIdInstructorQuery, GetChecklistByIdInstructorQueryVariables> & ({ variables: GetChecklistByIdInstructorQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetChecklistByIdInstructorQuery, GetChecklistByIdInstructorQueryVariables>(GetChecklistByIdInstructorDocument, options);
+      }
+export function useGetChecklistByIdInstructorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetChecklistByIdInstructorQuery, GetChecklistByIdInstructorQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetChecklistByIdInstructorQuery, GetChecklistByIdInstructorQueryVariables>(GetChecklistByIdInstructorDocument, options);
+        }
+export function useGetChecklistByIdInstructorSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetChecklistByIdInstructorQuery, GetChecklistByIdInstructorQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetChecklistByIdInstructorQuery, GetChecklistByIdInstructorQueryVariables>(GetChecklistByIdInstructorDocument, options);
+        }
+export type GetChecklistByIdInstructorQueryHookResult = ReturnType<typeof useGetChecklistByIdInstructorQuery>;
+export type GetChecklistByIdInstructorLazyQueryHookResult = ReturnType<typeof useGetChecklistByIdInstructorLazyQuery>;
+export type GetChecklistByIdInstructorSuspenseQueryHookResult = ReturnType<typeof useGetChecklistByIdInstructorSuspenseQuery>;
+export type GetChecklistByIdInstructorQueryResult = Apollo.QueryResult<GetChecklistByIdInstructorQuery, GetChecklistByIdInstructorQueryVariables>;
 export const AddChecklistDocument = gql`
     mutation AddChecklist($input: ChecklistDto!) {
   addChecklist(input: $input) {

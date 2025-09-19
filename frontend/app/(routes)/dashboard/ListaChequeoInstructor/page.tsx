@@ -95,7 +95,7 @@ export default function InstructorChecklistView() {
         // Intentar parsear como JSON
         const signatures = JSON.parse(checklist.instructorSignature);
         
-        console.log("Firmas cargadas desde BD:", signatures);
+        // console.log("Firmas cargadas desde BD:", signatures);
         
         // Si es un objeto con firmas separadas
         if (typeof signatures === 'object' && signatures !== null) {
@@ -105,7 +105,7 @@ export default function InstructorChecklistView() {
               ? signatures.anterior 
               : `data:image/jpeg;base64,${signatures.anterior}`;
             setFirmaAnterior(anteriorImage);
-            console.log("Firma anterior cargada");
+            // console.log("Firma anterior cargada");
           }
           
           if (signatures.nuevo) {
@@ -114,11 +114,11 @@ export default function InstructorChecklistView() {
               ? signatures.nuevo 
               : `data:image/jpeg;base64,${signatures.nuevo}`;
             setFirmaNuevo(nuevoImage);
-            console.log("Firma nuevo cargada");
+            // console.log("Firma nuevo cargada");
           }
         }
       } else {
-        console.log("No hay firmas existentes para cargar");
+        // console.log("No hay firmas existentes para cargar");
       }
     } catch (error) {
       // Si no es JSON válido, puede ser formato legacy o datos corruptos
