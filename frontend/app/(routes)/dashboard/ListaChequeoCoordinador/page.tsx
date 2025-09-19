@@ -255,13 +255,13 @@ export default function CoordinadorChecklistView() {
                 
                 // Verificar que la relación se estableció correctamente
                 try {
-                  const { verifyChecklistEvaluationLink } = await import('@services/checkListService');
+                  const { checkListService } = await import('@redux/slices/checklistSlice');
                   console.log("🔍 Verifying the database relationship...");
                   
                   // Pequeña pausa para que la DB se actualice
                   await new Promise(resolve => setTimeout(resolve, 500));
                   
-                  const isLinked = await verifyChecklistEvaluationLink(parseInt(newChecklistId));
+                  const isLinked = await checkListService.updateChecklistEvaluationLink(parseInt(newChecklistId), parseInt(evaluationResponse.id));
                   
                   if (isLinked) {
                     console.log("✅ VERIFICATION SUCCESS: Relationship confirmed in database");

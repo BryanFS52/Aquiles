@@ -11,8 +11,8 @@ import DataTable from "@components/UI/DataTable";
 import { DataTableColumn } from "@components/UI/DataTable/types";
 import Modal from "@components/UI/Modal";
 import EmptyState from "@components/UI/emptyState";
-import { fetchAllChecklists, fetchChecklistById } from "@services/checkListService.js";
-import { fetchEvaluationsByChecklist, fetchEvaluationsByChecklistOld, completeEvaluation, createMissingEvaluationForChecklist, createEvaluationForChecklist } from "@services/evaluationService";
+import { checkListService } from "@redux/slices/checklistSlice";
+import { evaluationService } from "@redux/slices/evaluationSlice";
 import { exportChecklistToPdf, exportChecklistToExcel, downloadFileFromBase64 } from "@services/exportService";
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/redux/store';
@@ -506,7 +506,7 @@ export default function InstructorChecklistView() {
       const instructorStudySheetNumber = localStorage.getItem('selectedStudySheetNumber');
       console.log("🔍 Instructor study sheet:", { id: instructorStudySheetId, number: instructorStudySheetNumber });
       
-      const response = await fetchAllChecklists(0, 100);
+      const response = await checkListService.fetchAllChecklists(0, 100);
       console.log("Raw checklists response:", response); // Debug log
 
       if (response.code === "200" && response.data) {
@@ -537,7 +537,7 @@ export default function InstructorChecklistView() {
         }
 
         console.log("Final active checklists:", activeLists); // Debug log
-        console.log("Trimester values:", activeLists.map(cl => ({ id: cl.id, trimester: cl.trimester, studySheets: cl.studySheets }))); // Debug log
+        console.log("Trimester values:", activeLists.map((cl: any) => ({ id: cl.id, trimester: cl.trimester, studySheets: cl.studySheets }))); // Debug log
 
         setActiveChecklists(activeLists);
         if (activeLists.length > 0 && !selectedChecklist) {
@@ -605,7 +605,7 @@ export default function InstructorChecklistView() {
       console.log("Checklist ID:", checklistId, "Type:", typeof checklistId);
 
       // Cargar evaluaciones desde la base de datos
-      const evaluationsResponse = await fetchEvaluationsByChecklist(checklistId);
+      const evaluationsResponse = await evaluationService.fetchEvaluationsByChecklist(checklistId);
       console.log("🔍 Raw evaluations response:", evaluationsResponse);
 
       if (evaluationsResponse && evaluationsResponse.code === "200") {
@@ -636,7 +636,7 @@ export default function InstructorChecklistView() {
 
       // Si llegamos aquí, intentar con la función alternativa
       try {
-        const alternativeResponse = await fetchEvaluationsByChecklistOld(checklistId);
+        const alternativeResponse = await evaluationService.fetchEvaluationsByChecklist(checklistId);
         console.log("Alternative response:", alternativeResponse);
 
         if (alternativeResponse && alternativeResponse.code === "200" && alternativeResponse.data && alternativeResponse.data.length > 0) {
@@ -818,7 +818,7 @@ export default function InstructorChecklistView() {
       try {
         // Cargar los detalles completos del checklist con sus items
         console.log("Loading checklist details for ID:", checklistId);
-        const checklistResponse = await fetchChecklistById(parseInt(checklistId));
+        const checklistResponse = await checkListService.fetchChecklistById(parseInt(checklistId));
 
         if (checklistResponse.code === "200" && checklistResponse.data) {
           console.log("Checklist details loaded:", checklistResponse.data);
@@ -1168,12 +1168,11 @@ export default function InstructorChecklistView() {
       });
 
       const teamScrumIdNumber = selectedTeamScrumId ? parseInt(selectedTeamScrumId) : undefined;
-      const response = await completeEvaluation(
+      const response = await evaluationService.completeEvaluation(
         parseInt(selectedEvaluation.id),
         evaluationObservations, // Solo las observaciones en texto plano
         evaluationRecommendations,
-        evaluationJudgment,
-        teamScrumIdNumber
+        evaluationJudgment
       );
 
       console.log("Respuesta del servidor:", response);
@@ -1465,7 +1464,7 @@ export default function InstructorChecklistView() {
       toast.info("🔄 Creando evaluación automáticamente...");
 
       const teamScrumIdNumber = selectedTeamScrumId ? parseInt(selectedTeamScrumId) : undefined;
-      const response = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id), teamScrumIdNumber);
+      const response = await evaluationService.createEvaluationForChecklist(parseInt(selectedChecklist.id), teamScrumIdNumber);
 
       if (response && response.code === "200") {
         toast.success("✅ Evaluación creada exitosamente");
@@ -1554,18 +1553,17 @@ export default function InstructorChecklistView() {
 
       // Crear la evaluación base usando createMissingEvaluationForChecklist
       const teamScrumIdNumber = selectedTeamScrumId ? parseInt(selectedTeamScrumId) : undefined;
-      const newEvaluationResult = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id), teamScrumIdNumber);
+      const newEvaluationResult = await evaluationService.createEvaluationForChecklist(parseInt(selectedChecklist.id), teamScrumIdNumber);
 
       if (newEvaluationResult && newEvaluationResult.code === "200" && newEvaluationResult.id) {
         console.log('✅ Evaluación base creada con ID:', newEvaluationResult.id);
 
         // Completar la evaluación con los datos del formulario
-        const completeResult = await completeEvaluation(
+        const completeResult = await evaluationService.completeEvaluation(
           parseInt(newEvaluationResult.id),
           evaluationData.observations,
           evaluationData.recommendations,
-          evaluationData.valueJudgment,
-          teamScrumIdNumber
+          evaluationData.valueJudgment
         );
 
         console.log('Complete result:', completeResult);
@@ -1683,7 +1681,7 @@ export default function InstructorChecklistView() {
       // No existe evaluación, crear una nueva
       console.log("No existe evaluación, creando nueva...");
       const teamScrumIdNumber = selectedTeamScrumId ? parseInt(selectedTeamScrumId) : undefined;
-      const createResponse = await createMissingEvaluationForChecklist(parseInt(selectedChecklist.id), teamScrumIdNumber);
+      const createResponse = await evaluationService.createEvaluationForChecklist(parseInt(selectedChecklist.id), teamScrumIdNumber);
       console.log("Create response:", createResponse);
 
       if (createResponse && createResponse.code === "200" && createResponse.id) {
@@ -1694,12 +1692,11 @@ export default function InstructorChecklistView() {
         
         // Guardar solo las observaciones generales (texto plano) en la base de datos
         const teamScrumIdNumber = selectedTeamScrumId ? parseInt(selectedTeamScrumId) : undefined;
-        const completeResponse = await completeEvaluation(
+        const completeResponse = await evaluationService.completeEvaluation(
           parseInt(createResponse.id),
           evaluationObservations, // Solo texto plano
           evaluationRecommendations,
-          evaluationJudgment,
-          teamScrumIdNumber
+          evaluationJudgment
         );
         console.log("Complete response:", completeResponse);
 

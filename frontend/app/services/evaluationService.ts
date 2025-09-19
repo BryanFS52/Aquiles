@@ -245,10 +245,10 @@ export const createMissingEvaluationForChecklist = async (
       
       try {
         // Importar el servicio de checklist para actualizar la vinculación
-        const { updateChecklistEvaluationLink } = await import('@services/checkListService');
+        const { checkListService } = await import('@redux/slices/checklistSlice');
         
-        if (updateChecklistEvaluationLink) {
-          const linkResult = await updateChecklistEvaluationLink(checklistId, parseInt(newEvaluationResponse.id));
+        if (checkListService.updateChecklistEvaluationLink) {
+          const linkResult = await checkListService.updateChecklistEvaluationLink(checklistId, parseInt(newEvaluationResponse.id));
           console.log('Linking result:', linkResult);
           
           if (linkResult && linkResult.code === "200") {

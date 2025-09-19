@@ -1,6 +1,6 @@
 import { client } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {GET_ALL_EVALUATIONS, GET_EVALUATION_BY_ID, ADD_EVALUATION, UPDATE_EVALUATION, DELETE_EVALUATION} from '@graphql/evaluationsGraph';
+import {GET_ALL_EVALUATIONS, GET_EVALUATION_BY_ID, ADD_EVALUATION, UPDATE_EVALUATION, DELETE_EVALUATION, GET_EVALUATIONS_BY_CHECKLIST} from '@graphql/evaluationsGraph';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import {
     Evaluation,
@@ -15,6 +15,184 @@ import {
     DeleteEvaluationMutation,
     DeleteEvaluationMutationVariables
 } from '@graphql/generated';
+
+// Service methods integrated into slice  
+interface EvaluationInput {
+    observations: string;
+    recommendations: string;
+    valueJudgment: string;
+    checklistId: number;
+}
+
+// Función de utilidad para comparar IDs de forma segura
+function safeIdComparison(id1: any, id2: any): boolean {
+    if (id1 == null || id2 == null) return false;
+    
+    // Comparación por string (más segura)
+    const stringMatch = id1.toString() === id2.toString();
+    
+    // Comparación numérica como respaldo
+    const numericMatch = parseInt(id1) === parseInt(id2) && !isNaN(parseInt(id1)) && !isNaN(parseInt(id2));
+    
+    return stringMatch || numericMatch;
+}
+
+const evaluationService = {
+    // Función para crear una evaluación directamente con todos los datos
+    createCompleteEvaluation: async (checklistId: number, observations: string, recommendations: string, valueJudgment: string) => {
+        try {
+            const numericChecklistId = parseInt(checklistId.toString());
+            
+            if (isNaN(numericChecklistId) || numericChecklistId <= 0) {
+                throw new Error(`ID de checklist inválido: ${checklistId}`);
+            }
+            
+            if (!observations || !observations.trim()) {
+                throw new Error('Las observaciones son requeridas');
+            }
+            
+            if (!recommendations || !recommendations.trim()) {
+                throw new Error('Las recomendaciones son requeridas');
+            }
+            
+            if (!valueJudgment || valueJudgment === "PENDIENTE") {
+                throw new Error('El juicio de valor es requerido');
+            }
+            
+            const evaluationInput = {
+                observations: observations.trim(),
+                recommendations: recommendations.trim(),
+                valueJudgment: valueJudgment,
+                checklistId: numericChecklistId
+            };
+
+            const { data } = await client.mutate({
+                mutation: ADD_EVALUATION,
+                variables: { input: evaluationInput },
+            });
+            
+            if (data && data.addEvaluation && data.addEvaluation.code === "200") {
+                return data.addEvaluation;
+            } else {
+                throw new Error(`Error creating complete evaluation: ${data?.addEvaluation?.message}`);
+            }
+        } catch (error) {
+            console.error('❌ Error creating complete evaluation:', error);
+            throw error;
+        }
+    },
+
+    // Función para crear una evaluación automáticamente al crear una lista de chequeo
+    createEvaluationForChecklist: async (checklistId: number, checklistData?: any) => {
+        try {
+            const numericChecklistId = parseInt(checklistId.toString());
+            
+            if (isNaN(numericChecklistId) || numericChecklistId <= 0) {
+                throw new Error(`ID de checklist inválido: ${checklistId}`);
+            }
+            
+            const evaluationInput = {
+                observations: "",
+                recommendations: "",
+                valueJudgment: "PENDIENTE",
+                checklistId: numericChecklistId
+            };
+
+            const { data } = await client.mutate({
+                mutation: ADD_EVALUATION,
+                variables: { input: evaluationInput },
+            });
+            
+            if (data && data.addEvaluation && data.addEvaluation.code === "200") {
+                return data.addEvaluation;
+            } else {
+                throw new Error(`Error creating evaluation: ${data?.addEvaluation?.message}`);
+            }
+        } catch (error: any) {
+            console.error('❌ Error creating evaluation:', error);
+            throw error;
+        }
+    },
+
+    // Función para obtener evaluaciones por checklist ID
+    fetchEvaluationsByChecklist: async (checklistId: number) => {
+        try {
+            const { data } = await client.query({
+                query: GET_EVALUATIONS_BY_CHECKLIST || GET_ALL_EVALUATIONS,
+                variables: GET_EVALUATIONS_BY_CHECKLIST ? { checklistId } : { page: 0, size: 100 },
+                fetchPolicy: 'no-cache',
+            });
+            
+            if (GET_EVALUATIONS_BY_CHECKLIST) {
+                return data.evaluationsByChecklist;
+            } else {
+                // Filtrar por checklistId si no hay query específica
+                if (data.allEvaluations && data.allEvaluations.data) {
+                    const filteredEvaluations = data.allEvaluations.data.filter((evaluation: any) => {
+                        return safeIdComparison(evaluation.checklistId, checklistId);
+                    });
+                    
+                    return {
+                        ...data.allEvaluations,
+                        data: filteredEvaluations
+                    };
+                }
+                return data.allEvaluations;
+            }
+        } catch (error) {
+            console.error('❌ Error fetching evaluations by checklist:', error);
+            throw error;
+        }
+    },
+
+    // Función para obtener una evaluación por ID
+    fetchEvaluationById: async (id: number) => {
+        try {
+            const { data } = await client.query({
+                query: GET_EVALUATION_BY_ID,
+                variables: { id },
+                fetchPolicy: 'no-cache',
+            });
+            return data.evaluationById;
+        } catch (error) {
+            console.error('Error fetching evaluation by ID:', error);
+            throw error;
+        }
+    },
+
+    // Función para actualizar una evaluación
+    updateEvaluation: async (id: number, evaluationData: EvaluationInput) => {
+        try {
+            const { data } = await client.mutate({
+                mutation: UPDATE_EVALUATION,
+                variables: { id, input: evaluationData },
+            });
+            return data.updateEvaluation;
+        } catch (error) {
+            console.error('Error updating evaluation:', error);
+            throw error;
+        }
+    },
+
+    // Función para completar una evaluación
+    completeEvaluation: async (evaluationId: number, observations: string, recommendations: string, valueJudgment: string) => {
+        try {
+            const currentEvaluation = await evaluationService.fetchEvaluationById(evaluationId);
+            
+            const evaluationData = {
+                observations: observations,
+                recommendations: recommendations,
+                valueJudgment: valueJudgment,
+                checklistId: currentEvaluation.data.checklistId
+            };
+
+            return await evaluationService.updateEvaluation(evaluationId, evaluationData);
+        } catch (error) {
+            console.error('Error completing evaluation:', error);
+            throw error;
+        }
+    }
+};
 
 
 const ttransformGraphQLToAttendanceItem = (graphqlData: any): Evaluation => {
@@ -320,5 +498,8 @@ const evaluationSlice = createSlice({
 });
 
 export const { } = evaluationSlice.actions;
+
+// Export service methods for compatibility
+export { evaluationService };
 
 export default evaluationSlice.reducer;

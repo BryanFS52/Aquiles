@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
-import { addChecklist } from '@services/checkListService'
+import { checkListService } from '@redux/slices/checklistSlice'
 import { trainingProjectService } from '@redux/slices/olympo/trainingProjectSlice'
 import { studySheetService } from '@redux/slices/olympo/studySheetSlice'
 

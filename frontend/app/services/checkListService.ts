@@ -154,9 +154,9 @@ export const verifyChecklistEvaluationLink = async (checklistId: number): Promis
     console.log('🔍 Verifying evaluation exists for checklist:', checklistId);
     
     // Importar dinámicamente para evitar dependencias circulares
-    const { fetchEvaluationsByChecklist } = await import('@services/evaluationService');
+    const { evaluationService } = await import('@redux/slices/evaluationSlice');
     
-    const evaluations = await fetchEvaluationsByChecklist(checklistId);
+    const evaluations = await evaluationService.fetchEvaluationsByChecklist(checklistId);
     
     if (evaluations && evaluations.data && evaluations.data.length > 0) {
       console.log('✅ Verification successful - Found', evaluations.data.length, 'evaluation(s) for checklist', checklistId);
