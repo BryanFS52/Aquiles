@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchJustificationTypes } from '@slice/justificationTypeSlice';
 import { fetchAttendancesWithJustificationsByStudentId } from '@slice/attendanceSlice';
 import {
-  fetchJustifications,
   showForm,
   resetForm,
   updateFormField,
@@ -37,14 +36,10 @@ export const JustificationsContainer: React.FC = () => {
   const base64Ref = useRef<string>('');
   const formRef = useRef<HTMLDivElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
-
-  // Estado local para controlar la carga del modal
-  const [shouldLoadModal, setShouldLoadModal] = useState(false);
-
-  const dispatch = useDispatch<AppDispatch>();
   const fileInputRefPrev = useRef<HTMLInputElement>(null);
+  const [shouldLoadModal, setShouldLoadModal] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
 
-  // Redux selectors
   const {
     data: justificationTypesData,
     loading: loadingJustificationTypes,
@@ -71,11 +66,7 @@ export const JustificationsContainer: React.FC = () => {
   const currentAttendance = useSelector(
     (state: RootState) => state.justification.form.currentAttendance
   );
-  
-  // const para simplificar el uso del ID del estudiante
-  TEMPORAL_APRENDIZ_ID;
 
-  // Effects
   useEffect(() => {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
     dispatch(fetchAttendancesWithJustificationsByStudentId({ id: TEMPORAL_APRENDIZ_ID, stateId: 2 }));
@@ -92,8 +83,7 @@ export const JustificationsContainer: React.FC = () => {
       setShouldLoadModal(false);
     }
   }, [form.showForm, shouldLoadModal]);
-
-  // Handlers
+  
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -169,19 +159,17 @@ export const JustificationsContainer: React.FC = () => {
     dispatch(setSubmitting(true));
 
     try {
-      // Extraer studentId de la asistencia actual
       const studentId = currentAttendance?.student?.id;
       if (!studentId) {
         throw new Error("No se pudo obtener el ID del estudiante");
       }
 
-      // Construir el input según el JustificationDto esperado por el backend
       const formDataWithFile = {
         studentId: parseInt(studentId.toString()),
         description: form.formData.descripcion,
         justificationFile: base64Ref.current,
-        absenceDate: currentAttendance?.attendanceDate, // Usar la fecha de la asistencia
-        justificationDate: new Date().toISOString().split('T')[0], // Formato YYYY-MM-DD
+        absenceDate: currentAttendance?.attendanceDate,
+        justificationDate: new Date().toISOString().split('T')[0],
         state: false,
         attendance: {
           id: currentAttendance?.id,
@@ -196,7 +184,6 @@ export const JustificationsContainer: React.FC = () => {
         justificationType: { 
           id: form.formData.justificationTypeId.id.toString()
         },
-        // No incluir justificationStatus ya que se asigna automáticamente en el backend
       };
 
       await dispatch(addJustification(formDataWithFile)).unwrap();
@@ -211,7 +198,6 @@ export const JustificationsContainer: React.FC = () => {
         topRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 200);
     } catch (error: any) {
-      // console.error('Error al enviar justificación:', error);
       const errorString = JSON.stringify(error);
       let toastMessage = 'Error inesperado al enviar la justificación.';
 
@@ -291,7 +277,6 @@ export const JustificationsContainer: React.FC = () => {
     }
   };
 
-  // Loading states
   if (
     loadingJustificationTypes ||
     loadingAttendances ||

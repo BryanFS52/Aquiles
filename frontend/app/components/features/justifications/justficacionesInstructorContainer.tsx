@@ -9,7 +9,6 @@ import PageTitle from "@components/UI/pageTitle";
 import JustificationFilters from "@components/features/justifications/justificationsFilter";
 import JustificationTable from "@components/features/justifications/justificationsTable";
 import EmptyState from "@components/UI/emptyState";
-// import { CompetenceSelector } from "./components/CompetenceSelector";
 import { 
   setCompetenceQuarterFilterOptions,
   setCompetenceQuarterMultiFilter,
@@ -21,7 +20,6 @@ import {
   downloadBase64File,
   fetchJustificationsByCompetenceQuarter,
   setCompetenceQuarterMode,
-  debugCompareJustifications,
   MultiFilterState,
 } from "@slice/justificationSlice";
 import { fetchAllJustificationStatuses } from "@/redux/slices/justificationStatusSlice";
@@ -40,20 +38,17 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
   competenceQuarterId,
   fichaNumber 
 }) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter();
-  const { showLoader, hideLoader } = useLoader();
-
-  // Estados locales para gestión de competencias
   const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
   const [selectedCompetenceId, setSelectedCompetenceId] = useState<string>(competenceQuarterId?.toString() || '');
   const [isLoadingCompetences, setIsLoadingCompetences] = useState(true);
   const [fichaFilteredData, setFichaFilteredData] = useState<any[]>([]);
 
-  // Acceso directo al estado de Redux - usando los nuevos campos para competence quarter
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  const { showLoader, hideLoader } = useLoader();
+
   const justificationState = useSelector((state: RootState) => state.justification);
   
-  // Extraer propiedades del estado
   const {
     competenceQuarterData: justifications,
     competenceQuarterFilteredData: filteredData,
@@ -66,13 +61,11 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
     (state: RootState) => state.justificationStatus
   );
 
-  // Efecto inicial para cargar estados y activar modo competence quarter
   useEffect(() => {
     dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
     dispatch(setCompetenceQuarterMode(true));
   }, [dispatch]);
 
-  // Efecto para cargar las competencias disponibles
   useEffect(() => {
     const loadCompetences = async () => {
       try {
@@ -87,7 +80,6 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
         if (fetchStudySheetByTeacher.fulfilled.match(result)) {
           const studySheets = result.payload?.data || [];
           
-          // Extraer competencias únicas de todas las fichas
           const competencesMap = new Map<string, CompetenceOption>();
           
           studySheets.forEach((sheet: any) => {
@@ -112,18 +104,12 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
           
           setAvailableCompetences(competencesArray);
           
-          // Si hay un competenceQuarterId de prop, verificar que exista en la lista
           if (competenceQuarterId) {
             const exists = competencesArray.find(c => c.id === competenceQuarterId.toString());
             if (exists) {
               setSelectedCompetenceId(competenceQuarterId.toString());
-            } else {
-              // Warning handled silently
             }
           }
-          
-        } else {
-          // Error handled silently
         }
       } catch (error) {
         // Error handled silently
@@ -135,7 +121,6 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
     loadCompetences();
   }, [dispatch, competenceQuarterId]);
 
-  // Efecto para cargar justificaciones cuando cambia la competencia seleccionada
   useEffect(() => {
     if (selectedCompetenceId && !isLoadingCompetences) {
       const competenceId = parseInt(selectedCompetenceId);
@@ -152,12 +137,10 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
     }
   }, [selectedCompetenceId, isLoadingCompetences, dispatch, fichaNumber]);
 
-  // Efecto para filtrar por ficha cuando sea necesario
   useEffect(() => {
     if (fichaNumber && filteredData) {
       
       const filtered = filteredData.filter((item: any) => {
-        // Buscar el número de ficha - ahora debería estar en el campo 'ficha'
         const itemFichaNumber = item.ficha || 
                                item.fichaNumero || 
                                item.studySheetNumber || 
@@ -176,7 +159,6 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
     }
   }, [filteredData, fichaNumber]);
 
-  // Gestión del loader
   useEffect(() => {
     if (loading || isLoadingCompetences) {
       showLoader();
@@ -204,25 +186,10 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
   const handleCompetenceChange = (competenceId: string) => {
     setSelectedCompetenceId(competenceId);
     
-    // Actualizar la URL para reflejar la nueva competencia, manteniendo el parámetro de ficha
     if (competenceId) {
       const baseUrl = `/dashboard/justificacionesInstructor/${competenceId}`;
       const urlWithFicha = fichaNumber ? `${baseUrl}?ficha=${fichaNumber}` : baseUrl;
       router.push(urlWithFicha);
-    }
-  };
-
-  const handleDebugCompare = async () => {
-    if (!selectedCompetenceId) return;
-    
-    const competenceIdNum = parseInt(selectedCompetenceId);
-    if (isNaN(competenceIdNum)) return;
-    
-    try {
-      const result = await dispatch(debugCompareJustifications({ competenceQuarterId: competenceIdNum }));
-      // Debug result processed silently
-    } catch (error) {
-      // Error handled silently
     }
   };
 
@@ -265,7 +232,7 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
     const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.estado;
     
     if (currentStatusId === newStatusId) {
-      return; // No hacer nada si el estado es el mismo
+      return;
     }
 
     dispatch(updateJustificationStatus({ 
@@ -314,7 +281,6 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
   const competenceName = selectedCompetence?.name || "Ninguna seleccionada";
   const hasJustificationData = justifications && justifications.length > 0;
 
-  // Determinar si hay filtros aplicados
   const { selectedFiltro, searchTerm, enableMultiFilter, multiFilters } = filterOptions;
   const hasFiltersApplied = Boolean(
     selectedFiltro ||
@@ -324,9 +290,8 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
   const handleBackToCompetences = () => {
     router.push('/dashboard/justificacionesInstructor');
   };
-  // Función para renderizar el contenido principal
+  
   const renderContent = () => {
-    // Si está cargando competencias
     if (isLoadingCompetences) {
       return (
         <div className="flex justify-center items-center py-8">
@@ -335,26 +300,22 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
       );
     }
 
-    // Si no hay competencias disponibles
     if (availableCompetences.length === 0) {
       return (
         <EmptyState message="No se encontraron competencias disponibles para este instructor." />
       );
     }
 
-    // Si no hay competencia seleccionada
     if (!selectedCompetenceId) {
       return (
         <EmptyState message="Selecciona una competencia para ver las justificaciones correspondientes." />
       );
     }
 
-    // Si hay error
     if (errorMessage) {
       return <EmptyState message={errorMessage} />;
     }
 
-    // Si está cargando justificaciones
     if (loading && !hasJustificationData) {
       return (
         <div className="flex justify-center items-center py-8">
@@ -365,7 +326,6 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
       );
     }
 
-    // Mostrar tabla con datos
     return (
       <JustificationTable
         filteredData={fichaFilteredData}
@@ -386,34 +346,9 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
           Justificaciones de la Ficha: {fichaNumber || selectedCompetence?.studySheetNumber || 'N/A'} por la {competenceName || 'Competencia'}
         </PageTitle>
 
-      {/* Selector de Competencias */}
-      {/* <CompetenceSelector
-        competences={availableCompetences}
-        selectedCompetenceId={selectedCompetenceId}
-        isLoading={isLoadingCompetences}
-        onCompetenceChange={handleCompetenceChange}
-        onRefresh={handleRefresh}
-        isRefreshing={loading}
-      /> */}
-
-      {/* Filtros - Solo mostrar si hay competencia seleccionada */}
+      {/* Filtros */}
       {selectedCompetenceId && !isLoadingCompetences && (
-        <>
-          {/* Botón temporal de debug */}
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-yellow-800 mb-2">🐛 Debug Tool (Temporal)</h3>
-            <p className="text-xs text-yellow-700 mb-3">
-              Este botón compara las dos consultas para identificar por qué faltan justificaciones. 
-              Revisa la consola del navegador después de hacer click.
-            </p>
-            <button
-              onClick={handleDebugCompare}
-              className="bg-yellow-600 text-white px-4 py-2 rounded text-sm hover:bg-yellow-700"
-            >
-              🔍 Comparar Consultas (Ver Consola)
-            </button>
-          </div>
-          
+        <>          
           <JustificationFilters
             filterOptions={filterOptions}
             loading={loading}

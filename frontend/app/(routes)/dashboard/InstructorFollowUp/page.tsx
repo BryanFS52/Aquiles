@@ -1,5 +1,5 @@
 "use client"
-// Mal
+
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -9,15 +9,10 @@ import NoveltyModal from "@components/Modals/noveltyModal";
 import { fetchAttendances, StudentSummary } from "@redux/slices/attendanceSlice";
 import { openNoveltyModal } from "@redux/slices/themis/noveltySlice";
 import { AppDispatch, RootState } from "@redux/store";
-import { TEMPORAL_APRENDIZ_ID, TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
+import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
 
-// Función temporal para obtener el ID del instructor
-// TODO: Reemplazar con autenticación real cuando esté implementada
-TEMPORAL_INSTRUCTOR_ID; // Cambiar por el ID real del instructor
 const getAuthenticatedInstructorId = (): number => {
-    //: Valor por defecto (NO recomendado para producción)
-    // console.error('No se pudo obtener el ID del instructor autenticado. Usando valor por defecto.');
-    return TEMPORAL_INSTRUCTOR_ID; // Cambiar por el ID real del instructor
+    return TEMPORAL_INSTRUCTOR_ID;
 };
 
 export default function InstructorFollowUp() {
@@ -46,11 +41,8 @@ export default function InstructorFollowUp() {
             return;
         }
 
-        // Buscar las ausencias del estudiante en attendanceSummary
         const studentData = attendanceSummary.find((student: StudentSummary) => student.id === studentId);
         const absenceCount = studentData?.cantidad || 0;
-
-        // Obtener el ID del instructor autenticado
         const TEMPORAL_INSTRUCTOR_ID = getAuthenticatedInstructorId();
 
         try {
@@ -62,7 +54,6 @@ export default function InstructorFollowUp() {
                 studentDocument: studentData?.documento || 'N/A'
             })).unwrap();
         } catch (error: any) {
-            // console.error('Error opening novelty modal:', error);
             if (error.code === 'INSUFFICIENT_ABSENCES') {
                 toast.warn(error.message || 'El estudiante no tiene suficientes ausencias e injustificadas para reportar deserción');
             } else {
@@ -72,7 +63,6 @@ export default function InstructorFollowUp() {
     };
 
     const handleCloseNoveltyModal = () => {
-        // No necesitamos hacer nada aquí, el modal maneja su propio cierre via Redux
     };
 
     return (

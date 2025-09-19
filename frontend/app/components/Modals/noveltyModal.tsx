@@ -19,11 +19,9 @@ interface NoveltyModalProps {
 }
 
 export default function NoveltyModal({ isOpen, onClose }: NoveltyModalProps) {
-  const dispatch = useDispatch<AppDispatch>()
-  
-  // Estado local para manejar el archivo seleccionado
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  
+  const dispatch = useDispatch<AppDispatch>()
+
   const { 
     loading, 
     error, 
@@ -39,7 +37,32 @@ export default function NoveltyModal({ isOpen, onClose }: NoveltyModalProps) {
     loading: noveltyTypesLoading 
   } = useSelector((state: RootState) => state.noveltyType)
 
-  // Handle success
+  const canReport = selectedStudentAbsences?.canReportDesertion ?? false
+  const absenceCount = selectedStudentAbsences?.absenceCount ?? 0
+  const studentName = selectedStudentAbsences?.studentName || 'Estudiante desconocido'
+  const studentDocument = selectedStudentAbsences?.studentDocument || 'N/A'
+
+  // useEffect
+  useEffect(() => {
+    if (!isOpen && modalOpen) {
+      dispatch(closeModal())
+    }
+  }, [isOpen, modalOpen, dispatch])
+  
+  useEffect(() => {
+    if (!formData.noveltyFiles) {
+      setSelectedFile(null)
+    }
+  }, [formData.noveltyFiles])
+  
+  useEffect(() => {
+    if (error) {
+      const errorMessage = typeof error === 'string' ? error : error.message || 'Error al enviar novedad'
+      toast.error(errorMessage)
+      dispatch(clearError())
+    }
+  }, [error, dispatch])
+
   useEffect(() => {
     if (submitSuccess && lastResponse) {
       toast.success(`Novedad enviada exitosamente. Código: ${lastResponse.code}`)
@@ -49,30 +72,12 @@ export default function NoveltyModal({ isOpen, onClose }: NoveltyModalProps) {
     }
   }, [submitSuccess, lastResponse, dispatch, onClose])
 
-  // Handle error
-  useEffect(() => {
-    if (error) {
-      const errorMessage = typeof error === 'string' ? error : error.message || 'Error al enviar novedad'
-      toast.error(errorMessage)
-      dispatch(clearError())
-    }
-  }, [error, dispatch])
-
-  // Handle modal close
-  useEffect(() => {
-    if (!isOpen && modalOpen) {
-      dispatch(closeModal())
-    }
-  }, [isOpen, modalOpen, dispatch])
-
-  // Handle file selection
+  // Handlers
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       try {
-        // Mantener archivo localmente para mostrar información
         setSelectedFile(file)
-        // Procesar archivo - el base64 se almacenará automáticamente en Redux
         await dispatch(processFile(file)).unwrap()
       } catch (error) {
         toast.error('Error al procesar el archivo')
@@ -82,21 +87,13 @@ export default function NoveltyModal({ isOpen, onClose }: NoveltyModalProps) {
     }
   }
 
-  // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     dispatch(updateFormField({ field: name as any, value }))
   }
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // console.log('Form submission - formData before submit:', {
-    //   studentId: formData.studentId,
-    //   teacherId: formData.teacherId,
-    //   observation: formData.observation ? 'Present' : 'Empty',
-    //   noveltyType: formData.noveltyType.id ? 'Present' : 'Empty'
-    // })
     try {
       await dispatch(submitNovelty()).unwrap()
     } catch (error) {
@@ -104,37 +101,13 @@ export default function NoveltyModal({ isOpen, onClose }: NoveltyModalProps) {
     }
   }
 
-  // Handle close
   const handleClose = () => {
-    setSelectedFile(null) // Limpiar archivo seleccionado
+    setSelectedFile(null)
     dispatch(closeModal())
     onClose()
   }
 
-  // Limpiar archivo cuando se resetee el formulario
-  useEffect(() => {
-    if (!formData.noveltyFiles) {
-      setSelectedFile(null)
-    }
-  }, [formData.noveltyFiles])
-
-  // // Debug: monitorear cambios en IDs
-  // useEffect(() => {
-  //   console.log('FormData IDs changed:', {
-  //     studentId: formData.studentId,
-  //     teacherId: formData.teacherId,
-  //     modalOpen,
-  //     selectedStudentAbsences: selectedStudentAbsences ? 'Present' : 'Null'
-  //   })
-  // }, [formData.studentId, formData.teacherId, modalOpen, selectedStudentAbsences])
-
   if (!isOpen || !modalOpen) return null
-
-  // Check if student can report desertion
-  const canReport = selectedStudentAbsences?.canReportDesertion ?? false
-  const absenceCount = selectedStudentAbsences?.absenceCount ?? 0
-  const studentName = selectedStudentAbsences?.studentName || 'Estudiante desconocido'
-  const studentDocument = selectedStudentAbsences?.studentDocument || 'N/A'
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

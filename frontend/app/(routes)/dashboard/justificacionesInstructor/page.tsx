@@ -16,78 +16,22 @@ interface CompetenceOption {
   id: string;
   name: string;
   studySheetNumber?: number;
-  originalCompetenceId?: string; // ID original de la competencia
+  originalCompetenceId?: string;
 }
 
 export default function JustificacionesInstructorSelector() {
+  const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { showLoader, hideLoader } = useLoader();
-  
-  // Obtener el número de ficha desde los parámetros de búsqueda
   const fichaNumber = searchParams.get('ficha');
-  
-  const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const handleBackToFichas = () => {
     router.push('/dashboard/FichasInstructor');
   };
-
-  useEffect(() => {
-    const loadCompetences = async () => {
-      try {
-        setLoading(true);        
-        const result = await dispatch(fetchStudySheetByTeacher({ 
-          idTeacher: TEMPORAL_INSTRUCTOR_ID, 
-          page: 0, 
-          size: 20 
-        }));
-        
-        if (fetchStudySheetByTeacher.fulfilled.match(result)) {
-          const studySheets = result.payload?.data || [];
-          
-          // Filtrar por ficha específica
-          const filteredSheets = studySheets.filter((sheet: any) => sheet.number.toString() === fichaNumber);
-          
-          // Extraer todas las competencias de la ficha específica
-          const allCompetences: CompetenceOption[] = [];
-          
-          filteredSheets.forEach((sheet: any) => {
-            if (sheet.teacherStudySheets) {
-              sheet.teacherStudySheets.forEach((tss: any) => {
-                if (tss.competence && tss.competence.id && tss.competence.name) {
-                  allCompetences.push({
-                    id: tss.competence.id, // Usar ID original
-                    name: tss.competence.name,
-                    studySheetNumber: sheet.number,
-                    originalCompetenceId: tss.competence.id
-                  });
-                }
-              });
-            }
-          });
-          
-          const competencesArray = allCompetences
-            .sort((a, b) => a.name.localeCompare(b.name));
-          
-          setAvailableCompetences(competencesArray);
-          setError(null);
-        } else {
-          setError("Error al cargar las competencias disponibles");
-        }
-      } catch (error) {
-        console.error('Error loading competences:', error);
-        setError("Error al cargar las competencias disponibles");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCompetences();
-  }, [dispatch, fichaNumber]);
 
   const handleCompetenceSelect = (competence: CompetenceOption) => {
     const competenceId = competence.originalCompetenceId || competence.id;
@@ -101,15 +45,6 @@ export default function JustificacionesInstructorSelector() {
     return "Seleccionar Competencia para Justificaciones";
   };
 
-  useEffect(() => {
-    if (loading) {
-      showLoader();
-    } else {
-      hideLoader();
-    }
-  }, [loading, showLoader, hideLoader]);
-
-  // Función para renderizar cada card de competencia
   const renderCompetenceCard = (competence: CompetenceOption) => (
     <Card
       className="hover:shadow-xl hover:scale-105 cursor-pointer transition-all duration-300 group"
@@ -145,7 +80,6 @@ export default function JustificacionesInstructorSelector() {
     />
   );
 
-  // Función de filtro personalizada para las competencias
   const filterCompetences = (competence: CompetenceOption, filter: string): boolean => {
     return (
       competence.name.toLowerCase().includes(filter.toLowerCase()) ||
@@ -153,7 +87,65 @@ export default function JustificacionesInstructorSelector() {
     );
   };
 
-  // Si no hay ficha especificada, mostrar mensaje de error
+  useEffect(() => {
+    const loadCompetences = async () => {
+      try {
+        setLoading(true);        
+        const result = await dispatch(fetchStudySheetByTeacher({ 
+          idTeacher: TEMPORAL_INSTRUCTOR_ID, 
+          page: 0, 
+          size: 20 
+        }));
+        
+        if (fetchStudySheetByTeacher.fulfilled.match(result)) {
+          const studySheets = result.payload?.data || [];
+          
+          const filteredSheets = studySheets.filter((sheet: any) => sheet.number.toString() === fichaNumber);
+          
+          const allCompetences: CompetenceOption[] = [];
+          
+          filteredSheets.forEach((sheet: any) => {
+            if (sheet.teacherStudySheets) {
+              sheet.teacherStudySheets.forEach((tss: any) => {
+                if (tss.competence && tss.competence.id && tss.competence.name) {
+                  allCompetences.push({
+                    id: tss.competence.id,
+                    name: tss.competence.name,
+                    studySheetNumber: sheet.number,
+                    originalCompetenceId: tss.competence.id
+                  });
+                }
+              });
+            }
+          });
+          
+          const competencesArray = allCompetences
+            .sort((a, b) => a.name.localeCompare(b.name));
+          
+          setAvailableCompetences(competencesArray);
+          setError(null);
+        } else {
+          setError("Error al cargar las competencias disponibles");
+        }
+      } catch (error) {
+        console.error('Error loading competences:', error);
+        setError("Error al cargar las competencias disponibles");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCompetences();
+  }, [dispatch, fichaNumber]);
+
+  useEffect(() => {
+    if (loading) {
+      showLoader();
+    } else {
+      hideLoader();
+    }
+  }, [loading, showLoader, hideLoader]);
+
   if (!fichaNumber) {
     return (
       <div className="space-y-6">

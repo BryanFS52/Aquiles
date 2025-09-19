@@ -27,9 +27,6 @@ interface FilterOptions {
 
 export interface TransformedAttendanceItem {
     id: string;
-    // programa: string;
-    // ficha: string;
-    // fecha: string;
     estado: string;
     documento: string;
     aprendiz: string;
@@ -39,7 +36,7 @@ export interface StudentSummary {
     id: number;
     documento: string;
     aprendiz: string;
-    cantidad: number; // Total de ausencias e injustificadas
+    cantidad: number;
     consecutivas: number;
 }
 
@@ -64,9 +61,6 @@ const transformToComponentFormat = (attendances: Attendance[]): TransformedAtten
 
         return {
             id: a.id,
-            // programa: "Sin programa", // Dato no disponible en AttendanceItem
-            // ficha: "Sin ficha", // Dato no disponible en AttendanceItem
-            // fecha: new Date(a.attendanceDate).toLocaleDateString("es-CO"),
             estado: a.attendanceState?.status || "Sin estado",
             documento: person?.document || '',
             aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim()
@@ -84,23 +78,12 @@ const filterAttendances = (
 
     if (!selectedFiltro || selectedFiltro === "todo") {
         return data.filter((j) =>
-            // j.programa.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            // j.ficha.toString().includes(searchTerm) ||
-            // j.fecha.includes(searchTerm) ||
             j.estado.toLowerCase().includes(searchTerm.toLowerCase())
         );
     }
 
     return data.filter((j) => {
         switch (selectedFiltro) {
-            // Casos comentados porque estos campos no están disponibles en TransformedAttendanceItem
-            // Si necesitas estos filtros, debes agregar los campos correspondientes a la interfaz
-            // case "programa":
-            //     return j.programa.toLowerCase().includes(searchTerm.toLowerCase());
-            // case "ficha":
-            //     return j.ficha.toString().includes(searchTerm);
-            // case "fecha":
-            //     return j.fecha.includes(searchTerm);
             case "estado":
                 return j.estado.toLowerCase().includes(searchTerm.toLowerCase());
             case "documento":
@@ -162,15 +145,6 @@ export const processAndSummarizeAttendances = (attendances: Attendance[]): Stude
             return (status === 'ausente' || status === 'injustificado') && !!a.attendanceDate;
         });
 
-        // // Debug: log de estados encontrados para este estudiante
-        // if (attendances.length > 0) {
-        //     const person = attendances[0]?.student?.person;
-        //     const allStatuses = attendances.map(a => a.attendanceState?.status).filter(Boolean);
-        //     const uniqueStatuses = [...new Set(allStatuses)];
-        //     console.log(`Estados de asistencia para ${person?.name} ${person?.lastname}:`, uniqueStatuses);
-        //     console.log(`Total ausencias + injustificadas encontradas: ${absences.length}`);
-        // }
-        // Ordenar por fecha (solo si la fecha existe)
         absences.sort((a, b) => {
             const dateA = a.attendanceDate ? new Date(a.attendanceDate).getTime() : 0;
             const dateB = b.attendanceDate ? new Date(b.attendanceDate).getTime() : 0;

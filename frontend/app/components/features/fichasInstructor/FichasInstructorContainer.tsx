@@ -14,38 +14,31 @@ import EmptyState from '@components/UI/emptyState';
 import { TEMPORAL_INSTRUCTOR_ID } from '@/temporaryCredential';
 
 export const FichasInstructorContainer: React.FC = () => {
+    const [selectedFicha, setSelectedFicha] = useState<StudySheetWithCompetence | null>(null);
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [loadingAttendance, setLoadingAttendance] = useState<string | null>(null);
+
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
     const { showLoader, hideLoader } = useLoader();
 
-    // Local state
-    const [selectedFicha, setSelectedFicha] = useState<StudySheetWithCompetence | null>(null);
-    const [isModalOpen, setModalOpen] = useState(false);
-    const [isTransitioning, setIsTransitioning] = useState(false);
-    const [loadingAttendance, setLoadingAttendance] = useState<string | null>(null); // ID de la ficha que está cargando
-
-    // Redux state
     const { data, loading, loadingAttendanceSheet } = useSelector((state: any) => state.studySheet);
     const fichas: StudySheetWithCompetence[] = data || [];
 
-    TEMPORAL_INSTRUCTOR_ID
-    // Effects
     useEffect(() => {
-        // Limpiar la selección de asistencia cuando se carga la página de fichas
         dispatch(clearAttendanceSelection());
         dispatch(fetchStudySheetByTeacher({ idTeacher: TEMPORAL_INSTRUCTOR_ID, page: 0, size: 5 }));
     }, [dispatch]);
 
     useEffect(() => {
-        // Solo mostrar loader para la carga inicial de fichas
         if (loading) {
             showLoader();
         } else {
             hideLoader();
         }
     }, [loading, showLoader, hideLoader]);
-
-    // Handlers
+    
     const handleViewApprentices = (ficha: StudySheetWithCompetence) => {
         setSelectedFicha(ficha);
         setModalOpen(true);
@@ -64,23 +57,19 @@ export const FichasInstructorContainer: React.FC = () => {
         setLoadingAttendance(studySheet.id);
         
         try {
-            // Construir la URL con los parámetros necesarios para persistencia
             const urlParams = new URLSearchParams();
             urlParams.set('studySheetId', studySheet.id);
             if (competenceId) {
                 urlParams.set('competenceId', competenceId.toString());
             }
             
-            // Navegar inmediatamente y que la página de destino maneje la carga
             router.push(`/dashboard/asistencia?${urlParams.toString()}`);
             
-            // Ejecutar la carga en paralelo (no bloqueante)
             dispatch(fetchStudySheetByIdWithAttendances({
                 id: parseInt(studySheet.id),
                 competenceId
             }));
             
-            // Limpiar el estado local después de un breve momento
             setTimeout(() => {
                 setLoadingAttendance(null);
             }, 200);
@@ -92,17 +81,14 @@ export const FichasInstructorContainer: React.FC = () => {
     };
 
     const handleTakeJustification = (studySheet: StudySheetWithCompetence) => {
-        // Si hay competenceId, navegar directamente a esa competencia con la ficha
         if (studySheet.competenceId) {
             const competenceQuarterId = studySheet.competenceId;
             router.push(`/dashboard/justificacionesInstructor/${competenceQuarterId}?ficha=${studySheet.number}`);
         } else {
-            // Si no hay competenceId, navegar a la página de selección con el número de ficha
             router.push(`/dashboard/justificacionesInstructor?ficha=${studySheet.number}`);
         }
     };
 
-    // Early returns
     if (!loading && (!fichas || fichas.length === 0)) {
         return <EmptyState message="No se encontraron fichas disponibles." />;
     }
@@ -121,7 +107,7 @@ export const FichasInstructorContainer: React.FC = () => {
                                         studySheet={studySheet}
                                         onViewApprentices={handleViewApprentices}
                                         onTakeAttendance={handleTakeAttendance}
-                                        loading={loadingAttendance === studySheet.id} // Solo mostrar loading en la ficha específica
+                                        loading={loadingAttendance === studySheet.id}
                                         onViewApprenticesJustifications={() => {
                                         }}
                                         onTakeJustification={handleTakeJustification}

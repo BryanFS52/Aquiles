@@ -4,7 +4,6 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload, GenericPaginatedState } from '@type/slices/common/generic'
 import { GET_NOVELTYTYPE_LIST } from '@graphql/themis/noveltyTypeGraph'
 
-// Interface para NoveltyType
 export interface NoveltyType {
     id: string;
     nameNovelty: string;
@@ -13,7 +12,6 @@ export interface NoveltyType {
     procedureDescription: string;
 }
 
-// Interface para la respuesta de la query
 export interface NoveltyTypeResponse {
     code: string;
     message: string;
@@ -24,7 +22,6 @@ export interface NoveltyTypeResponse {
     data: NoveltyType[];
 }
 
-// Query types (simuladas hasta que se generen automáticamente)
 export interface GetNoveltyTypesQuery {
     allNoveltyTypes: NoveltyTypeResponse;
 }
@@ -34,18 +31,15 @@ export interface GetNoveltyTypesQueryVariables {
     size?: number;
 }
 
-// Estado del slice extendido
 export interface NoveltyTypeState extends GenericPaginatedState<NoveltyType> {
     filteredData: NoveltyType[];
 }
 
-// Estado inicial
 const initialState: NoveltyTypeState = {
     ...createInitialPaginatedState<NoveltyType>(),
     filteredData: [],
 };
 
-// Async thunk para obtener tipos de novedad
 export const fetchNoveltyTypes = createAsyncThunk<
     NoveltyTypeResponse,
     { page?: number; size?: number },
@@ -54,7 +48,6 @@ export const fetchNoveltyTypes = createAsyncThunk<
     'noveltyType/fetchNoveltyTypes',
     async ({ page = 0, size = 100 }, { rejectWithValue }) => {
         try {
-            // console.log('Fetching novelty types:', { page, size });
 
             const { data } = await clientLAN.query<GetNoveltyTypesQuery, GetNoveltyTypesQueryVariables>({
                 query: GET_NOVELTYTYPE_LIST,
@@ -66,7 +59,6 @@ export const fetchNoveltyTypes = createAsyncThunk<
                 throw new Error('No se recibieron tipos de novedad del servidor');
             }
 
-            // console.log('Novelty types fetched successfully:', data.allNoveltyTypes);
             return data.allNoveltyTypes;
         } catch (error: any) {
             console.error('Error fetching novelty types:', error);
@@ -110,12 +102,11 @@ const noveltyTypeSlice = createSlice({
             state.totalPages = 0;
         },
         filterByDesercion: (state) => {
-            // Filtrar solo tipos de novedad que contengan "Deserción" en nameNovelty
+            // Filtrar por "Desercion"
             state.filteredData = state.data.filter(noveltyType =>
                 noveltyType.nameNovelty.toLowerCase().includes('deserción') ||
                 noveltyType.nameNovelty.toLowerCase().includes('desercion')
             );
-            // console.log('Filtered novelty types for Deserción:', state.filteredData);
         },
         resetFilter: (state) => {
             state.filteredData = state.data;
@@ -123,7 +114,6 @@ const noveltyTypeSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            // Fetch novelty types
             .addCase(fetchNoveltyTypes.pending, (state) => {
                 state.loading = true;
                 state.error = null;

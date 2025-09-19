@@ -30,7 +30,6 @@ import {
   generateFileName,
 } from "@slice/justificationSlice";
 
-// Helper component for formatting dates
 const formatDate = (dateString: string) => {
   const [year, month, day] = dateString.split('-').map(Number);
   const date = new Date(year, month - 1, day);
@@ -46,14 +45,12 @@ export const JustificationsContainer: React.FC = () => {
   const base64Ref = useRef<string>('');
   const formRef = useRef<HTMLDivElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
+  const fileInputRefPrev = useRef<HTMLInputElement>(null);
 
-  // Estado local para controlar la carga del modal
   const [shouldLoadModal, setShouldLoadModal] = useState(false);
 
   const dispatch = useDispatch<AppDispatch>();
-  const fileInputRefPrev = useRef<HTMLInputElement>(null);
 
-  // Redux selectors
   const {
     data: justificationTypesData,
     loading: loadingJustificationTypes,
@@ -81,7 +78,6 @@ export const JustificationsContainer: React.FC = () => {
     (state: RootState) => state.justification.form.currentAttendance
   );
 
-  // Effects
   useEffect(() => {
     dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
     dispatch(fetchAttendancesWithJustificationsByStudentId({ id: 2, stateId: 2 }));
@@ -98,8 +94,7 @@ export const JustificationsContainer: React.FC = () => {
       setShouldLoadModal(false);
     }
   }, [form.showForm, shouldLoadModal]);
-
-  // Handlers
+  
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -175,19 +170,17 @@ export const JustificationsContainer: React.FC = () => {
     dispatch(setSubmitting(true));
 
     try {
-      // Extraer studentId de la asistencia actual
       const studentId = currentAttendance?.student?.id;
       if (!studentId) {
         throw new Error("No se pudo obtener el ID del estudiante");
       }
 
-      // Construir el input según el JustificationDto esperado por el backend
       const formDataWithFile = {
         studentId: parseInt(studentId.toString()),
         description: form.formData.descripcion,
         justificationFile: base64Ref.current,
-        absenceDate: currentAttendance?.attendanceDate, // Usar la fecha de la asistencia
-        justificationDate: new Date().toISOString().split('T')[0], // Formato YYYY-MM-DD
+        absenceDate: currentAttendance?.attendanceDate,
+        justificationDate: new Date().toISOString().split('T')[0],
         state: false,
         attendance: {
           id: currentAttendance?.id,
@@ -202,10 +195,8 @@ export const JustificationsContainer: React.FC = () => {
         justificationType: { 
           id: form.formData.justificationTypeId.id.toString()
         },
-        // No incluir justificationStatus ya que se asigna automáticamente en el backend
       };
 
-      // console.log("🚀 Enviando justificación con datos:", formDataWithFile);
 
       await dispatch(addJustification(formDataWithFile)).unwrap();
 
@@ -299,7 +290,6 @@ export const JustificationsContainer: React.FC = () => {
     }
   };
 
-  // Loading states
   if (
     loadingJustificationTypes ||
     loadingAttendances ||
@@ -314,6 +304,7 @@ export const JustificationsContainer: React.FC = () => {
       </div>
     );
   }
+  
   if (errorJustificationTypes || errorAttendances)
     return <p>Error cargando datos</p>;
 
