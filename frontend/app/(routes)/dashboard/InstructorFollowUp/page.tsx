@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import AttendanceTable from "@components/features/asistencia/attendanceTable";
+import AttendanceTable from "@/components/features/InstructorFollowUp/attendanceTable";
 import PageTitle from "@components/UI/pageTitle";
 import NoveltyModal from "@components/Modals/noveltyModal";
 import { fetchAttendances, StudentSummary } from "@redux/slices/attendanceSlice";
@@ -69,13 +69,11 @@ export default function InstructorFollowUp() {
         <div className="space-y-4 sm:space-y-6 p-2 sm:p-4 md:p-6 lg:p-8">
             <PageTitle>Seguimiento de Ausencias</PageTitle>
 
-            <div className="overflow-x-auto">
                 <AttendanceTable
                     data={attendanceSummary}
                     loading={loading}
                     onReportNovelty={handleReportNovelty}
                 />
-            </div>
 
             {/* Modal de Novedad */}
             <NoveltyModal

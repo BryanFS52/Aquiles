@@ -146,6 +146,15 @@ export const GET_ATTENDANCES_BY_COMPETENCE_QUARTER_AND_JUSTIFICATIONS = gql`
           studentStudySheets {
             studySheet {
               number
+              teacherStudySheets{
+                competence{
+                    learningOutcome{
+                        code
+                        id
+                        name
+                    }
+                }
+              }
             }
           }
         }

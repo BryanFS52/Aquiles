@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.io.Serializable;
-import java.util.Base64;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,7 +13,7 @@ import java.util.Base64;
 @Setter
 @Entity
 @Table(name = "evaluations")
-public class Evaluation implements Serializable {
+public class Evaluations implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,27 +28,17 @@ public class Evaluation implements Serializable {
     @Column(name = "value_judgment", nullable = false, length = 60)
     private String valueJudgment;
 
-    @Column(name = "instructor_signature", nullable = false)
-    private byte[] instructorSignature;
-
-    // Relations
-    // 1. Relation (1-1) with checklist
+    // Relación uno a uno con Checklist - Esta evaluación pertenece a un único checklist
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "checklist_id", nullable = false, unique = true)
     private Checklist checklist;
 
     // Campo para asociar la evaluación a un team scrum específico
-    @Column(name = "team_scrum_id")
-    private Long teamScrumId;
+    @ManyToOne
+    @JoinColumn(name = "team_scrum_id")
+    private TeamsScrum teamsScrum;
 
-  
 
-    // Custom methods to handle signature as Base64
-    public byte[] getInstructorSignature() {
-        return Base64.getEncoder().encodeToString(instructorSignature).getBytes();
-    }
 
-    public void setInstructorSignature(byte[] instructorSignature) {
-        this.instructorSignature = Base64.getDecoder().decode(instructorSignature);
-    }
+
 }

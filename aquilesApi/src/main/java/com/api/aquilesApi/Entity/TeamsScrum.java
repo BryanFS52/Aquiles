@@ -65,6 +65,6 @@ public class TeamsScrum implements Serializable {
     private List<ChecklistQualification> checklistQualifications;
 
     // 6. Relation (1-M) with evaluations
-//    @OneToMany(mappedBy = "teamsScrum", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Evaluation> evaluations;
+    @OneToMany(mappedBy = "teamsScrum", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Evaluations> evaluations;
 }

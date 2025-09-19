@@ -194,10 +194,10 @@ export const submitNovelty = createAsyncThunk<
             const { novelty } = getState();
             const { formData, selectedStudentAbsences } = novelty;
 
-            if (!formData.observation.trim()) {
+            if (!formData.justification.trim()) {
                 return rejectWithValue({
                     code: 'VALIDATION_ERROR',
-                    message: 'La observación es requerida'
+                    message: 'La justificación es requerida'
                 });
             }
 

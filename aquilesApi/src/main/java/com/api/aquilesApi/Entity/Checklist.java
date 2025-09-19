@@ -1,24 +1,22 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Builder
 @Getter
 @Setter
 @Table(name = "checklist")
 public class Checklist implements Serializable {
-    @Transient
-    private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,6 +24,15 @@ public class Checklist implements Serializable {
     // Columns
     @Column(name = "state", nullable = false)
     private Boolean state;
+
+    @Column(name = "remarks", nullable = false, length = 255)
+    private String remarks;
+
+    @Column(name = "instructor_signature", nullable = false)
+    private byte[] instructorSignature;
+
+    @Column(name = "evaluation_criteria", nullable = false)
+    private boolean evaluationCriteria;
 
     @Column(name = "date_assigned", length = 30)
     private LocalDate dateAssigned;
@@ -46,20 +53,15 @@ public class Checklist implements Serializable {
     private String trainingProjectName;
 
     // Relations
-    // 1. Relation (M-M) with item
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "checklist_items",
-            joinColumns = @JoinColumn(name = "checklist_id"),
-            inverseJoinColumns = @JoinColumn(name = "item_id")
-    )
+    // 1.Relation (1-M) con item
+    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items;
 
-    // 2. Relation (1-1) with evaluations
+    // 2.Relación (1-1) con evaluations - Un checklist tiene una única evaluación
     @OneToOne(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Evaluation evaluation;
+    private Evaluations evaluation;
 
-    // 3. Relation (M-M) with teamsScrum
+    // 3.Relation (M-M) con teamsScrum
     @ManyToMany
     @JoinTable(
             name = "checklist_teams",
@@ -68,7 +70,15 @@ public class Checklist implements Serializable {
     )
     private List<TeamsScrum> teamsScrum;
 
-    // 4. Relation (1-M) with ChecklistQualification
-    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChecklistQualification> checklistQualifications;
+    // 4.Relation (1-M) con learningOutcome
+    @Column(name = "learningOutcome_id")
+    private Long LearningOutcome;
+
+    // 5.Relation (1-M) con juries
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "checklist_juries",
+            joinColumns = @JoinColumn(name = "checklist_id"),
+            inverseJoinColumns = @JoinColumn(name = "jury_id"))
+    private List<Juries> juries;
+
 }

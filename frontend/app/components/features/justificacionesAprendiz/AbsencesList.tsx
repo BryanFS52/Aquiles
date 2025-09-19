@@ -19,7 +19,17 @@ export const AbsencesList: React.FC<AbsencesListProps> = ({
     absences,
     onShowForm,
 }) => {
-    const sortedAbsences = [...absences].sort((a, b) => {
+    // Filtrar ausencias que no estén justificadas ni injustificadas
+    const filteredAbsences = absences.filter(absence => {
+        const justificationStatus = absence.justification?.justificationStatus?.name;
+        return justificationStatus !== "Justificado" && 
+               justificationStatus !== "Injustificado" && 
+               justificationStatus !== "Denegado" &&
+               justificationStatus !== "Aceptado";
+    });
+
+    const sortedAbsences = [...filteredAbsences].sort((a, b) => {
+
         const dateA = new Date(a.attendanceDate ?? '');
         const dateB = new Date(b.attendanceDate ?? '');
         return dateB.getTime() - dateA.getTime();
