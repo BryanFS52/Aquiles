@@ -1,0 +1,236 @@
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
+
+// Service methods integrated into slice
+const API_BASE_URL = "http://localhost:8080/api";
+
+interface EmailNotificationData {
+    email: string;
+    subject?: string;
+    htmlContent?: string;
+    studentName?: string;
+    date?: string;
+}
+
+const emailService = {
+    sendEmailAbsence: async (email: string, studentName: string, date: string) => {
+        try {
+            const subject = "Notificación de Inasistencia";
+            const htmlContent = `
+                <div style="max-width: 800px; margin: auto; background-color: #ffffff; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;">
+                <div style="background-color: #0e314d; padding: 16px;">
+                    <img src="cid:logoImage" alt="Logo Sena" style="width: 64px; height: 64px; display: block; margin: auto;" />
+                </div>
+                <div style="padding: 24px;">
+                    <h1 style="font-size: 1.5rem; color: #0e314d; font-family: 'Inter', sans-serif;">SENA</h1>
+                    <h5 style="color: #0e314d; font-size: 1rem; font-family: 'Inter', sans-serif;">
+                    Transformando el futuro con las nuevas habilidades del SENA.
+                    </h5>
+                    <h1 style="font-size: 1.25rem; font-weight: bold; color: #40b003;">
+                    Notificación de Inasistencia a Clase y Solicitud de Justificación
+                    </h1>
+                    <p style="margin-top: 16px; color: #0e314d; font-size: 1rem;">Hola, ${studentName}:</p>
+                    <p style="margin-top: 8px;">
+                    Nos hemos dado cuenta de que no asistió a la clase el día ${date}.
+                    </p>
+                    <p style="margin-top: 8px;">
+                    Entendemos que pueden haber razones válidas para su inasistencia. A continuación, le recordamos las tres excusas aceptables para justificar su ausencia:
+                    </p>
+                    <ul style="list-style-type: disc; margin-top: 16px; margin-bottom: 24px; padding-left: 20px;">
+                    <li>
+                        <strong style="color: #0e314d;">Certificado médico:</strong> Si estaba enfermo/a, por favor, adjunte un certificado médico que respalde su inasistencia.
+                    </li>
+                    <li>
+                        <strong style="color: #0e314d;">Previo aviso:</strong> Si informó sobre su ausencia antes de la clase, adjunte cualquier documento o comunicación previa que lo respalde.
+                    </li>
+                    <li>
+                        <strong style="color: #0e314d;">Calamidad doméstica:</strong> Si tuvo una emergencia en casa, adjunte una nota explicativa o cualquier documentación relevante.
+                    </li>
+                    </ul>
+                    <p style="font-size: 1.125rem; color: #0e314d; margin-top: 16px; font-weight: bold;">
+                    Recordatorio:
+                    </p>
+                    <p style="margin-top: 8px; margin-bottom: 24px;">
+                    Tenga en cuenta que las justificaciones deben presentarse dentro de un plazo de 3 días hábiles a partir de la fecha de la inasistencia. Pasado este plazo, la inasistencia será considerada injustificada.
+                    </p>
+                    <p style="margin-top: 16px; margin-bottom: 24px;">
+                    Para adjuntar el archivo correspondiente, por favor ingrese al apartado de justificaciones de la plataforma para cargar su justificación.
+                    </p>
+                    <a href="/justificacionaprendiz" style="display: inline-block; margin-top: 24px; background-color: #0e314d; color: #ffffff; font-weight: bold; padding: 12px 24px; border-radius: 4px; text-decoration: none;">
+                    Adjuntar evidencia
+                    </a>
+                </div>
+                </div>
+            `;
+
+            // Enviar solicitud POST al backend
+            const response = await axios.post(`${API_BASE_URL}/send-notification`, {
+                email,
+                subject,
+                htmlContent
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            return response.data;
+        } catch (error: any) {
+            // Log de errores si la solicitud falla
+            console.error('Error al enviar correo:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status
+            });
+            throw error;
+        }
+    },
+
+    sendSimpleEmailAbsence: async (email: string) => {
+        try {
+            const response = await axios.post('http://localhost:8080/api/send-notification', {
+                email: email,
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error al enviar el correo:', error);
+            throw error;
+        }
+    }
+};
+
+// Async thunks
+export const sendEmailAbsenceNotification = createAsyncThunk<any, { email: string; studentName: string; date: string }>(
+    'email/sendAbsenceNotification',
+    async ({ email, studentName, date }) => {
+        const response = await axios.post(`${API_BASE_URL}/send-notification`, {
+            email,
+            subject: "Notificación de Inasistencia",
+            htmlContent: `
+                <div style="max-width: 800px; margin: auto; background-color: #ffffff; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;">
+                <div style="background-color: #0e314d; padding: 16px;">
+                    <img src="cid:logoImage" alt="Logo Sena" style="width: 64px; height: 64px; display: block; margin: auto;" />
+                </div>
+                <div style="padding: 24px;">
+                    <h1 style="font-size: 1.5rem; color: #0e314d; font-family: 'Inter', sans-serif;">SENA</h1>
+                    <h5 style="color: #0e314d; font-size: 1rem; font-family: 'Inter', sans-serif;">
+                    Transformando el futuro con las nuevas habilidades del SENA.
+                    </h5>
+                    <h1 style="font-size: 1.25rem; font-weight: bold; color: #40b003;">
+                    Notificación de Inasistencia a Clase y Solicitud de Justificación
+                    </h1>
+                    <p style="margin-top: 16px; color: #0e314d; font-size: 1rem;">Hola, ${studentName}:</p>
+                    <p style="margin-top: 8px;">
+                    Nos hemos dado cuenta de que no asistió a la clase el día ${date}.
+                    </p>
+                    <p style="margin-top: 8px;">
+                    Entendemos que pueden haber razones válidas para su inasistencia. A continuación, le recordamos las tres excusas aceptables para justificar su ausencia:
+                    </p>
+                    <ul style="list-style-type: disc; margin-top: 16px; margin-bottom: 24px; padding-left: 20px;">
+                    <li>
+                        <strong style="color: #0e314d;">Certificado médico:</strong> Si estaba enfermo/a, por favor, adjunte un certificado médico que respalde su inasistencia.
+                    </li>
+                    <li>
+                        <strong style="color: #0e314d;">Previo aviso:</strong> Si informó sobre su ausencia antes de la clase, adjunte cualquier documento o comunicación previa que lo respalde.
+                    </li>
+                    <li>
+                        <strong style="color: #0e314d;">Calamidad doméstica:</strong> Si tuvo una emergencia en casa, adjunte una nota explicativa o cualquier documentación relevante.
+                    </li>
+                    </ul>
+                    <p style="font-size: 1.125rem; color: #0e314d; margin-top: 16px; font-weight: bold;">
+                    Recordatorio:
+                    </p>
+                    <p style="margin-top: 8px; margin-bottom: 24px;">
+                    Tenga en cuenta que las justificaciones deben presentarse dentro de un plazo de 3 días hábiles a partir de la fecha de la inasistencia. Pasado este plazo, la inasistencia será considerada injustificada.
+                    </p>
+                    <p style="margin-top: 16px; margin-bottom: 24px;">
+                    Para adjuntar el archivo correspondiente, por favor ingrese al apartado de justificaciones de la plataforma para cargar su justificación.
+                    </p>
+                    <a href="/justificacionaprendiz" style="display: inline-block; margin-top: 24px; background-color: #0e314d; color: #ffffff; font-weight: bold; padding: 12px 24px; border-radius: 4px; text-decoration: none;">
+                    Adjuntar evidencia
+                    </a>
+                </div>
+                </div>
+            `
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        return response.data;
+    }
+);
+
+export const sendSimpleEmailAbsence = createAsyncThunk<any, string>(
+    'email/sendSimpleAbsence',
+    async (email) => {
+        const response = await axios.post('http://localhost:8080/api/send-notification', {
+            email: email,
+        });
+        return response.data;
+    }
+);
+
+interface EmailState {
+    loading: boolean;
+    error: string | null;
+    lastSentEmail: string | null;
+}
+
+const initialState: EmailState = {
+    loading: false,
+    error: null,
+    lastSentEmail: null,
+};
+
+const emailSlice = createSlice({
+    name: 'email',
+    initialState,
+    reducers: {
+        clearEmailState: (state) => {
+            state.loading = false;
+            state.error = null;
+            state.lastSentEmail = null;
+        }
+    },
+    extraReducers: (builder) => {
+        // Send absence notification
+        builder
+            .addCase(sendEmailAbsenceNotification.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(sendEmailAbsenceNotification.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = null;
+                state.lastSentEmail = action.meta.arg.email;
+            })
+            .addCase(sendEmailAbsenceNotification.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message ?? 'Error sending email notification';
+            });
+
+        // Send simple absence notification
+        builder
+            .addCase(sendSimpleEmailAbsence.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(sendSimpleEmailAbsence.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = null;
+                state.lastSentEmail = action.meta.arg;
+            })
+            .addCase(sendSimpleEmailAbsence.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message ?? 'Error sending simple email';
+            });
+    }
+});
+
+export const { clearEmailState } = emailSlice.actions;
+
+// Export service methods for compatibility
+export { emailService };
+
+export default emailSlice.reducer;

@@ -267,6 +267,7 @@ export type ClassTypePage = {
 
 export type Collaborator = {
   administrative?: Maybe<Administrative>;
+  administrative?: Maybe<Administrative>;
   contractType?: Maybe<ContractType>;
   coordination?: Maybe<Coordination>;
   endDate?: Maybe<Scalars['String']['output']>;
@@ -275,6 +276,7 @@ export type Collaborator = {
   person?: Maybe<Person>;
   starDate?: Maybe<Scalars['String']['output']>;
   state?: Maybe<Scalars['Boolean']['output']>;
+  teacher?: Maybe<Teacher>;
   teacher?: Maybe<Teacher>;
 };
 
@@ -3201,6 +3203,7 @@ export type Person = {
   address?: Maybe<Scalars['String']['output']>;
   bloodType?: Maybe<Scalars['String']['output']>;
   collaborator?: Maybe<Collaborator>;
+  collaborator?: Maybe<Collaborator>;
   dateBirth?: Maybe<Scalars['String']['output']>;
   document?: Maybe<Scalars['String']['output']>;
   documentType?: Maybe<DocumentType>;
@@ -3211,6 +3214,7 @@ export type Person = {
   phone?: Maybe<Scalars['String']['output']>;
   photo?: Maybe<Scalars['String']['output']>;
   state?: Maybe<Scalars['Boolean']['output']>;
+  student?: Maybe<Student>;
   student?: Maybe<Student>;
   user?: Maybe<User>;
 };
@@ -4172,6 +4176,7 @@ export type QueryAllTeacherStudySheetTypeArgs = {
 
 
 export type QueryAllTeachersArgs = {
+  coordinationId?: InputMaybe<Scalars['Long']['input']>;
   coordinationId?: InputMaybe<Scalars['Long']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   personName?: InputMaybe<Scalars['String']['input']>;
