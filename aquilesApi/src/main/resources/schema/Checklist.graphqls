@@ -1,3 +1,4 @@
+
 type Checklist {
     id: ID!
     state: Boolean
@@ -6,14 +7,12 @@ type Checklist {
     component: String
     instructorSignature: String
     evaluationCriteria: Boolean
-    studySheets: String 
+    studySheets: String
     trainingProjectId: Long
     trainingProjectName: String
     evaluations: Evaluation
     items: [Item]
-    evaluation: Evaluation
-    teamsScrum: [TeamsScrum]
-    checklistQualifications: [ChecklistQualification]
+    associatedJuries: [Juries]
 }
 
 type ChecklistPage {
@@ -35,7 +34,6 @@ type ChecklistPageId {
 
 
 input ChecklistDto {
-    id: ID
     state: Boolean!
     remarks: String!
     trimester: String!
@@ -48,14 +46,16 @@ input ChecklistDto {
     evaluationId: Long
     evaluations: [EvaluationDto]
     items: [ItemDto]
-    evaluation: EvaluationDto
-    teamsScrum: [TeamsScrumDto]
-    checklistQualifications: [ChecklistQualificationDto]
+    associatedJuries: [Long]
+    deletedItemIds: [Long]  # ← Campo para IDs de items a eliminar
 }
 
 extend type Query {
     allChecklists(page: Int, size: Int): ChecklistPage
     checklistById(id: Long!): ChecklistPageId
+    exportChecklistToPdf(id: Long!): String
+    exportChecklistToExcel(id: Long!): String
+
 }
 
 extend type Mutation {
