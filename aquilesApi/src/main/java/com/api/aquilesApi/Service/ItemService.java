@@ -3,6 +3,9 @@ package com.api.aquilesApi.Service;
 import com.api.aquilesApi.Entity.Item;
 import com.api.aquilesApi.Repository.ItemRepository;
 import com.api.aquilesApi.Utilities.CustomException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,15 @@ public class ItemService {
 
     public ItemService(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
+    }
+
+    public Page<Item> findAll(PageRequest pageRequest) {
+        try {
+            return itemRepository.findAll(pageRequest);
+        } catch (Exception e) {
+            System.err.println("Error using findAllWithRelations, falling back to regular findAll: " + e.getMessage());
+            return itemRepository.findAll(pageRequest);
+        }
     }
 
     public Item findById(Long id) {

@@ -25,7 +25,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    createItem(item: ItemDto!): ItemPageId
+    addItem(item: ItemDto!): ItemPageId
     updateItem(id: Long!, item: ItemDto!): ItemPageId
     deleteItem(id: Long!): ItemPageId
 }
