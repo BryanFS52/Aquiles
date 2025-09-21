@@ -110,8 +110,6 @@ export default function JustificacionesCoordinator() {
 
         } else {
           const error = result.payload as any;
-          if (error?.code !== "500" || !error?.message?.includes("already has the specified status")) {
-          }
         }
       })
       .catch((error) => {

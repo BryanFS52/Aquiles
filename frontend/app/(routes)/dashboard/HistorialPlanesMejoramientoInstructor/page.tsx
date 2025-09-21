@@ -77,7 +77,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
             page: 0, 
             size: 5 
         }));
-    }, [dispatch]);
+    }, [dispatch, fichaData]);
 
     // Función para formatear fecha en horizontal
     const formatDate = (dateString: string) => {

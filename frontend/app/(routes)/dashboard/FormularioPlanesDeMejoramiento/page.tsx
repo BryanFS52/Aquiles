@@ -245,7 +245,7 @@ export default function FormularioPlanesDeMejoramientoPage() {
                 state: formData.state,
                 qualification: false, // Siempre false ya que no se puede calificar al crear
                 teacherCompetence: formData.teacherCompetenceId,
-                faultType: { id: formData.faultTypeId }
+                faultTypeId: formData.faultTypeId
             };
 
             // Logs corregidos para evitar errores de acceso
@@ -256,7 +256,7 @@ export default function FormularioPlanesDeMejoramientoPage() {
             console.log('Tipos de datos:');
             console.log('- studentId:', typeof improvementPlanData.studentId, '=', improvementPlanData.studentId);
             console.log('- teacherCompetence:', typeof improvementPlanData.teacherCompetence, '=', improvementPlanData.teacherCompetence);
-            console.log('- faultType:', improvementPlanData.faultType);
+            console.log('- faultTypeId:', typeof improvementPlanData.faultTypeId, '=', improvementPlanData.faultTypeId);
             console.log('- qualification:', typeof improvementPlanData.qualification, '=', improvementPlanData.qualification);
             console.log('===============================');
 
