@@ -33,17 +33,17 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
         const checkMobile = () => {
             setIsMobile(window.innerWidth < 768);
         };
-        
+
         checkMobile();
         window.addEventListener('resize', checkMobile);
-        
+
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
     // Extraer emails de todos los estudiantes de la ficha
     const getStudentEmails = () => {
         if (!selectedForAttendance?.studentStudySheets) return [];
-        
+
         return selectedForAttendance.studentStudySheets
             .filter((studentSheet: any) => {
                 // Solo incluir estudiantes activos/en formación
@@ -64,16 +64,16 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
 
     useEffect(() => {
         if (!isOpen) return;
-        
+
         setShowModal(true);
         setImageError(false); // Reset error state
-        
+
         // Generar QR con manejo de errores mejorado
         const generateQR = async () => {
             try {
                 console.log('🔄 Iniciando generación de QR...');
                 const result = await dispatch(generateQrCode({}));
-                
+
                 if (generateQrCode.fulfilled.match(result)) {
                     console.log('✅ QR generado exitosamente:', result.payload);
                 } else if (generateQrCode.rejected.match(result)) {
@@ -86,9 +86,9 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
                 toast.error('Error inesperado al generar el código QR. Verifica tu conexión.');
             }
         };
-        
+
         generateQR();
-        
+
         // Timer
         const interval = setInterval(() => {
             setTimer((prev) => {
@@ -106,7 +106,7 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
                 return prev - 1;
             });
         }, 1000);
-        
+
         return () => clearInterval(interval);
     }, [isOpen, dispatch, router, onClose]);
 
@@ -118,7 +118,7 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
         }
 
         const studentEmails = getStudentEmails();
-        
+
         if (studentEmails.length === 0) {
             toast.error("No hay estudiantes con emails válidos en esta ficha.");
             return;
@@ -157,7 +157,7 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
                 try {
                     // Generar URL de asistencia personalizada con el email del estudiante
                     const personalizedAttendanceUrl = `${attendanceUrl}&email=${encodeURIComponent(email)}`;
-                    
+
                     const htmlContent = getAttendanceEmailTemplate({
                         attendanceUrl: personalizedAttendanceUrl, // URL personalizada con email
                         sessionId: data.sessionId || '',
@@ -173,7 +173,7 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
                     };
 
                     const result = await dispatch(sendEmailNotification({ emailRequest }));
-                    
+
                     if (sendEmailNotification.fulfilled.match(result)) {
                         successCount++;
                         console.log(`✅ Correo enviado exitosamente a: ${email}`);
@@ -318,20 +318,19 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
                     </div>
                 </div>
 
-                {/* Action Buttons - Mantener normales en PC */}
-                <div className={`flex ${isMobile ? 'flex-col gap-2' : 'flex-col sm:flex-row gap-3'} w-full ${isMobile ? 'max-w-xs' : 'max-w-sm'}`}>
+                {/* Action Buttons - Centrados */}
+                <div className={`flex ${isMobile ? 'flex-col gap-3' : 'flex-row gap-4'} justify-center items-center w-full`}>
                     <button
-                        className={`bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold ${isMobile ? 'px-4 py-2.5 text-sm' : 'px-6 py-3'} rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto`}
+                        className={`bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold ${isMobile ? 'px-6 py-3 text-sm min-h-[48px] w-44' : 'px-6 py-3 min-h-[48px] w-40'} rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center`}
                         onClick={handleClose}
                     >
                         Cerrar
                     </button>
                     <button
-                        className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold ${isMobile ? 'px-4 py-2.5 text-sm min-h-[42px]' : 'px-6 py-3 min-h-[48px]'} rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 w-full sm:w-auto flex items-center justify-center gap-2 ${
-                            (loading || emailLoading || !data?.sessionId) 
-                                ? 'opacity-50 cursor-not-allowed hover:transform-none' 
+                        className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold ${isMobile ? 'px-6 py-3 text-sm min-h-[48px] w-44' : 'px-6 py-3 min-h-[48px] w-40'} rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2 ${(loading || emailLoading || !data?.sessionId)
+                                ? 'opacity-50 cursor-not-allowed hover:transform-none'
                                 : ''
-                        }`}
+                            }`}
                         onClick={sendAttendanceEmail}
                         disabled={loading || emailLoading || !data?.sessionId}
                     >
