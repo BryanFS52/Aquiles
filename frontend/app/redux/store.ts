@@ -2,8 +2,8 @@ import { configureStore } from "@reduxjs/toolkit";
 import justificationReducer from "@slice/justificationSlice";
 import justificationTypeReducer from "@slice/justificationTypeSlice";
 import justificationStatusReducer from "./slices/justificationStatusSlice";
-// import checklistReducer from "@slices/checklistSlice";
-// import evaluationReducer from "@slices/evaluationSlice";
+import checklistReducer from "@slice/checklistSlice";
+import evaluationReducer from "@slice/evaluationSlice";
 import studentReducer from "@slice/olympo/studentSlice";
 import programReducer from "@slice/olympo/programSlice";
 import studySheetReducer from "@slice/olympo/studySheetSlice";
@@ -26,8 +26,8 @@ const store = configureStore({
         justification: justificationReducer,
         justificationType: justificationTypeReducer,
         justificationStatus: justificationStatusReducer,
-        // checklist: checklistReducer,
-        // evaluation: evaluationReducer,
+        checklist: checklistReducer,
+        evaluation: evaluationReducer,
         student: studentReducer,
         program: programReducer,
         studySheet: studySheetReducer,
