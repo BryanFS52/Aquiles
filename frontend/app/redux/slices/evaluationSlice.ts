@@ -357,6 +357,7 @@ export const deleteEvaluation = createAsyncThunk<string, string,
                 variables: { id },
             });
 
+
             const res = data?.deleteEvaluation;
             if (!res || res.code !== '200') {
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
@@ -368,7 +369,6 @@ export const deleteEvaluation = createAsyncThunk<string, string,
         }
     }
 );      
-
 const initialState = createInitialPaginatedState<Evaluation>();
 
 const evaluationSlice = createSlice({
