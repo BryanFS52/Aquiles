@@ -12,11 +12,7 @@ import Link from "next/link";
 
 export default function StudySheetsPage() {
   const dispatch = useDispatch<AppDispatch>();
-  const {
-    data: studySheets,
-    loading: studySheetLoading,
-    error,
-  } = useSelector((state: RootState) => state.studySheet);
+  const { data: studySheets, loading: studySheetLoading, error } = useSelector((state: RootState) => state.studySheet);
   const { showLoader, hideLoader } = useLoader();
 
   useEffect(() => {
@@ -51,7 +47,6 @@ export default function StudySheetsPage() {
             : "Error desconocido al cargar las fichas."
         }
       />
-
     );
   }
 
@@ -62,7 +57,7 @@ export default function StudySheetsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="w-full px-2 sm:px-4 lg:px-8">
       <PageTitle>Teams Scrum</PageTitle>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {(studySheets as StudySheet[]).map((sheet) => (
@@ -73,7 +68,6 @@ export default function StudySheetsPage() {
           >
             <div className="w-full h-full rounded-xl sm:rounded-2xl overflow-hidden bg-white dark:bg-dark-card hover:shadow-lg dark:hover:bg-dark-cardHover transition-all duration-300 border border-lightGray dark:border-dark-border flex flex-col cursor-pointer transform hover:-translate-y-1 hover:scale-[1.02] relative min-h-[400px] sm:min-h-[450px]">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-lightGreen/5 dark:from-shadowBlue/10 dark:to-darkBlue/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
               <div className="relative p-4 sm:p-6 pb-3 sm:pb-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
                   <div className="bg-gradient-to-r from-primary to-lightGreen dark:from-shadowBlue dark:to-darkBlue text-white px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-bold text-center sm:text-left">
@@ -87,7 +81,6 @@ export default function StudySheetsPage() {
                   </div>
                 </div>
               </div>
-
               <div className="relative px-4 sm:px-6 pb-4 sm:pb-6 flex-1">
                 <div className="space-y-3 sm:space-y-4">
                   <div className="bg-gray-50 dark:bg-shadowBlue/50 rounded-lg p-3 sm:p-4">
@@ -99,7 +92,6 @@ export default function StudySheetsPage() {
                       {sheet.trainingProject?.program?.name ?? "No especificado"}
                     </p>
                   </div>
-
                   <div className="grid grid-cols-1 gap-2 sm:gap-3">
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-dark-border">
                       <span className="text-xs sm:text-sm text-grayText dark:text-dark-textSecondary font-medium">Jornada</span>
@@ -107,14 +99,12 @@ export default function StudySheetsPage() {
                         {sheet.journey?.name ?? "Sin jornada"}
                       </span>
                     </div>
-
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-dark-border">
                       <span className="text-xs sm:text-sm text-grayText dark:text-dark-textSecondary font-medium">Oferta</span>
                       <span className="text-xs sm:text-sm text-black dark:text-dark-text font-semibold text-right">
                         {sheet.offer?.name ?? "Sin oferta"}
                       </span>
                     </div>
-
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-dark-border">
                       <span className="text-xs sm:text-sm text-grayText dark:text-dark-textSecondary font-medium">Trimestre</span>
                       <span className="text-xs sm:text-sm text-black dark:text-dark-text font-semibold text-right">
@@ -122,17 +112,13 @@ export default function StudySheetsPage() {
                           if (!sheet.quarter || sheet.quarter.length === 0) {
                             return "Sin trimestre";
                           }
-
                           const lastQuarter = [...sheet.quarter]
                             .filter(q => q?.name?.number !== undefined)
                             .sort((a, b) => (b?.name?.number ?? 0) - (a?.name?.number ?? 0))[0];
-
                           return `${lastQuarter?.name?.extension} ${lastQuarter?.name?.number}`;
                         })()}
                       </span>
                     </div>
-
-
                     <div className="bg-blue-50 dark:bg-shadowBlue/20 rounded-lg p-3 space-y-2">
                       <div className="flex items-center space-x-2 mb-2">
                         <div className="w-2 h-2 bg-blue-500 dark:bg-lightGreen rounded-full"></div>
@@ -162,7 +148,6 @@ export default function StudySheetsPage() {
                   </div>
                 </div>
               </div>
-
               <div className="relative px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 dark:bg-shadowBlue/30 border-t border-gray-200 dark:border-dark-border mt-auto">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">

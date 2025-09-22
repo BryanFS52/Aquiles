@@ -12,7 +12,6 @@ import java.util.Map;
 @DgsComponent
 public class AttendanceCompetenceQuarterData {
 
-
     @DgsData(parentType = "Attendance")
     public Map<String, Object> competenceQuarter(DgsDataFetchingEnvironment env) {
         try {

@@ -1,20 +1,19 @@
 package com.api.aquilesApi.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
+import java.time.LocalDate; 
 import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Getter
-@Builder
 @Setter
+@Builder
+@Entity
 @Table(name = "attendances")
 public class Attendance implements Serializable {
     @Transient
@@ -39,7 +38,6 @@ public class Attendance implements Serializable {
     private Justification justification;
 
     // 2. Relation (1-1) with attendanceState
-    @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "stateAttendance_id", referencedColumnName = "id")
     private AttendanceState attendanceState;

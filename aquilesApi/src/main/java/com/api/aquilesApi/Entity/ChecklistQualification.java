@@ -6,10 +6,10 @@ import java.io.Serializable;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
+@Builder
 @Getter
 @Setter
-@Builder
-@Entity
 @Table(name = "checklist_qualifications")
 public class ChecklistQualification implements Serializable {
     @Id

@@ -1,19 +1,17 @@
 package com.api.aquilesApi.Entity;
 
 import  jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.List;
 
-@Entity
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
+@Builder
+@Entity
 @Table(name = "justificationStatus")
 public class JustificationStatus implements Serializable {
     @Id
