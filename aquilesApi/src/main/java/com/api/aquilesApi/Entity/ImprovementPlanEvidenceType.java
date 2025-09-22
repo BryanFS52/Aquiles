@@ -16,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "ImprovementPlan_evidence_types")
-public class ImprovementPlanEvidenceType implements Serializable {
+public class    ImprovementPlanEvidenceType implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
