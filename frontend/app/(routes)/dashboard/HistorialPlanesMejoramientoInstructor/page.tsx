@@ -162,7 +162,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                 <div className="flex items-center gap-2 whitespace-nowrap">
                     <FiCalendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                     <span className="text-sm text-gray-700 dark:text-white">
-                        {formatDate(row.date)}
+                        {row.date ? formatDate(row.date) : 'Fecha no disponible'}
                     </span>
                 </div>
             )
@@ -185,7 +185,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
             render: (row) => (
                 <div className="flex items-center gap-2">
                     <FiStar className="w-4 h-4 text-yellow-500 dark:text-yellow-400" />
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${getQualificationColor(row.qualification)}`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${getQualificationColor(row.qualification ?? null)}`}>
                         {(
                             typeof row.qualification === "boolean" && row.qualification === false
                         ) || row.qualification === null || row.qualification === undefined
@@ -264,7 +264,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
     ];
 
     // Función de filtro personalizada
-    const filterFunction = (row: ImprovementPlan, filter: string) => {
+    const filterFunction = (row: ImprovementPlan, filter: string): boolean => {
         const searchTerm = filter.toLowerCase().trim();
         if (!searchTerm) return true;
         
@@ -279,22 +279,22 @@ const HistorialPlanesMejoramientoInstructor = () => {
         
         return (
             // Búsqueda en datos del estudiante
-            (row.student?.person?.name && normalizeText(row.student.person.name).includes(normalizedSearch)) ||
-            (row.student?.person?.lastname && normalizeText(row.student.person.lastname).includes(normalizedSearch)) ||
-            (row.student?.person?.document && row.student.person.document.includes(searchTerm)) ||
+            (row.student?.person?.name ? normalizeText(row.student.person.name).includes(normalizedSearch) : false) ||
+            (row.student?.person?.lastname ? normalizeText(row.student.person.lastname).includes(normalizedSearch) : false) ||
+            (row.student?.person?.document ? row.student.person.document.includes(searchTerm) : false) ||
             // Búsqueda en competencia
-            (row.teacherCompetence?.competence?.name && normalizeText(row.teacherCompetence.competence.name).includes(normalizedSearch)) ||
+            (row.teacherCompetence?.competence?.name ? normalizeText(row.teacherCompetence.competence.name).includes(normalizedSearch) : false) ||
             // Búsqueda en ciudad
-            (row.city && normalizeText(row.city).includes(normalizedSearch)) ||
+            (row.city ? normalizeText(row.city).includes(normalizedSearch) : false) ||
             // Búsqueda en razón
-            (row.reason && normalizeText(row.reason).includes(normalizedSearch)) ||
+            (row.reason ? normalizeText(row.reason).includes(normalizedSearch) : false) ||
             // Búsqueda en tipo de falta
-            (row.faultType?.name && normalizeText(row.faultType.name).includes(normalizedSearch)) ||
+            (row.faultType?.name ? normalizeText(row.faultType.name).includes(normalizedSearch) : false) ||
             // Búsqueda por palabras clave específicas de tipo de falta
-            (row.faultType?.name && (
+            (row.faultType?.name ? (
                 (normalizeText(row.faultType.name).includes('academica') && normalizedSearch.includes('academica')) ||
                 (normalizeText(row.faultType.name).includes('disciplinaria') && normalizedSearch.includes('disciplinaria'))
-            )) ||
+            ) : false) ||
             // Búsqueda por estado de calificación
             (normalizedSearch.includes('aprobado') && !normalizedSearch.includes('no') && (
                 (typeof row.qualification === "boolean" && row.qualification === true) ||
@@ -307,7 +307,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                 (typeof row.qualification === "number" && row.qualification < 3.0)
             )) ||
             // Búsqueda por calificación numérica
-            (row.qualification?.toString().includes(searchTerm))
+            (row.qualification ? row.qualification.toString().includes(searchTerm) : false)
         );
     };
 

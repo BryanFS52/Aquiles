@@ -100,19 +100,6 @@ export default function AttendanceTable({
           filterPlaceholder="Buscar aprendiz o documento..."
           className="w-full min-w-[340px] sm:min-w-[600px] max-w-none"
         />
-        {loading && (
-          <div className="flex flex-col items-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black dark:border-white"></div>
-            <p className="text-lg font-medium mt-4">Cargando Asistencias...</p>
-          </div>
-        )}
-        {!loading && (!data || data.length === 0) && (
-          <div className="flex flex-col items-center py-8">
-            <FaRegFileAlt className="w-12 h-12 mb-4 opacity-50" />
-            <p className="text-lg font-medium mb-2">No hay ausencias</p>
-            <p className="text-sm">No se encontraron aprendices con ausencias.</p>
-          </div>
-        )}
       </div>
     </motion.div>
   );
