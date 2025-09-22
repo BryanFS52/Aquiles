@@ -54,16 +54,6 @@ public class Notifications implements Serializable {
     @JoinColumn(name = "justification_id", referencedColumnName = "id")
     private Justification justification;
 
-    // 4.Relation (1-1) con juries
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "jury_id", referencedColumnName = "id")
-    private Juries jury;
-
-    // 5.Relation (1-1) con improvementPlan
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "improvement_plan_id", referencedColumnName = "id")
-    private ImprovementPlan improvementPlan;
-
     // 6.Relation (1-1) con finalReport
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "final_report_id", referencedColumnName = "id")

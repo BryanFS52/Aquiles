@@ -191,6 +191,13 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
             name
           }
         }
+        teacherStudySheets {
+          id
+          competence {
+            id
+            name
+          }
+        }
         studentStudySheets {
           student {
             id
@@ -320,8 +327,8 @@ query studySheetByTeacherIdWithTeamScrum($idTeacher: Long, $page: Int, $size: In
 `;
 
 export const GET_STUDY_SHEET_BY_ID_WITH_ATTENDANCES = gql`
-query GetStudySheetByIdWithAttendances($id: Long!, $competenceId : Long) {
-  studySheetById(id: $id) {
+query GetStudySheetByIdWithAttendances($id: Long!, $competenceId : Long, $teacherId: Long) {
+  studySheetById(id: $id, teacherId : $teacherId) {
     code
     message
     data {

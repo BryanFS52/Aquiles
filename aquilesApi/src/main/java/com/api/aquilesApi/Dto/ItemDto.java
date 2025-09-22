@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemDto {
-
     private Long id;
 
     @NotBlank(message = "El código es obligatorio")
@@ -20,6 +19,6 @@ public class ItemDto {
     @NotBlank(message = "El indicador es obligatorio")
     @Size(max = 100, message = "El indicador no puede exceder los 100 caracteres")
     private String indicator;
-
     private Boolean active = true;
+    private ItemTypeDto itemType;
 }

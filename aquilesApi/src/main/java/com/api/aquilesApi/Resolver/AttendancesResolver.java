@@ -9,7 +9,6 @@ import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,12 +23,29 @@ import java.util.UUID;
 public class AttendancesResolver {
     private final AttendancesBusiness attendancesBusiness;
     private final QrCodeGenerator qrCodeGenerator;
-    private final ModelMapper modelMapper;
 
-    public AttendancesResolver(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator, ModelMapper modelMapper) {
+    public AttendancesResolver(AttendancesBusiness attendancesBusiness, QrCodeGenerator qrCodeGenerator) {
         this.attendancesBusiness = attendancesBusiness;
         this.qrCodeGenerator = qrCodeGenerator;
-        this.modelMapper = modelMapper;
+    }
+
+    // FindAll Attendances (GraphQL)
+    @DgsQuery
+    public Map<String, Object> allAttendances(@InputArgument Integer page, @InputArgument Integer size) {
+        try {
+            Page<AttendanceDto> attendancesDtoPage = attendancesBusiness.findAll(page, size);
+            return ResponseHttpApi.responseHttpFindAll(
+                    attendancesDtoPage.getContent(),
+                    ResponseHttpApi.CODE_OK,
+                    "Query ok",
+                    attendancesDtoPage.getTotalPages(),
+                    page,
+                    (int) attendancesDtoPage.getTotalElements()
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @DgsQuery
@@ -55,25 +71,6 @@ public class AttendancesResolver {
         }
     }
 
-    // FindAll Attendances (GraphQL)
-    @DgsQuery
-    public Map<String, Object> allAttendances(@InputArgument Integer page, @InputArgument Integer size) {
-        try {
-            Page<AttendanceDto> attendancesDtoPage = attendancesBusiness.findAll(page, size);
-            return ResponseHttpApi.responseHttpFindAll(
-                    attendancesDtoPage.getContent(),
-                    ResponseHttpApi.CODE_OK,
-                    "Query ok",
-                    attendancesDtoPage.getTotalPages(),
-                    page,
-                    (int) attendancesDtoPage.getTotalElements()
-            );
-        } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     // FindById Attendance (GraphQL)
     @DgsQuery
     public Map<String, Object> attendanceById(@InputArgument Long id) {
@@ -91,6 +88,31 @@ public class AttendancesResolver {
         }
     }
 
+    // FindAll Attendances By CompetenceQuarterId With Justifications (GraphQL)
+    @DgsQuery
+    public Map<String, Object> allAttendanceByCompetenceQuarterIdWithJustifications( @InputArgument Long competenceQuarterId, @InputArgument Integer page, @InputArgument Integer size) {
+        try {
+            int safePage = (page != null) ? page : 0;
+            int safeSize = (size != null) ? size : 10;
+
+            Pageable pageable = PageRequest.of(safePage, safeSize);
+            Page<AttendanceDto> attendances = attendancesBusiness.findAllByCompetenceQuarterId(competenceQuarterId, pageable);
+
+            return ResponseHttpApi.responseHttpFindAll(
+                    attendances.getContent(),
+                    ResponseHttpApi.CODE_OK,
+                    "Query by competence quarter id ok",
+                    attendances.getSize(),
+                    safePage,
+                    attendances.getTotalPages()
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
     // Add a new Attendance (GraphQL)
     @DgsMutation
     public Map<String, Object> addAttendance(@InputArgument(name = "input") AttendanceDto attendanceDto) {
@@ -100,9 +122,9 @@ public class AttendancesResolver {
             return ResponseHttpApi.responseHttpAction(
                     attendanceDto1.getId(),
                     ResponseHttpApi.CODE_OK,
-                    "Add ok"
+                    "Attendance created successfully"
             );
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error adding Attendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
@@ -117,7 +139,7 @@ public class AttendancesResolver {
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
-                    "Update ok"
+                    "Attendance updated successfully"
             );
         }
         catch (Exception e) {
@@ -135,7 +157,7 @@ public class AttendancesResolver {
             return ResponseHttpApi.responseHttpAction(
                     id,
                     ResponseHttpApi.CODE_OK,
-                    "Delete ok"
+                    "Attendance deleted successfully"
             );
         }
         catch (Exception e) {
@@ -151,7 +173,7 @@ public class AttendancesResolver {
     @DgsMutation
     public QRCodePayloadDto generateQRCode() throws Exception {
         String sessionId = UUID.randomUUID().toString();
-        String qrUrl = frontendUrl + "/FormularioQRAsistencia?session=" + sessionId;
+        String qrUrl = frontendUrl + "/dashboard/FormularioQRAsistencia?session=" + sessionId;
 
         byte[] qrCode = qrCodeGenerator.generateQRCodeImage(qrUrl);
         String qrCodeBase64 = Base64.getEncoder().encodeToString(qrCode);

@@ -49,7 +49,7 @@ public  final class FIleMapper {
         return Base64.getEncoder().encodeToString(value);
     }
 
-    // Genéricos (también estáticos)
+    // Generics
     public static byte[] map(String value) {
         return stringToBytes(value);
     }

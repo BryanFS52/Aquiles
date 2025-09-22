@@ -14,7 +14,7 @@ import java.util.List;
 public interface TeamScrumMap {
     TeamScrumMap INSTANCE = Mappers.getMapper(TeamScrumMap.class);
 
-    TeamsScrumDto EntityToDto(TeamsScrumDto teamsScrum);
+    TeamsScrumDto EntityToDto(TeamsScrum teamsScrum);
 
     TeamsScrum DtoToEntity(TeamsScrumDto teamsScrum);
 

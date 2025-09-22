@@ -45,11 +45,12 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
   const { justificationStatuses } = useSelector(
     (state: RootState) => state.justificationStatus
   );
+
+  // const competenceQuarterId = 
   
   useEffect(() => {
     dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
-    // Activar el modo competence quarter
-    dispatch(setCompetenceQuarterMode(true));
+    dispatch(fetchJustificationsByCompetenceQuarter({ competenceQuarterId}));
   }, [dispatch]);
 
   const handleFilterChange = (filterType: string, value: string) => {

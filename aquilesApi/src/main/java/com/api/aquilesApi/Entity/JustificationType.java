@@ -28,7 +28,7 @@ public class JustificationType implements Serializable {
     private String description;
 
     // Relations
-    // 1. Relation (1-M) con justification
+    // 1. Relation (1-M) with justification
     @OneToMany(mappedBy = "justificationType")
     private Set<Justification> justificationSet;
 }

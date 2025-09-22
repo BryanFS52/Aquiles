@@ -71,6 +71,10 @@ export const FichasInstructorContainer: React.FC = () => {
         }
     };
 
+    const handleTakeJustification = (studySheet: StudySheetWithCompetence) => {
+        router.push('/dashboard/justificacionesInstructor/[competenceQuarterId]');
+    };
+
     // Early returns
     if (!loading && (!fichas || fichas.length === 0)) {
         return <EmptyState message="No se encontraron fichas disponibles." />;
@@ -94,9 +98,7 @@ export const FichasInstructorContainer: React.FC = () => {
                                         onViewApprenticesJustifications={() => {
                                             // TODO: implement handler for viewing apprentices justifications
                                         }}
-                                        onTakeJustification={() => {
-                                            // TODO: implement handler for taking justification
-                                        }}
+                                        onTakeJustification={handleTakeJustification}
                                     />
                                 </div>
                             ))}

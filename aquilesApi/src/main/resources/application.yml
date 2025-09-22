@@ -59,4 +59,4 @@ spring:
       max-age: 3600
 
 frontend:
-  url: https://7d12-179-1-218-161.ngrok-free.app
+  url: https://d8dd663d03b5.ngrok-free.app
