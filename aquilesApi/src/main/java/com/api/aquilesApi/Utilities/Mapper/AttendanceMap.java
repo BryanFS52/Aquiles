@@ -26,4 +26,4 @@ public interface AttendanceMap {
         List<AttendanceDto> dtos = EntityToDTOs(attendances.getContent());
         return new PageImpl<>(dtos, attendances.getPageable(), attendances.getTotalElements());
     }
-}
+}   

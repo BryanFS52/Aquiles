@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useRef, useEffect } from 'react';
 import { IoPersonCircleOutline, IoCalendarOutline, IoMailOutline, IoCheckmarkCircleOutline } from "react-icons/io5";
@@ -10,17 +10,6 @@ import Webcam from "react-webcam";
 import jsQR from "jsqr";
 import type { RootState, AppDispatch } from "@redux/store";
 import { addAttendance } from "@redux/slices/attendanceSlice";
-
-// Interfaces
-interface AttendanceData {
-    attendanceDate: string;
-    studentId: number;
-    attendanceState: {
-        id: string;
-        status: string;
-    };
-    competenceQuarter: number;
-}
 
 // Función para obtener nombre del día en español
 const getDayName = (date: Date): string => {

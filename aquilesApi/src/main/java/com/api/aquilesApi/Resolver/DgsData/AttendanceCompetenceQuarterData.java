@@ -22,7 +22,6 @@ public class AttendanceCompetenceQuarterData {
 
             Attendance attendance;
             if (source instanceof AttendanceDto) {
-                System.out.println("ola");
                 attendance = AttendanceMap.INSTANCE.DTOToEntity((AttendanceDto) source);
             } else {
                 attendance = (Attendance) source;
@@ -34,7 +33,6 @@ public class AttendanceCompetenceQuarterData {
 
             return Map.of("id", attendance.getCompetenceQuarter());
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println("Error getting Attendance: ");
             throw new RuntimeException("Error getting Attendance: " + e.getMessage());
         }

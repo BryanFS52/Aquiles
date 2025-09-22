@@ -2,6 +2,7 @@
 
 import React from "react";
 import { LucideIcon } from "lucide-react";
+import Image from "next/image";
 
 interface WelcomeHeroProps {
     userName?: string;
@@ -105,7 +106,7 @@ export const WelcomeHero: React.FC<WelcomeHeroProps> = ({
                                     <div className="absolute inset-6 flex items-center justify-center">
                                         <div className="relative w-full h-full rounded-full overflow-hidden backdrop-blur-sm border-2 border-white/20 shadow-2xl animate-logo-glow">
                                             <div className="dark:hidden">
-                                                <img
+                                                <Image
                                                     src={logoSrc}
                                                     alt="Aquiles Logo"
                                                     className="w-full h-full object-contain p-4 animate-logo-pulse"
@@ -113,7 +114,7 @@ export const WelcomeHero: React.FC<WelcomeHeroProps> = ({
                                                 />
                                             </div>
                                             <div className="hidden dark:block">
-                                                <img
+                                                <Image
                                                     src={logoSrc}
                                                     alt="Aquiles Logo"
                                                     className="w-full h-full object-contain p-4 animate-logo-pulse"

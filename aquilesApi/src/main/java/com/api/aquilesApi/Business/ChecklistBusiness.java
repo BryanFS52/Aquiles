@@ -18,13 +18,14 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
 
-@Service
+@Component
 public class ChecklistBusiness {
 
     private final ChecklistService checklistService;
