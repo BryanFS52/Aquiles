@@ -2,10 +2,7 @@ package com.api.aquilesApi.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -16,6 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Getter
+@Builder
 @Setter
 @Table(name = "attendances")
 public class Attendance implements Serializable {
@@ -36,16 +34,17 @@ public class Attendance implements Serializable {
     private Long competenceQuarter;
 
     // Relations
-    // Relation (1-1) con justification
+    // 1. Relation (1-1) with justification
     @OneToOne(mappedBy = "attendance", cascade = CascadeType.ALL)
     private Justification justification;
 
+    // 2. Relation (1-1) with attendanceState
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "stateAttendance_id", referencedColumnName = "id")
     private AttendanceState attendanceState;
 
-    // 3.Relation (M-M) con notifications
+    // 3.Relation (M-M) with notifications
     @ManyToMany(mappedBy = "attendances")
     private Set<Notifications> notifications;
 

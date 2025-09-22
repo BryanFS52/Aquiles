@@ -66,7 +66,7 @@ public class JustificationService implements Idao<Justification, Long> {
         this.justificationRepository.delete(entity);
     }
 
-    //Justification by attendance by Student ID
+    // Justification by attendance by Student ID
     public List<Justification> findByStudentId(Long studentId) {
         return justificationRepository.findAllByAttendanceStudentId(studentId);
     }

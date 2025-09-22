@@ -133,7 +133,7 @@ export const JustificationsContainer: React.FC = () => {
         const reader = new FileReader();
         reader.onloadend = () => {
           const result = reader.result as string;
-          const base64 = result.split(',')[1];
+          const base64 = result.split(',')[1].replace(/\s/g, '');
           resolve(base64);
         };
         reader.onerror = () => reject('Error al leer el archivo.');

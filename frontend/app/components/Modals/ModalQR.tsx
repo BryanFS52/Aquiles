@@ -8,6 +8,8 @@ import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState, AppDispatch } from "@redux/store";
 import { generateQrCode } from "@redux/slices/generateQrSlice";
+import { sendEmailNotification } from "@redux/slices/sendEmailSlice";
+import { getAttendanceEmailTemplate, getAttendanceEmailSubject } from "@templates/attendanceQrTemplate";
 import Modal from "@components/UI/Modal";
 
 interface ModalQRProps {
@@ -22,6 +24,7 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
     const { data, loading, error } = useSelector((state: RootState) => state.generateQr);
+    const { loading: emailLoading, error: emailError } = useSelector((state: RootState) => state.sendEmail);
     const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
@@ -49,13 +52,57 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
         }, 300);
     };
 
-    // Placeholder para integración GraphQL de envío de correo
+    // Función para enviar correo de asistencia con GraphQL
     const sendAttendanceEmail = async () => {
-        if (!data?.qrCodeBase64) {
-            toast.error("No hay imagen QR generada.");
+        if (!data?.sessionId) {
+            toast.error("No hay sesión QR generada.");
             return;
         }
-        toast.info("Función de envío de correo por GraphQL pendiente de integración.");
+
+        try {
+            const expirationTime = new Date(Date.now() + timer * 1000).toLocaleString('es-ES', {
+                timeZone: 'America/Bogota',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            // Generar URL de asistencia basada en el sessionId
+            const baseUrl = window.location.origin;
+            const attendanceUrl = `${baseUrl}/dashboard/FormularioQRAsistencia?sessionId=${data.sessionId}&token=${btoa(data.sessionId + ':' + Date.now())}`;
+
+            // Generar URLs completas para los logos (sin "public/" porque Next.js sirve desde /public como /)
+            const logoInstitution = `${baseUrl}/img/LogoAquiles.png`;
+            const logoSena = `${baseUrl}/img/logo_Sena.png`;
+
+            const htmlContent = getAttendanceEmailTemplate({
+                attendanceUrl,
+                sessionId: data.sessionId,
+                expirationTime,
+                defaultLogoInstitution: logoInstitution,
+                defaultLogoSena: logoSena
+            });
+
+            const emailRequest = {
+                email: apprenticeEmail,
+                subject: getAttendanceEmailSubject(),
+                htmlContent: htmlContent
+            };
+
+            const result = await dispatch(sendEmailNotification({ emailRequest }));
+            
+            if (sendEmailNotification.fulfilled.match(result)) {
+                toast.success("Correo de asistencia enviado exitosamente.");
+            } else {
+                toast.error("Error al enviar el correo de asistencia.");
+            }
+        } catch (error) {
+            console.error("Error al enviar correo:", error);
+            toast.error("Error inesperado al enviar el correo.");
+        }
     };
 
     const formatTime = (seconds: number) => {
@@ -94,12 +141,13 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
                     <button
                         className="group relative bg-gradient-to-r from-lime-600 to-green-600 hover:from-lime-700 hover:to-green-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg focus:outline-none focus:ring-4 focus:ring-lime-500/50 active:scale-95 flex items-center justify-center gap-2 min-w-[180px]"
                         onClick={sendAttendanceEmail}
-                        disabled={loading}
+                        disabled={loading || emailLoading || !data?.sessionId}
                     >
-                        Enviar Correo
+                        {emailLoading ? "Enviando..." : "Enviar Correo"}
                     </button>
                 </div>
                 {error && <span className="text-red-500 mt-4 text-center">{error.message}</span>}
+                {emailError && <span className="text-red-500 mt-2 text-center">Error enviando correo: {emailError.message}</span>}
             </div>
         </Modal>
     );

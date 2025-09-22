@@ -1,23 +1,14 @@
 package com.api.aquilesApi.Resolver.DgsEntityFetcher;
 
-import com.api.aquilesApi.Business.AttendancesBusiness;
 import com.api.aquilesApi.Dto.TeacherStudySheet;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsEntityFetcher;
-import org.modelmapper.ModelMapper;
 
 import java.util.Map;
 
 @DgsComponent
 public class TeacherStudySheetEntityFetcher {
 
-    private final AttendancesBusiness attendancesBusiness;
-
-    private final ModelMapper modelMapper;
-    public TeacherStudySheetEntityFetcher(AttendancesBusiness attendancesBusiness, ModelMapper modelMapper) {
-        this.attendancesBusiness = attendancesBusiness;
-        this.modelMapper = modelMapper;
-    }
     @DgsEntityFetcher(name = "TeacherStudySheet")
     public TeacherStudySheet getTeacherStudySheet(Map<String, Object> values){
         Long id = null;

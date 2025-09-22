@@ -1,0 +1,37 @@
+type ItemType {
+    id: ID!
+    name: String
+}
+
+type ItemTypePage {
+    data: [ItemType]
+    code: String
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type ItemTypePageId {
+    data: [ItemType]
+    date: String
+    code: String
+    message: String
+}
+
+input ItemTypeDto {
+    id: ID
+    name: String
+}
+
+extend type Query {
+    allItemTypes(page: Int, size: Int): ItemTypePage
+    itemTypeById(id: Long!): ItemTypePageId
+}
+
+extend type Mutation {
+    addItemType(input: ItemTypeDto!): Response
+    updateItemType(id: Long!, input: ItemTypeDto!): Response
+    deleteItemType(id: Long!): Response
+}

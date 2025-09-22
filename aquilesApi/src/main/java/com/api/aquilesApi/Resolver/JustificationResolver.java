@@ -26,7 +26,9 @@ public class JustificationResolver {
     @DgsQuery
     public Map<String, Object> allJustifications(@InputArgument Integer page, @InputArgument Integer size) {
         try {
+            System.out.println("aoalwdwadsd");
             Page<JustificationDto> justificationDtoPage = justificationBusiness.findAll(page, size);
+            System.out.println(justificationDtoPage.getTotalPages());
             return ResponseHttpApi.responseHttpFindAll(
                     justificationDtoPage.getContent(),
                     ResponseHttpApi.CODE_OK,
@@ -83,6 +85,7 @@ public class JustificationResolver {
     @DgsMutation
     public Map<String, Object> addJustification(@InputArgument(name = "input") JustificationDto justificationDto) {
         try {
+
             JustificationDto result = justificationBusiness.add(justificationDto);
 
             return ResponseHttpApi.responseHttpAction(

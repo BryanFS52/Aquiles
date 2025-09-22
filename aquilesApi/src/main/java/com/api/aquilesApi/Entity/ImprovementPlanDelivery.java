@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -25,7 +24,7 @@ public class ImprovementPlanDelivery implements Serializable {
     @Column(name = "delivery_format", nullable = false, unique = true)
     private String deliveryFormat;
 
-    // OneToMany con ImprovementPlanActivity
+    //  OneToMany with ImprovementPlanActivity
     @OneToMany(mappedBy = "delivery")
     private List<ImprovementPlanActivity> activities;
 
