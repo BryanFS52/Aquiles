@@ -292,7 +292,7 @@ export default function InstructorChecklistView() {
       setIsFinalSaved(false);
       setShowPreview(false);
     }
-  }, [selectedChecklist?.id, isClientMounted]); // Agregar isClientMounted como dependencia
+  }, [selectedChecklist, isClientMounted, isSignatureUpdate]); // Agregar isClientMounted como dependencia
 
   // Efecto para cargar datos de evaluación seleccionada INMEDIATAMENTE
   useEffect(() => {
@@ -349,7 +349,7 @@ export default function InstructorChecklistView() {
         setItemStates({});
       }
     }
-  }, [selectedEvaluation]);
+  }, [selectedEvaluation, selectedChecklist]);
 
   // Función auxiliar para sincronizar datos después de crear/actualizar evaluación
   const syncEvaluationDataAfterSave = async (checklistId: number, savedData: any) => {
@@ -560,7 +560,7 @@ export default function InstructorChecklistView() {
       console.log('🔄 Loading checklists for instructor sheet:', { id: selectedStudySheetId, number: selectedStudySheetNumber });
       loadActiveChecklists();
     }
-  }, [isClientMounted, selectedStudySheetId, loadActiveChecklists]);
+  }, [isClientMounted, selectedStudySheetId, selectedStudySheetNumber, loadActiveChecklists]);
 
   // Recuperar información del team scrum seleccionado desde localStorage
   useEffect(() => {

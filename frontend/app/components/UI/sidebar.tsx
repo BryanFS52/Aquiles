@@ -171,8 +171,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
                                 value={isClientMounted ? role : (initialRole || "instructor")}
                                 onChange={handleRoleChange}
                                 className="sidebar-select rounded-lg px-2 lg:px-3 py-1 border-2 border-white/30 
-                           bg-white/90 text-gray-900 dark:bg-dark-card dark:text-dark-text dark:border-dark-border
-                           font-bold shadow text-sm focus:outline-none focus:ring-2 focus:ring-darkGreen/60 transition-all duration-200"
+                            bg-white/90 text-gray-900 dark:bg-dark-card dark:text-dark-text dark:border-dark-border
+                            font-bold shadow text-sm focus:outline-none focus:ring-2 focus:ring-darkGreen/60 transition-all duration-200"
                             >
                                 <option value="instructor">Instructor</option>
                                 <option value="aprendiz">Aprendiz</option>

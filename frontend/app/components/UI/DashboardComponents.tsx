@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import React from "react";
 import { LucideIcon } from "lucide-react";
 import Image from "next/image";
@@ -109,16 +110,22 @@ export const WelcomeHero: React.FC<WelcomeHeroProps> = ({
                                                 <Image
                                                     src={logoSrc}
                                                     alt="Aquiles Logo"
+                                                    layout="intrinsic" // or "responsive" or "fill" depending on how you want the image to behave
                                                     className="w-full h-full object-contain p-4 animate-logo-pulse"
                                                     style={{ filter: "invert(1) drop-shadow(0 0 20px rgba(57,143,15,0.3))" }}
+                                                    width={100}  // Define a fixed width, or use a value that's appropriate for your design
+                                                    height={100} // Define a fixed height
                                                 />
                                             </div>
                                             <div className="hidden dark:block">
                                                 <Image
                                                     src={logoSrc}
                                                     alt="Aquiles Logo"
+                                                    layout="intrinsic" // or "responsive" or "fill"
                                                     className="w-full h-full object-contain p-4 animate-logo-pulse"
                                                     style={{ filter: "drop-shadow(0 0 20px rgba(57,143,15,0.3))" }}
+                                                    width={100}
+                                                    height={100}
                                                 />
                                             </div>
                                             {/* Shimmer effect */}

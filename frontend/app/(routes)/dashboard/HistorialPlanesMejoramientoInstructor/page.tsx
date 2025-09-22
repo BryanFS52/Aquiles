@@ -35,7 +35,13 @@ export default function HistorialPlanesMejoramientoInstructor() {
     }, []);
 
     useEffect(() => {
-        dispatch(fetchImprovementPlans({ page: 0, size: 5 }));
+        console.log('fichaData en HistorialPlanesMejoramientoInstructor:', fichaData);
+        
+        // Traer todos los planes de mejoramiento y filtrar del lado del cliente
+        dispatch(fetchImprovementPlans({ 
+            page: 0, 
+            size: 5 
+        }));
     }, [dispatch, fichaData]);
 
     const formatDate = (dateString: string) => {
@@ -105,7 +111,7 @@ export default function HistorialPlanesMejoramientoInstructor() {
                 <div className="flex items-center gap-2 whitespace-nowrap">
                     <FiCalendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                     <span className="text-sm text-gray-700 dark:text-white">
-                        {formatDate(row.date ?? "Sin fecha")}
+                        {row.date ? formatDate(row.date) : 'Fecha no disponible'}
                     </span>
                 </div>
             )
@@ -206,23 +212,32 @@ export default function HistorialPlanesMejoramientoInstructor() {
         }
     ];
 
+    // Función de filtro personalizada
     const filterFunction = (row: ImprovementPlan, filter: string): boolean => {
         const searchTerm = filter.toLowerCase().trim();
         if (!searchTerm) return true;
     const normalizeText = (text: string) => text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const normalizedSearch = normalizeText(searchTerm);
-        return Boolean(
-            (row.student?.person?.name && normalizeText(row.student.person.name).includes(normalizedSearch)) ||
-            (row.student?.person?.lastname && normalizeText(row.student.person.lastname).includes(normalizedSearch)) ||
-            (row.student?.person?.document && row.student.person.document.includes(searchTerm)) ||
-            (row.teacherCompetence?.competence?.name && normalizeText(row.teacherCompetence.competence.name).includes(normalizedSearch)) ||
-            (row.city && normalizeText(row.city).includes(normalizedSearch)) ||
-            (row.reason && normalizeText(row.reason).includes(normalizedSearch)) ||
-            (row.faultType?.name && normalizeText(row.faultType.name).includes(normalizedSearch)) ||
-            (row.faultType?.name && (
+        
+        return (
+            // Búsqueda en datos del estudiante
+            (row.student?.person?.name ? normalizeText(row.student.person.name).includes(normalizedSearch) : false) ||
+            (row.student?.person?.lastname ? normalizeText(row.student.person.lastname).includes(normalizedSearch) : false) ||
+            (row.student?.person?.document ? row.student.person.document.includes(searchTerm) : false) ||
+            // Búsqueda en competencia
+            (row.teacherCompetence?.competence?.name ? normalizeText(row.teacherCompetence.competence.name).includes(normalizedSearch) : false) ||
+            // Búsqueda en ciudad
+            (row.city ? normalizeText(row.city).includes(normalizedSearch) : false) ||
+            // Búsqueda en razón
+            (row.reason ? normalizeText(row.reason).includes(normalizedSearch) : false) ||
+            // Búsqueda en tipo de falta
+            (row.faultType?.name ? normalizeText(row.faultType.name).includes(normalizedSearch) : false) ||
+            // Búsqueda por palabras clave específicas de tipo de falta
+            (row.faultType?.name ? (
                 (normalizeText(row.faultType.name).includes('academica') && normalizedSearch.includes('academica')) ||
                 (normalizeText(row.faultType.name).includes('disciplinaria') && normalizedSearch.includes('disciplinaria'))
-            )) ||
+            ) : false) ||
+            // Búsqueda por estado de calificación
             (normalizedSearch.includes('aprobado') && !normalizedSearch.includes('no') && (
                 (typeof row.qualification === "boolean" && row.qualification === true) ||
                 (typeof row.qualification === "number" && row.qualification >= 3.0)
@@ -233,7 +248,8 @@ export default function HistorialPlanesMejoramientoInstructor() {
                 row.qualification === undefined ||
                 (typeof row.qualification === "number" && row.qualification < 3.0)
             )) ||
-            (row.qualification?.toString().includes(searchTerm))
+            // Búsqueda por calificación numérica
+            (row.qualification ? row.qualification.toString().includes(searchTerm) : false)
         );
     }
 
