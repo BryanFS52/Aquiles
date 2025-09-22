@@ -93,6 +93,36 @@ export const FichasInstructorContainer: React.FC = () => {
         return <EmptyState message="No se encontraron fichas disponibles." />;
     }
 
+    const handleTakeFollowUp = async (studySheet: StudySheetWithCompetence) => {
+        if (!studySheet.id) return;
+
+        const competenceId = studySheet.competenceId ?? undefined;
+
+        setLoadingAttendance(studySheet.id);
+        
+        try {
+            const urlParams = new URLSearchParams();
+            urlParams.set('studySheetId', studySheet.id);
+            if (competenceId) {
+                urlParams.set('competenceId', competenceId.toString());
+            }
+
+            router.push(`/dashboard/InstructorFollowUp?${urlParams.toString()}`);
+
+            dispatch(fetchStudySheetByIdWithAttendances({
+                id: parseInt(studySheet.id),
+                competenceId
+            }));
+            
+            setTimeout(() => {
+                setLoadingAttendance(null);
+            }, 200);
+            
+        } catch (error) {
+            console.error('Error al cargar la ficha:', error);
+            setLoadingAttendance(null);
+        }    };
+
     return (
         <>
             <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
@@ -111,6 +141,7 @@ export const FichasInstructorContainer: React.FC = () => {
                                         onViewApprenticesJustifications={() => {
                                         }}
                                         onTakeJustification={handleTakeJustification}
+                                        onTakeFollowUp={handleTakeFollowUp}
                                     />
                                 </div>
                             ))}
