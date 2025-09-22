@@ -292,7 +292,7 @@ export default function InstructorChecklistView() {
       setIsFinalSaved(false);
       setShowPreview(false);
     }
-  }, [selectedChecklist?.id, isClientMounted, isSignatureUpdate]); // Agregar isClientMounted como dependencia
+  }, [selectedChecklist, isClientMounted, isSignatureUpdate]); // Agregar isClientMounted como dependencia
 
   // Efecto para cargar datos de evaluación seleccionada INMEDIATAMENTE
   useEffect(() => {
