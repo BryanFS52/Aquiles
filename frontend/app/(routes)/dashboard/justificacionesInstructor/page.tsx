@@ -11,18 +11,29 @@ import { Card, CardGrid } from "@components/UI/Card";
 import { fetchStudySheetByTeacher } from "@slice/olympo/studySheetSlice";
 import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
 import { BookOpen, ArrowRight } from "lucide-react";
+import ModalLearningOutcome from "@components/Modals/ModalLearningOutcome";
 
 interface CompetenceOption {
   id: string;
   name: string;
   studySheetNumber?: number;
   originalCompetenceId?: string;
+  learningOutcomes?: LearningOutcome[];
+}
+
+interface LearningOutcome {
+  id: string;
+  name: string;
+  description?: string;
+  code?: number;
 }
 
 export default function JustificacionesInstructorSelector() {
   const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCompetence, setSelectedCompetence] = useState<CompetenceOption | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -34,8 +45,20 @@ export default function JustificacionesInstructorSelector() {
   };
 
   const handleCompetenceSelect = (competence: CompetenceOption) => {
-    const competenceId = competence.originalCompetenceId || competence.id;
-    router.push(`/dashboard/justificacionesInstructor/${competenceId}?ficha=${competence.studySheetNumber}`);
+    setSelectedCompetence(competence);
+    setIsModalOpen(true);
+  };
+
+  const handleLearningOutcomeSelect = (learningOutcomeId: string) => {
+    if (!selectedCompetence) return;
+    
+    const competenceId = selectedCompetence.originalCompetenceId || selectedCompetence.id;
+    router.push(`/dashboard/justificacionesInstructor/${competenceId}?ficha=${selectedCompetence.studySheetNumber}&learningOutcome=${learningOutcomeId}`);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedCompetence(null);
   };
 
   const getPageTitle = () => {
@@ -73,7 +96,7 @@ export default function JustificacionesInstructorSelector() {
           onClick={() => handleCompetenceSelect(competence)}
           className="w-full flex items-center justify-center gap-2 bg-primary dark:bg-secondary text-white px-4 py-2 rounded-lg hover:bg-primary/90 dark:hover:bg-secondary/90 transition-colors duration-200 group-hover:scale-105"
         >
-          Ver Justificaciones
+          Resultados de aprendizaje
           <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
         </button>
       }
@@ -108,11 +131,20 @@ export default function JustificacionesInstructorSelector() {
             if (sheet.teacherStudySheets) {
               sheet.teacherStudySheets.forEach((tss: any) => {
                 if (tss.competence && tss.competence.id && tss.competence.name) {
+                  // Mapear los learning outcomes
+                  const learningOutcomes = tss.competence.learningOutcome?.map((lo: any) => ({
+                    id: lo.id || '',
+                    name: lo.name || '',
+                    description: lo.description || '',
+                    code: lo.code
+                  })) || [];
+
                   allCompetences.push({
                     id: tss.competence.id,
                     name: tss.competence.name,
                     studySheetNumber: sheet.number,
-                    originalCompetenceId: tss.competence.id
+                    originalCompetenceId: tss.competence.id,
+                    learningOutcomes: learningOutcomes
                   });
                 }
               });
@@ -219,6 +251,16 @@ export default function JustificacionesInstructorSelector() {
         filterPlaceholder="Buscar por nombre de competencia..."
         filterFunction={filterCompetences}
         className="mt-6"
+      />
+
+      {/* Modal de Learning Outcomes */}
+      <ModalLearningOutcome
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        competenceName={selectedCompetence?.name || ''}
+        learningOutcomes={selectedCompetence?.learningOutcomes || []}
+        loading={false}
+        onSelectLearningOutcome={handleLearningOutcomeSelect}
       />
     </div>
   );

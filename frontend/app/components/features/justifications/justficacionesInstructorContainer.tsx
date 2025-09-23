@@ -32,11 +32,20 @@ interface CompetenceOption {
   id: string;
   name: string;
   studySheetNumber?: number;
+  learningOutcomes?: LearningOutcome[];
+}
+
+interface LearningOutcome {
+  id: string;
+  name: string;
+  description?: string;
+  code?: number;
 }
 
 export const JustificacionesInstructorContainer: React.FC<JustificacionesInstructorContainerProps> = ({ 
   competenceQuarterId,
-  fichaNumber 
+  fichaNumber,
+  learningOutcomeId
 }) => {
   const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
   const [selectedCompetenceId, setSelectedCompetenceId] = useState<string>(competenceQuarterId?.toString() || '');
@@ -87,11 +96,21 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
               sheet.teacherStudySheets.forEach((tss: any) => {
                 if (tss.competence && tss.competence.id && tss.competence.name) {
                   const competenceId = tss.competence.id;
+                  
+                  // Mapear los learning outcomes
+                  const learningOutcomes = tss.competence.learningOutcome?.map((lo: any) => ({
+                    id: lo.id || '',
+                    name: lo.name || '',
+                    description: lo.description || '',
+                    code: lo.code
+                  })) || [];
+
                   if (!competencesMap.has(competenceId)) {
                     competencesMap.set(competenceId, {
                       id: competenceId,
                       name: tss.competence.name,
-                      studySheetNumber: sheet.number
+                      studySheetNumber: sheet.number,
+                      learningOutcomes: learningOutcomes
                     });
                   }
                 }
@@ -138,17 +157,39 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
   }, [selectedCompetenceId, isLoadingCompetences, dispatch, fichaNumber]);
 
   useEffect(() => {
-    if (fichaNumber && filteredData) {
+    if ((fichaNumber || learningOutcomeId) && filteredData) {
       
       const filtered = filteredData.filter((item: any) => {
-        const itemFichaNumber = item.ficha || 
-                               item.fichaNumero || 
-                               item.studySheetNumber || 
-                               item.numeroFicha || 
-                               item.studySheet?.number ||
-                               item.attendance?.studySheet?.number;
-        
-        const matches = itemFichaNumber?.toString() === fichaNumber;
+        let matches = true;
+
+        // Filtro por ficha si está presente
+        if (fichaNumber) {
+          const itemFichaNumber = item.ficha || 
+                                 item.fichaNumero || 
+                                 item.studySheetNumber || 
+                                 item.numeroFicha || 
+                                 item.studySheet?.number ||
+                                 item.attendance?.studySheet?.number;
+          
+          matches = matches && itemFichaNumber?.toString() === fichaNumber;
+        }
+
+        // Filtro por learning outcome si está presente
+        if (learningOutcomeId && matches) {
+          // Buscar en las diferentes estructuras posibles donde puede estar el learning outcome
+          const learningOutcomeMatch = 
+            item.learningOutcomeId?.toString() === learningOutcomeId ||
+            item.attendance?.learningOutcome?.id?.toString() === learningOutcomeId ||
+            item.student?.studentStudySheets?.some((sss: any) => 
+              sss.studySheet?.teacherStudySheets?.some((tss: any) =>
+                tss.competence?.learningOutcome?.some((lo: any) => 
+                  lo.id?.toString() === learningOutcomeId
+                )
+              )
+            );
+
+          matches = matches && learningOutcomeMatch;
+        }
         
         return matches;
       });
@@ -157,7 +198,7 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
     } else {
       setFichaFilteredData(filteredData || []);
     }
-  }, [filteredData, fichaNumber]);
+  }, [filteredData, fichaNumber, learningOutcomeId]);
 
   useEffect(() => {
     if (loading || isLoadingCompetences) {
@@ -276,6 +317,24 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
     }
   };
 
+  const getPageTitle = () => {
+    const competenceName = selectedCompetence?.name || 'Competencia';
+    const fichaText = fichaNumber || selectedCompetence?.studySheetNumber || 'N/A';
+    
+    let title = `Justificaciones de la Ficha: ${fichaText} por la ${competenceName}`;
+    
+    if (learningOutcomeId && selectedCompetence?.learningOutcomes) {
+      const learningOutcome = selectedCompetence.learningOutcomes.find(
+        lo => lo.id === learningOutcomeId
+      );
+      if (learningOutcome) {
+        title += ` - ${learningOutcome.name}`;
+      }
+    }
+    
+    return title;
+  };
+
   const errorMessage = formatErrorMessage(error);
   const selectedCompetence = availableCompetences.find(c => c.id === selectedCompetenceId);
   const competenceName = selectedCompetence?.name || "Ninguna seleccionada";
@@ -343,7 +402,7 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
   return (
     <div className="space-y-6">
         <PageTitle onBack={() => router.back()}>
-          Justificaciones de la Ficha: {fichaNumber || selectedCompetence?.studySheetNumber || 'N/A'} por la {competenceName || 'Competencia'}
+          {getPageTitle()}
         </PageTitle>
 
       {/* Filtros */}

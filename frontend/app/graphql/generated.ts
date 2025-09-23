@@ -983,6 +983,22 @@ export type FloorPage = {
   totalPages?: Maybe<Scalars['Int']['output']>;
 };
 
+export type FollowUp = {
+  caseDescription?: Maybe<Scalars['String']['output']>;
+  committeeEventId?: Maybe<Scalars['ID']['output']>;
+  coordinatorId?: Maybe<Scalars['ID']['output']>;
+  creationDate?: Maybe<Scalars['String']['output']>;
+  evidenceFiles?: Maybe<Scalars['String']['output']>;
+  followUpFlowStatusId?: Maybe<Scalars['ID']['output']>;
+  followUpStatusId?: Maybe<Scalars['ID']['output']>;
+  followUpTypeId?: Maybe<Scalars['ID']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  isActive?: Maybe<Scalars['Boolean']['output']>;
+  studentId?: Maybe<Scalars['ID']['output']>;
+  studySheetId?: Maybe<Scalars['ID']['output']>;
+  teacherId?: Maybe<Scalars['ID']['output']>;
+};
+
 export type FollowUpAction = {
   description?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
@@ -1012,6 +1028,99 @@ export type FollowUpActionPageId = {
   data?: Maybe<FollowUpAction>;
   date?: Maybe<Scalars['String']['output']>;
   message?: Maybe<Scalars['String']['output']>;
+};
+
+export type FollowUpDto = {
+  caseDescription?: InputMaybe<Scalars['String']['input']>;
+  committeeEventId?: InputMaybe<Scalars['ID']['input']>;
+  coordinatorId?: InputMaybe<Scalars['ID']['input']>;
+  evidenceFiles?: InputMaybe<Scalars['String']['input']>;
+  followUpFlowStatusId?: InputMaybe<Scalars['ID']['input']>;
+  followUpStatusId?: InputMaybe<Scalars['ID']['input']>;
+  followUpTypeId?: InputMaybe<Scalars['ID']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  studentId?: InputMaybe<Scalars['ID']['input']>;
+  studySheetId?: InputMaybe<Scalars['ID']['input']>;
+  teacherId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type FollowUpFlowStatus = {
+  description?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+};
+
+export type FollowUpFlowStatusDto = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type FollowUpFlowStatusPage = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<FollowUpFlowStatus>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type FollowUpPage = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<FollowUp>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type FollowUpStatus = {
+  description?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+};
+
+export type FollowUpStatusDto = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type FollowUpStatusPage = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<FollowUpStatus>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type FollowUpType = {
+  description?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  isActive?: Maybe<Scalars['Boolean']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+};
+
+export type FollowUpTypeDto = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type FollowUpTypePage = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<FollowUpType>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
 };
 
 export type Headquarter = {
@@ -1595,6 +1704,10 @@ export type Mutation = {
   addEvaluation?: Maybe<Response>;
   addExternal?: Maybe<Response>;
   addFinalReport?: Maybe<Response>;
+  addFollowUp?: Maybe<Response>;
+  addFollowUpFlowStatus?: Maybe<Response>;
+  addFollowUpStatus?: Maybe<Response>;
+  addFollowUpType?: Maybe<Response>;
   addHeadquarter?: Maybe<Response>;
   addImprovementPlan?: Maybe<Response>;
   addImprovementPlanActivity?: Maybe<Response>;
@@ -1670,6 +1783,10 @@ export type Mutation = {
   deleteEvaluation?: Maybe<Response>;
   deleteExternal?: Maybe<Response>;
   deleteFinalReport?: Maybe<Response>;
+  deleteFollowUp?: Maybe<Response>;
+  deleteFollowUpFlowStatus?: Maybe<Response>;
+  deleteFollowUpStatus?: Maybe<Response>;
+  deleteFollowUpType?: Maybe<Response>;
   deleteHeadquarter?: Maybe<Response>;
   deleteImprovementPlan?: Maybe<Response>;
   deleteImprovementPlanActivity?: Maybe<Response>;
@@ -1745,6 +1862,10 @@ export type Mutation = {
   updateEvaluation?: Maybe<Response>;
   updateExternal?: Maybe<Response>;
   updateFinalReport?: Maybe<Response>;
+  updateFollowUp?: Maybe<Response>;
+  updateFollowUpFlowStatus?: Maybe<Response>;
+  updateFollowUpStatus?: Maybe<Response>;
+  updateFollowUpType?: Maybe<Response>;
   updateHeadquarter?: Maybe<Response>;
   updateImprovementPlan?: Maybe<Response>;
   updateImprovementPlanActivity?: Maybe<Response>;
@@ -1929,6 +2050,26 @@ export type MutationAddExternalArgs = {
 
 export type MutationAddFinalReportArgs = {
   input?: InputMaybe<FinalReportDto>;
+};
+
+
+export type MutationAddFollowUpArgs = {
+  input?: InputMaybe<FollowUpDto>;
+};
+
+
+export type MutationAddFollowUpFlowStatusArgs = {
+  input?: InputMaybe<FollowUpFlowStatusDto>;
+};
+
+
+export type MutationAddFollowUpStatusArgs = {
+  input?: InputMaybe<FollowUpStatusDto>;
+};
+
+
+export type MutationAddFollowUpTypeArgs = {
+  input?: InputMaybe<FollowUpTypeDto>;
 };
 
 
@@ -2312,6 +2453,26 @@ export type MutationDeleteExternalArgs = {
 
 export type MutationDeleteFinalReportArgs = {
   id: Scalars['Long']['input'];
+};
+
+
+export type MutationDeleteFollowUpArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteFollowUpFlowStatusArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteFollowUpStatusArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteFollowUpTypeArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -2708,6 +2869,30 @@ export type MutationUpdateExternalArgs = {
 export type MutationUpdateFinalReportArgs = {
   id: Scalars['Long']['input'];
   input?: InputMaybe<FinalReportDto>;
+};
+
+
+export type MutationUpdateFollowUpArgs = {
+  id: Scalars['ID']['input'];
+  input?: InputMaybe<FollowUpDto>;
+};
+
+
+export type MutationUpdateFollowUpFlowStatusArgs = {
+  id: Scalars['ID']['input'];
+  input?: InputMaybe<FollowUpFlowStatusDto>;
+};
+
+
+export type MutationUpdateFollowUpStatusArgs = {
+  id: Scalars['ID']['input'];
+  input?: InputMaybe<FollowUpStatusDto>;
+};
+
+
+export type MutationUpdateFollowUpTypeArgs = {
+  id: Scalars['ID']['input'];
+  input?: InputMaybe<FollowUpTypeDto>;
 };
 
 
@@ -3324,6 +3509,16 @@ export type ProcessMethodologyById = {
 };
 
 export type ProcessMethodologyDto = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  methodology?: InputMaybe<MethodologyDto>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  profiles?: InputMaybe<Array<InputMaybe<ProfileDto>>>;
+  settings?: InputMaybe<ProcessSettingsDto>;
+};
+
+export type ProcessMethodologyDto = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   isUnique?: InputMaybe<Scalars['Boolean']['input']>;
   profileId?: InputMaybe<Scalars['String']['input']>;
@@ -3556,6 +3751,10 @@ export type Query = {
   allExternals?: Maybe<ExternalPage>;
   allFinalReports?: Maybe<FinalReportPage>;
   allFloorsByHeadquarterId?: Maybe<FloorPage>;
+  allFollowUpFlowStatuses?: Maybe<FollowUpFlowStatusPage>;
+  allFollowUpStatuses?: Maybe<FollowUpStatusPage>;
+  allFollowUpTypes?: Maybe<FollowUpTypePage>;
+  allFollowUps?: Maybe<FollowUpPage>;
   allHeadquarters?: Maybe<HeadquarterPage>;
   allHeadquartersList?: Maybe<HeadquarterPage>;
   allImprovementPlanActivities?: Maybe<ImprovementPlanActivityPage>;
@@ -3658,6 +3857,10 @@ export type Query = {
   findCommitteesByCoordinationId?: Maybe<Array<Maybe<Committee>>>;
   findCommitteesByStudentId?: Maybe<Array<Maybe<Committee>>>;
   findCommitteesByTeacherId?: Maybe<Array<Maybe<Committee>>>;
+  followUpById?: Maybe<FollowUp>;
+  followUpFlowStatusById?: Maybe<FollowUpFlowStatus>;
+  followUpStatusById?: Maybe<FollowUpStatus>;
+  followUpTypeById?: Maybe<FollowUpType>;
   generateMinuteDocx?: Maybe<Scalars['String']['output']>;
   generateMinuteDocxUrl?: Maybe<Scalars['String']['output']>;
   getNotificationById?: Maybe<NoticationAnswer>;
@@ -3880,6 +4083,30 @@ export type QueryAllFinalReportsArgs = {
 export type QueryAllFloorsByHeadquarterIdArgs = {
   headquarterId?: InputMaybe<Scalars['Long']['input']>;
   state?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type QueryAllFollowUpFlowStatusesArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAllFollowUpStatusesArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAllFollowUpTypesArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAllFollowUpsArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -4344,6 +4571,26 @@ export type QueryFindCommitteesByStudentIdArgs = {
 
 export type QueryFindCommitteesByTeacherIdArgs = {
   teacherId: Scalars['Long']['input'];
+};
+
+
+export type QueryFollowUpByIdArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryFollowUpFlowStatusByIdArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryFollowUpStatusByIdArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryFollowUpTypeByIdArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -5603,7 +5850,7 @@ export type GetStudySheetByIdWithAttendancesQueryVariables = Exact<{
 }>;
 
 
-export type GetStudySheetByIdWithAttendancesQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, number?: number | null, numberStudents?: number | null, quarter?: Array<{ id?: string | null, name?: { number?: number | null, extension?: string | null } | null } | null> | null, trainingProject?: { id?: string | null, name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null, studentStudySheets?: Array<{ id?: string | null, student?: { id?: string | null, attendances?: Array<{ attendanceDate?: string | null, attendanceState?: { status?: string | null } | null } | null> | null, person?: { id?: string | null, document?: string | null, name?: string | null, lastname?: string | null, email?: string | null, phone?: string | null } | null } | null, studentStudySheetState?: { id?: string | null, name?: string | null } | null } | null> | null, teacherStudySheets?: Array<{ id?: string | null, competence?: { name?: string | null } | null } | null> | null } | null } | null };
+export type GetStudySheetByIdWithAttendancesQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, number?: number | null, numberStudents?: number | null, quarter?: Array<{ id?: string | null, name?: { number?: number | null, extension?: string | null } | null } | null> | null, trainingProject?: { id?: string | null, name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null, studentStudySheets?: Array<{ id?: string | null, student?: { id?: string | null, attendances?: Array<{ attendanceDate?: string | null, attendanceState?: { status?: string | null } | null } | null> | null, person?: { id?: string | null, document?: string | null, name?: string | null, lastname?: string | null, email?: string | null, phone?: string | null } | null } | null, studentStudySheetState?: { id?: string | null, name?: string | null } | null } | null> | null, teacherStudySheets?: Array<{ id?: string | null, competence?: { name?: string | null, description?: string | null, learningOutcome?: Array<{ name?: string | null, description?: string | null } | null> | null } | null } | null> | null } | null } | null };
 
 export type GetAllTrainingProjectsQueryVariables = Exact<{
   name?: InputMaybe<Scalars['String']['input']>;
@@ -9400,6 +9647,11 @@ export const GetStudySheetByIdWithAttendancesDocument = gql`
         id
         competence {
           name
+          description
+          learningOutcome {
+            name
+            description
+          }
         }
       }
     }

@@ -22,10 +22,12 @@ export const AbsencesList: React.FC<AbsencesListProps> = ({
     // Filtrar ausencias que no estén justificadas ni injustificadas
     const filteredAbsences = absences.filter(absence => {
         const justificationStatus = absence.justification?.justificationStatus?.name;
+        const attendanceState = absence.attendanceState?.status;
         return justificationStatus !== "Justificado" && 
                justificationStatus !== "Injustificado" && 
                justificationStatus !== "Denegado" &&
-               justificationStatus !== "Aceptado";
+               justificationStatus !== "Aceptado" &&
+               attendanceState !== "Retardo";
     });
 
     const sortedAbsences = [...filteredAbsences].sort((a, b) => {
