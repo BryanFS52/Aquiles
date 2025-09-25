@@ -21,7 +21,7 @@ private final ModelMapper modelMapper = new ModelMapper();
 public FollowUpBusiness(FollowUpService followUpService) {
     this.followUpService = followUpService;
 }
-//Validation Object
+// Validation Object
 
 // Find All
 public Page<FollowUpActionDto> findAll(int page, int size) {

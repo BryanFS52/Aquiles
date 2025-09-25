@@ -1,19 +1,18 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
 @Getter
 @Setter
+@Builder
+@Entity
 @Table(name = "ImprovementPlan_activities")
 public class ImprovementPlanActivity implements Serializable {
 

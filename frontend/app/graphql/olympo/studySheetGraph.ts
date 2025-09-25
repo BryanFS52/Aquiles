@@ -381,14 +381,15 @@ query GetStudySheetByIdWithAttendances($id: Long!, $competenceId : Long, $teache
       }
       teacherStudySheets {
         id
-        competence {
-          name
-          description
-          learningOutcome{
+        competence{
             name
-            description            
-          }
-        }
+            description
+            learningOutcome{
+                name
+                description
+                state
+            }
+       }
       }
     }
   }

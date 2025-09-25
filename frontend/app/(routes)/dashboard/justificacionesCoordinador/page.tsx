@@ -112,8 +112,6 @@ export default function JustificacionesCoordinator() {
           const error = result.payload as any;
         }
       })
-      .catch((error) => {
-      });
   };
 
   const showJustificationStatusMessage = (statusName: string) => {

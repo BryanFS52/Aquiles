@@ -11,7 +11,7 @@ import Image from "next/image";
 import PageTitle from "@components/UI/pageTitle";
 import EmptyState from "@components/UI/emptyState";
 
-const ApprenticeView = () => {
+const ApprenticeView =() => {
   const dispatch = useDispatch<AppDispatch>();
   const { showLoader, hideLoader } = useLoader();
   const { data: studySheetData, dataForStudents, loading } = useSelector((state: RootState) => state.studySheet);
@@ -38,8 +38,8 @@ const ApprenticeView = () => {
   }
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen w-full px-0 sm:px-4 lg:px-8">
+      <div className="space-y-8">
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
             <PageTitle>Ficha y Aprendices</PageTitle>
@@ -220,6 +220,6 @@ const ApprenticeView = () => {
       `}</style>
     </div>
   );
-};
+}
 
 export default ApprenticeView;

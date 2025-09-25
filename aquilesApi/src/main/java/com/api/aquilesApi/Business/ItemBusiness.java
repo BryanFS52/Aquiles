@@ -54,7 +54,6 @@ public class ItemBusiness {
         try {
             Item item = new Item();
             ItemMap.INSTANCE.updateItem(itemDto, item);
-
             Item savedItem = itemService.save(item);
             return ItemMap.INSTANCE.EntityToDTO(savedItem);
 

@@ -1692,7 +1692,7 @@ export type Mutation = {
   addCommitteeAndSendEmail: CommitteeEmailResponse;
   addCommitteeEvent?: Maybe<Response>;
   addCommitteeEventAndSendEmail: CommitteeEmailResponse;
-  addCommitteeEventsBulk?: Maybe<Response>;
+  addCommitteeEventsBulk?: Maybe<CommitteeEventPage>;
   addCompany?: Maybe<Response>;
   addCompetence?: Maybe<Response>;
   addCondition?: Maybe<Response>;
@@ -1761,7 +1761,7 @@ export type Mutation = {
   addWorkItem?: Maybe<StringResponse>;
   addWorkItemState?: Maybe<StringResponse>;
   addWorkItemType?: Maybe<StringResponse>;
-  assignCommitteeToEvents?: Maybe<Response>;
+  assignCommitteeToEvents?: Maybe<CommitteeEventPage>;
   createNotification?: Maybe<Response>;
   deleteAdministrative?: Maybe<Response>;
   deleteAdministrativeType?: Maybe<Response>;
@@ -3714,6 +3714,7 @@ export type Query = {
   AllFollowUpsAction?: Maybe<FollowUpActionPage>;
   FollowUpActionById?: Maybe<FollowUpActionPageId>;
   ProfileById?: Maybe<ProfileById>;
+  activeCommittees?: Maybe<Array<Maybe<Committee>>>;
   allAdministrative?: Maybe<AdministrativePage>;
   allAdministrativeList?: Maybe<AdministrativePage>;
   allAdministrativeTypes?: Maybe<AdministrativeTypePage>;
@@ -3845,6 +3846,7 @@ export type Query = {
   checklistHistoryId?: Maybe<Array<Maybe<ChecklistHistory>>>;
   committeeById?: Maybe<Committee>;
   committeeEventById?: Maybe<CommitteeEvent>;
+  committeesByStudentId?: Maybe<Array<Maybe<Committee>>>;
   evaluationByChecklist?: Maybe<EvaluationPageId>;
   evaluationById?: Maybe<EvaluationPageId>;
   evaluationExistsForChecklist?: Maybe<EvaluationPageId>;
@@ -3852,11 +3854,6 @@ export type Query = {
   exportChecklistToExcel?: Maybe<Scalars['String']['output']>;
   exportChecklistToPdf?: Maybe<Scalars['String']['output']>;
   finalReportById?: Maybe<FinalReportPageId>;
-  findActiveCommittees?: Maybe<Array<Maybe<Committee>>>;
-  findCommitteesByAdministrativeId?: Maybe<Array<Maybe<Committee>>>;
-  findCommitteesByCoordinationId?: Maybe<Array<Maybe<Committee>>>;
-  findCommitteesByStudentId?: Maybe<Array<Maybe<Committee>>>;
-  findCommitteesByTeacherId?: Maybe<Array<Maybe<Committee>>>;
   followUpById?: Maybe<FollowUp>;
   followUpFlowStatusById?: Maybe<FollowUpFlowStatus>;
   followUpStatusById?: Maybe<FollowUpStatus>;
@@ -4519,6 +4516,11 @@ export type QueryCommitteeEventByIdArgs = {
 };
 
 
+export type QueryCommitteesByStudentIdArgs = {
+  studentId: Scalars['Long']['input'];
+};
+
+
 export type QueryEvaluationByChecklistArgs = {
   checklistId: Scalars['Long']['input'];
 };
@@ -4551,26 +4553,6 @@ export type QueryExportChecklistToPdfArgs = {
 
 export type QueryFinalReportByIdArgs = {
   id: Scalars['Long']['input'];
-};
-
-
-export type QueryFindCommitteesByAdministrativeIdArgs = {
-  administrativeId: Scalars['Long']['input'];
-};
-
-
-export type QueryFindCommitteesByCoordinationIdArgs = {
-  coordinationId: Scalars['Long']['input'];
-};
-
-
-export type QueryFindCommitteesByStudentIdArgs = {
-  studentId: Scalars['Long']['input'];
-};
-
-
-export type QueryFindCommitteesByTeacherIdArgs = {
-  teacherId: Scalars['Long']['input'];
 };
 
 
@@ -5850,7 +5832,7 @@ export type GetStudySheetByIdWithAttendancesQueryVariables = Exact<{
 }>;
 
 
-export type GetStudySheetByIdWithAttendancesQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, number?: number | null, numberStudents?: number | null, quarter?: Array<{ id?: string | null, name?: { number?: number | null, extension?: string | null } | null } | null> | null, trainingProject?: { id?: string | null, name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null, studentStudySheets?: Array<{ id?: string | null, student?: { id?: string | null, attendances?: Array<{ attendanceDate?: string | null, attendanceState?: { status?: string | null } | null } | null> | null, person?: { id?: string | null, document?: string | null, name?: string | null, lastname?: string | null, email?: string | null, phone?: string | null } | null } | null, studentStudySheetState?: { id?: string | null, name?: string | null } | null } | null> | null, teacherStudySheets?: Array<{ id?: string | null, competence?: { name?: string | null, description?: string | null, learningOutcome?: Array<{ name?: string | null, description?: string | null } | null> | null } | null } | null> | null } | null } | null };
+export type GetStudySheetByIdWithAttendancesQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, number?: number | null, numberStudents?: number | null, quarter?: Array<{ id?: string | null, name?: { number?: number | null, extension?: string | null } | null } | null> | null, trainingProject?: { id?: string | null, name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null, studentStudySheets?: Array<{ id?: string | null, student?: { id?: string | null, attendances?: Array<{ attendanceDate?: string | null, attendanceState?: { status?: string | null } | null } | null> | null, person?: { id?: string | null, document?: string | null, name?: string | null, lastname?: string | null, email?: string | null, phone?: string | null } | null } | null, studentStudySheetState?: { id?: string | null, name?: string | null } | null } | null> | null, teacherStudySheets?: Array<{ id?: string | null, competence?: { name?: string | null, description?: string | null, learningOutcome?: Array<{ name?: string | null, description?: string | null, state?: boolean | null } | null> | null } | null } | null> | null } | null } | null };
 
 export type GetAllTrainingProjectsQueryVariables = Exact<{
   name?: InputMaybe<Scalars['String']['input']>;
@@ -9651,6 +9633,7 @@ export const GetStudySheetByIdWithAttendancesDocument = gql`
           learningOutcome {
             name
             description
+            state
           }
         }
       }

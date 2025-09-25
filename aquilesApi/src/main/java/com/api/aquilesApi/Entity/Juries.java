@@ -1,18 +1,16 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Getter
 @Setter
+@Builder
+@Entity
 @Table(name = "juries")
 public class Juries implements Serializable {
     @Id

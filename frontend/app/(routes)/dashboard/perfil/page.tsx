@@ -6,13 +6,55 @@ import Image from "next/image";
 import PageTitle from "@components/UI/pageTitle";
 import axios from 'axios';
 
+// Interfaces para tipado
+interface ProfileData {
+    nombres: string;
+    apellidos: string;
+    correo: string;
+    centro: string;
+    documento: string;
+    telefono: string;
+    fechaNacimiento: string;
+    programa: string;
+    foto?: string;
+}
+
+interface ProfileFieldProps {
+    label: string;
+    name: keyof ProfileData;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    placeholder?: string;
+    type?: string;
+    icon?: React.ComponentType<{ className?: string }>;
+    error?: string;
+    disabled?: boolean;
+    required?: boolean;
+}
+
+interface AlertProps {
+    type: 'success' | 'error';
+    message: string;
+    onClose?: () => void;
+}
+
+interface ValidationErrors {
+    [key: string]: string;
+}
+
+interface ApiResponse<T = any> {
+    success: boolean;
+    data?: T;
+    message?: string;
+}
+
 // Componente reutilizable para campos
-const ProfileField = ({
+const ProfileField: React.FC<ProfileFieldProps> = ({
     label,
     name,
     value,
     onChange,
-    placeholder,
+    placeholder = "",
     type = "text",
     icon: Icon,
     error,
@@ -54,7 +96,7 @@ const ProfileField = ({
 );
 
 // Componente de alerta
-const Alert = ({ type, message, onClose }) => {
+const Alert: React.FC<AlertProps> = ({ type, message, onClose }) => {
     const bgColor = type === 'success'
         ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-700'
         : 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-700';
@@ -92,8 +134,8 @@ const Alert = ({ type, message, onClose }) => {
     );
 };
 
-export default function Perfil() {
-    const [profileData, setProfileData] = useState({
+export default function Perfil(): React.JSX.Element {
+    const [profileData, setProfileData] = useState<ProfileData>({
         nombres: '',
         apellidos: '',
         correo: '',
@@ -104,17 +146,27 @@ export default function Perfil() {
         programa: ''
     });
 
-    const [originalData, setOriginalData] = useState({});
-    const [profileImage, setProfileImage] = useState("https://img.freepik.com/foto-gratis/joven-bella-mujer-pie-sobre-pared-blanca_114579-90514.jpg");
-    const [isEditing, setIsEditing] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isLoadingData, setIsLoadingData] = useState(true);
-    const [errors, setErrors] = useState({});
-    const [alert, setAlert] = useState(null);
-    const [hasChanges, setHasChanges] = useState(false);
-    const fileInputRef = useRef(null);
+    const [originalData, setOriginalData] = useState<ProfileData>({
+        nombres: '',
+        apellidos: '',
+        correo: '',
+        centro: '',
+        documento: '',
+        telefono: '',
+        fechaNacimiento: '',
+        programa: ''
+    });
+    
+    const [profileImage, setProfileImage] = useState<string>("https://img.freepik.com/foto-gratis/joven-bella-mujer-pie-sobre-pared-blanca_114579-90514.jpg");
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
+    const [errors, setErrors] = useState<ValidationErrors>({});
+    const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const [hasChanges, setHasChanges] = useState<boolean>(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const showAlert = useCallback((message, type = 'error') => {
+    const showAlert = useCallback((message: string, type: 'success' | 'error' = 'error') => {
         setAlert({ message, type });
         setTimeout(() => setAlert(null), 5000);
     }, []);
@@ -122,8 +174,8 @@ export default function Perfil() {
     const loadProfileData = useCallback(async () => {
         try {
             setIsLoadingData(true);
-            const response = await axios.get('/api/profile');
-            if (response.data?.success) {
+            const response = await axios.get<ApiResponse<ProfileData>>('/api/profile');
+            if (response.data?.success && response.data.data) {
                 const data = response.data.data;
                 setProfileData(data);
                 setOriginalData(data);
@@ -146,8 +198,8 @@ export default function Perfil() {
         setHasChanges(hasDataChanged);
     }, [profileData, originalData]);
 
-    const validateForm = () => {
-        const newErrors = {};
+    const validateForm = (): boolean => {
+        const newErrors: ValidationErrors = {};
 
         if (!profileData.nombres?.trim()) {
             newErrors.nombres = 'Los nombres son requeridos';
@@ -175,7 +227,7 @@ export default function Perfil() {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setProfileData(prev => ({ ...prev, [name]: value }));
 
@@ -184,8 +236,8 @@ export default function Perfil() {
         }
     };
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
         if (file) {
             if (file.size > 5 * 1024 * 1024) {
                 showAlert('La imagen debe ser menor a 5MB', 'error');
@@ -198,8 +250,10 @@ export default function Perfil() {
 
             const reader = new FileReader();
             reader.onload = (e) => {
-                setProfileImage(e.target.result);
-                setHasChanges(true);
+                if (e.target?.result) {
+                    setProfileImage(e.target.result as string);
+                    setHasChanges(true);
+                }
             };
             reader.readAsDataURL(file);
         }
@@ -225,7 +279,7 @@ export default function Perfil() {
 
         setIsLoading(true);
         try {
-            const response = await axios.put('/api/profile', {
+            const response = await axios.put<ApiResponse>('/api/profile', {
                 ...profileData,
                 foto: profileImage !== "https://img.freepik.com/foto-gratis/joven-bella-mujer-pie-sobre-pared-blanca_114579-90514.jpg" ? profileImage : null
             });
@@ -238,7 +292,7 @@ export default function Perfil() {
             } else {
                 throw new Error(response.data?.message || 'Error al actualizar');
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error actualizando perfil:', error);
             showAlert(
                 error.response?.data?.message || 'Error al actualizar el perfil. Intenta nuevamente.',

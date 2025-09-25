@@ -1,3 +1,5 @@
+// Sigue en api Rest
+
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { createInitialPaginatedState } from '@type/slices/common/generic';
 import axios from 'axios';

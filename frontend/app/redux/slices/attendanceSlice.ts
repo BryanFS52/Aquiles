@@ -54,47 +54,6 @@ interface AttendanceState extends ReturnType<typeof createInitialPaginatedState>
     filterOptions: FilterOptions;
     attendanceSummary: StudentSummary[];
 }
-const transformToComponentFormat = (attendances: Attendance[]): TransformedAttendanceItem[] => {
-    return attendances.map((a) => {
-        const student = a.student;
-        const person = student?.person;
-
-        return {
-            id: a.id,
-            estado: a.attendanceState?.status || "Sin estado",
-            documento: person?.document || '',
-            aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim()
-        };
-    });
-};
-
-const filterAttendances = (
-    data: TransformedAttendanceItem[],
-    filterOptions: FilterOptions
-): TransformedAttendanceItem[] => {
-    const { selectedFiltro, searchTerm } = filterOptions;
-
-    if (!searchTerm) return data;
-
-    if (!selectedFiltro || selectedFiltro === "todo") {
-        return data.filter((j) =>
-            j.estado.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }
-
-    return data.filter((j) => {
-        switch (selectedFiltro) {
-            case "estado":
-                return j.estado.toLowerCase().includes(searchTerm.toLowerCase());
-            case "documento":
-                return j.documento.toLowerCase().includes(searchTerm.toLowerCase());
-            case "aprendiz":
-                return j.aprendiz.toLowerCase().includes(searchTerm.toLowerCase());
-            default:
-                return true;
-        }
-    });
-};
 const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
     return {
         id: graphqlData.id,

@@ -3,21 +3,15 @@
 import React from 'react';
 import { useLoader } from '@context/LoaderContext';
 import { MdAddCircle, MdGroup } from 'react-icons/md';
-
-// Componentes
-import PageTitle from '@components/UI/pageTitle';
-import EmptyState from '@components/UI/emptyState';
 import { TeamCard } from './TeamCard';
 import { TeamDeleteConfirmation } from './TeamDeleteConfirmation';
-
-// Modales
-import ModalNewTeam from '@/components/features/teamScrum/modalNewTeam';
-import ModalTeamInformation from '@/components/features/teamScrum/modalTeamScrumInfo';
 import { ModalComposition } from '@/components/features/teamScrum/modalComposition';
-
-// Hook y tipos
 import { useTeamScrum } from './useTeamScrum';
-import type { TeamScrumContainerProps } from './types';
+import { TeamScrumContainerProps } from './types';
+import PageTitle from '@components/UI/pageTitle';
+import EmptyState from '@components/UI/emptyState';
+import ModalNewTeam from '@components/features/teamScrum/modalNewTeam';
+import ModalTeamInformation from '@/components/features/teamScrum/modalTeamScrumInfo';
 
 export const TeamScrumContainer: React.FC<TeamScrumContainerProps> = ({ studySheetId }) => {
     const { showLoader, hideLoader } = useLoader();

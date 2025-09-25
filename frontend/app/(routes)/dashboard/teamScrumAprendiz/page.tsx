@@ -263,7 +263,7 @@ export default function TeamScrum() {
     }
 
     return (
-        <div className="container mx-auto p-6">
+        <div className="w-full">
             <PageTitle>Mi Team Scrum</PageTitle>
 
             {/* Encabezado del equipo */}

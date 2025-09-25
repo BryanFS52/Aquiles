@@ -1,3 +1,4 @@
+// Error
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -79,6 +80,7 @@ export default function InstructorSelection() {
   }, []);
 
   // Cargar fichas asignadas al instructor
+  // Mal
   useEffect(() => {
     const loadStudySheets = async () => {
       if (!user?.id) return;

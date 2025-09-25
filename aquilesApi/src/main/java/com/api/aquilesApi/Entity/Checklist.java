@@ -1,10 +1,7 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -12,9 +9,10 @@ import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Getter
 @Setter
+@Builder
+@Entity
 @Table(name = "checklist")
 public class Checklist implements Serializable {
     @Id
@@ -57,7 +55,7 @@ public class Checklist implements Serializable {
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items;
 
-    // 2.Relación (1-1) con evaluations - Un checklist tiene una única evaluación
+    // 2.Relation (1-1) con evaluations
     @OneToOne(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private Evaluations evaluation;
 

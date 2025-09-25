@@ -20,33 +20,22 @@ import {
     AddProfileToStudentMutationVariables,
 } from '@graphql/generated'
 
-// Función para transformar datos de GraphQL a TeamsScrum
-const transformGraphQLToTeamScrumItem = (graphqlData: any): TeamsScrum => {
-    const teamData = graphqlData?.teamScrum || graphqlData;
-    return {
-        id: teamData.id,
-        teamName: teamData.teamName,
-        projectName: teamData.projectName,
-        problem: teamData.problem,
-        objectives: teamData.objectives,
-        description: teamData.description,
-        projectJustification: teamData.projectJustification,
-        checklist: teamData.checklist,
-        studySheet: teamData.studySheet,
-        students: teamData.students || [],
-    };
-};
-
 
 export const fetchTeamsScrums = createAsyncThunk<GetTeamsScrumsQuery['allTeamsScrums'], GetTeamsScrumsQueryVariables>(
     'teamScrum/fetchAll',
     async ({ page, size }) => {
-        const { data } = await clientLAN.query<GetTeamsScrumsQuery, GetTeamsScrumsQueryVariables>({
-            query: GET_TEAMS_SCRUMS,
-            variables: { page, size },
-            fetchPolicy: 'no-cache',
-        });
-        return data.allTeamsScrums;
+        try {
+
+            const { data } = await clientLAN.query<GetTeamsScrumsQuery, GetTeamsScrumsQueryVariables>({
+                query: GET_TEAMS_SCRUMS,
+                variables: { page, size },
+                fetchPolicy: 'no-cache',
+            });
+            return data.allTeamsScrums;
+        } catch (error) {
+            console.error("Error fetching teamScrums:", error);
+            throw error;
+        }
     }
 );
 
@@ -195,10 +184,9 @@ const teamScrumSlice = createSlice({
             })
             .addCase(fetchTeamsScrums.fulfilled, (state, action) => {
                 if (action.payload?.data) {
-                    // Filtra nulls y transforma los datos
+                    // Filtra nulls y usa los datos directamente
                     state.data = action.payload.data
-                        .filter((item): item is NonNullable<typeof item> => item !== null)
-                        .map(transformGraphQLToTeamScrumItem);
+                        .filter((item): item is NonNullable<typeof item> => item !== null);
 
                     state.totalItems = action.payload.totalItems ?? 0;
                     state.totalPages = action.payload.totalPages ?? 0;
@@ -218,7 +206,7 @@ const teamScrumSlice = createSlice({
             })
             .addCase(fetchTeamScrumById.fulfilled, (state, action: PayloadAction<GetTeamScrumByIdQuery['teamScrumById']>) => {
                 if (action.payload) {
-                    state.dataForTeamScrumById = transformGraphQLToTeamScrumItem(action.payload.data);
+                    state.dataForTeamScrumById = action.payload.data as TeamsScrum;
                 }
                 state.loading = false;
             })
@@ -234,7 +222,7 @@ const teamScrumSlice = createSlice({
             })
             .addCase(fetchTeamScrumByIdWithStudents.fulfilled, (state, action: PayloadAction<GetTeamScrumByIdWithStudentsQuery['teamScrumById']>) => {
                 if (action.payload) {
-                    state.dataForTeamScrumById = transformGraphQLToTeamScrumItem(action.payload.data);
+                    state.dataForTeamScrumById = action.payload.data as TeamsScrum;
                 }
                 state.loading = false;
             })
@@ -247,7 +235,7 @@ const teamScrumSlice = createSlice({
             // addTeamScrum
             .addCase(addTeamScrum.fulfilled, (state, action: PayloadAction<AddTeamScrumMutation['addTeamScrum']>) => {
                 if (action.payload) {
-                    state.data.push(action.payload as any);
+                    state.data.push(action.payload as TeamsScrum);
                 }
                 state.error = null;
             })
@@ -259,8 +247,8 @@ const teamScrumSlice = createSlice({
             // updateTeamScrum
             .addCase(updateTeamScrum.fulfilled, (state, action: PayloadAction<UpdateTeamScrumMutation['updateTeamScrum']>) => {
                 if (action.payload) {
-                    const updatedTeamScrum = transformGraphQLToTeamScrumItem(action.payload);
-                    const index = state.data.findIndex((teamScrum: any) => teamScrum.id === updatedTeamScrum.id);
+                    const updatedTeamScrum = action.payload as TeamsScrum;
+                    const index = state.data.findIndex((teamScrum: TeamsScrum) => teamScrum.id === updatedTeamScrum.id);
                     if (index !== -1) {
                         state.data[index] = updatedTeamScrum;
                     }
@@ -275,7 +263,7 @@ const teamScrumSlice = createSlice({
             // deleteTeamScrum
             .addCase(deleteTeamScrum.fulfilled, (state, action: PayloadAction<string>) => {
                 if (action.payload) {
-                    state.data = state.data.filter((teamScrum: any) => teamScrum.id !== action.payload);
+                    state.data = state.data.filter((teamScrum: TeamsScrum) => teamScrum.id !== action.payload);
                 }
                 state.error = null;
             })
@@ -288,156 +276,5 @@ const teamScrumSlice = createSlice({
 });
 
 export const { } = teamScrumSlice.actions;
-
-// Service methods integrated for compatibility
-interface TeamScrumFormData {
-    teamName: string;
-    projectName?: string;
-    problem?: string;
-    objectives?: string;
-    description?: string;
-    projectJustification?: string;
-    checklist?: any;
-    studySheet?: any;
-}
-
-export const teamScrumService = {
-    getAllTeams: async (page = 0, size = 10) => {
-        try {
-            const { data } = await clientLAN.query({
-                query: GET_TEAMS_SCRUMS,
-                variables: { page, size },
-                fetchPolicy: 'network-only',
-            });
-            return data.allTeamsScrums;
-        } catch (error) {
-            console.error("Error fetching all teams scrum:", error);
-            throw new Error("Simulated error");
-        }
-    },
-
-    getTeamById: async (id: number) => {
-        try {
-            const { data } = await clientLAN.query({
-                query: GET_TEAM_SCRUM_BY_ID,
-                variables: { id },
-                fetchPolicy: 'network-only',
-            });
-            return data.teamScrumById;
-        } catch (error) {
-            console.error("Error fetching team scrum by id:", error);
-            throw error;
-        }
-    },
-
-    getTeamByIdWithStudents: async (id: number) => {
-        try {
-            const { data } = await clientLAN.query({
-                query: GET_TEAM_SCRUM_BY_ID_WITH_STUDENTS,
-                variables: { id },
-                fetchPolicy: 'network-only',
-            });
-            return data.teamScrumById;
-        } catch (error) {
-            console.error("Error fetching team scrum by id with students:", error);
-            throw error;
-        }
-    },
-
-    createTeam: async (teamData: TeamScrumFormData) => {
-        try {
-            const { data } = await clientLAN.mutate({
-                mutation: ADD_TEAM_SCRUM,
-                variables: {
-                    input: {
-                        teamName: teamData.teamName,
-                        projectName: teamData.projectName || '',
-                        problem: teamData.problem || '',
-                        objectives: teamData.objectives || '',
-                        description: teamData.description || '',
-                        projectJustification: teamData.projectJustification || '',
-                        checklist: teamData.checklist,
-                        studySheet: teamData.studySheet,
-                    },
-                },
-            });
-
-            if (!data?.addTeamScrum?.code) {
-                throw new Error("Error creating team scrum");
-            }
-
-            return data.addTeamScrum;
-        } catch (error) {
-            console.error("Error creating team scrum:", error);
-            throw error;
-        }
-    },
-
-    updateTeam: async (id: number, teamData: TeamScrumFormData) => {
-        try {
-            const { data } = await clientLAN.mutate({
-                mutation: UPDATE_TEAM_SCRUM,
-                variables: {
-                    id,
-                    input: {
-                        teamName: teamData.teamName,
-                        projectName: teamData.projectName || '',
-                        problem: teamData.problem || '',
-                        objectives: teamData.objectives || '',
-                        description: teamData.description || '',
-                        projectJustification: teamData.projectJustification || '',
-                        checklist: teamData.checklist,
-                        studySheet: teamData.studySheet,
-                    },
-                },
-            });
-
-            if (!data?.updateTeamScrum?.code) {
-                throw new Error("Error updating team scrum");
-            }
-
-            return data.updateTeamScrum;
-        } catch (error) {
-            console.error("Error updating team scrum:", error);
-            throw error;
-        }
-    },
-
-    deleteTeam: async (id: number) => {
-        try {
-            const { data } = await clientLAN.mutate({
-                mutation: DELETE_TEAM_SCRUM,
-                variables: { id },
-            });
-
-            if (!data?.deleteTeamScrum?.code) {
-                throw new Error("Error deleting team scrum");
-            }
-
-            return data.deleteTeamScrum;
-        } catch (error) {
-            console.error("Error deleting team scrum:", error);
-            throw error;
-        }
-    },
-
-    addProfileToStudent: async (profileData: any) => {
-        try {
-            const { data } = await clientLAN.mutate({
-                mutation: ADD_PROFILE_TO_STUDENT,
-                variables: { input: profileData },
-            });
-
-            if (!data?.addProfileToStudent?.code) {
-                throw new Error("Error adding profile to student");
-            }
-
-            return data.addProfileToStudent;
-        } catch (error) {
-            console.error("Error adding profile to student:", error);
-            throw error;
-        }
-    },
-};
 
 export default teamScrumSlice.reducer;
