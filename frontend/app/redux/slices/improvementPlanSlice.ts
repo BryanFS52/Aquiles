@@ -71,12 +71,12 @@ const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPla
   };
 };
 
-export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], GetAllImprovementPlansQueryVariables>(
+export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], { page?: number; size?: number; teacherCompetence?: number; idStudySheet?: number }>(
     'improvementPlan/fetchAll',
-    async ({ page, size, teacherCompetence }) => {
-        const { data } = await clientLAN.query<GetAllImprovementPlansQuery, GetAllImprovementPlansQueryVariables>({
+    async ({ page, size, teacherCompetence, idStudySheet }) => {
+        const { data } = await clientLAN.query<GetAllImprovementPlansQuery, any>({
             query: GET_ALL_IMPROVEMENT_PLANS,
-            variables: { page, size, teacherCompetence },
+            variables: { page, size, teacherCompetence, idStudySheet },
             fetchPolicy: 'no-cache',
         });
         return data.allImprovementPlans;
@@ -89,6 +89,7 @@ export const fetchImprovementPlanById = createAsyncThunk<GetImprovementPlanByIdQ
         const { data } = await clientLAN.query<GetImprovementPlanByIdQuery, GetImprovementPlanByIdQueryVariables>({
             query: GET_IMPROVEMENT_PLAN_BY_ID,
             variables: { id },
+            fetchPolicy: 'no-cache',
         });
         return data.improvementPlanById;
     }

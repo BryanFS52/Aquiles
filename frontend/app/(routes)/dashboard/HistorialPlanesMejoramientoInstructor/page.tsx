@@ -3,6 +3,7 @@
 import PageTitle from "@components/UI/pageTitle";
 import DataTable from "@components/UI/DataTable";
 import type { DataTableColumn } from "@components/UI/DataTable/types";
+import Paginator from "@components/UI/Paginator/Paginator";
 import type { AppDispatch } from "@redux/store"
 import { useDispatch, useSelector } from "react-redux"
 import {fetchImprovementPlans} from "@slice/improvementPlanSlice";
@@ -18,32 +19,51 @@ const HistorialPlanesMejoramientoInstructor = () => {
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { data: allImprovementPlans, loading, error } = useSelector((state: any) => state.improvementPlan);
+    const { 
+        data: allImprovementPlans, 
+        loading, 
+        error, 
+        totalPages, 
+        totalItems, 
+        currentPage 
+    } = useSelector((state: any) => state.improvementPlan);
 
     // Obtener datos de la ficha desde los query parameters
     const fichaDataString = searchParams.get('fichaData');
-    const fichaData = fichaDataString ? JSON.parse(decodeURIComponent(fichaDataString)) : null;
+    const fichaData = React.useMemo(() => {
+        return fichaDataString ? JSON.parse(decodeURIComponent(fichaDataString)) : null;
+    }, [fichaDataString]);
     
-    // Filtrar planes de mejoramiento por estudiantes de la ficha
+    // Memorizar el ID de la ficha para evitar renders innecesarios
+    const fichaId = React.useMemo(() => fichaData?.id || null, [fichaData?.id]);
+    
+    // Filtrar por ficha en frontend si el backend no lo hace correctamente
     const improvementPlans = React.useMemo(() => {
-        if (!fichaData || !allImprovementPlans) {
-            return allImprovementPlans || [];
-        }
-        
-        // Filtrar planes donde el studentId esté en la lista de estudiantes de la ficha
-        return allImprovementPlans.filter((plan: ImprovementPlan) => 
+        if (!fichaData || !allImprovementPlans) return [];
+        // Filtrar por los ids de estudiantes de la ficha
+        return allImprovementPlans.filter((plan: ImprovementPlan) =>
             plan.student?.id && fichaData.studentIds.includes(plan.student.id)
         );
     }, [allImprovementPlans, fichaData]);
+    
+    // Estado para manejar la página actual (Paginator espera páginas basadas en 1)
+    const [page, setPage] = React.useState(1);
 
     // Detectar modo oscuro
     const [isDarkMode, setIsDarkMode] = React.useState(false);
+    
+    // Función para manejar cambio de página
+    const handlePageChange = React.useCallback((newPage: number) => {
+        if (loading || newPage === page) return; // Evitar llamadas duplicadas
+        
+        setPage(newPage);
+        // No necesitamos dispatch aquí porque el useEffect se encargará cuando page cambie
+    }, [loading, page]);
 
+    // useEffect para detectar modo oscuro - solo se ejecuta una vez
     useEffect(() => {
-        // Función para detectar el modo oscuro
         const checkDarkMode = () => {
             const isDark = document.documentElement.classList.contains('dark');
-            console.log('Dark mode detected:', isDark); // Debug
             setIsDarkMode(isDark);
         };
 
@@ -67,17 +87,17 @@ const HistorialPlanesMejoramientoInstructor = () => {
 
         // Limpiar el observer
         return () => observer.disconnect();
-    }, []);
+    }, []); // Array vacío - solo se ejecuta una vez
 
+    // useEffect para hacer fetch de datos - ahora sí filtra por ficha en el backend
     useEffect(() => {
-        console.log('fichaData en HistorialPlanesMejoramientoInstructor:', fichaData);
-        
-        // Traer todos los planes de mejoramiento y filtrar del lado del cliente
+        if (!fichaId) return;
         dispatch(fetchImprovementPlans({ 
-            page: 0, 
-            size: 5 
+            page: page - 1, // Backend espera páginas basadas en 0
+            size: 5,
+            idStudySheet: fichaId
         }));
-    }, [dispatch]);
+    }, [dispatch, page, fichaId]);
 
     // Función para formatear fecha en horizontal
     const formatDate = (dateString: string) => {
@@ -466,7 +486,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                             <FiFileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                         </div>
                         <h3 className="text-2xl font-bold text-black dark:text-white mb-1">{improvementPlans?.length || 0}</h3>
-                        <p className="text-gray-600 dark:text-gray-300 font-medium">Planes Totales</p>
+                        <p className="text-gray-600 dark:text-gray-300 font-medium">Planes Totales (Ficha)</p>
                     </div>
                     <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
                         <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-2xl mb-3 mx-auto">
@@ -478,7 +498,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                                 (typeof plan.qualification === "number" && plan.qualification >= 3.0)
                             ).length || 0}
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-300 font-medium">Aprobados</p>
+                        <p className="text-gray-600 dark:text-gray-300 font-medium">Aprobados (página actual)</p>
                     </div>
                     <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
                         <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-2xl mb-3 mx-auto">
@@ -492,19 +512,32 @@ const HistorialPlanesMejoramientoInstructor = () => {
                                 (typeof plan.qualification === "number" && plan.qualification < 3.0)
                             ).length || 0}
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-300 font-medium">No Aprobados</p>
+                        <p className="text-gray-600 dark:text-gray-300 font-medium">No Aprobados (página actual)</p>
                     </div>
                 </div>
 
                 <DataTable<ImprovementPlan>
                     columns={columns}
                     data={improvementPlans || []}
-                    pageSize={5}
                     filterPlaceholder="Buscar..."
                     filterFunction={filterFunction}
                     className="shadow-lg"
                     isDarkMode={isDarkMode}
                 />
+                
+                {/* Paginación externa para manejar paginación del servidor */}
+                {totalPages > 1 && (
+                    <div className="mt-6">
+                        <Paginator
+                            page={page}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                            isDarkMode={isDarkMode}
+                        />
+                    </div>
+                )}
+                
+
             </div>
         </div>
     );

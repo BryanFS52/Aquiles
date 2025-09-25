@@ -32,6 +32,10 @@ public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
         return improvementPlanRepository.searchByFilter(pageRequest, teacherCompetence);
     }
 
+    public Page<ImprovementPlan> findByStudySheetId(PageRequest pageRequest, Long studySheetId) {
+        return improvementPlanRepository.findByStudySheetId(pageRequest, studySheetId);
+    }
+
     public Page<ImprovementPlan> findAll(Pageable pageable) {
         return improvementPlanRepository.findAll(pageable);
     }

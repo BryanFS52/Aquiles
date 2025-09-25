@@ -22,13 +22,24 @@ public class ImprovementPlanResolver {
 
     // FindAll ImprovementPlan (GraphQL)
     @DgsQuery
-    public Map<String, Object> allImprovementPlans(@InputArgument Integer page, @InputArgument Integer size, @InputArgument Long teacherCompetence) {
+    public Map<String, Object> allImprovementPlans(@InputArgument Integer page, @InputArgument Integer size, @InputArgument Long teacherCompetence, @InputArgument Long idStudySheet, @InputArgument Long id) {
         try {
-            System.out.println(teacherCompetence);
             Page<ImprovementPlanDto> improvementPlanPage;
-            if (teacherCompetence != null) {
+            if (id != null) {
+                ImprovementPlanDto dto = improvementPlanBusiness.findById(id);
+                return ResponseHttpApi.responseHttpFindAll(
+                        java.util.List.of(dto),
+                        ResponseHttpApi.CODE_OK,
+                        "Query ok",
+                        1,
+                        page,
+                        1
+                );
+            } else if (teacherCompetence != null) {
                 improvementPlanPage = improvementPlanBusiness.findByFilter(page, size, teacherCompetence);
-            }else  {
+            } else if (idStudySheet != null) {
+                improvementPlanPage = improvementPlanBusiness.findByStudySheetId(page, size, idStudySheet);
+            } else  {
                 improvementPlanPage = improvementPlanBusiness.findAll(page, size);
             }
             return ResponseHttpApi.responseHttpFindAll(
