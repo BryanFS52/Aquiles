@@ -37,14 +37,8 @@ const HistorialPlanesMejoramientoInstructor = () => {
     // Memorizar el ID de la ficha para evitar renders innecesarios
     const fichaId = React.useMemo(() => fichaData?.id || null, [fichaData?.id]);
     
-    // Filtrar por ficha en frontend si el backend no lo hace correctamente
-    const improvementPlans = React.useMemo(() => {
-        if (!fichaData || !allImprovementPlans) return [];
-        // Filtrar por los ids de estudiantes de la ficha
-        return allImprovementPlans.filter((plan: ImprovementPlan) =>
-            plan.student?.id && fichaData.studentIds.includes(plan.student.id)
-        );
-    }, [allImprovementPlans, fichaData]);
+    // Usar directamente los datos del backend ya que están filtrados correctamente
+    const improvementPlans = allImprovementPlans || [];
     
     // Estado para manejar la página actual (Paginator espera páginas basadas en 1)
     const [page, setPage] = React.useState(1);
