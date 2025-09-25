@@ -1,16 +1,16 @@
 package com.api.aquilesApi.Utilities.Seeder;
 
 import com.api.aquilesApi.Entity.AttendanceState;
-import com.api.aquilesApi.Repository.AttendanceStateRepository;
+import com.api.aquilesApi.Repository.StateAttendanceRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AttendanceStateSeeder implements CommandLineRunner {
 
-    private final AttendanceStateRepository attendanceStateRepository;
+    private final StateAttendanceRepository attendanceStateRepository;
 
-    public AttendanceStateSeeder(AttendanceStateRepository attendanceStateRepository) {
+    public AttendanceStateSeeder(StateAttendanceRepository attendanceStateRepository) {
         this.attendanceStateRepository = attendanceStateRepository;
     }
 
