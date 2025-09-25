@@ -12,6 +12,7 @@ import { StudySheetWithCompetence } from './types';
 import PageTitle from '@components/UI/pageTitle';
 import EmptyState from '@components/UI/emptyState';
 import { TEMPORAL_INSTRUCTOR_ID } from '@/temporaryCredential';
+import { fetchJustificationsByCompetenceQuarter } from '@/redux/slices/justificationSlice';
 
 export const FichasInstructorContainer: React.FC = () => {
     const [selectedFicha, setSelectedFicha] = useState<StudySheetWithCompetence | null>(null);
@@ -80,14 +81,22 @@ export const FichasInstructorContainer: React.FC = () => {
         }
     };
 
-    const handleTakeJustification = (studySheet: StudySheetWithCompetence) => {
-        if (studySheet.competenceId) {
-            const competenceQuarterId = studySheet.competenceId;
-            router.push(`/dashboard/justificacionesInstructor/${competenceQuarterId}?ficha=${studySheet.number}`);
-        } else {
-            router.push(`/dashboard/justificacionesInstructor?ficha=${studySheet.number}`);
+    const handleTakeJustification = async (studySheet: StudySheetWithCompetence) => {
+        if (!studySheet.id) return;
+
+        setLoadingAttendance(studySheet.id);
+
+        try {
+            // 🔄 Ir al selector de competencias
+            router.push(`/dashboard/justificacionesInstructor?ficha=${studySheet.number || ""}`);
+
+            setTimeout(() => setLoadingAttendance(null), 200);
+        } catch (error) {
+            console.error("Error al navegar a justificaciones:", error);
+            setLoadingAttendance(null);
         }
     };
+
 
     if (!loading && (!fichas || fichas.length === 0)) {
         return <EmptyState message="No se encontraron fichas disponibles." />;
@@ -96,7 +105,7 @@ export const FichasInstructorContainer: React.FC = () => {
     const handleTakeFollowUp = async (studySheet: StudySheetWithCompetence) => {
         if (!studySheet.id) return;
 
-        const competenceId = studySheet.competenceId ?? undefined;
+        const competenceId = studySheet.competenceId || undefined;
 
         setLoadingAttendance(studySheet.id);
         
@@ -107,7 +116,7 @@ export const FichasInstructorContainer: React.FC = () => {
                 urlParams.set('competenceId', competenceId.toString());
             }
 
-            router.push(`/dashboard/InstructorFollowUp?${urlParams.toString()}`);
+            router.push(`/dashboard/InstructorFollowUp/${competenceId}?ficha=${studySheet.number}`);
 
             dispatch(fetchStudySheetByIdWithAttendances({
                 id: parseInt(studySheet.id),
@@ -121,7 +130,8 @@ export const FichasInstructorContainer: React.FC = () => {
         } catch (error) {
             console.error('Error al cargar la ficha:', error);
             setLoadingAttendance(null);
-        }    };
+        }    
+    };
 
     return (
         <>

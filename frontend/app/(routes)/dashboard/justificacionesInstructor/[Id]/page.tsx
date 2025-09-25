@@ -8,11 +8,9 @@ export default function JustificationInstructorPage() {
     const searchParams = useSearchParams();
     const competenceQuarterId = Number(params.Id);
     const fichaNumber = searchParams.get('ficha');
-    const learningOutcomeId = searchParams.get('learningOutcome');
 
     return <JustificacionesInstructorContainer 
         competenceQuarterId={competenceQuarterId} 
         fichaNumber={fichaNumber} 
-        learningOutcomeId={learningOutcomeId}
     />;
 }
