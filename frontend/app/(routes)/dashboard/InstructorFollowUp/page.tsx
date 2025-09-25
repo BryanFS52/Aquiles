@@ -15,7 +15,7 @@ const getAuthenticatedInstructorId = (): number => {
     return TEMPORAL_INSTRUCTOR_ID;
 };
 
-export default function InstructorFollowUp() {
+const InstructorFollowUp = () => {
     const dispatch = useDispatch<AppDispatch>();
 
     const {
@@ -83,3 +83,5 @@ export default function InstructorFollowUp() {
         </div>
     );
 }
+
+export default InstructorFollowUp;

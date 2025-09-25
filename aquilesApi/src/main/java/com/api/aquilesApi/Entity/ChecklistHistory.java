@@ -22,7 +22,7 @@ public class ChecklistHistory implements Serializable {
     private Long checklistId;
 
     @Column(name = "actions", nullable = false, length = 255)
-    private String actions; // CREATE, UPDATE, DELETE
+    private String actions;
 
     @Column(name = "teacher", length = 100)
     private String teacher;

@@ -34,7 +34,7 @@ public class ChecklistBusiness {
     private final ChecklistExportService exportService;
     private final ChecklistHistoryBusiness checklistHistoryBusiness;
     private final ItemTypeRepository itemTypeRepository;
-    private final ItemService itemService; // ← Agregar el servicio de items
+    private final ItemService itemService;
     private final TrainingProjectService trainingProjectService;
 
     public ChecklistBusiness(

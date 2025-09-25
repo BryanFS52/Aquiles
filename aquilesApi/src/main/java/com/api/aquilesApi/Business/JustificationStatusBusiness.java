@@ -4,6 +4,7 @@ import com.api.aquilesApi.Dto.JustificationStatusDto;
 import com.api.aquilesApi.Entity.JustificationStatus;
 import com.api.aquilesApi.Service.JustificationStatusService;
 import com.api.aquilesApi.Utilities.CustomException;
+import com.api.aquilesApi.Utilities.Mapper.JustificationStatusMap;
 import com.api.aquilesApi.Utilities.Util;
 import org.json.JSONObject;
 import org.modelmapper.ModelMapper;
@@ -21,13 +22,9 @@ import java.util.stream.Collectors;
 @Component
 public class JustificationStatusBusiness {
     private final JustificationStatusService justificationStatusService;
-    private final Util util;
-    private final ModelMapper modelMapper;
 
-    public JustificationStatusBusiness(JustificationStatusService justificationStatusService, Util util, ModelMapper modelMapper) {
+    public JustificationStatusBusiness(JustificationStatusService justificationStatusService) {
         this.justificationStatusService = justificationStatusService;
-        this.util = util;
-        this.modelMapper = modelMapper;
     }
 
     // Validation object
@@ -44,28 +41,23 @@ public class JustificationStatusBusiness {
         }
     }
 
-    // FindAll
+    // Get all Justification Status (paginated)
     public Page<JustificationStatusDto> findAll(int page, int size){
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<JustificationStatus> justificationStatusPage = this.justificationStatusService.findAll(pageRequest);
+            Page<JustificationStatus> justificationStatusPage = justificationStatusService.findAll(pageRequest);
+            return JustificationStatusMap.INSTANCE.EntityToDTOs(justificationStatusPage);
 
-            List<JustificationStatusDto> justificationStatusDtoList = justificationStatusPage.getContent()
-                    .stream()
-                    .map(entity -> modelMapper.map(entity, JustificationStatusDto.class))
-                    .collect(Collectors.toList());
-
-            return new PageImpl<>(justificationStatusDtoList, pageRequest, justificationStatusPage.getTotalElements());
         } catch (Exception e){
             throw new CustomException("Error retrieving Status Justification" , HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // Find By ID
+    // Get Justification Status by ID
     public JustificationStatusDto findById(Long id) {
         try {
             JustificationStatus justificationStatus = this.justificationStatusService.getById(id);
-            return modelMapper.map(justificationStatus, JustificationStatusDto.class);
+            return JustificationStatusMap.INSTANCE.EntityToDTO(justificationStatus);
         } catch (CustomException e) {
           throw e;
         } catch (Exception e) {
@@ -73,32 +65,33 @@ public class JustificationStatusBusiness {
         }
     }
 
-
-    //Add
+    // Add new Justification Status
     public JustificationStatusDto add(JustificationStatusDto justificationStatusDto) {
         try {
             validationObject(justificationStatusDto);
-            justificationStatusDto.setState(true);
-            JustificationStatus justificationStatus = modelMapper.map(justificationStatusDto, JustificationStatus.class);
-            return modelMapper.map(this.justificationStatusService.save(justificationStatus), JustificationStatusDto.class);
+            JustificationStatus justificationStatus = new JustificationStatus();
+            JustificationStatusMap.INSTANCE.updateJustificationStatus(justificationStatusDto, justificationStatus);
+            JustificationStatus savedJustificationStatus = justificationStatusService.save(justificationStatus);
+            return JustificationStatusMap.INSTANCE.EntityToDTO(savedJustificationStatus);
         } catch (Exception e) {
             throw new CustomException("Error Creating Status: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    // Update
+    // Update existing JustificationStatus
     public void update(Long justificationStatusId, JustificationStatusDto justificationStatusDto) {
         try {
             justificationStatusDto.setId(justificationStatusId);
             validationObject(justificationStatusDto);
-            JustificationStatus justificationStatus = modelMapper.map(justificationStatusDto, JustificationStatus.class);
-            this.justificationStatusService.save(justificationStatus);
+            JustificationStatus justificationStatus = justificationStatusService.getById(justificationStatusId);
+            JustificationStatusMap.INSTANCE.updateJustificationStatus(justificationStatusDto, justificationStatus);
+            justificationStatusService.save(justificationStatus);
         } catch (Exception e) {
             throw new CustomException("Error Updating Status Justification: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    // Delete
+    // Delete justification status by ID
     public void delete(Long justificationStatusId) {
         try {
             JustificationStatus justificationStatus = justificationStatusService.getById(justificationStatusId);

@@ -1,11 +1,10 @@
-// Pendiente
+// Pendiente sigue en api Rest
 'use client'
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react'
+import { Apprentice, NewApprentice } from '@type/slices/aprendices'
 import { toast } from 'react-toastify'
 import PageTitle from '@components/UI/pageTitle'
-
-import { Apprentice, NewApprentice } from '@type/slices/aprendices'
-function ListaApprentices() {
+const ListaApprentices = () => {
   const [apprentices, setApprentices] = useState<Apprentice[]>([])
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [newApprentice, setNewApprentice] = useState<NewApprentice>({
@@ -165,4 +164,4 @@ function ListaApprentices() {
   )
 }
 
-export default ListaApprentices
+export default ListaApprentices;

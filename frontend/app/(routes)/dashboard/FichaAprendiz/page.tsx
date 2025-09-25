@@ -11,7 +11,7 @@ import Image from "next/image";
 import PageTitle from "@components/UI/pageTitle";
 import EmptyState from "@components/UI/emptyState";
 
-const ApprenticeView = () => {
+const ApprenticeView =() => {
   const dispatch = useDispatch<AppDispatch>();
   const { showLoader, hideLoader } = useLoader();
   const { data: studySheetData, dataForStudents, loading } = useSelector((state: RootState) => state.studySheet);
@@ -220,6 +220,6 @@ const ApprenticeView = () => {
       `}</style>
     </div>
   );
-};
+}
 
 export default ApprenticeView;

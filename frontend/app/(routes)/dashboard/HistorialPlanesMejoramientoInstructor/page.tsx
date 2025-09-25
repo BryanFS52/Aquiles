@@ -12,7 +12,7 @@ import { ImprovementPlan } from "@graphql/generated";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function HistorialPlanesMejoramientoInstructor() {
+const HistorialPlanesMejoramientoInstructor = () => {
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -387,3 +387,5 @@ export default function HistorialPlanesMejoramientoInstructor() {
         </div>
     );
 }
+
+export default HistorialPlanesMejoramientoInstructor;

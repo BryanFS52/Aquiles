@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@redux/store'
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -10,25 +10,27 @@ import { fetchStudySheetByIdWithAttendances } from '@slice/olympo/studySheetSlic
 import TableAttendance from "@components/features/asistencia/tableAttendance";
 import PageTitle from "@components/UI/pageTitle";
 import AttendanceFooter from "@components/features/asistencia/attendanceFooter";
+import Loader from "@components/UI/Loader";
+import EmptyState from "@components/UI/emptyState";
 
-function AttendanceContent() {
+const Attendance = () => {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
     const searchParams = useSearchParams();
     const { showLoader, hideLoader } = useLoader();
     const [isTransitioning, setIsTransitioning] = useState(false);
-    
+
     // Obtener parámetros de la URL
     const studySheetIdFromUrl = searchParams.get('studySheetId');
     const competenceIdFromUrl = searchParams.get('competenceId');
-    
+
     const { data: studySheets, selectedForAttendance, loading, loadingAttendanceSheet, error } = useSelector(
         (state: RootState) => state.studySheet
     );
 
     // Usar la ficha seleccionada para asistencia si está disponible, de lo contrario usar la primera del array
     const studySheet = selectedForAttendance || (studySheets.length > 0 ? studySheets[0] : undefined);
-    
+
     const students = (studySheet?.studentStudySheets as any[])?.filter(
         (s: any) => {
             // Aceptar diferentes estados activos
@@ -52,12 +54,12 @@ function AttendanceContent() {
         router.push(`/dashboard/asistenciaManual?${urlParams.toString()}`);
     };
 
-    // Efecto para cargar la ficha desde la URL si no está disponible en Redux
+    // Efecto para cargar la ficha desde la URL si no está disponible en Redux (State)
     useEffect(() => {
         if (studySheetIdFromUrl && !selectedForAttendance) {
             const studySheetId = parseInt(studySheetIdFromUrl);
             const competenceId = competenceIdFromUrl ? parseInt(competenceIdFromUrl) : undefined;
-            
+
             dispatch(fetchStudySheetByIdWithAttendances({
                 id: studySheetId,
                 competenceId
@@ -75,20 +77,18 @@ function AttendanceContent() {
 
     if (error) {
         return (
-            <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-                <PageTitle>Lista de asistencia</PageTitle>
-                <div className="flex items-center justify-center h-32 sm:h-64">
-                    <p className="text-red-500 dark:text-red-400 text-sm sm:text-base text-center px-4">
-                        Error al cargar la ficha: {typeof error === 'string' ? error : error?.message ?? "Error desconocido"}
-                    </p>
-                </div>
-            </div>
+            <EmptyState message={typeof error === 'string' ? error : error?.message ?? "Error desconocido"} />
         );
     }
 
-    // Mostrar estado de carga si hay parámetros de URL pero no hay ficha cargada aún
-    if (studySheetIdFromUrl && !studySheet && (loadingAttendanceSheet || loading)) {
-        return null; // El loader global se encarga de mostrar la pantalla de carga
+    // Loader de carga
+    if (loadingAttendanceSheet || loading) {
+        return <Loader />;
+    }
+
+    // Estado vacío si no hay datos
+    if (!studySheet) {
+        return <EmptyState message="No se encontraron datos de asistencia." />;
     }
 
     return (
@@ -213,19 +213,4 @@ function AttendanceContent() {
     );
 }
 
-export default function Attendance() {
-    return (
-        <Suspense fallback={
-            <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-                <PageTitle>Lista de asistencia</PageTitle>
-                <div className="flex items-center justify-center h-32 sm:h-64">
-                    <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base text-center px-4">
-                        Cargando información de la ficha...
-                    </p>
-                </div>
-            </div>
-        }>
-            <AttendanceContent />
-        </Suspense>
-    );
-}
+export default Attendance;

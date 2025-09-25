@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useRouter, useSearchParams } from "next/navigation";
-import type { AppDispatch } from "@/redux/store";
-import PageTitle from "@components/UI/pageTitle";
-import EmptyState from "@components/UI/emptyState";
-import { useLoader } from "@context/LoaderContext";
 import { Card, CardGrid } from "@components/UI/Card";
 import { fetchStudySheetByTeacher } from "@slice/olympo/studySheetSlice";
+import { AppDispatch } from "@/redux/store";
+import { useLoader } from "@context/LoaderContext";
 import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
 import { BookOpen, ArrowRight } from "lucide-react";
+import PageTitle from "@components/UI/pageTitle";
+import EmptyState from "@components/UI/emptyState";
 
 interface CompetenceOption {
   id: string;

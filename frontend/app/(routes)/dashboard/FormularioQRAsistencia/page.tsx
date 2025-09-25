@@ -2,6 +2,8 @@
 
 import FormularioQr from "@components/features/asistencia/formularioQr";
 
-export default function AttendanceFormPage() {
+const AttendanceFormPage = () => {
   return <FormularioQr />;
 }
+
+export default AttendanceFormPage;

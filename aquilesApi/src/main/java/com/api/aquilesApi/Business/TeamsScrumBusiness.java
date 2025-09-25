@@ -53,7 +53,7 @@ public class TeamsScrumBusiness {
         }
     }
 
-    // Find All
+    // Get all TeamsScrum (paginated)
     public Page<TeamsScrumDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
@@ -96,71 +96,20 @@ public class TeamsScrumBusiness {
         }
     }
 
-    // Add
+    // Add new TeamScrum
     public TeamsScrumDto add(TeamsScrumDto teamsScrumDto) {
         try {
             validationObject(teamsScrumDto);
-            
-            // Crear la entidad manualmente para evitar problemas de mapeo con checklist anidado
             TeamsScrum teamsScrum = new TeamsScrum();
-            teamsScrum.setTeamName(teamsScrumDto.getTeamName());
-            teamsScrum.setStudySheetId(teamsScrumDto.getStudySheetId());
-            
-            // Establecer campos obligatorios desde el DTO con valores por defecto si están vacíos
-            teamsScrum.setProjectName(
-                teamsScrumDto.getProjectName() != null && !teamsScrumDto.getProjectName().trim().isEmpty() 
-                    ? teamsScrumDto.getProjectName() 
-                    : "Proyecto por definir"
-            );
-            
-            teamsScrum.setProblem(
-                teamsScrumDto.getProblem() != null && !teamsScrumDto.getProblem().trim().isEmpty() 
-                    ? teamsScrumDto.getProblem() 
-                    : "Problema por definir"
-            );
-            
-            teamsScrum.setObjectives(
-                teamsScrumDto.getObjectives() != null && !teamsScrumDto.getObjectives().trim().isEmpty() 
-                    ? teamsScrumDto.getObjectives() 
-                    : "Objetivos por definir"
-            );
-            
-            teamsScrum.setDescription(
-                teamsScrumDto.getDescription() != null && !teamsScrumDto.getDescription().trim().isEmpty() 
-                    ? teamsScrumDto.getDescription() 
-                    : "Descripción por definir"
-            );
-            
-            teamsScrum.setProjectJustification(
-                teamsScrumDto.getProjectJustification() != null && !teamsScrumDto.getProjectJustification().trim().isEmpty() 
-                    ? teamsScrumDto.getProjectJustification() 
-                    : "Justificación por definir"
-            );
-            
-            // Campos opcionales
-            teamsScrum.setProcessMethodologyId(teamsScrumDto.getProcessMethodologyId());
-            
-            // Mapear miembros si existen
-            if (teamsScrumDto.getMemberIds() != null) {
-                List<TeamScrumMemberId> memberIds = teamsScrumDto.getMemberIds()
-                        .stream()
-                        .map(dto -> new TeamScrumMemberId(dto.getStudentId(), dto.getProfileId()))
-                        .collect(Collectors.toList());
-                teamsScrum.setMemberIds(memberIds);
-            }
-            
-            // No incluir checklist en la creación inicial para evitar problemas de mapeo
-            // El checklist se creará por separado cuando sea necesario
-            
-            TeamsScrum savedTeamsScrum = teamScrumService.save(teamsScrum);
-            return TeamScrumMap.INSTANCE.EntityToDTO(savedTeamsScrum);
-
+            TeamScrumMap.INSTANCE.updateTeamScrum(teamsScrumDto, teamsScrum);
+            TeamsScrum savedTeamScrum = teamScrumService.save(teamsScrum);
+            return TeamScrumMap.INSTANCE.EntityToDTO(savedTeamScrum);
         } catch (Exception e) {
-            throw new CustomException("Error al registrar el team scrum: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    // Update
+    // Update existing TeamScrum
     public void update(Long teamScrumId, TeamsScrumDto teamsScrumDto) {
         try {
             teamsScrumDto.setId(teamScrumId);
@@ -227,7 +176,8 @@ public class TeamsScrumBusiness {
             throw new CustomException("Error Adding Profile to Student: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-    // Delete
+    
+    // Delete TeamScrum by ID
     public void delete(Long teamScrumId) {
         try {
             TeamsScrum teamsScrum = teamScrumService.getById(teamScrumId);

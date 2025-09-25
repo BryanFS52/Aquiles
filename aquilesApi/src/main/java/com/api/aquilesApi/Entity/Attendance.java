@@ -2,10 +2,9 @@ package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate; 
+import java.time.LocalDate;
 import java.util.Set;
 
 @NoArgsConstructor

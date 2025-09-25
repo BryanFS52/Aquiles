@@ -59,24 +59,27 @@ public class AttendancesService implements Idao<Attendance, Long> {
         this.attendancesRepository.save(entity);
     }
 
+    // Filter attendances with justifications for a specific competence quarter
     public Page<Attendance> findAllByCompetenceQuarterIdAndJustifications( Long id, Pageable pageable) {
         return attendancesRepository.findAllByCompetenceQuarterIdAndJustifications(id, pageable);
     }
 
-    // Get all attendances for a specific student
+    // Filter attendances for a specific student
     public List<Attendance> findAllByStudentId(Long studentId) {
         System.out.println("Fetching attendances for student ID: " + studentId);
         return attendancesRepository.findAllByStudentId(studentId);
     }
 
+    // Filter attendances for a specific competence quarter
     public List<Attendance> findAllByCompetenceQuarterId(Long id) {
         return attendancesRepository.findAllByCompetenceQuarter(id);
     }
 
-
+    // Filter attendances for a specific student and competence quarter
     public List<Attendance> getAllByStudentIdAndCompetenceQuarter(Long studentId, Long competenceQuarterId) {
         return attendancesRepository.findAllByStudentIdAndCompetenceQuarter(studentId, competenceQuarterId);
     }
+
     // Filter attendances by student and/or state
     public Page<Attendance> findAllByFilter(Long studentId, Long attendanceState, Pageable pageable) {
         return attendancesRepository.findByStudentIdAndOrAttendanceStateId(studentId, attendanceState, pageable);

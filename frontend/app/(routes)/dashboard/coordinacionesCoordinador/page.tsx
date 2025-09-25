@@ -10,16 +10,7 @@ import { Card, CardGrid } from '@components/UI/Card';
 import DataTable from '@components/UI/DataTable';
 import Loader from '@components/UI/Loader';
 import EmptyState from '@components/UI/emptyState';
-import {
-    Users,
-    Building2,
-    Check,
-    X,
-    Grid3X3,
-    List,
-    User,
-    UserCheck
-} from 'lucide-react';
+import { Users,Building2, Check, X, Grid3X3, List, User, UserCheck } from 'lucide-react';
 
 type ViewMode = 'cards' | 'table';
 

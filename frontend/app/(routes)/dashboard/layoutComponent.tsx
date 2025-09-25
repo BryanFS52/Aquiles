@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { Sidebar } from "../../components/UI/sidebar";
-import { Header } from "../../components/UI/header";
-import { useUser } from "../../context/UserContext";
+import { Sidebar } from "@components/UI/sidebar";
+import { Header } from "@components/UI/header";
+import { useUser } from "@context/UserContext";
 import { Provider } from "react-redux";
-import store from '../../redux/store';
+import store from '@redux/store';
 import { RoleType } from '../../types/roles';
 
 interface LayoutContentProps {

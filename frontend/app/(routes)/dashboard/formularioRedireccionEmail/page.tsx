@@ -2,8 +2,9 @@
 
 import logoSenaFormulario from "@public/img/Logo-sena-green.png";
 import Image from 'next/image';
+import React from 'react';
 
-const FormularioRedireccionEmail = () => {
+const FormularioRedireccionEmail: React.FC = () => {
   const logo = "URL_DEL_LOGO"; // Reemplazar con la URL del logo o importarlo
 
   return (

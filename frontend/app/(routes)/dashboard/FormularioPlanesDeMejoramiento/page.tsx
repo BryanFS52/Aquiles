@@ -11,7 +11,7 @@ import { addImprovementPlan } from "@slice/improvementPlanSlice";
 import { toast } from "react-toastify";
 import { useLoader } from "@context/LoaderContext";
 
-export default function FormularioPlanesDeMejoramientoPage() {
+const FormularioPlanesDeMejoramientoPage =() => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const dispatch = useDispatch<AppDispatch>();
@@ -565,3 +565,5 @@ export default function FormularioPlanesDeMejoramientoPage() {
         </div>
     );
 }
+
+export default FormularioPlanesDeMejoramientoPage;

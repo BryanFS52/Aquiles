@@ -55,7 +55,7 @@ public class Checklist implements Serializable {
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items;
 
-    // 2.Relación (1-1) con evaluations - Un checklist tiene una única evaluación
+    // 2.Relation (1-1) con evaluations
     @OneToOne(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private Evaluations evaluation;
 
