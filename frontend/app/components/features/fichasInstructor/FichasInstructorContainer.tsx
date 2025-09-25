@@ -87,8 +87,7 @@ export const FichasInstructorContainer: React.FC = () => {
         setLoadingAttendance(studySheet.id);
 
         try {
-            // 🔄 Ir al selector de competencias
-            router.push(`/dashboard/justificacionesInstructor?ficha=${studySheet.number || ""}`);
+            router.push(`/dashboard/justificacionesInstructor?ficha=${studySheet.number}`);
 
             setTimeout(() => setLoadingAttendance(null), 200);
         } catch (error) {
@@ -105,32 +104,17 @@ export const FichasInstructorContainer: React.FC = () => {
     const handleTakeFollowUp = async (studySheet: StudySheetWithCompetence) => {
         if (!studySheet.id) return;
 
-        const competenceId = studySheet.competenceId || undefined;
-
         setLoadingAttendance(studySheet.id);
         
         try {
-            const urlParams = new URLSearchParams();
-            urlParams.set('studySheetId', studySheet.id);
-            if (competenceId) {
-                urlParams.set('competenceId', competenceId.toString());
-            }
-
-            router.push(`/dashboard/InstructorFollowUp/${competenceId}?ficha=${studySheet.number}`);
-
-            dispatch(fetchStudySheetByIdWithAttendances({
-                id: parseInt(studySheet.id),
-                competenceId
-            }));
-            
+            router.push(`/dashboard/InstructorFollowUp?ficha=${studySheet.number}`);
             setTimeout(() => {
                 setLoadingAttendance(null);
             }, 200);
-            
         } catch (error) {
-            console.error('Error al cargar la ficha:', error);
+            console.error('Error al navegar a seguimiento:', error);
             setLoadingAttendance(null);
-        }    
+        }  
     };
 
     return (
@@ -152,6 +136,7 @@ export const FichasInstructorContainer: React.FC = () => {
                                         }}
                                         onTakeJustification={handleTakeJustification}
                                         onTakeFollowUp={handleTakeFollowUp}
+                                        onViewApprenticesFollowUp={handleTakeFollowUp}
                                     />
                                 </div>
                             ))}

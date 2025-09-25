@@ -10,27 +10,12 @@ import { StudentSummary, setAttendanceSummaryFromStudySheet } from "@redux/slice
 import { openNoveltyModal } from "@redux/slices/themis/noveltySlice";
 import { AppDispatch, RootState } from "@redux/store";
 import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
-import { useRouter, useSearchParams } from "next/navigation";
-import { fetchStudySheetByIdWithAttendances } from "@/redux/slices/olympo/studySheetSlice";
+import { useRouter } from "next/navigation";
 import { InstructorFollowUpContainerProps } from "./types";
 
 const getAuthenticatedInstructorId = (): number => {
     return TEMPORAL_INSTRUCTOR_ID;
 };
-
-interface CompetenceOption {
-  id: string;
-  name: string;
-  studySheetNumber?: number;
-  learningOutcomes?: LearningOutcome[];
-}
-
-interface LearningOutcome {
-  id: string;
-  name: string;
-  description?: string;
-  code?: number;
-}
 
 export const InstructorFollowUpContainer: React.FC<InstructorFollowUpContainerProps> = ({
   competenceQuarterId,
@@ -38,11 +23,8 @@ export const InstructorFollowUpContainer: React.FC<InstructorFollowUpContainerPr
 }) => {
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
-    const searchParams = useSearchParams();
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const studySheetIdFromUrl = searchParams.get("studySheetId");
-    const competenceIdFromUrl = searchParams.get("competenceId");
-
+    
     const {
         data: studySheets,
         selectedForAttendance,
@@ -53,10 +35,6 @@ export const InstructorFollowUpContainer: React.FC<InstructorFollowUpContainerPr
 
     const { attendanceSummary } = useSelector((state: RootState) => state.attendances);
 
-    // Usar la ficha seleccionada para asistencia si está disponible
-    const studySheet =
-        selectedForAttendance || (studySheets.length > 0 ? studySheets[0] : undefined);
-
     const {
         modalOpen: isNoveltyModalOpen,
         loading: noveltyLoading,
@@ -64,30 +42,35 @@ export const InstructorFollowUpContainer: React.FC<InstructorFollowUpContainerPr
     } = useSelector((state: RootState) => state.novelty);
 
     useEffect(() => {
-        if (studySheetIdFromUrl && !selectedForAttendance) {
-            const studySheetId = parseInt(studySheetIdFromUrl);
-            const competenceId = competenceIdFromUrl
-                ? parseInt(competenceIdFromUrl)
-                : undefined;
+        dispatch(setAttendanceSummaryFromStudySheet([]));
+    }, [competenceQuarterId, fichaNumber, dispatch]);
 
-            dispatch(
-                fetchStudySheetByIdWithAttendances({
-                    id: studySheetId,
-                    competenceId,
-                })
-            )
-                .unwrap()
-                .then((res) => {
-                    if (res?.data) {
-                        // 🔹 Alimentar el attendanceSummary desde la ficha
-                        dispatch(setAttendanceSummaryFromStudySheet(res.data));
-                    }
-                })
-                .catch((err) => {
-                    console.error("Error cargando ficha con asistencias:", err);
-                });
+    useEffect(() => {
+        if (selectedForAttendance) {
+            dispatch(setAttendanceSummaryFromStudySheet(selectedForAttendance));
         }
-    }, [studySheetIdFromUrl, competenceIdFromUrl, selectedForAttendance, dispatch]);
+    }, [selectedForAttendance, dispatch]);
+
+    const getCompetenceName = () => {
+        if (selectedForAttendance?.teacherStudySheets) {
+            const targetTeacherStudySheet = selectedForAttendance.teacherStudySheets.find(
+                (tss: any) => {
+                    const teacherStudySeets = parseInt(tss.id);
+                    const targetId = parseInt(competenceQuarterId.toString());
+                    return teacherStudySeets === targetId;
+                }
+            );
+            
+            if (targetTeacherStudySheet?.competence?.name) {
+                return targetTeacherStudySheet.competence.name;
+            }
+        }
+        
+        return `Competencia ${competenceQuarterId}`;
+    };
+
+    const competenceName = getCompetenceName();
+    const shouldShowData = selectedForAttendance && attendanceSummary.length > 0 && !loadingAttendanceSheet;
 
     const handleReportNovelty = async (studentId?: number) => {
         if (!studentId) {
@@ -115,7 +98,7 @@ export const InstructorFollowUpContainer: React.FC<InstructorFollowUpContainerPr
             if (error.code === "INSUFFICIENT_ABSENCES") {
                 toast.warn(
                     error.message ||
-                        "El estudiante no tiene suficientes ausencias e injustificadas para reportar deserción"
+                        "El estudiante no tienen suficientes ausencias e injustificadas para reportar deserción"
                 );
             } else {
                 toast.error(error.message || "Error al abrir modal de novedad");
@@ -127,16 +110,26 @@ export const InstructorFollowUpContainer: React.FC<InstructorFollowUpContainerPr
 
     return (
         <div className="space-y-4 sm:space-y-6 p-2 sm:p-4 md:p-6 lg:p-8">
-            <PageTitle>Seguimiento de Ausencias</PageTitle>
+            {loadingAttendanceSheet ? (
+                <div className="flex justify-center items-center py-8">
+                    <div className="text-lg">Cargando asistencias para {competenceName}...</div>
+                </div>
+            ) : (
+                <>
+                    <PageTitle onBack={() => router.back()}>
+                        Seguimiento de Ausencias - {competenceName}
+                        {fichaNumber && ` - Ficha ${fichaNumber}`}
+                    </PageTitle>
 
-            <AttendanceTable
-                data={attendanceSummary}
-                loading={loading}
-                onReportNovelty={handleReportNovelty}
-            />
+                    <AttendanceTable
+                        data={shouldShowData ? attendanceSummary : []}
+                        loading={loadingAttendanceSheet}
+                        onReportNovelty={handleReportNovelty}
+                    />
 
-            {/* Modal de Novedad */}
-            <NoveltyModal isOpen={isNoveltyModalOpen} onClose={handleCloseNoveltyModal} />
+                    <NoveltyModal isOpen={isNoveltyModalOpen} onClose={handleCloseNoveltyModal} />
+                </>
+            )}
         </div>
     );
-}
+};
