@@ -140,7 +140,7 @@ export const getStatusNameById = (
   justificationStatuses: JustificationStatus[],
   statusId?: string
 ): string => {
-  if (!statusId || !justificationStatuses.length) {
+  if (!statusId || !justificationStatuses || !Array.isArray(justificationStatuses) || !justificationStatuses.length) {
     return "En proceso";
   }
 
@@ -151,6 +151,9 @@ export const getStatusNameById = (
 export const getActiveStatuses = (
   justificationStatuses: JustificationStatus[]
 ): JustificationStatus[] => {
+  if (!justificationStatuses || !Array.isArray(justificationStatuses)) {
+    return [];
+  }
   return justificationStatuses.filter(status => status.state === true);
 };
 

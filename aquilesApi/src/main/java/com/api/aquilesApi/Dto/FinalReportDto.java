@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class FinalReportDto {
 
     private Long id;

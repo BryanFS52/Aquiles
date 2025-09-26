@@ -18,8 +18,8 @@ public class AttendanceStateSeeder implements CommandLineRunner {
     public void run(String... args) {
         createStateIfNotExists("Presente");
         createStateIfNotExists("Ausente");
-        createStateIfNotExists("Justificado");
         createStateIfNotExists("Retardo");
+        createStateIfNotExists("Justificado");
         createStateIfNotExists("Injustificado");
     }
 

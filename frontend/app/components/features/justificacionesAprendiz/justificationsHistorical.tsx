@@ -4,11 +4,12 @@ import { motion } from "framer-motion";
 import { FaCheckCircle, FaClock, FaFileAlt, FaRegFileAlt } from "react-icons/fa";
 import { GrAttachment } from "react-icons/gr";
 import { MdHistory } from "react-icons/md";
-import { TransformedJustificationItem } from "@slice/justificationSlice";
+import { Justification } from "@graphql/generated";
+
 interface JustificationsHistoricalProps {
-  data: TransformedJustificationItem[];
+  data: Justification[];
   loading: boolean;
-  handleDownloadFile: (justificacion: TransformedJustificationItem) => void;
+  handleDownloadFile: (justificacion: Justification) => void;
 }
 
 export default function JustificationsHistorical({
@@ -19,7 +20,7 @@ export default function JustificationsHistorical({
   // Ordenar justificaciones por fecha de ausencia (más reciente primero)
   const sortedData = [...data].sort((a, b) => {
     // Función para convertir DD/MM/YYYY a Date
-    const parseDate = (dateString: string) => {
+    const parseDate = (dateString?: string | null) => {
       if (!dateString) return new Date(0);
       
       const parts = dateString.split('/');
@@ -34,8 +35,8 @@ export default function JustificationsHistorical({
       return new Date(dateString);
     };
 
-    const dateA = parseDate(a.absenceDate);
-    const dateB = parseDate(b.absenceDate);
+    const dateA = parseDate(a.absenceDate || undefined);
+    const dateB = parseDate(b.absenceDate || undefined);
     
     return dateB.getTime() - dateA.getTime(); // Descendente (más reciente primero)
   });
@@ -129,7 +130,7 @@ export default function JustificationsHistorical({
               ) : (
                 sortedData.map(
                   (
-                    justification: TransformedJustificationItem,
+                    justification: Justification,
                     index: number
                   ) => (
                     <motion.tr
@@ -141,26 +142,24 @@ export default function JustificationsHistorical({
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center">
-                          {justification.justificationType}
+                          {justification.justificationType?.name || 'N/A'}
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center">
-                          {justification.absenceDate}
+                          {justification.absenceDate || 'N/A'}
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center">
-                          {justification.justificationDate}
+                          {justification.justificationDate || 'N/A'}
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
-                          {justification.archivoAdjunto ? (
+                          {justification.justificationFile ? (
                             <GrAttachment
-                              title={`Descargar archivo (${
-                                justification.archivoMime || "desconocido"
-                              })`}
+                              title="Descargar archivo"
                               className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
                               onClick={() => handleDownloadFile(justification)}
                             />
@@ -175,14 +174,14 @@ export default function JustificationsHistorical({
                         <div className="flex flex-col space-y-1 items-start">
                           <span
                             className={`inline-flex items-center px-2.5 py-1.5 text-xs font-semibold rounded-full whitespace-nowrap ${getStatusColor(
-                              justification.estado || "En Proceso"
+                              justification.justificationStatus?.name || "En Proceso"
                             )}`}
                           >
                             {getStatusIcon(
-                              justification.estado || "En Proceso"
+                              justification.justificationStatus?.name || "En Proceso"
                             )}
                             <span className="ml-1">
-                              {justification.estado || "En Proceso"}
+                              {justification.justificationStatus?.name || "En Proceso"}
                             </span>
                           </span>
                           <span
@@ -192,7 +191,7 @@ export default function JustificationsHistorical({
                                 : "text-gray-400 dark:text-gray-500"
                             }`}
                           >
-                            {justification.state}
+                            {justification.state ? 'Activo' : 'Inactivo'}
                           </span>
                         </div>
                       </td>

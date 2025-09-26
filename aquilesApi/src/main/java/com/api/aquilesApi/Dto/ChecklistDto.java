@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class ChecklistDto {
     private Long id;
 

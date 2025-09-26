@@ -1,10 +1,10 @@
 package com.api.aquilesApi.Dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
+@Data
 @AllArgsConstructor
-@Getter
+@NoArgsConstructor
 public class StudySheet {
     private Long id;
 }
