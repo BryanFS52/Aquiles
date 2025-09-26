@@ -38,7 +38,7 @@ public class ImprovementPlanResolver {
             } else if (teacherCompetence != null) {
                 improvementPlanPage = improvementPlanBusiness.findByFilter(page, size, teacherCompetence);
             } else if (idStudySheet != null) {
-                improvementPlanPage = improvementPlanBusiness.findByStudySheet(page,size, idStudySheet);
+                improvementPlanPage = improvementPlanBusiness.findByStudySheetId(page, size, idStudySheet);
             } else  {
                 improvementPlanPage = improvementPlanBusiness.findAll(page, size);
             }

@@ -1,16 +1,16 @@
 package com.api.aquilesApi.Utilities.Seeder;
 
 import com.api.aquilesApi.Entity.AttendanceState;
-import com.api.aquilesApi.Repository.StateAttendanceRepository;
+import com.api.aquilesApi.Repository.AttendanceStateRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AttendanceStateSeeder implements CommandLineRunner {
 
-    private final StateAttendanceRepository attendanceStateRepository;
+    private final AttendanceStateRepository attendanceStateRepository;
 
-    public AttendanceStateSeeder(StateAttendanceRepository attendanceStateRepository) {
+    public AttendanceStateSeeder(AttendanceStateRepository attendanceStateRepository) {
         this.attendanceStateRepository = attendanceStateRepository;
     }
 
@@ -19,6 +19,7 @@ public class AttendanceStateSeeder implements CommandLineRunner {
         createStateIfNotExists("Presente");
         createStateIfNotExists("Ausente");
         createStateIfNotExists("Justificado");
+        createStateIfNotExists("Retardo");
         createStateIfNotExists("Injustificado");
     }
 
