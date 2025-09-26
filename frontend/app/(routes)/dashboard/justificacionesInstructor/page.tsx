@@ -17,6 +17,7 @@ interface CompetenceOption {
   name: string;
   studySheetNumber?: number;
   originalCompetenceId?: string;
+  teacherStudySheetId?: string; // 🆕 Agregar para almacenar tss.id
 }
 
 export default function JustificacionesInstructorSelector() {
@@ -34,8 +35,12 @@ export default function JustificacionesInstructorSelector() {
   };
 
   const handleCompetenceSelect = (competence: CompetenceOption) => {
-    const competenceId = competence.originalCompetenceId || competence.id;
-    router.push(`/dashboard/justificacionesInstructor/${competenceId}?ficha=${competence.studySheetNumber}`);
+    // 🆕 Usar teacherStudySheetId como competenceQuarterId
+    const competenceQuarterId = competence.teacherStudySheetId || competence.id;
+    console.log('🔍 [Selector] Selected competence:', competence);
+    console.log('✅ [Selector] Using competenceQuarterId (tss.id):', competenceQuarterId);
+    
+    router.push(`/dashboard/justificacionesInstructor/${competenceQuarterId}?ficha=${competence.studySheetNumber}`);
   };
 
   const getPageTitle = () => {
@@ -90,52 +95,116 @@ export default function JustificacionesInstructorSelector() {
   useEffect(() => {
     const loadCompetences = async () => {
       try {
-        setLoading(true);        
+        setLoading(true);
+        
+        console.log('🔍 [Selector] Loading competences for ficha:', fichaNumber);
+        console.log('🔍 [Selector] TEMPORAL_INSTRUCTOR_ID:', TEMPORAL_INSTRUCTOR_ID);
+        
         const result = await dispatch(fetchStudySheetByTeacher({ 
           idTeacher: TEMPORAL_INSTRUCTOR_ID, 
           page: 0, 
           size: 20 
         }));
         
+        console.log('🔍 [Selector] Dispatch result:', result);
+        
         if (fetchStudySheetByTeacher.fulfilled.match(result)) {
           const studySheets = result.payload?.data || [];
+          console.log('🔍 [Selector] All study sheets:', studySheets);
+          console.log('🔍 [Selector] Looking for ficha:', fichaNumber);
           
-          const filteredSheets = studySheets.filter((sheet: any) => sheet.number.toString() === fichaNumber);
+          // 🔍 Ver todos los números de ficha disponibles
+          const availableFichas = studySheets.map((sheet: any) => sheet.number);
+          console.log('🔍 [Selector] Available fichas:', availableFichas);
+          
+          const filteredSheets = studySheets.filter((sheet: any) => {
+            const sheetNumber = sheet.number.toString();
+            const targetFicha = fichaNumber;
+            console.log(`🔍 [Selector] Comparing: sheet.number="${sheetNumber}" with fichaNumber="${targetFicha}"`);
+            return sheetNumber === targetFicha;
+          });
+          
+          console.log('🔍 [Selector] Filtered sheets for ficha', fichaNumber, ':', filteredSheets);
           
           const allCompetences: CompetenceOption[] = [];
           
-          filteredSheets.forEach((sheet: any) => {
-            if (sheet.teacherStudySheets) {
-              sheet.teacherStudySheets.forEach((tss: any) => {
-                if (tss.competence && tss.competence.id && tss.competence.name) {
-                  allCompetences.push({
-                    id: tss.competence.id,
-                    name: tss.competence.name,
-                    studySheetNumber: sheet.number,
-                    originalCompetenceId: tss.competence.id
-                  });
-                }
-              });
+          filteredSheets.forEach((sheet: any, sheetIndex) => {
+            console.log(`🔍 [Selector] Processing sheet ${sheetIndex}:`, sheet);
+            
+            if (sheet.teacherStudySheets && sheet.teacherStudySheets.length > 0) {
+              console.log(`🔍 [Selector] teacherStudySheets for sheet ${sheetIndex}:`, sheet.teacherStudySheets);
+              
+              interface TeacherStudySheetCompetence {
+                id: string;
+                name: string;
+              }
+
+              interface TeacherStudySheet {
+                id: string;
+                competence: TeacherStudySheetCompetence;
+              }
+
+              interface StudySheet {
+                id: string;
+                number: number;
+                teacherStudySheets: TeacherStudySheet[];
+              }
+
+                            sheet.teacherStudySheets.forEach((tss: TeacherStudySheet, tssIndex: number) => {
+                              console.log(`🔍 [Selector] Processing tss ${tssIndex}:`, tss);
+                              
+                              if (tss.competence && tss.competence.id && tss.competence.name && tss.id) {
+                                const competenceOption: CompetenceOption = {
+                                  id: tss.competence.id,
+                                  name: tss.competence.name,
+                                  studySheetNumber: sheet.number,
+                                  originalCompetenceId: tss.competence.id,
+                                  teacherStudySheetId: tss.id // 🆕 Usar tss.id como competenceQuarterId
+                                };
+                                
+                                console.log('✅ [Selector] Adding competence with tss.id:', competenceOption);
+                                allCompetences.push(competenceOption);
+                              } else {
+                                console.log('⚠️ [Selector] Skipping tss due to missing data:', {
+                                  hasCompetence: !!tss.competence,
+                                  competenceId: tss.competence?.id,
+                                  competenceName: tss.competence?.name,
+                                  tssId: tss.id
+                                });
+                              }
+                            });
+            } else {
+              console.log('⚠️ [Selector] No teacherStudySheets found for sheet:', sheet.id);
             }
           });
+          
+          console.log('🔍 [Selector] All competences found:', allCompetences);
           
           const competencesArray = allCompetences
             .sort((a, b) => a.name.localeCompare(b.name));
           
+          console.log('🔍 [Selector] Final sorted competences:', competencesArray);
+          
           setAvailableCompetences(competencesArray);
           setError(null);
         } else {
+          console.error('❌ [Selector] Failed to fetch study sheets:', result);
           setError("Error al cargar las competencias disponibles");
         }
       } catch (error) {
-        console.error('Error loading competences:', error);
+        console.error('❌ [Selector] Error loading competences:', error);
         setError("Error al cargar las competencias disponibles");
       } finally {
         setLoading(false);
       }
     };
 
-    loadCompetences();
+    if (fichaNumber) {
+      loadCompetences();
+    } else {
+      console.warn('⚠️ [Selector] No fichaNumber provided');
+      setLoading(false);
+    }
   }, [dispatch, fichaNumber]);
 
   useEffect(() => {

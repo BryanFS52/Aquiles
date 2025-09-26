@@ -314,8 +314,30 @@ const attendanceSlice = createSlice({
     name: 'attendance',
     initialState,
     reducers: {
-        updateAttendanceSummary: (state) => {
-            state.attendanceSummary = processAndSummarizeAttendances(state.data);
+    updateAttendanceSummary: (state) => {
+        state.attendanceSummary = processAndSummarizeAttendances(state.data);
+    },
+        setAttendanceSummaryFromStudySheet: (state, action: PayloadAction<any>) => {
+            const studySheet = action.payload;
+            if (!studySheet?.studentStudySheets) {
+            state.attendanceSummary = [];
+            return;
+            }
+
+            // Transformar todas las asistencias de todos los estudiantes a un solo array
+            const allAttendances = studySheet.studentStudySheets.flatMap((ss: any) =>
+            (ss.student?.attendances || []).map((a: any) => ({
+                id: a.id || `${ss.student.id}-${a.attendanceDate}`,
+                attendanceDate: a.attendanceDate,
+                attendanceState: a.attendanceState,
+                student: {
+                id: ss.student.id,
+                person: ss.student.person,
+                },
+            }))
+            );
+
+            state.attendanceSummary = processAndSummarizeAttendances(allAttendances);
         }
     },
     extraReducers: (builder) => {
@@ -438,6 +460,6 @@ const attendanceSlice = createSlice({
     }
 });
 
-export const { updateAttendanceSummary } = attendanceSlice.actions;
+export const { updateAttendanceSummary, setAttendanceSummaryFromStudySheet } = attendanceSlice.actions;
 
 export default attendanceSlice.reducer;

@@ -40,4 +40,5 @@ export interface JustificationsHistoricalProps {
 export interface JustificacionesInstructorContainerProps {
     competenceQuarterId: number;
     fichaNumber?: string | null;
+    learningOutcomeId?: string | null;
 }

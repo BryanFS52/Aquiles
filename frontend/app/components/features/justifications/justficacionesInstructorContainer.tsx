@@ -9,7 +9,7 @@ import PageTitle from "@components/UI/pageTitle";
 import JustificationFilters from "@components/features/justifications/justificationsFilter";
 import JustificationTable from "@components/features/justifications/justificationsTable";
 import EmptyState from "@components/UI/emptyState";
-import { 
+import {
   setCompetenceQuarterFilterOptions,
   setCompetenceQuarterMultiFilter,
   toggleCompetenceQuarterMultiFilter,
@@ -34,12 +34,13 @@ interface CompetenceOption {
   studySheetNumber?: number;
 }
 
-export const JustificacionesInstructorContainer: React.FC<JustificacionesInstructorContainerProps> = ({ 
-  competenceQuarterId,
-  fichaNumber 
-}) => {
+export const JustificacionesInstructorContainer: React.FC<
+  JustificacionesInstructorContainerProps
+> = ({ competenceQuarterId, fichaNumber }) => {
   const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
-  const [selectedCompetenceId, setSelectedCompetenceId] = useState<string>(competenceQuarterId?.toString() || '');
+  const [selectedCompetenceId, setSelectedCompetenceId] = useState<string>(
+    competenceQuarterId?.toString() || ""
+  );
   const [isLoadingCompetences, setIsLoadingCompetences] = useState(true);
   const [fichaFilteredData, setFichaFilteredData] = useState<any[]>([]);
 
@@ -47,284 +48,128 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
   const router = useRouter();
   const { showLoader, hideLoader } = useLoader();
 
-  const justificationState = useSelector((state: RootState) => state.justification);
-  
-  const {
-    competenceQuarterData: justifications,
-    competenceQuarterFilteredData: filteredData,
-    competenceQuarterFilterOptions: filterOptions,
-    loading,
-    error,
-  } = justificationState;
+  const { competenceQuarterData: justifications, competenceQuarterFilteredData: filteredData, competenceQuarterFilterOptions: filterOptions, loading, error } =
+    useSelector((state: RootState) => state.justification);
 
-  const { justificationStatuses } = useSelector(
-    (state: RootState) => state.justificationStatus
-  );
+  const { justificationStatuses } = useSelector((state: RootState) => state.justificationStatus);
 
+  // Cargar estados y activar modo "competenceQuarter"
   useEffect(() => {
     dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
     dispatch(setCompetenceQuarterMode(true));
   }, [dispatch]);
 
-  useEffect(() => {
-    const loadCompetences = async () => {
-      try {
-        setIsLoadingCompetences(true);
-        
-        const result = await dispatch(fetchStudySheetByTeacher({ 
-          idTeacher: TEMPORAL_INSTRUCTOR_ID, 
-          page: 0, 
-          size: 20 
-        }));
-        
-        if (fetchStudySheetByTeacher.fulfilled.match(result)) {
-          const studySheets = result.payload?.data || [];
-          
-          const competencesMap = new Map<string, CompetenceOption>();
-          
-          studySheets.forEach((sheet: any) => {
-            if (sheet.teacherStudySheets) {
-              sheet.teacherStudySheets.forEach((tss: any) => {
-                if (tss.competence && tss.competence.id && tss.competence.name) {
-                  const competenceId = tss.competence.id;
-                  if (!competencesMap.has(competenceId)) {
-                    competencesMap.set(competenceId, {
-                      id: competenceId,
-                      name: tss.competence.name,
-                      studySheetNumber: sheet.number
-                    });
-                  }
-                }
-              });
-            }
-          });
-          
-          const competencesArray = Array.from(competencesMap.values())
-            .sort((a, b) => a.name.localeCompare(b.name));
-          
-          setAvailableCompetences(competencesArray);
-          
-          if (competenceQuarterId) {
-            const exists = competencesArray.find(c => c.id === competenceQuarterId.toString());
-            if (exists) {
-              setSelectedCompetenceId(competenceQuarterId.toString());
-            }
-          }
-        }
-      } catch (error) {
-        // Error handled silently
-      } finally {
-        setIsLoadingCompetences(false);
-      }
-    };
-
-    loadCompetences();
-  }, [dispatch, competenceQuarterId]);
-
+  // Cargar justificaciones según competencia seleccionada
   useEffect(() => {
     if (selectedCompetenceId && !isLoadingCompetences) {
-      const competenceId = parseInt(selectedCompetenceId);
+      const competenceId = Number(selectedCompetenceId);
       if (!isNaN(competenceId)) {
-        dispatch(fetchJustificationsByCompetenceQuarter({ competenceQuarterId: competenceId }))
-          .unwrap()
-          .then((data) => {
-            // Data loaded successfully
-          })
-          .catch((error) => {
-            // Error handled silently
-          });
+        dispatch(fetchJustificationsByCompetenceQuarter({ competenceQuarterId: competenceId }));
       }
     }
   }, [selectedCompetenceId, isLoadingCompetences, dispatch, fichaNumber]);
 
+  // Filtrar por ficha
   useEffect(() => {
-    if (fichaNumber && filteredData) {
-      
-      const filtered = filteredData.filter((item: any) => {
-        const itemFichaNumber = item.ficha || 
-                               item.fichaNumero || 
-                               item.studySheetNumber || 
-                               item.numeroFicha || 
-                               item.studySheet?.number ||
-                               item.attendance?.studySheet?.number;
-        
-        const matches = itemFichaNumber?.toString() === fichaNumber;
-        
-        return matches;
-      });
-      
-      setFichaFilteredData(filtered);
+    if (fichaNumber) {
+      setFichaFilteredData(
+        filteredData.filter((item: any) =>
+          [
+            item.ficha,
+            item.fichaNumero,
+            item.studySheetNumber,
+            item.numeroFicha,
+            item.studySheet?.number,
+            item.attendance?.studySheet?.number,
+          ]
+            .filter(Boolean)
+            .some(num => num?.toString() === fichaNumber)
+        )
+      );
     } else {
       setFichaFilteredData(filteredData || []);
     }
   }, [filteredData, fichaNumber]);
 
+  // Mostrar loader global
   useEffect(() => {
-    if (loading || isLoadingCompetences) {
-      showLoader();
-    } else {
-      hideLoader();
-    }
+    loading || isLoadingCompetences ? showLoader() : hideLoader();
   }, [loading, isLoadingCompetences, showLoader, hideLoader]);
 
-  const handleFilterChange = (filterType: string, value: string) => {
+  // 🔹 Handlers
+  const handleFilterChange = (filterType: string, value: string) =>
     dispatch(setCompetenceQuarterFilterOptions({ [filterType]: value }));
-  };
 
-  const handleMultiFilterChange = (field: keyof MultiFilterState, value: string) => {
+  const handleMultiFilterChange = (field: keyof MultiFilterState, value: string) =>
     dispatch(setCompetenceQuarterMultiFilter({ field, value }));
-  };
-
-  const handleToggleMultiFilter = () => {
-    dispatch(toggleCompetenceQuarterMultiFilter());
-  };
-
-  const handleClearMultiFilters = () => {
-    dispatch(clearCompetenceQuarterMultiFilters());
-  };
 
   const handleCompetenceChange = (competenceId: string) => {
     setSelectedCompetenceId(competenceId);
-    
     if (competenceId) {
-      const baseUrl = `/dashboard/justificacionesInstructor/${competenceId}`;
-      const urlWithFicha = fichaNumber ? `${baseUrl}?ficha=${fichaNumber}` : baseUrl;
-      router.push(urlWithFicha);
+      router.push(
+        `/dashboard/justificacionesInstructor/${competenceId}${fichaNumber ? `?ficha=${fichaNumber}` : ""}`
+      );
     }
   };
 
   const handleRefresh = async () => {
     if (!selectedCompetenceId) return;
-    
-    const competenceIdNum = parseInt(selectedCompetenceId);
-    if (isNaN(competenceIdNum)) return;
-
     try {
-      const data = await dispatch(fetchJustificationsByCompetenceQuarter({ 
-        competenceQuarterId: competenceIdNum 
-      })).unwrap();
-      
-      toast.success("Datos actualizados correctamente", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-    } catch (error) {
-      toast.error("Error al actualizar los datos", {
-        position: "top-right",
-        autoClose: 5000,
-      });
+      await dispatch(
+        fetchJustificationsByCompetenceQuarter({ competenceQuarterId: Number(selectedCompetenceId) })
+      ).unwrap();
+      toast.success("Datos actualizados correctamente");
+    } catch {
+      toast.error("Error al actualizar los datos");
     }
   };
 
   const handleDownloadFile = (justificacion: any) => {
-    if (justificacion.archivoAdjunto) {
-      const mimeType = justificacion.archivoMime || "application/octet-stream";
-      const fileName = generateFileName(justificacion.id, mimeType);
-      downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
-    }
+    if (!justificacion.archivoAdjunto) return;
+    const mimeType = justificacion.archivoMime || "application/octet-stream";
+    downloadBase64File(justificacion.archivoAdjunto, generateFileName(justificacion.id, mimeType), mimeType);
   };
 
   const handleStatusChange = (justificacionId: string, newStatusId: string) => {
-    const selectedStatus = justificationStatuses.find(status => status.id?.toString() === newStatusId);
-    const statusName = selectedStatus?.name || "Estado actualizado";
+    const current = filteredData.find((j: any) => j.id.toString() === justificacionId);
+    const currentStatusId = current?.justificationStatusId?.toString() || current?.estado;
+    if (currentStatusId === newStatusId) return;
 
-    const currentJustification = filteredData.find((j: any) => j.id.toString() === justificacionId);
-    const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.estado;
-    
-    if (currentStatusId === newStatusId) {
-      return;
-    }
-
-    dispatch(updateJustificationStatus({ 
-      id: justificacionId, 
-      statusId: newStatusId,
-      statusName: statusName
-    }))
-      .then((result) => {
-        if (updateJustificationStatus.fulfilled.match(result)) {
-          showJustificationStatusMessage(statusName);
-        }
+    const statusName = justificationStatuses.find(s => s.id?.toString() === newStatusId)?.name || "Estado actualizado";
+    dispatch(updateJustificationStatus({ id: justificacionId, statusId: newStatusId, statusName }))
+      .unwrap()
+      .then(() => {
+        const lower = statusName.toLowerCase();
+        if (lower.includes("aprobad") || lower.includes("acepta")) toast.success("Justificación aprobada");
+        else if (lower.includes("denegad") || lower.includes("rechaza") || lower.includes("no acepta"))
+          toast.error("Justificación denegada");
+        else if (lower.includes("proceso") || lower.includes("pendiente") || lower.includes("revision"))
+          toast.info("Justificación en proceso");
+        else toast.info(`Estado actualizado: ${statusName}`);
       })
-      .catch((error) => {
-        console.error("Error inesperado al actualizar el estado:", error);
-      });
+      .catch(err => console.error("Error al actualizar estado:", err));
   };
 
-  const showJustificationStatusMessage = (statusName: string) => {
-    const statusNameLower = statusName.toLowerCase();
-    
-    if (statusNameLower.includes('aprobad') || statusNameLower.includes('acepta')) {
-      toast.success(`Justificación aprobada`, {
-        position: "top-right",
-        autoClose: 5000,
-      });
-    } else if (statusNameLower.includes('denegad') || statusNameLower.includes('rechaza') || statusNameLower.includes('no acepta')) {
-      toast.error(`Justificación denegada`, {
-        position: "top-right",
-        autoClose: 5000,
-      });
-    } else if (statusNameLower.includes('proceso') || statusNameLower.includes('pendiente') || statusNameLower.includes('revision')) {
-      toast.info(`Justificación en proceso`, {
-        position: "top-right",
-        autoClose: 4000,
-      });
-    } else {
-      toast.info(`Estado actualizado: ${statusName}`, {
-        position: "top-right",
-        autoClose: 3000,
-      });
-    }
-  };
-
+  // Render
   const errorMessage = formatErrorMessage(error);
   const selectedCompetence = availableCompetences.find(c => c.id === selectedCompetenceId);
   const competenceName = selectedCompetence?.name || "Ninguna seleccionada";
-  const hasJustificationData = justifications && justifications.length > 0;
-
   const { selectedFiltro, searchTerm, enableMultiFilter, multiFilters } = filterOptions;
   const hasFiltersApplied = Boolean(
     selectedFiltro ||
     searchTerm ||
     (enableMultiFilter && Object.values(multiFilters).some(value => value))
   );
-  const handleBackToCompetences = () => {
-    router.push('/dashboard/justificacionesInstructor');
-  };
-  
   const renderContent = () => {
-    if (isLoadingCompetences) {
-      return (
-        <div className="flex justify-center items-center py-8">
-          <div className="text-gray-600">Cargando competencias disponibles...</div>
-        </div>
-      );
-    }
-
-    if (availableCompetences.length === 0) {
-      return (
-        <EmptyState message="No se encontraron competencias disponibles para este instructor." />
-      );
-    }
-
-    if (!selectedCompetenceId) {
-      return (
-        <EmptyState message="Selecciona una competencia para ver las justificaciones correspondientes." />
-      );
-    }
-
-    if (errorMessage) {
-      return <EmptyState message={errorMessage} />;
-    }
-
-    if (loading && !hasJustificationData) {
-      return (
-        <div className="flex justify-center items-center py-8">
-          <div className="text-gray-600">
-            Cargando justificaciones para {competenceName}...
-          </div>
-        </div>
-      );
-    }
+    if (isLoadingCompetences)
+      return <EmptyState message="Cargando competencias disponibles..." />;
+    if (!availableCompetences.length)
+      return <EmptyState message="No se encontraron competencias disponibles para este instructor." />;
+    if (!selectedCompetenceId)
+      return <EmptyState message="Selecciona una competencia para ver las justificaciones correspondientes." />;
+    if (errorMessage) return <EmptyState message={errorMessage} />;
+    if (loading && !(justifications?.length > 0))
+      return <EmptyState message={`Cargando justificaciones para ${competenceName}...`} />;
 
     return (
       <JustificationTable
@@ -335,34 +180,31 @@ export const JustificacionesInstructorContainer: React.FC<JustificacionesInstruc
         isLoading={loading}
         hasError={Boolean(error)}
         hasFiltersApplied={hasFiltersApplied}
-        isInstructorView={true}
+        isInstructorView
       />
     );
   };
 
   return (
     <div className="space-y-6">
-        <PageTitle onBack={() => router.back()}>
-          Justificaciones de la Ficha: {fichaNumber || selectedCompetence?.studySheetNumber || 'N/A'} por la {competenceName || 'Competencia'}
-        </PageTitle>
+      <PageTitle onBack={() => router.back()}>
+        Justificaciones de la Ficha: {fichaNumber || selectedCompetence?.studySheetNumber || "N/A"} por la{" "}
+        {competenceName}
+      </PageTitle>
 
-      {/* Filtros */}
       {selectedCompetenceId && !isLoadingCompetences && (
-        <>          
-          <JustificationFilters
-            filterOptions={filterOptions}
-            loading={loading}
-            showMultiFilterToggle={false}
-            onFilterChange={handleFilterChange}
-            onMultiFilterChange={handleMultiFilterChange}
-            onToggleMultiFilter={handleToggleMultiFilter}
-            onClearMultiFilters={handleClearMultiFilters}
-            onRefresh={handleRefresh}
-          />
-        </>
+        <JustificationFilters
+          filterOptions={filterOptions}
+          loading={loading}
+          showMultiFilterToggle={false}
+          onFilterChange={handleFilterChange}
+          onMultiFilterChange={handleMultiFilterChange}
+          onToggleMultiFilter={() => dispatch(toggleCompetenceQuarterMultiFilter())}
+          onClearMultiFilters={() => dispatch(clearCompetenceQuarterMultiFilters())}
+          onRefresh={handleRefresh}
+        />
       )}
 
-      {/* Contenido principal */}
       {renderContent()}
     </div>
   );

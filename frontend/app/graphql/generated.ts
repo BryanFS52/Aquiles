@@ -3509,6 +3509,16 @@ export type ProcessMethodologyById = {
 };
 
 export type ProcessMethodologyDto = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  methodology?: InputMaybe<MethodologyDto>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  profiles?: InputMaybe<Array<InputMaybe<ProfileDto>>>;
+  settings?: InputMaybe<ProcessSettingsDto>;
+};
+
+export type ProcessMethodologyDto = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   isUnique?: InputMaybe<Scalars['Boolean']['input']>;
   profileId?: InputMaybe<Scalars['String']['input']>;
