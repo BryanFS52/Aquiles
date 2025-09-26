@@ -1,17 +1,18 @@
 server:
-  port: 8080  # Cambia 8081 por el puerto que prefieras
+  port: 8081  # Cambia 8081 por el puerto que prefieras
+
 spring:
   application:
     name: aquilesApi
 
   datasource:
     url: jdbc:postgresql://localhost:5432/DB_Aquiles
-    username: postgres
-    password: "Azkoien1033702995@"
+    username: fabrica
+    password: fabrica2024*
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    hibernate:
+    hibernate:  
       ddl-auto: update
     show-sql: true
     properties:
@@ -58,4 +59,8 @@ spring:
       max-age: 3600
 
 frontend:
-  url: https://d8dd663d03b5.ngrok-free.app
+  url: https://7d12-179-1-218-161.ngrok-free.app
+
+olympo:
+  microservice:
+    url: http://localhost:8080

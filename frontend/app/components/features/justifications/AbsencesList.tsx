@@ -23,7 +23,7 @@ export const AbsencesList: React.FC<AbsencesListProps> = ({
     return (
         <div className="bg-white dark:bg-[#002033] rounded-xl shadow-lg p-8 border border-gray-100 dark:border-gray-800">
             <div className="flex items-center mb-6">
-                <div className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 p-3 rounded-full shadow-lg">
+                <div className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-blue-500 p-3 rounded-full shadow-lg">
                     <IoPeople className="text-2xl text-white" />
                 </div>
                 <div className="ml-4">
@@ -65,7 +65,7 @@ export const AbsencesList: React.FC<AbsencesListProps> = ({
                                     </div>
                                     <button
                                         onClick={() => onShowForm(attendance.id)}
-                                        className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
+                                        className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-blue-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
                                     >
                                         <FaRegListAlt className="mr-2" />
                                         Justificar
@@ -85,7 +85,7 @@ export const AbsencesList: React.FC<AbsencesListProps> = ({
                         transition={{ type: 'spring', duration: 0.6 }}
                         className="mb-6"
                     >
-                        <div className="bg-gradient-to-r from-green-400 to-emerald-500 p-6 rounded-full inline-block shadow-lg">
+                        <div className="bg-gradient-to-r from-blue-400 to-blue-500 p-6 rounded-full inline-block shadow-lg">
                             <FaCheckCircle className="text-6xl text-white" />
                         </div>
                     </motion.div>

@@ -8,6 +8,7 @@ import com.api.aquilesApi.Utilities.Mapper.ItemMap;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -24,9 +25,9 @@ public class ItemBusiness {
     }
 
     // Get all items (paginated)
-    public Page<ItemDto> findAll(int page, int size){
+    public Page<ItemDto> findAll(Integer page, Integer size){
+        PageRequest pageRequest = PageRequest.of(page, size);
         try {
-            PageRequest pageRequest = PageRequest.of(page, size);
             Page<Item> itemPage = itemService.findAll(pageRequest);
             return ItemMap.INSTANCE.EntityToDTOs(itemPage);
         } catch (DataAccessException e) {
@@ -39,7 +40,7 @@ public class ItemBusiness {
     // Get an item by ID
     public ItemDto findById(Long id){
         try {
-            Item item = itemService.getById(id);
+            Item item = itemService.findById(id);
             return ItemMap.INSTANCE.EntityToDTO(item);
         } catch (CustomException e) {
             throw e;
@@ -53,7 +54,6 @@ public class ItemBusiness {
         try {
             Item item = new Item();
             ItemMap.INSTANCE.updateItem(itemDto, item);
-
             Item savedItem = itemService.save(item);
             return ItemMap.INSTANCE.EntityToDTO(savedItem);
 
@@ -66,7 +66,7 @@ public class ItemBusiness {
     public void update(Long itemId, ItemDto itemDto) {
         try {
             itemDto.setId(itemId);
-            Item item = itemService.getById(itemId);
+            Item item = itemService.findById(itemId);
             ItemMap.INSTANCE.updateItem(itemDto, item);
             itemService.save(item);
         } catch (Exception e) {
@@ -77,7 +77,7 @@ public class ItemBusiness {
     // Delete an item
     public void delete(Long itemId) {
         try {
-            Item item = itemService.getById(itemId);
+            Item item = itemService.findById(itemId);
             itemService.delete(item);
         } catch (CustomException e) {
             throw e;

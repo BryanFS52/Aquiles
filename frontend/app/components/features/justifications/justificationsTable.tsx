@@ -29,41 +29,32 @@ export default function JustificationTable({
   hasFiltersApplied = false,
   isInstructorView = false,
 }: JustificationTableProps) {
-  // Obtener los estados de justificación del store
+  
   const { justificationStatuses, loading: loadingStatuses } = useSelector(
     (state: RootState) => state.justificationStatus
   );
 
-  // Los datos ya vienen filtrados desde el slice
   const dataToRender = filteredData;
 
   const handleSelectChange = (justificacionId: string, event: React.ChangeEvent<HTMLSelectElement>) => {
     const newStatusId = event.target.value;
-    // console.log("🔄 Cambiando estado:", {
-    //   justificacionId,
-    //   newStatusId
-    // });
+
     if (newStatusId) {
       handleStatusChange(justificacionId, newStatusId);
     }
   };
 
   const getCurrentStatusName = (justificacion: any) => {
-    // ✅ Priorizar el campo justificationStatus que ya contiene el nombre correcto
     if (justificacion.justificationStatus && justificacion.justificationStatus !== "Sin status") {
       return justificacion.justificationStatus;
     }
-
-    // ✅ Fallback al campo estado que también contiene el nombre del estado
     return justificacion.estado || "En proceso";
   };
 
-  // ✅ Función para obtener el valor actual para el select (justificationStatus.id)
   const getCurrentSelectValue = (justificacion: any) => {
     return justificacion.justificationStatusId || "";
   };
 
-  // Mostrar estado de carga
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -72,14 +63,12 @@ export default function JustificationTable({
     );
   }
 
-  // Mostrar estado de error
   if (hasError) {
     return (
       <EmptyState message="Ocurrió un error al cargar las justificaciones. Intenta recargar la página." />
     );
   }
 
-  // Mostrar mensaje cuando no hay datos en absoluto
   if (!hasAnyData) {
     const message = isInstructorView 
       ? "No se encontraron justificaciones para esta ficha. Selecciona una ficha desde el panel del instructor."
@@ -87,14 +76,12 @@ export default function JustificationTable({
     return <EmptyState message={message} />;
   }
 
-  // Mostrar mensaje cuando hay datos pero no coinciden con los filtros
   if (hasAnyData && dataToRender.length === 0 && hasFiltersApplied) {
     return (
       <EmptyState message="No se encontraron justificaciones que coincidan con los filtros aplicados. Prueba con otros criterios de búsqueda." />
     );
   }
 
-  // Mostrar tabla con datos
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
       <table className="w-full text-sm text-left text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800">
@@ -166,7 +153,7 @@ export default function JustificationTable({
                   >
                     <option value="">Seleccionar estado...</option>
                     {getActiveStatuses(justificationStatuses)
-                      .filter(status => status.name !== "En proceso") // Excluir "En proceso"
+                      .filter(status => status.name !== "En proceso")
                       .map((status) => (
                         <option key={status.id} value={status.id}>
                           {status.name}

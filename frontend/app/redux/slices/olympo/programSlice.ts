@@ -4,6 +4,36 @@ import { GET_PROGRAMS } from '@graphql/olympo/programGraph';
 import { createInitialPaginatedState } from '@type/slices/common/generic';
 import { Program, GetProgramsQuery, GetProgramsQueryVariables } from '@graphql/generated'
 
+// Service methods integrated into slice
+interface GetProgramsServiceParams {
+    idCoordination?: number;
+    idTrainingLevel?: number;
+    name?: string;
+    page?: number;
+    size?: number;
+}
+
+const programService = {
+    getPrograms: async ({ idCoordination, idTrainingLevel, name, page = 0, size = 10 }: GetProgramsServiceParams = {}) => {
+        try {
+            const { data } = await clientLAN.query({
+                query: GET_PROGRAMS,
+                variables: { idCoordination, idTrainingLevel, name, page, size },
+                fetchPolicy: 'network-only',
+            });
+
+            if (data?.allPrograms?.code === '200' || data?.allPrograms?.code === 200) {
+                return data.allPrograms;
+            } else {
+                throw new Error(data?.allPrograms?.message || 'Error fetching programs');
+            }
+        } catch (error) {
+            console.error('Error fetching programs:', error);
+            throw error;
+        }
+    },
+};
+
 // Función para transformar datos de GraphQL a Program
 export const transformGraphQLToProgramItem = (graphqlData: any): Program => {
     return {
@@ -76,5 +106,8 @@ const programSlice = createSlice({
 
 
 export const { } = programSlice.actions;
+
+// Export service methods for compatibility
+export { programService };
 
 export default programSlice.reducer;

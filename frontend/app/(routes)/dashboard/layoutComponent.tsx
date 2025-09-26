@@ -6,7 +6,7 @@ import { Header } from "@components/UI/header";
 import { useUser } from "@context/UserContext";
 import { Provider } from "react-redux";
 import store from '@redux/store';
-import { RoleType } from '@type/roles';
+import { RoleType } from '../../types/roles';
 
 interface LayoutContentProps {
     children: React.ReactNode;
@@ -17,11 +17,12 @@ const LayoutContent: React.FC<LayoutContentProps> = ({ children }) => {
     const { user, role } = useUser();
 
     // Normalizar: si llega "Instructor" -> "instructor"
+    // Usar valor por defecto consistente durante hidratación
     const normalizedRole: RoleType = (user?.role?.toLowerCase() as RoleType) || role || "instructor";
 
     return (
         <Provider store={store}>
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+            <div className="min-h-screen bg-gray-50 dark:bg-darkBackground transition-colors duration-300">
                 <div className="flex min-h-screen">
                     {/* Sidebar */}
                     <aside className="w-0 lg:w-[300px] flex-shrink-0 bg-transparent transition-all duration-300">
@@ -35,10 +36,10 @@ const LayoutContent: React.FC<LayoutContentProps> = ({ children }) => {
                             <Header role={normalizedRole} />
                         </div>
 
-                        {/* Contenido */}
-                        <main className="flex-1 p-3 sm:p-4 lg:p-6 xl:p-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300 min-w-0 overflow-x-hidden">
+                        {/* Contenido principal con el estilo de las imágenes de referencia */}
+                        <main className="flex-1 p-3 sm:p-4 lg:p-6 xl:p-8 bg-gray-50 dark:bg-darkBackground transition-colors duration-300 min-w-0 overflow-x-hidden">
                             <div className="w-full max-w-none h-full">
-                                <div className="bg-white dark:bg-[#002033] rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 min-h-[calc(100vh-10rem)] lg:min-h-[calc(100vh-8rem)] p-4 sm:p-6 lg:p-8 transition-all duration-300 w-full">
+                                <div className="bg-white dark:bg-dark-card rounded-xl shadow-sm border border-gray-200 dark:border-dark-border min-h-[calc(100vh-10rem)] lg:min-h-[calc(100vh-8rem)] p-4 sm:p-6 lg:p-8 transition-all duration-300 w-full">
                                     {children}
                                 </div>
                             </div>

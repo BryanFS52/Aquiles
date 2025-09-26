@@ -1,18 +1,15 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @Entity
 @Table(name = "items")
 public class Item implements Serializable {
@@ -31,17 +28,14 @@ public class Item implements Serializable {
     private Boolean active = true;
 
     // Relations
-    // 1. Relation (M-1) with itemType
+    // 1. Relation (M-1) con itemType
     @ManyToOne
     @JoinColumn(name = "item_type_id", nullable = false)
     private ItemType itemType;
 
-    // 2. Relation (M-M) with checklist
-    @ManyToMany(mappedBy = "items")
-    private List<Checklist> checklists;
-
-    // 3. Relation (1-M) with checklistQualification
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChecklistQualification> checklistQualifications;
+    // 2. Relation (M-1) con checklist
+    @ManyToOne
+    @JoinColumn(name = "checklist_id", nullable = false)
+    private Checklist checklist;
 
 }

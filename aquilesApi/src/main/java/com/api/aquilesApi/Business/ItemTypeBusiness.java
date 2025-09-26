@@ -51,7 +51,6 @@ public class ItemTypeBusiness {
         try {
             ItemType itemType = new ItemType();
             ItemTypeMap.INSTANCE.updateItemType(itemTypeDto, itemType);
-
             ItemType savedItemType = itemTypeService.save(itemType);
             return ItemTypeMap.INSTANCE.EntityToDTO(savedItemType);
 

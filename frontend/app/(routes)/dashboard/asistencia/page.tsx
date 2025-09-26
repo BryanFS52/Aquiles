@@ -1,26 +1,42 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '@redux/store'
-import { useRouter } from 'next/navigation';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '@redux/store'
+import { useRouter, useSearchParams } from 'next/navigation';
 import { BsPersonCircle } from "react-icons/bs";
 import { useLoader } from '@context/LoaderContext';
+import { fetchStudySheetByIdWithAttendances } from '@slice/olympo/studySheetSlice';
 import TableAttendance from "@components/features/asistencia/tableAttendance";
 import PageTitle from "@components/UI/pageTitle";
 import AttendanceFooter from "@components/features/asistencia/attendanceFooter";
+import Loader from "@components/UI/Loader";
+import EmptyState from "@components/UI/emptyState";
 
-export default function Attendance() {
+const Attendance = () => {
     const router = useRouter();
+    const dispatch = useDispatch<AppDispatch>();
+    const searchParams = useSearchParams();
     const { showLoader, hideLoader } = useLoader();
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const { data: studySheets, loading, error } = useSelector(
+
+    // Obtener parámetros de la URL
+    const studySheetIdFromUrl = searchParams.get('studySheetId');
+    const competenceIdFromUrl = searchParams.get('competenceId');
+
+    const { data: studySheets, selectedForAttendance, loading, loadingAttendanceSheet, error } = useSelector(
         (state: RootState) => state.studySheet
     );
 
-    const studySheet = studySheets.length > 0 ? studySheets[0] : undefined;
+    // Usar la ficha seleccionada para asistencia si está disponible, de lo contrario usar la primera del array
+    const studySheet = selectedForAttendance || (studySheets.length > 0 ? studySheets[0] : undefined);
+
     const students = (studySheet?.studentStudySheets as any[])?.filter(
-        (s: any) => s?.state === "Activo"
+        (s: any) => {
+            // Aceptar diferentes estados activos
+            const stateName = s?.studentStudySheetState?.name;
+            return stateName === "Activo" || stateName === "En formacion" || s?.state === "Activo";
+        }
     ) || [];
 
     const activeStudents = students.length;
@@ -30,28 +46,49 @@ export default function Attendance() {
 
     const handleNavigate = (competenceId: string) => {
         setIsTransitioning(true);
-        router.push(`/dashboard/asistenciaManual?competenceId=${competenceId}`);
+        const urlParams = new URLSearchParams();
+        urlParams.set('competenceId', competenceId);
+        if (studySheetIdFromUrl) {
+            urlParams.set('studySheetId', studySheetIdFromUrl);
+        }
+        router.push(`/dashboard/asistenciaManual?${urlParams.toString()}`);
     };
 
+    // Efecto para cargar la ficha desde la URL si no está disponible en Redux (State)
     useEffect(() => {
-        if (loading || isTransitioning) {
+        if (studySheetIdFromUrl && !selectedForAttendance) {
+            const studySheetId = parseInt(studySheetIdFromUrl);
+            const competenceId = competenceIdFromUrl ? parseInt(competenceIdFromUrl) : undefined;
+
+            dispatch(fetchStudySheetByIdWithAttendances({
+                id: studySheetId,
+                competenceId
+            }));
+        }
+    }, [studySheetIdFromUrl, competenceIdFromUrl, selectedForAttendance, dispatch]);
+
+    useEffect(() => {
+        if (loadingAttendanceSheet) {
             showLoader();
-        } else {
+        } else if (studySheet || error) {
             hideLoader();
         }
-    }, [loading, isTransitioning, showLoader, hideLoader]);
+    }, [loadingAttendanceSheet, studySheet, error, showLoader, hideLoader]);
 
     if (error) {
         return (
-            <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-                <PageTitle>Lista de asistencia</PageTitle>
-                <div className="flex items-center justify-center h-32 sm:h-64">
-                    <p className="text-red-500 dark:text-red-400 text-sm sm:text-base text-center px-4">
-                        Error al cargar la ficha: {typeof error === 'string' ? error : error?.message ?? "Error desconocido"}
-                    </p>
-                </div>
-            </div>
+            <EmptyState message={typeof error === 'string' ? error : error?.message ?? "Error desconocido"} />
         );
+    }
+
+    // Loader de carga
+    if (loadingAttendanceSheet || loading) {
+        return <Loader />;
+    }
+
+    // Estado vacío si no hay datos
+    if (!studySheet) {
+        return <EmptyState message="No se encontraron datos de asistencia." />;
     }
 
     return (
@@ -175,3 +212,5 @@ export default function Attendance() {
         </div>
     );
 }
+
+export default Attendance;

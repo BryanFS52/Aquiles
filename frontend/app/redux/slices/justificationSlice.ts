@@ -24,7 +24,6 @@ import {
     GetAttendancesByCompetenceQuarterAndJustificationsQueryVariables
 } from '@graphql/generated'
 
-// Tipos para el estado extendido
 export interface TransformedJustificationItem {
     id: number;
     ficha: string;
@@ -42,7 +41,6 @@ export interface TransformedJustificationItem {
     justificationStatus: string;
 }
 
-// Nueva interfaz para multi-filtros
 export interface MultiFilterState {
     documento: string;
     aprendiz: string;
@@ -54,7 +52,6 @@ export interface MultiFilterState {
 interface FilterOptions {
     selectedFiltro: string;
     searchTerm: string;
-    // Multi-filtros
     multiFilters: MultiFilterState;
     enableMultiFilter: boolean;
 }
@@ -85,14 +82,80 @@ interface JustificationState extends ReturnType<typeof createInitialPaginatedSta
     localCurrentPage: number;
     itemsPerPage: number;
     form: JustificationFormState;
-    // Datos para vista de instructor (competence quarter)
+    
     competenceQuarterData: TransformedJustificationItem[];
     competenceQuarterFilteredData: TransformedJustificationItem[];
     competenceQuarterFilterOptions: FilterOptions;
     isCompetenceQuarterMode: boolean;
 }
 
-// Utilidades existentes
+const initialFormData: FormDataState = {
+    justificationTypeId: { id: "" },
+    numeroDocumento: "",
+    nombreAprendiz: "",
+    descripcion: "",
+    justificacionFile: null,
+    justificacionFileBase64: "",
+    notificationId: "123456",
+};
+
+const loadFiltersFromStorage = (): Partial<FilterOptions> => {
+    if (typeof window !== 'undefined') {
+        try {
+            const savedFilters = localStorage.getItem('justification-filters');
+            if (savedFilters) {
+                return JSON.parse(savedFilters);
+            }
+        } catch (error) {
+            console.error('Error loading filters from localStorage:', error);
+        }
+    }
+    return {};
+};
+
+const initialState: JustificationState = {
+    ...createInitialPaginatedState<Justification>(),
+    transformedData: [],
+    filteredData: [],
+    filterOptions: {
+        selectedFiltro: "",
+        searchTerm: "",
+        multiFilters: {
+            documento: "",
+            aprendiz: "",
+            justificationStatus: "",
+            fecha: "",
+            absenceDate: ""
+        },
+        enableMultiFilter: false,
+        ...loadFiltersFromStorage()
+    },
+    localCurrentPage: 0,
+    itemsPerPage: 6,
+    form: {
+        showForm: false,
+        isSubmitting: false,
+        formData: initialFormData,
+        validationErrors: [],
+        currentAttendance: null,
+    },
+    competenceQuarterData: [],
+    competenceQuarterFilteredData: [],
+    competenceQuarterFilterOptions: {
+        selectedFiltro: "",
+        searchTerm: "",
+        multiFilters: {
+            documento: "",
+            aprendiz: "",
+            justificationStatus: "",
+            fecha: "",
+            absenceDate: ""
+        },
+        enableMultiFilter: false
+    },
+    isCompetenceQuarterMode: false,
+};
+
 const getMimeTypeFromBase64 = (base64: string): string => {
     if (!base64) return "application/octet-stream";
 
@@ -128,7 +191,6 @@ const getExtensionFromMime = (mimeType: string): string => {
     return map[mimeType as keyof typeof map] || "bin";
 };
 
-// Función para transformar datos de GraphQL a Justification
 const transformGraphQLToJustificationItem = (graphqlData: any): Justification => {
     return {
         id: graphqlData.justificationId || graphqlData.id,
@@ -163,12 +225,11 @@ const transformGraphQLToJustificationItem = (graphqlData: any): Justification =>
     };
 };
 
-// Función helper para formatear fechas de forma segura
+// Helper para formatear fechas
 const formatDateSafely = (dateString: string | null | undefined): string => {
     if (!dateString) return "Sin fecha";
     
     try {
-        // Si viene en formato DD/MM/YYYY (desde GraphQL formateado)
         if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
             const [day, month, year] = dateString.split('/').map(Number);
             const date = new Date(year, month - 1, day);
@@ -182,7 +243,6 @@ const formatDateSafely = (dateString: string | null | undefined): string => {
             });
         }
         
-        // Si viene en formato YYYY-MM-DD
         if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
             const [year, month, day] = dateString.split('-').map(Number);
             const date = new Date(year, month - 1, day);
@@ -196,7 +256,6 @@ const formatDateSafely = (dateString: string | null | undefined): string => {
             });
         }
         
-        // Si viene en formato ISO completo
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return "Fecha inválida";
         
@@ -211,23 +270,20 @@ const formatDateSafely = (dateString: string | null | undefined): string => {
     }
 };
 
-// Función para convertir fecha del formato de UI (DD/MM/YYYY) al formato del backend (YYYY-MM-DD)
+// Convertir fecha de UI (DD/MM/YYYY) a (YYYY-MM-DD)
 const convertDateToBackendFormat = (dateString: string | null | undefined): string => {
     if (!dateString) return "";
     
     try {
-        // Si ya está en formato YYYY-MM-DD, devolverla tal como está
         if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
             return dateString;
         }
         
-        // Si está en formato DD/MM/YYYY, convertir a YYYY-MM-DD
         if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
             const [day, month, year] = dateString.split('/').map(Number);
             return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         }
         
-        // Si es cualquier otro formato, intentar parsearlo como Date y convertir
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return "";
         
@@ -249,18 +305,8 @@ const transformToComponentFormat = (justifications: Justification[]): Transforme
         const person = student?.person;
         const studySheet = student?.studentStudySheets?.[0];
 
-        // console.log("🔍 Transformando justificación:", {
-        //     justificationId: j.id,
-        //     attendanceId: j.attendance?.id,
-        //     absenceDate: j.absenceDate,
-        //     justificationDate: j.justificationDate,
-        //     justificationStatus: j.justificationStatus,
-        //     state: j.state
-        // });
-
         const booleanState = Boolean(j.state);
         
-        // Determinar el estado y ID basado en el nombre
         const statusName = (j as any).justificationStatus?.name || "En proceso";
         const statusId = (j as any).justificationStatus?.id?.toString() || 
             (statusName === 'En proceso' ? 'default-en-proceso' : undefined);
@@ -284,30 +330,24 @@ const transformToComponentFormat = (justifications: Justification[]): Transforme
     });
 };
 
-
-// Función para filtrar datos con soporte multi-filtro
 const filterJustifications = (
     data: TransformedJustificationItem[],
     filterOptions: FilterOptions
 ): TransformedJustificationItem[] => {
     const { selectedFiltro, searchTerm, multiFilters, enableMultiFilter } = filterOptions;
 
-    // Si los multi-filtros están habilitados, usar esa lógica
     if (enableMultiFilter) {
         return data.filter((j) => {
-            // Verificar cada filtro solo si tiene valor
             const matchesDocumento = !multiFilters.documento || j.documento.includes(multiFilters.documento);
             const matchesAprendiz = !multiFilters.aprendiz || j.aprendiz.toLowerCase().includes(multiFilters.aprendiz.toLowerCase());
             const matchesJustificationStatus = !multiFilters.justificationStatus || j.justificationStatus.toLowerCase().includes(multiFilters.justificationStatus.toLowerCase());
             const matchesFecha = !multiFilters.fecha || j.justificationDate.includes(multiFilters.fecha);
             const matchesAbsenceDate = !multiFilters.absenceDate || j.absenceDate.includes(multiFilters.absenceDate);
 
-            // Todos los filtros activos deben coincidir (AND lógico)
             return matchesDocumento && matchesAprendiz && matchesJustificationStatus && matchesFecha && matchesAbsenceDate;
         });
     }
 
-    // Lógica de filtrado simple existente (fallback)
     if (!searchTerm) return data;
 
     if (!selectedFiltro || selectedFiltro === "todo") {
@@ -338,7 +378,6 @@ const filterJustifications = (
     });
 };
 
-// Nuevas funciones de validación
 const validateFormData = (formData: FormDataState): string[] => {
     const errors: string[] = [];
     if (!formData.numeroDocumento.trim()) errors.push("El número de documento es obligatorio");
@@ -350,7 +389,7 @@ const validateFormData = (formData: FormDataState): string[] => {
 };
 
 const validateFileSize = (file: File): boolean => {
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024;
     return file.size <= maxSize;
 };
 
@@ -359,17 +398,14 @@ const validateFileType = (file: File): boolean => {
     return validTypes.includes(file.type);
 };
 
-// Función para limpiar solo caracteres numéricos
 const cleanNumericInput = (value: string): string => {
     return value.replace(/[^0-9]/g, "");
 };
 
-// Función para limpiar texto con caracteres especiales permitidos
 const cleanTextInput = (value: string): string => {
     return value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]/g, "");
 };
 
-// Función para leer archivo como base64
 const readFileAsBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -384,7 +420,6 @@ const readFileAsBase64 = (file: File): Promise<string> => {
     });
 };
 
-// Función para descargar archivo
 export const downloadBase64File = (base64Data: string, fileName: string, mimeType: string = "application/octet-stream") => {
     const linkSource = `data:${mimeType};base64,${base64Data}`;
     const downloadLink = document.createElement("a");
@@ -393,13 +428,11 @@ export const downloadBase64File = (base64Data: string, fileName: string, mimeTyp
     downloadLink.click();
 };
 
-// Función para generar nombre de archivo
 export const generateFileName = (id: number, mimeType: string): string => {
     const extension = getExtensionFromMime(mimeType);
     return `justificacion_${id}.${extension}`;
 };
 
-// Función para formatear mensaje de error
 export const formatErrorMessage = (error: any): string | null => {
     if (!error) return null;
     if (typeof error === 'string') return error;
@@ -407,7 +440,6 @@ export const formatErrorMessage = (error: any): string | null => {
     return 'Error desconocido';
 };
 
-// Thunks existentes
 export const fetchJustifications = createAsyncThunk<GetAllJustificationsQuery['allJustifications'], GetAllJustificationsQueryVariables>(
     'justifications/fetchAll',
     async ({ page, size }) => {
@@ -446,7 +478,7 @@ export const fetchJustificationsByStudentId = createAsyncThunk<
     }
 );
 
-// Nueva función para justificaciones por competence quarter (para instructores)
+// justificaciones por competence quarter
 export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
     TransformedJustificationItem[],
     GetAttendancesByCompetenceQuarterAndJustificationsQueryVariables
@@ -454,6 +486,7 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
     'justifications/fetchByCompetenceQuarter',
     async ({ competenceQuarterId }, { rejectWithValue }) => {
         try {
+            
             const { data } = await clientLAN.query<
                 GetAttendancesByCompetenceQuarterAndJustificationsQuery,
                 GetAttendancesByCompetenceQuarterAndJustificationsQueryVariables
@@ -466,22 +499,24 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
 
             const rawData = data.allAttendanceByCompetenceQuarterIdWithJustifications?.data || [];
             const cleanData = rawData.filter((item): item is NonNullable<typeof item> => item !== null);
-            
-            // Transformar los datos para vista de instructor (sin ficha ni programa)
-            return cleanData.map((attendance) => {
+
+            const transformedData = cleanData.map((attendance, index) => {
                 const justification = attendance.justification;
                 const student = attendance.student;
                 const person = student?.person;
 
-                // Determinar el estado y ID basado en el nombre
+                if (!justification || !justification.id) {
+                    console.warn(`Attendance ${attendance.id} no tiene justificación válida - omitiendo`);
+                    return null;
+                }
+
                 const statusName = justification?.justificationStatus?.name || 'En proceso';
-                // Usar any temporalmente hasta que se regeneren los tipos de GraphQL
                 const statusId = (justification?.justificationStatus as any)?.id || 
                     (statusName === 'En proceso' ? 'default-en-proceso' : undefined);
 
-                return {
+                const transformedItem = {
                     id: Number(justification?.id || 0),
-                    ficha: '', // Vacío para instructores
+                    ficha: attendance.student?.studentStudySheets?.[0]?.studySheet?.number?.toString() || '',
                     absenceDate: justification?.absenceDate || '',
                     justificationDate: justification?.justificationDate || '',
                     estado: statusName,
@@ -495,7 +530,9 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
                     justificationStatusId: statusId,
                     justificationStatus: statusName
                 };
-            });
+                return transformedItem;
+            }).filter(item => item !== null) as TransformedJustificationItem[];
+            return transformedData;
         } catch (error) {
             console.error("Error al obtener justificaciones por competence quarter", error);
             return rejectWithValue({ message: (error as Error).message || 'Unknown error' });
@@ -503,6 +540,7 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
     }
 );
 
+// addJustification
 export const addJustification = createAsyncThunk<AddJustificationMutation['addJustification'], AddJustificationMutationVariables['input'],
     { rejectValue: { code: string; message: string } }
 >(
@@ -525,6 +563,7 @@ export const addJustification = createAsyncThunk<AddJustificationMutation['addJu
     }
 );
 
+// updateJustification
 export const updateJustification = createAsyncThunk<UpdateJustificationMutation['updateJustification'], UpdateJustificationMutationVariables,
     { rejectValue: { code: string; message: string } }
 >(
@@ -548,7 +587,7 @@ export const updateJustification = createAsyncThunk<UpdateJustificationMutation[
     }
 );
 
-// Nueva función para cambiar el estado de una justificación
+// updateJustificationStatus
 export const updateJustificationStatus = createAsyncThunk<
     UpdateStatusInJustificationMutation['updateStatusInJustification'],
     { id: string; statusId: string; statusName?: string },
@@ -560,13 +599,6 @@ export const updateJustificationStatus = createAsyncThunk<
             const justificationId = parseInt(id);
             const justificationStatusId = parseInt(statusId);
 
-            // console.log("🔄 Actualizando justificationStatus con nueva mutation:", {
-            //     id: justificationId,
-            //     statusId: justificationStatusId,
-            //     statusName: statusName,
-            //     mutation: "UPDATE_STATUS_IN_JUSTIFICATION"
-            // });
-
             const { data } = await clientLAN.mutate<UpdateStatusInJustificationMutation, UpdateStatusInJustificationMutationVariables>({
                 mutation: UPDATE_STATUS_IN_JUSTIFICATION,
                 variables: { 
@@ -576,21 +608,20 @@ export const updateJustificationStatus = createAsyncThunk<
             });
 
             const res = data?.updateStatusInJustification;
-            // console.log("📋 Respuesta del backend:", res);
             
             if (!res || res.code !== '200') {
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Error al actualizar el estado' });
             }
 
-            // Retornar el resultado con el statusName incluido
             return { ...res, statusName };
         } catch (error: any) {
-            console.error("❌ Error actualizando estado:", error);
+            console.error("Error actualizando estado:", error);
             return rejectWithValue({ code: '500', message: error.message });
         }
     }
 );
 
+// deleteJustification
 export const deleteJustification = createAsyncThunk<string, string,
     { rejectValue: { code: string; message: string } }
 >(
@@ -614,7 +645,7 @@ export const deleteJustification = createAsyncThunk<string, string,
     }
 );
 
-// Nuevo thunk para procesar archivo
+// processFile
 export const processFile = createAsyncThunk<
     { file: File; base64: string },
     File,
@@ -623,17 +654,14 @@ export const processFile = createAsyncThunk<
     'justifications/processFile',
     async (file, { rejectWithValue }) => {
         try {
-            // Validar tipo de archivo
             if (!validateFileType(file)) {
                 return rejectWithValue('Solo se permiten archivos PDF, JPG o PNG');
             }
 
-            // Validar tamaño de archivo
             if (!validateFileSize(file)) {
                 return rejectWithValue('El archivo es demasiado grande. Máximo permitido: 5MB');
             }
 
-            // Leer archivo como base64
             const base64 = await readFileAsBase64(file);
 
             return { file, base64 };
@@ -643,22 +671,7 @@ export const processFile = createAsyncThunk<
     }
 );
 
-// Función para cargar filtros desde localStorage
-const loadFiltersFromStorage = (): Partial<FilterOptions> => {
-    if (typeof window !== 'undefined') {
-        try {
-            const savedFilters = localStorage.getItem('justification-filters');
-            if (savedFilters) {
-                return JSON.parse(savedFilters);
-            }
-        } catch (error) {
-            console.error('Error loading filters from localStorage:', error);
-        }
-    }
-    return {};
-};
-
-// Función para guardar filtros en localStorage
+// guardar filtros en localStorage
 const saveFiltersToStorage = (filterOptions: FilterOptions) => {
     if (typeof window !== 'undefined') {
         try {
@@ -669,70 +682,14 @@ const saveFiltersToStorage = (filterOptions: FilterOptions) => {
     }
 };
 
-// Estado inicial con formulario
-const initialFormData: FormDataState = {
-    justificationTypeId: { id: "" },
-    numeroDocumento: "",
-    nombreAprendiz: "",
-    descripcion: "",
-    justificacionFile: null,
-    justificacionFileBase64: "",
-    notificationId: "123456",
-};
-
-const initialState: JustificationState = {
-    ...createInitialPaginatedState<Justification>(),
-    transformedData: [],
-    filteredData: [],
-    filterOptions: {
-        selectedFiltro: "",
-        searchTerm: "",
-        multiFilters: {
-            documento: "",
-            aprendiz: "",
-            justificationStatus: "",
-            fecha: "",
-            absenceDate: ""
-        },
-        enableMultiFilter: false,
-        ...loadFiltersFromStorage() // Cargar filtros guardados
-    },
-    localCurrentPage: 0,
-    itemsPerPage: 6,
-    form: {
-        showForm: false,
-        isSubmitting: false,
-        formData: initialFormData,
-        validationErrors: [],
-        currentAttendance: null,
-    },
-    // Datos para vista de instructor (competence quarter)
-    competenceQuarterData: [],
-    competenceQuarterFilteredData: [],
-    competenceQuarterFilterOptions: {
-        selectedFiltro: "",
-        searchTerm: "",
-        multiFilters: {
-            documento: "",
-            aprendiz: "",
-            justificationStatus: "",
-            fecha: "",
-            absenceDate: ""
-        },
-        enableMultiFilter: false
-    },
-    isCompetenceQuarterMode: false,
-};
-
 const justificationSlice = createSlice({
     name: 'justifications',
     initialState,
     reducers: {
-        // Reducers existentes para filtros
         setFilterOptions: (state, action: PayloadAction<Partial<FilterOptions>>) => {
             state.filterOptions = { ...state.filterOptions, ...action.payload };
             state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-            saveFiltersToStorage(state.filterOptions); // Persistir cambios
+            saveFiltersToStorage(state.filterOptions);
         },
 
         clearFilters: (state) => {
@@ -749,7 +706,7 @@ const justificationSlice = createSlice({
                 enableMultiFilter: false
             };
             state.filteredData = state.transformedData;
-            saveFiltersToStorage(state.filterOptions); // Persistir cambios
+            saveFiltersToStorage(state.filterOptions);
         },
 
         setLocalCurrentPage: (state, action: PayloadAction<number>) => {
@@ -771,8 +728,6 @@ const justificationSlice = createSlice({
         setCurrentAttendance: (state, action: PayloadAction<Attendance>) => {
             state.form.currentAttendance = action.payload;
         },
-
-        // Nuevos reducers para el formulario
         showForm: (state) => {
             state.form.showForm = true;
         },
@@ -825,17 +780,12 @@ const justificationSlice = createSlice({
             state.form.validationErrors = validateFormData(state.form.formData);
         },
 
-        // ✅ Nuevo reducer para manejar la actualización de asistencias
         markAttendanceAsJustified: (state, action: PayloadAction<string>) => {
             const attendanceId = action.payload;
-            // Aquí podrías agregar lógica adicional si necesitas
-            // console.log(`✅ Asistencia ${attendanceId} marcada como justificada`);
         },
 
-        // 🆕 Nuevas acciones para multi-filtros
         toggleMultiFilter: (state) => {
             state.filterOptions.enableMultiFilter = !state.filterOptions.enableMultiFilter;
-            // Si se desactiva multi-filtro, limpiar todos los filtros múltiples
             if (!state.filterOptions.enableMultiFilter) {
                 state.filterOptions.multiFilters = {
                     documento: "",
@@ -846,14 +796,14 @@ const justificationSlice = createSlice({
                 };
             }
             state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-            saveFiltersToStorage(state.filterOptions); // Persistir cambios
+            saveFiltersToStorage(state.filterOptions);
         },
 
         setMultiFilter: (state, action: PayloadAction<{ field: keyof MultiFilterState; value: string }>) => {
             const { field, value } = action.payload;
             state.filterOptions.multiFilters[field] = value;
             state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-            saveFiltersToStorage(state.filterOptions); // Persistir cambios
+            saveFiltersToStorage(state.filterOptions);
         },
 
         clearMultiFilters: (state) => {
@@ -865,17 +815,17 @@ const justificationSlice = createSlice({
                 absenceDate: ""
             };
             state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-            saveFiltersToStorage(state.filterOptions); // Persistir cambios
+            saveFiltersToStorage(state.filterOptions);
         },
 
         clearSingleMultiFilter: (state, action: PayloadAction<keyof MultiFilterState>) => {
             const field = action.payload;
             state.filterOptions.multiFilters[field] = "";
             state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-            saveFiltersToStorage(state.filterOptions); // Persistir cambios
+            saveFiltersToStorage(state.filterOptions);
         },
 
-        // Acciones para competence quarter (instructor)
+        // Acciones competence quarter
         setCompetenceQuarterMode: (state, action: PayloadAction<boolean>) => {
             state.isCompetenceQuarterMode = action.payload;
         },
@@ -913,198 +863,183 @@ const justificationSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        builder
-            // fetchJustifications - existente
-            .addCase(fetchJustifications.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchJustifications.fulfilled, (state, action: PayloadAction<GetAllJustificationsQuery['allJustifications']>) => {
-                if (action.payload?.data) {
-                    // console.log("📥 Datos recibidos del backend:", action.payload.data);
-                    
-                    state.data = action.payload.data
-                        .filter((item): item is NonNullable<typeof item> => item !== null)
-                        .map(transformGraphQLToJustificationItem);
+      builder
+        // fetchJustifications
+        .addCase(fetchJustifications.pending, (state) => {
+            state.loading = true;
+        })
+        .addCase(fetchJustifications.fulfilled, (state, action: PayloadAction<GetAllJustificationsQuery['allJustifications']>) => {
+            if (action.payload?.data) {
+                
+                state.data = action.payload.data
+                    .filter((item): item is NonNullable<typeof item> => item !== null)
+                    .map(transformGraphQLToJustificationItem);
 
-                    // console.log("🔄 Datos transformados:", state.data);
+                state.transformedData = transformToComponentFormat(state.data);
+                
+                state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
 
-                    state.transformedData = transformToComponentFormat(state.data);
-                    // console.log("📊 Datos para componente:", state.transformedData);
-                    
-                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+                state.totalItems = action.payload.totalItems ?? 0;
+                state.totalPages = action.payload.totalPages ?? 0;
+                state.currentPage = action.payload.currentPage ?? 0;
+            }
+            state.loading = false;
+        })
+        .addCase(fetchJustifications.rejected, (state, action) => {
+            state.error = action.error.message || 'Error fetching justifications';
+            state.loading = false;
+        })
+        // fetchJustificationById
+        .addCase(fetchJustificationById.pending, (state) => {
+            state.loading = true;
+        })
+        .addCase(fetchJustificationById.fulfilled, (state, action: PayloadAction<GetJustificationByIdQuery['justificationById']>) => {
+            if (action.payload) {
+                state.data = [transformGraphQLToJustificationItem(action.payload)];
+                state.transformedData = transformToComponentFormat(state.data);
+                state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+            }
+            state.loading = false;
+        })
+        .addCase(fetchJustificationById.rejected, (state, action) => {
+            const payload = action.payload as RejectedPayload;
+            const { code, message } = payload || {};
+            state.error = { code, message };
+            state.loading = false;
+        })
+        // fetchJustificationsByStudentId
+        .addCase(fetchJustificationsByStudentId.pending, (state) => {
+            state.loading = true;
+        })
+        .addCase(fetchJustificationsByStudentId.fulfilled, (state, action: PayloadAction<GetJustificationByStudentIdQuery['justificationByStudentId']>) => {
+            if (action.payload?.data) {
+                
+                state.data = action.payload.data
+                    .filter((item): item is NonNullable<typeof item> => item !== null)
+                    .map(transformGraphQLToJustificationItem);
 
-                    state.totalItems = action.payload.totalItems ?? 0;
-                    state.totalPages = action.payload.totalPages ?? 0;
-                    state.currentPage = action.payload.currentPage ?? 0;
-                }
-                state.loading = false;
-            })
-            .addCase(fetchJustifications.rejected, (state, action) => {
-                state.error = action.error.message || 'Error fetching justifications';
-                state.loading = false;
-            })
-            // fetchJustificationById - existente
-            .addCase(fetchJustificationById.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchJustificationById.fulfilled, (state, action: PayloadAction<GetJustificationByIdQuery['justificationById']>) => {
-                if (action.payload) {
-                    state.data = [transformGraphQLToJustificationItem(action.payload)];
-                    state.transformedData = transformToComponentFormat(state.data);
-                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-                }
-                state.loading = false;
-            })
-            .addCase(fetchJustificationById.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                const { code, message } = payload || {};
-                state.error = { code, message };
-                state.loading = false;
-            })
-            // fetchJustificationsByStudentId - nuevo
-            .addCase(fetchJustificationsByStudentId.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(fetchJustificationsByStudentId.fulfilled, (state, action: PayloadAction<GetJustificationByStudentIdQuery['justificationByStudentId']>) => {
-                if (action.payload?.data) {
-                    // console.log("📥 Datos recibidos por estudiante:", action.payload.data);
-                    
-                    state.data = action.payload.data
-                        .filter((item): item is NonNullable<typeof item> => item !== null)
-                        .map(transformGraphQLToJustificationItem);
+                state.transformedData = transformToComponentFormat(state.data);
+                state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+                
+                state.totalItems = state.data.length;
+                state.totalPages = Math.ceil(state.data.length / state.itemsPerPage);
+                state.currentPage = 1;
+            }
+            state.loading = false;
+        })
+        .addCase(fetchJustificationsByStudentId.rejected, (state, action) => {
+            state.error = action.error.message || 'Error fetching justifications by student ID';
+            state.loading = false;
+        })
+        // addJustification
+        .addCase(addJustification.pending, (state) => {
+            state.form.isSubmitting = true;
+            state.form.validationErrors = [];
+        })
+        .addCase(addJustification.fulfilled, (state, action: PayloadAction<AddJustificationMutation['addJustification']>) => {
+            if (action.payload) {
+                const newJustification = transformGraphQLToJustificationItem(action.payload);
+                state.data.push(newJustification);
+                state.transformedData = transformToComponentFormat(state.data);
+                state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
 
-                    state.transformedData = transformToComponentFormat(state.data);
-                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-                    
-                    // Actualizar información de paginación basada en los datos recibidos
-                    state.totalItems = state.data.length;
-                    state.totalPages = Math.ceil(state.data.length / state.itemsPerPage);
-                    state.currentPage = 1;
-                }
-                state.loading = false;
-            })
-            .addCase(fetchJustificationsByStudentId.rejected, (state, action) => {
-                state.error = action.error.message || 'Error fetching justifications by student ID';
-                state.loading = false;
-            })
-            // addJustification - modificado para manejar la actualización
-            .addCase(addJustification.pending, (state) => {
-                state.form.isSubmitting = true;
+                state.form.showForm = false;
+                state.form.formData = initialFormData;
                 state.form.validationErrors = [];
-            })
-            .addCase(addJustification.fulfilled, (state, action: PayloadAction<AddJustificationMutation['addJustification']>) => {
-                if (action.payload) {
-                    const newJustification = transformGraphQLToJustificationItem(action.payload);
-                    state.data.push(newJustification);
-                    state.transformedData = transformToComponentFormat(state.data);
-                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-
-                    // ✅ Resetear formulario después de éxito
-                    state.form.showForm = false;
-                    state.form.formData = initialFormData;
-                    state.form.validationErrors = [];
-                    state.form.currentAttendance = null; // Limpiar la asistencia actual
-                }
-                state.form.isSubmitting = false;
-                state.error = null;
-            })
-            .addCase(addJustification.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                const { code, message } = payload || {};
-                state.error = { code, message };
-                state.form.isSubmitting = false;
-            })
-            // updateJustification - existente
-            .addCase(updateJustification.fulfilled, (state, action: PayloadAction<UpdateJustificationMutation['updateJustification']>) => {
-                if (action.payload) {
-                    const updatedJustification = transformGraphQLToJustificationItem(action.payload);
-                    const index = state.data.findIndex((justification: Justification) => justification.id === updatedJustification.id);
-                    if (index !== -1) {
-                        state.data[index] = updatedJustification;
-                        state.transformedData = transformToComponentFormat(state.data);
-                        state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-                    }
-                }
-                state.error = null;
-            })
-            .addCase(updateJustification.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                const { code, message } = payload || {};
-                state.error = { code, message };
-            })
-            // updateJustificationStatus - actualizado para nueva mutation
-            .addCase(updateJustificationStatus.fulfilled, (state, action) => {
-                // Actualizar el estado local inmediatamente
-                if (action.meta.arg && action.payload) {
-                    const { id, statusId, statusName } = action.meta.arg;
-                    
-                    // Convertir ambos IDs a string para comparación consistente
-                    const targetId = id.toString();
-                    
-                    // ✅ Actualizar en state.data para coordinadores
-                    const justificationIndex = state.data.findIndex(j => j.id.toString() === targetId);
-                    if (justificationIndex !== -1) {
-                        // Actualizar la relación justificationStatus con id y name real
-                        (state.data[justificationIndex] as any).justificationStatus = { 
-                            id: statusId,
-                            name: statusName || "Estado actualizado"
-                        };
-                        
-                        // Regenerar transformedData y filteredData para coordinadores
-                        state.transformedData = transformToComponentFormat(state.data);
-                        state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
-                    }
-
-                    // ✅ NUEVO: Actualizar también en competenceQuarterData para instructores
-                    const competenceQuarterIndex = state.competenceQuarterData.findIndex(j => j.id.toString() === targetId);
-                    if (competenceQuarterIndex !== -1) {
-                        // Actualizar directamente los campos en el objeto transformado
-                        state.competenceQuarterData[competenceQuarterIndex].estado = statusName || "Estado actualizado";
-                        state.competenceQuarterData[competenceQuarterIndex].justificationStatus = statusName || "Estado actualizado";
-                        state.competenceQuarterData[competenceQuarterIndex].justificationStatusId = statusId;
-                        
-                        // Regenerar filteredData para instructores
-                        state.competenceQuarterFilteredData = filterJustifications(state.competenceQuarterData, state.competenceQuarterFilterOptions);
-                    }
-                }
-                state.error = null;
-            })
-            .addCase(updateJustificationStatus.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                const { code, message } = payload || {};
-                state.error = { code, message };
-            })
-            // deleteJustification - existente
-            .addCase(deleteJustification.fulfilled, (state, action: PayloadAction<string>) => {
-                if (action.payload) {
-                    state.data = state.data.filter((justification) => justification.id !== String(action.payload));
+                state.form.currentAttendance = null;
+            }
+            state.form.isSubmitting = false;
+            state.error = null;
+        })
+        .addCase(addJustification.rejected, (state, action) => {
+            const payload = action.payload as RejectedPayload;
+            const { code, message } = payload || {};
+            state.error = { code, message };
+            state.form.isSubmitting = false;
+        })
+        // updateJustification
+        .addCase(updateJustification.fulfilled, (state, action: PayloadAction<UpdateJustificationMutation['updateJustification']>) => {
+            if (action.payload) {
+                const updatedJustification = transformGraphQLToJustificationItem(action.payload);
+                const index = state.data.findIndex((justification: Justification) => justification.id === updatedJustification.id);
+                if (index !== -1) {
+                    state.data[index] = updatedJustification;
                     state.transformedData = transformToComponentFormat(state.data);
                     state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                 }
-                state.error = null;
-            })
-            .addCase(deleteJustification.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                const { code, message } = payload || {};
-                state.error = { code, message };
-            })
-            // fetchJustificationsByCompetenceQuarter - nuevo
-            .addCase(fetchJustificationsByCompetenceQuarter.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchJustificationsByCompetenceQuarter.fulfilled, (state, action: PayloadAction<TransformedJustificationItem[]>) => {
-                state.competenceQuarterData = action.payload;
-                state.competenceQuarterFilteredData = filterJustifications(action.payload, state.competenceQuarterFilterOptions);
-                state.loading = false;
-                state.error = null;
-            })
-            .addCase(fetchJustificationsByCompetenceQuarter.rejected, (state, action) => {
-                state.loading = false;
-                const payload = action.payload as RejectedPayload;
-                const { message } = payload || {};
-                state.error = { code: '500', message: message || 'Error al cargar justificaciones por competence quarter' };
-            })
+            }
+            state.error = null;
+        })
+        .addCase(updateJustification.rejected, (state, action) => {
+            const payload = action.payload as RejectedPayload;
+            const { code, message } = payload || {};
+            state.error = { code, message };
+        })
+        // updateJustificationStatus
+        .addCase(updateJustificationStatus.fulfilled, (state, action) => {
+            if (action.meta.arg && action.payload) {
+                const { id, statusId, statusName } = action.meta.arg;
+                
+                const targetId = id.toString();
+                
+                const justificationIndex = state.data.findIndex(j => j.id.toString() === targetId);
+                if (justificationIndex !== -1) {
+                    (state.data[justificationIndex] as any).justificationStatus = { 
+                        id: statusId,
+                        name: statusName || "Estado actualizado"
+                    };
+                    
+                    state.transformedData = transformToComponentFormat(state.data);
+                    state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+                }
+
+                const competenceQuarterIndex = state.competenceQuarterData.findIndex(j => j.id.toString() === targetId);
+                if (competenceQuarterIndex !== -1) {
+                    state.competenceQuarterData[competenceQuarterIndex].estado = statusName || "Estado actualizado";
+                    state.competenceQuarterData[competenceQuarterIndex].justificationStatus = statusName || "Estado actualizado";
+                    state.competenceQuarterData[competenceQuarterIndex].justificationStatusId = statusId;
+                    
+                    state.competenceQuarterFilteredData = filterJustifications(state.competenceQuarterData, state.competenceQuarterFilterOptions);
+                }
+            }
+            state.error = null;
+        })
+        .addCase(updateJustificationStatus.rejected, (state, action) => {
+            const payload = action.payload as RejectedPayload;
+            const { code, message } = payload || {};
+            state.error = { code, message };
+        })
+        // deleteJustification
+        .addCase(deleteJustification.fulfilled, (state, action: PayloadAction<string>) => {
+            if (action.payload) {
+                state.data = state.data.filter((justification) => justification.id !== String(action.payload));
+                state.transformedData = transformToComponentFormat(state.data);
+                state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
+            }
+            state.error = null;
+        })
+        .addCase(deleteJustification.rejected, (state, action) => {
+            const payload = action.payload as RejectedPayload;
+            const { code, message } = payload || {};
+            state.error = { code, message };
+        })
+        // fetchJustificationsByCompetenceQuarter - nuevo
+        .addCase(fetchJustificationsByCompetenceQuarter.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+        })
+        .addCase(fetchJustificationsByCompetenceQuarter.fulfilled, (state, action: PayloadAction<TransformedJustificationItem[]>) => {
+            state.competenceQuarterData = action.payload;
+            state.competenceQuarterFilteredData = filterJustifications(action.payload, state.competenceQuarterFilterOptions);
+            state.loading = false;
+            state.error = null;
+        })
+        .addCase(fetchJustificationsByCompetenceQuarter.rejected, (state, action) => {
+            state.loading = false;
+            const payload = action.payload as RejectedPayload;
+            const { message } = payload || {};
+            state.error = { code: '500', message: message || 'Error al cargar justificaciones por competence quarter' };
+        })
     }
 });
 
@@ -1132,7 +1067,6 @@ export const {
     setMultiFilter,
     clearMultiFilters,
     clearSingleMultiFilter,
-    // Nuevas acciones para competence quarter
     setCompetenceQuarterMode,
     setCompetenceQuarterFilterOptions,
     setCompetenceQuarterMultiFilter,
@@ -1140,5 +1074,172 @@ export const {
     clearCompetenceQuarterMultiFilters,
     clearCompetenceQuarterJustifications,
 } = justificationSlice.actions;
+
+// Service methods integrated for compatibility
+interface JustificationFormData {
+    numeroDocumento: string;
+    nombreAprendiz: string;
+    descripcion: string;
+    justificationTypeId: number;
+    justificacionFile?: File | null;
+    notificationId?: number;
+}
+
+export const justificationService = {
+    getAllJustifications: async (page = 0, size = 10) => {
+        try {
+            const { data } = await clientLAN.query({
+                query: GET_ALL_JUSTIFICATIONS,
+                variables: { page, size },
+                fetchPolicy: 'network-only',
+            });
+            return data.allJustifications;
+        } catch (error) {
+            console.error("Error fetching all justifications:", error);
+            throw new Error("Simulated error");
+        }
+    },
+
+    getJustificationById: async (id: number) => {
+        try {
+            const { data } = await clientLAN.query({
+                query: GET_JUSTIFICATION_BY_ID,
+                variables: { id },
+                fetchPolicy: 'network-only',
+            });
+            return data.justificationById;
+        } catch (error) {
+            console.error("Error fetching justification by id:", error);
+            throw error;
+        }
+    },
+
+    submitJustification: async (formData: JustificationFormData) => {
+        try {
+            const {
+                numeroDocumento,
+                nombreAprendiz,
+                descripcion,
+                justificationTypeId,
+                justificacionFile,
+                notificationId,
+            } = formData;
+
+            // Convierte archivo a Base64
+            const toBase64 = (file: File): Promise<string> =>
+                new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve((reader.result as string).split(',')[1]);
+                    reader.onerror = (error) => reject(error);
+                });
+
+            const justificationFileBase64 = justificacionFile
+                ? await toBase64(justificacionFile)
+                : null;
+
+            const justificationDate = new Date().toISOString();
+
+            const { data } = await clientLAN.mutate({
+                mutation: ADD_JUSTIFICATION,
+                variables: {
+                    input: {
+                        documentNumber: numeroDocumento,
+                        name: nombreAprendiz,
+                        description: descripcion,
+                        justificationFile: justificationFileBase64,
+                        justificationTypeId,
+                        justificationDate,
+                        justificationHistory: "tipoNovedad",
+                        state: true,
+                        notificationId,
+                    },
+                },
+            });
+
+            if (!data?.addJustification?.code) {
+                throw new Error("Error adding justification");
+            }
+
+            return data.addJustification;
+        } catch (error) {
+            console.error("Error adding justification:", error);
+            throw error;
+        }
+    },
+
+    updateJustification: async (id: number, formData: JustificationFormData) => {
+        try {
+            const {
+                numeroDocumento,
+                nombreAprendiz,
+                descripcion,
+                justificationTypeId,
+                justificacionFile,
+                notificationId,
+            } = formData;
+
+            // Convierte archivo a Base64 solo si hay archivo nuevo
+            const toBase64 = (file: File): Promise<string> =>
+                new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = () => resolve((reader.result as string).split(',')[1]);
+                    reader.onerror = (error) => reject(error);
+                });
+
+            const justificationFileBase64 = justificacionFile
+                ? await toBase64(justificacionFile)
+                : null;
+
+            const justificationDate = new Date().toISOString();
+
+            const { data } = await clientLAN.mutate({
+                mutation: UPDATE_JUSTIFICATION,
+                variables: {
+                    id,
+                    input: {
+                        documentNumber: numeroDocumento,
+                        name: nombreAprendiz,
+                        description: descripcion,
+                        justificationFile: justificationFileBase64,
+                        justificationTypeId,
+                        justificationDate,
+                        justificationHistory: "tipoNovedad",
+                        state: true,
+                        notificationId,
+                    },
+                },
+            });
+
+            if (!data?.updateJustification?.code) {
+                throw new Error("Error updating justification");
+            }
+
+            return data.updateJustification;
+        } catch (error) {
+            console.error("Error updating justification:", error);
+            throw error;
+        }
+    },
+
+    deleteJustification: async (id: number) => {
+        try {
+            const { data } = await clientLAN.mutate({
+                mutation: DELETE_JUSTIFICATION,
+                variables: { id },
+            });
+
+            if (!data?.deleteJustification?.code) {
+                throw new Error("Error deleting justification");
+            }
+
+            return data.deleteJustification;
+        } catch (error) {
+            console.error("Error deleting justification:", error);
+            throw error;
+        }
+    },
+};
 
 export default justificationSlice.reducer;

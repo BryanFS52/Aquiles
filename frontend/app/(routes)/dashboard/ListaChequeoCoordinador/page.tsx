@@ -8,6 +8,7 @@ import { AppDispatch, RootState } from "@redux/store"
 import { addEvaluation } from "@slice/evaluationSlice"
 import CrearListaChequeo from "@components/Modals/modalNewChecklist"
 import PageTitle from "@components/UI/pageTitle"
+import { checklistEnhancementService } from "@redux/slices/checklistEnhancementSlice"
 import {
   fetchChecklists,
   fetchChecklistById,
@@ -39,6 +40,9 @@ interface Checklist {
   remarks?: string
   trimester?: string
   component?: string
+  trainingProjectId?: number
+  trainingProjectName?: string
+  studySheets?: string
   items?: ChecklistItem[]
   [key: string]: any
 }
@@ -52,26 +56,33 @@ export default function CoordinadorChecklistView() {
   const [checklistToDelete, setChecklistToDelete] = useState<string | null>(null)
   const [editingChecklist, setEditingChecklist] = useState<Checklist | null>(null)
   const [isEditing, setIsEditing] = useState<boolean>(false)
+  const [enrichedChecklists, setEnrichedChecklists] = useState<any[]>([])
+  const [enrichmentLoading, setEnrichmentLoading] = useState<boolean>(false)
   
   
   const loadChecklists = useCallback(async (): Promise<void> => {
     try {
-    console.log("🔄 Loading checklists with force refresh...") // Debug log
-    const result = await dispatch(
-      fetchChecklists({ page: 0, size: 100 })
-    ).unwrap()
-      console.log('loadChecklists Redux result:', result) // Debug log
+      const result = await dispatch(
+        fetchChecklists({ page: 0, size: 100 })
+      ).unwrap()
+      
       if (result?.data) {
-        console.log('loadChecklists data count:', result.data.length) // Debug log
-        console.log('First checklist sample:', result.data[0]) // Debug log
-        if (result.data[0] && result.data[0].items) {
-          console.log('First checklist items:', result.data[0].items) // Debug log
+        // Enriquecer los checklists con información adicional
+        setEnrichmentLoading(true)
+        try {
+          const enriched = await checklistEnhancementService.enrichChecklists(result.data)
+          setEnrichedChecklists(enriched)
+        } catch (enrichmentError) {
+          console.warn('Error enriching checklists, using basic data:', enrichmentError)
+          setEnrichedChecklists(result.data)
+        } finally {
+          setEnrichmentLoading(false)
         }
-        console.log('✅ Checklists loaded successfully'); // Debug log
       }
     } catch (error) {
-      console.error("❌ Error loading checklists:", error)
+      console.error("Error loading checklists:", error)
       toast.error("Error al cargar las listas de chequeo")
+      setEnrichmentLoading(false)
     }
   }, [dispatch])
   
@@ -93,19 +104,10 @@ export default function CoordinadorChecklistView() {
     try {
       if (isEditing && editingChecklist) {
         // Actualizar checklist existente
-        console.log('=== UPDATING CHECKLIST ===');
-        console.log('Updating checklist with ID:', editingChecklist.id);
-        console.log('Original editingChecklist:', editingChecklist);
-        console.log('Incoming checklistData:', checklistData);
         
-        // ← Log específico para trimester y component
-        console.log('🔍 FIELD VALUES COMPARISON:');
-        console.log('  trimester - original:', editingChecklist.trimester, ', incoming:', checklistData.trimester);
-        console.log('  component - original:', editingChecklist.component, ', incoming:', checklistData.component);
-
-        // ← Procesar items eliminados si los hay
+        // Procesar items eliminados si los hay
         if (checklistData.deletedItemIds && checklistData.deletedItemIds.length > 0) {
-          console.log('🗑️ PROCESSING DELETED ITEMS:', checklistData.deletedItemIds);
+          // Items will be processed for deletion
         }
 
         const updateData = {
@@ -114,75 +116,44 @@ export default function CoordinadorChecklistView() {
           trimester: checklistData.trimester !== undefined ? checklistData.trimester : (editingChecklist.trimester || "1"),
           component: checklistData.component !== undefined ? checklistData.component : (editingChecklist.component || ""),
           evaluationCriteria: editingChecklist.evaluationCriteria || false,
-          instructorSignature: editingChecklist.instructorSignature || "No signature",
-          studySheets: editingChecklist.studySheets || null,
+          instructorSignature: editingChecklist.instructorSignature || JSON.stringify({}),
+          studySheets: checklistData.studySheets || editingChecklist.studySheets || null,
+          trainingProjectId: checklistData.trainingProjectId || (editingChecklist as any).trainingProjectId || null,
           evaluations: editingChecklist.evaluations || null,
           associatedJuries: editingChecklist.associatedJuries || null,
           items: checklistData.items ? transformItems(checklistData.items) : [],
-          // ← Agregar items eliminados para el backend
+          // Agregar items eliminados para el backend
           ...(checklistData.deletedItemIds && checklistData.deletedItemIds.length > 0 && { 
             deletedItemIds: checklistData.deletedItemIds 
           })
         };
-
-        console.log('Final updateData being sent:', updateData);
-        console.log('🎯 FINAL VALUES BEING SENT:');
-        console.log('  trimester:', updateData.trimester, '(type:', typeof updateData.trimester, ')');
-        console.log('  component:', updateData.component, '(type:', typeof updateData.component, ')');
-        console.log('🎯 DETAILED UPDATEDATA ITEMS:');
-        updateData.items.forEach((item: any, index: number) => {
-          console.log(`  UpdateData Item ${index + 1}: id=${item.id || 'NO_ID'}, code="${item.code}", indicator="${item.indicator}", active=${item.active}`);
-        });
-        
-        // ← Log adicional para items eliminados
-        if (updateData.deletedItemIds && updateData.deletedItemIds.length > 0) {
-          console.log('🗑️ ITEMS TO DELETE BEING SENT TO BACKEND:', updateData.deletedItemIds);
-        }
 
         const result = await dispatch(updateChecklist({
           id: parseInt(editingChecklist.id),
           input: updateData
         })).unwrap();
 
-        console.log("Update result:", result); // Debug log
-
         if (result && result.code === "200") {
-          console.log("✅ Update successful, refreshing specific checklist data..."); // Debug log
           toast.success("Lista de chequeo actualizada exitosamente");
 
           // Pequeño delay para asegurar que la DB se actualice
           await new Promise(resolve => setTimeout(resolve, 1000));
 
           // Primero recargar el checklist específico por ID para forzar una actualización
-          console.log("📡 Fetching updated checklist by ID...");
           await dispatch(fetchChecklistById({ id: parseInt(editingChecklist.id) })).unwrap();
 
           // Luego recargar toda la lista para asegurar consistencia
-          console.log("📡 Reloading full checklist data...");
           await loadChecklists();
 
           // Cerrar el modal
           handleCloseModal();
 
-          console.log("✅ Data refreshed and modal closed"); // Debug log
-          console.log("📊 Final checklist data after update:"); // Debug log
-
           // Buscar el checklist actualizado en los datos actuales
           const updatedChecklistInState = normalizedChecklists.find(c => c.id === editingChecklist.id);
-          console.log("Updated checklist in state:", updatedChecklistInState); // Debug log
           if (updatedChecklistInState) {
-            console.log("Updated checklist items:", updatedChecklistInState.items); // Debug log
-            console.log("🔍 DETAILED FINAL ITEMS AFTER UPDATE:"); // Debug log
-            if (updatedChecklistInState.items) {
-              updatedChecklistInState.items.forEach((item, index) => {
-                if (item) {
-                  console.log(`  Final Item ${index + 1}: id=${item.id}, indicator="${item.indicator}", active=${item.active}`); // Debug log
-                }
-              });
-            }
+            // Checklist updated successfully
           }
         } else {
-          console.log("❌ Update failed:", result); // Debug log
           toast.error(result?.message || "Error al actualizar la lista de chequeo");
         }
       } else {
@@ -193,19 +164,18 @@ export default function CoordinadorChecklistView() {
           trimester: checklistData.trimester || "1",
           component: checklistData.component || "",
           evaluationCriteria: false,
-          instructorSignature: "No signature",
-          studySheets: null,
+          instructorSignature: JSON.stringify({}),
+          studySheets: checklistData.studySheets || null,
+          trainingProjectId: checklistData.trainingProjectId || null,
           evaluations: null,
           associatedJuries: null,
           items: checklistData.items ? transformItems(checklistData.items) : []
         };
 
         const result = await dispatch(addChecklist(newChecklistData)).unwrap();
-        console.log("Create result:", result); // Debug log
 
         if (result && result.code === "200") {
           const newChecklistId = result.id;
-          console.log("✅ Checklist created successfully with ID:", newChecklistId); // Debug log
 
           if (newChecklistId) {
             // Crear automáticamente una evaluación para esta lista de chequeo usando Redux
@@ -217,78 +187,52 @@ export default function CoordinadorChecklistView() {
                 checklistId: parseInt(newChecklistId) // Asegurar que es un número entero
               };
 
-              console.log('=== CREATING AUTOMATIC EVALUATION ===');
-              console.log('📝 New Checklist ID:', newChecklistId, '(Type:', typeof newChecklistId, ')');
-              console.log('🔢 Parsed Checklist ID:', parseInt(newChecklistId), '(Type:', typeof parseInt(newChecklistId), ')');
-              console.log('📋 Evaluation Input:', evaluationInput);
-              console.log('🔗 This will create a 1:1 relationship in the database');
+
 
               const evaluationResponse = await dispatch(addEvaluation(evaluationInput)).unwrap();
-              console.log("🎯 Evaluation creation response:", evaluationResponse);
 
               if (evaluationResponse && evaluationResponse.code === "200") {
-                console.log("✅ SUCCESS: Evaluation created with ID:", evaluationResponse.id);
-                console.log("🔗 SUCCESS: Evaluation linked to Checklist ID:", newChecklistId);
-                console.log("📊 Database now has: Checklist", newChecklistId, "↔ Evaluation", evaluationResponse.id);
-                
                 // Verificar que la relación se estableció correctamente
                 try {
-                  const { verifyChecklistEvaluationLink } = await import('@services/checkListService');
-                  console.log("🔍 Verifying the database relationship...");
+                  const { checkListService } = await import('@redux/slices/checklistSlice');
                   
                   // Pequeña pausa para que la DB se actualice
                   await new Promise(resolve => setTimeout(resolve, 500));
                   
-                  const isLinked = await verifyChecklistEvaluationLink(parseInt(newChecklistId));
+                  const isLinked = await checkListService.updateChecklistEvaluationLink(parseInt(newChecklistId), parseInt(evaluationResponse.id));
                   
                   if (isLinked) {
-                    console.log("✅ VERIFICATION SUCCESS: Relationship confirmed in database");
-                    toast.success("🎉 Lista de chequeo creada exitosamente")
-                    toast.success("✅ Evaluación asociada creada y vinculada correctamente")
-                  } else {
-                    console.log("⚠️ VERIFICATION WARNING: Evaluation created but relationship not confirmed");
                     toast.success("Lista de chequeo creada exitosamente")
-                    toast.warning("⚠️ Evaluación creada pero la verificación de vínculo falló")
+                    toast.success("Evaluación asociada creada y vinculada correctamente")
+                  } else {
+                    toast.success("Lista de chequeo creada exitosamente")
+                    toast.warning("Evaluación creada pero la verificación de vínculo falló")
                   }
                 } catch (verificationError) {
-                  console.warn("⚠️ Could not verify relationship:", verificationError);
-                  toast.success("🎉 Lista de chequeo creada exitosamente")
-                  toast.success("✅ Evaluación asociada creada automáticamente")
+                  toast.success("Lista de chequeo creada exitosamente")
+                  toast.success("Evaluación asociada creada automáticamente")
                 }
                 
                 // Pequeña pausa para mostrar ambos toasts
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 
               } else {
-                console.log("❌ PARTIAL SUCCESS: Checklist created but evaluation failed:", evaluationResponse);
                 toast.success("Lista de chequeo creada exitosamente")
-                toast.warning("⚠️ Evaluación no pudo crearse automáticamente: " + (evaluationResponse?.message || "Error desconocido"))
+                toast.warning("Evaluación no pudo crearse automáticamente: " + (evaluationResponse?.message || "Error desconocido"))
               }
             } catch (evaluationError: any) {
-              console.error("❌ ERROR creating evaluation:", evaluationError);
-              console.error("Error details:", {
-                message: evaluationError.message,
-                stack: evaluationError.stack,
-                graphQLErrors: evaluationError.graphQLErrors,
-                networkError: evaluationError.networkError
-              });
-              
               toast.success("Lista de chequeo creada exitosamente")
-              toast.error("❌ Error al crear la evaluación automática: " + (evaluationError.message || "Error desconocido"))
+              toast.error("Error al crear la evaluación automática: " + (evaluationError.message || "Error desconocido"))
             }
           } else {
-            console.warn("⚠️ WARNING: Checklist created but ID not returned:", result);
             toast.success("Lista de chequeo creada exitosamente")
-            toast.warning("⚠️ No se pudo crear la evaluación automáticamente (ID no disponible)")
+            toast.warning("No se pudo crear la evaluación automáticamente (ID no disponible)")
           }
 
           // Recargar la lista para mostrar el nuevo checklist
-          console.log("🔄 Reloading checklists to show new data...");
           await loadChecklists()
           setModalOpen(false)
-          console.log("✅ Creation process completed");
         } else {
-          console.log("❌ FAILED: Checklist creation failed:", result);
           toast.error(result?.message || "Error al crear la lista de chequeo")
         }
       }
@@ -327,14 +271,9 @@ export default function CoordinadorChecklistView() {
   }
 
   const handleCloseModal = (): void => {
-    console.log("handleCloseModal called, isEditing:", isEditing) // Debug log
-
     setModalOpen(false)
     setIsEditing(false)
     setEditingChecklist(null)
-
-    // Limpiar cualquier cache o estado temporal
-    console.log("Modal closed, states cleared") // Debug log
   }
 
   const handleOpenCreateModal = (): void => {
@@ -345,33 +284,20 @@ export default function CoordinadorChecklistView() {
 
   const handleOpenEditModal = async (checklist: any): Promise<void> => {
     try {
-      console.log("Opening edit modal for checklist:", checklist.id) // Debug log
-
       // Obtener el checklist completo con todos sus items/indicadores usando Redux
       await dispatch(fetchChecklistById({ id: parseInt(checklist.id) })).unwrap();
 
       // Buscar el checklist transformado en el estado de Redux
       const updatedChecklist = checklists.find(item => item.id === checklist.id);
-      console.log("Updated checklist from Redux state:", updatedChecklist) // Debug log
 
       if (updatedChecklist) {
-        console.log("=== OPENING EDIT MODAL ==="); // Debug log
-        console.log("Checklist items being passed to modal:", updatedChecklist.items) // Debug log
-        console.log("🔍 DETAILED ITEMS BEING PASSED TO MODAL:"); // Debug log
         if (updatedChecklist.items) {
-          updatedChecklist.items.forEach((item, index) => {
-            if (item) {
-              console.log(`  Item ${index + 1}: id=${item.id}, indicator="${item.indicator}", active=${item.active}`); // Debug log
-            }
-          });
+          // Process items for modal
         }
         setIsEditing(true)
         setEditingChecklist(updatedChecklist as any)
         setModalOpen(true)
-        console.log("Edit modal opened successfully"); // Debug log
-        console.log("=== END OPENING EDIT MODAL ==="); // Debug log
       } else {
-        console.log("Checklist not found in Redux state after fetch") // Debug log
         toast.error("Error al obtener los detalles del checklist")
       }
     } catch (error: any) {
@@ -385,8 +311,22 @@ export default function CoordinadorChecklistView() {
     setConfirmModalOpen(true)
   }
 
+  // Función auxiliar para formatear las fichas
+  const getFormattedStudySheets = (studySheets: string): string => {
+    if (!studySheets) return 'Sin fichas asociadas'
+    
+    const sheetIds = studySheets.split(',')
+    if (sheetIds.length === 1) {
+      return `Ficha ${sheetIds[0]}`
+    }
+    return `${sheetIds.length} fichas asociadas`
+  }
+
+  // Usar checklists enriquecidos si están disponibles, sino usar los datos de Redux
+  const checklistsToUse = enrichedChecklists.length > 0 ? enrichedChecklists : checklists;
+  
   // Normalizar id a string para evitar exclusión por tipo
-  const normalizedChecklists = checklists.map(c => ({
+  const normalizedChecklists = checklistsToUse.map(c => ({
     ...c,
     id: c.id != null ? c.id.toString() : ''
   }));
@@ -395,7 +335,6 @@ export default function CoordinadorChecklistView() {
     .filter((checklist) => {
       // Filtrar checklists inválidos
       if (!checklist || checklist.id == null || checklist.id === '') {
-        console.warn("Filtering out invalid checklist:", checklist); // Debug log
         return false;
       }
 
@@ -419,7 +358,7 @@ export default function CoordinadorChecklistView() {
             id="trimestre-select"
             value={selectedTrimestre}
             onChange={(e) => setSelectedTrimestre(e.target.value)}
-            className="px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-full focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
+            className="px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-full focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
           >
             <option value="todos">Todos los Trimestres</option>
             <option value="1">Primer Trimestre</option>
@@ -440,10 +379,12 @@ export default function CoordinadorChecklistView() {
         </button>
       </div>
 
-      {loading ? (
+      {(loading || enrichmentLoading) ? (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lime-600 dark:border-shadowBlue"></div>
-          <span className="ml-2 text-gray-600 dark:text-gray-400">Cargando listas de chequeo...</span>
+          <span className="ml-2 text-gray-600 dark:text-gray-400">
+            {enrichmentLoading ? "Cargando información de proyectos y fichas..." : "Cargando listas de chequeo..."}
+          </span>
         </div>
       ) : (
         <div className="mt-6 overflow-visible">
@@ -463,8 +404,7 @@ export default function CoordinadorChecklistView() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
                 {filteredChecklists.map((checklist) => {
                   // Debug log para cada checklist en el render
-                  console.log(`Rendering checklist ${checklist.id}:`, checklist);
-                  console.log(`Checklist ${checklist.id} items:`, checklist.items);
+                  // Rendering checklist card
 
                   // Verificación de seguridad adicional
                   if (!checklist || !checklist.id) {
@@ -507,23 +447,57 @@ export default function CoordinadorChecklistView() {
 
                         {/* Contenido de la tarjeta */}
                         <div className="p-6 space-y-4">
+                          {/* Proyecto Formativo */}
+                          <div>
+                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
+                              Proyecto Formativo
+                            </span>
+                            <p className="text-sm text-gray-700 dark:text-white mt-1 font-medium">
+                              {(checklist as any).trainingProjectName || (
+                                <span className="text-gray-500 italic">Sin proyecto asociado</span>
+                              )}
+                            </p>
+                          </div>
+
                           {/* Componente */}
                           <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Componente
                             </span>
-                            <p className="text-sm text-darkBlue dark:text-white mt-1 font-medium">
+                            <p className="text-sm text-gray-700 dark:text-white mt-1 font-medium">
                               {checklist.component || 'N/A'}
                             </p>
                           </div>
 
+                          {/* Fichas asociadas */}
+                          <div>
+                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
+                              Fichas Asociadas
+                            </span>
+                            <div className="mt-1">
+                              {(checklist as any).studySheets ? (
+                                (checklist as any).formattedStudySheets ? (
+                                  <div className="text-xs text-gray-700 dark:text-white">
+                                    {(checklist as any).formattedStudySheets}
+                                  </div>
+                                ) : (
+                                  <span className="inline-block px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-blue-800/20 dark:to-blue-600/20 text-gray-800 dark:text-blue-300 rounded-full text-xs font-bold border border-gray-300 dark:border-blue-500/30">
+                                    {getFormattedStudySheets((checklist as any).studySheets)}
+                                  </span>
+                                )
+                              ) : (
+                                <span className="text-gray-500 italic text-sm">Sin fichas asociadas</span>
+                              )}
+                            </div>
+                          </div>
+
                           {/* Indicadores */}
                           <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Indicadores
                             </span>
                             <div className="mt-1">
-                              <span className="inline-block px-3 py-1 bg-gradient-to-r from-lime-100 to-lime-200 dark:from-shadowBlue/20 dark:to-darkBlue/20 text-lime-800 dark:text-lime-300 rounded-full text-xs font-bold border border-lime-300 dark:border-shadowBlue/30">
+                              <span className="inline-block px-3 py-1 bg-gradient-to-r from-lime-100 to-lime-200 dark:from-shadowBlue/20 dark:to-darkBlue/20 text-lime-800 dark:text-gray-300 rounded-full text-xs font-bold border border-lime-300 dark:border-shadowBlue/30">
                                 {checklist.items ? checklist.items.length : 0} indicadores
                               </span>
                             </div>
@@ -531,14 +505,14 @@ export default function CoordinadorChecklistView() {
 
                           {/* Estado */}
                           <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Estado
                             </span>
                             <div className="mt-2 flex items-center">
                               <button
                                 onClick={() => handleToggleState(checklist.id, checklist.state)}
                                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${checklist.state
-                                  ? 'bg-gradient-to-r from-lime-600 to-lime-500 focus:ring-lime-500'
+                                  ? 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-blue-600 dark:to-blue-500 focus:ring-lime-500 dark:focus:ring-blue-500'
                                   : 'bg-gray-200 dark:bg-gray-600 focus:ring-gray-500'
                                   }`}
                                 title={checklist.state ? 'Desactivar lista' : 'Activar lista'}
@@ -549,7 +523,7 @@ export default function CoordinadorChecklistView() {
                                 />
                               </button>
                               <span className={`ml-3 text-xs font-bold ${checklist.state
-                                ? 'text-lime-600 dark:text-lime-400'
+                                ? 'text-lime-600 dark:text-gray-300'
                                 : 'text-gray-500 dark:text-gray-400'
                                 }`}>
                                 {checklist.state ? 'Activo' : 'Inactivo'}
@@ -559,7 +533,7 @@ export default function CoordinadorChecklistView() {
 
                           {/* Observaciones */}
                           <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-lime-400 uppercase tracking-wide">
+                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Competencia
                             </span>
                             <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2 leading-relaxed">

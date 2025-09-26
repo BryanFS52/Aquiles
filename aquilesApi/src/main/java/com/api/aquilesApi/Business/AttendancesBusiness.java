@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Component
@@ -27,15 +26,14 @@ public class AttendancesBusiness {
 
     public AttendancesBusiness(
             AttendancesService attendancesService,
-            AttendanceStateService attendanceStateService,
-            ModelMapper modelMapper
+            AttendanceStateService attendanceStateService
     ) {
         this.attendancesService = attendancesService;
         this.attendanceStateService = attendanceStateService;
     }
 
     // Validation Object
-    private void validationObject(TeamsScrumDto teamsScrumDto) throws CustomException {
+    private void validationObject(AttendanceDto attendanceDto) throws CustomException {
 
     }
 

@@ -4,6 +4,7 @@ import com.api.aquilesApi.Entity.Checklist;
 import com.api.aquilesApi.Repository.ChecklistRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
+import com.api.aquilesApi.Business.ChecklistHistoryBusiness;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,8 @@ public class ChecklistService implements Idao<Checklist, Long> {
 
     @Override
     public Checklist getById(Long id) {
-        return checklistRepository.findById(id).orElseThrow(() -> new CustomException("CheckList with id " + id + " not found", HttpStatus.NO_CONTENT));
+        return checklistRepository.findById(id)
+                .orElseThrow(() -> new CustomException("CheckList with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
     @Override

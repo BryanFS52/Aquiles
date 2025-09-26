@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Utilities.Mapper;
 
 import com.api.aquilesApi.Dto.EvaluationDto;
-import com.api.aquilesApi.Entity.Evaluation;
+import com.api.aquilesApi.Entity.Evaluations;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -14,15 +14,15 @@ import java.util.List;
 public interface EvaluationMap {
     EvaluationMap INSTANCE = Mappers.getMapper(EvaluationMap.class);
 
-    EvaluationDto EntityToDTO(Evaluation evaluation);
+    EvaluationDto EntityToDTO(Evaluations evaluation);
 
-    Evaluation DTOToEntity(EvaluationDto evaluation);
+    Evaluations DTOToEntity(EvaluationDto evaluation);
 
-    List<EvaluationDto> EntityToDTOs(List<Evaluation> evaluations);
+    List<EvaluationDto> EntityToDTOs(List<Evaluations> evaluations);
 
-    void updateEvaluation(EvaluationDto evaluationDto, @MappingTarget Evaluation evaluation);
+    void updateEvaluation(EvaluationDto evaluationDto, @MappingTarget Evaluations evaluation);
 
-    default Page<EvaluationDto> EntityToDTOs(Page<Evaluation> evaluations) {
+    default Page<EvaluationDto> EntityToDTOs(Page<Evaluations> evaluations) {
         List<EvaluationDto> dtos = EntityToDTOs(evaluations.getContent());
         return new PageImpl<>(dtos, evaluations.getPageable(), evaluations.getTotalElements());
     }

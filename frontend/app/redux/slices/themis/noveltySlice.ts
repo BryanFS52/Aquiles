@@ -5,7 +5,6 @@ import { createInitialPaginatedState, RejectedPayload } from '@type/slices/commo
 import { ADD_NOVELTY } from '@graphql/themis/noveltyGraph'
 import { fetchNoveltyTypes, filterByDesercion } from './noveltyTypeSlice'
 
-// Interfaces para NoveltyDto (basadas en las variables exactas del backend)
 export interface NoveltyTypeDto {
     id: string;
 }
@@ -21,16 +20,14 @@ export interface ProcessFlowStatusDto {
 export interface NoveltyDto {
     observation: string;
     justification: string;
-    noveltyFiles: string; // bytea en base64
+    noveltyFiles: string;
     noveltyType: NoveltyTypeDto;
     noveltyStatus: NoveltyStatusDto;
     processFlowStatus: ProcessFlowStatusDto;
     studentId: number;
     teacherId: number;
-    //   administrativeId: number;
 }
 
-// Interface para el formulario del modal
 export interface NoveltyFormData {
     observation: string;
     justification: string;
@@ -40,16 +37,13 @@ export interface NoveltyFormData {
     processFlowStatus: { id: string };
     studentId: number;
     teacherId: number;
-    // selectedFile eliminado - manejado localmente en el componente
 }
 
-// Interface para validación de ausencias
 export interface StudentAbsenceData {
     studentId: number;
     absenceCount: number;
     canReportDesertion: boolean;
-    teacherId: number; // Agregar teacherId al payload
-    // Información adicional del estudiante
+    teacherId: number;
     studentName?: string;
     studentDocument?: string;
     studentLastname?: string;
@@ -61,7 +55,6 @@ export interface NoveltyResponse {
     message: string;
 }
 
-// Mutations types generadas (simuladas hasta que se generen automáticamente)
 export interface AddNoveltyMutation {
     addNovelty: NoveltyResponse;
 }
@@ -76,10 +69,8 @@ export interface NoveltyState {
     error: string | { code?: string; message?: string } | null;
     submitSuccess: boolean;
     lastResponse: NoveltyResponse | null;
-    // Form state
     formData: NoveltyFormData;
     modalOpen: boolean;
-    // Absence validation
     selectedStudentAbsences: StudentAbsenceData | null;
     noveltyTypesLoaded: boolean;
 }
@@ -90,10 +81,10 @@ const initialFormData: NoveltyFormData = {
     justification: '',
     noveltyFiles: '',
     noveltyType: { id: '' },
-    noveltyStatus: { id: '1' }, // Valor por defecto para deserción
-    processFlowStatus: { id: '1' }, // Valor por defecto para deserción
+    noveltyStatus: { id: '1' },
+    processFlowStatus: { id: '1' },
     studentId: 0,
-    teacherId: 0, // Se establecerá cuando se abra el modal
+    teacherId: 0,
 };
 
 const initialState: NoveltyState = {
@@ -107,7 +98,6 @@ const initialState: NoveltyState = {
     noveltyTypesLoaded: false,
 };
 
-// Async thunk para validar ausencias y abrir modal
 export const openNoveltyModal = createAsyncThunk<
     StudentAbsenceData,
     {
@@ -123,9 +113,7 @@ export const openNoveltyModal = createAsyncThunk<
     'novelty/openNoveltyModal',
     async ({ studentId, teacherId, absenceCount, studentName, studentDocument, studentLastname }, { dispatch, rejectWithValue }) => {
         try {
-            // console.log('Opening novelty modal for student:', { studentId, teacherId, absenceCount, studentName });
 
-            // Validar que teacherId sea válido
             if (!teacherId || teacherId === 0) {
                 return rejectWithValue({
                     code: 'INVALID_TEACHER_ID',
@@ -142,13 +130,13 @@ export const openNoveltyModal = createAsyncThunk<
                 });
             }
 
-            // Cargar tipos de novedad y filtrar por "Deserción"
+            // Filtrar por deserción
             await dispatch(fetchNoveltyTypes({ page: 0, size: 10 })).unwrap();
             await dispatch(filterByDesercion());
 
             return {
                 studentId,
-                teacherId, // ¡INCLUIR teacherId en el retorno!
+                teacherId,
                 absenceCount,
                 canReportDesertion,
                 studentName,
@@ -174,14 +162,12 @@ export const processFile = createAsyncThunk<
     'novelty/processFile',
     async (file, { rejectWithValue }) => {
         try {
-            // console.log('Processing file:', file.name);
 
             return new Promise<string>((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = () => {
                     const result = reader.result as string;
-                    // Remove the data:mime;base64, prefix
                     const base64 = result.split(',')[1];
                     resolve(base64);
                 };
@@ -197,7 +183,6 @@ export const processFile = createAsyncThunk<
     }
 );
 
-// Async thunk para enviar novedad con validación completa
 export const submitNovelty = createAsyncThunk<
     NoveltyResponse,
     void,
@@ -209,11 +194,10 @@ export const submitNovelty = createAsyncThunk<
             const { novelty } = getState();
             const { formData, selectedStudentAbsences } = novelty;
 
-            // Validaciones
-            if (!formData.observation.trim()) {
+            if (!formData.justification.trim()) {
                 return rejectWithValue({
                     code: 'VALIDATION_ERROR',
-                    message: 'La observación es requerida'
+                    message: 'La justificación es requerida'
                 });
             }
 
@@ -245,7 +229,6 @@ export const submitNovelty = createAsyncThunk<
                 });
             }
 
-            // Preparar datos para envío
             const noveltyData: NoveltyDto = {
                 observation: formData.observation,
                 justification: formData.justification,
@@ -256,14 +239,6 @@ export const submitNovelty = createAsyncThunk<
                 studentId: formData.studentId,
                 teacherId: formData.teacherId,
             };
-
-            // console.log('Submitting novelty with data:', {
-            //   ...noveltyData,
-            //   teacherId: formData.teacherId,
-            //   studentId: formData.studentId,
-            //   observation: formData.observation ? 'Present' : 'Missing',
-            //   noveltyType: formData.noveltyType.id ? 'Present' : 'Missing'
-            // });
 
             const { data } = await clientLAN.mutate<AddNoveltyMutation, AddNoveltyMutationVariables>({
                 mutation: ADD_NOVELTY,
@@ -276,7 +251,6 @@ export const submitNovelty = createAsyncThunk<
                 throw new Error('No se recibió respuesta del servidor');
             }
 
-            // console.log('Novelty submitted successfully:', data.addNovelty);
             return data.addNovelty;
         } catch (error: any) {
             console.error('Error submitting novelty:', error);
@@ -303,12 +277,12 @@ export const submitNovelty = createAsyncThunk<
         }
     }
 );
+
 // Slice
 const noveltySlice = createSlice({
     name: 'novelty',
     initialState,
     reducers: {
-        // Modal management
         closeModal: (state) => {
             state.modalOpen = false;
             state.formData = initialFormData;
@@ -316,7 +290,6 @@ const noveltySlice = createSlice({
             state.error = null;
         },
 
-        // Form management
         updateFormField: (state, action: PayloadAction<{ field: keyof NoveltyFormData; value: any }>) => {
             const { field, value } = action.payload;
             if (field === 'noveltyType' || field === 'noveltyStatus' || field === 'processFlowStatus') {
@@ -339,7 +312,6 @@ const noveltySlice = createSlice({
             };
         },
 
-        // Error management
         clearError: (state) => {
             state.error = null;
         },
@@ -353,60 +325,56 @@ const noveltySlice = createSlice({
         }
     },
     extraReducers: (builder) => {
-        builder
-            // Open modal
-            .addCase(openNoveltyModal.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(openNoveltyModal.fulfilled, (state, action: PayloadAction<StudentAbsenceData>) => {
-                state.loading = false;
-                state.error = null;
-                state.modalOpen = true;
-                state.selectedStudentAbsences = action.payload;
-                state.noveltyTypesLoaded = true;
-                // Establecer tanto studentId como teacherId desde el payload
-                state.formData.studentId = action.payload.studentId;
-                state.formData.teacherId = action.payload.teacherId;
-            })
-            .addCase(openNoveltyModal.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload || { message: 'Error al abrir modal' };
-                state.modalOpen = false;
-            })
+      builder
+        .addCase(openNoveltyModal.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+        })
+        .addCase(openNoveltyModal.fulfilled, (state, action: PayloadAction<StudentAbsenceData>) => {
+            state.loading = false;
+            state.error = null;
+            state.modalOpen = true;
+            state.selectedStudentAbsences = action.payload;
+            state.noveltyTypesLoaded = true;
+            state.formData.studentId = action.payload.studentId;
+            state.formData.teacherId = action.payload.teacherId;
+        })
+        .addCase(openNoveltyModal.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload || { message: 'Error al abrir modal' };
+            state.modalOpen = false;
+        })
 
-            // Process file
-            .addCase(processFile.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(processFile.fulfilled, (state, action: PayloadAction<string>) => {
-                state.loading = false;
-                state.formData.noveltyFiles = action.payload;
-            })
-            .addCase(processFile.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload || { message: 'Error al procesar archivo' };
-            })
+        .addCase(processFile.pending, (state) => {
+            state.loading = true;
+        })
+        .addCase(processFile.fulfilled, (state, action: PayloadAction<string>) => {
+            state.loading = false;
+            state.formData.noveltyFiles = action.payload;
+        })
+        .addCase(processFile.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload || { message: 'Error al procesar archivo' };
+        })
 
-            // Submit novelty
-            .addCase(submitNovelty.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-                state.submitSuccess = false;
-            })
-            .addCase(submitNovelty.fulfilled, (state, action: PayloadAction<NoveltyResponse>) => {
-                state.loading = false;
-                state.error = null;
-                state.submitSuccess = true;
-                state.lastResponse = action.payload;
-                state.modalOpen = false;
-                state.formData = initialFormData;
-            })
-            .addCase(submitNovelty.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload || { message: 'Error desconocido' };
-                state.submitSuccess = false;
-            });
+        .addCase(submitNovelty.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+            state.submitSuccess = false;
+        })
+        .addCase(submitNovelty.fulfilled, (state, action: PayloadAction<NoveltyResponse>) => {
+            state.loading = false;
+            state.error = null;
+            state.submitSuccess = true;
+            state.lastResponse = action.payload;
+            state.modalOpen = false;
+            state.formData = initialFormData;
+        })
+        .addCase(submitNovelty.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload || { message: 'Error desconocido' };
+            state.submitSuccess = false;
+        });
     }
 });
 
@@ -420,12 +388,9 @@ export const {
     resetNoveltyState
 } = noveltySlice.actions;
 
-// Selectores útiles
 export const selectNoveltyState = (state: { novelty: NoveltyState }) => state.novelty;
-export const selectCanReportDesertion = (state: { novelty: NoveltyState }) =>
-    state.novelty.selectedStudentAbsences?.canReportDesertion ?? false;
-export const selectStudentAbsenceCount = (state: { novelty: NoveltyState }) =>
-    state.novelty.selectedStudentAbsences?.absenceCount ?? 0;
+export const selectCanReportDesertion = (state: { novelty: NoveltyState }) => state.novelty.selectedStudentAbsences?.canReportDesertion ?? false;
+export const selectStudentAbsenceCount = (state: { novelty: NoveltyState }) => state.novelty.selectedStudentAbsences?.absenceCount ?? 0;
 export const selectIsModalOpen = (state: { novelty: NoveltyState }) => state.novelty.modalOpen;
 export const selectFormData = (state: { novelty: NoveltyState }) => state.novelty.formData;
 export const selectIsLoading = (state: { novelty: NoveltyState }) => state.novelty.loading;

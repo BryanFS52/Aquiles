@@ -1,7 +1,7 @@
 import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
-import { GET_ALL_CHECKLISTS, GET_CHECKLIST_BY_ID, ADD_CHECKLIST, UPDATE_CHECKLIST, DELETE_CHECKLIST } from '@graphql/checklistGraph'
+import { GET_ALL_CHECKLISTS_COORDINATOR, GET_CHECKLIST_BY_ID_COORDINATOR, ADD_CHECKLIST, UPDATE_CHECKLIST, DELETE_CHECKLIST, GET_ALL_CHECKLISTS, GET_CHECKLIST_BY_ID } from '@graphql/checklistGraph'
 import {
     Checklist,
     GetAllChecklistsQuery,
@@ -15,6 +15,7 @@ import {
     DeleteChecklistMutation,
     DeleteChecklistMutationVariables
 } from '@graphql/generated'
+
 
 // Función para transformar datos de GraphQL a Checklist
 const transformGraphQLToChecklistItem = (graphqlData: any): Checklist => {
@@ -37,7 +38,7 @@ export const fetchChecklists = createAsyncThunk<GetAllChecklistsQuery['allCheckl
     'checklist/fetchAll',
     async ({ page, size }) => {
         const { data } = await client.query<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>({
-            query: GET_ALL_CHECKLISTS,
+            query: GET_ALL_CHECKLISTS_COORDINATOR,
             variables: { page, size },
             fetchPolicy: 'no-cache',
         });
@@ -49,7 +50,7 @@ export const fetchChecklistById = createAsyncThunk<GetChecklistByIdQuery['checkl
     'checklist/fetchById',
     async ({ id }) => {
         const { data } = await client.query<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>({
-            query: GET_CHECKLIST_BY_ID,
+            query: GET_CHECKLIST_BY_ID_COORDINATOR,
             variables: { id },
             fetchPolicy: 'no-cache', // Forzar recarga desde servidor
         });
@@ -146,6 +147,39 @@ export const updateChecklistState = createAsyncThunk<UpdateChecklistMutation['up
 
             return res;
         } catch (error: any) {
+            return rejectWithValue({ code: '500', message: error.message });
+        }
+    }
+);
+
+export const updateChecklistSignature = createAsyncThunk<UpdateChecklistMutation['updateChecklist'], 
+    { id: number; checklistData: any },
+    { rejectValue: { code: string; message: string } }
+>(
+    'checklist/updateSignature',
+    async ({ id, checklistData }, { rejectWithValue }) => {
+        try {
+            console.log('=== REDUX UPDATE CHECKLIST SIGNATURE ===');
+            console.log('ID:', id);
+            console.log('Checklist data:', checklistData);
+            
+            const { data } = await client.mutate<UpdateChecklistMutation, UpdateChecklistMutationVariables>({
+                mutation: UPDATE_CHECKLIST,
+                variables: { id, input: checklistData },
+            });
+
+            console.log('GraphQL signature update response:', data);
+            
+            const res = data?.updateChecklist;
+            if (!res || res.code !== '200') {
+                console.log('Signature update failed with response:', res);
+                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
+            }
+
+            console.log('✅ Signature update successful in Redux:', res);
+            return res;
+        } catch (error: any) {
+            console.error('Error updating checklist signature:', error);
             return rejectWithValue({ code: '500', message: error.message });
         }
     }
@@ -273,6 +307,27 @@ const checklistSlice = createSlice({
                 const { code, message } = payload || {};
                 state.error = { code, message };
             })
+            // updateChecklistSignature
+            .addCase(updateChecklistSignature.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(updateChecklistSignature.fulfilled, (state, action) => {
+                console.log('=== REDUX SIGNATURE UPDATE FULFILLED ===');
+                console.log('Signature update completed successfully');
+                
+                state.loading = false;
+                state.error = null;
+                
+                // La mutación solo devuelve { code, message, id }, no los datos completos
+                // El componente debe recargar los datos del checklist para obtener la firma actualizada
+                console.log('✅ Signature update successful - component should refetch data');
+            })
+            .addCase(updateChecklistSignature.rejected, (state, action) => {
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
+                state.error = { code, message };
+                state.loading = false;
+            })
             // deleteChecklist
             .addCase(deleteChecklist.fulfilled, (state, action: PayloadAction<string>) => {
                 if (action.payload) {
@@ -289,5 +344,4 @@ const checklistSlice = createSlice({
 });
 
 export const { } = checklistSlice.actions;
-
 export default checklistSlice.reducer;

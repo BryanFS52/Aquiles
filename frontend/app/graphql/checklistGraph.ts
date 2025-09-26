@@ -1,5 +1,13 @@
 import { gql } from "@apollo/client";
 
+// Los campos trainingProjectId y trainingProjectName están implementados
+// tanto en el backend como en el frontend para soportar la asociación de
+// listas de chequeo con proyectos formativos y fichas de formación.
+
+// ============================================================================
+// CONSULTAS PARA EL COORDINADOR (con campos de proyecto formativo)
+// ============================================================================
+
 export const GET_ALL_CHECKLISTS = gql`
   query GetAllChecklists($page: Int, $size: Int) {
     allChecklists(page: $page, size: $size) {
@@ -64,6 +72,152 @@ export const GET_CHECKLIST_BY_ID = gql`
     }
   }
 `;
+
+// ============================================================================
+// CONSULTAS PARA EL COORDINADOR (con campos de proyecto formativo)
+// ============================================================================
+
+export const GET_ALL_CHECKLISTS_COORDINATOR = gql`
+  query GetAllChecklistsCoordinator($page: Int, $size: Int) {
+    allChecklists(page: $page, size: $size) {
+      date
+      code
+      message
+      currentPage
+      totalPages
+      totalItems
+      data {
+        id
+        state
+        remarks
+        instructorSignature
+        evaluationCriteria
+        trimester
+        component
+        studySheets
+        trainingProjectId
+        trainingProjectName
+        items {
+          id
+          code
+          indicator
+          active
+        }
+      }
+    }
+  }
+`;
+
+export const GET_CHECKLIST_BY_ID_COORDINATOR = gql`
+  query GetChecklistByIdCoordinator($id: Long!) {
+    checklistById(id: $id) {
+      code
+      date
+      message
+      data {
+        id
+        state
+        remarks
+        instructorSignature
+        evaluationCriteria
+        trimester
+        component
+        studySheets
+        trainingProjectId
+        trainingProjectName
+        items {
+          id
+          code
+          indicator
+          active
+        }
+        evaluations {
+          id
+          observations
+          recommendations
+          valueJudgment
+          checklistId
+        }
+        associatedJuries {
+          id
+        }
+      }
+    }
+  }
+`;
+
+// ============================================================================
+// CONSULTAS PARA EL INSTRUCTOR (sin campos de proyecto formativo)
+// ============================================================================
+
+export const GET_ALL_CHECKLISTS_INSTRUCTOR = gql`
+  query GetAllChecklistsInstructor($page: Int, $size: Int) {
+    allChecklists(page: $page, size: $size) {
+      date
+      code
+      message
+      currentPage
+      totalPages
+      totalItems
+      data {
+        id
+        state
+        remarks
+        instructorSignature
+        evaluationCriteria
+        trimester
+        component
+        studySheets
+        items {
+          id
+          code
+          indicator
+          active
+        }
+      }
+    }
+  }
+`;
+
+export const GET_CHECKLIST_BY_ID_INSTRUCTOR = gql`
+  query GetChecklistByIdInstructor($id: Long!) {
+    checklistById(id: $id) {
+      code
+      date
+      message
+      data {
+        id
+        state
+        remarks
+        instructorSignature
+        evaluationCriteria
+        trimester
+        component
+        studySheets
+        items {
+          id
+          code
+          indicator
+          active
+        }
+        evaluations {
+          id
+          observations
+          recommendations
+          valueJudgment
+          checklistId
+        }
+        associatedJuries {
+          id
+        }
+      }
+    }
+  }
+`;
+
+// ============================================================================
+// MUTACIONES (compartidas entre coordinador e instructor)
+// ============================================================================
 
 export const ADD_CHECKLIST = gql`
   mutation AddChecklist($input: ChecklistDto!) {

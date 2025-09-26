@@ -57,7 +57,7 @@ public class ItemResolver {
 
     // Add a new Item (GraphQL)
     @DgsMutation
-    public Map<String, Object> addItem(@InputArgument(name ="input") ItemDto itemDto) {
+    public Map<String, Object> addItem(@InputArgument(name ="item") ItemDto itemDto) {
         try {
             ItemDto itemDto1 = itemBusiness.add(itemDto);
             return ResponseHttpApi.responseHttpAction(
@@ -74,8 +74,7 @@ public class ItemResolver {
 
     // Update an existing Item (GraphQL)
     @DgsMutation
-    public Map<String, Object> updateItem(@InputArgument Long id, @InputArgument (name ="input") ItemDto itemDto) {
-        try {
+    public Map<String, Object> updateItem(@InputArgument Long id, @InputArgument(name = "item") ItemDto itemDto) {        try {
             itemBusiness.update(id, itemDto);
             return ResponseHttpApi.responseHttpAction(
                     id,
@@ -88,6 +87,7 @@ public class ItemResolver {
             );
         }
     }
+
 
     @DgsMutation
     public Map<String, Object> deleteItem(@InputArgument Long id) {

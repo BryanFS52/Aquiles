@@ -1,6 +1,6 @@
 import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { GET_STUDY_SHEETS, GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER, GET_STUDY_SHEET_WITH_STUDENTS, GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM, GET_STUDY_SHEET_BY_ID_WITH_ATTENDANCES } from '@graphql/olympo/studySheetGraph'
+import { GET_STUDY_SHEETS, GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER, GET_STUDY_SHEET_WITH_STUDENTS, GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM, GET_STUDY_SHEET_BY_ID_WITH_ATTENDANCES, GET_STUDY_SHEETS_BY_TRAINING_PROJECT } from '@graphql/olympo/studySheetGraph'
 import { createInitialPaginatedState } from '@type/slices/common/generic';
 import {
     StudySheet,
@@ -21,6 +21,95 @@ import {
     GetStudySheetByIdWithAttendancesQuery,
     GetStudySheetByIdWithAttendancesQueryVariables
 } from '@graphql/generated';
+
+// Service methods integrated into slice
+interface GetStudySheetsServiceParams {
+    name?: string;
+    idJourney?: number;
+    page?: number;
+    size?: number;
+}
+
+interface GetStudySheetsByTrainingProjectParams {
+    idTrainingProject: number;
+    page?: number;
+    size?: number;
+}
+
+const studySheetService = {
+    getStudySheets: async ({ name, idJourney, page = 0, size = 10 }: GetStudySheetsServiceParams = {}) => {
+        try {
+            const { data } = await clientLAN.query({
+                query: GET_STUDY_SHEETS,
+                variables: { name, idJourney, page, size },
+                fetchPolicy: 'network-only',
+            });
+
+            if (data?.allStudySheets?.code === '200' || data?.allStudySheets?.code === 200) {
+                return data.allStudySheets;
+            } else {
+                throw new Error(data?.allStudySheets?.message || 'Error fetching study sheets');
+            }
+        } catch (error) {
+            console.error('Error fetching study sheets:', error);
+            throw error;
+        }
+    },
+
+    getStudySheetById: async (id: number) => {
+        try {
+            const { data } = await clientLAN.query({
+                query: GET_STUDY_SHEET_BY_ID,
+                variables: { id },
+                fetchPolicy: 'network-only',
+            });
+
+            const response = data?.studySheetById;
+
+            if (response?.code === '200' || response?.code === 200) {
+                return response.data;
+            } else {
+                throw new Error(response?.message || 'Error obteniendo la ficha');
+            }
+        } catch (error: any) {
+            const status = error.networkError?.statusCode || 500;
+            const message = `[${status}] Error de red o microservicio inactivo`;
+            console.error('Error Apollo:', message, error);
+            throw new Error(message);
+        }
+    },
+
+    getStudySheetsByTrainingProject: async ({ idTrainingProject, page = 0, size = 100 }: GetStudySheetsByTrainingProjectParams) => {
+        try {
+            const { data } = await clientLAN.query({
+                query: GET_STUDY_SHEETS_BY_TRAINING_PROJECT,
+                variables: { page, size },
+                fetchPolicy: 'network-only',
+            });
+
+            if (data?.allStudySheets?.code === '200' || data?.allStudySheets?.code === 200) {
+                // Filtrar las fichas que pertenecen específicamente a este proyecto formativo
+                const filteredSheets = data.allStudySheets.data.filter((sheet: any) => 
+                    sheet.trainingProject?.id?.toString() === idTrainingProject.toString()
+                );
+                
+                const filteredData = {
+                    ...data.allStudySheets,
+                    data: filteredSheets,
+                    totalItems: filteredSheets.length,
+                    totalPages: Math.ceil(filteredSheets.length / size)
+                };
+                
+                return filteredData;
+            } else {
+                throw new Error(data?.allStudySheets?.message || 'Error fetching study sheets by training project');
+            }
+        } catch (error) {
+            console.error('Error fetching study sheets by training project:', error);
+            throw error;
+        }
+    }
+};
 
 // Función para transformar datos de GraphQL a StudySheet
 export const transformGraphQLToStudySheetItem = (graphqlData: any): StudySheet => {
@@ -218,13 +307,17 @@ export const fetchStudySheetByIdWithAttendances = createAsyncThunk<GetStudySheet
 
 interface ExtendedStudySheetState extends ReturnType<typeof createInitialPaginatedState < StudySheet >> {
     dataForStudents: Record<string, Student[]>,
-    dataForTeamScrums: TeamsScrum[]
+    dataForTeamScrums: TeamsScrum[],
+    selectedForAttendance: StudySheet | null, // Nueva propiedad para la ficha seleccionada para asistencia
+    loadingAttendanceSheet: boolean // Estado de carga específico para ficha de asistencia
 }
 
 const initialState: ExtendedStudySheetState = {
     ...createInitialPaginatedState<StudySheet>(),
     dataForStudents: {},
     dataForTeamScrums: [],
+    selectedForAttendance: null,
+    loadingAttendanceSheet: false,
 };
 
 const studySheetSlice = createSlice({
@@ -237,9 +330,15 @@ const studySheetSlice = createSlice({
             state.error = null;
             state.dataForStudents = {};
             state.dataForTeamScrums = [];
+            state.selectedForAttendance = null;
+            state.loadingAttendanceSheet = false;
             state.currentPage = 0;
             state.totalItems = 0;
             state.totalPages = 0;
+        },
+        clearAttendanceSelection: (state) => {
+            state.selectedForAttendance = null;
+            state.loadingAttendanceSheet = false;
         }
     },
     extraReducers: (builder) => {
@@ -407,26 +506,31 @@ const studySheetSlice = createSlice({
         // Fetch StudySheetByIdWithAttendances
         builder
             .addCase(fetchStudySheetByIdWithAttendances.pending, (state) => {
-                state.loading = true;
+                state.loadingAttendanceSheet = true;
                 state.error = null;
             })
             .addCase(fetchStudySheetByIdWithAttendances.fulfilled, (state, action) => {
                 const item = action.payload?.data;
                 if (item) {
                     const transformed = transformGraphQLToStudySheetItem(item);
-                    state.data = [transformed];
+                    // Guardamos la ficha seleccionada para asistencia sin afectar la lista principal
+                    state.selectedForAttendance = transformed;
                 } else {
-                    state.data = [];
+                    state.selectedForAttendance = null;
                 }
-                state.loading = false;
+                state.loadingAttendanceSheet = false;
             })
             .addCase(fetchStudySheetByIdWithAttendances.rejected, (state, action) => {
                 state.error = action.error.message ?? 'Error fetching study sheet by id with attendances';
-                state.loading = false;
+                state.loadingAttendanceSheet = false;
+                state.selectedForAttendance = null;
             });
     }
 });
 
-export const { clearStudySheetState } = studySheetSlice.actions;
+export const { clearStudySheetState, clearAttendanceSelection } = studySheetSlice.actions;
+
+// Export service methods for compatibility
+export { studySheetService };
 
 export default studySheetSlice.reducer;

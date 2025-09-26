@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import type { AppDispatch, RootState } from "@/redux/store";
 import PageTitle from "@components/UI/pageTitle";
 import JustificationFilters from "@components/features/justifications/justificationsFilter";
 import JustificationTable from "@components/features/justifications/justificationsTable";
 import EmptyState from "@components/UI/emptyState";
-import { 
+import {
   setCompetenceQuarterFilterOptions,
   setCompetenceQuarterMultiFilter,
   toggleCompetenceQuarterMultiFilter,
@@ -22,189 +23,189 @@ import {
   MultiFilterState,
 } from "@slice/justificationSlice";
 import { fetchAllJustificationStatuses } from "@/redux/slices/justificationStatusSlice";
+import { fetchStudySheetByTeacher } from "@slice/olympo/studySheetSlice";
 import { useLoader } from "@/context/LoaderContext";
+import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
 import { JustificacionesInstructorContainerProps } from "./types";
 
-export const JustificacionesInstructorContainer: React.FC<JustificacionesInstructorContainerProps> = ({ competenceQuarterId }) => {
+interface CompetenceOption {
+  id: string;
+  name: string;
+  studySheetNumber?: number;
+}
+
+export const JustificacionesInstructorContainer: React.FC<
+  JustificacionesInstructorContainerProps
+> = ({ competenceQuarterId, fichaNumber }) => {
+  const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
+  const [selectedCompetenceId, setSelectedCompetenceId] = useState<string>(
+    competenceQuarterId?.toString() || ""
+  );
+  const [isLoadingCompetences, setIsLoadingCompetences] = useState(true);
+  const [fichaFilteredData, setFichaFilteredData] = useState<any[]>([]);
+
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
   const { showLoader, hideLoader } = useLoader();
 
-  // Acceso directo al estado de Redux - usando los nuevos campos para competence quarter
-  const justificationState = useSelector((state: RootState) => state.justification);
-  
-  // Extraer propiedades del estado
-  const {
-    competenceQuarterData: justifications,
-    competenceQuarterFilteredData: filteredData,
-    competenceQuarterFilterOptions: filterOptions,
-    loading,
-    error,
-    isCompetenceQuarterMode,
-  } = justificationState;
+  const { competenceQuarterData: justifications, competenceQuarterFilteredData: filteredData, competenceQuarterFilterOptions: filterOptions, loading, error } =
+    useSelector((state: RootState) => state.justification);
 
-  const { justificationStatuses } = useSelector(
-    (state: RootState) => state.justificationStatus
-  );
+  const { justificationStatuses } = useSelector((state: RootState) => state.justificationStatus);
 
-  // const competenceQuarterId = 
-  
+  // Cargar estados y activar modo "competenceQuarter"
   useEffect(() => {
     dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
-    dispatch(fetchJustificationsByCompetenceQuarter({ competenceQuarterId}));
+    dispatch(setCompetenceQuarterMode(true));
   }, [dispatch]);
 
-  const handleFilterChange = (filterType: string, value: string) => {
-    dispatch(setCompetenceQuarterFilterOptions({ [filterType]: value }));
-  };
-  
-  const handleRefresh = () => {
-    // Aquí podrías agregar lógica para recargar datos específicos si es necesario
-  };
-
-  const handleMultiFilterChange = (field: keyof MultiFilterState, value: string) => {
-    dispatch(setCompetenceQuarterMultiFilter({ field, value }));
-  };
-
-  const handleToggleMultiFilter = () => {
-    dispatch(toggleCompetenceQuarterMultiFilter());
-  };
-
-  const handleClearMultiFilters = () => {
-    dispatch(clearCompetenceQuarterMultiFilters());
-  };
-
+  // Cargar justificaciones según competencia seleccionada
   useEffect(() => {
-    if (loading) {
-      showLoader();
-    } else {
-      hideLoader();
+    if (selectedCompetenceId && !isLoadingCompetences) {
+      const competenceId = Number(selectedCompetenceId);
+      if (!isNaN(competenceId)) {
+        dispatch(fetchJustificationsByCompetenceQuarter({ competenceQuarterId: competenceId }));
+      }
     }
-  }, [loading, showLoader, hideLoader]);
+  }, [selectedCompetenceId, isLoadingCompetences, dispatch, fichaNumber]);
+
+  // Filtrar por ficha
+  useEffect(() => {
+    if (fichaNumber) {
+      setFichaFilteredData(
+        filteredData.filter((item: any) =>
+          [
+            item.ficha,
+            item.fichaNumero,
+            item.studySheetNumber,
+            item.numeroFicha,
+            item.studySheet?.number,
+            item.attendance?.studySheet?.number,
+          ]
+            .filter(Boolean)
+            .some(num => num?.toString() === fichaNumber)
+        )
+      );
+    } else {
+      setFichaFilteredData(filteredData || []);
+    }
+  }, [filteredData, fichaNumber]);
+
+  // Mostrar loader global
+  useEffect(() => {
+    loading || isLoadingCompetences ? showLoader() : hideLoader();
+  }, [loading, isLoadingCompetences, showLoader, hideLoader]);
+
+  // 🔹 Handlers
+  const handleFilterChange = (filterType: string, value: string) =>
+    dispatch(setCompetenceQuarterFilterOptions({ [filterType]: value }));
+
+  const handleMultiFilterChange = (field: keyof MultiFilterState, value: string) =>
+    dispatch(setCompetenceQuarterMultiFilter({ field, value }));
+
+  const handleCompetenceChange = (competenceId: string) => {
+    setSelectedCompetenceId(competenceId);
+    if (competenceId) {
+      router.push(
+        `/dashboard/justificacionesInstructor/${competenceId}${fichaNumber ? `?ficha=${fichaNumber}` : ""}`
+      );
+    }
+  };
+
+  const handleRefresh = async () => {
+    if (!selectedCompetenceId) return;
+    try {
+      await dispatch(
+        fetchJustificationsByCompetenceQuarter({ competenceQuarterId: Number(selectedCompetenceId) })
+      ).unwrap();
+      toast.success("Datos actualizados correctamente");
+    } catch {
+      toast.error("Error al actualizar los datos");
+    }
+  };
 
   const handleDownloadFile = (justificacion: any) => {
-    if (justificacion.archivoAdjunto) {
-      const mimeType = justificacion.archivoMime || "application/octet-stream";
-      const fileName = generateFileName(justificacion.id, mimeType);
-      downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
-    }
+    if (!justificacion.archivoAdjunto) return;
+    const mimeType = justificacion.archivoMime || "application/octet-stream";
+    downloadBase64File(justificacion.archivoAdjunto, generateFileName(justificacion.id, mimeType), mimeType);
   };
 
   const handleStatusChange = (justificacionId: string, newStatusId: string) => {
-    // Buscar el nombre del estado en la lista de estados disponibles
-    const selectedStatus = justificationStatuses.find(status => status.id?.toString() === newStatusId);
-    const statusName = selectedStatus?.name || "Estado actualizado";
+    const current = filteredData.find((j: any) => j.id.toString() === justificacionId);
+    const currentStatusId = current?.justificationStatusId?.toString() || current?.estado;
+    if (currentStatusId === newStatusId) return;
 
-    // Buscar la justificación actual para verificar si ya tiene el mismo estado
-    const currentJustification = filteredData.find((j: any) => j.id.toString() === justificacionId);
-
-    // Verificar si el estado ya es el mismo
-    const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.estado;
-    
-    if (currentStatusId === newStatusId) {
-      return; // No hacer nada si el estado es el mismo
-    }
-
-    // Enviar directamente el statusId para usar la relación real
-    dispatch(updateJustificationStatus({ 
-      id: justificacionId, 
-      statusId: newStatusId,
-      statusName: statusName
-    }))
-      .then((result) => {
-        if (updateJustificationStatus.fulfilled.match(result)) {
-          // Mostrar mensaje personalizado según el estado
-          showJustificationStatusMessage(statusName);
-        } else {
-          const error = result.payload as any;
-          if (error?.code !== "500" || !error?.message?.includes("already has the specified status")) {
-            // Solo mostrar error si no es el caso de estado duplicado (para debugging)
-            // console.error("❌ Error al actualizar el estado:", error);
-          }
-        }
+    const statusName = justificationStatuses.find(s => s.id?.toString() === newStatusId)?.name || "Estado actualizado";
+    dispatch(updateJustificationStatus({ id: justificacionId, statusId: newStatusId, statusName }))
+      .unwrap()
+      .then(() => {
+        const lower = statusName.toLowerCase();
+        if (lower.includes("aprobad") || lower.includes("acepta")) toast.success("Justificación aprobada");
+        else if (lower.includes("denegad") || lower.includes("rechaza") || lower.includes("no acepta"))
+          toast.error("Justificación denegada");
+        else if (lower.includes("proceso") || lower.includes("pendiente") || lower.includes("revision"))
+          toast.info("Justificación en proceso");
+        else toast.info(`Estado actualizado: ${statusName}`);
       })
-      .catch((error) => {
-        // Error inesperado (para debugging)
-        // console.error("❌ Error inesperado al actualizar el estado:", error);
-      });
+      .catch(err => console.error("Error al actualizar estado:", err));
   };
 
-  // Función para mostrar mensajes de estado de justificación
-  const showJustificationStatusMessage = (statusName: string) => {
-    const statusNameLower = statusName.toLowerCase();
-    
-    if (statusNameLower.includes('aprobad') || statusNameLower.includes('acepta')) {
-      toast.success(`Justificación aprobada`, {
-        position: "top-right",
-        autoClose: 5000,
-      });
-    } else if (statusNameLower.includes('denegad') || statusNameLower.includes('rechaza') || statusNameLower.includes('no acepta')) {
-      toast.error(`Justificación denegada`, {
-        position: "top-right",
-        autoClose: 5000,
-      });
-    } else if (statusNameLower.includes('proceso') || statusNameLower.includes('pendiente') || statusNameLower.includes('revision')) {
-      toast.info(`Justificación en proceso`, {
-        position: "top-right",
-        autoClose: 4000,
-      });
-    } else {
-      toast.info(`Estado actualizado: ${statusName}`, {
-        position: "top-right",
-        autoClose: 3000,
-      });
-    }
-  };
-
+  // Render
   const errorMessage = formatErrorMessage(error);
-  
-  // Obtener el número de ficha de los datos disponibles
-  const studySheetNumber = filteredData?.[0]?.ficha || justifications?.[0]?.ficha || "Sin ficha";
-  
-  // Verificar si hay datos de justificaciones
-  const hasJustificationData = justifications && justifications.length > 0;
-  
-  // Determinar si hay filtros aplicados
+  const selectedCompetence = availableCompetences.find(c => c.id === selectedCompetenceId);
+  const competenceName = selectedCompetence?.name || "Ninguna seleccionada";
   const { selectedFiltro, searchTerm, enableMultiFilter, multiFilters } = filterOptions;
   const hasFiltersApplied = Boolean(
     selectedFiltro ||
     searchTerm ||
     (enableMultiFilter && Object.values(multiFilters).some(value => value))
   );
+  const renderContent = () => {
+    if (isLoadingCompetences)
+      return <EmptyState message="Cargando competencias disponibles..." />;
+    if (!availableCompetences.length)
+      return <EmptyState message="No se encontraron competencias disponibles para este instructor." />;
+    if (!selectedCompetenceId)
+      return <EmptyState message="Selecciona una competencia para ver las justificaciones correspondientes." />;
+    if (errorMessage) return <EmptyState message={errorMessage} />;
+    if (loading && !(justifications?.length > 0))
+      return <EmptyState message={`Cargando justificaciones para ${competenceName}...`} />;
+
+    return (
+      <JustificationTable
+        filteredData={fichaFilteredData}
+        handleDownloadFile={handleDownloadFile}
+        handleStatusChange={handleStatusChange}
+        hasAnyData={fichaFilteredData.length > 0}
+        isLoading={loading}
+        hasError={Boolean(error)}
+        hasFiltersApplied={hasFiltersApplied}
+        isInstructorView
+      />
+    );
+  };
 
   return (
     <div className="space-y-6">
-      <PageTitle>Justificaciones de la Ficha: {studySheetNumber}</PageTitle>
+      <PageTitle onBack={() => router.back()}>
+        Justificaciones de la Ficha: {fichaNumber || selectedCompetence?.studySheetNumber || "N/A"} por la{" "}
+        {competenceName}
+      </PageTitle>
 
-      {/* Filters */}
-      <JustificationFilters
-        filterOptions={filterOptions}
-        loading={loading}
-        showMultiFilterToggle={false}
-        onFilterChange={handleFilterChange}
-        onMultiFilterChange={handleMultiFilterChange}
-        onToggleMultiFilter={handleToggleMultiFilter}
-        onClearMultiFilters={handleClearMultiFilters}
-        onRefresh={handleRefresh}
-      />
-
-      {/* Error Message */}
-      {errorMessage && (
-        <EmptyState message={errorMessage} />
-      )}
-
-      {/* Table with built-in empty states */}
-      {!errorMessage && (
-        <JustificationTable
-          filteredData={filteredData}
-          handleDownloadFile={handleDownloadFile}
-          handleStatusChange={handleStatusChange}
-          hasAnyData={hasJustificationData}
-          isLoading={loading}
-          hasError={Boolean(error)}
-          hasFiltersApplied={hasFiltersApplied}
-          isInstructorView={true}
+      {selectedCompetenceId && !isLoadingCompetences && (
+        <JustificationFilters
+          filterOptions={filterOptions}
+          loading={loading}
+          showMultiFilterToggle={false}
+          onFilterChange={handleFilterChange}
+          onMultiFilterChange={handleMultiFilterChange}
+          onToggleMultiFilter={() => dispatch(toggleCompetenceQuarterMultiFilter())}
+          onClearMultiFilters={() => dispatch(clearCompetenceQuarterMultiFilters())}
+          onRefresh={handleRefresh}
         />
       )}
+
+      {renderContent()}
     </div>
   );
-}
+};

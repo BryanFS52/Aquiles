@@ -25,9 +25,9 @@ import {
   MultiFilterState,
 } from '@slice/justificationSlice';
 
-
 export default function JustificacionesCoordinator() {
   const dispatch = useDispatch<AppDispatch>();
+  
   const {
     filteredData,
     loading,
@@ -39,16 +39,13 @@ export default function JustificacionesCoordinator() {
     itemsPerPage
   } = useSelector((state: RootState) => state.justification);
 
-  // Obtener los estados de justificación para mapear IDs a nombres
   const { justificationStatuses } = useSelector(
     (state: RootState) => state.justificationStatus
   );
 
-
   useEffect(() => {
     dispatch(fetchJustifications({ page: 0, size: itemsPerPage }));
-    // Cargar todos los estados de justificación disponibles
-    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 })); // Aumentar a 50 para obtener todos los estados
+    dispatch(fetchAllJustificationStatuses({ page: 0, size: 3 }));
   }, [dispatch, localCurrentPage, itemsPerPage]);
 
   const handleFilterChange = (filterType: string, value: string) => {
@@ -92,19 +89,16 @@ export default function JustificacionesCoordinator() {
   };
 
   const handleStatusChange = (justificacionId: string, newStatusId: string) => {
-    // Buscar el nombre del estado en la lista de estados disponibles
     const selectedStatus = justificationStatuses.find(status => status.id?.toString() === newStatusId);
     const statusName = selectedStatus?.name || "Estado actualizado";
 
-    // Buscar la justificación actual para verificar si ya tiene el mismo estado
     const currentJustification = filteredData.find((j: any) => j.id.toString() === justificacionId);
     const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.justificationStatus?.toString();
 
     if (currentStatusId === newStatusId) {
-      return; // No hacer nada si el estado es el mismo
+      return;
     }
 
-    // Enviar directamente el statusId para usar la relación real
     dispatch(updateJustificationStatus({
       id: justificacionId,
       statusId: newStatusId,
@@ -112,25 +106,14 @@ export default function JustificacionesCoordinator() {
     }))
       .then((result) => {
         if (updateJustificationStatus.fulfilled.match(result)) {
-          // Mostrar mensaje personalizado según el estado
           showJustificationStatusMessage(statusName);
 
-          // Ya no necesitamos recargar ya que el estado se actualiza localmente
         } else {
           const error = result.payload as any;
-          if (error?.code !== "500" || !error?.message?.includes("already has the specified status")) {
-            // Solo mostrar error si no es el caso de estado duplicado (para debugging)
-            // console.error("❌ Error al actualizar el estado:", error);
-          }
         }
       })
-      .catch((error) => {
-        // Error inesperado (para debugging)
-        // console.error("❌ Error inesperado al actualizar el estado:", error);
-      });
   };
 
-  // Función para mostrar mensajes de estado de justificación
   const showJustificationStatusMessage = (statusName: string) => {
     const statusNameLower = statusName.toLowerCase();
 
@@ -161,7 +144,6 @@ export default function JustificacionesCoordinator() {
   const canGoNext = localCurrentPage < totalPages;
   const canGoPrevious = localCurrentPage > 1;
 
-  // Determinar si hay filtros aplicados
   const { selectedFiltro, searchTerm, enableMultiFilter, multiFilters } = filterOptions;
   const hasFiltersApplied = Boolean(
     selectedFiltro ||

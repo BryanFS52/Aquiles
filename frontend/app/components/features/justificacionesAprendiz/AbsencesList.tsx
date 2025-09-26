@@ -19,7 +19,19 @@ export const AbsencesList: React.FC<AbsencesListProps> = ({
     absences,
     onShowForm,
 }) => {
-    const sortedAbsences = [...absences].sort((a, b) => {
+    // Filtrar ausencias que no estén justificadas ni injustificadas
+    const filteredAbsences = absences.filter(absence => {
+        const justificationStatus = absence.justification?.justificationStatus?.name;
+        const attendanceState = absence.attendanceState?.status;
+        return justificationStatus !== "Justificado" && 
+               justificationStatus !== "Injustificado" && 
+               justificationStatus !== "Denegado" &&
+               justificationStatus !== "Aceptado" &&
+               attendanceState !== "Retardo";
+    });
+
+    const sortedAbsences = [...filteredAbsences].sort((a, b) => {
+
         const dateA = new Date(a.attendanceDate ?? '');
         const dateB = new Date(b.attendanceDate ?? '');
         return dateB.getTime() - dateA.getTime();
@@ -43,40 +55,68 @@ export const AbsencesList: React.FC<AbsencesListProps> = ({
             {sortedAbsences.length > 0 && (
                 <div className="mb-6">
                     <div className="max-h-80 overflow-y-auto pr-2 space-y-4">
-                        {sortedAbsences.map((attendance: Attendance, index) => (
-                            <motion.div
-                                key={attendance.id}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                className="group hover:shadow-md transition-all duration-300 p-4 bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 dark:bg-gradient-to-r dark:from-red-300 dark:to-orange-100 dark:border-red-800 rounded-xl relative overflow-hidden"
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        {sortedAbsences.map((attendance: Attendance, index) => {
+                            const isProcessing = attendance.justification?.justificationStatus?.name === "En proceso";
+                            return (
+                                <motion.div
+                                    key={attendance.id}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: index * 0.1 }}
+                                    className={`group hover:shadow-md transition-all duration-300 p-4 rounded-xl relative overflow-hidden ${
+                                        isProcessing
+                                            ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 dark:bg-gradient-to-r dark:from-orange-300 dark:to-amber-100 dark:border-amber-800'
+                                            : 'bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 dark:bg-gradient-to-r dark:from-red-300 dark:to-orange-100 dark:border-red-800'
+                                    }`}
+                                >
+                                <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                                    isProcessing 
+                                        ? 'bg-gradient-to-r from-yellow-500/5 to-amber-500/5' 
+                                        : 'bg-gradient-to-r from-red-500/5 to-orange-500/5'
+                                }`} />
                                 <div className="relative flex items-center justify-between">
                                     <div className="flex items-center">
-                                        <div className="bg-red-500 p-2 rounded-lg shadow-md">
+                                        <div className={`p-2 rounded-lg shadow-md ${
+                                            isProcessing ? 'bg-amber-600 dark:bg-yellow-700' : 'bg-red-500'
+                                        }`}>
                                             <FaCalendarDay className="text-white text-lg" />
                                         </div>
                                         <div className="ml-4">
                                             <div className="font-semibold text-gray-800 text-lg">
                                                 {formatDate(attendance.attendanceDate ?? '')}
                                             </div>
-                                            <div className="text-sm text-red-600 font-medium">
-                                                Estado:{' '}
-                                                {attendance.attendanceState?.status || 'Ausente'}
+                                            <div className={`text-sm font-medium ${
+                                                isProcessing ? 'text-yellow-600' : 'text-red-600'
+                                            }`}>
+                                                {attendance.justification?.justificationStatus?.name === "En proceso" 
+                                                    ? "Justificacion por evaluar" 
+                                                    : `${attendance.attendanceState?.status === 'Ausente' ? 'Ausencia' : attendance.attendanceState?.status || 'Ausencia'} por justificar`
+                                                }
                                             </div>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => onShowForm(attendance.id)}
-                                        className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
-                                    >
-                                        <FaRegListAlt className="mr-2" />
-                                        Justificar
-                                    </button>
+                                    {/* Verificar si la justificación ya está en proceso para deshabilitar el botón */}
+                                    {(() => {
+                                        const isProcessing = attendance.justification?.justificationStatus?.name === "En proceso";
+                                        return (
+                                            <button
+                                                onClick={() => !isProcessing && onShowForm(attendance.id)}
+                                                disabled={isProcessing}
+                                                className={`font-semibold py-3 px-6 rounded-xl transition-all duration-200 flex items-center text-sm shadow-lg transform ${
+                                                    isProcessing
+                                                        ? 'bg-gradient-to-r from-amber-600 to-amber-400 dark:from-yellow-700 dark:to-yellow-600 text-white cursor-not-allowed border border-yellow-400'
+                                                        : 'bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 text-white hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0'
+                                                }`}
+                                            >
+                                                <FaRegListAlt className="mr-2" />
+                                                {isProcessing ? 'En proceso' : 'Justificar'}
+                                            </button>
+                                        );
+                                    })()}
                                 </div>
                             </motion.div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             )}

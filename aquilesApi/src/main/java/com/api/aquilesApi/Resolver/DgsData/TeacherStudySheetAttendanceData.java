@@ -15,17 +15,13 @@ public class TeacherStudySheetAttendanceData {
 
     private final AttendancesBusiness attendancesBusiness;
 
-    private final ModelMapper modelMapper;
-
-    public TeacherStudySheetAttendanceData(AttendancesBusiness attendancesBusiness, ModelMapper modelMapper) {
+    public TeacherStudySheetAttendanceData(AttendancesBusiness attendancesBusiness) {
         this.attendancesBusiness = attendancesBusiness;
-        this.modelMapper = modelMapper;
     }
 
 
 
     @DgsData(parentType = "TeacherStudySheet")
-
     public List<Attendance> attendances(DgsDataFetchingEnvironment env) {
         TeacherStudySheet teacherStudySheet = env.getSource();
         assert teacherStudySheet != null;

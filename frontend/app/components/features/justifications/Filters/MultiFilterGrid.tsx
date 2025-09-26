@@ -40,7 +40,7 @@ export const MultiFilterGrid = ({
           Limpiar Filtros
         </button>
         <div className="flex-shrink-0 ">
-          <div className="bg-gray-50 px-3 py-2 rounded-lg border">
+          <div className="bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600">
             <ToggleSwitch
               isActive={true}
               onClick={onToggleMultiFilter}
@@ -55,7 +55,7 @@ export const MultiFilterGrid = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Documento Filter */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Documento</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Documento</label>
           <FilterInput
             type="number"
             placeholder="Buscar por documento"
@@ -68,7 +68,7 @@ export const MultiFilterGrid = ({
 
         {/* Aprendiz Filter */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Aprendiz</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Aprendiz</label>
           <FilterInput
             type="text"
             placeholder="Buscar por nombre"
@@ -80,7 +80,7 @@ export const MultiFilterGrid = ({
 
         {/* Fecha de Ausencia Filter */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Fecha de Ausencia</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Ausencia</label>
           <FilterInput
             type="text"
             placeholder="DD/MM/YYYY"
@@ -92,7 +92,7 @@ export const MultiFilterGrid = ({
 
         {/* Fecha Filter */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Fecha de Justificación</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Justificación</label>
           <FilterInput
             type="text"
             placeholder="DD/MM/YYYY"
@@ -104,7 +104,7 @@ export const MultiFilterGrid = ({
 
         {/* Estado del proceso Filter */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700">Estado del proceso</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Estado del proceso</label>
           <FilterSelect
             value={multiFilters.justificationStatus}
             onChange={(e) => onMultiFilterChange("justificationStatus", e.target.value)}

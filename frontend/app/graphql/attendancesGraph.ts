@@ -53,6 +53,35 @@ export const GET_ATTENDANCES_BY_STUDENT = gql`
   }
 `;
 
+export const GET_ATTENDANCES_WITH_JUSTIFICATIONS_BY_STUDENT = gql`
+  query allAttendancesWithJustificationsByStudentId($id: Long, $stateId: Long) {
+    allAttendancesByStudentId(id: $id, stateId: $stateId) {
+      data {
+        id
+        attendanceDate
+        student {
+          id
+          person {
+            name
+            lastname
+            document
+          }
+        }
+        attendanceState {
+          id
+          status
+        }
+        justification {
+          justificationStatus {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT = gql`
   query GetAttendancesAndCompetenceByStudentId($id: Long) {
     allAttendancesByStudentId(id: $id) {
@@ -117,6 +146,15 @@ export const GET_ATTENDANCES_BY_COMPETENCE_QUARTER_AND_JUSTIFICATIONS = gql`
           studentStudySheets {
             studySheet {
               number
+              teacherStudySheets{
+                competence{
+                    learningOutcome{
+                        code
+                        id
+                        name
+                    }
+                }
+              }
             }
           }
         }

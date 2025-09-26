@@ -11,9 +11,9 @@ import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Embeddable
 @Getter
 @Setter
+@Embeddable
 public class TeamScrumMemberId {
     @Column(name = "student_id", nullable = false)
     private Long studentId;

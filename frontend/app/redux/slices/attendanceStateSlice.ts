@@ -14,22 +14,21 @@ import {
     DeleteStateAttendanceMutationVariables
 } from '@graphql/generated'
 
-const transformGraphQLToAttendanceStateItem = (graphqlData: any): AttendanceState => {
-    return {
-        id: graphqlData.id || graphqlData.id,
-        status: graphqlData.status
-    };
-};
-
 export const fetchAttendanceState = createAsyncThunk<GetStateAttendanceQuery['allStateAttendances'], GetStateAttendanceQueryVariables>(
-    'attedanceState/fetchAll',
+    'attendanceState/fetchAll',
     async ({ page, size }) => {
-        const { data } = await clientLAN.query<GetStateAttendanceQuery, GetStateAttendanceQueryVariables>({
-            query: GET_ALL_ATTENDANCES_STATE,
-            variables: { page, size },
-            fetchPolicy: 'no-cache'
-        });
-        return data.allStateAttendances
+        try {
+            const { data } = await clientLAN.query<GetStateAttendanceQuery, GetStateAttendanceQueryVariables>({
+                query: GET_ALL_ATTENDANCES_STATE,
+                variables: { page, size },
+                fetchPolicy: 'no-cache',
+            });
+
+            return data.allStateAttendances;
+        } catch (error: any) {
+            console.error('Error fetching attendance states:', error);
+            throw error;
+        }
     }
 );
 
@@ -117,10 +116,9 @@ const attendanceStateSlice = createSlice({
             })
             .addCase(fetchAttendanceState.fulfilled, (state, action: PayloadAction<GetStateAttendanceQuery['allStateAttendances']>) => {
                 if (action.payload?.data) {
-                    // Filtra nulls y transforma los datos
+                    // Filtra nulls y usa los datos directamente
                     state.data = action.payload.data
-                        .filter((item): item is NonNullable<typeof item> => item !== null)
-                        .map(transformGraphQLToAttendanceStateItem);
+                        .filter((item): item is NonNullable<typeof item> => item !== null);
                     state.totalItems = action.payload.totalItems ?? 0;
                     state.totalPages = action.payload.totalPages ?? 0;
                     state.currentPage = action.payload.currentPage ?? 0;
@@ -134,9 +132,8 @@ const attendanceStateSlice = createSlice({
             // addAttendanceState
             .addCase(addAttendanceState.fulfilled, (state, action: PayloadAction<AddStateAttendanceMutation['addStateAttendance']>) => {
                 if (action.payload) {
-                    // Transforma el payload antes de agregarlo al estado
-                    const newAttendanceState = transformGraphQLToAttendanceStateItem(action.payload);
-                    state.data.push(newAttendanceState);
+                    // Usa el payload directamente sin transformación
+                    state.data.push(action.payload as AttendanceState);
                 }
                 state.error = null;
             })
@@ -148,8 +145,8 @@ const attendanceStateSlice = createSlice({
             // updateAttendanceState
             .addCase(updateAttendanceState.fulfilled, (state, action: PayloadAction<UpdateStateAttendanceMutation['updateStateAttendance']>) => {
                 if (action.payload) {
-                    // Transforma el payload y actualiza el elemento correspondiente
-                    const updatedAttendanceState = transformGraphQLToAttendanceStateItem(action.payload);
+                    // Usa el payload directamente y actualiza el elemento correspondiente
+                    const updatedAttendanceState = action.payload as AttendanceState;
                     const index = state.data.findIndex((attendanceState: AttendanceState) => attendanceState.id === updatedAttendanceState.id);
                     if (index !== -1) {
                         state.data[index] = updatedAttendanceState;

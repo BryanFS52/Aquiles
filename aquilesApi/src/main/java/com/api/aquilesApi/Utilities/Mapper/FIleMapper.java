@@ -5,7 +5,7 @@ import org.mapstruct.Named;
 import java.util.Base64;
 import java.util.regex.Pattern;
 
-public  final class FIleMapper {
+public final class FIleMapper {
     private FIleMapper() {}
 
     // Pattern to validate Base64 strings

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { AppDispatch } from '@redux/store';
-import { fetchStudySheetByTeacher, fetchStudySheetByIdWithAttendances } from '@slice/olympo/studySheetSlice';
+import { fetchStudySheetByTeacher, fetchStudySheetByIdWithAttendances, clearAttendanceSelection } from '@slice/olympo/studySheetSlice';
 import { useLoader } from '@context/LoaderContext';
 import { StudySheetCard } from './StudySheetCard';
 import { ApprenticesModal } from './ApprenticesModal';
@@ -12,36 +12,34 @@ import { StudySheetWithCompetence } from './types';
 import PageTitle from '@components/UI/pageTitle';
 import EmptyState from '@components/UI/emptyState';
 import { TEMPORAL_INSTRUCTOR_ID } from '@/temporaryCredential';
+import { fetchJustificationsByCompetenceQuarter } from '@/redux/slices/justificationSlice';
 
 export const FichasInstructorContainer: React.FC = () => {
+    const [selectedFicha, setSelectedFicha] = useState<StudySheetWithCompetence | null>(null);
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [loadingAttendance, setLoadingAttendance] = useState<string | null>(null);
+
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
     const { showLoader, hideLoader } = useLoader();
 
-    // Local state
-    const [selectedFicha, setSelectedFicha] = useState<StudySheetWithCompetence | null>(null);
-    const [isModalOpen, setModalOpen] = useState(false);
-    const [isTransitioning, setIsTransitioning] = useState(false);
-
-    // Redux state
-    const { data, loading } = useSelector((state: any) => state.studySheet);
+    const { data, loading, loadingAttendanceSheet } = useSelector((state: any) => state.studySheet);
     const fichas: StudySheetWithCompetence[] = data || [];
 
-    TEMPORAL_INSTRUCTOR_ID
-    // Effects
     useEffect(() => {
+        dispatch(clearAttendanceSelection());
         dispatch(fetchStudySheetByTeacher({ idTeacher: TEMPORAL_INSTRUCTOR_ID, page: 0, size: 5 }));
     }, [dispatch]);
 
     useEffect(() => {
-        if (loading || isTransitioning) {
+        if (loading) {
             showLoader();
         } else {
             hideLoader();
         }
-    }, [loading, isTransitioning, showLoader, hideLoader]);
-
-    // Handlers
+    }, [loading, showLoader, hideLoader]);
+    
     const handleViewApprentices = (ficha: StudySheetWithCompetence) => {
         setSelectedFicha(ficha);
         setModalOpen(true);
@@ -57,28 +55,67 @@ export const FichasInstructorContainer: React.FC = () => {
 
         const competenceId = studySheet.competenceId ?? undefined;
 
-        setIsTransitioning(true);
+        setLoadingAttendance(studySheet.id);
+        
         try {
-            await dispatch(fetchStudySheetByIdWithAttendances({
+            const urlParams = new URLSearchParams();
+            urlParams.set('studySheetId', studySheet.id);
+            if (competenceId) {
+                urlParams.set('competenceId', competenceId.toString());
+            }
+            
+            router.push(`/dashboard/asistencia?${urlParams.toString()}`);
+            
+            dispatch(fetchStudySheetByIdWithAttendances({
                 id: parseInt(studySheet.id),
                 competenceId
             }));
-            router.push('/dashboard/asistencia');
+            
+            setTimeout(() => {
+                setLoadingAttendance(null);
+            }, 200);
+            
         } catch (error) {
             console.error('Error al cargar la ficha:', error);
-        } finally {
-            setIsTransitioning(false);
+            setLoadingAttendance(null);
         }
     };
 
-    const handleTakeJustification = (studySheet: StudySheetWithCompetence) => {
-        router.push('/dashboard/justificacionesInstructor/[competenceQuarterId]');
+    const handleTakeJustification = async (studySheet: StudySheetWithCompetence) => {
+        if (!studySheet.id) return;
+
+        setLoadingAttendance(studySheet.id);
+
+        try {
+            router.push(`/dashboard/justificacionesInstructor?ficha=${studySheet.number}`);
+
+            setTimeout(() => setLoadingAttendance(null), 200);
+        } catch (error) {
+            console.error("Error al navegar a justificaciones:", error);
+            setLoadingAttendance(null);
+        }
     };
 
-    // Early returns
+
     if (!loading && (!fichas || fichas.length === 0)) {
         return <EmptyState message="No se encontraron fichas disponibles." />;
     }
+
+    const handleTakeFollowUp = async (studySheet: StudySheetWithCompetence) => {
+        if (!studySheet.id) return;
+
+        setLoadingAttendance(studySheet.id);
+        
+        try {
+            router.push(`/dashboard/InstructorFollowUp?ficha=${studySheet.number}`);
+            setTimeout(() => {
+                setLoadingAttendance(null);
+            }, 200);
+        } catch (error) {
+            console.error('Error al navegar a seguimiento:', error);
+            setLoadingAttendance(null);
+        }  
+    };
 
     return (
         <>
@@ -94,11 +131,12 @@ export const FichasInstructorContainer: React.FC = () => {
                                         studySheet={studySheet}
                                         onViewApprentices={handleViewApprentices}
                                         onTakeAttendance={handleTakeAttendance}
-                                        loading={loading}
+                                        loading={loadingAttendance === studySheet.id}
                                         onViewApprenticesJustifications={() => {
-                                            // TODO: implement handler for viewing apprentices justifications
                                         }}
                                         onTakeJustification={handleTakeJustification}
+                                        onTakeFollowUp={handleTakeFollowUp}
+                                        onViewApprenticesFollowUp={handleTakeFollowUp}
                                     />
                                 </div>
                             ))}

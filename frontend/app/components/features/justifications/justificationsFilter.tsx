@@ -157,7 +157,7 @@ export default function JustificationFilters({
           {/* Refresh Button */}
           <button
             onClick={onRefresh}
-            className="px-6 py-2 bg-[#01b001] text-white rounded-lg hover:bg-[#00324d] transition-colors duration-300 disabled:opacity-50"
+            className="px-6 py-2 bg-[#01b001] dark:bg-shadowBlue text-white rounded-lg hover:bg-green-600 dark:hover:bg-darkBlue transition-colors duration-300 disabled:opacity-50"
             disabled={loading}
           >
             {loading ? "Cargando..." : "Recargar Justificaciones"}

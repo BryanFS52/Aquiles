@@ -30,10 +30,34 @@ export function Card<T>({
     className = "",
     isDarkMode = false,
 }: CardProps) {
+    // Detectar modo oscuro automáticamente si no se proporciona
+    const [autoDetectedDarkMode, setAutoDetectedDarkMode] = React.useState(false);
+    
+    React.useEffect(() => {
+        const checkDarkMode = () => {
+            setAutoDetectedDarkMode(document.documentElement.classList.contains('dark'));
+        };
+        
+        // Verificar inicialmente
+        checkDarkMode();
+        
+        // Observar cambios en las clases del documento
+        const observer = new MutationObserver(checkDarkMode);
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+        
+        return () => observer.disconnect();
+    }, []);
+    
+    // Usar el modo detectado automáticamente si isDarkMode no se proporcionó explícitamente
+    const effectiveDarkMode = isDarkMode || autoDetectedDarkMode;
+
     return (
         <div
-            className={`relative rounded-2xl border p-6 shadow-lg transition-all duration-300 ${isDarkMode
-                ? "border-gray-700/60 bg-gray-800"
+            className={`relative rounded-2xl border p-6 shadow-lg transition-all duration-300 ${effectiveDarkMode
+                ? "border-shadowBlue/60 bg-gradient-to-br from-shadowBlue to-darkBlue"
                 : "border-gray-200/80 bg-gradient-to-br from-white via-gray-50 to-white"
                 } ${className}`}
         >
@@ -41,7 +65,7 @@ export function Card<T>({
             {body && <div className="mb-2">{body}</div>}
             {footer && (
                 <div
-                    className={`mt-4 border-t pt-2 ${isDarkMode ? "border-slate-600" : "border-gray-200"
+                    className={`mt-4 border-t pt-2 ${effectiveDarkMode ? "border-shadowBlue/30" : "border-gray-200"
                         }`}
                 >
                     {footer}

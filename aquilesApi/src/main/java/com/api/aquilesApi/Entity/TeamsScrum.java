@@ -1,10 +1,7 @@
 package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -13,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @Entity
 @Table(name = "teams_scrum")
 public class TeamsScrum implements Serializable {
@@ -66,5 +64,5 @@ public class TeamsScrum implements Serializable {
 
     // 6. Relation (1-M) with evaluations
     @OneToMany(mappedBy = "teamsScrum", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Evaluation> evaluations;
+    private List<Evaluations> evaluations;
 }

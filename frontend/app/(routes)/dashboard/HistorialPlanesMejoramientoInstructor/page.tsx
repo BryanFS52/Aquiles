@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useEffect } from "react";
 import PageTitle from "@components/UI/pageTitle";
 import DataTable from "@components/UI/DataTable";
 import type { DataTableColumn } from "@components/UI/DataTable/types";
@@ -7,13 +8,10 @@ import Paginator from "@components/UI/Paginator/Paginator";
 import type { AppDispatch } from "@redux/store"
 import { useDispatch, useSelector } from "react-redux"
 import {fetchImprovementPlans} from "@slice/improvementPlanSlice";
-import React, { useEffect } from "react";
 import { FiMapPin, FiCalendar, FiFileText, FiStar, FiBook, FiPlus, FiArrowLeft } from "react-icons/fi";
-import { ImprovementPlan } from "@/graphql/generated";
-import Link from "next/link";
+import { ImprovementPlan } from "@graphql/generated";
 import { useRouter, useSearchParams } from "next/navigation";
-
-
+import Link from "next/link";
 
 const HistorialPlanesMejoramientoInstructor = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -28,7 +26,6 @@ const HistorialPlanesMejoramientoInstructor = () => {
         currentPage 
     } = useSelector((state: any) => state.improvementPlan);
 
-    // Obtener datos de la ficha desde los query parameters
     const fichaDataString = searchParams.get('fichaData');
     const fichaData = React.useMemo(() => {
         return fichaDataString ? JSON.parse(decodeURIComponent(fichaDataString)) : null;
@@ -43,7 +40,6 @@ const HistorialPlanesMejoramientoInstructor = () => {
     // Estado para manejar la página actual (Paginator espera páginas basadas en 1)
     const [page, setPage] = React.useState(1);
 
-    // Detectar modo oscuro
     const [isDarkMode, setIsDarkMode] = React.useState(false);
     
     // Función para manejar cambio de página
@@ -63,23 +59,8 @@ const HistorialPlanesMejoramientoInstructor = () => {
 
         // Verificar inmediatamente
         checkDarkMode();
-
-        // Crear un observer para detectar cambios en la clase 'dark'
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                    checkDarkMode();
-                }
-            });
-        });
-
-        // Observar cambios en el elemento html
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['class']
-        });
-
-        // Limpiar el observer
+        const observer = new MutationObserver(() => checkDarkMode());
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
         return () => observer.disconnect();
     }, []); // Array vacío - solo se ejecuta una vez
 
@@ -93,32 +74,16 @@ const HistorialPlanesMejoramientoInstructor = () => {
         }));
     }, [dispatch, page, fichaId]);
 
-    // Función para formatear fecha en horizontal
     const formatDate = (dateString: string) => {
         if (!dateString) return 'No especificada';
-        return new Date(dateString).toLocaleDateString('es-ES', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'
-        });
+        return new Date(dateString).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
     };
-
-    // Función para obtener color de calificación
     const getQualificationColor = (qualification: number | boolean | null) => {
-        if (qualification === false || qualification === null || qualification === undefined) {
-            return 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30';
-        }
-        if (qualification === true) {
-            return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
-        }
-        const numQualification = Number(qualification);
-        if (numQualification >= 3.0) {
-            return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
-        }
-        return 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30';
+        if (qualification === false || qualification === null || qualification === undefined) return 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30';
+        if (qualification === true) return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
+        return Number(qualification) >= 3.0 ? 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30' : 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30';
     };
 
-    // Configuración de columnas para la tabla
     const columns: DataTableColumn<ImprovementPlan>[] = [
         {
             key: 'student',
@@ -176,7 +141,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                 <div className="flex items-center gap-2 whitespace-nowrap">
                     <FiCalendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                     <span className="text-sm text-gray-700 dark:text-white">
-                        {formatDate(row.date)}
+                        {row.date ? formatDate(row.date) : 'Fecha no disponible'}
                     </span>
                 </div>
             )
@@ -199,7 +164,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
             render: (row) => (
                 <div className="flex items-center gap-2">
                     <FiStar className="w-4 h-4 text-yellow-500 dark:text-yellow-400" />
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${getQualificationColor(row.qualification)}`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${getQualificationColor(row.qualification ?? null)}`}>
                         {(
                             typeof row.qualification === "boolean" && row.qualification === false
                         ) || row.qualification === null || row.qualification === undefined
@@ -278,37 +243,30 @@ const HistorialPlanesMejoramientoInstructor = () => {
     ];
 
     // Función de filtro personalizada
-    const filterFunction = (row: ImprovementPlan, filter: string) => {
+    const filterFunction = (row: ImprovementPlan, filter: string): boolean => {
         const searchTerm = filter.toLowerCase().trim();
         if (!searchTerm) return true;
-        
-        // Función auxiliar para normalizar texto (quitar tildes y convertir a minúsculas)
-        const normalizeText = (text: string) => {
-            return text.toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '');
-        };
-        
+    const normalizeText = (text: string) => text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const normalizedSearch = normalizeText(searchTerm);
         
         return (
             // Búsqueda en datos del estudiante
-            (row.student?.person?.name && normalizeText(row.student.person.name).includes(normalizedSearch)) ||
-            (row.student?.person?.lastname && normalizeText(row.student.person.lastname).includes(normalizedSearch)) ||
-            (row.student?.person?.document && row.student.person.document.includes(searchTerm)) ||
+            (row.student?.person?.name ? normalizeText(row.student.person.name).includes(normalizedSearch) : false) ||
+            (row.student?.person?.lastname ? normalizeText(row.student.person.lastname).includes(normalizedSearch) : false) ||
+            (row.student?.person?.document ? row.student.person.document.includes(searchTerm) : false) ||
             // Búsqueda en competencia
-            (row.teacherCompetence?.competence?.name && normalizeText(row.teacherCompetence.competence.name).includes(normalizedSearch)) ||
+            (row.teacherCompetence?.competence?.name ? normalizeText(row.teacherCompetence.competence.name).includes(normalizedSearch) : false) ||
             // Búsqueda en ciudad
-            (row.city && normalizeText(row.city).includes(normalizedSearch)) ||
+            (row.city ? normalizeText(row.city).includes(normalizedSearch) : false) ||
             // Búsqueda en razón
-            (row.reason && normalizeText(row.reason).includes(normalizedSearch)) ||
+            (row.reason ? normalizeText(row.reason).includes(normalizedSearch) : false) ||
             // Búsqueda en tipo de falta
-            (row.faultType?.name && normalizeText(row.faultType.name).includes(normalizedSearch)) ||
+            (row.faultType?.name ? normalizeText(row.faultType.name).includes(normalizedSearch) : false) ||
             // Búsqueda por palabras clave específicas de tipo de falta
-            (row.faultType?.name && (
+            (row.faultType?.name ? (
                 (normalizeText(row.faultType.name).includes('academica') && normalizedSearch.includes('academica')) ||
                 (normalizeText(row.faultType.name).includes('disciplinaria') && normalizedSearch.includes('disciplinaria'))
-            )) ||
+            ) : false) ||
             // Búsqueda por estado de calificación
             (normalizedSearch.includes('aprobado') && !normalizedSearch.includes('no') && (
                 (typeof row.qualification === "boolean" && row.qualification === true) ||
@@ -321,131 +279,91 @@ const HistorialPlanesMejoramientoInstructor = () => {
                 (typeof row.qualification === "number" && row.qualification < 3.0)
             )) ||
             // Búsqueda por calificación numérica
-            (row.qualification?.toString().includes(searchTerm))
+            (row.qualification ? row.qualification.toString().includes(searchTerm) : false)
         );
-    };
+    }
 
     if (loading) {
         return (
-            <div className="mx-auto px-4 py-8">
-                <div className="flex items-center justify-center min-h-[400px]">
-                    <div className="text-center">
-                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary dark:border-lightGreen"></div>
-                        <p className="mt-2 text-gray-600 dark:text-gray-400">Cargando planes de mejoramiento...</p>
-                    </div>
+            <div className="mx-auto px-4 py-8 flex items-center justify-center min-h-[400px]">
+                <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary dark:border-lightGreen"></div>
+                    <p className="mt-2 text-gray-600 dark:text-gray-400">Cargando planes de mejoramiento...</p>
                 </div>
             </div>
         );
     }
-
     if (error) {
         return (
             <div className="mx-auto px-4 py-8">
                 <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl shadow-lg p-6">
-                    <div className="flex items-start">
-                        <div className="flex-shrink-0">
-                            <svg className="h-5 w-5 text-red-400 dark:text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                            </svg>
-                        </div>
-                        <div className="ml-3">
-                            <h3 className="text-sm font-medium text-red-800 dark:text-red-400">
-                                Error al cargar los datos
-                            </h3>
-                            <div className="mt-2 text-sm text-red-700 dark:text-red-300">
-                                {typeof error === 'string' ? error : 'Ha ocurrido un error inesperado al cargar los planes de mejoramiento.'}
-                            </div>
-                        </div>
+                    <h3 className="text-sm font-medium text-red-800 dark:text-red-400">Error al cargar los datos</h3>
+                    <div className="mt-2 text-sm text-red-700 dark:text-red-300">
+                        {typeof error === 'string' ? error : 'Ha ocurrido un error inesperado al cargar los planes de mejoramiento.'}
                     </div>
                 </div>
             </div>
         );
     }
-
     if (!loading && (!improvementPlans || improvementPlans.length === 0)) {
         return (
-            <div className="mx-auto px-4 py-8">
-                <div className="space-y-6">
-                    <div>
-                        <PageTitle>
-                            {fichaData 
-                                ? `Planes de Mejoramiento - Ficha N° ${fichaData.fichaNumber}`
-                                : `Historial De Planes De Mejoramiento`
-                            }
-                        </PageTitle>
-                        {fichaData && (
-                            <button
-                                onClick={() => router.back()}
-                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen transition-colors duration-200 mt-2"
-                            >
-                                <FiArrowLeft className="w-4 h-4 mr-1" />
-                                Volver a Fichas
-                            </button>
-                        )}
-                        {/* Botón debajo del título, con degradado verde */}
-                        <div className="mt-4">
-                            <Link href={fichaData 
-                                ? `./FormularioPlanesDeMejoramiento?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}`
-                                : "./FormularioPlanesDeMejoramiento"
-                            }>
-                                <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-lightGreen transition-colors duration-200 shadow-lg">
-                                    <FiPlus className="w-4 h-4 mr-2" />
-                                    Crear Nuevo Plan de Mejoramiento
-                                </button>
-                            </Link>
+            <div className="mx-auto px-4 py-8 space-y-6">
+                <PageTitle>
+                    {fichaData ? `Planes de Mejoramiento - Ficha N° ${fichaData.fichaNumber}` : `Historial De Planes De Mejoramiento`}
+                </PageTitle>
+                {fichaData && (
+                    <button onClick={() => router.back()} className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen mt-2">
+                        <FiArrowLeft className="w-4 h-4 mr-1" /> Volver a Fichas
+                    </button>
+                )}
+                <div className="mt-4">
+                    <Link href={fichaData ? `./FormularioPlanesDeMejoramiento?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}` : "./FormularioPlanesDeMejoramiento"}>
+                        <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen shadow-lg">
+                            <FiPlus className="w-4 h-4 mr-2" /> Crear Nuevo Plan de Mejoramiento
+                        </button>
+                    </Link>
+                </div>
+                {fichaData && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Mostrando planes de mejoramiento de {fichaData.totalStudents} estudiantes de la ficha N° {fichaData.fichaNumber}</p>
+                )}
+                <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
+                        <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mb-3 mx-auto">
+                            <FiFileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                         </div>
-                        {fichaData && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                                Mostrando planes de mejoramiento de {fichaData.totalStudents} estudiantes de la ficha N° {fichaData.fichaNumber}
-                            </p>
-                        )}
+                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">0</h3>
+                        <p className="text-gray-600 dark:text-gray-300 font-medium">Planes Totales</p>
                     </div>
-
-                    {/* Dashboard Stats - Estado vacío */}
-                    <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                        <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                            <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mb-3 mx-auto">
-                                <FiFileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-black dark:text-white mb-1">0</h3>
-                            <p className="text-gray-600 dark:text-gray-300 font-medium">Planes Totales</p>
+                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
+                        <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-2xl mb-3 mx-auto">
+                            <FiStar className="w-6 h-6 text-lightGreen dark:text-darkGreen" />
                         </div>
-                        <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                            <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-2xl mb-3 mx-auto">
-                                <FiStar className="w-6 h-6 text-lightGreen dark:text-darkGreen" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-black dark:text-white mb-1">0</h3>
-                            <p className="text-gray-600 dark:text-gray-300 font-medium">Aprobados</p>
-                        </div>
-                        <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                            <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-2xl mb-3 mx-auto">
-                                <FiFileText className="w-6 h-6 text-red-600 dark:text-red-400" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-black dark:text-white mb-1">0</h3>
-                            <p className="text-gray-600 dark:text-gray-300 font-medium">No Aprobados</p>
-                        </div>
+                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">0</h3>
+                        <p className="text-gray-600 dark:text-gray-300 font-medium">Aprobados</p>
                     </div>
-
-                    <div className="text-center py-12">
-                        <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-8 border border-lightGray dark:border-grayText">
-                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full mb-4 mx-auto">
-                                <FiFileText className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-                            </div>
-                            <h3 className="text-lg font-semibold text-black dark:text-white mb-2">
-                                No se encontraron planes de mejoramiento
-                            </h3>
-                            <p className="text-gray-600 dark:text-gray-400 mb-4">
-                                {fichaData 
-                                    ? `No hay planes de mejoramiento registrados para los estudiantes de la ficha N° ${fichaData.fichaNumber}.`
-                                    : 'Aún no hay planes de mejoramiento registrados en el sistema.'
-                                }
-                            </p>
+                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
+                        <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-2xl mb-3 mx-auto">
+                            <FiFileText className="w-6 h-6 text-red-600 dark:text-red-400" />
                         </div>
+                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">0</h3>
+                        <p className="text-gray-600 dark:text-gray-300 font-medium">No Aprobados</p>
+                    </div>
+                </div>
+                <div className="text-center py-12">
+                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-8 border border-lightGray dark:border-grayText">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full mb-4 mx-auto">
+                            <FiFileText className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-black dark:text-white mb-2">No se encontraron planes de mejoramiento</h3>
+                        <p className="text-gray-600 dark:text-gray-400 mb-4">
+                            {fichaData ? `No hay planes de mejoramiento registrados para los estudiantes de la ficha N° ${fichaData.fichaNumber}.` : 'Aún no hay planes de mejoramiento registrados en el sistema.'}
+                        </p>
                     </div>
                 </div>
             </div>
         );
     }
+    
     
     return (
         <div className="mx-auto px-4 py-8">
@@ -535,6 +453,6 @@ const HistorialPlanesMejoramientoInstructor = () => {
             </div>
         </div>
     );
-};
+}
 
-export default HistorialPlanesMejoramientoInstructor;           
+export default HistorialPlanesMejoramientoInstructor;

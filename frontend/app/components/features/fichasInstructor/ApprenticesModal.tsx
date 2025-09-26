@@ -42,7 +42,7 @@ export const ApprenticesModal: React.FC<ApprenticesModalProps> = ({
                                     className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600"
                                 >
                                     <div className="flex items-center gap-2 sm:gap-3 w-full">
-                                        <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-r from-primary to-lime-500 rounded-full flex items-center justify-center text-white font-semibold border border-lime-500 shadow text-base sm:text-lg">
+                                        <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-r from-primary to-lime-500 dark:from-shadowBlue dark:to-darkBlue rounded-full flex items-center justify-center text-white font-semibold border border-lime-500 dark:border-shadowBlue shadow text-base sm:text-lg">
                                             {displayName.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="min-w-0">
@@ -64,7 +64,7 @@ export const ApprenticesModal: React.FC<ApprenticesModalProps> = ({
 
                                     <div className="flex items-center mt-2 sm:mt-0 sm:ml-2 sm:flex-row">
                                         <span className={`px-2 py-1 text-[10px] sm:text-xs font-medium rounded-full whitespace-nowrap ${studentState === 'En formacion'
-                                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                                            ? 'bg-green-100 text-green-800 dark:bg-shadowBlue/20 dark:text-blue-300'
                                             : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
                                             }`}>
                                             {studentState}

@@ -30,8 +30,8 @@ export const ToggleSwitch = ({
       <button
         onClick={onClick}
         title={`${isActive ? "Desactivar" : "Activar"} ${label}`}
-        className={`relative inline-flex ${sizeClasses} items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#01b001] focus:ring-offset-2 ${
-          isActive ? 'bg-[#01b001]' : 'bg-gray-200'
+        className={`relative inline-flex ${sizeClasses} items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#01b001] dark:focus:ring-shadowBlue focus:ring-offset-2 ${
+          isActive ? 'bg-[#01b001] dark:bg-shadowBlue' : 'bg-gray-200 dark:bg-gray-600'
         }`}
         aria-label={`${isActive ? "Desactivar" : "Activar"} ${label}`}
       >
@@ -39,7 +39,7 @@ export const ToggleSwitch = ({
           className={`inline-block ${thumbClasses} transform rounded-full bg-white transition-transform ${translateClasses}`}
         />
       </button>
-      <span className={`${size === "small" ? "text-xs" : "text-sm"} text-gray-600`}>
+      <span className={`${size === "small" ? "text-xs" : "text-sm"} text-gray-600 dark:text-gray-300`}>
         {label}
       </span>
     </div>
@@ -74,10 +74,10 @@ export const FilterInput = ({
       onChange={onChange}
       onKeyDown={onKeyDown}
       onPaste={onPaste}
-      className={`w-full ${showSearchIcon ? 'pl-10' : 'pl-4'} pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#01b001] ${className}`}
+      className={`w-full ${showSearchIcon ? 'pl-10' : 'pl-4'} pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#01b001] dark:focus:ring-shadowBlue bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ${className}`}
     />
     {showSearchIcon && (
-      <GoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+      <GoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
     )}
   </div>
 );
@@ -105,7 +105,7 @@ export const FilterSelect = ({
     value={value}
     onChange={onChange}
     title={title}
-    className={`w-full py-2 px-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#01b001] ${className}`}
+    className={`w-full py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#01b001] dark:focus:ring-shadowBlue bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ${className}`}
   >
     <option value="" disabled hidden>
       {placeholder}
@@ -141,13 +141,13 @@ export const ActiveFiltersDisplay = ({
   if (enableMultiFilter) {
     return (
       <div className="space-y-2">
-        <h4 className="text-sm font-medium text-gray-700">Filtros activos:</h4>
+        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Filtros activos:</h4>
         <div className="flex flex-wrap gap-2">
           {activeMultiFilters.length > 0 ? (
             activeMultiFilters.map(([key, value]) => (
               <span
                 key={key}
-                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#01b001] text-white shadow-sm"
+                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[#01b001] dark:bg-shadowBlue text-white shadow-sm"
               >
                 <span className="capitalize">{filterLabels[key] || key}:</span>
                 <span className="ml-1 font-normal">{value}</span>
@@ -162,7 +162,7 @@ export const ActiveFiltersDisplay = ({
               </span>
             ))
           ) : (
-            <span className="text-sm text-gray-500 italic">
+            <span className="text-sm text-gray-500 dark:text-gray-400 italic">
               No hay filtros aplicados
             </span>
           )}
@@ -174,13 +174,13 @@ export const ActiveFiltersDisplay = ({
   if (hasActiveFilters) {
     return (
       <div className="space-y-2">
-        <h4 className="text-sm font-medium text-gray-700">Filtro activo:</h4>
+        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Filtro activo:</h4>
         <div className="flex flex-wrap gap-2">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-shadowBlue/20 text-blue-800 dark:text-blue-300">
             {selectedFiltro ? filterLabels[selectedFiltro] : 'Búsqueda general'}: {searchTerm}
             <button
               onClick={onClearSingleFilter}
-              className="ml-2 text-blue-600 hover:text-blue-800 transition-colors"
+              className="ml-2 text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-100 transition-colors"
               title="Limpiar filtro"
               aria-label="Limpiar filtro"
             >

@@ -19,8 +19,8 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps): JSX.Element {
     return (
-        <html lang="es">
-            <body className={`bg-white text-black font-sans ${inter.className}`}>
+        <html lang="es" className="scroll-smooth">
+            <body className={`bg-white dark:bg-darkBackground text-black dark:text-white font-sans transition-colors duration-300 ${inter.className}`}>
                 <LoaderProvider>
                     {children}
                 </LoaderProvider>

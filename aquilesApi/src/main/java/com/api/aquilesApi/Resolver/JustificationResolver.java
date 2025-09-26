@@ -140,4 +140,21 @@ public class JustificationResolver {
             );
         }
     }
+
+    // Delete Justification (GraphQL)
+    @DgsMutation
+    public Map<String, Object> deleteJustification(@InputArgument Long id) {
+        try {
+            justificationBusiness.delete(id);
+            return ResponseHttpApi.responseHttpAction(
+                    id,
+                    ResponseHttpApi.CODE_OK,
+                    "Delete ok"
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error deleting Justification: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }

@@ -12,6 +12,7 @@ export interface Evaluation {
   recommendations?: string;
   valueJudgment?: string;
   checklistId: number;
+  teamScrumId?: number;
 }
 
 export interface Checklist {
@@ -22,7 +23,9 @@ export interface Checklist {
   component?: string;
   instructorSignature?: string;
   evaluationCriteria?: boolean;
-  studySheets?: number;
+  studySheets?: string;
+  trainingProjectId?: number;
+  trainingProjectName?: string;
   evaluations?: Evaluation[];
   items?: ChecklistItem[];
   associatedJuries?: any[];
@@ -70,7 +73,8 @@ export interface ChecklistDto {
   component?: string;
   instructorSignature: string;
   evaluationCriteria: boolean;
-  studySheets?: number;
+  studySheets?: string;
+  trainingProjectId?: number;
   evaluations?: EvaluationDto[];
   items?: ItemDto[];
   associatedJuries?: number[];
@@ -82,6 +86,7 @@ export interface EvaluationDto {
   recommendations?: string;
   valueJudgment?: string;
   checklistId: number;
+  teamScrumId?: number;
 }
 
 export interface ItemDto {

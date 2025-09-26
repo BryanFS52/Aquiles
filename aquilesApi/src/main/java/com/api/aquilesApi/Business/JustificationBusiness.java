@@ -25,14 +25,12 @@ public class JustificationBusiness {
     private final AttendanceStateService attendanceStateService;
 
 
-    public JustificationBusiness(JustificationService justificationService, AttendancesService attendancesService, JustificationTypeService
-            justificationTypeService, JustificationStatusService justificationStatusService, AttendanceStateService attendanceStateService) {
+    public JustificationBusiness(JustificationService justificationService, AttendancesService attendancesService, JustificationTypeService justificationTypeService, JustificationStatusService justificationStatusService, AttendanceStateService attendanceStateService) {
         this.justificationService = justificationService;
         this.attendancesService = attendancesService;
         this.justificationTypeService = justificationTypeService;
         this.justificationStatusService = justificationStatusService;
         this.attendanceStateService = attendanceStateService;
-
     }
 
    public Page<JustificationDto> findAll(Integer page, Integer size) {
@@ -52,7 +50,7 @@ public class JustificationBusiness {
         }
     }
 
-    // Find By ID
+    // Get Justification by ID
     public JustificationDto findById(Long id) {
         try {
             Justification justification = justificationService.getById(id);
@@ -62,21 +60,20 @@ public class JustificationBusiness {
         }
     }
 
-    // Find By attendance by Student ID
+    // Get Justifications by Student ID
     public List<JustificationDto> findByStudentId(Long studentId) {
         try {
             List<Justification> justifications = justificationService.findByStudentId(studentId);
-            return  JustificationMap.INSTANCE.EntityToDTOs(justifications);
+            return JustificationMap.INSTANCE.EntityToDTOs(justifications);
         } catch (Exception e) {
             e.printStackTrace();
             throw new CustomException("Database error retrieving Justifications by Student ID: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // Add
+    // Add new Justification
     public JustificationDto add(JustificationDto dto) {
         try {
-
             Justification justification =  new Justification();
             JustificationMap.INSTANCE.updateEntity(dto, justification);
 
@@ -107,7 +104,7 @@ public class JustificationBusiness {
         }
     }
 
-    // Update
+    // Update existing Justification
     public void update(Long id, JustificationDto dto) {
 
         Justification existing = justificationService.getById(id);
@@ -126,10 +123,10 @@ public class JustificationBusiness {
                 AttendanceState attendanceState = attendanceStateService.getById(3L);
                 existing.getAttendance().setAttendanceState(attendanceState);
             }
-//            if (Objects.equals(justificationStatus.getName(), "Denegado")){
-//                AttendanceState attendanceState = stateAttendanceService.getById(4L);
-//                existing.getAttendance().setAttendanceState(attendanceState);
-//            }
+            if (Objects.equals(justificationStatus.getName(), "Denegado")){
+                AttendanceState attendanceState = attendanceStateService.getById(5L);
+                existing.getAttendance().setAttendanceState(attendanceState);
+            }
             existing.setJustificationStatus(justificationStatus);
             justificationService.save(existing);
 
@@ -142,7 +139,7 @@ public class JustificationBusiness {
         }
     }
 
-    // Delete
+    // Delete Justification by ID
     public void delete(Long id) {
         try {
             Justification justification = justificationService.getById(id);

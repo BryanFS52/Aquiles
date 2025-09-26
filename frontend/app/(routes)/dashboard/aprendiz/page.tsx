@@ -5,7 +5,7 @@ import { LiaLanguageSolid } from "react-icons/lia";
 import { FaComputer } from "react-icons/fa6";
 import { FaPeopleCarry } from "react-icons/fa";
 
-export default function Aprendiz() {
+const Aprendiz = () => {
   return (
     <div className="min-h-screen grid grid-cols-1 xl:grid-cols-6">
       <div className="xl:col-span-5">
@@ -67,3 +67,5 @@ export default function Aprendiz() {
     </div>
   );
 }
+
+export default Aprendiz;

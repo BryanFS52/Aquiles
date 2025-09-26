@@ -4,6 +4,7 @@ import com.api.aquilesApi.Dto.AttendanceStateDto;
 import com.api.aquilesApi.Entity.AttendanceState;
 import com.api.aquilesApi.Service.AttendanceStateService;
 import com.api.aquilesApi.Utilities.CustomException;
+import com.api.aquilesApi.Utilities.Mapper.AttendanceStateMap;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -14,11 +15,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class AttendanceStateBusiness {
     private final AttendanceStateService attendanceStateService;
-    private final ModelMapper modelMapper;
 
-    public AttendanceStateBusiness(AttendanceStateService attendanceStateService, ModelMapper modelMapper) {
+    public AttendanceStateBusiness(AttendanceStateService attendanceStateService ) {
         this.attendanceStateService = attendanceStateService;
-        this.modelMapper = modelMapper;
     }
 
     // Validation object
@@ -26,13 +25,13 @@ public class AttendanceStateBusiness {
 
     }
 
-    // Find all
+    // Get all attendanceStates (paginated)
     public Page<AttendanceStateDto> findAll(int page , int size){
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<AttendanceState>  stateAttendancesPage = attendanceStateService.findAll(pageRequest);
+            Page<AttendanceState>  attendanceStatePage = attendanceStateService.findAll(pageRequest);
 
-            return stateAttendancesPage.map(entity -> modelMapper.map(entity, AttendanceStateDto.class));
+            return AttendanceStateMap.INSTANCE.EntityToDTOs(attendanceStatePage);
         } catch (DataAccessException e) {
             throw new CustomException("Error retrieving attendances due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
@@ -40,11 +39,11 @@ public class AttendanceStateBusiness {
         }
     }
 
-    // Find By Id
+    // Get attendanceState by ID
     public AttendanceStateDto findById(Long id){
         try {
-            AttendanceState attendanceState = this.attendanceStateService.getById(id);
-            return modelMapper.map(attendanceState, AttendanceStateDto.class);
+            AttendanceState attendanceState = attendanceStateService.getById(id);
+            return AttendanceStateMap.INSTANCE.EntityToDTO(attendanceState);
         } catch (CustomException e){
             throw e;
         } catch (Exception e){
@@ -52,28 +51,32 @@ public class AttendanceStateBusiness {
         }
     }
 
-    // Add
+    // Add new attendanceState
     public AttendanceStateDto add(AttendanceStateDto attendanceStateDto){
         try {
-            AttendanceState attendanceState = modelMapper.map(attendanceStateDto, AttendanceState.class);
-            return modelMapper.map(this.attendanceStateService.save(attendanceState) , AttendanceStateDto.class);
+            AttendanceState attendanceState = new AttendanceState();
+            AttendanceStateMap.INSTANCE.updateAttendanceState(attendanceStateDto, attendanceState);
+            AttendanceState savedAttendanceState = attendanceStateService.save(attendanceState);
+            return AttendanceStateMap.INSTANCE.EntityToDTO(savedAttendanceState);
+
         } catch (Exception e){
             throw new CustomException("Error Creating State: " + e.getMessage() , HttpStatus.BAD_REQUEST);
         }
     }
 
-    // Update
+    // Update existing attendanceState
     public void update(Long stateAttendanceId, AttendanceStateDto attendanceStateDto) {
         try {
            attendanceStateDto.setId(stateAttendanceId);
-           AttendanceState attendanceState = modelMapper.map(attendanceStateDto, AttendanceState.class);
-           this.attendanceStateService.save(attendanceState);
+           AttendanceState attendanceState = attendanceStateService.getById(stateAttendanceId);
+           AttendanceStateMap.INSTANCE.updateAttendanceState(attendanceStateDto, attendanceState);
+           attendanceStateService.save(attendanceState);
         } catch (Exception e) {
             throw new CustomException("Error Updating State Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    // Delete
+    // Delete attendance state by ID
     public void delete (Long stateAttendanceId){
         try {
             AttendanceState attendanceState = attendanceStateService.getById(stateAttendanceId);

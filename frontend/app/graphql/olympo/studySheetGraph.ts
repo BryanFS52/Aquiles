@@ -196,6 +196,10 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
           competence {
             id
             name
+            learningOutcome {
+              name
+              description            
+            }
           }
         }
         studentStudySheets {
@@ -377,9 +381,15 @@ query GetStudySheetByIdWithAttendances($id: Long!, $competenceId : Long, $teache
       }
       teacherStudySheets {
         id
-        competence {
-          name
-        }
+        competence{
+            name
+            description
+            learningOutcome{
+                name
+                description
+                state
+            }
+       }
       }
     }
   }

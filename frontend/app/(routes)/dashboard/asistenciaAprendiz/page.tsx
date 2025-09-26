@@ -7,8 +7,8 @@ import { EventClickArg } from '@fullcalendar/core';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@redux/store';
 import { fetchAttendanceAndCompetenceByStudent } from '@slice/attendanceSlice';
-import { Attendance } from '@graphql/generated';
 import { useLoader } from "@context/LoaderContext";
+import { TEMPORAL_APRENDIZ_ID } from "@/temporaryCredential";
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -16,10 +16,8 @@ import interactionPlugin from '@fullcalendar/interaction';
 import PageTitle from "@components/UI/pageTitle";
 import EmptyState from "@components/UI/emptyState";
 import Modal from "@components/UI/Modal";
-import { TEMPORAL_APRENDIZ_ID } from "@/temporaryCredential";
 
 // Tipos TypeScript
-
 type FilterType = 'all' | 'Asistencia' | 'Inasistencia' | 'Retardo' | 'Justificacion';
 
 // Estilos CSS personalizados para FullCalendar

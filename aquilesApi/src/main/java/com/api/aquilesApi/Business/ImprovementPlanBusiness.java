@@ -23,7 +23,9 @@ public class ImprovementPlanBusiness {
     }
 
     // Validation object
+    private void validationObject(ImprovementPlanDto improvementplanDto) throws CustomException {
 
+    }
 
 
     public Page<ImprovementPlanDto> findByFilter(int page, int size, Long teacherCompetence) {

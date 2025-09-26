@@ -1,6 +1,6 @@
 import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE } from '@graphql/attendancesGraph';
+import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE, GET_ATTENDANCES_WITH_JUSTIFICATIONS_BY_STUDENT } from '@graphql/attendancesGraph';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import {
     Attendance,
@@ -16,6 +16,8 @@ import {
     DeleteAttendanceMutationVariables,
     AllAttendancesByStudentIdQuery,
     AllAttendancesByStudentIdQueryVariables,
+    AllAttendancesWithJustificationsByStudentIdQuery,
+    AllAttendancesWithJustificationsByStudentIdQueryVariables,
 } from '@graphql/generated';
 
 interface FilterOptions {
@@ -25,9 +27,6 @@ interface FilterOptions {
 
 export interface TransformedAttendanceItem {
     id: string;
-    // programa: string;
-    // ficha: string;
-    // fecha: string;
     estado: string;
     documento: string;
     aprendiz: string;
@@ -37,7 +36,7 @@ export interface StudentSummary {
     id: number;
     documento: string;
     aprendiz: string;
-    cantidad: number; // Total de ausencias e injustificadas
+    cantidad: number;
     consecutivas: number;
 }
 
@@ -55,55 +54,6 @@ interface AttendanceState extends ReturnType<typeof createInitialPaginatedState>
     filterOptions: FilterOptions;
     attendanceSummary: StudentSummary[];
 }
-const transformToComponentFormat = (attendances: Attendance[]): TransformedAttendanceItem[] => {
-    return attendances.map((a) => {
-        const student = a.student;
-        const person = student?.person;
-
-        return {
-            id: a.id,
-            // programa: "Sin programa", // Dato no disponible en AttendanceItem
-            // ficha: "Sin ficha", // Dato no disponible en AttendanceItem
-            // fecha: new Date(a.attendanceDate).toLocaleDateString("es-CO"),
-            estado: a.attendanceState?.status || "Sin estado",
-            documento: person?.document || '',
-            aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim()
-        };
-    });
-};
-
-const filterAttendances = (
-    data: TransformedAttendanceItem[],
-    filterOptions: FilterOptions
-): TransformedAttendanceItem[] => {
-    const { selectedFiltro, searchTerm } = filterOptions;
-
-    if (!searchTerm) return data;
-
-    if (!selectedFiltro || selectedFiltro === "todo") {
-        return data.filter((j) =>
-            // j.programa.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            // j.ficha.toString().includes(searchTerm) ||
-            // j.fecha.includes(searchTerm) ||
-            j.estado.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }
-
-    return data.filter((j) => {
-        switch (selectedFiltro) {
-            // case "programa":
-            //     return j.programa.toLowerCase().includes(searchTerm.toLowerCase());
-            // case "ficha":
-            //     return j.ficha.toString().includes(searchTerm);
-            // case "fecha":
-            //     return j.fecha.includes(searchTerm);
-            case "estado":
-                return j.estado.toLowerCase().includes(searchTerm.toLowerCase());
-            default:
-                return true;
-        }
-    });
-};
 const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
     return {
         id: graphqlData.id,
@@ -121,7 +71,15 @@ const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
                 document: graphqlData.student?.person?.document ?? '',
             },
             studentStudySheets: graphqlData.student?.studentStudySheets ?? []
-        }
+        },
+        justification: graphqlData.justification ? {
+            id: graphqlData.justification.id,
+            description: graphqlData.justification.description,
+            justificationStatus: graphqlData.justification.justificationStatus ? {
+                id: graphqlData.justification.justificationStatus.id,
+                name: graphqlData.justification.justificationStatus.name,
+            } : null
+        } : null
     };
 }
 
@@ -146,15 +104,6 @@ export const processAndSummarizeAttendances = (attendances: Attendance[]): Stude
             return (status === 'ausente' || status === 'injustificado') && !!a.attendanceDate;
         });
 
-        // // Debug: log de estados encontrados para este estudiante
-        // if (attendances.length > 0) {
-        //     const person = attendances[0]?.student?.person;
-        //     const allStatuses = attendances.map(a => a.attendanceState?.status).filter(Boolean);
-        //     const uniqueStatuses = [...new Set(allStatuses)];
-        //     console.log(`Estados de asistencia para ${person?.name} ${person?.lastname}:`, uniqueStatuses);
-        //     console.log(`Total ausencias + injustificadas encontradas: ${absences.length}`);
-        // }
-        // Ordenar por fecha (solo si la fecha existe)
         absences.sort((a, b) => {
             const dateA = a.attendanceDate ? new Date(a.attendanceDate).getTime() : 0;
             const dateB = b.attendanceDate ? new Date(b.attendanceDate).getTime() : 0;
@@ -236,6 +185,24 @@ export const fetchAttendancesByStudent = createAsyncThunk<
             return cleanData.map(transformGraphQLToAttendanceItem);
         } catch (error) {
             console.error("Error al obtener asistencias por estudiante", error);
+            return rejectWithValue({ message: (error as Error).message || 'Unknown error' });
+        }
+    }
+);
+
+// fetch para allAttendancesWithJustificationsByStudentId
+export const fetchAttendancesWithJustificationsByStudentId = createAsyncThunk<AllAttendancesWithJustificationsByStudentIdQuery['allAttendancesByStudentId'], AllAttendancesWithJustificationsByStudentIdQueryVariables>(
+    'attendance/fetchWithJustificationsByStudent',
+    async ({ id }, { rejectWithValue }) => {
+        try {
+            const { data } = await clientLAN.query<AllAttendancesWithJustificationsByStudentIdQuery, AllAttendancesWithJustificationsByStudentIdQueryVariables>({
+                query: GET_ATTENDANCES_WITH_JUSTIFICATIONS_BY_STUDENT,
+                variables: { id },
+                fetchPolicy: 'no-cache',
+            });
+            return data.allAttendancesByStudentId;
+        } catch (error) {
+            console.error("Error al obtener asistencias con justificaciones por estudiante", error);
             return rejectWithValue({ message: (error as Error).message || 'Unknown error' });
         }
     }
@@ -347,8 +314,30 @@ const attendanceSlice = createSlice({
     name: 'attendance',
     initialState,
     reducers: {
-        updateAttendanceSummary: (state) => {
-            state.attendanceSummary = processAndSummarizeAttendances(state.data);
+    updateAttendanceSummary: (state) => {
+        state.attendanceSummary = processAndSummarizeAttendances(state.data);
+    },
+        setAttendanceSummaryFromStudySheet: (state, action: PayloadAction<any>) => {
+            const studySheet = action.payload;
+            if (!studySheet?.studentStudySheets) {
+            state.attendanceSummary = [];
+            return;
+            }
+
+            // Transformar todas las asistencias de todos los estudiantes a un solo array
+            const allAttendances = studySheet.studentStudySheets.flatMap((ss: any) =>
+            (ss.student?.attendances || []).map((a: any) => ({
+                id: a.id || `${ss.student.id}-${a.attendanceDate}`,
+                attendanceDate: a.attendanceDate,
+                attendanceState: a.attendanceState,
+                student: {
+                id: ss.student.id,
+                person: ss.student.person,
+                },
+            }))
+            );
+
+            state.attendanceSummary = processAndSummarizeAttendances(allAttendances);
         }
     },
     extraReducers: (builder) => {
@@ -390,6 +379,28 @@ const attendanceSlice = createSlice({
             .addCase(fetchAttendancesByStudent.rejected, (state, action) => {
                 state.studentAttendances.loading = false;
                 state.studentAttendances.error = (action.payload as RejectedPayload)?.message ?? action.error.message ?? 'Error al cargar asistencias del estudiante';
+            })
+            .addCase(fetchAttendancesWithJustificationsByStudentId.pending, (state) => {
+                state.studentAttendances.loading = true;
+                state.studentAttendances.error = null;
+            })
+            .addCase(fetchAttendancesWithJustificationsByStudentId.fulfilled, (
+                state,
+                action: PayloadAction<AllAttendancesWithJustificationsByStudentIdQuery['allAttendancesByStudentId']>
+            ) => {
+                const payload = action.payload;
+                if (payload?.data) {
+                    const cleanData = payload.data.filter((item): item is NonNullable<typeof item> & { id: string } => !!item && !!item.id);
+                    state.studentAttendances.data = cleanData.map(transformGraphQLToAttendanceItem);
+                } else {
+                    state.studentAttendances.data = [];
+                }
+                state.studentAttendances.loading = false;
+                state.studentAttendances.error = null;
+            })
+            .addCase(fetchAttendancesWithJustificationsByStudentId.rejected, (state, action) => {
+                state.studentAttendances.loading = false;
+                state.studentAttendances.error = (action.payload as RejectedPayload)?.message ?? action.error.message ?? 'Error al cargar asistencias con justificaciones del estudiante';
             })
             .addCase(fetchAttendanceAndCompetenceByStudent.pending, (state) => {
                 state.studentAttendances.loading = true;
@@ -449,6 +460,6 @@ const attendanceSlice = createSlice({
     }
 });
 
-export const { updateAttendanceSummary } = attendanceSlice.actions;
+export const { updateAttendanceSummary, setAttendanceSummaryFromStudySheet } = attendanceSlice.actions;
 
 export default attendanceSlice.reducer;

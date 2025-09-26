@@ -24,8 +24,11 @@ public class ItemType implements Serializable {
     @Column(name = "name", nullable = false, length = 20)
     private String name;
 
+    @Column(name = "trimester", nullable = false)
+    private String trimester;
+
     // Relations
-    // 1. Relation (1-M) with item
+    // 1. Relation (1-M) con item
     @OneToMany(mappedBy = "itemType", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items;
 }
