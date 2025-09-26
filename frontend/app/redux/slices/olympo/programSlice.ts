@@ -4,59 +4,6 @@ import { GET_PROGRAMS } from '@graphql/olympo/programGraph';
 import { createInitialPaginatedState } from '@type/slices/common/generic';
 import { Program, GetProgramsQuery, GetProgramsQueryVariables } from '@graphql/generated'
 
-// Service methods integrated into slice
-interface GetProgramsServiceParams {
-    idCoordination?: number;
-    idTrainingLevel?: number;
-    name?: string;
-    page?: number;
-    size?: number;
-}
-
-const programService = {
-    getPrograms: async ({ idCoordination, idTrainingLevel, name, page = 0, size = 10 }: GetProgramsServiceParams = {}) => {
-        try {
-            const { data } = await clientLAN.query({
-                query: GET_PROGRAMS,
-                variables: { idCoordination, idTrainingLevel, name, page, size },
-                fetchPolicy: 'network-only',
-            });
-
-            if (data?.allPrograms?.code === '200' || data?.allPrograms?.code === 200) {
-                return data.allPrograms;
-            } else {
-                throw new Error(data?.allPrograms?.message || 'Error fetching programs');
-            }
-        } catch (error) {
-            console.error('Error fetching programs:', error);
-            throw error;
-        }
-    },
-};
-
-// Función para transformar datos de GraphQL a Program
-export const transformGraphQLToProgramItem = (graphqlData: any): Program => {
-    return {
-        id: graphqlData.id,
-        name: graphqlData.name,
-        description: graphqlData.description,
-        state: graphqlData.state,
-        coordination: graphqlData.coordination
-            ? {
-                id: graphqlData.coordination.id,
-                name: graphqlData.coordination.name,
-            }
-            : null,
-        trainingLevel: graphqlData.trainingLevel
-            ? {
-                id: graphqlData.trainingLevel.id,
-                name: graphqlData.trainingLevel.name,
-            }
-            : null,
-    };
-};
-
-
 export const fetchPrograms = createAsyncThunk<GetProgramsQuery['allPrograms'], GetProgramsQueryVariables>(
     'program/fetchAll',
     async ({ page, size }) => {
@@ -84,9 +31,9 @@ const programSlice = createSlice({
                 const payload = action.payload;
 
                 if (payload && payload.data) {
+                    // Filtra nulls y usa los datos directamente
                     state.data = payload.data
-                        .filter((item): item is NonNullable<typeof item> => item !== null)
-                        .map(transformGraphQLToProgramItem);
+                        .filter((item): item is NonNullable<typeof item> => item !== null) as Program[];
                     state.totalItems = payload.totalItems ?? 0;
                     state.totalPages = payload.totalPages ?? 0;
                     state.currentPage = payload.currentPage ?? 0;
@@ -106,8 +53,5 @@ const programSlice = createSlice({
 
 
 export const { } = programSlice.actions;
-
-// Export service methods for compatibility
-export { programService };
 
 export default programSlice.reducer;

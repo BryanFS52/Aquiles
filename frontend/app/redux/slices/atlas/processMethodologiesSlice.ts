@@ -2,34 +2,7 @@ import { clientLAN } from "@/lib/apollo-client";
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GET_ALL_METHODOLOGIES_AND_PROFILES } from "@graphql/atlas/processMethodologiesGraph";
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
-import {
-    ProcessMethodology,
-    GetAllProcessMethodologiesAndProfilesQuery,
-    GetAllProcessMethodologiesAndProfilesQueryVariables
-} from "@/graphql/generated";
-
-const transformGraphQLToProcessMethodologiesItem = (grahpqlData: any): ProcessMethodology => {
-    const item: ProcessMethodology = {
-        id: grahpqlData.id ?? grahpqlData._id ?? "",
-        name: grahpqlData.name,
-        description: grahpqlData.description,
-        isActive: grahpqlData.isActive,
-        methodology: grahpqlData.methodology
-            ? {
-                id: grahpqlData.methodology.id,
-                name: grahpqlData.methodology.name,
-                description: grahpqlData.methodology.description
-            }
-            : { id: "", name: "", description: "" },
-        profiles: grahpqlData.profiles?.map((profile: any) => ({
-            id: profile.id,
-            name: profile.name,
-            description: profile.description
-        })) || []
-    };
-
-    return item;
-};
+import { ProcessMethodology,GetAllProcessMethodologiesAndProfilesQuery, GetAllProcessMethodologiesAndProfilesQueryVariables } from "@/graphql/generated";
 
 export const fetchAllProcessMethodologiesAndProfiles = createAsyncThunk<
     GetAllProcessMethodologiesAndProfilesQuery['allProcessMethodology'],
@@ -70,11 +43,21 @@ const processMethodologiesSlice = createSlice({
             })
             .addCase(fetchAllProcessMethodologiesAndProfiles.fulfilled, (state, action: PayloadAction<any>) => {
                 state.loading = false;
-                state.data = action.payload.data.map(transformGraphQLToProcessMethodologiesItem);
-
-                state.currentPage = action.payload.currentPage;
-                state.totalPages = action.payload.totalPages;
-                state.totalItems = action.payload.totalItems;
+                
+                if (action.payload?.data) {
+                    // Filtra nulls y usa los datos directamente
+                    state.data = action.payload.data
+                        .filter((item: any): item is NonNullable<typeof item> => item !== null) as ProcessMethodology[];
+                    
+                    state.currentPage = action.payload.currentPage ?? 0;
+                    state.totalPages = action.payload.totalPages ?? 0;
+                    state.totalItems = action.payload.totalItems ?? 0;
+                } else {
+                    state.data = [];
+                    state.currentPage = 0;
+                    state.totalPages = 0;
+                    state.totalItems = 0;
+                }
             })
             .addCase(fetchAllProcessMethodologiesAndProfiles.rejected, (state, action: PayloadAction<unknown>) => {
                 state.loading = false;
