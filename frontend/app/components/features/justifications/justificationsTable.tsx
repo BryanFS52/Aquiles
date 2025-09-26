@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { GrAttachment } from "react-icons/gr";
 import persona from "@public/img/persona.jpg";
 import { RootState } from "@/redux/store";
-import { getStatusNameById, getActiveStatuses } from "@/redux/slices/justificationStatusSlice";
+import { getStatusNameById, getActiveStatuses, JustificationStatus } from "@/redux/slices/justificationStatusSlice";
 import EmptyState from "@components/UI/emptyState";
 
 interface JustificationTableProps {
@@ -17,6 +17,7 @@ interface JustificationTableProps {
   hasError?: boolean;
   hasFiltersApplied?: boolean;
   isInstructorView?: boolean;
+  justificationStatuses: JustificationStatus[];
 }
 
 export default function JustificationTable({
@@ -155,7 +156,7 @@ export default function JustificationTable({
                     {getActiveStatuses(justificationStatuses)
                       .filter(status => status.name !== "En proceso")
                       .map((status) => (
-                        <option key={status.id} value={status.id}>
+                        <option key={status.id} value={status.id?.toString()}>
                           {status.name}
                         </option>
                       ))}

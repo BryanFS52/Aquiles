@@ -4,13 +4,16 @@ import { useParams, useSearchParams } from "next/navigation";
 import { JustificacionesInstructorContainer } from "@/components/features/justifications/justficacionesInstructorContainer";
 
 export default function JustificationInstructorPage() {
-    const params = useParams();
-    const searchParams = useSearchParams();
-    const competenceQuarterId = Number(params.Id);
-    const fichaNumber = searchParams.get('ficha');
+  const params = useParams<{ Id: string }>();
+  const searchParams = useSearchParams();
 
-    return <JustificacionesInstructorContainer 
-        competenceQuarterId={competenceQuarterId} 
-        fichaNumber={fichaNumber} 
-    />;
+  const competenceQuarterId = Number(params.Id);
+  const fichaNumber = searchParams.get("ficha");
+
+  return (
+    <JustificacionesInstructorContainer
+      competenceQuarterId={competenceQuarterId}
+      fichaNumber={fichaNumber}
+    />
+  );
 }
