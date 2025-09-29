@@ -28,38 +28,38 @@ public class TrainingProjectService {
     public TrainingProjectResponseDto getTrainingProjectById(Long projectId) {
         try {
             String url = olympoBaseUrl + "/graphql";
-            
+
             // Construir la consulta GraphQL
             String query = String.format(
-                "{ \"query\": \"{ allTrainingProjects(page: 0, size: 100) { data { id name program { id name } } } }\" }"
+                    "{ \"query\": \"{ allTrainingProjects(page: 0, size: 100) { data { id name program { id name } } } }\" }"
             );
 
             ResponseEntity<String> response = restTemplate.postForEntity(url, query, String.class);
-            
+
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 JsonNode rootNode = objectMapper.readTree(response.getBody());
                 JsonNode dataNode = rootNode.path("data").path("allTrainingProjects").path("data");
-                
+
                 for (JsonNode projectNode : dataNode) {
                     if (projectNode.path("id").asLong() == projectId) {
                         TrainingProjectResponseDto project = new TrainingProjectResponseDto();
                         project.setId(projectNode.path("id").asLong());
                         project.setName(projectNode.path("name").asText());
-                        
+
                         JsonNode programNode = projectNode.path("program");
                         if (!programNode.isMissingNode()) {
-                            TrainingProjectResponseDto.ProgramDto program = 
-                                new TrainingProjectResponseDto.ProgramDto();
+                            TrainingProjectResponseDto.ProgramDto program =
+                                    new TrainingProjectResponseDto.ProgramDto();
                             program.setId(programNode.path("id").asLong());
                             program.setName(programNode.path("name").asText());
                             project.setProgram(program);
                         }
-                        
+
                         return project;
                     }
                 }
             }
-            
+
             return null;
         } catch (Exception e) {
             System.err.println("Error fetching training project with ID " + projectId + ": " + e.getMessage());
@@ -74,7 +74,7 @@ public class TrainingProjectService {
         if (projectId == null) {
             return null;
         }
-        
+
         TrainingProjectResponseDto project = getTrainingProjectById(projectId);
         return project != null ? project.getName() : null;
     }

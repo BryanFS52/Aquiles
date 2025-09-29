@@ -1,7 +1,10 @@
 'use client'
 
+import React from "react";
 import { InstructorChecklistContainer } from "@components/features/listaChequeoInstructor";
 
-export default function InstructorChecklistView() {
+const InstructorChecklistView = () => {
   return <InstructorChecklistContainer />;
 }
+
+export default InstructorChecklistView;

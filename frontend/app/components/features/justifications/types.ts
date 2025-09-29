@@ -1,5 +1,5 @@
 // Types for Justifications module - Using GraphQL CodeGen types
-import { Attendance, JustificationType } from '@graphql/generated';
+import { Attendance, JustificationType, JustificationStatus } from '@graphql/generated';
 import { FormDataState } from '@slice/justificationSlice';
 
 // Component props interfaces using GraphQL types
@@ -38,7 +38,7 @@ export interface JustificationsHistoricalProps {
 
 // justifications instructor container props
 export interface JustificacionesInstructorContainerProps {
-    competenceQuarterId: number;
-    fichaNumber?: string | null;
-    learningOutcomeId?: string | null;
+  competenceQuarterId: number;
+  fichaNumber?: string | null;
+  learningOutcomeId?: string | null;
 }

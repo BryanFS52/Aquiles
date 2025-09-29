@@ -54,19 +54,10 @@ export const InstructorFollowUpContainer: React.FC<InstructorFollowUpContainerPr
     const getCompetenceName = () => {
         if (selectedForAttendance?.teacherStudySheets) {
             const targetTeacherStudySheet = selectedForAttendance.teacherStudySheets.find(
-                (tss: any) => {
-                    const teacherStudySeets = parseInt(tss.id);
-                    const targetId = parseInt(competenceQuarterId.toString());
-                    return teacherStudySeets === targetId;
-                }
+            (tss: any) => parseInt(tss.id) === parseInt(competenceQuarterId.toString())
             );
-            
-            if (targetTeacherStudySheet?.competence?.name) {
-                return targetTeacherStudySheet.competence.name;
-            }
+            return targetTeacherStudySheet?.competence?.name || `Competencia ${competenceQuarterId}`;
         }
-        
-        return `Competencia ${competenceQuarterId}`;
     };
 
     const competenceName = getCompetenceName();

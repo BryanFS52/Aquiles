@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ImprovementPlanDeliveryRepository extends JpaRepository<ImprovementPlanDelivery, Long> {
 
+    // Method to check if a delivery format exists
     boolean existsByDeliveryFormat(String deliveryFormat);
 }

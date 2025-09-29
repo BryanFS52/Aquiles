@@ -88,14 +88,14 @@ export const FichasInstructorContainer: React.FC = () => {
 
         try {
             router.push(`/dashboard/justificacionesInstructor?ficha=${studySheet.number}`);
-
-            setTimeout(() => setLoadingAttendance(null), 200);
+            setTimeout(() => {
+                setLoadingAttendance(null);
+            }, 200);
         } catch (error) {
-            console.error("Error al navegar a justificaciones:", error);
+            console.error("Error al preparar justificaciones:", error);
             setLoadingAttendance(null);
         }
     };
-
 
     if (!loading && (!fichas || fichas.length === 0)) {
         return <EmptyState message="No se encontraron fichas disponibles." />;

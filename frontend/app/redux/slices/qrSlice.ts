@@ -3,32 +3,6 @@ import { createInitialPaginatedState } from '@type/slices/common/generic';
 import { client } from '@lib/apollo-client';
 import { GENERATE_QR_CODE } from '@graphql/generateQrGraph';
 
-// Service methods integrated into slice
-const qrService = {
-    generateQRCode: async () => {
-        try {
-            const { data } = await client.mutate({
-                mutation: GENERATE_QR_CODE,
-            });
-
-            if (!data?.generateQRCode?.qrCodeBase64) {
-                throw new Error("No QR code returned from server");
-            }
-
-            const qrCodeImage = `data:image/png;base64,${data.generateQRCode.qrCodeBase64}`;
-
-            return {
-                qrCodeImage,
-                sessionId: data.generateQRCode.sessionId,
-                qrUrl: data.generateQRCode.qrUrl,
-            };
-        } catch (error) {
-            console.error("Error generating QR code:", error);
-            throw error;
-        }
-    },
-};
-
 // Async thunks
 export const generateQRCode = createAsyncThunk(
     'qr/generate',
@@ -91,9 +65,6 @@ const qrSlice = createSlice({
     }
 });
 
-export const { clearQrResult } = qrSlice.actions;
-
-// Export service methods for compatibility
-export { qrService };
+export const {  } = qrSlice.actions;
 
 export default qrSlice.reducer;

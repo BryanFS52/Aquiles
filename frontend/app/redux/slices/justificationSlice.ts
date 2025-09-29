@@ -24,23 +24,6 @@ import {
     GetAttendancesByCompetenceQuarterAndJustificationsQueryVariables
 } from '@graphql/generated'
 
-export interface TransformedJustificationItem {
-    id: number;
-    ficha: string;
-    absenceDate: string;
-    justificationDate: string;
-    estado: string;
-    state: boolean;
-    justificationType: string;
-    archivoAdjunto: string;
-    archivoMime: string;
-    documento: string;
-    aprendiz: string;
-    attendanceId?: string;
-    justificationStatusId?: string;
-    justificationStatus: string;
-}
-
 export interface MultiFilterState {
     documento: string;
     aprendiz: string;
@@ -76,15 +59,15 @@ interface JustificationFormState {
 
 interface JustificationState extends ReturnType<typeof createInitialPaginatedState> {
     data: Justification[];
-    transformedData: TransformedJustificationItem[];
-    filteredData: TransformedJustificationItem[];
+    transformedData: Justification[];
+    filteredData: Justification[];
     filterOptions: FilterOptions;
     localCurrentPage: number;
     itemsPerPage: number;
     form: JustificationFormState;
     
-    competenceQuarterData: TransformedJustificationItem[];
-    competenceQuarterFilteredData: TransformedJustificationItem[];
+    competenceQuarterData: any[];
+    competenceQuarterFilteredData: any[];
     competenceQuarterFilterOptions: FilterOptions;
     isCompetenceQuarterMode: boolean;
 }
@@ -191,40 +174,6 @@ const getExtensionFromMime = (mimeType: string): string => {
     return map[mimeType as keyof typeof map] || "bin";
 };
 
-const transformGraphQLToJustificationItem = (graphqlData: any): Justification => {
-    return {
-        id: graphqlData.justificationId || graphqlData.id,
-        description: graphqlData.description,
-        absenceDate: graphqlData.absenceDate,
-        justificationDate: graphqlData.justificationDate,
-        justificationFile: graphqlData.justificationFile,
-        state: graphqlData.state,
-        justificationType: graphqlData.justificationType
-            ? {
-                id: graphqlData.justificationType.id,
-                name: graphqlData.justificationType.name
-            }
-            : { id: 0, name: '' },
-        justificationStatus: graphqlData.justificationStatus
-            ? {
-                id: graphqlData.justificationStatus.id,
-                name: graphqlData.justificationStatus.name
-            }
-            : { id: 0, name: '' },
-        attendance: {
-            id: graphqlData.attendance?.id ?? 0,
-            student: {
-                id: graphqlData.attendance?.student?.id ?? 0,
-                person: {
-                    name: graphqlData.attendance?.student?.person?.name ?? '',
-                    lastname: graphqlData.attendance?.student?.person?.lastname ?? '',
-                    document: graphqlData.attendance?.student?.person?.document ?? ''
-                }
-            }
-        }
-    };
-};
-
 // Helper para formatear fechas
 const formatDateSafely = (dateString: string | null | undefined): string => {
     if (!dateString) return "Sin fecha";
@@ -270,70 +219,10 @@ const formatDateSafely = (dateString: string | null | undefined): string => {
     }
 };
 
-// Convertir fecha de UI (DD/MM/YYYY) a (YYYY-MM-DD)
-const convertDateToBackendFormat = (dateString: string | null | undefined): string => {
-    if (!dateString) return "";
-    
-    try {
-        if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-            return dateString;
-        }
-        
-        if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-            const [day, month, year] = dateString.split('/').map(Number);
-            return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-        }
-        
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return "";
-        
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const day = date.getDate().toString().padStart(2, '0');
-        
-        return `${year}-${month}-${day}`;
-    } catch (error) {
-        console.error("Error convirtiendo fecha al formato del backend:", error);
-        return "";
-    }
-};
-
-// Función para transformar datos al formato del componente
-const transformToComponentFormat = (justifications: Justification[]): TransformedJustificationItem[] => {
-    return justifications.map((j) => {
-        const student = j.attendance?.student;
-        const person = student?.person;
-        const studySheet = student?.studentStudySheets?.[0];
-
-        const booleanState = Boolean(j.state);
-        
-        const statusName = (j as any).justificationStatus?.name || "En proceso";
-        const statusId = (j as any).justificationStatus?.id?.toString() || 
-            (statusName === 'En proceso' ? 'default-en-proceso' : undefined);
-        
-        return {
-            id: Number(j.id),
-            ficha: studySheet?.studentStudySheetState?.toString() || "Sin ficha",
-            absenceDate: formatDateSafely(j.absenceDate),
-            justificationDate: formatDateSafely(j.justificationDate),
-            estado: statusName,  
-            state: booleanState, 
-            justificationType: j.justificationType?.name ?? "Sin tipo",
-            archivoAdjunto: j.justificationFile ?? "",
-            archivoMime: getMimeTypeFromBase64(j.justificationFile ?? ""),
-            documento: person?.document || '',
-            aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim(),
-            attendanceId: j.attendance?.id?.toString(),
-            justificationStatusId: statusId,
-            justificationStatus: statusName
-        };
-    });
-};
-
 const filterJustifications = (
-    data: TransformedJustificationItem[],
+    data: any[],
     filterOptions: FilterOptions
-): TransformedJustificationItem[] => {
+): any[] => {
     const { selectedFiltro, searchTerm, multiFilters, enableMultiFilter } = filterOptions;
 
     if (enableMultiFilter) {
@@ -480,7 +369,7 @@ export const fetchJustificationsByStudentId = createAsyncThunk<
 
 // justificaciones por competence quarter
 export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
-    TransformedJustificationItem[],
+    any[],
     GetAttendancesByCompetenceQuarterAndJustificationsQueryVariables
 >(
     'justifications/fetchByCompetenceQuarter',
@@ -531,7 +420,7 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
                     justificationStatus: statusName
                 };
                 return transformedItem;
-            }).filter(item => item !== null) as TransformedJustificationItem[];
+            }).filter(item => item !== null) as any[];
             return transformedData;
         } catch (error) {
             console.error("Error al obtener justificaciones por competence quarter", error);
@@ -870,12 +759,12 @@ const justificationSlice = createSlice({
         })
         .addCase(fetchJustifications.fulfilled, (state, action: PayloadAction<GetAllJustificationsQuery['allJustifications']>) => {
             if (action.payload?.data) {
-                
+                // Filtra nulls y usa los datos directamente
                 state.data = action.payload.data
-                    .filter((item): item is NonNullable<typeof item> => item !== null)
-                    .map(transformGraphQLToJustificationItem);
+                    .filter((item): item is NonNullable<typeof item> => item !== null) as Justification[];
 
-                state.transformedData = transformToComponentFormat(state.data);
+                // Usa los datos directamente sin transformaciones adicionales
+                state.transformedData = state.data as any;
                 
                 state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
 
@@ -895,8 +784,8 @@ const justificationSlice = createSlice({
         })
         .addCase(fetchJustificationById.fulfilled, (state, action: PayloadAction<GetJustificationByIdQuery['justificationById']>) => {
             if (action.payload) {
-                state.data = [transformGraphQLToJustificationItem(action.payload)];
-                state.transformedData = transformToComponentFormat(state.data);
+                state.data = [action.payload as Justification];
+                state.transformedData = state.data as any;
                 state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
             }
             state.loading = false;
@@ -913,12 +802,11 @@ const justificationSlice = createSlice({
         })
         .addCase(fetchJustificationsByStudentId.fulfilled, (state, action: PayloadAction<GetJustificationByStudentIdQuery['justificationByStudentId']>) => {
             if (action.payload?.data) {
-                
+                // Filtra nulls y usa los datos directamente
                 state.data = action.payload.data
-                    .filter((item): item is NonNullable<typeof item> => item !== null)
-                    .map(transformGraphQLToJustificationItem);
+                    .filter((item): item is NonNullable<typeof item> => item !== null) as Justification[];
 
-                state.transformedData = transformToComponentFormat(state.data);
+                state.transformedData = state.data as any;
                 state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                 
                 state.totalItems = state.data.length;
@@ -938,9 +826,9 @@ const justificationSlice = createSlice({
         })
         .addCase(addJustification.fulfilled, (state, action: PayloadAction<AddJustificationMutation['addJustification']>) => {
             if (action.payload) {
-                const newJustification = transformGraphQLToJustificationItem(action.payload);
+                const newJustification = action.payload as Justification;
                 state.data.push(newJustification);
-                state.transformedData = transformToComponentFormat(state.data);
+                state.transformedData = state.data as any;
                 state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
 
                 state.form.showForm = false;
@@ -960,11 +848,11 @@ const justificationSlice = createSlice({
         // updateJustification
         .addCase(updateJustification.fulfilled, (state, action: PayloadAction<UpdateJustificationMutation['updateJustification']>) => {
             if (action.payload) {
-                const updatedJustification = transformGraphQLToJustificationItem(action.payload);
+                const updatedJustification = action.payload as Justification;
                 const index = state.data.findIndex((justification: Justification) => justification.id === updatedJustification.id);
                 if (index !== -1) {
                     state.data[index] = updatedJustification;
-                    state.transformedData = transformToComponentFormat(state.data);
+                    state.transformedData = state.data as any;
                     state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                 }
             }
@@ -989,11 +877,11 @@ const justificationSlice = createSlice({
                         name: statusName || "Estado actualizado"
                     };
                     
-                    state.transformedData = transformToComponentFormat(state.data);
+                    state.transformedData = state.data as any;
                     state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
                 }
 
-                const competenceQuarterIndex = state.competenceQuarterData.findIndex(j => j.id.toString() === targetId);
+                const competenceQuarterIndex = state.competenceQuarterData.findIndex((j: any) => j.id.toString() === targetId);
                 if (competenceQuarterIndex !== -1) {
                     state.competenceQuarterData[competenceQuarterIndex].estado = statusName || "Estado actualizado";
                     state.competenceQuarterData[competenceQuarterIndex].justificationStatus = statusName || "Estado actualizado";
@@ -1013,7 +901,7 @@ const justificationSlice = createSlice({
         .addCase(deleteJustification.fulfilled, (state, action: PayloadAction<string>) => {
             if (action.payload) {
                 state.data = state.data.filter((justification) => justification.id !== String(action.payload));
-                state.transformedData = transformToComponentFormat(state.data);
+                state.transformedData = state.data as any;
                 state.filteredData = filterJustifications(state.transformedData, state.filterOptions);
             }
             state.error = null;
@@ -1028,7 +916,7 @@ const justificationSlice = createSlice({
             state.loading = true;
             state.error = null;
         })
-        .addCase(fetchJustificationsByCompetenceQuarter.fulfilled, (state, action: PayloadAction<TransformedJustificationItem[]>) => {
+        .addCase(fetchJustificationsByCompetenceQuarter.fulfilled, (state, action: PayloadAction<any[]>) => {
             state.competenceQuarterData = action.payload;
             state.competenceQuarterFilteredData = filterJustifications(action.payload, state.competenceQuarterFilterOptions);
             state.loading = false;

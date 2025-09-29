@@ -5,11 +5,11 @@ import { IoPersonCircleOutline, IoCalendarOutline, IoMailOutline, IoCheckmarkCir
 import { BsQrCodeScan, BsCameraFill } from "react-icons/bs";
 import { useSearchParams } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from "@redux/store";
 import { toast } from 'react-toastify';
+import { addAttendance } from "@redux/slices/attendanceSlice";
 import Webcam from "react-webcam";
 import jsQR from "jsqr";
-import type { RootState, AppDispatch } from "@redux/store";
-import { addAttendance } from "@redux/slices/attendanceSlice";
 
 // Función para obtener nombre del día en español
 const getDayName = (date: Date): string => {
@@ -34,17 +34,32 @@ const FormularioQr: React.FC = () => {
     const sessionId = searchParams.get('sessionId');
     const token = searchParams.get('token');
     const email = searchParams.get('email');
+    const studentId = searchParams.get('studentId'); // Nuevo parámetro
+    const competenceQuarterId = searchParams.get('competenceQuarterId'); // Nuevo parámetro para la competencia
 
     useEffect(() => {
         if (email) {
             setStudentEmail(decodeURIComponent(email));
         }
-    }, [email]);
+        
+        // Si tenemos studentId de la URL, deshabilitar el escaneo/input manual
+        if (studentId) {
+            setIsScanning(false);
+            setDocumentNumber(studentId);
+            console.log('🎯 Datos obtenidos de la URL:', {
+                studentId,
+                email: email ? decodeURIComponent(email) : null,
+                competenceQuarterId,
+                sessionId
+            });
+        }
+    }, [email, studentId, competenceQuarterId, sessionId]);
 
     const handleSubmit = async (): Promise<void> => {
-        const documentToUse = qrResult || documentNumber;
+        // Si tenemos studentId de la URL, usarlo directamente
+        const studentIdToUse = studentId || qrResult || documentNumber;
         
-        if (!documentToUse.trim()) {
+        if (!studentIdToUse.trim()) {
             toast.error('Por favor ingresa tu número de documento o escanea el QR');
             return;
         }
@@ -57,18 +72,30 @@ const FormularioQr: React.FC = () => {
         try {
             const attendanceData = {
                 attendanceDate: currentDate.toISOString().split('T')[0], // Formato YYYY-MM-DD
-                studentId: parseInt(documentToUse),
+                studentId: parseInt(studentIdToUse),
                 attendanceState: {
                     id: "2",
                     status: "Presente"
                 },
-                competenceQuarter: 1 // ID de competencia por defecto
+                competenceQuarter: competenceQuarterId ? parseInt(competenceQuarterId) : 1 // Usar el ID de la URL o valor por defecto
             };
+
+            console.log('📝 Registrando asistencia con datos:', {
+                studentId: studentIdToUse,
+                competenceQuarterId: competenceQuarterId,
+                sessionId: sessionId,
+                email: studentEmail,
+                fromUrl: !!studentId, // Indica si viene de URL personalizada
+                attendanceData
+            });
 
             const result = await dispatch(addAttendance(attendanceData));
             
             if (addAttendance.fulfilled.match(result)) {
-                toast.success('¡Asistencia registrada exitosamente!');
+                const messageBase = '¡Asistencia registrada exitosamente!';
+                const studentInfo = studentEmail ? ` para ${studentEmail}` : '';
+                toast.success(`${messageBase}${studentInfo}`);
+                
                 setAttendanceUpdated(true);
                 setDocumentNumber('');
                 setQrResult('');
@@ -152,14 +179,29 @@ const FormularioQr: React.FC = () => {
                         
                         <div className="bg-green-50 p-4 rounded-xl mb-4">
                             <p className="text-sm text-green-700">
-                                <strong>Documento:</strong> {qrResult || documentNumber}
+                                <strong>Estudiante ID:</strong> {studentId || qrResult || documentNumber}
                             </p>
+                            {studentEmail && (
+                                <p className="text-sm text-green-700">
+                                    <strong>Email:</strong> {studentEmail}
+                                </p>
+                            )}
                             <p className="text-sm text-green-700">
                                 <strong>Fecha:</strong> {formattedDate}
                             </p>
                             <p className="text-sm text-green-700">
                                 <strong>Hora:</strong> {formattedTime}
                             </p>
+                            {competenceQuarterId && (
+                                <p className="text-sm text-green-700">
+                                    <strong>Competencia:</strong> {competenceQuarterId}
+                                </p>
+                            )}
+                            {studentId && (
+                                <p className="text-sm text-green-600 mt-2">
+                                    ✅ Asistencia automática via email
+                                </p>
+                            )}
                         </div>
                         
                         <p className="text-sm text-gray-500">Esta ventana se cerrará automáticamente...</p>
@@ -194,8 +236,20 @@ const FormularioQr: React.FC = () => {
                 <div className="w-full max-w-lg bg-white p-8 rounded-3xl shadow-2xl border border-gray-200">
                     <div className="text-center mb-8">
                         <BsCameraFill className="text-blue-500 text-4xl mx-auto mb-3" />
-                        <h2 className="text-xl font-bold text-gray-800 mb-2">Registra tu Asistencia</h2>
-                        <p className="text-gray-600">Escanea tu QR personal o ingresa tu documento manualmente</p>
+                        <h2 className="text-xl font-bold text-gray-800 mb-2">
+                            {studentId ? 'Confirma tu Asistencia' : 'Registra tu Asistencia'}
+                        </h2>
+                        <p className="text-gray-600">
+                            {studentId 
+                                ? 'Tu información ha sido pre-cargada desde el email' 
+                                : 'Escanea tu QR personal o ingresa tu documento manualmente'
+                            }
+                        </p>
+                        {studentId && (
+                            <div className="mt-2 p-2 bg-green-100 text-green-700 rounded-lg text-sm">
+                                ✅ Estudiante identificado automáticamente
+                            </div>
+                        )}
                     </div>
 
                     {/* Email del estudiante */}
@@ -214,8 +268,8 @@ const FormularioQr: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Cámara QR */}
-                    {isScanning && (
+                    {/* Cámara QR - Solo mostrar si no tenemos studentId */}
+                    {isScanning && !studentId && (
                         <div className="relative mb-6">
                             <div className="relative overflow-hidden rounded-xl border-4 border-dashed border-blue-300 bg-blue-50">
                                 <Webcam
@@ -234,8 +288,41 @@ const FormularioQr: React.FC = () => {
                         </div>
                     )}
 
+                    {/* Información del estudiante identificado automáticamente */}
+                    {studentId && (
+                        <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-6">
+                            <div className="flex items-center space-x-3 mb-4">
+                                <IoPersonCircleOutline className="text-blue-500 text-3xl" />
+                                <div>
+                                    <p className="text-blue-700 font-semibold text-lg">Estudiante Identificado</p>
+                                    <p className="text-blue-600 text-sm">ID: {studentId}</p>
+                                </div>
+                            </div>
+                            {studentEmail && (
+                                <div className="bg-white rounded-lg p-3 mb-3">
+                                    <p className="text-gray-700 text-sm">
+                                        <strong>Email:</strong> {studentEmail}
+                                    </p>
+                                </div>
+                            )}
+                            <div className="bg-white rounded-lg p-3 mb-3">
+                                <p className="text-gray-700 text-sm">
+                                    <strong>Fecha:</strong> {formattedDate}
+                                </p>
+                                <p className="text-gray-700 text-sm">
+                                    <strong>Hora:</strong> {formattedTime}
+                                </p>
+                                {competenceQuarterId && (
+                                    <p className="text-gray-700 text-sm">
+                                        <strong>Competencia:</strong> {competenceQuarterId}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     {/* QR Detectado */}
-                    {qrResult && (
+                    {qrResult && !studentId && (
                         <div className="bg-green-50 border-2 border-green-200 rounded-xl p-4 mb-6">
                             <div className="flex items-center space-x-3">
                                 <IoCheckmarkCircleOutline className="text-green-500 text-2xl" />
@@ -247,20 +334,22 @@ const FormularioQr: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Campo Número de Documento */}
-                    <div className="relative w-full mb-6">
-                        <input
-                            type="text"
-                            value={qrResult || documentNumber}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDocumentNumber(e.target.value)}
-                            className="flex h-14 w-full rounded-xl border-2 border-gray-300 px-12 shadow-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-                            placeholder="Número de Documento"
-                            disabled={!!qrResult}
-                        />
-                        <div className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400 text-2xl">
-                            <IoPersonCircleOutline />
+                    {/* Campo Número de Documento - Solo mostrar si no tenemos studentId */}
+                    {!studentId && (
+                        <div className="relative w-full mb-6">
+                            <input
+                                type="text"
+                                value={qrResult || documentNumber}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDocumentNumber(e.target.value)}
+                                className="flex h-14 w-full rounded-xl border-2 border-gray-300 px-12 shadow-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                                placeholder="Número de Documento"
+                                disabled={!!qrResult}
+                            />
+                            <div className="absolute top-1/2 left-4 transform -translate-y-1/2 text-gray-400 text-2xl">
+                                <IoPersonCircleOutline />
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Campo Día */}
                     <div className="relative w-full mb-6">
@@ -280,11 +369,13 @@ const FormularioQr: React.FC = () => {
                     <div className="space-y-3">
                         <button
                             onClick={handleSubmit}
-                            disabled={loading || (!qrResult && !documentNumber.trim())}
+                            disabled={loading || (!studentId && !qrResult && !documentNumber.trim())}
                             className={`w-full h-14 rounded-xl text-white font-semibold transition-all transform hover:scale-105 active:scale-95 shadow-lg ${
-                                loading || (!qrResult && !documentNumber.trim())
+                                loading || (!studentId && !qrResult && !documentNumber.trim())
                                     ? 'bg-gray-400 cursor-not-allowed transform-none' 
-                                    : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-blue-200'
+                                    : studentId 
+                                        ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-green-200'
+                                        : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-blue-200'
                             }`}
                         >
                             {loading ? (
@@ -293,11 +384,11 @@ const FormularioQr: React.FC = () => {
                                     <span>Registrando...</span>
                                 </div>
                             ) : (
-                                'Registrar Asistencia'
+                                studentId ? 'Confirmar Asistencia' : 'Registrar Asistencia'
                             )}
                         </button>
                         
-                        {qrResult && (
+                        {qrResult && !studentId && (
                             <button
                                 onClick={() => {
                                     setQrResult('');
@@ -307,6 +398,14 @@ const FormularioQr: React.FC = () => {
                             >
                                 Escanear Otro QR
                             </button>
+                        )}
+
+                        {studentId && (
+                            <div className="text-center">
+                                <p className="text-sm text-gray-500">
+                                    ✨ Asistencia automática desde tu correo electrónico
+                                </p>
+                            </div>
                         )}
                     </div>
                 </div>

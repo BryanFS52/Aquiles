@@ -40,8 +40,8 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Extraer emails de todos los estudiantes de la ficha
-    const getStudentEmails = () => {
+    // Extraer información de estudiantes (email y studentId)
+    const getStudentsData = () => {
         if (!selectedForAttendance?.studentStudySheets) return [];
 
         return selectedForAttendance.studentStudySheets
@@ -50,8 +50,11 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
                 const stateName = studentSheet?.studentStudySheetState?.name;
                 return stateName === "Activo" || stateName === "En formacion";
             })
-            .map((studentSheet: any) => studentSheet?.student?.person?.email)
-            .filter((email: string) => email && email.trim() !== ""); // Filtrar emails válidos
+            .map((studentSheet: any) => ({
+                email: studentSheet?.student?.person?.email,
+                studentId: studentSheet?.student?.id
+            }))
+            .filter((student: any) => student.email && student.email.trim() !== "" && student.studentId); // Filtrar datos válidos
     };
 
     const handleClose = useCallback(() => {
@@ -117,10 +120,10 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
             return;
         }
 
-        const studentEmails = getStudentEmails();
+        const studentsData = getStudentsData();
 
-        if (studentEmails.length === 0) {
-            toast.error("No hay estudiantes con emails válidos en esta ficha.");
+        if (studentsData.length === 0) {
+            toast.error("No hay estudiantes con datos válidos en esta ficha.");
             return;
         }
 
@@ -134,32 +137,37 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
                 minute: '2-digit',
                 second: '2-digit'
             });
-            const baseUrl = window.location.origin;
-            const attendanceUrl = `${baseUrl}/dashboard/FormularioQRAsistencia?sessionId=${data.sessionId}&token=${btoa(data.sessionId + ':' + Date.now())}`;
+            
+            // Usar el tunnel de Cloudflare en lugar de window.location.origin
+            const baseUrl = 'https://assists-edmonton-stephen-herein.trycloudflare.com';
+            
+            // Obtener competenceQuarterId del contexto actual
+            // Primero intentar desde la URL actual
+            const urlParams = new URLSearchParams(window.location.search);
+            let competenceQuarterId = urlParams.get('competenceId') || urlParams.get('competenceQuarterId') || '1';
+            
+            console.log('🎯 CompetenceQuarterId obtenido:', competenceQuarterId, {
+                fromUrl: urlParams.get('competenceId') || urlParams.get('competenceQuarterId'),
+                final: competenceQuarterId
+            });
 
-            // Generar URLs completas para los logos (sin "public/" porque Next.js sirve desde /public como /)
+            // Generar URLs completas para los logos
             const logoInstitution = `${baseUrl}/img/LogoAquiles.png`;
             const logoSena = `${baseUrl}/img/logo_Sena.png`;
-
-            const htmlContent = getAttendanceEmailTemplate({
-                attendanceUrl,
-                sessionId: data.sessionId,
-                expirationTime,
-                defaultLogoInstitution: logoInstitution,
-                defaultLogoSena: logoSena
-            });
 
             // Enviar correo a todos los estudiantes
             let successCount = 0;
             let errorCount = 0;
 
-            const emailPromises = studentEmails.map(async (email) => {
+            const emailPromises = studentsData.map(async (student: { email: string; studentId: string }) => {
                 try {
-                    // Generar URL de asistencia personalizada con el email del estudiante
-                    const personalizedAttendanceUrl = `${attendanceUrl}&email=${encodeURIComponent(email)}`;
+                    // Generar URL de asistencia personalizada con todos los parámetros necesarios
+                    const personalizedAttendanceUrl = `${baseUrl}/dashboard/FormularioQRAsistencia?sessionId=${data.sessionId}&token=${btoa(data.sessionId + ':' + Date.now())}&studentId=${student.studentId}&email=${encodeURIComponent(student.email)}&competenceQuarterId=${competenceQuarterId}`;
+
+                    console.log('🔗 URL personalizada generada:', personalizedAttendanceUrl);
 
                     const htmlContent = getAttendanceEmailTemplate({
-                        attendanceUrl: personalizedAttendanceUrl, // URL personalizada con email
+                        attendanceUrl: personalizedAttendanceUrl, // URL personalizada con todos los parámetros
                         sessionId: data.sessionId || '',
                         expirationTime,
                         defaultLogoInstitution: logoInstitution,
@@ -167,7 +175,7 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
                     });
 
                     const emailRequest = {
-                        email: email,
+                        email: student.email,
                         subject: getAttendanceEmailSubject(),
                         htmlContent: htmlContent
                     };
@@ -176,14 +184,14 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
 
                     if (sendEmailNotification.fulfilled.match(result)) {
                         successCount++;
-                        console.log(`✅ Correo enviado exitosamente a: ${email}`);
+                        console.log(`✅ Correo enviado exitosamente a: ${student.email} (StudentID: ${student.studentId})`);
                     } else {
                         errorCount++;
-                        console.error(`❌ Error enviando correo a: ${email}`, result.payload);
+                        console.error(`❌ Error enviando correo a: ${student.email}`, result.payload);
                     }
                 } catch (error) {
                     errorCount++;
-                    console.error(`❌ Error inesperado enviando correo a: ${email}`, error);
+                    console.error(`❌ Error inesperado enviando correo a: ${student.email}`, error);
                 }
             });
 

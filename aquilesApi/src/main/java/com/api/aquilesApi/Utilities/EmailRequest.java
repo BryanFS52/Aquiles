@@ -4,9 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@NoArgsConstructor
 @Setter
 @Getter
-@NoArgsConstructor
 public class EmailRequest {
     private String email;
     private String subject;
