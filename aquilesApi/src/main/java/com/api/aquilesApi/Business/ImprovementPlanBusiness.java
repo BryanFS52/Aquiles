@@ -119,4 +119,16 @@ public class ImprovementPlanBusiness {
             throw new CustomException("Error Getting Teacher Competence IDs: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    public Page<ImprovementPlanDto> findByStudySheetId(Integer page, Integer size, Long idStudySheet) {
+        try {
+            PageRequest pageRequest = PageRequest.of(page, size);
+            Page<ImprovementPlan> improvementPlanPage = improvementPlanService.findByStudySheetId(pageRequest, idStudySheet);
+            return improvementPlanPage.map(entity -> modelMapper.map(entity, ImprovementPlanDto.class));
+        } catch (DataAccessException e) {
+            throw new CustomException("Error retrieving ImprovementPlan by StudySheetId due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            throw new CustomException("An unexpected error occurred while retrieving ImprovementPlan by StudySheetId.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
