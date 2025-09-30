@@ -4,12 +4,12 @@ import React, { useEffect, useState, useCallback } from "react";
 import { BsQrCode } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState, AppDispatch } from "@redux/store";
+import { RootState, AppDispatch } from "@redux/store";
 import { generateQrCode } from "@redux/slices/generateQrSlice";
 import { sendEmailNotification } from "@redux/slices/sendEmailSlice";
 import { getAttendanceEmailTemplate, getAttendanceEmailSubject } from "@templates/attendanceQrTemplate";
+import Image from "next/image";
 import Modal from "@components/UI/Modal";
 
 interface ModalQRProps {
@@ -139,7 +139,7 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
             });
             
             // Usar el tunnel de Cloudflare en lugar de window.location.origin
-            const baseUrl = 'https://assists-edmonton-stephen-herein.trycloudflare.com';
+            const baseUrl = ' https://voted-mile-planners-handmade.trycloudflare.com';
             
             // Obtener competenceQuarterId del contexto actual
             // Primero intentar desde la URL actual
