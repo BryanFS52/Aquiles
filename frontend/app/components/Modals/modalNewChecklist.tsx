@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { checkListService } from '@redux/slices/checklistSlice'
-import { trainingProjectService } from '@redux/slices/olympo/trainingProjectSlice'
-import { studySheetService } from '@redux/slices/olympo/studySheetSlice'
+import { useSelector, useDispatch } from 'react-redux'
+import { RootState, AppDispatch } from '@redux/store'
+import { fetchAllTrainingProjects } from '@redux/slices/olympo/trainingProjectSlice'
+import { fetchStudySheetsByTrainingProject } from '@redux/slices/olympo/studySheetSlice'
 
 interface ChecklistItem {
   id?: string
@@ -32,6 +34,7 @@ interface ModalProps {
 }
 
 export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingData = null, isEditing = false }: ModalProps) {
+  const dispatch = useDispatch<AppDispatch>()
   const [trimestre, setTrimestre] = useState<string>('')
   const [componente, setComponente] = useState<string>('')
   const [observaciones, setObservaciones] = useState<string>('')
@@ -41,56 +44,28 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
   // Estados para proyectos formativos y fichas
   const [selectedTrainingProject, setSelectedTrainingProject] = useState<string>('')
   const [selectedStudySheets, setSelectedStudySheets] = useState<string[]>([])
-  const [trainingProjects, setTrainingProjects] = useState<any[]>([])
-  const [studySheets, setStudySheets] = useState<any[]>([])
-  const [loadingProjects, setLoadingProjects] = useState<boolean>(false)
-  const [loadingSheets, setLoadingSheets] = useState<boolean>(false)
+
+  // Redux selectors
+  const trainingProjects = useSelector((state: RootState) => state.trainingProject.data)
+  const loadingProjects = useSelector((state: RootState) => state.trainingProject.loading)
+  const studySheets = useSelector((state: RootState) => state.studySheet.data)
+  const loadingSheets = useSelector((state: RootState) => state.studySheet.loading)
 
   // Cargar proyectos formativos al abrir el modal
   useEffect(() => {
     if (isOpen) {
-      loadTrainingProjects()
+      dispatch(fetchAllTrainingProjects({ size: 100 }))
     }
-  }, [isOpen])
+  }, [isOpen, dispatch])
 
   // Cargar fichas cuando se selecciona un proyecto formativo
   useEffect(() => {
     if (selectedTrainingProject) {
-      loadStudySheets(selectedTrainingProject)
+      dispatch(fetchStudySheetsByTrainingProject({ trainingProjectId: parseInt(selectedTrainingProject), size: 100 }))
     } else {
-      setStudySheets([])
       setSelectedStudySheets([])
     }
-  }, [selectedTrainingProject])
-
-  const loadTrainingProjects = async () => {
-    setLoadingProjects(true)
-    try {
-      const response = await trainingProjectService.getAllTrainingProjects({ size: 100 })
-      setTrainingProjects(response.data || [])
-    } catch (error) {
-      console.error('Error loading training projects:', error)
-      toast.error('Error al cargar los proyectos formativos')
-    } finally {
-      setLoadingProjects(false)
-    }
-  }
-
-  const loadStudySheets = async (trainingProjectId: string) => {
-    setLoadingSheets(true)
-    try {
-      const response = await studySheetService.getStudySheetsByTrainingProject({ 
-        idTrainingProject: parseInt(trainingProjectId),
-        size: 100
-      })
-      setStudySheets(response.data || [])
-    } catch (error) {
-      console.error('Error loading study sheets:', error)
-      toast.error('Error al cargar las fichas de formación')
-    } finally {
-      setLoadingSheets(false)
-    }
-  }
+  }, [selectedTrainingProject, dispatch])
 
   // Efecto para cargar datos de edición
   useEffect(() => {
@@ -206,6 +181,9 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
     setSelectedStudySheets([])
   }
 
+  // Filtrar fichas por proyecto formativo en el render
+  const filteredStudySheets = studySheets.filter(sheet => sheet.trainingProject?.id?.toString() === selectedTrainingProject)
+
   if (isOpen !== undefined) {
     if (!isOpen) return null
     return (
@@ -289,8 +267,8 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                 disabled={loadingProjects}
               >
                 <option value="">Selecciona un proyecto formativo</option>
-                {trainingProjects.map((project) => (
-                  <option key={project.id} value={project.id}>
+                {trainingProjects.filter(project => project.id != null).map((project) => (
+                  <option key={project.id!} value={project.id!}>
                     {project.name} - {project.program?.name}
                   </option>
                 ))}
@@ -306,14 +284,14 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                 </label>
                 {loadingSheets ? (
                   <p className="text-sm text-gray-500">Cargando fichas...</p>
-                ) : studySheets.length > 0 ? (
+                ) : filteredStudySheets.length > 0 ? (
                   <div className="max-h-32 overflow-y-auto border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl p-3 space-y-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700">
-                    {studySheets.map((sheet) => (
-                      <label key={sheet.id} className="flex items-center space-x-2 cursor-pointer">
+                    {filteredStudySheets.filter(sheet => sheet.id != null).map((sheet) => (
+                      <label key={sheet.id!} className="flex items-center space-x-2 cursor-pointer">
                         <input
                           type="checkbox"
-                          checked={selectedStudySheets.includes(sheet.id.toString())}
-                          onChange={(e) => handleStudySheetChange(sheet.id.toString(), e.target.checked)}
+                          checked={selectedStudySheets.includes(sheet.id!.toString())}
+                          onChange={(e) => handleStudySheetChange(sheet.id!.toString(), e.target.checked)}
                           className="h-4 w-4 text-lime-600 focus:ring-lime-500 dark:text-blue-600 dark:focus:ring-blue-500 border-gray-300 rounded"
                         />
                         <span className="text-sm text-gray-700 dark:text-gray-300">

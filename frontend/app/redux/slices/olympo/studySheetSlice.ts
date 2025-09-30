@@ -107,6 +107,18 @@ export const fetchStudySheetByIdWithAttendances = createAsyncThunk<GetStudySheet
     }
 );
 
+export const fetchStudySheetsByTrainingProject = createAsyncThunk<any, { trainingProjectId: number; page?: number; size?: number }>(
+  'studySheet/fetchByTrainingProject',
+  async ({ trainingProjectId, page = 0, size = 100 }) => {
+    const { data } = await clientLAN.query({
+      query: GET_STUDY_SHEETS_BY_TRAINING_PROJECT,
+      variables: { trainingProjectId, page, size },
+      fetchPolicy: 'no-cache',
+    });
+    return data.allStudySheets;
+  }
+);
+
 interface ExtendedStudySheetState extends ReturnType<typeof createInitialPaginatedState < StudySheet >> {
     dataForStudents: Record<string, Student[]>,
     dataForTeamScrums: TeamsScrum[],

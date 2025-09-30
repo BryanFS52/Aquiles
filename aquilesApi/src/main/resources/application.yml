@@ -1,5 +1,5 @@
 server:
-  port: 8081  # Cambia 8081 por el puerto que prefieras
+  port: 8080  # Cambia 8081 por el puerto que prefieras
 
 spring:
   application:
@@ -7,7 +7,7 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/DB_Aquiles
-    username: fabrica
+    username: postgres
     password: fabrica2024*
     driver-class-name: org.postgresql.Driver
 
