@@ -59,4 +59,4 @@ spring:
       max-age: 3600
 
 frontend:
-  url: https://assists-edmonton-stephen-herein.trycloudflare.com
+  url: https://voted-mile-planners-handmade.trycloudflare.com

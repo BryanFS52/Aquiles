@@ -106,7 +106,6 @@ public class JustificationBusiness {
 
     // Update existing Justification
     public void update(Long id, JustificationDto dto) {
-
         Justification existing = justificationService.getById(id);
         JustificationMap.INSTANCE.updateEntity(dto, existing);
         existing.setId(existing.getId());
