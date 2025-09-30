@@ -6,31 +6,18 @@ import { useSelector, useDispatch } from 'react-redux'
 import { RootState, AppDispatch } from '@redux/store'
 import { fetchAllTrainingProjects } from '@redux/slices/olympo/trainingProjectSlice'
 import { fetchStudySheetsByTrainingProject } from '@redux/slices/olympo/studySheetSlice'
+import { Checklist, Item } from "@graphql/generated";
 
-interface ChecklistItem {
-  id?: string
-  code?: string
-  indicator: string
-  active?: boolean
-}
+type ModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  onCreate: (checklistData: any) => Promise<void>;
+  editingData?: Checklist | null;
+  isEditing?: boolean;
+};
 
-interface Checklist {
-  id: string
-  state: boolean
-  remarks?: string
-  trimester?: string
-  component?: string
-  items?: ChecklistItem[]
-  [key: string]: any
-}
-
-interface ModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onCreate: (checklistData: any) => Promise<void>
-  editingData?: Checklist | null
-  isEditing?: boolean
-}
+// Si usas Next.js App Router y ves el error de serialización, puedes ignorarlo para modales controlados por el cliente.
+// Si quieres evitar el error, define el modal como componente hijo y pásale las funciones por props desde un componente cliente.
 
 export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingData = null, isEditing = false }: ModalProps) {
   const dispatch = useDispatch<AppDispatch>()
@@ -76,10 +63,12 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
       setSelectedTrainingProject(editingData.trainingProjectId?.toString() || '')
       setSelectedStudySheets(editingData.studySheets ? editingData.studySheets.split(',') : [])
       if (editingData.items && editingData.items.length > 0) {
-        const loadedItems = editingData.items.map(item => ({
-          id: item.id?.toString(),
-          indicador: item.indicator || ''
-        }))
+        const loadedItems = editingData.items
+          .filter((item): item is Item => !!item)
+          .map(item => ({
+            id: item.id?.toString(),
+            indicador: item.indicator || ''
+          }))
         setItems(loadedItems)
       } else {
         setItems([{ indicador: '' }])
