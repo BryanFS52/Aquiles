@@ -69,7 +69,6 @@ public class ChecklistBusiness {
                 dto.setTrimester(entity.getTrimester());
                 dto.setComponent(entity.getComponent());
                 dto.setTrainingProjectId(entity.getTrainingProjectId());
-                dto.setTrainingProjectName(entity.getTrainingProjectName());
                 return dto;
             });
         } catch (DataAccessException e) {
@@ -90,7 +89,6 @@ public class ChecklistBusiness {
             dto.setTrimester(checklist.getTrimester());
             dto.setComponent(checklist.getComponent());
             dto.setTrainingProjectId(checklist.getTrainingProjectId());
-            dto.setTrainingProjectName(checklist.getTrainingProjectName());
             return dto;
         } catch (CustomException e) {
             throw e;
@@ -110,7 +108,6 @@ public class ChecklistBusiness {
             checklist.setEvaluationCriteria(checklistDto.isEvaluationCriteria());
             checklist.setStudySheets(checklistDto.getStudySheets());
             checklist.setTrainingProjectId(checklistDto.getTrainingProjectId());
-            checklist.setTrainingProjectName(checklistDto.getTrainingProjectName());
 
             // Conversión manual del String a byte[] para instructorSignature
             if (checklistDto.getInstructorSignature() != null) {
@@ -160,7 +157,6 @@ public class ChecklistBusiness {
             result.setTrimester(saved.getTrimester());
             result.setComponent(saved.getComponent());
             result.setTrainingProjectId(saved.getTrainingProjectId());
-            result.setTrainingProjectName(saved.getTrainingProjectName());
             return result;
         } catch (Exception e) {
             throw new CustomException("Error creating checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -194,9 +190,6 @@ public class ChecklistBusiness {
             }
             if (checklistDto.getTrainingProjectId() != null) {
                 checklistAntes.setTrainingProjectId(checklistDto.getTrainingProjectId());
-            }
-            if (checklistDto.getTrainingProjectName() != null) {
-                checklistAntes.setTrainingProjectName(checklistDto.getTrainingProjectName());
             }
             if (checklistDto.getInstructorSignature() != null) {
                 checklistAntes.setInstructorSignature(

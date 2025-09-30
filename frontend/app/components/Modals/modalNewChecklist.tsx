@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
-import { checkListService } from '@redux/slices/checklistSlice'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState, AppDispatch } from '@redux/store'
 import { fetchAllTrainingProjects } from '@redux/slices/olympo/trainingProjectSlice'

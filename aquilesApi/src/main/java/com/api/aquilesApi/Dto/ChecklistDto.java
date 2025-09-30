@@ -36,8 +36,6 @@ public class ChecklistDto {
 
     private Long trainingProjectId;
 
-    private String trainingProjectName;
-
     // Relations - Relación 1:1 con Evaluación
     // @NotNull(message = "Los jurados asociados son obligatorios") // ← Removido: no siempre son obligatorios
     private Set<Long> associatedJuries;

@@ -1,4 +1,3 @@
-
 type Checklist {
     id: ID!
     state: Boolean
@@ -9,7 +8,6 @@ type Checklist {
     evaluationCriteria: Boolean
     studySheets: String
     trainingProjectId: Long
-    trainingProjectName: String
     evaluations: Evaluation
     items: [Item]
     associatedJuries: [Juries]
@@ -42,7 +40,6 @@ input ChecklistDto {
     evaluationCriteria: Boolean!
     studySheets: String
     trainingProjectId: Long
-    trainingProjectName: String
     evaluationId: Long
     evaluations: [EvaluationDto]
     items: [ItemDto]

@@ -96,7 +96,6 @@ export const GET_ALL_CHECKLISTS_COORDINATOR = gql`
         component
         studySheets
         trainingProjectId
-        trainingProjectName
         items {
           id
           code
@@ -124,7 +123,6 @@ export const GET_CHECKLIST_BY_ID_COORDINATOR = gql`
         component
         studySheets
         trainingProjectId
-        trainingProjectName
         items {
           id
           code
