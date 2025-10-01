@@ -8,10 +8,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.Date;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class FinalReportDto {
 
     private Long id;
@@ -31,15 +32,16 @@ public class FinalReportDto {
     @Size(max = 255, message = "Las conclusiones no pueden exceder los 255 caracteres")
     private String conclusions;
 
-    private byte[] annexes;
+    private String annexes;
 
-    @NotNull(message = "La firma es obligatoria")
     private String signature;
 
     @NotNull(message = "El estado es obligatorio")
     private Boolean state;
 
-    private Instant  createdAt;
+    private Long competenceQuarter;
+
+    private Date createdAt;
 
     // Relations
 }

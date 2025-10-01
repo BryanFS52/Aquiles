@@ -1,7 +1,6 @@
 import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { 
-    GET_ALL_TRAINING_PROJECTS, 
+import { GET_ALL_TRAINING_PROJECTS, 
     GET_TRAINING_PROJECTS_BY_PROGRAM,
     GET_TRAINING_PROJECT_BY_ID 
 } from '@graphql/olympo/trainingProjectGraph';

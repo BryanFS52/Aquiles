@@ -2,24 +2,7 @@ import { clientLAN } from '@lib/apollo-client';
 import { GET_ALL_PROFILES, GET_PROFILE_BY_ID } from '@graphql/atlas/profilesGraph';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
-import {
-    Profile,
-    GetAllProfilesQuery,
-    GetAllProfilesQueryVariables,
-    GetProfileByIdQuery,
-    GetProfileByIdQueryVariables
-} from '@graphql/generated'
-
-const transformGraphQLToProfileItem = (graphqlData: any): Profile => {
-    return {
-        id: graphqlData.id,
-        name: graphqlData.name,
-        description: graphqlData.description,
-        isActive: graphqlData.isActive,
-        isUnique: graphqlData.isUnique,
-        process: graphqlData.process
-    }
-};
+import { Profile, GetAllProfilesQuery, GetAllProfilesQueryVariables, GetProfileByIdQuery,GetProfileByIdQueryVariables} from '@graphql/generated'
 
 export const fetchProfiles = createAsyncThunk<GetAllProfilesQuery['allProfiles'], GetAllProfilesQueryVariables>(
     'profile/fetchAll',
@@ -59,9 +42,9 @@ const profileSlice = createSlice({
             })
             .addCase(fetchProfiles.fulfilled, (state, action: PayloadAction<any>) => {
                 if (action.payload?.data) {
+                    // Filtra nulls y usa los datos directamente
                     state.data = action.payload.data
-                        .filter((item: any): item is NonNullable<typeof item> => item !== null)
-                        .map(transformGraphQLToProfileItem);
+                        .filter((item: any): item is NonNullable<typeof item> => item !== null) as Profile[];
                     state.totalItems = action.payload.totalItems ?? 0;
                     state.totalPages = action.payload.totalPages ?? 0;
                     state.currentPage = action.payload.currentPage ?? 0;
@@ -78,7 +61,7 @@ const profileSlice = createSlice({
             })
             .addCase(fetchProfileById.fulfilled, (state, action: PayloadAction<any>) => {
                 if (action.payload?.data) {
-                    state.data = [transformGraphQLToProfileItem(action.payload.data)];
+                    state.data = [action.payload.data as Profile];
                 }
                 state.loading = false;
             })

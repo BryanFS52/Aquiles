@@ -15,7 +15,8 @@ import {
     PiCirclesFourDuotone,
     PiListBulletsDuotone,
     PiCaretDoubleLeftDuotone,
-    PiTargetDuotone
+    PiTargetDuotone,
+    PiNotepadDuotone
 } from "react-icons/pi";
 
 import Link from 'next/link';
@@ -50,6 +51,7 @@ const IconAprendices = <PiStudentDuotone className="w-6 h-6 text-black dark:text
 const IconPlanesMejoramiento = <PiClipboardDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
 const IconCoordinaciones = <PiUsersDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
 const IconSeguimiento = <PiTargetDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
+const IconActas = <PiNotepadDuotone className="w-6 h-6 text-black dark:text-dark-text" />;
 
 // Configuración de menú por rol
 const MENU_CONFIG: MenuConfig = {
@@ -59,6 +61,7 @@ const MENU_CONFIG: MenuConfig = {
         { href: "/dashboard/InstructorSelection", label: "Sustentaciones", icon: IconSustentaciones },
         { href: "/dashboard/planesMejoramientoInstructor", label: "P. Mejoramiento", icon: IconPlanesMejoramiento },
         { href: "/dashboard/Seguimiento", label: "Seguimiento", icon: IconSeguimiento },
+        { href: "/dashboard/actasInstructor", label: "Actas", icon: IconActas }
     ],
     aprendiz: [
         { href: "/dashboard/FichaAprendiz", label: "Ficha", icon: IconFichas },

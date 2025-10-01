@@ -7,86 +7,8 @@ import {
     GetStudentsQuery,
     GetStudentsQueryVariables,
     GetStudentListQuery,
-    GetStudentListQueryVariables
+    GetStudentListQueryVariables,
 } from '@graphql/generated'
-
-// Service methods integrated into slice
-interface GetStudentsServiceParams {
-    name?: string;
-    idStudySheet?: number;
-    page?: number;
-    size?: number;
-}
-
-const studentService = {
-    getStudents: async ({ name, idStudySheet, page = 0, size = 10 }: GetStudentsServiceParams = {}) => {
-        try {
-            const { data } = await clientLAN.query({
-                query: GET_All_STUDENTS,
-                variables: { name, idStudySheet, page, size },
-                fetchPolicy: 'network-only',
-            });
-
-            if (data?.allStudents?.code === '200' || data?.allStudents?.code === 200) {
-                return data.allStudents;
-            } else {
-                throw new Error(data?.allStudents?.message || 'Error fetching students');
-            }
-        } catch (error) {
-            console.error('Error fetching students:', error);
-            throw error;
-        }
-    },
-
-    getStudentList: async () => {
-        try {
-            const { data } = await clientLAN.query({
-                query: GET_STUDENT_LIST,
-                fetchPolicy: 'network-only',
-            });
-
-            if (data?.allStudentList?.code === '200' || data?.allStudentList?.code === 200) {
-                return data.allStudentList;
-            } else {
-                throw new Error(data?.allStudentList?.message || 'Error fetching student list');
-            }
-        } catch (error) {
-            console.error('Error fetching student list:', error);
-            throw error;
-        }
-    },
-};
-
-export interface StudentWithSheets extends Student {
-  studySheets?: {
-    id: string;
-    number: string;
-    state: string;
-  }[];
-}
-
-
-// Función para transformar datos de GraphQL a Student
-export const transformGraphQLToStudentItem = (graphqlData: any): StudentWithSheets => {
-    return {
-        id: graphqlData.id,
-        state: graphqlData.state,
-        person: {
-            id: graphqlData.person?.id,
-            document: graphqlData.person?.document,
-            name: graphqlData.person?.name,
-            lastname: graphqlData.person?.lastname,
-            phone: graphqlData.person?.phone,
-            email: graphqlData.person?.email,
-            address: graphqlData.person?.address,
-        },
-        studentStudySheets: graphqlData.studentStudySheets?.map((sheet: any) => ({
-            id: sheet.id,
-            number: sheet.number,
-            state: sheet.state
-        }))
-    };
-};
 
 
 export const fetchStudents = createAsyncThunk<GetStudentsQuery['allStudents'], GetStudentsQueryVariables>(
@@ -127,9 +49,9 @@ const studentSlice = createSlice({
             .addCase(fetchStudents.fulfilled, (state, action) => {
                 const payload = action.payload ?? {};
 
+                // Filtra nulls y usa los datos directamente
                 state.data = (payload.data ?? [])
-                    .filter((item): item is NonNullable<typeof item> => item !== null)
-                    .map(transformGraphQLToStudentItem);
+                    .filter((item): item is NonNullable<typeof item> => item !== null) as Student[];
 
                 state.totalItems = payload.totalItems ?? 0;
                 state.totalPages = payload.totalPages ?? 0;
@@ -155,9 +77,9 @@ const studentSlice = createSlice({
             .addCase(fetchStudentList.fulfilled, (state, action) => {
                 const payload = action.payload ?? {};
 
+                // Filtra nulls y usa los datos directamente
                 state.data = (payload.data ?? [])
-                    .filter((item): item is NonNullable<typeof item> => item !== null)
-                    .map(transformGraphQLToStudentItem);
+                    .filter((item): item is NonNullable<typeof item> => item !== null) as Student[];
 
                 // valores por defecto para compatibilidad
                 state.totalItems = payload.totalItems ?? payload.data?.length ?? 0;
@@ -178,8 +100,5 @@ const studentSlice = createSlice({
 });
 
 export const { } = studentSlice.actions;
-
-// Export service methods for compatibility
-export { studentService };
 
 export default studentSlice.reducer;

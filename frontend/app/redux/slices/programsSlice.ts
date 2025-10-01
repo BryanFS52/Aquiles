@@ -1,5 +1,8 @@
+/*
+
+// Cambiar de axios a redux
+
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { createInitialPaginatedState } from '@type/slices/common/generic';
 
 // Service methods integrated into slice
@@ -9,28 +12,6 @@ interface Program {
     description?: string;
     [key: string]: any;
 }
-
-const programsService = {
-    getProgramById: async (id: number) => {
-        try {
-            const response = await axios.get(`http://localhost:8081/api/programs/${id}`);
-            return response.data;
-        } catch (error) {
-            console.error("Error fetching program:", error);
-            throw error;
-        }
-    },
-
-    getAllPrograms: async () => {
-        try {
-            const response = await axios.get('http://localhost:8081/api/programs/all');
-            return response.data;
-        } catch (error) {
-            console.error("Error fetching programs:", error);
-            throw error;
-        }
-    }
-};
 
 // Async thunks
 export const fetchProgramById = createAsyncThunk<Program, number>(
@@ -48,20 +29,6 @@ export const fetchAllPrograms = createAsyncThunk<Program[]>(
         return response.data;
     }
 );
-
-interface ProgramsState {
-    data: Program[];
-    loading: boolean;
-    error: string | null;
-    selectedProgram: Program | null;
-}
-
-const initialState: ProgramsState = {
-    data: [],
-    loading: false,
-    error: null,
-    selectedProgram: null,
-};
 
 const programsSlice = createSlice({
     name: 'programs',
@@ -118,3 +85,4 @@ export const { clearPrograms, setSelectedProgram } = programsSlice.actions;
 export { programsService };
 
 export default programsSlice.reducer;
+*/

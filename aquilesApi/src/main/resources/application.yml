@@ -59,8 +59,4 @@ spring:
       max-age: 3600
 
 frontend:
-  url: https://7d12-179-1-218-161.ngrok-free.app
-
-olympo:
-  microservice:
-    url: http://localhost:8080
+  url: https://voted-mile-planners-handmade.trycloudflare.com
