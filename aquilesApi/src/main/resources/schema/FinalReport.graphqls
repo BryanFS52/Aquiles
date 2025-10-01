@@ -35,6 +35,7 @@ input FinalReportDto {
     annexes: String
     signature: String
     state: Boolean
+    competenceQuarter: Long
 }
 
 extend type Query {

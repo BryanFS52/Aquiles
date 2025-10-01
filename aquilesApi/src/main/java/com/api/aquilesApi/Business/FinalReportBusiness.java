@@ -73,6 +73,12 @@ public class FinalReportBusiness {
             System.out.println(">>> Annexes recibido = " + finalreportDto.getAnnexes());
             System.out.println(">>> Signature recibido = " + finalreportDto.getSignature());
             FinalReportMap.INSTANCE.updateFinalReport(finalreportDto, finalReport);
+
+            // Set signature
+            if (finalReport.getSignature() == null) {
+                finalReport.setSignature("SIGNATURE_DEFAULT".getBytes());
+            }
+
             FinalReport savedFinalReport = finalReportService.save(finalReport);
             return FinalReportMap.INSTANCE.EntityToDTO(savedFinalReport);
         }catch ( Exception e){
