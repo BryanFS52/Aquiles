@@ -27,6 +27,7 @@ export const GET_STUDY_SHEETS = gql`
                     }
                 }
                 trainingProject {
+                    id
                     name
                     program {
                         id
