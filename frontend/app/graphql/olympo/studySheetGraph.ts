@@ -42,8 +42,8 @@ export const GET_STUDY_SHEETS = gql`
 `;
 
 export const GET_STUDY_SHEETS_BY_TRAINING_PROJECT = gql`
-    query GetStudySheetsByTrainingProject($page: Int, $size: Int) {
-        allStudySheets(page: $page, size: $size) {
+    query GetStudySheetsByTrainingProject($trainingProjectId: Long, $page: Int, $size: Int) {
+        allStudySheets(trainingProjectId: $trainingProjectId, page: $page, size: $size) {
             date
             code
             message

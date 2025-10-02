@@ -334,6 +334,34 @@ const studySheetSlice = createSlice({
                 state.loadingAttendanceSheet = false;
                 state.selectedForAttendance = null;
             });
+
+        // Fetch StudySheets by Training Project
+        builder
+            .addCase(fetchStudySheetsByTrainingProject.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchStudySheetsByTrainingProject.fulfilled, (state, action) => {
+                const payload = action.payload;
+
+                if (payload?.data) {
+                    state.data = payload.data
+                        .filter((item: any): item is NonNullable<typeof item> => item !== null) as StudySheet[];
+                    state.totalItems = payload.totalItems ?? 0;
+                    state.totalPages = payload.totalPages ?? 0;
+                    state.currentPage = payload.currentPage ?? 0;
+                } else {
+                    state.data = [];
+                    state.totalItems = 0;
+                    state.totalPages = 0;
+                    state.currentPage = 0;
+                }
+                state.loading = false;
+            })
+            .addCase(fetchStudySheetsByTrainingProject.rejected, (state, action) => {
+                state.error = action.error.message ?? 'Error fetching study sheets by training project';
+                state.loading = false;
+            });
     }
 });
 
