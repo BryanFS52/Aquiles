@@ -34,6 +34,7 @@ public class AttendancesResolver {
     public Map<String, Object> allAttendances(@InputArgument Integer page, @InputArgument Integer size) {
         try {
             Page<AttendanceDto> attendancesDtoPage = attendancesBusiness.findAll(page, size);
+            if (!attendancesDtoPage.isEmpty()){
             return ResponseHttpApi.responseHttpFindAll(
                     attendancesDtoPage.getContent(),
                     ResponseHttpApi.CODE_OK,
@@ -42,12 +43,23 @@ public class AttendancesResolver {
                     page,
                     (int) attendancesDtoPage.getTotalElements()
             );
+            } else {
+                return ResponseHttpApi.responseHttpFindAll(
+                        null,
+                        ResponseHttpApi.NO_CONTENT,
+                        "No Attendances found",
+                        0,
+                        0,
+                        0
+                );
+            }
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error retrieving Attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    // Find Attendances By StudentId (GraphQL)
     @DgsQuery
     public Map<String, Object> allAttendancesByStudentId(@InputArgument Long id, @InputArgument Long stateId, @InputArgument Integer page, @InputArgument Integer size) {
         try {

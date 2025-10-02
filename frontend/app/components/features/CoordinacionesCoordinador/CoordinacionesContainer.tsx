@@ -11,11 +11,13 @@ import DataTable from '@components/UI/DataTable';
 import Loader from '@components/UI/Loader';
 import EmptyState from '@components/UI/emptyState';
 import { Users,Building2, Check, X, Grid3X3, List, User, UserCheck } from 'lucide-react';
+import { useLoader } from '@/context/LoaderContext';
 
 type ViewMode = 'cards' | 'table';
 
 const CoordinacionesContainer: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
+    const { showLoader, hideLoader } = useLoader();
     const [viewMode, setViewMode] = useState<ViewMode>('cards');
     const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -49,7 +51,18 @@ const CoordinacionesContainer: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        dispatch(fetchCoordinationByColaborator({ collaboratorId: 7, page: 0, size: 5 }));
+        const loadCoordinations = async () => {
+            showLoader();
+            try {
+                await dispatch(fetchCoordinationByColaborator({ collaboratorId: 7, page: 0, size: 5 })).unwrap();
+            } catch (error) {
+                console.error('Error loading coordinations:', error);
+            } finally {
+                hideLoader();
+            }
+        };
+        
+        loadCoordinations();
     }, [dispatch]);
 
     // Función para renderizar las cards de coordinaciones

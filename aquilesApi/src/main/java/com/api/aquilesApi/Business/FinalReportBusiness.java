@@ -20,7 +20,7 @@ public class FinalReportBusiness {
         this.finalReportService = finalReportService;
     }
 
-    // Validation object
+    // Validation Object
     private void validationObject (FinalReportDto finalreportDto) {
         if (finalreportDto == null) {
             throw new CustomException("The finalReport object is null", HttpStatus.BAD_REQUEST);
@@ -40,7 +40,7 @@ public class FinalReportBusiness {
     }
 
 
-    // Get all finalReports (paginated)
+    // Get all finalReports (Paginated)
     public Page<FinalReportDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);

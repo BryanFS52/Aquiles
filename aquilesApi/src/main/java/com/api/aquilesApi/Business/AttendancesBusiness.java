@@ -37,7 +37,7 @@ public class AttendancesBusiness {
 
     }
 
-    // Get all attendances (paginated)
+    // Get all Attendances (Paginated)
     public Page<AttendanceDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
@@ -50,7 +50,7 @@ public class AttendancesBusiness {
         }
     }
 
-    // Get attendance by ID
+    // Get Attendance by ID
     public AttendanceDto findById(Long id) {
         try {
             Attendance attendance = attendancesService.getById(id);
@@ -62,7 +62,7 @@ public class AttendancesBusiness {
         }
     }
 
-    // Get attendances by student ID
+    // Get Attendances by studentId
     public List<Attendance> findAllByStudentId(Long studentId) {
         try {
             return attendancesService.findAllByStudentId(studentId);
@@ -71,7 +71,7 @@ public class AttendancesBusiness {
         }
     }
 
-    // Get All attendance ByStudentIdAndCompetenceQuarter
+    // Get Attendances By StudentIdAndCompetenceQuarter
     public List<Attendance> getAllByStudentIdAndCompetenceQuarter(Long studentId, Long competenceQuarterId) {
         try {
             return attendancesService.getAllByStudentIdAndCompetenceQuarter(studentId, competenceQuarterId);
@@ -81,7 +81,7 @@ public class AttendancesBusiness {
         }
     }
 
-    // Get attendances by competence quarter ID
+    // Get Attendances by competenceQuarterId
     public Page<AttendanceDto> findAllByCompetenceQuarterId(Long id, Pageable pageable) {
         try {
             Page<Attendance> attendanceList = attendancesService.findAllByCompetenceQuarterIdAndJustifications(id, pageable);
@@ -91,7 +91,7 @@ public class AttendancesBusiness {
         }
     }
 
-    // Get filtered attendances (student and state)
+    // Get filtered Attendances (student and state)
     public Page<AttendanceDto> findAllByStudentId(Long studentId, Long idState, Pageable pageable) {
         try {
             Page<Attendance> attendancePage = attendancesService.findAllByFilter(studentId, idState, pageable);
@@ -101,7 +101,7 @@ public class AttendancesBusiness {
         }
     }
 
-    // Add new attendance
+    // Add new Attendance
     public AttendanceDto add(AttendanceDto attendanceDto) {
         try {
             Attendance attendance = new Attendance();
@@ -115,7 +115,7 @@ public class AttendancesBusiness {
         }
     }
 
-    // Update existing attendance
+    // Update existing Attendance
     public void update(Long attendanceId, AttendanceDto attendanceDto) {
         try {
             attendanceDto.setId(attendanceId);
@@ -127,7 +127,7 @@ public class AttendancesBusiness {
         }
     }
 
-    // Delete attendance by ID
+    // Delete Attendance by ID
     public void delete(Long attendanceId) {
         try {
             Attendance attendance = attendancesService.getById(attendanceId);

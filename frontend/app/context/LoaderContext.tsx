@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useCallback, useMemo } from 'react';
 import Loader from '@components/UI/Loader';
 
 interface LoaderContextType {
@@ -14,17 +14,17 @@ export const LoaderProvider = ({ children }: { children: ReactNode }) => {
     const [loading, setLoading] = useState(false);
     const loaderStartTime = React.useRef<number | null>(null);
 
-    const showLoader = () => {
+    const showLoader = useCallback(() => {
         loaderStartTime.current = Date.now();
         setLoading(true);
-    };
+    }, []);
 
-    const hideLoader = () => {
+    const hideLoader = useCallback(() => {
         const startTime = loaderStartTime.current;
         if (startTime) {
             const elapsedTime = Date.now() - startTime;
-            // Tiempo mínimo muy reducido para transiciones más fluidas
-            const minimumTime = 150; // Reducido de 300ms a 150ms
+            // Tiempo mínimo optimizado para navegación
+            const minimumTime = 200; // Reducido para navegación más fluida
             const remainingTime = minimumTime - elapsedTime;
 
             if (remainingTime > 0) {
@@ -35,10 +35,15 @@ export const LoaderProvider = ({ children }: { children: ReactNode }) => {
         } else {
             setLoading(false);
         }
-    };
+    }, []);
+
+    const contextValue = useMemo(() => ({
+        showLoader,
+        hideLoader
+    }), [showLoader, hideLoader]);
 
     return (
-        <LoaderContext.Provider value={{ showLoader, hideLoader }}>
+        <LoaderContext.Provider value={contextValue}>
             {children}
             {loading && <Loader />}
         </LoaderContext.Provider>

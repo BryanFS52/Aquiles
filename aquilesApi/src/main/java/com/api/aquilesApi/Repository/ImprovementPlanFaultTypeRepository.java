@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ImprovementPlanFaultTypeRepository extends JpaRepository<ImprovementPlanFaultType, Long> {
+
+    // Check if an ImprovementPlanFaultType with the given name exists
+    boolean existsByName(String name);
 }

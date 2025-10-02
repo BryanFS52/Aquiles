@@ -41,7 +41,7 @@ public class JustificationStatusBusiness {
         }
     }
 
-    // Get all Justification Status (paginated)
+    // Get all justificationStatus (Paginated)
     public Page<JustificationStatusDto> findAll(int page, int size){
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
@@ -53,7 +53,7 @@ public class JustificationStatusBusiness {
         }
     }
 
-    // Get Justification Status by ID
+    // Get justificationStatus by ID
     public JustificationStatusDto findById(Long id) {
         try {
             JustificationStatus justificationStatus = this.justificationStatusService.getById(id);
@@ -65,7 +65,7 @@ public class JustificationStatusBusiness {
         }
     }
 
-    // Add new Justification Status
+    // Add new justificationStatus
     public JustificationStatusDto add(JustificationStatusDto justificationStatusDto) {
         try {
             validationObject(justificationStatusDto);
@@ -74,7 +74,7 @@ public class JustificationStatusBusiness {
             JustificationStatus savedJustificationStatus = justificationStatusService.save(justificationStatus);
             return JustificationStatusMap.INSTANCE.EntityToDTO(savedJustificationStatus);
         } catch (Exception e) {
-            throw new CustomException("Error Creating Status: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Error Creating justificationStatus: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 

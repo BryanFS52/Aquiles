@@ -2,6 +2,7 @@ package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.FinalReportBusiness;
 import com.api.aquilesApi.Dto.FinalReportDto;
+import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
@@ -59,19 +60,16 @@ public class FinalReportResolver {
     @DgsMutation
     public Map<String, Object> addFinalReport(@InputArgument( name = "input") FinalReportDto finalreportDto) {
         try {
-            // Converted the base64 signature to byte[]
-            if (finalreportDto.getSignature() != null && !finalreportDto.getSignature().isEmpty()) {
-                // Decode the signature from base64
-                byte[] signatureBytes = java.util.Base64.getDecoder().decode(finalreportDto.getSignature());
-                finalreportDto.setSignature(new String(signatureBytes));
-            } else {
-                throw new IllegalArgumentException("Signature is required");
-            }
             FinalReportDto finalReportDto1 = finalReportBusiness.add(finalreportDto);
             return ResponseHttpApi.responseHttpAction(
                     finalReportDto1.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
+            );
+        } catch (CustomException e) {
+            return ResponseHttpApi.responseHttpError(
+                    e.getMessage(),
+                    HttpStatus.BAD_REQUEST
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(

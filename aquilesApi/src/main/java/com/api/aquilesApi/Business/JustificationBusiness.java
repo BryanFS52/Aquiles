@@ -24,8 +24,13 @@ public class JustificationBusiness {
     private final JustificationStatusService justificationStatusService;
     private final AttendanceStateService attendanceStateService;
 
-
-    public JustificationBusiness(JustificationService justificationService, AttendancesService attendancesService, JustificationTypeService justificationTypeService, JustificationStatusService justificationStatusService, AttendanceStateService attendanceStateService) {
+    public JustificationBusiness(
+            JustificationService justificationService,
+            AttendancesService attendancesService,
+            JustificationTypeService justificationTypeService,
+            JustificationStatusService justificationStatusService,
+            AttendanceStateService attendanceStateService
+    ) {
         this.justificationService = justificationService;
         this.attendancesService = attendancesService;
         this.justificationTypeService = justificationTypeService;
@@ -33,19 +38,14 @@ public class JustificationBusiness {
         this.attendanceStateService = attendanceStateService;
     }
 
-   public Page<JustificationDto> findAll(Integer page, Integer size) {
-        PageRequest pageRequest =  PageRequest.of(page, size);
+    // Get all justifications (Paginated)
+    public Page<JustificationDto> findAll(Integer page, Integer size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
         try {
             Page<Justification> justification = justificationService.findAll(pageRequest);
-            System.out.println("JESUS");
             System.out.println(justification.getTotalElements());
             return JustificationMap.INSTANCE.EntityToDTOs(justification);
-
         } catch (Exception e) {
-            System.err.println("EL DIABLO");
-            System.err.println(e.getMessage());
-            System.out.println(e.getMessage());
-            e.printStackTrace();
             throw new CustomException("Database error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -54,7 +54,7 @@ public class JustificationBusiness {
     public JustificationDto findById(Long id) {
         try {
             Justification justification = justificationService.getById(id);
-            return  JustificationMap.INSTANCE.EntityToDTO(justification);
+            return JustificationMap.INSTANCE.EntityToDTO(justification);
         } catch (Exception e) {
             throw new CustomException("Justification error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -67,14 +67,17 @@ public class JustificationBusiness {
             return JustificationMap.INSTANCE.EntityToDTOs(justifications);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new CustomException("Database error retrieving Justifications by Student ID: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException(
+                    "Database error retrieving Justifications by Student ID: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 
     // Add new Justification
     public JustificationDto add(JustificationDto dto) {
         try {
-            Justification justification =  new Justification();
+            Justification justification = new Justification();
             JustificationMap.INSTANCE.updateEntity(dto, justification);
 
             Attendance attendance = attendancesService.getById(dto.getAttendance().getId());
@@ -91,15 +94,16 @@ public class JustificationBusiness {
 
             if (daysBetween > 3) {
                 throw new CustomException(
-                    "La justificación no puede superar los 3 días desde la fecha de asistencia",
-                    HttpStatus.BAD_REQUEST
+                        "La justificación no puede superar los 3 días desde la fecha de asistencia",
+                        HttpStatus.BAD_REQUEST
                 );
             }
+
             justification.setAttendance(attendance);
             justification.setJustificationType(justificationType);
+
             return JustificationMap.INSTANCE.EntityToDTO(justificationService.save(justification));
         } catch (Exception e) {
-
             throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
@@ -115,26 +119,34 @@ public class JustificationBusiness {
     // Update Justification Status Only
     public void UpdateStatusInJustification(Long id, Long statusId) {
         try {
-
             Justification existing = justificationService.getById(id);
             JustificationStatus justificationStatus = justificationStatusService.getById(statusId);
-            if (Objects.equals(justificationStatus.getName(), "Aceptado")){
+
+            if (Objects.equals(justificationStatus.getName(), "Aceptado")) {
                 AttendanceState attendanceState = attendanceStateService.getById(3L);
                 existing.getAttendance().setAttendanceState(attendanceState);
             }
-            if (Objects.equals(justificationStatus.getName(), "Denegado")){
+
+            if (Objects.equals(justificationStatus.getName(), "Denegado")) {
                 AttendanceState attendanceState = attendanceStateService.getById(5L);
                 existing.getAttendance().setAttendanceState(attendanceState);
             }
+
             existing.setJustificationStatus(justificationStatus);
             justificationService.save(existing);
 
         } catch (CustomException e) {
             throw e;
         } catch (DataAccessException e) {
-            throw new CustomException("Database error updating justification status: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException(
+                    "Database error updating justification status: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
         } catch (Exception e) {
-            throw new CustomException("Error updating justification status: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException(
+                    "Error updating justification status: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 
