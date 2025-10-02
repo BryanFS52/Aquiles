@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { toast } from "react-toastify"
-import { client } from '@lib/apollo-client'
+import { client, clientLAN } from '@lib/apollo-client'
 import { useQuery, useMutation } from '@apollo/client'
 import { FaTrashAlt, FaEdit } from "react-icons/fa"
 import {
@@ -11,6 +11,7 @@ import {
   UPDATE_CHECKLIST,
   DELETE_CHECKLIST
 } from '@graphql/checklistGraph'
+import { GET_ALL_TRAINING_PROJECTS } from '@graphql/olympo/trainingProjectGraph'
 import CrearListaChequeo from "@components/Modals/modalNewChecklist"
 import PageTitle from "@components/UI/pageTitle"
 
@@ -50,6 +51,29 @@ export default function CoordinadorChecklistView() {
     client,
     fetchPolicy: 'network-only',
   })
+  
+  // Cargar proyectos formativos para hacer lookup del nombre
+  const { data: trainingProjectsData, loading: loadingProjects, error: errorProjects } = useQuery(GET_ALL_TRAINING_PROJECTS, {
+    variables: { page: 0, size: 5 },
+    client: clientLAN, // Usar clientLAN para el microservicio Olympo
+    fetchPolicy: 'network-only',
+  })
+  
+  // Debug: ver qué datos están llegando
+  useEffect(() => {
+    console.log('=== DEBUG TRAINING PROJECTS ===');
+    console.log('trainingProjectsData:', trainingProjectsData);
+    console.log('loadingProjects:', loadingProjects);
+    console.log('errorProjects:', errorProjects);
+    if (trainingProjectsData?.allTrainingProjects?.data) {
+      console.log('Projects found:', trainingProjectsData.allTrainingProjects.data.length);
+      console.log('First project:', trainingProjectsData.allTrainingProjects.data[0]);
+    }
+    if (errorProjects) {
+      console.error('Error loading training projects:', errorProjects);
+    }
+  }, [trainingProjectsData, loadingProjects, errorProjects])
+  
   const [addChecklistMutation] = useMutation(ADD_CHECKLIST, { client })
   const [updateChecklistMutation] = useMutation(UPDATE_CHECKLIST, { client })
   const [deleteChecklistMutation] = useMutation(DELETE_CHECKLIST, { client })
@@ -61,8 +85,40 @@ export default function CoordinadorChecklistView() {
   const [editingChecklist, setEditingChecklist] = useState<Checklist | null>(null)
   const [isEditing, setIsEditing] = useState<boolean>(false)
 
+  // Función para obtener el nombre del proyecto formativo
+  const getTrainingProjectName = useCallback((trainingProjectId: string | number | null | undefined): string => {
+    console.log('=== DEBUG getTrainingProjectName ===');
+    console.log('trainingProjectId:', trainingProjectId);
+    console.log('trainingProjectsData available:', !!trainingProjectsData?.allTrainingProjects?.data);
+    
+    if (!trainingProjectId || !trainingProjectsData?.allTrainingProjects?.data) {
+      console.log('Returning default: Sin proyecto asociado');
+      return 'Sin proyecto asociado'
+    }
+    
+    const project = trainingProjectsData.allTrainingProjects.data.find(
+      (p: any) => p?.id?.toString() === trainingProjectId.toString()
+    )
+    
+    console.log('Found project:', project);
+    console.log('Project name:', project?.name || 'Proyecto no encontrado');
+    
+    return project?.name || 'Proyecto no encontrado'
+  }, [trainingProjectsData])
+
   // Normalizar checklists desde Apollo
   const checklists: Checklist[] = data?.allChecklists?.data || []
+  
+  // Debug: ver los datos de los checklists
+  useEffect(() => {
+    console.log('=== DEBUG CHECKLISTS ===');
+    console.log('Raw data:', data);
+    console.log('Checklists:', checklists);
+    if (checklists.length > 0) {
+      console.log('First checklist:', checklists[0]);
+      console.log('First checklist trainingProjectId:', (checklists[0] as any).trainingProjectId);
+    }
+  }, [data, checklists])
   // Filtrar y ordenar checklists
   const filteredChecklists: Checklist[] = checklists
     .filter((checklist: Checklist) => {
@@ -337,9 +393,7 @@ export default function CoordinadorChecklistView() {
                               Proyecto Formativo
                             </span>
                             <p className="text-sm text-gray-700 dark:text-white mt-1 font-medium">
-                              {(checklist as any).trainingProjectName || (
-                                <span className="text-gray-500 italic">Sin proyecto asociado</span>
-                              )}
+                              {getTrainingProjectName((checklist as any).trainingProjectId)}
                             </p>
                           </div>
 
@@ -440,7 +494,7 @@ export default function CoordinadorChecklistView() {
         isOpen={modalOpen}
         onClose={handleCloseModal}
         onCreate={handleCreateChecklist}
-        editingData={editingChecklist || undefined}
+        editingData={editingChecklist as any}
         isEditing={isEditing}
       />
 

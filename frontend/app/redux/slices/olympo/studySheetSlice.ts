@@ -1,6 +1,6 @@
 import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { GET_STUDY_SHEETS, GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER, GET_STUDY_SHEET_WITH_STUDENTS, GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM, GET_STUDY_SHEET_BY_ID_WITH_ATTENDANCES, GET_STUDY_SHEETS_BY_TRAINING_PROJECT } from '@graphql/olympo/studySheetGraph'
+import { GET_STUDY_SHEETS, GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER, GET_STUDY_SHEET_WITH_STUDENTS, GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM, GET_STUDY_SHEET_BY_ID_WITH_ATTENDANCES } from '@graphql/olympo/studySheetGraph'
 import { createInitialPaginatedState } from '@type/slices/common/generic';
 import {
     StudySheet,
@@ -116,22 +116,6 @@ export const fetchStudySheetByIdWithAttendances = createAsyncThunk<GetStudySheet
         });
         return data.studySheetById;
     }
-);
-
-export const fetchStudySheetsByTrainingProject = createAsyncThunk<any, { trainingProjectId: number; page?: number; size?: number }>(
-  'studySheet/fetchByTrainingProject',
-  async ({ trainingProjectId, page = 0, size = 100 }) => {
-    const { data } = await clientLAN.query({
-      query: GET_STUDY_SHEETS_BY_TRAINING_PROJECT,
-      variables: { 
-        trainingProjectId, 
-        page: page ?? 0, 
-        size: size ?? 100 
-      },
-      fetchPolicy: 'no-cache',
-    });
-    return data.allStudySheets;
-  }
 );
 
 
@@ -349,34 +333,6 @@ const studySheetSlice = createSlice({
                 state.error = action.error.message ?? 'Error fetching study sheet by id with attendances';
                 state.loadingAttendanceSheet = false;
                 state.selectedForAttendance = null;
-            });
-
-        // Fetch StudySheets by Training Project
-        builder
-            .addCase(fetchStudySheetsByTrainingProject.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(fetchStudySheetsByTrainingProject.fulfilled, (state, action) => {
-                const payload = action.payload;
-
-                if (payload?.data) {
-                    state.data = payload.data
-                        .filter((item: any): item is NonNullable<typeof item> => item !== null) as StudySheet[];
-                    state.totalItems = payload.totalItems ?? 0;
-                    state.totalPages = payload.totalPages ?? 0;
-                    state.currentPage = payload.currentPage ?? 0;
-                } else {
-                    state.data = [];
-                    state.totalItems = 0;
-                    state.totalPages = 0;
-                    state.currentPage = 0;
-                }
-                state.loading = false;
-            })
-            .addCase(fetchStudySheetsByTrainingProject.rejected, (state, action) => {
-                state.error = action.error.message ?? 'Error fetching study sheets by training project';
-                state.loading = false;
             });
     }
 });

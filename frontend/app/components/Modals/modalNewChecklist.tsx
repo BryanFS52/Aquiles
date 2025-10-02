@@ -37,23 +37,27 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
   const studySheets = useSelector((state: RootState) => state.studySheet.data)
   const loadingSheets = useSelector((state: RootState) => state.studySheet.loading)
 
-  // Cargar proyectos formativos al abrir el modal
+  // Log cuando cambien las fichas
+  useEffect(() => {
+    console.log('📋 Fichas cargadas:', studySheets.length, 'loading:', loadingSheets)
+  }, [studySheets, loadingSheets])
+
+  // Cargar proyectos formativos y fichas al abrir el modal
   useEffect(() => {
     if (isOpen) {
       dispatch(fetchAllTrainingProjects({ page: 0, size: 100 }))
+      dispatch(fetchStudySheets({ page: 0, size: 1000 }))
     }
   }, [isOpen, dispatch])
 
-  // Cargar fichas cuando se selecciona un proyecto formativo
+  // Limpiar fichas seleccionadas cuando cambia el proyecto
   useEffect(() => {
     if (selectedTrainingProject) {
-      // Como la API no tiene filtro por proyecto formativo, cargamos todas las fichas
-      // y las filtramos en el cliente
-      dispatch(fetchStudySheets({ page: 0, size: 1000 })) // Aumentamos el tamaño para obtener más fichas
+      setSelectedStudySheets([])
     } else {
       setSelectedStudySheets([])
     }
-  }, [selectedTrainingProject, dispatch])
+  }, [selectedTrainingProject])
 
   // Efecto para cargar datos de edición
   useEffect(() => {
@@ -171,7 +175,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
     setSelectedStudySheets([])
   }
 
-  // Filtrar fichas por proyecto formativo en el render
+  // Filtrar fichas por proyecto formativo
   const filteredStudySheets = studySheets.filter(sheet => 
     sheet.trainingProject?.id?.toString() === selectedTrainingProject
   )
@@ -287,25 +291,41 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                 {loadingSheets ? (
                   <p className="text-sm text-gray-500">Cargando fichas...</p>
                 ) : filteredStudySheets.length > 0 ? (
-                  <div className="max-h-32 overflow-y-auto border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl p-3 space-y-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700">
-                    {filteredStudySheets.filter(sheet => sheet.id != null).map((sheet: any) => (
-                      <label key={sheet.id!} className="flex items-center space-x-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedStudySheets.includes(sheet.id!.toString())}
-                          onChange={(e) => handleStudySheetChange(sheet.id!.toString(), e.target.checked)}
-                          className="h-4 w-4 text-lime-600 focus:ring-lime-500 dark:text-blue-600 dark:focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">
-                          Ficha {sheet.number} - {sheet.journey?.name} ({sheet.numberStudents} estudiantes)
-                        </span>
-                      </label>
-                    ))}
+                  <div>
+                    <p className="text-xs text-green-600 font-bold mb-2">
+                      ✅ {filteredStudySheets.length} ficha(s) encontrada(s) para este proyecto
+                    </p>
+                    <div className="max-h-40 overflow-y-auto border-2 border-lime-500 dark:border-shadowBlue rounded-xl p-4 space-y-3 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700">
+                      {filteredStudySheets.filter(sheet => sheet.id != null).map((sheet: any) => {
+                        return (
+                          <div key={sheet.id!} className="bg-white dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+                            <label className="flex items-center space-x-3 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={selectedStudySheets.includes(sheet.id!.toString())}
+                                onChange={(e) => handleStudySheetChange(sheet.id!.toString(), e.target.checked)}
+                                className="h-5 w-5 text-lime-600 focus:ring-lime-500 dark:text-blue-600 dark:focus:ring-blue-500 border-gray-300 rounded"
+                              />
+                              <div className="flex-1">
+                                <div className="text-sm font-bold text-gray-800 dark:text-white">
+                                  Ficha {sheet.number}
+                                </div>
+                                <div className="text-xs text-gray-600 dark:text-gray-300">
+                                  {sheet.journey?.name} • {sheet.numberStudents} estudiantes
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                  {sheet.startLective} - {sheet.endLective}
+                                </div>
+                              </div>
+                            </label>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 ) : (
                   <p className="text-sm text-orange-600">
-                    No hay fichas disponibles para este proyecto formativo. 
-                    Las fichas se mostrarán cuando el microservicio esté disponible.
+                    ❌ No hay fichas disponibles para este proyecto formativo.
                   </p>
                 )}
               </div>

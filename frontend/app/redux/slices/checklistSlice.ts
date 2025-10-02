@@ -28,6 +28,7 @@ const transformGraphQLToChecklistItem = (graphqlData: any): Checklist => {
         instructorSignature: graphqlData.instructorSignature,
         evaluationCriteria: graphqlData.evaluationCriteria,
         studySheets: graphqlData.studySheets,
+        trainingProjectId: graphqlData.trainingProjectId,
         associatedJuries: graphqlData.associatedJuries,
         items: graphqlData.items || [],
         evaluations: graphqlData.evaluations || []
