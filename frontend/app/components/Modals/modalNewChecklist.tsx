@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState, AppDispatch } from '@redux/store'
 import { fetchAllTrainingProjects } from '@redux/slices/olympo/trainingProjectSlice'
-import { fetchStudySheetsByTrainingProject } from '@redux/slices/olympo/studySheetSlice'
+import { fetchStudySheets } from '@redux/slices/olympo/studySheetSlice'
 import { Checklist, Item } from "@graphql/generated";
 
 type ModalProps = {
@@ -40,14 +40,16 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
   // Cargar proyectos formativos al abrir el modal
   useEffect(() => {
     if (isOpen) {
-      dispatch(fetchAllTrainingProjects({ size: 100 }))
+      dispatch(fetchAllTrainingProjects({ page: 0, size: 100 }))
     }
   }, [isOpen, dispatch])
 
   // Cargar fichas cuando se selecciona un proyecto formativo
   useEffect(() => {
     if (selectedTrainingProject) {
-      dispatch(fetchStudySheetsByTrainingProject({ trainingProjectId: parseInt(selectedTrainingProject), size: 100 }))
+      // Como la API no tiene filtro por proyecto formativo, cargamos todas las fichas
+      // y las filtramos en el cliente
+      dispatch(fetchStudySheets({ page: 0, size: 1000 })) // Aumentamos el tamaño para obtener más fichas
     } else {
       setSelectedStudySheets([])
     }
@@ -170,7 +172,9 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
   }
 
   // Filtrar fichas por proyecto formativo en el render
-  const filteredStudySheets = studySheets.filter(sheet => sheet.trainingProject?.id?.toString() === selectedTrainingProject)
+  const filteredStudySheets = studySheets.filter(sheet => 
+    sheet.trainingProject?.id?.toString() === selectedTrainingProject
+  )
 
   if (isOpen !== undefined) {
     if (!isOpen) return null
@@ -255,6 +259,10 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                 disabled={loadingProjects}
               >
                 <option value="">Selecciona un proyecto formativo</option>
+                {/* Los proyectos formativos se cargarán cuando el GraphQL esté disponible */}
+                {trainingProjects.length === 0 && !loadingProjects && (
+                  <option disabled>No hay proyectos disponibles</option>
+                )}
                 {trainingProjects.filter(project => project.id != null).map((project) => (
                   <option key={project.id!} value={project.id!}>
                     {project.name} - {project.program?.name}
@@ -263,6 +271,12 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
               </select>
               {loadingProjects && (
                 <p className="text-sm text-gray-500 mt-1">Cargando proyectos formativos...</p>
+              )}
+              {!loadingProjects && trainingProjects.length === 0 && (
+                <p className="text-sm text-orange-600 mt-1">
+                  Los proyectos formativos no están disponibles actualmente. 
+                  Puedes crear la lista de chequeo sin asociar un proyecto específico.
+                </p>
               )}
             </div>
             {selectedTrainingProject && (
@@ -274,7 +288,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                   <p className="text-sm text-gray-500">Cargando fichas...</p>
                 ) : filteredStudySheets.length > 0 ? (
                   <div className="max-h-32 overflow-y-auto border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-xl p-3 space-y-2 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700">
-                    {filteredStudySheets.filter(sheet => sheet.id != null).map((sheet) => (
+                    {filteredStudySheets.filter(sheet => sheet.id != null).map((sheet: any) => (
                       <label key={sheet.id!} className="flex items-center space-x-2 cursor-pointer">
                         <input
                           type="checkbox"
@@ -289,7 +303,10 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500">No hay fichas disponibles para este proyecto formativo</p>
+                  <p className="text-sm text-orange-600">
+                    No hay fichas disponibles para este proyecto formativo. 
+                    Las fichas se mostrarán cuando el microservicio esté disponible.
+                  </p>
                 )}
               </div>
             )}

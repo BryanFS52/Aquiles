@@ -24,10 +24,13 @@ import {
 
 export const fetchStudySheets = createAsyncThunk<GetStudySheetsQuery['allStudySheets'], GetStudySheetsQueryVariables>(
     'studySheet/fetchAll',
-    async ({ page, size }) => {
+    async ({ page = 0, size = 100 }) => {
         const { data } = await clientLAN.query<GetStudySheetsQuery, GetStudySheetsQueryVariables>({
             query: GET_STUDY_SHEETS,
-            variables: { page, size },
+            variables: { 
+                page: page ?? 0, 
+                size: size ?? 100 
+            },
             fetchPolicy: 'no-cache',
         });
         return data.allStudySheets;
@@ -61,10 +64,14 @@ export const fetchStudySheetById = createAsyncThunk<GetStudySheetByIdQuery['stud
 
 export const fetchStudySheetByTeacher = createAsyncThunk<StudySheetByTeacherQuery['allStudySheets'], StudySheetByTeacherQueryVariables>(
     'studySheet/fetchByTeacher',
-    async ({ idTeacher, page, size }) => {
+    async ({ idTeacher, page = 0, size = 100 }) => {
         const { data } = await clientLAN.query<StudySheetByTeacherQuery, StudySheetByTeacherQueryVariables>({
             query: GET_STUDY_SHEET_BY_TEACHER,
-            variables: { idTeacher, page, size },
+            variables: { 
+                idTeacher, 
+                page: page ?? 0, 
+                size: size ?? 100 
+            },
             fetchPolicy: 'no-cache',
         })
         return data.allStudySheets;
@@ -85,10 +92,14 @@ export const fetchStudySheetWithStudents = createAsyncThunk<GetStudySheetWithStu
 
 export const fetchStudySheetByTeacherIdWithTeamScrum = createAsyncThunk<StudySheetByTeacherIdWithTeamScrumQuery['allStudySheets'], StudySheetByTeacherIdWithTeamScrumQueryVariables>(
     'studySheet/fetchByTeacherIdWithTeamScrum',
-    async ({ idTeacher, page, size }) => {
+    async ({ idTeacher, page = 0, size = 100 }) => {
         const { data } = await clientLAN.query<StudySheetByTeacherIdWithTeamScrumQuery, StudySheetByTeacherIdWithTeamScrumQueryVariables>({
             query: GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM,
-            variables: { idTeacher, page, size },
+            variables: { 
+                idTeacher, 
+                page: page ?? 0, 
+                size: size ?? 100 
+            },
             fetchPolicy: 'no-cache',
         });
         return data.allStudySheets;
@@ -112,12 +123,17 @@ export const fetchStudySheetsByTrainingProject = createAsyncThunk<any, { trainin
   async ({ trainingProjectId, page = 0, size = 100 }) => {
     const { data } = await clientLAN.query({
       query: GET_STUDY_SHEETS_BY_TRAINING_PROJECT,
-      variables: { trainingProjectId, page, size },
+      variables: { 
+        trainingProjectId, 
+        page: page ?? 0, 
+        size: size ?? 100 
+      },
       fetchPolicy: 'no-cache',
     });
     return data.allStudySheets;
   }
 );
+
 
 interface ExtendedStudySheetState extends ReturnType<typeof createInitialPaginatedState < StudySheet >> {
     dataForStudents: Record<string, Student[]>,
