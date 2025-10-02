@@ -6,12 +6,13 @@ import { useSelector, useDispatch } from 'react-redux'
 import { RootState, AppDispatch } from '@redux/store'
 import { fetchAllTrainingProjects } from '@redux/slices/olympo/trainingProjectSlice'
 import { fetchStudySheets } from '@redux/slices/olympo/studySheetSlice'
-import { Checklist, Item } from "@graphql/generated";
+import { Checklist, Item } from "@graphql/generated"
+import { evaluationService } from '@redux/slices/evaluationSlice';
 
 type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: (checklistData: any) => Promise<void>;
+  onCreate: (checklistData: any) => Promise<any>;
   editingData?: Checklist | null;
   isEditing?: boolean;
 };
@@ -39,7 +40,9 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
 
   // Log cuando cambien las fichas
   useEffect(() => {
-    console.log('📋 Fichas cargadas:', studySheets.length, 'loading:', loadingSheets)
+    if (studySheets.length > 0) {
+      console.log(`✅ ${studySheets.length} fichas cargadas correctamente`)
+    }
   }, [studySheets, loadingSheets])
 
   // Cargar proyectos formativos y fichas al abrir el modal
@@ -116,7 +119,30 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
         })),
         ...(isEditing && deletedItemIds.length > 0 && { deletedItemIds })
       }
-      await onCreate(newChecklist)
+      
+      // Crear el checklist
+      const checklistResult = await onCreate(newChecklist)
+      
+      // Si no estamos editando y el checklist se creó exitosamente, crear la evaluación automáticamente
+      if (!isEditing && checklistResult?.success && checklistResult?.id) {
+        try {
+          const evaluationResult = await evaluationService.createCompleteEvaluation(
+            parseInt(checklistResult.id),
+            '',
+            '',
+            'PENDIENTE'
+          )
+          
+          if (evaluationResult) {
+            console.log('✅ Evaluación automática creada exitosamente')
+          } else {
+            console.warn('⚠️ Problema al crear la evaluación automática')
+          }
+        } catch (evaluationError) {
+          console.error('Error creating automatic evaluation:', evaluationError)
+        }
+      }
+      
       if (isEditing) {
         setDeletedItemIds([])
         if (onClose) onClose()
@@ -194,7 +220,7 @@ export default function CrearListaChequeo({ isOpen, onClose, onCreate, editingDa
             <p className="text-lime-800 dark:text-gray-300 text-sm font-medium">
               💡 <strong>Nota:</strong> {isEditing ?
                 'Los cambios se guardarán automáticamente. Puede cerrar este modal cuando termine.' :
-                'Se creará automáticamente una evaluación vinculada a esta lista. El instructor podrá completarla desde su vista.'
+                'Se creará automáticamente una lista de chequeo y una evaluación vacía vinculada. El instructor podrá completar la evaluación desde su vista.'
               }
             </p>
             {isEditing && deletedItemIds.length > 0 && (

@@ -143,7 +143,7 @@ export default function CoordinadorChecklistView() {
     }));
   };
 
-  const handleCreateChecklist = async (checklistData: ChecklistData): Promise<void> => {
+  const handleCreateChecklist = async (checklistData: ChecklistData): Promise<any> => {
     try {
       if (isEditing && editingChecklist) {
         // Actualizar checklist existente
@@ -170,8 +170,10 @@ export default function CoordinadorChecklistView() {
           toast.success("Lista de chequeo actualizada exitosamente")
           await refetch()
           handleCloseModal()
+          return { id: editingChecklist.id, success: true }
         } else {
           toast.error(result?.updateChecklist?.message || "Error al actualizar la lista de chequeo")
+          return { success: false }
         }
       } else {
         // Crear nuevo checklist
@@ -195,13 +197,16 @@ export default function CoordinadorChecklistView() {
           toast.success("Lista de chequeo creada exitosamente")
           await refetch()
           setModalOpen(false)
+          return { id: result?.addChecklist?.id, success: true }
         } else {
           toast.error(result?.addChecklist?.message || "Error al crear la lista de chequeo")
+          return { success: false }
         }
       }
     } catch (error: any) {
       console.error("Error with checklist operation:", error)
       toast.error(isEditing ? "Error al actualizar la lista de chequeo" : "Error al crear la lista de chequeo")
+      return { success: false }
     }
   }
 
