@@ -18,12 +18,19 @@ const HistorialPlanesMejoramientoInstructor = () => {
     const searchParams = useSearchParams();
     const { data: allImprovementPlans, loading, error } = useSelector((state: any) => state.improvementPlan);
 
-    const fichaDataString = searchParams.get('fichaData');
-    const fichaData = fichaDataString ? JSON.parse(decodeURIComponent(fichaDataString)) : null;
-    const improvementPlans = React.useMemo(() => {
-        if (!fichaData || !allImprovementPlans) return allImprovementPlans || [];
-        return allImprovementPlans.filter((plan: ImprovementPlan) => plan.student?.id && fichaData.studentIds.includes(plan.student.id));
-    }, [allImprovementPlans, fichaData]);
+    // Obtener parámetros de la URL de forma simple
+    const fichaNumber = searchParams.get('ficha');
+    const studentIds = searchParams.get('studentIds')?.split(',') || [];
+    
+    // Filtrar planes si hay filtros de ficha
+    const improvementPlans = (fichaNumber || studentIds.length > 0) && allImprovementPlans
+        ? allImprovementPlans.filter((plan: ImprovementPlan) => {
+            if (studentIds.length > 0) {
+                return plan.student?.id && studentIds.includes(plan.student.id.toString());
+            }
+            return true;
+        })
+        : allImprovementPlans || [];
 
     const [isDarkMode, setIsDarkMode] = React.useState(false);
     useEffect(() => {
@@ -35,14 +42,11 @@ const HistorialPlanesMejoramientoInstructor = () => {
     }, []);
 
     useEffect(() => {
-        console.log('fichaData en HistorialPlanesMejoramientoInstructor:', fichaData);
-        
-        // Traer todos los planes de mejoramiento y filtrar del lado del cliente
         dispatch(fetchImprovementPlans({ 
             page: 0, 
             size: 5 
         }));
-    }, [dispatch, fichaData]);
+    }, [dispatch]);
 
     const formatDate = (dateString: string) => {
         if (!dateString) return 'No especificada';
@@ -263,6 +267,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
             </div>
         );
     }
+    
     if (error) {
         return (
             <div className="mx-auto px-4 py-8">
@@ -279,22 +284,22 @@ const HistorialPlanesMejoramientoInstructor = () => {
         return (
             <div className="mx-auto px-4 py-8 space-y-6">
                 <PageTitle>
-                    {fichaData ? `Planes de Mejoramiento - Ficha N° ${fichaData.fichaNumber}` : `Historial De Planes De Mejoramiento`}
+                    {fichaNumber ? `Planes de Mejoramiento - Ficha N° ${fichaNumber}` : `Historial De Planes De Mejoramiento`}
                 </PageTitle>
-                {fichaData && (
+                {fichaNumber && (
                     <button onClick={() => router.back()} className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen mt-2">
                         <FiArrowLeft className="w-4 h-4 mr-1" /> Volver a Fichas
                     </button>
                 )}
                 <div className="mt-4">
-                    <Link href={fichaData ? `./FormularioPlanesDeMejoramiento?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}` : "./FormularioPlanesDeMejoramiento"}>
+                    <Link href={fichaNumber ? `./FormularioPlanesDeMejoramiento?ficha=${fichaNumber}` : "./FormularioPlanesDeMejoramiento"}>
                         <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen shadow-lg">
                             <FiPlus className="w-4 h-4 mr-2" /> Crear Nuevo Plan de Mejoramiento
                         </button>
                     </Link>
                 </div>
-                {fichaData && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Mostrando planes de mejoramiento de {fichaData.totalStudents} estudiantes de la ficha N° {fichaData.fichaNumber}</p>
+                {fichaNumber && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Mostrando planes de mejoramiento de la ficha N° {fichaNumber}</p>
                 )}
                 <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
@@ -326,7 +331,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                         </div>
                         <h3 className="text-lg font-semibold text-black dark:text-white mb-2">No se encontraron planes de mejoramiento</h3>
                         <p className="text-gray-600 dark:text-gray-400 mb-4">
-                            {fichaData ? `No hay planes de mejoramiento registrados para los estudiantes de la ficha N° ${fichaData.fichaNumber}.` : 'Aún no hay planes de mejoramiento registrados en el sistema.'}
+                            {fichaNumber ? `No hay planes de mejoramiento registrados para la ficha N° ${fichaNumber}.` : 'Aún no hay planes de mejoramiento registrados en el sistema.'}
                         </p>
                     </div>
                 </div>
@@ -342,7 +347,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                 <FiArrowLeft className="w-4 h-4 mr-1" /> Volver
             </button>
             <div className="mt-4">
-                <Link href={fichaData ? `./FormularioPlanesDeMejoramiento?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}` : "./FormularioPlanesDeMejoramiento"}>
+                <Link href={fichaNumber ? `./FormularioPlanesDeMejoramiento?ficha=${fichaNumber}` : "./FormularioPlanesDeMejoramiento"}>
                     <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen shadow-lg">
                         <FiPlus className="w-4 h-4 mr-2" /> Crear Nuevo Plan de Mejoramiento
                     </button>

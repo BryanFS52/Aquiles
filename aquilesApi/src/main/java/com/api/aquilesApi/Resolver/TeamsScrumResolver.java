@@ -26,6 +26,7 @@ public class TeamsScrumResolver {
         this.teamsScrumBusiness = teamsScrumBusiness;
     };
 
+    // FindAll TeamScrums (GraphQL)
     @DgsQuery
     public Map<String , Object> allTeamsScrums(@InputArgument Integer page, @InputArgument Integer size){
         try {

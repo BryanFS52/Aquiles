@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import PageTitle from '@components/UI/pageTitle';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLoader } from '@context/LoaderContext';
 import { AppDispatch, RootState } from '@redux/store';
 import { fetchCoordinationByColaborator } from '@redux/slices/olympo/coordinationSlice';
 import { Coordination } from '@graphql/generated';
@@ -16,6 +17,7 @@ type ViewMode = 'cards' | 'table';
 
 const CoordinacionesCoordinador: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
+    const { showLoader, hideLoader } = useLoader();
     const [viewMode, setViewMode] = useState<ViewMode>('cards');
     const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -49,7 +51,18 @@ const CoordinacionesCoordinador: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        dispatch(fetchCoordinationByColaborator({ collaboratorId: 7, page: 0, size: 5 }));
+        const loadCoordinations = async () => {
+            showLoader();
+            try {
+                await dispatch(fetchCoordinationByColaborator({ collaboratorId: 7, page: 0, size: 5 })).unwrap();
+            } catch (error) {
+                console.error('Error loading coordinations:', error);
+            } finally {
+                hideLoader();
+            }
+        };
+        
+        loadCoordinations();
     }, [dispatch]);
 
     // Función para renderizar las cards de coordinaciones

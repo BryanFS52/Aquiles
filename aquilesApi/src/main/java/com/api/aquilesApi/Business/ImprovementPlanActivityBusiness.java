@@ -22,6 +22,7 @@ public class ImprovementPlanActivityBusiness {
         this.modelMapper = modelMapper;
     }
 
+    // Get all improvementPlanActivity (Paginated)
     public Page<ImprovementPlanActivityDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
@@ -32,6 +33,7 @@ public class ImprovementPlanActivityBusiness {
         }
     }
 
+    // Get improvementPlanActivity by ID
     public ImprovementPlanActivityDto findById(Long id) {
         try {
             return modelMapper.map(service.getById(id), ImprovementPlanActivityDto.class);
@@ -42,6 +44,7 @@ public class ImprovementPlanActivityBusiness {
         }
     }
 
+    // Add new improvementPlanActivity
     public ImprovementPlanActivityDto add(ImprovementPlanActivityDto dto) {
         try {
             ImprovementPlanActivity entity = modelMapper.map(dto, ImprovementPlanActivity.class);
@@ -51,6 +54,7 @@ public class ImprovementPlanActivityBusiness {
         }
     }
 
+    // Update improvementPlanActivity
     public void update(Long id, ImprovementPlanActivityDto dto) {
         try {
             dto.setId(id);
@@ -60,6 +64,7 @@ public class ImprovementPlanActivityBusiness {
         }
     }
 
+    // Delete improvementPlanActivity by ID
     public void delete(Long id) {
         try {
             service.delete(service.getById(id));

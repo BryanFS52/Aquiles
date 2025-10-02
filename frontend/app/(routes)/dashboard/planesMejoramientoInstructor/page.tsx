@@ -99,11 +99,12 @@ const PlanMejoramientoInstructor: React.FC = () => {
 
     useEffect(() => {
         const loadData = async () => {
+            showLoader();
             try {
                 await dispatch(fetchStudySheetByTeacher({
                     idTeacher: 1,
                     page: 0,
-                    size: 50 // Aumentado para obtener más fichas
+                    size: 50
                 })).unwrap();
             } catch (error) {
                 console.error('Error al cargar fichas:', error);
@@ -111,19 +112,13 @@ const PlanMejoramientoInstructor: React.FC = () => {
                     position: "top-right",
                     autoClose: 4000,
                 });
+            } finally {
+                hideLoader();
             }
         };
         
         loadData();
     }, [dispatch]);
-
-    useEffect(() => {
-        if (loading) {
-            showLoader();
-        } else {
-            hideLoader();
-        }
-    }, [loading, showLoader, hideLoader]);
 
     const handleViewStudents = (sheet: NonNullable<StudySheet>) => {
         setCurrentSheet(sheet);
@@ -135,80 +130,60 @@ const PlanMejoramientoInstructor: React.FC = () => {
     const handleSelectSheet = async (sheet: NonNullable<StudySheet>) => {
         console.log('Ficha seleccionada:', sheet);
         
-        // Usar el loader global en lugar de estado local
         showLoader();
         
-        // Primero cargar las competencias de esta ficha
-        const teacherId = 1; // Obtener el ID del instructor actual
-        let currentCompetences: any[] = [];
-        
         try {
-            const competencesResult = await dispatch(fetchTeacherCompetencesByStudySheet({
-                studySheetId: sheet.id?.toString() || '',
-                teacherId: teacherId.toString()
-            })).unwrap();
+            // Primero cargar las competencias de esta ficha
+            const teacherId = 1;
+            let currentCompetences: any[] = [];
             
-            currentCompetences = competencesResult || [];
-            console.log('Competencias cargadas para la ficha:', currentCompetences);
+            try {
+                const competencesResult = await dispatch(fetchTeacherCompetencesByStudySheet({
+                    studySheetId: sheet.id?.toString() || '',
+                    teacherId: teacherId.toString()
+                })).unwrap();
+                
+                currentCompetences = competencesResult || [];
+                console.log('Competencias cargadas para la ficha:', currentCompetences);
+            } catch (error) {
+                console.error('Error al cargar competencias:', error);
+                toast.error('Error al cargar las competencias de la ficha', {
+                    position: "top-right",
+                    autoClose: 4000,
+                });
+                currentCompetences = [];
+            }
+            
+            // Obtener los estudiantes de la ficha (misma lógica que el modal)
+            const validStudents = (sheet.studentStudySheets || []).filter((ss): ss is NonNullable<StudentStudySheet> => ss !== null);
+            const studentIds = validStudents.map(ss => ss.student?.id).filter(Boolean);
+            
+            console.log('Estudiantes de la ficha:', validStudents);
+            console.log('IDs de estudiantes:', studentIds);
+            
+            if (validStudents.length > 0) {
+                // Navegación simplificada con parámetros básicos
+                const url = `./HistorialPlanesMejoramientoInstructor?ficha=${sheet.number}&studentIds=${studentIds.join(',')}`;
+                
+                console.log('Navegando a:', url);
+                
+                router.push(url);
+            } else {
+                toast.warning('Esta ficha no tiene estudiantes asignados', {
+                    position: "top-right",
+                    autoClose: 4000,
+                });
+                // Si no hay estudiantes, navegar sin filtro
+                router.push(`./HistorialPlanesMejoramientoInstructor`);
+            }
         } catch (error) {
-            console.error('Error al cargar competencias:', error);
-            toast.error('Error al cargar las competencias de la ficha', {
+            console.error('Error general en handleSelectSheet:', error);
+            toast.error('Error al procesar la selección de ficha', {
                 position: "top-right",
                 autoClose: 4000,
             });
-            currentCompetences = [];
-        }
-        
-        // Obtener los estudiantes de la ficha (misma lógica que el modal)
-        const validStudents = (sheet.studentStudySheets || []).filter((ss): ss is NonNullable<StudentStudySheet> => ss !== null);
-        const studentIds = validStudents.map(ss => ss.student?.id).filter(Boolean);
-        
-        console.log('Estudiantes de la ficha:', validStudents);
-        console.log('IDs de estudiantes:', studentIds);
-        
-        if (validStudents.length > 0) {
-            // Navegar pasando información completa de la ficha, estudiantes Y competencias
-            const fichaData = {
-                id: sheet.id,
-                fichaNumber: sheet.number,
-                studentIds: studentIds,
-                totalStudents: validStudents.length,
-                quarter: (sheet.quarter && sheet.quarter[0]) ? {
-                    id: sheet.quarter[0].id,
-                    name: sheet.quarter[0].name
-                } : null,
-                students: validStudents.map(ss => ({
-                    id: ss.student?.id,
-                    person: {
-                        name: ss.student?.person?.name,
-                        lastname: ss.student?.person?.lastname,
-                        document: ss.student?.person?.document,
-                        email: ss.student?.person?.email,
-                        phone: ss.student?.person?.phone
-                    },
-                    studentStudySheetState: ss.studentStudySheetState
-                })),
-                // Incluir las competencias que acabamos de cargar
-                teacherCompetences: currentCompetences
-            };
-            
-            // Convertir a string para pasar como query parameter
-            const fichaDataString = encodeURIComponent(JSON.stringify(fichaData));
-            const url = `./HistorialPlanesMejoramientoInstructor?fichaData=${fichaDataString}`;
-            
-            console.log('Navegando a:', url);
-            console.log('Datos de la ficha con competencias:', fichaData);
-            
+        } finally {
             hideLoader();
-            router.push(url);
-        } else {
-            hideLoader();
-            toast.warning('Esta ficha no tiene estudiantes asignados', {
-                position: "top-right",
-                autoClose: 4000,
-            });
-            // Si no hay estudiantes, navegar sin filtro
-            router.push(`./HistorialPlanesMejoramientoInstructor`);
         }
     };
 
@@ -233,7 +208,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
         );
     }
 
-    if (!loading && (!studySheets || studySheets.length === 0)) {
+    if ((!studySheets || studySheets.length === 0) && !error) {
         return <EmptyState message="No se encontraron fichas de mejoramiento." />;
     }
 
@@ -476,24 +451,15 @@ const PlanMejoramientoInstructor: React.FC = () => {
                                         </button>
                                         <button
                                             onClick={() => handleSelectSheet(sheet)}
-                                            disabled={loading}
-                                            className={`flex items-center justify-between w-full px-2 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-800 dark:hover:from-gray-600 dark:hover:to-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-all duration-200 font-medium group text-xs ${
-                                                loading ? 'opacity-50 cursor-not-allowed' : ''
-                                            }`}
+                                            className="flex items-center justify-between w-full px-2 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-800 dark:hover:from-gray-600 dark:hover:to-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-all duration-200 font-medium group text-xs"
                                         >
                                             <div className="flex items-center gap-1.5">
-                                                {loading ? (
-                                                    <div className="inline-block animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-gray-600 dark:border-gray-300"></div>
-                                                ) : (
-                                                    <FiEye className="w-3.5 h-3.5" />
-                                                )}
+                                                <FiEye className="w-3.5 h-3.5" />
                                                 <span>
                                                     Ver Historial
                                                 </span>
                                             </div>
-                                            {!loading && (
-                                                <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                                            )}
+                                            <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                                         </button>
                                     </div>
                                 </div>

@@ -22,7 +22,6 @@ interface CompetenceOption {
 
 export default function JustificacionesInstructorSelector() {
   const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
@@ -90,8 +89,8 @@ export default function JustificacionesInstructorSelector() {
 
   useEffect(() => {
     const loadCompetences = async () => {
+      showLoader();
       try {
-        setLoading(true);        
         const result = await dispatch(fetchStudySheetByTeacher({ 
           idTeacher: TEMPORAL_INSTRUCTOR_ID, 
           page: 0, 
@@ -133,20 +132,12 @@ export default function JustificacionesInstructorSelector() {
         console.error('Error loading competences:', error);
         setError("Error al cargar las competencias disponibles");
       } finally {
-        setLoading(false);
+        hideLoader();
       }
     };
 
     loadCompetences();
   }, [dispatch, fichaNumber]);
-
-  useEffect(() => {
-    if (loading) {
-      showLoader();
-    } else {
-      hideLoader();
-    }
-  }, [loading, showLoader, hideLoader]);
 
   if (!fichaNumber) {
     return (
@@ -155,16 +146,6 @@ export default function JustificacionesInstructorSelector() {
           Seleccionar Competencia para Justificaciones
         </PageTitle>
         <EmptyState message="No se encontró ficha" />
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-          <PageTitle onBack={handleBackToFichas}>
-          {getPageTitle()}
-        </PageTitle>
       </div>
     );
   }
