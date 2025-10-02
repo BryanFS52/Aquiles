@@ -52,7 +52,7 @@ public class AttendancesResolver {
     public Map<String, Object> allAttendancesByStudentId(@InputArgument Long id, @InputArgument Long stateId, @InputArgument Integer page, @InputArgument Integer size) {
         try {
             int safePage = (page != null) ? page : 0;
-            int safeSize = (size != null) ? size : 10;
+            int safeSize = (size != null) ? size : Integer.MAX_VALUE;
 
             Pageable pageable = PageRequest.of(safePage, safeSize);
             Page<AttendanceDto> attendances = attendancesBusiness.findAllByStudentId(id, stateId, pageable);
@@ -93,7 +93,7 @@ public class AttendancesResolver {
     public Map<String, Object> allAttendanceByCompetenceQuarterIdWithJustifications( @InputArgument Long competenceQuarterId, @InputArgument Integer page, @InputArgument Integer size) {
         try {
             int safePage = (page != null) ? page : 0;
-            int safeSize = (size != null) ? size : 10;
+            int safeSize = (size != null) ? size : Integer.MAX_VALUE;
 
             Pageable pageable = PageRequest.of(safePage, safeSize);
             Page<AttendanceDto> attendances = attendancesBusiness.findAllByCompetenceQuarterId(competenceQuarterId, pageable);

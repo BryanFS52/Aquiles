@@ -77,6 +77,11 @@ export const GET_ATTENDANCES_WITH_JUSTIFICATIONS_BY_STUDENT = gql`
             name
           }
         }
+        competenceQuarter{
+          competence{
+            name
+          }
+        }
       }
     }
   }
