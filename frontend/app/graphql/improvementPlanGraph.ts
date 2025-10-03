@@ -39,7 +39,6 @@ query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long) {
     }
   }
 }
-
 `;
 
 export const GET_IMPROVEMENT_PLAN_BY_ID = gql`

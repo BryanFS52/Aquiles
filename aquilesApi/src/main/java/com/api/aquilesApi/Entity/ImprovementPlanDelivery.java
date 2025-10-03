@@ -22,8 +22,9 @@ public class ImprovementPlanDelivery implements Serializable {
     @Column(name = "delivery_format", nullable = false, unique = true)
     private String deliveryFormat;
 
-    //  OneToMany with ImprovementPlanActivity
-    @OneToMany(mappedBy = "delivery")
+    // Relations
+    // 1. (1-M) with ImprovementPlanActivity
+    @OneToMany(mappedBy = "improvementPlanDelivery")
     private List<ImprovementPlanActivity> activities;
 
 }

@@ -23,7 +23,8 @@ public class ImprovementPlanEvidenceType implements Serializable {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    // ManyToMany
+    // Relations
+    // 1. Relation (M-M) with improvementPlan
     @ManyToMany(mappedBy = "evidenceTypes")
     private List<ImprovementPlan> improvementPlans = new ArrayList<>();
 

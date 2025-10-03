@@ -26,9 +26,9 @@ public class ImprovementPlanActivityDto {
     private Long learningOutcomeId;
 
     // @NotNull(message = "The Improvement Plan ID is required")
-    private ImprovementPlanDto improvementPlanDto;
+    private ImprovementPlanDto improvementPlan;
 
     // @NotBlank(message = "The delivery format is required")
     // @Size(max = 100, message = "The delivery format cannot exceed 100 characters")
-    private ImprovementPlanDeliveryDto improvementPlanDeliveryDto;
+    private ImprovementPlanDeliveryDto improvementPlanDelivery;
 }

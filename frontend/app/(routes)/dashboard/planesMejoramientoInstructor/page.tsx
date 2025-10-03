@@ -104,7 +104,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
                 await dispatch(fetchStudySheetByTeacher({
                     idTeacher: 1,
                     page: 0,
-                    size: 50
+                    size: 5
                 })).unwrap();
             } catch (error) {
                 console.error('Error al cargar fichas:', error);

@@ -54,8 +54,7 @@ public class ImprovementPlan implements Serializable {
     private List<ImprovementPlanEvidenceType> evidenceTypes;
 
     // 3. Relation (M-1) with faultType
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn(name = "fault_type_id", nullable = false)
     private ImprovementPlanFaultType faultType;
-
 }
