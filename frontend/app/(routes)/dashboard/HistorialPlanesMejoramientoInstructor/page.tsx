@@ -32,7 +32,8 @@ const HistorialPlanesMejoramientoInstructor = () => {
     }, [fichaDataString]);
     
     // Memorizar el ID de la ficha para evitar renders innecesarios
-    const fichaId = React.useMemo(() => fichaData?.id || null, [fichaData?.id]);
+    // Asegurar que sea numérico para GraphQL (Long)
+    const fichaId = React.useMemo(() => (fichaData?.id != null ? Number(fichaData.id) : null), [fichaData?.id]);
     
     // Usar directamente los datos del backend ya que están filtrados correctamente
     const improvementPlans = allImprovementPlans || [];
@@ -435,6 +436,8 @@ const HistorialPlanesMejoramientoInstructor = () => {
                     filterFunction={filterFunction}
                     className="shadow-lg"
                     isDarkMode={isDarkMode}
+                    // Desactivar paginación interna: usaremos la del servidor abajo
+                    paginator={() => null}
                 />
                 
                 {/* Paginación externa para manejar paginación del servidor */}

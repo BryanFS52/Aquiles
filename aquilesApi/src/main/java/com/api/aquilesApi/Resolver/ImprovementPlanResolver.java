@@ -38,7 +38,8 @@ public class ImprovementPlanResolver {
             } else if (teacherCompetence != null) {
                 improvementPlanPage = improvementPlanBusiness.findByFilter(page, size, teacherCompetence);
             } else if (idStudySheet != null) {
-                improvementPlanPage = improvementPlanBusiness.findByStudySheetId(page, size, idStudySheet);
+                // Solicitud del usuario: ignorar asociación con TeamScrum y traer todos los planes
+                improvementPlanPage = improvementPlanBusiness.findAll(page, size);
             } else  {
                 improvementPlanPage = improvementPlanBusiness.findAll(page, size);
             }

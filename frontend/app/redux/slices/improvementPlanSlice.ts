@@ -71,10 +71,12 @@ const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPla
   };
 };
 
-export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], { page?: number; size?: number; teacherCompetence?: number; idStudySheet?: number }>(
+type FetchImprovementPlansVars = { page?: number; size?: number; teacherCompetence?: number; idStudySheet?: number; id?: number };
+
+export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], FetchImprovementPlansVars>(
     'improvementPlan/fetchAll',
     async ({ page, size, teacherCompetence, idStudySheet }) => {
-        const { data } = await clientLAN.query<GetAllImprovementPlansQuery, any>({
+        const { data } = await clientLAN.query<GetAllImprovementPlansQuery, FetchImprovementPlansVars>({
             query: GET_ALL_IMPROVEMENT_PLANS,
             variables: { page, size, teacherCompetence, idStudySheet },
             fetchPolicy: 'no-cache',
@@ -253,11 +255,9 @@ const improvementPlanSlice = createSlice({
                 state.loading = false;
             })
             // addImprovementPlan
-            .addCase(addImprovementPlan.fulfilled, (state, action: PayloadAction<any>) => {
-                if (action.payload) {
-                    const newItem = transformGraphQLToImprovementPlanItem(action.payload);
-                    state.data.push(newItem);
-                }
+            .addCase(addImprovementPlan.fulfilled, (state) => {
+                // El backend retorna solo { code, message }. No empujar un item incompleto.
+                // Opcional: disparar un refetch de la página actual desde el componente después del éxito.
                 state.error = null;
             })
             .addCase(addImprovementPlan.rejected, (state, action) => {

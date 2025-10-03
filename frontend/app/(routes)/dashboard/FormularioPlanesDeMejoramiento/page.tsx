@@ -238,15 +238,16 @@ const FormularioPlanesDeMejoramientoPage =() => {
 
         try {
             const improvementPlanData = {
-                studentId: selectedStudent,
+                // En GraphQL ID suele mapear a string en TS; el backend lo convierte a Long
+                studentId: String(selectedStudent),
                 city: formData.city,
                 date: formData.date, // formato "YYYY-MM-DD"
                 reason: formData.reason,
                 state: formData.state,
                 qualification: false, // Siempre false ya que no se puede calificar al crear
-                teacherCompetence: formData.teacherCompetenceId,
-                faultTypeId: formData.faultTypeId
-            };
+                teacherCompetence: String(formData.teacherCompetenceId),
+                faultType: { id: String(formData.faultTypeId) }
+            } as const;
 
             // Logs corregidos para evitar errores de acceso
             console.log('=== DATOS ANTES DE ENVIAR ===');
@@ -254,9 +255,9 @@ const FormularioPlanesDeMejoramientoPage =() => {
             console.log('formData completo:', formData);
             console.log('improvementPlanData final:', improvementPlanData);
             console.log('Tipos de datos:');
-            console.log('- studentId:', typeof improvementPlanData.studentId, '=', improvementPlanData.studentId);
-            console.log('- teacherCompetence:', typeof improvementPlanData.teacherCompetence, '=', improvementPlanData.teacherCompetence);
-            console.log('- faultTypeId:', typeof improvementPlanData.faultTypeId, '=', improvementPlanData.faultTypeId);
+            console.log('- studentId (ID):', typeof improvementPlanData.studentId, '=', improvementPlanData.studentId);
+            console.log('- teacherCompetence (ID):', typeof improvementPlanData.teacherCompetence, '=', improvementPlanData.teacherCompetence);
+            console.log('- faultType.id (ID):', typeof improvementPlanData.faultType.id, '=', improvementPlanData.faultType.id);
             console.log('- qualification:', typeof improvementPlanData.qualification, '=', improvementPlanData.qualification);
             console.log('===============================');
 
