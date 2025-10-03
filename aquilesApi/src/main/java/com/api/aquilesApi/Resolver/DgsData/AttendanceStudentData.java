@@ -20,6 +20,7 @@ public class AttendanceStudentData {
     @DgsData(parentType = "Student", field = "attendances")
     public List<Attendance> getAttendances(DgsDataFetchingEnvironment env) {
         Student student = env.getSource();
+        assert student != null;
         Long studentId = student.getId();
 
         Long competenceQuarterId = env.getArgument("competenceQuarterId");

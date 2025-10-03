@@ -41,7 +41,6 @@ const FormularioPlanesDeMejoramientoPage =() => {
         state: true
     });
 
-    const [isLoading, setIsLoading] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
     // Detectar modo oscuro
@@ -234,7 +233,7 @@ const FormularioPlanesDeMejoramientoPage =() => {
             return;
         }
 
-        setIsLoading(true);
+        showLoader();
 
         try {
             const improvementPlanData = {
@@ -304,7 +303,7 @@ const FormularioPlanesDeMejoramientoPage =() => {
                 autoClose: 6000,
             });
         } finally {
-            setIsLoading(false);
+            hideLoader();
         }
     };
 
@@ -541,23 +540,14 @@ const FormularioPlanesDeMejoramientoPage =() => {
                             </button>
                             <button
                                 type="submit"
-                                disabled={!selectedStudent || isLoading}
-                                className={`inline-flex items-center px-6 py-3 bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen text-white rounded-xl font-medium shadow-lg transition-all duration-200 ${(!selectedStudent || isLoading)
+                                disabled={!selectedStudent}
+                                className={`inline-flex items-center px-6 py-3 bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen text-white rounded-xl font-medium shadow-lg transition-all duration-200 ${!selectedStudent
                                     ? 'opacity-50 cursor-not-allowed'
                                     : 'hover:shadow-xl transform hover:-translate-y-0.5'
                                     }`}
                             >
-                                {isLoading ? (
-                                    <>
-                                        <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                        Guardando...
-                                    </>
-                                ) : (
-                                    <>
-                                        <FiSave className="w-4 h-4 mr-2" />
-                                        Guardar Plan de Mejoramiento
-                                    </>
-                                )}
+                                <FiSave className="w-4 h-4 mr-2" />
+                                Guardar Plan de Mejoramiento
                             </button>
                         </div>
                     </form>

@@ -7,7 +7,7 @@ type FinalReport {
     annexes: String
     signature: String
     state: Boolean
-    createdAt: String
+    competenceQuarter: TeacherStudySheet
 }
 
 type FinalReportPage {
@@ -28,14 +28,14 @@ type FinalReportPageId {
 }
 
 input FinalReportDto {
-    fileNumber: String!
-    objectives: String!
+    fileNumber: String
+    objectives: String
     disciplinaryOffenses: String
-    conclusions: String!
+    conclusions: String
     annexes: String
-    signature: String!
-    state: Boolean!
-    createdAt: String
+    signature: String
+    state: Boolean
+    competenceQuarter: Long
 }
 
 extend type Query {

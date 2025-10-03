@@ -53,7 +53,7 @@ public class TeamsScrumBusiness {
         }
     }
 
-    // Get all TeamsScrum (paginated)
+    // Get all TeamsScrum (Paginated)
     public Page<TeamsScrumDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
@@ -64,7 +64,7 @@ public class TeamsScrumBusiness {
         }
     }
 
-    // Find ById
+    // Get TeamsScrum by ID
     public TeamsScrumDto findById(Long id) {
         try {
             TeamsScrum teamsScrum = teamScrumService.getById(id);
@@ -76,7 +76,7 @@ public class TeamsScrumBusiness {
         }
     }
 
-    // Find By StudentId
+    // Get TeamsScrum by StudentId
     public List<TeamsScrumDto> findAllByStudentId(Long studentId) {
         try {
             List<TeamsScrum> teamsScrumList = teamScrumService.findAllByStudentId(studentId);
@@ -86,7 +86,7 @@ public class TeamsScrumBusiness {
         }
     }
 
-    // Find By StudySheetId
+    // Get TeamsScrum by StudySheetId
     public List<TeamsScrumDto> findAllByStudySheetId(Long studySheetId) {
         try {
             List<TeamsScrum> entities = teamScrumService.findByStudySheetId(studySheetId);
@@ -114,10 +114,12 @@ public class TeamsScrumBusiness {
         try {
             teamsScrumDto.setId(teamScrumId);
             validationObject(teamsScrumDto);
-            TeamsScrum teamsScrum = teamScrumService.getById(teamScrumId);
-            TeamScrumMap.INSTANCE.EntityToDTO(teamsScrum);
 
-            // Validation explicit de memberIds
+            TeamsScrum teamsScrum = teamScrumService.getById(teamScrumId);
+            
+            TeamScrumMap.INSTANCE.updateTeamScrum(teamsScrumDto, teamsScrum);
+
+            // Si hay memberIds, los procesamos
             if (teamsScrumDto.getMemberIds() != null) {
                 List<TeamScrumMemberId> memberIds = teamsScrumDto.getMemberIds()
                         .stream()
@@ -132,6 +134,7 @@ public class TeamsScrumBusiness {
             throw new CustomException("Error Updating Team Scrum: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
 
     // Add Profile to Student
     public List<TeamScrumMemberIdDto> addProfileToStudent(List<ProcessMethodologyDto> teamScrumMemberIds) {

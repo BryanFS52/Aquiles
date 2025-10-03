@@ -26,20 +26,19 @@ const HistorialPlanesMejoramientoInstructor = () => {
         currentPage 
     } = useSelector((state: any) => state.improvementPlan);
 
-    const fichaDataString = searchParams.get('fichaData');
-    const fichaData = React.useMemo(() => {
-        return fichaDataString ? JSON.parse(decodeURIComponent(fichaDataString)) : null;
-    }, [fichaDataString]);
+    // Obtener parámetros de la URL de forma simple
+    const fichaNumber = searchParams.get('ficha');
+    const studentIds = searchParams.get('studentIds')?.split(',') || [];
     
-    // Memorizar el ID de la ficha para evitar renders innecesarios
-    // Asegurar que sea numérico para GraphQL (Long)
-    const fichaId = React.useMemo(() => (fichaData?.id != null ? Number(fichaData.id) : null), [fichaData?.id]);
-    
-    // Usar directamente los datos del backend ya que están filtrados correctamente
-    const improvementPlans = allImprovementPlans || [];
-    
-    // Estado para manejar la página actual (Paginator espera páginas basadas en 1)
-    const [page, setPage] = React.useState(1);
+    // Filtrar planes si hay filtros de ficha
+    const improvementPlans = (fichaNumber || studentIds.length > 0) && allImprovementPlans
+        ? allImprovementPlans.filter((plan: ImprovementPlan) => {
+            if (studentIds.length > 0) {
+                return plan.student?.id && studentIds.includes(plan.student.id.toString());
+            }
+            return true;
+        })
+        : allImprovementPlans || [];
 
     const [isDarkMode, setIsDarkMode] = React.useState(false);
     
@@ -67,13 +66,12 @@ const HistorialPlanesMejoramientoInstructor = () => {
 
     // useEffect para hacer fetch de datos - ahora sí filtra por ficha en el backend
     useEffect(() => {
-        if (!fichaId) return;
         dispatch(fetchImprovementPlans({ 
             page: page - 1, // Backend espera páginas basadas en 0
             size: 5,
             idStudySheet: fichaId
         }));
-    }, [dispatch, page, fichaId]);
+    }, [dispatch]);
 
     const formatDate = (dateString: string) => {
         if (!dateString) return 'No especificada';
@@ -294,6 +292,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
             </div>
         );
     }
+    
     if (error) {
         return (
             <div className="mx-auto px-4 py-8">
@@ -310,22 +309,22 @@ const HistorialPlanesMejoramientoInstructor = () => {
         return (
             <div className="mx-auto px-4 py-8 space-y-6">
                 <PageTitle>
-                    {fichaData ? `Planes de Mejoramiento - Ficha N° ${fichaData.fichaNumber}` : `Historial De Planes De Mejoramiento`}
+                    {fichaNumber ? `Planes de Mejoramiento - Ficha N° ${fichaNumber}` : `Historial De Planes De Mejoramiento`}
                 </PageTitle>
-                {fichaData && (
+                {fichaNumber && (
                     <button onClick={() => router.back()} className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen mt-2">
                         <FiArrowLeft className="w-4 h-4 mr-1" /> Volver a Fichas
                     </button>
                 )}
                 <div className="mt-4">
-                    <Link href={fichaData ? `./FormularioPlanesDeMejoramiento?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}` : "./FormularioPlanesDeMejoramiento"}>
+                    <Link href={fichaNumber ? `./FormularioPlanesDeMejoramiento?ficha=${fichaNumber}` : "./FormularioPlanesDeMejoramiento"}>
                         <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen shadow-lg">
                             <FiPlus className="w-4 h-4 mr-2" /> Crear Nuevo Plan de Mejoramiento
                         </button>
                     </Link>
                 </div>
-                {fichaData && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Mostrando planes de mejoramiento de {fichaData.totalStudents} estudiantes de la ficha N° {fichaData.fichaNumber}</p>
+                {fichaNumber && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Mostrando planes de mejoramiento de la ficha N° {fichaNumber}</p>
                 )}
                 <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
@@ -357,7 +356,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                         </div>
                         <h3 className="text-lg font-semibold text-black dark:text-white mb-2">No se encontraron planes de mejoramiento</h3>
                         <p className="text-gray-600 dark:text-gray-400 mb-4">
-                            {fichaData ? `No hay planes de mejoramiento registrados para los estudiantes de la ficha N° ${fichaData.fichaNumber}.` : 'Aún no hay planes de mejoramiento registrados en el sistema.'}
+                            {fichaNumber ? `No hay planes de mejoramiento registrados para la ficha N° ${fichaNumber}.` : 'Aún no hay planes de mejoramiento registrados en el sistema.'}
                         </p>
                     </div>
                 </div>
@@ -367,16 +366,15 @@ const HistorialPlanesMejoramientoInstructor = () => {
     
     
     return (
-        <div className="mx-auto px-4 py-8">
-            <div className="space-y-6">
-                <div>
-                    <PageTitle>Historial De Planes De Mejoramiento</PageTitle>
-                    <button
-                        onClick={() => router.back()}
-                        className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen transition-colors duration-200 mt-2"
-                    >
-                        <FiArrowLeft className="w-4 h-4 mr-1" />
-                        Volver
+        <div className="mx-auto px-4 py-8 space-y-6">
+            <PageTitle>Historial De Planes De Mejoramiento</PageTitle>
+            <button onClick={() => router.back()} className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen mt-2">
+                <FiArrowLeft className="w-4 h-4 mr-1" /> Volver
+            </button>
+            <div className="mt-4">
+                <Link href={fichaNumber ? `./FormularioPlanesDeMejoramiento?ficha=${fichaNumber}` : "./FormularioPlanesDeMejoramiento"}>
+                    <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen shadow-lg">
+                        <FiPlus className="w-4 h-4 mr-2" /> Crear Nuevo Plan de Mejoramiento
                     </button>
                     {/* Botón debajo del título, con degradado verde */}
                     <div className="mt-4">

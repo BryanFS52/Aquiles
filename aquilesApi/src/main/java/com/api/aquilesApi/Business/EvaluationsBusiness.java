@@ -32,7 +32,7 @@ public class EvaluationsBusiness {
     // Validation Object
 
 
-    // Find ALl
+    // Get all evaluations (Paginated)
     public Page<EvaluationsDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
@@ -43,7 +43,7 @@ public class EvaluationsBusiness {
         }
     }
 
-    // Find By Id
+    // Get Evaluation by ID
     public EvaluationsDto findById(Long id) {
         try {
             Evaluations evaluation = evaluationsService.getById(id);

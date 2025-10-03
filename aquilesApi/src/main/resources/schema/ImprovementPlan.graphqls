@@ -1,4 +1,4 @@
-type ImprovementPlan {
+    type ImprovementPlan {
     id: ID
     city: String
     date: String

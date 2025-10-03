@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { useLoader } from '@context/LoaderContext';
 import { FaComputer, FaPeopleRoof } from 'react-icons/fa6';
 import { FaPeopleCarry } from 'react-icons/fa';
 import { AiOutlineStock } from 'react-icons/ai';
@@ -34,17 +35,21 @@ const iconMap = {
 export default function Programas(): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
   const { data: programs, loading, error } = useSelector((state: RootState) => state.program);
+  const { showLoader, hideLoader } = useLoader();
   
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
     const fetchProgramsData = async (): Promise<void> => {
+      showLoader();
       try {
         await dispatch(fetchPrograms({ page: 0, size: 100 })).unwrap();
       } catch (err) {
         toast.error("No se pudieron cargar los programas.");
         console.error(err);
+      } finally {
+        hideLoader();
       }
     };
 

@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ChecklistHistoryBusiness {
+public class  ChecklistHistoryBusiness {
     private final ChecklistHistoryService checklistHistoryService;
     private final ModelMapper modelMapper;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;

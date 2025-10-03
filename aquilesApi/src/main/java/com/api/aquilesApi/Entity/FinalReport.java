@@ -19,7 +19,7 @@ public class FinalReport implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //Columns
+    // Columns
     @Column(name = "file_number",nullable = false, length = 55)
     private String fileNumber;
 
@@ -32,16 +32,17 @@ public class FinalReport implements Serializable {
     @Column(name = "conclusions", nullable = false, length = 255)
     private String conclusions;
 
-    @Lob
     @Column(name = "annexes")
     private byte[] annexes;
 
-    @Lob
-    @Column(name = "signature", nullable = false)
-    private byte[] firma;
+    @Column(name = "signature")
+    private byte[] signature;
 
     @Column(name = "state", nullable = false)
     private Boolean state;
+
+    @Column (name = "competence_quarter")
+    private Long competenceQuarter;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

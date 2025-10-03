@@ -26,7 +26,7 @@ public class JustificationTypeBusiness {
     }
 
 
-    // Get all justificationTypes (paginated)
+    // Get all justificationTypes (Paginated)
     public Page<JustificationTypeDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);

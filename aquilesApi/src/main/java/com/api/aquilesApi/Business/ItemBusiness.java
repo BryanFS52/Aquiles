@@ -24,7 +24,7 @@ public class ItemBusiness {
 
     }
 
-    // Get all items (paginated)
+    // Get all items (Paginated)
     public Page<ItemDto> findAll(Integer page, Integer size){
         PageRequest pageRequest = PageRequest.of(page, size);
         try {

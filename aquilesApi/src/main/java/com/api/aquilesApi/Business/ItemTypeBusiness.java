@@ -21,7 +21,7 @@ public class ItemTypeBusiness {
         this.itemTypeService = itemTypeService;
     }
 
-    // Get all item types (paginated)
+    // Get all itemTypes (Paginated)
     public Page<ItemTypeDto> findAll(int page, int size){
         try {
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -34,7 +34,7 @@ public class ItemTypeBusiness {
         }
     }
 
-    // Get an item type by ID
+    // Get an itemType by ID
     public ItemTypeDto findById(Long id){
         try {
             ItemType itemType = itemTypeService.getById(id);
@@ -46,7 +46,7 @@ public class ItemTypeBusiness {
         }
     }
 
-    // Add a new item type
+    // Add a new itemType
     public ItemTypeDto add(ItemTypeDto itemTypeDto){
         try {
             ItemType itemType = new ItemType();
@@ -59,7 +59,7 @@ public class ItemTypeBusiness {
         }
     }
 
-    // Update an existing item type
+    // Update an existing itemType
     public void update(Long itemTypeId, ItemTypeDto itemTypeDto){
         try {
             itemTypeDto.setId(itemTypeId);
@@ -71,7 +71,7 @@ public class ItemTypeBusiness {
         }
     }
 
-    // Delete an item type
+    // Delete an itemType
     public void delete(Long itemTypeId){
         try {
             ItemType itemType = itemTypeService.getById(itemTypeId);

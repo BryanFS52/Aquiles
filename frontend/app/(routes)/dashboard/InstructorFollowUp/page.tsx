@@ -15,7 +15,6 @@ import { CompetenceOption } from "@/components/features/InstructorFollowUp/types
 
 export default function CompetenceSelectionPage() {
   const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCompetence, setSelectedCompetence] = useState<CompetenceOption | null>(null);
@@ -85,8 +84,8 @@ export default function CompetenceSelectionPage() {
 
   useEffect(() => {
     const loadCompetences = async () => {
+      showLoader();
       try {
-        setLoading(true);        
         const result = await dispatch(fetchStudySheetByTeacher({ 
           idTeacher: TEMPORAL_INSTRUCTOR_ID, 
           page: 0, 
@@ -128,20 +127,12 @@ export default function CompetenceSelectionPage() {
         console.error('Error loading competences:', error);
         setError("Error al cargar las competencias disponibles");
       } finally {
-        setLoading(false);
+        hideLoader();
       }
     };
 
     loadCompetences();
   }, [dispatch, fichaNumber]);
-
-  useEffect(() => {
-    if (loading) {
-      showLoader();
-    } else {
-      hideLoader();
-    }
-  }, [loading, showLoader, hideLoader]);
 
   if (!fichaNumber) {
     return (
@@ -150,16 +141,6 @@ export default function CompetenceSelectionPage() {
           Seleccionar Competencia para el seguimiento
         </PageTitle>
         <EmptyState message="No se encontró ficha" />
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <PageTitle onBack={handleBackToFichas}>
-          {getPageTitle()}
-        </PageTitle>
       </div>
     );
   }
