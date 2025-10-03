@@ -4,12 +4,13 @@ import { useState } from "react";
 import Image from "next/image";
 import { useSelector } from "react-redux";
 import { GrAttachment } from "react-icons/gr";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaEye } from "react-icons/fa";
 import persona from "@public/img/persona.jpg";
 import { RootState } from "@/redux/store";
 import { getStatusNameById, getActiveStatuses } from "@/redux/slices/justificationStatusSlice";
 import { JustificationStatus } from "@graphql/generated";
 import EmptyState from "@components/UI/emptyState";
+import ModalJustificationDetails from "@components/Modals/modalJustificationDetails";
 
 interface JustificationTableProps {
   filteredData: any[];
@@ -37,6 +38,10 @@ export default function JustificationTable({
   // Estado para la paginación
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 10;
+
+  // Estado para el modal de detalles
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedJustification, setSelectedJustification] = useState<any>(null);
 
   const { data: justificationStatuses, loading: loadingStatuses } = useSelector(
     (state: RootState) => state.justificationStatus
@@ -85,6 +90,18 @@ export default function JustificationTable({
 
   const getCurrentSelectValue = (justificacion: any) => {
     return justificacion.justificationStatusId || "";
+  };
+
+  // Función para abrir el modal de detalles
+  const handleViewDetails = (justificacion: any) => {
+    setSelectedJustification(justificacion);
+    setIsModalOpen(true);
+  };
+
+  // Función para cerrar el modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedJustification(null);
   };
 
   if (isLoading) {
@@ -197,6 +214,13 @@ export default function JustificationTable({
                       Cargando...
                     </span>
                   )}
+                <button
+                  onClick={() => handleViewDetails(justificacion)}
+                  title="Ver detalles de la justificación"
+                  className="flex items-center justify-center p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <FaEye className="w-4 h-4" />
+                </button>
                 </div>
               </td>
             </tr>
@@ -261,6 +285,13 @@ export default function JustificationTable({
           </div>
         </div>
       )}
+
+      {/* Modal de detalles de justificación */}
+      <ModalJustificationDetails
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        justificationData={selectedJustification}
+      />
     </div>
   );
 }

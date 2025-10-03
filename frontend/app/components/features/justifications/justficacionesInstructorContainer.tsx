@@ -33,7 +33,7 @@ export const JustificacionesInstructorContainer: React.FC<
     error,
   } = useSelector((state: RootState) => state.justification);
 
-  const { justificationStatuses } = useSelector(
+  const { data: justificationStatuses } = useSelector(
     (state: RootState) => state.justificationStatus
   );
 

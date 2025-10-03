@@ -310,11 +310,23 @@ const readFileAsBase64 = (file: File): Promise<string> => {
 };
 
 export const downloadBase64File = (base64Data: string, fileName: string, mimeType: string = "application/octet-stream") => {
-    const linkSource = `data:${mimeType};base64,${base64Data}`;
-    const downloadLink = document.createElement("a");
-    downloadLink.href = linkSource;
-    downloadLink.download = fileName;
-    downloadLink.click();
+    try {
+        if (!base64Data) {
+            throw new Error('No hay datos base64 para descargar');
+        }
+
+        const linkSource = `data:${mimeType};base64,${base64Data}`;
+        const downloadLink = document.createElement("a");
+        downloadLink.href = linkSource;
+        downloadLink.download = fileName;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+        alert(`Error al descargar el archivo: ${errorMessage}`);
+    }
 };
 
 export const generateFileName = (id: number, mimeType: string): string => {
@@ -410,7 +422,8 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
                     justificationDate: justification?.justificationDate || '',
                     estado: statusName,
                     state: true,
-                    justificationType: 'Tipo no disponible',
+                    justificationType: (justification as any)?.justificationType?.name || '', // ✅ Mapear correctamente desde GraphQL
+                    description: (justification as any)?.description || '', // ✅ Agregar descripción desde GraphQL
                     archivoAdjunto: justification?.justificationFile || '',
                     archivoMime: '',
                     documento: person?.document || '',

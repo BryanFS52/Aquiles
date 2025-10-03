@@ -134,9 +134,14 @@ export const GET_ATTENDANCES_BY_COMPETENCE_QUARTER_AND_JUSTIFICATIONS = gql`
         id
         justification {
           id
+          description
           absenceDate
           justificationDate
           justificationFile
+          justificationType {
+            id
+            name
+          }
           justificationStatus {
             id
             name
