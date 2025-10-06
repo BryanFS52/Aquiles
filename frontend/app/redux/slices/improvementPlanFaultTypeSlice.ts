@@ -2,7 +2,14 @@ import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_FAULT_TYPES, GET_FAULT_TYPE_BY_ID } from '@graphql/improvementPlanFaultTypeGraph'
-import {ImprovementPlanFaultType, GetAllImprovementPlanFaultTypesQuery, GetAllImprovementPlanFaultTypesQueryVariables, GetImprovementPlanFaultTypeByIdQuery, GetImprovementPlanFaultTypeByIdQueryVariables, AddImprovementPlanFaultTypeMutation, AddImprovementPlanFaultTypeMutationVariables } from '@graphql/generated'
+import {ImprovementPlanFaultType, 
+    GetAllImprovementPlanFaultTypesQuery, 
+    GetAllImprovementPlanFaultTypesQueryVariables,
+    GetImprovementPlanFaultTypeByIdQuery,
+    GetImprovementPlanFaultTypeByIdQueryVariables, 
+    AddImprovementPlanFaultTypeMutation, 
+    AddImprovementPlanFaultTypeMutationVariables 
+} from '@graphql/generated'
 
 // Función para transformar datos de GraphQL a ImprovementPlanFaultType
 const transformGraphQLToFaultTypeItem = (graphqlData: any): ImprovementPlanFaultType => {
