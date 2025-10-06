@@ -30,14 +30,14 @@ public class ImprovementPlanActivity implements Serializable {
     private LocalDate deliveryDate;
 
     @Column(name = "learning_outcome", nullable = true)
-    private Long learningOutcomeId;
+    private Long learningOutcome;
 
-    // 1. (M-1) Relation with ImprovementPlan
+    // 1. Relation (M-1) with ImprovementPlan
     @ManyToOne
     @JoinColumn(name = "improvement_plan_id", nullable = false)
     private ImprovementPlan improvementPlan;
 
-    // 2. (M-1) Relation with ImprovementPlanDelivery
+    // 2. Relation (M-1) with ImprovementPlanDelivery
     @ManyToOne
     @JoinColumn(name = "delivery_id", nullable = false)
     private ImprovementPlanDelivery improvementPlanDelivery;

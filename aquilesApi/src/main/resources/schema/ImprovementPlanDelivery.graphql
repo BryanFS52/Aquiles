@@ -1,10 +1,11 @@
 type ImprovementPlanDelivery {
     id: ID!
-    deliveryFormat: String!
+    deliveryFormat: String
 }
 
 input ImprovementPlanDeliveryDto {
-    deliveryFormat: String!
+    id: ID
+    deliveryFormat: String
 }
 
 type ImprovementPlanDeliveryPage {

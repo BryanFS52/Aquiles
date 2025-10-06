@@ -52,6 +52,8 @@ public class ImprovementPlanActivityBusiness {
            ImprovementPlanActivity improvementPlanActivity = new ImprovementPlanActivity();
            ImprovementPlanActivityMap.INSTANCE.updateImprovementPlanActivity(improvementPlanActivityDto, improvementPlanActivity);
            ImprovementPlanActivity savedImprovementPlanActivity = improvementPlanActivityService.save(improvementPlanActivity);
+           System.out.println(improvementPlanActivity);
+           System.out.println(improvementPlanActivityDto + "Data ");
            return ImprovementPlanActivityMap.INSTANCE.EntityToDTO(savedImprovementPlanActivity);
         } catch (Exception e) {
             e.printStackTrace();

@@ -2,17 +2,17 @@ type ImprovementPlanActivity {
     id: ID!
     description: String
     deliveryDate: String
-    improvementPlanId: ID
-    deliveryId: ID
+    improvementPlan: ImprovementPlan
+    improvementPlanDelivery: ImprovementPlanDelivery
     learningOutcome: Long
 }
 
 input ImprovementPlanActivityDto {
-    improvementPlanId: ID
     description: String
     deliveryDate: String
-    deliveryId: ID
     learningOutcome: Long
+    improvementPlan: ImprovementPlanDto
+    improvementPlanDelivery: ImprovementPlanDeliveryDto
 }
 
 type ImprovementPlanActivityPage {

@@ -11,6 +11,7 @@ type ImprovementPlan {
 }
 
 input ImprovementPlanDto {
+    id: ID
     city: String
     date: String
     reason: String
