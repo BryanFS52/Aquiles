@@ -386,6 +386,13 @@ export type CommitteeNoveltyObservationInput = {
   studentId: Scalars['Long']['input'];
 };
 
+export type CommitteeNoveltyResponseInput = {
+  name: Scalars['String']['input'];
+  noveltyId: Scalars['Long']['input'];
+  observation?: InputMaybe<Scalars['String']['input']>;
+  studentId: Scalars['Long']['input'];
+};
+
 export type CommitteePage = {
   code?: Maybe<Scalars['String']['output']>;
   currentPage?: Maybe<Scalars['Int']['output']>;
@@ -1235,7 +1242,6 @@ export type ImprovementPlanEvidenceTypePageId = {
 export type ImprovementPlanFaultType = {
   id?: Maybe<Scalars['ID']['output']>;
   name?: Maybe<Scalars['String']['output']>;
-  teacherCompetence?: Maybe<TeacherStudySheet>;
 };
 
 export type ImprovementPlanFaultTypeDto = {
@@ -2674,7 +2680,7 @@ export type MutationRemovePersonFromCommitteeArgs = {
 
 export type MutationRespondNoveltiesFromCommitteeArgs = {
   committeeId: Scalars['Long']['input'];
-  responses: Array<CommitteeNoveltyObservationInput>;
+  responses: Array<CommitteeNoveltyResponseInput>;
 };
 
 
@@ -5561,7 +5567,7 @@ export type AddImprovementPlanFaultTypeMutationVariables = Exact<{
 }>;
 
 
-export type AddImprovementPlanFaultTypeMutation = { addImprovementPlanFaultType?: { code?: string | null, message?: string | null } | null };
+export type AddImprovementPlanFaultTypeMutation = { addImprovementPlanFaultType?: { code?: string | null, message?: string | null, id?: any | null } | null };
 
 export type UpdateImprovementPlanFaultTypeMutationVariables = Exact<{
   id: Scalars['Long']['input'];
@@ -5569,14 +5575,14 @@ export type UpdateImprovementPlanFaultTypeMutationVariables = Exact<{
 }>;
 
 
-export type UpdateImprovementPlanFaultTypeMutation = { updateImprovementPlanFaultType?: { code?: string | null, message?: string | null } | null };
+export type UpdateImprovementPlanFaultTypeMutation = { updateImprovementPlanFaultType?: { code?: string | null, message?: string | null, id?: any | null } | null };
 
 export type DeleteImprovementPlanFaultTypeMutationVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
 
 
-export type DeleteImprovementPlanFaultTypeMutation = { deleteImprovementPlanFaultType?: { code?: string | null, message?: string | null } | null };
+export type DeleteImprovementPlanFaultTypeMutation = { deleteImprovementPlanFaultType?: { code?: string | null, message?: string | null, id?: any | null } | null };
 
 export type GetAllImprovementPlansQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -8014,6 +8020,7 @@ export const AddImprovementPlanFaultTypeDocument = gql`
   addImprovementPlanFaultType(input: $input) {
     code
     message
+    id
   }
 }
     `;
@@ -8048,6 +8055,7 @@ export const UpdateImprovementPlanFaultTypeDocument = gql`
   updateImprovementPlanFaultType(id: $id, input: $input) {
     code
     message
+    id
   }
 }
     `;
@@ -8083,6 +8091,7 @@ export const DeleteImprovementPlanFaultTypeDocument = gql`
   deleteImprovementPlanFaultType(id: $id) {
     code
     message
+    id
   }
 }
     `;

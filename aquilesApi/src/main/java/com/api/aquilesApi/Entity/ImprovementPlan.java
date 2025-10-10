@@ -33,10 +33,14 @@ public class ImprovementPlan implements Serializable {
     @Column(name = "state", nullable = false)
     private Boolean state;
 
-    @Column(name = "qualification", nullable = true)
+    @Column(name = "qualification")
     private Boolean qualification;
 
+    // Reference IDs (Gateway)
+    @Column (name = "student_id")
     private Long studentId;
+
+    @Column (name = "teacher_competence")
     private Long teacherCompetence;
 
     // Relations
