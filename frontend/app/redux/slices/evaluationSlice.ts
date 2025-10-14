@@ -316,14 +316,10 @@ export const updateEvaluationItemStates = createAsyncThunk<UpdateEvaluationMutat
             console.log('Item states:', itemStates);
             console.log('General observations:', generalObservations);
 
-            // Crear el JSON estructurado que incluye tanto los estados de items como las observaciones generales
-            const observationsData = {
-                itemStates: itemStates,
-                generalObservations: generalObservations || ""
-            };
-
+            // Guardar solo las observaciones generales como texto plano
+            // Los estados de items se mantienen en localStorage y se sincronizan con la evaluación
             const input = {
-                observations: JSON.stringify(observationsData),
+                observations: generalObservations || "",
                 recommendations: recommendations || "",
                 valueJudgment: valueJudgment || "PENDIENTE"
             };

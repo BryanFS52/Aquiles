@@ -170,11 +170,9 @@ export class InstructorChecklistHandlers {
     try {
       setIsSavingItems(true);
       
-      // Estructura para guardar: observaciones generales + estados de items
-      const observationsToSave = JSON.stringify({
-        generalObservations: evaluationObservations,
-        itemStates: currentItemStates
-      });
+      // Guardar solo las observaciones generales como texto plano
+      // Los estados de items se manejan separadamente en el frontend
+      const observationsToSave = evaluationObservations.trim();
       
       const updateResponse = await evaluationService.completeEvaluation(
         parseInt(selectedEvaluation.id || "0"),
@@ -225,11 +223,9 @@ export class InstructorChecklistHandlers {
     try {
       toast.info("💾 Guardando evaluación...");
       
-      // Estructura para guardar: observaciones generales + estados de items
-      const observationsToSave = JSON.stringify({
-        generalObservations: evaluationObservations,
-        itemStates: itemStates
-      });
+      // Guardar solo las observaciones generales como texto plano
+      // Los estados de items se manejan separadamente en el frontend
+      const observationsToSave = evaluationObservations.trim();
 
       const response = await evaluationService.completeEvaluation(
         parseInt(selectedEvaluation.id || "0"),
@@ -327,11 +323,9 @@ export class InstructorChecklistHandlers {
       );
 
       if (newEvaluationResult && newEvaluationResult.code === "200" && newEvaluationResult.id) {
-        // Estructura para guardar: observaciones generales + estados de items
-        const observationsToSave = JSON.stringify({
-          generalObservations: evaluationObservations,
-          itemStates: itemStates
-        });
+        // Guardar solo las observaciones generales como texto plano
+        // Los estados de items se manejan separadamente en el frontend
+        const observationsToSave = evaluationObservations.trim();
 
         const completeResult = await evaluationService.completeEvaluation(
           parseInt(newEvaluationResult.id),

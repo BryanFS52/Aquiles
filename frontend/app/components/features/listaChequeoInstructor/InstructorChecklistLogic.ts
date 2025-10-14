@@ -84,7 +84,7 @@ export class InstructorChecklistLogic {
   static extractGeneralObservationsFromEvaluation = (evaluation: Evaluation) => {
     if (!evaluation.observations) return "";
 
-    // Si las observaciones no contienen caracteres JSON, asumir que son texto plano
+    // Si las observaciones no contienen caracteres JSON, asumir que son texto plano (nuevo formato)
     if (!evaluation.observations.includes('{') && !evaluation.observations.includes('"')) {
       return evaluation.observations.trim();
     }
@@ -92,16 +92,16 @@ export class InstructorChecklistLogic {
     try {
       const parsed = JSON.parse(evaluation.observations);
       if (parsed.generalObservations && typeof parsed.generalObservations === 'string') {
-        // Devolver solo el texto que el usuario digitó (formato anterior)
+        // Formato anterior: devolver el texto de generalObservations
         return parsed.generalObservations.trim();
       }
       
-      // Si no tiene generalObservations pero es JSON, devolver cadena vacía
+      // Si no tiene generalObservations pero es JSON válido, devolver cadena vacía
       if (typeof parsed === 'object') {
         return "";
       }
     } catch (error) {
-      // Si no se puede parsear como JSON, verificar si contiene formato JSON
+      // Si no se puede parsear como JSON pero contiene formato JSON, probablemente sea datos corruptos
       if (evaluation.observations.includes('itemStates') || 
           evaluation.observations.includes('generalObservations') || 
           evaluation.observations.startsWith('{')) {
@@ -109,12 +109,12 @@ export class InstructorChecklistLogic {
         return "";
       }
       
-      // Es texto plano, usar el valor completo
+      // Es texto plano, usar el valor completo (nuevo formato)
       return evaluation.observations.trim();
     }
 
-    // Por defecto, devolver cadena vacía
-    return "";
+    // Por defecto, devolver el texto completo si no es JSON válido
+    return evaluation.observations.trim();
   };
 
   // Cargar listas de chequeo activas
