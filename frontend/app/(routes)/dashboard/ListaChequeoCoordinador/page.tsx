@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { toast } from "react-toastify"
 import { client, clientLAN } from '@lib/apollo-client'
 import { useQuery, useMutation } from '@apollo/client'
-import { FaTrashAlt, FaEdit } from "react-icons/fa"
+import { FaTrashAlt, FaEdit, FaChevronDown, FaGraduationCap } from "react-icons/fa"
 import {
   GET_ALL_CHECKLISTS_COORDINATOR,
   ADD_CHECKLIST,
@@ -13,6 +13,7 @@ import {
 } from '@graphql/checklistGraph'
 import { ADD_EVALUATION } from '@graphql/evaluationsGraph'
 import { GET_ALL_TRAINING_PROJECTS } from '@graphql/olympo/trainingProjectGraph'
+import { GET_STUDY_SHEETS } from '@graphql/olympo/studySheetGraph'
 import CrearListaChequeo from "@components/Modals/modalNewChecklist"
 import PageTitle from "@components/UI/pageTitle"
 
@@ -59,6 +60,13 @@ export default function CoordinadorChecklistView() {
     client: clientLAN, // Usar clientLAN para el microservicio Olympo
     fetchPolicy: 'network-only',
   })
+
+  // Cargar fichas de formación para hacer lookup de nombres
+  const { data: studySheetsData, loading: loadingSheets, error: errorSheets } = useQuery(GET_STUDY_SHEETS, {
+    variables: { page: 0, size: 100 },
+    client: clientLAN, // Usar clientLAN para el microservicio Olympo
+    fetchPolicy: 'network-only',
+  })
   
   // Debug: ver qué datos están llegando
   useEffect(() => {
@@ -78,6 +86,21 @@ export default function CoordinadorChecklistView() {
       }
     }
   }, [trainingProjectsData, loadingProjects, errorProjects])
+
+  // Debug: ver qué datos de fichas están llegando
+  useEffect(() => {
+    console.log('=== DEBUG STUDY SHEETS ===');
+    console.log('studySheetsData:', studySheetsData);
+    console.log('loadingSheets:', loadingSheets);
+    console.log('errorSheets:', errorSheets);
+    if (studySheetsData?.allStudySheets?.data) {
+      console.log('Study sheets found:', studySheetsData.allStudySheets.data.length);
+      console.log('First study sheet:', studySheetsData.allStudySheets.data[0]);
+    }
+    if (errorSheets) {
+      console.error('❌ Error loading study sheets:', errorSheets);
+    }
+  }, [studySheetsData, loadingSheets, errorSheets])
   
   const [addChecklistMutation] = useMutation(ADD_CHECKLIST, { client })
   const [updateChecklistMutation] = useMutation(UPDATE_CHECKLIST, { client })
@@ -90,6 +113,7 @@ export default function CoordinadorChecklistView() {
   const [checklistToDelete, setChecklistToDelete] = useState<string | null>(null)
   const [editingChecklist, setEditingChecklist] = useState<Checklist | null>(null)
   const [isEditing, setIsEditing] = useState<boolean>(false)
+  const [expandedStudySheets, setExpandedStudySheets] = useState<string | null>(null)
 
   // Función para obtener el nombre del proyecto formativo
   const getTrainingProjectName = useCallback((trainingProjectId: string | number | null | undefined): string => {
@@ -113,6 +137,56 @@ export default function CoordinadorChecklistView() {
     
     return project?.name || 'Proyecto no encontrado'
   }, [trainingProjectsData])
+
+  // Función para obtener la información detallada de las fichas
+  const getStudySheetDetails = useCallback((studySheetIds: string): { sheets: any[], summary: string } => {
+    if (!studySheetIds || !studySheetsData?.allStudySheets?.data) {
+      return { sheets: [], summary: 'Sin fichas asociadas' }
+    }
+    
+    const sheetIds = studySheetIds.split(',').map(id => id.trim()).filter(id => id)
+    if (sheetIds.length === 0) {
+      return { sheets: [], summary: 'Sin fichas asociadas' }
+    }
+    
+    const foundSheets = sheetIds.map(id => {
+      const sheet = studySheetsData.allStudySheets.data.find(
+        (s: any) => s?.id?.toString() === id.toString()
+      )
+      return sheet ? {
+        id: sheet.id,
+        number: sheet.number || id,
+        name: sheet.program?.name || 'Programa no especificado',
+        found: true
+      } : {
+        id,
+        number: id,
+        name: 'Ficha no encontrada en el sistema',
+        found: false
+      }
+    })
+    
+    const validSheets = foundSheets.filter(sheet => sheet.found)
+    const invalidCount = foundSheets.length - validSheets.length
+    
+    let summary = ''
+    if (foundSheets.length === 1) {
+      summary = validSheets.length === 1 ? `Ficha ${foundSheets[0].number}` : `Ficha ${foundSheets[0].number} (no encontrada)`
+    } else {
+      const validText = validSheets.length > 0 ? `${validSheets.length} fichas` : ''
+      const invalidText = invalidCount > 0 ? `${invalidCount} no encontradas` : ''
+      
+      if (validText && invalidText) {
+        summary = `${validText} (${invalidText})`
+      } else if (validText) {
+        summary = `${validText} asociadas`
+      } else {
+        summary = `${foundSheets.length} fichas no encontradas`
+      }
+    }
+    
+    return { sheets: foundSheets, summary }
+  }, [studySheetsData])
 
   // Normalizar checklists desde Apollo
   const checklists: Checklist[] = data?.allChecklists?.data || []
@@ -331,7 +405,19 @@ export default function CoordinadorChecklistView() {
     setConfirmModalOpen(true)
   }
 
-  // Función auxiliar para formatear las fichas
+  // Función para toggle del desplegable de fichas
+  const toggleStudySheetExpansion = (checklistId: string): void => {
+    setExpandedStudySheets(expandedStudySheets === checklistId ? null : checklistId)
+  }
+
+  // Cerrar desplegables cuando se abre un modal
+  useEffect(() => {
+    if (modalOpen || confirmModalOpen) {
+      setExpandedStudySheets(null)
+    }
+  }, [modalOpen, confirmModalOpen])
+
+  // Función auxiliar para formatear las fichas (mantenida para compatibilidad)
   const getFormattedStudySheets = (studySheets: string): string => {
     if (!studySheets) return 'Sin fichas asociadas'
     
@@ -470,17 +556,72 @@ export default function CoordinadorChecklistView() {
                               Fichas Asociadas
                             </span>
                             <div className="mt-1">
-                              {(checklist as any).studySheets ? (
-                                (checklist as any).formattedStudySheets ? (
-                                  <div className="text-xs text-gray-700 dark:text-white">
-                                    {(checklist as any).formattedStudySheets}
+                              {(checklist as any).studySheets ? (() => {
+                                const studySheetDetails = getStudySheetDetails((checklist as any).studySheets);
+                                const isExpanded = expandedStudySheets === checklist.id;
+                                
+                                return (
+                                  <div className="space-y-2">
+                                    {/* Botón principal con resumen */}
+                                    <button
+                                      onClick={() => toggleStudySheetExpansion(checklist.id)}
+                                      className="inline-flex items-center justify-between w-full px-3 py-2 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-800/20 dark:to-blue-600/20 text-blue-800 dark:text-blue-300 rounded-lg text-xs font-bold border border-blue-300 dark:border-blue-500/30 hover:from-blue-200 hover:to-blue-300 dark:hover:from-blue-700/30 dark:hover:to-blue-500/30 transition-all duration-200"
+                                    >
+                                      <span>{studySheetDetails.summary}</span>
+                                      <FaChevronDown 
+                                        className={`w-3 h-3 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                                      />
+                                    </button>
+                                    
+                                    {/* Lista desplegable de fichas */}
+                                    {isExpanded && studySheetDetails.sheets.length > 0 && (
+                                      <div className="bg-white dark:bg-gray-700 border border-blue-200 dark:border-blue-600 rounded-lg shadow-lg overflow-hidden animate-slide-down">
+                                        {studySheetDetails.sheets.map((sheet, index) => (
+                                          <div 
+                                            key={sheet.id}
+                                            className={`px-3 py-3 text-xs border-b border-blue-100 dark:border-blue-700 last:border-b-0 hover:bg-blue-100 dark:hover:bg-blue-800/30 transition-colors duration-150 ${
+                                              sheet.found 
+                                                ? (index % 2 === 0 ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-white dark:bg-gray-700')
+                                                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700'
+                                            }`}
+                                          >
+                                            <div className="flex items-center space-x-2">
+                                              <FaGraduationCap 
+                                                className={`w-3 h-3 flex-shrink-0 ${
+                                                  sheet.found 
+                                                    ? 'text-blue-600 dark:text-blue-400' 
+                                                    : 'text-red-500 dark:text-red-400'
+                                                }`} 
+                                              />
+                                              <div className="flex-1 min-w-0">
+                                                <div className="flex justify-between items-center">
+                                                  <span className={`font-semibold truncate ${
+                                                    sheet.found 
+                                                      ? 'text-blue-800 dark:text-blue-300'
+                                                      : 'text-red-700 dark:text-red-300'
+                                                  }`}>
+                                                    Ficha {sheet.number}
+                                                  </span>
+                                                  <span className="text-gray-500 dark:text-gray-400 text-xs ml-2">
+                                                    ID: {sheet.id}
+                                                  </span>
+                                                </div>
+                                                <div className={`mt-1 text-xs truncate ${
+                                                  sheet.found 
+                                                    ? 'text-gray-700 dark:text-gray-300'
+                                                    : 'text-red-600 dark:text-red-400 italic'
+                                                }`}>
+                                                  {sheet.name}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
                                   </div>
-                                ) : (
-                                  <span className="inline-block px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-blue-800/20 dark:to-blue-600/20 text-gray-800 dark:text-blue-300 rounded-full text-xs font-bold border border-gray-300 dark:border-blue-500/30">
-                                    {getFormattedStudySheets((checklist as any).studySheets)}
-                                  </span>
-                                )
-                              ) : (
+                                );
+                              })() : (
                                 <span className="text-gray-500 italic text-sm">Sin fichas asociadas</span>
                               )}
                             </div>
