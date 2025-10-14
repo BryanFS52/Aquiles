@@ -30,6 +30,7 @@ type ImprovementPlanPage {
     totalItems: Int
     currentPage: Int
     message: String
+    studySheet: StudySheet
 }
 
 type ImprovementPlanPageId {

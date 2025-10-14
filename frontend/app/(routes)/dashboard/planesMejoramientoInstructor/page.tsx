@@ -161,9 +161,22 @@ const PlanMejoramientoInstructor: React.FC = () => {
             console.log('Estudiantes de la ficha:', validStudents);
             console.log('IDs de estudiantes:', studentIds);
             
+            // Crear un objeto fichaData completo con toda la información necesaria
+            const fichaData = {
+                id: sheet.id,
+                fichaNumber: sheet.number,
+                number: sheet.number,
+                studentIds: studentIds,
+                teacherCompetences: currentCompetences,
+                students: validStudents.map(ss => ss.student),
+                studentStudySheets: validStudents
+            };
+            
+            console.log('FichaData completo a enviar:', fichaData);
+            
             if (validStudents.length > 0) {
-                // Navegación simplificada con parámetros básicos
-                const url = `./HistorialPlanesMejoramientoInstructor?ficha=${sheet.number}&studentIds=${studentIds.join(',')}`;
+                // Navegación con objeto completo en JSON
+                const url = `./HistorialPlanesMejoramientoInstructor?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}`;
                 
                 console.log('Navegando a:', url);
                 

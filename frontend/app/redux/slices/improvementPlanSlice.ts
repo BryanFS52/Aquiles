@@ -192,19 +192,31 @@ export const deleteImprovementPlan = createAsyncThunk<string, string,
 export const fetchTeacherCompetencesByStudySheet = createAsyncThunk<TeacherCompetence[], { studySheetId: string; teacherId: string }>(
     'improvementPlan/fetchTeacherCompetencesByStudySheet',
     async ({ studySheetId, teacherId }) => {
-        const { data } = await clientLAN.query({
-            query: GET_TEACHER_COMPETENCES_BY_STUDY_SHEET,
-            variables: { id: parseInt(studySheetId), teacherId: parseInt(teacherId) },
-            fetchPolicy: 'no-cache',
-        });
+        console.log('Solicitando competencias con:', { studySheetId, teacherId });
         
-        return data.studySheetById?.data?.teacherStudySheets?.map((item: any) => ({
-            id: item.id,
-            competence: {
-                id: item.competence.id,
-                name: item.competence.name,
-            },
-        })) || [];
+        try {
+            const { data } = await clientLAN.query({
+                query: GET_TEACHER_COMPETENCES_BY_STUDY_SHEET,
+                variables: { id: parseInt(studySheetId), teacherId: parseInt(teacherId) },
+                fetchPolicy: 'no-cache',
+            });
+            
+            console.log('Respuesta completa de GET_TEACHER_COMPETENCES_BY_STUDY_SHEET:', data);
+            
+            const result = data.studySheetById?.data?.teacherStudySheets?.map((item: any) => ({
+                id: item.id,
+                competence: {
+                    id: item.competence.id,
+                    name: item.competence.name,
+                },
+            })) || [];
+            
+            console.log('Competencias procesadas:', result);
+            return result;
+        } catch (error) {
+            console.error('Error al obtener competencias:', error);
+            throw error;
+        }
     }
 );
 
