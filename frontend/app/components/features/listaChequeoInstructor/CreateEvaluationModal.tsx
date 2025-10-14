@@ -90,11 +90,8 @@ export const CreateEvaluationModal: React.FC<CreateEvaluationModalProps> = ({
           className="w-full px-6 py-4 border-2 border-darkBlue dark:border-gray-600 rounded-2xl focus:ring-4 focus:ring-[#5cb800]/30 dark:focus:ring-shadowBlue/30 focus:border-[#5cb800] dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white font-semibold text-lg shadow-inner transition-all duration-300"
         >
           <option value="">Seleccione un juicio de valor</option>
-          <option value="EXCELENTE">Excelente</option>
-          <option value="BUENO">Bueno</option>
-          <option value="ACEPTABLE">Aceptable</option>
-          <option value="DEFICIENTE">Deficiente</option>
-          <option value="RECHAZADO">Rechazado</option>
+          <option value="APROBADO">Aprobado</option>
+          <option value="NO APROBADO">No Aprobado</option>
         </select>
       </div>
 

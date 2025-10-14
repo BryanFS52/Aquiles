@@ -122,7 +122,7 @@ export default function ListaChequeoInstructorPasoAPaso() {
                 <form onSubmit={async e => {
                   e.preventDefault();
                   if (!canSubmit) return;
-                  await addEvaluation({ variables: { input: { checklistId: checklistObj?.id, valueJudgment: 'Aprobado', observations: '', recommendations: '' } } });
+                  await addEvaluation({ variables: { input: { checklistId: checklistObj?.id, valueJudgment: 'APROBADO', observations: '', recommendations: '' } } });
                   setSubmitted(true);
                 }}>
                   <ul className="mb-6">

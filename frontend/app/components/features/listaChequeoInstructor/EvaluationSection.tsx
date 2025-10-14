@@ -99,7 +99,6 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                           required
                         >
                           <option value="">Seleccionar...</option>
-                          <option value="PENDIENTE">Pendiente</option>
                           <option value="APROBADO">Aprobado</option>
                           <option value="NO APROBADO">No Aprobado</option>
                         </select>

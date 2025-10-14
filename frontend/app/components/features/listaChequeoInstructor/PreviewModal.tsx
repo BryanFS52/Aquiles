@@ -159,11 +159,9 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
                       </div>
                       <div className="bg-gradient-to-br from-gray-50 to-white dark:from-[#5cb800]/5 dark:to-[#8fd400]/5 p-4 rounded-2xl border border-gray-200/60 dark:border-[#5cb800]/20 min-h-[120px] flex items-center justify-center">
                         <span className={`inline-flex px-6 py-4 rounded-2xl text-lg font-bold shadow-lg transform transition-all duration-300 hover:scale-105 ${
-                          previewData.evaluation.judgment === 'EXCELENTE' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-500/30' :
-                          previewData.evaluation.judgment === 'BUENO' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-500/30' :
-                          previewData.evaluation.judgment === 'ACEPTABLE' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-500/30' :
-                          previewData.evaluation.judgment === 'DEFICIENTE' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-500/30' :
-                          previewData.evaluation.judgment === 'RECHAZADO' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-500/30' :
+                          previewData.evaluation.judgment === 'APROBADO' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-green-500/30' :
+                          previewData.evaluation.judgment === 'NO APROBADO' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-500/30' :
+                          previewData.evaluation.judgment === 'PENDIENTE' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white shadow-yellow-500/30' :
                           'bg-gradient-to-r from-gray-500 to-slate-600 text-white shadow-gray-500/30'
                         }`}>
                           {previewData.evaluation.judgment || 'PENDIENTE'}
