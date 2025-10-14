@@ -3,9 +3,8 @@
 import React, { useEffect } from "react";
 import PageTitle from "@components/UI/pageTitle";
 import DataTable from "@components/UI/DataTable";
-import type { DataTableColumn } from "@components/UI/DataTable/types";
-import Paginator from "@components/UI/Paginator/Paginator";
-import type { AppDispatch } from "@redux/store"
+import { DataTableColumn } from "@components/UI/DataTable/types";
+import { AppDispatch } from "@redux/store"
 import { useDispatch, useSelector } from "react-redux"
 import {fetchImprovementPlans} from "@slice/improvementPlanSlice";
 import { FiMapPin, FiCalendar, FiFileText, FiStar, FiBook, FiPlus, FiArrowLeft } from "react-icons/fi";
@@ -17,14 +16,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { 
-        data: allImprovementPlans, 
-        loading, 
-        error, 
-        totalPages, 
-        totalItems, 
-        currentPage 
-    } = useSelector((state: any) => state.improvementPlan);
+    const { data: allImprovementPlans, loading, error } = useSelector((state: any) => state.improvementPlan);
 
     // Obtener parámetros de la URL de forma simple
     const fichaNumber = searchParams.get('ficha');
@@ -41,35 +33,18 @@ const HistorialPlanesMejoramientoInstructor = () => {
         : allImprovementPlans || [];
 
     const [isDarkMode, setIsDarkMode] = React.useState(false);
-    
-    // Función para manejar cambio de página
-    const handlePageChange = React.useCallback((newPage: number) => {
-        if (loading || newPage === page) return; // Evitar llamadas duplicadas
-        
-        setPage(newPage);
-        // No necesitamos dispatch aquí porque el useEffect se encargará cuando page cambie
-    }, [loading, page]);
-
-    // useEffect para detectar modo oscuro - solo se ejecuta una vez
     useEffect(() => {
-        const checkDarkMode = () => {
-            const isDark = document.documentElement.classList.contains('dark');
-            setIsDarkMode(isDark);
-        };
-
-        // Verificar inmediatamente
+        const checkDarkMode = () => setIsDarkMode(document.documentElement.classList.contains('dark'));
         checkDarkMode();
         const observer = new MutationObserver(() => checkDarkMode());
         observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
         return () => observer.disconnect();
-    }, []); // Array vacío - solo se ejecuta una vez
+    }, []);
 
-    // useEffect para hacer fetch de datos - ahora sí filtra por ficha en el backend
     useEffect(() => {
         dispatch(fetchImprovementPlans({ 
-            page: page - 1, // Backend espera páginas basadas en 0
-            size: 5,
-            idStudySheet: fichaId
+            page: 0, 
+            size: 5 
         }));
     }, [dispatch]);
 
@@ -376,82 +351,44 @@ const HistorialPlanesMejoramientoInstructor = () => {
                     <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen shadow-lg">
                         <FiPlus className="w-4 h-4 mr-2" /> Crear Nuevo Plan de Mejoramiento
                     </button>
-                    {/* Botón debajo del título, con degradado verde */}
-                    <div className="mt-4">
-                        <Link href={fichaData 
-                            ? `./FormularioPlanesDeMejoramiento?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}`
-                            : "./FormularioPlanesDeMejoramiento"
-                        }>
-                            <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-lightGreen transition-colors duration-200 shadow-lg">
-                                <FiPlus className="w-4 h-4 mr-2" />
-                                Crear Nuevo Plan de Mejoramiento
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-
-                {/* Dashboard Stats */}
-                <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                        <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mb-3 mx-auto">
-                            <FiFileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">{improvementPlans?.length || 0}</h3>
-                        <p className="text-gray-600 dark:text-gray-300 font-medium">Planes Totales (Ficha)</p>
-                    </div>
-                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                        <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-2xl mb-3 mx-auto">
-                            <FiStar className="w-6 h-6 text-lightGreen dark:text-darkGreen" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
-                            {improvementPlans?.filter((plan: ImprovementPlan) => 
-                                (typeof plan.qualification === "boolean" && plan.qualification === true) ||
-                                (typeof plan.qualification === "number" && plan.qualification >= 3.0)
-                            ).length || 0}
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-300 font-medium">Aprobados (página actual)</p>
-                    </div>
-                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                        <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-2xl mb-3 mx-auto">
-                            <FiFileText className="w-6 h-6 text-red-600 dark:text-red-400" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
-                            {improvementPlans?.filter((plan: ImprovementPlan) => 
-                                (typeof plan.qualification === "boolean" && plan.qualification === false) ||
-                                plan.qualification === null || 
-                                plan.qualification === undefined ||
-                                (typeof plan.qualification === "number" && plan.qualification < 3.0)
-                            ).length || 0}
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-300 font-medium">No Aprobados (página actual)</p>
-                    </div>
-                </div>
-
-                <DataTable<ImprovementPlan>
-                    columns={columns}
-                    data={improvementPlans || []}
-                    filterPlaceholder="Buscar..."
-                    filterFunction={filterFunction}
-                    className="shadow-lg"
-                    isDarkMode={isDarkMode}
-                    // Desactivar paginación interna: usaremos la del servidor abajo
-                    paginator={() => null}
-                />
-                
-                {/* Paginación externa para manejar paginación del servidor */}
-                {totalPages > 1 && (
-                    <div className="mt-6">
-                        <Paginator
-                            page={page}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                            isDarkMode={isDarkMode}
-                        />
-                    </div>
-                )}
-                
-
+                </Link>
             </div>
+            <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mb-3 mx-auto">
+                        <FiFileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-black dark:text-white mb-1">{improvementPlans?.length || 0}</h3>
+                    <p className="text-gray-600 dark:text-gray-300 font-medium">Planes Totales</p>
+                </div>
+                <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-2xl mb-3 mx-auto">
+                        <FiStar className="w-6 h-6 text-lightGreen dark:text-darkGreen" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
+                        {improvementPlans?.filter((plan: ImprovementPlan) => (typeof plan.qualification === "boolean" && plan.qualification === true) || (typeof plan.qualification === "number" && plan.qualification >= 3.0)).length || 0}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 font-medium">Aprobados</p>
+                </div>
+                <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-2xl mb-3 mx-auto">
+                        <FiFileText className="w-6 h-6 text-red-600 dark:text-red-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
+                        {improvementPlans?.filter((plan: ImprovementPlan) => (typeof plan.qualification === "boolean" && plan.qualification === false) || plan.qualification === null || plan.qualification === undefined || (typeof plan.qualification === "number" && plan.qualification < 3.0)).length || 0}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 font-medium">No Aprobados</p>
+                </div>
+            </div>
+            <DataTable<ImprovementPlan>
+                columns={columns}
+                data={improvementPlans || []}
+                pageSize={5}
+                filterPlaceholder="Buscar..."
+                filterFunction={filterFunction}
+                className="shadow-lg"
+                isDarkMode={isDarkMode}
+            />
         </div>
     );
 }
