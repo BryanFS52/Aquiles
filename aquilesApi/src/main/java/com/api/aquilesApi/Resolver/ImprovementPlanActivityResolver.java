@@ -14,26 +14,23 @@ import java.util.Map;
 
 @DgsComponent
 public class ImprovementPlanActivityResolver {
-    private final ImprovementPlanActivityBusiness business;
+    private final ImprovementPlanActivityBusiness improvementPlanActivityBusiness;
 
-    public ImprovementPlanActivityResolver(ImprovementPlanActivityBusiness business) {
-        this.business = business;
+    public ImprovementPlanActivityResolver(ImprovementPlanActivityBusiness improvementPlanActivityBusiness) {
+        this.improvementPlanActivityBusiness = improvementPlanActivityBusiness;
     }
 
+    // FindAll ImprovementPlanActivities (GraphQL)
     @DgsQuery
     public Map<String, Object> allImprovementPlanActivities(@InputArgument Integer page, @InputArgument Integer size) {
         try {
-            // Valores por defecto si no se proporcionan
-            int pageNumber = page != null ? page : 0;
-            int pageSize = size != null ? size : 10;
-
-            Page<ImprovementPlanActivityDto> pageResult = business.findAll(pageNumber, pageSize);
+            Page<ImprovementPlanActivityDto> pageResult = improvementPlanActivityBusiness.findAll(page, size);
             return ResponseHttpApi.responseHttpFindAll(
                     pageResult.getContent(),
                     ResponseHttpApi.CODE_OK,
                     "Query ok",
                     pageResult.getTotalPages(),
-                    pageNumber,
+                    page,
                     (int) pageResult.getTotalElements()
             );
         } catch (Exception e) {
@@ -44,38 +41,33 @@ public class ImprovementPlanActivityResolver {
         }
     }
 
+    // Find ImprovementPlanActivity by ID (GraphQL)
     @DgsQuery
     public Map<String, Object> improvementPlanActivityById(@InputArgument Long id) {
         try {
-            if (id == null) {
-                return ResponseHttpApi.responseHttpError(
-                        "ID parameter is required",
-                        HttpStatus.BAD_REQUEST
-                );
-            }
-
-            ImprovementPlanActivityDto dto = business.findById(id);
-            return ResponseHttpApi.responseHttpFindId(dto, ResponseHttpApi.CODE_OK, "Query by id ok");
+            ImprovementPlanActivityDto improvementPlanActivityDto = improvementPlanActivityBusiness.findById(id);
+            return ResponseHttpApi.responseHttpFindId(
+                    improvementPlanActivityDto,
+                    ResponseHttpApi.CODE_OK,
+                    "Query ok"
+            );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
-                    "Error retrieving ImprovementPlanActivity: " + e.getMessage(),
-                    HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error retrieving ImprovementPlanActivity: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }
 
+    // Add ImprovementPlanActivity (GraphQL)
     @DgsMutation
     public Map<String, Object> addImprovementPlanActivity(@InputArgument(name = "input") ImprovementPlanActivityDto dto) {
         try {
-            if (dto == null) {
-                return ResponseHttpApi.responseHttpError(
-                        "Input parameter is required",
-                        HttpStatus.BAD_REQUEST
-                );
-            }
-
-            ImprovementPlanActivityDto saved = business.add(dto);
-            return ResponseHttpApi.responseHttpAction(saved.getId(), ResponseHttpApi.CODE_OK, "Add ok");
+            ImprovementPlanActivityDto improvementPlanActivityDto = improvementPlanActivityBusiness.add(dto);
+            return ResponseHttpApi.responseHttpAction(
+                    improvementPlanActivityDto.getId(),
+                    ResponseHttpApi.CODE_OK,
+                    "Add ok"
+            );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error adding ImprovementPlanActivity: " + e.getMessage(),
@@ -84,25 +76,16 @@ public class ImprovementPlanActivityResolver {
         }
     }
 
+    // Update ImprovementPlanActivity (GraphQL)
     @DgsMutation
-    public Map<String, Object> updateImprovementPlanActivity(@InputArgument Long id, @InputArgument(name = "input") ImprovementPlanActivityDto dto) {
+    public Map<String, Object> updateImprovementPlanActivity(@InputArgument Long id, @InputArgument(name = "input") ImprovementPlanActivityDto improvementPlanActivityDto) {
         try {
-            if (id == null) {
-                return ResponseHttpApi.responseHttpError(
-                        "ID parameter is required",
-                        HttpStatus.BAD_REQUEST
-                );
-            }
-
-            if (dto == null) {
-                return ResponseHttpApi.responseHttpError(
-                        "Input parameter is required",
-                        HttpStatus.BAD_REQUEST
-                );
-            }
-
-            business.update(id, dto);
-            return ResponseHttpApi.responseHttpAction(id, ResponseHttpApi.CODE_OK, "Update ok");
+            improvementPlanActivityBusiness.update(id, improvementPlanActivityDto);
+            return ResponseHttpApi.responseHttpAction(
+                    id,
+                    ResponseHttpApi.CODE_OK,
+                    "Update ok"
+            );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error updating ImprovementPlanActivity: " + e.getMessage(),
@@ -111,19 +94,18 @@ public class ImprovementPlanActivityResolver {
         }
     }
 
+    // Delete ImprovementPlanActivity (GraphQL)
     @DgsMutation
     public Map<String, Object> deleteImprovementPlanActivity(@InputArgument Long id) {
         try {
-            if (id == null) {
-                return ResponseHttpApi.responseHttpError(
-                        "ID parameter is required",
-                        HttpStatus.BAD_REQUEST
-                );
-            }
-
-            business.delete(id);
-            return ResponseHttpApi.responseHttpAction(id, ResponseHttpApi.CODE_OK, "Delete ok");
-        } catch (Exception e) {
+            improvementPlanActivityBusiness.delete(id);
+            return ResponseHttpApi.responseHttpAction(
+                    id,
+                    ResponseHttpApi.CODE_OK,
+                    "Delete ok"
+            );
+        }
+        catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error deleting ImprovementPlanActivity: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR

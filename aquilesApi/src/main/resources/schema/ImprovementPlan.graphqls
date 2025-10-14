@@ -1,4 +1,4 @@
-    type ImprovementPlan {
+type ImprovementPlan {
     id: ID
     city: String
     date: String
@@ -11,6 +11,7 @@
 }
 
 input ImprovementPlanDto {
+    id: ID
     city: String
     date: String
     reason: String

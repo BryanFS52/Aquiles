@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -13,11 +14,10 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 @Entity
-@Table(name = "ImprovementPlan_activities")
+@Table(name = "improvement_plan_activities")
 public class ImprovementPlanActivity implements Serializable {
-
     @Transient
-    private final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,19 +27,18 @@ public class ImprovementPlanActivity implements Serializable {
     private String description;
 
     @Column(name = "delivery_date", nullable = false)
-    private LocalDateTime deliveryDate;
+    private LocalDate deliveryDate;
 
-    @Column(name = "learning_outcome", nullable = false)
-    private Long learningOutcomeId;
+    @Column(name = "learning_outcome", nullable = true)
+    private Long learningOutcome;
 
-    // (M-1) Relation with ImprovementPlan
+    // 1. Relation (M-1) with ImprovementPlan
     @ManyToOne
     @JoinColumn(name = "improvement_plan_id", nullable = false)
     private ImprovementPlan improvementPlan;
 
-    // (M-1) Relation with ImprovementPlanDelivery
+    // 2. Relation (M-1) with ImprovementPlanDelivery
     @ManyToOne
     @JoinColumn(name = "delivery_id", nullable = false)
-    private ImprovementPlanDelivery delivery;
-
+    private ImprovementPlanDelivery improvementPlanDelivery;
 }

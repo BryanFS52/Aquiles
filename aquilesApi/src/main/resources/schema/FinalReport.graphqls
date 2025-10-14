@@ -11,20 +11,20 @@ type FinalReport {
 }
 
 type FinalReportPage {
-    code: String
-    message: String
     data: [FinalReport]
+    code: String
     date: String
     totalPages: Int
     totalItems: Int
     currentPage: Int
+    message: String
 }
 
 type FinalReportPageId {
-    code: String
-    message: String
     data: FinalReport
     date: String
+    code: String
+    message: String
 }
 
 input FinalReportDto {
