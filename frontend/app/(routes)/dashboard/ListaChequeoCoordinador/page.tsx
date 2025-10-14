@@ -283,31 +283,10 @@ export default function CoordinadorChecklistView() {
         if (result?.addChecklist?.code === "200") {
           toast.success("Lista de chequeo creada exitosamente")
           
-          // Crear evaluación automáticamente para la nueva lista de chequeo
-          const checklistId = result?.addChecklist?.id
-          if (checklistId) {
-            try {
-              const evaluationData = {
-                observations: "Evaluación creada automáticamente al crear la lista de chequeo",
-                recommendations: "Pendiente de completar por el instructor",
-                valueJudgment: "PENDIENTE",
-                checklistId: parseInt(checklistId)
-              }
-              
-              const { data: evaluationResult } = await addEvaluationMutation({
-                variables: { input: evaluationData }
-              })
-              
-              if (evaluationResult?.addEvaluation?.code === "200") {
-                console.log("✅ Evaluación creada automáticamente con ID:", evaluationResult.addEvaluation.id)
-              } else {
-                console.warn("⚠️ Error al crear evaluación automática:", evaluationResult?.addEvaluation?.message)
-              }
-            } catch (evaluationError) {
-              console.error("❌ Error al crear evaluación automática:", evaluationError)
-              // No mostramos error al usuario ya que la lista de chequeo se creó exitosamente
-            }
-          }
+          // NOTA: No creamos evaluación automática aquí porque las evaluaciones
+          // deben estar asociadas a un team scrum específico. Se crearán cuando
+          // el instructor seleccione un team scrum.
+          console.log("✅ Lista de chequeo creada con ID:", result?.addChecklist?.id)
           
           await refetch()
           setModalOpen(false)

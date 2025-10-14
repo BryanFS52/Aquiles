@@ -1,11 +1,12 @@
 import { toast } from "react-toastify";
 import { evaluationService } from "@redux/slices/evaluationSlice";
-import { checkListService } from "@redux/slices/checklistSlice";
+import { client } from "@lib/apollo-client";
+import { GET_CHECKLIST_BY_ID } from "@graphql/checklistGraph";
 import { InstructorChecklistLogic } from "@components/features/listaChequeoInstructor/InstructorChecklistLogic";
 import {
   Checklist,
   Evaluation,
-} from "@/types/checklist";
+} from "@graphql/generated";
 
 export class InstructorChecklistHandlers {
   // Handler para cambio de trimestre
@@ -45,11 +46,14 @@ export class InstructorChecklistHandlers {
       localStorage.setItem('selectedChecklistId', checklistId);
       
       try {
-        const checklistResponse = await checkListService.fetchChecklistById(parseInt(checklistId));
+        const { data } = await client.query({
+          query: GET_CHECKLIST_BY_ID,
+          variables: { id: parseInt(checklistId) }
+        });
 
-        if (checklistResponse.code === "200" && checklistResponse.data) {
-          setSelectedChecklist(checklistResponse.data);
-          loadExistingSignatures(checklistResponse.data);
+        if (data?.checklistById?.code === "200" && data?.checklistById?.data) {
+          setSelectedChecklist(data.checklistById.data);
+          loadExistingSignatures(data.checklistById.data);
           
           // Verificar si tenemos una evaluación guardada localmente
           const localEvaluationData = localStorage.getItem(`evaluationData_${checklistId}`);
@@ -173,7 +177,7 @@ export class InstructorChecklistHandlers {
       });
       
       const updateResponse = await evaluationService.completeEvaluation(
-        parseInt(selectedEvaluation.id),
+        parseInt(selectedEvaluation.id || "0"),
         observationsToSave,
         evaluationRecommendations,
         evaluationJudgment
@@ -228,7 +232,7 @@ export class InstructorChecklistHandlers {
       });
 
       const response = await evaluationService.completeEvaluation(
-        parseInt(selectedEvaluation.id),
+        parseInt(selectedEvaluation.id || "0"),
         observationsToSave,
         evaluationRecommendations,
         evaluationJudgment
@@ -290,6 +294,11 @@ export class InstructorChecklistHandlers {
       return;
     }
 
+    if (!selectedTeamScrumId) {
+      toast.error("Por favor seleccione un Team Scrum antes de crear la evaluación");
+      return;
+    }
+
     if (!evaluationObservations.trim() || !evaluationRecommendations.trim()) {
       toast.error("Por favor complete las observaciones y recomendaciones");
       return;
@@ -305,6 +314,13 @@ export class InstructorChecklistHandlers {
       toast.info("🚀 Creando evaluación...");
 
       const teamScrumIdNumber = selectedTeamScrumId ? parseInt(selectedTeamScrumId) : undefined;
+      
+      if (!teamScrumIdNumber) {
+        toast.error("ID de Team Scrum inválido");
+        setIsCreatingEvaluation(false);
+        return;
+      }
+
       const newEvaluationResult = await evaluationService.createEvaluationForChecklist(
         parseInt(selectedChecklist.id), 
         teamScrumIdNumber

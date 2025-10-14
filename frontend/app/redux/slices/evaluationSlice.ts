@@ -83,7 +83,7 @@ const evaluationService = {
     },
 
     // Función para crear una evaluación automáticamente al crear una lista de chequeo
-    createEvaluationForChecklist: async (checklistId: number, checklistData?: any) => {
+    createEvaluationForChecklist: async (checklistId: number, teamScrumId?: number) => {
         try {
             const numericChecklistId = parseInt(checklistId.toString());
             
@@ -95,8 +95,11 @@ const evaluationService = {
                 observations: "",
                 recommendations: "",
                 valueJudgment: "PENDIENTE",
-                checklistId: numericChecklistId
+                checklistId: numericChecklistId,
+                teamScrumId: teamScrumId // Incluir teamScrumId para hacer la evaluación única
             };
+
+            console.log("🚀 Creando evaluación con datos:", evaluationInput);
 
             const { data } = await client.mutate({
                 mutation: ADD_EVALUATION,
@@ -104,6 +107,7 @@ const evaluationService = {
             });
             
             if (data && data.addEvaluation && data.addEvaluation.code === "200") {
+                console.log("✅ Evaluación creada exitosamente:", data.addEvaluation);
                 return data.addEvaluation;
             } else {
                 throw new Error(`Error creating evaluation: ${data?.addEvaluation?.message}`);
