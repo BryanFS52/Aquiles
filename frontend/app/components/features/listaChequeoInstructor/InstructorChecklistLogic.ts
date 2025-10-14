@@ -1,11 +1,13 @@
 import { toast } from "react-toastify";
 import { evaluationService } from "@redux/slices/evaluationSlice";
-import { checkListService } from "@redux/slices/checklistSlice";
+import { fetchChecklists } from "@redux/slices/checklistSlice";
 import { exportService } from "@redux/slices/exportSlice";
+import { client } from '@lib/apollo-client';
+import { GET_ALL_CHECKLISTS } from '@graphql/checklistGraph';
 import {
   Checklist,
   Evaluation,
-} from "@/types/checklist";
+} from "@graphql/generated";
 
 export class InstructorChecklistLogic {
   // Función para cargar firmas existentes desde el checklist
@@ -132,12 +134,17 @@ export class InstructorChecklistLogic {
       const instructorStudySheetNumber = localStorage.getItem('selectedStudySheetNumber');
       console.log("🔍 Instructor study sheet:", { id: instructorStudySheetId, number: instructorStudySheetNumber });
       
-      const response = await checkListService.fetchAllChecklists(0, 100);
+      const response = await client.query({
+        query: GET_ALL_CHECKLISTS,
+        variables: { page: 0, size: 100 },
+        fetchPolicy: 'network-only'
+      });
       console.log("Raw checklists response:", response);
 
-      if (response.code === "200" && response.data) {
+      const checklistData = response.data?.allChecklists;
+      if (checklistData?.code === "200" && checklistData.data) {
         // Filtrar solo las listas activas
-        let activeLists = response.data.filter((checklist: Checklist) => checklist.state === true);
+        let activeLists = checklistData.data.filter((checklist: Checklist) => checklist.state === true);
         console.log("All active checklists:", activeLists.length);
         
         // Si el instructor tiene una ficha asignada, filtrar por esa ficha
@@ -164,7 +171,13 @@ export class InstructorChecklistLogic {
 
         setActiveChecklists(activeLists);
         if (activeLists.length > 0 && !selectedChecklist) {
-          setSelectedChecklist(activeLists[0]);
+          const firstChecklist = activeLists[0];
+          setSelectedChecklist(firstChecklist);
+          loadExistingSignatures(firstChecklist);
+          
+          // Cargar automáticamente las evaluaciones del primer checklist
+          console.log("🔄 Auto-loading evaluations for first checklist:", firstChecklist.id);
+          await loadEvaluationsForChecklist(parseInt(firstChecklist.id));
         } else if (activeLists.length === 0 && instructorStudySheetId) {
           toast.info(`No hay listas de chequeo asignadas a tu ficha de formación (Ficha ${instructorStudySheetNumber})`);
         }

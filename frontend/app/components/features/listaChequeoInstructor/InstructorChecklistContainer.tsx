@@ -11,10 +11,16 @@ import { AppDispatch, RootState } from '@/redux/store';
 import {
   Checklist,
   Evaluation,
-  SimulatedChecklistItem,
-} from "@/types/checklist";
-import { checkListService } from '@redux/slices/checklistSlice';
+} from "@graphql/generated";
 import { evaluationService } from '@redux/slices/evaluationSlice';
+
+// Interfaces locales
+interface SimulatedChecklistItem {
+  id: number;
+  indicator: string;
+  completed: boolean | null;
+  observations: string;
+}
 
 // Import logic classes
 import { InstructorChecklistLogic } from './InstructorChecklistLogic';
@@ -139,7 +145,9 @@ export const InstructorChecklistContainer: React.FC = () => {
     }
 
     // Mapear los items reales del checklist a nuestro formato
-    return selectedChecklist.items.map((item, index) => {
+    return selectedChecklist.items?.map((item, index) => {
+      if (!item) return null; // Skip null items
+      
       const itemId = parseInt(item.id || (index + 1).toString());
       
       // Obtener el estado desde itemStates (datos de BD) o valores por defecto
@@ -147,11 +155,11 @@ export const InstructorChecklistContainer: React.FC = () => {
       
       return {
         id: itemId,
-        indicator: item.indicator,
+        indicator: item.indicator || '',
         completed: itemState ? itemState.completed : null, // Usar datos de BD si existen
         observations: itemState ? itemState.observations : "" // Usar observaciones de BD si existen
       };
-    });
+    }).filter(Boolean) as SimulatedChecklistItem[] || [];
   }, [selectedChecklist, itemStates]);
 
   // Filtrar checklists por trimestre
@@ -577,6 +585,60 @@ export const InstructorChecklistContainer: React.FC = () => {
           selectedStudySheetNumber={selectedStudySheetNumber}
           selectedChecklist={selectedChecklist}
         />
+
+        {/* Banner informativo sobre evaluaciones disponibles */}
+        {selectedChecklist && evaluations.length > 0 && (
+          <div className="mx-6 mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-blue-500 dark:bg-blue-400 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-1">
+                  Evaluación Disponible
+                </h4>
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                  Se ha creado automáticamente una evaluación para esta lista de chequeo. 
+                  El coordinador configuró esta lista para el equipo scrum <strong>{selectedTeamScrumName}</strong>.
+                  Puedes completar la evaluación revisando cada indicador y agregando tus observaciones y recomendaciones.
+                </p>
+                {selectedEvaluation && (
+                  <div className="mt-2 text-xs text-blue-600 dark:text-blue-400">
+                    Estado actual: <span className="font-medium capitalize">{selectedEvaluation.valueJudgment || 'PENDIENTE'}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Banner cuando no hay evaluaciones */}
+        {selectedChecklist && evaluations.length === 0 && (
+          <div className="mx-6 mb-6 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-yellow-500 dark:bg-yellow-400 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                  </svg>
+                </div>
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-yellow-800 dark:text-yellow-200 mb-1">
+                  Sin Evaluación Automática
+                </h4>
+                <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                  Esta lista de chequeo no tiene una evaluación automática creada. 
+                  Puedes crear una nueva evaluación usando el botón correspondiente en la sección de evaluación.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Controles de filtros y acciones */}
         <ChecklistControls

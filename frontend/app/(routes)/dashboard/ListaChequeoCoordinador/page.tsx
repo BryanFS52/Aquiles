@@ -11,6 +11,7 @@ import {
   UPDATE_CHECKLIST,
   DELETE_CHECKLIST
 } from '@graphql/checklistGraph'
+import { ADD_EVALUATION } from '@graphql/evaluationsGraph'
 import { GET_ALL_TRAINING_PROJECTS } from '@graphql/olympo/trainingProjectGraph'
 import CrearListaChequeo from "@components/Modals/modalNewChecklist"
 import PageTitle from "@components/UI/pageTitle"
@@ -54,7 +55,7 @@ export default function CoordinadorChecklistView() {
   
   // Cargar proyectos formativos para hacer lookup del nombre
   const { data: trainingProjectsData, loading: loadingProjects, error: errorProjects } = useQuery(GET_ALL_TRAINING_PROJECTS, {
-    variables: { page: 0, size: 5 },
+    variables: { page: 0, size: 100 },
     client: clientLAN, // Usar clientLAN para el microservicio Olympo
     fetchPolicy: 'network-only',
   })
@@ -70,13 +71,18 @@ export default function CoordinadorChecklistView() {
       console.log('First project:', trainingProjectsData.allTrainingProjects.data[0]);
     }
     if (errorProjects) {
-      console.error('Error loading training projects:', errorProjects);
+      console.error('❌ Error loading training projects:', errorProjects);
+      // Verificar si es un error de conexión
+      if (errorProjects.message?.includes('Failed to fetch') || errorProjects.networkError) {
+        console.error('Network error with clientLAN. Check if server is running on correct port.');
+      }
     }
   }, [trainingProjectsData, loadingProjects, errorProjects])
   
   const [addChecklistMutation] = useMutation(ADD_CHECKLIST, { client })
   const [updateChecklistMutation] = useMutation(UPDATE_CHECKLIST, { client })
   const [deleteChecklistMutation] = useMutation(DELETE_CHECKLIST, { client })
+  const [addEvaluationMutation] = useMutation(ADD_EVALUATION, { client })
 
   const [modalOpen, setModalOpen] = useState<boolean>(false)
   const [selectedTrimestre, setSelectedTrimestre] = useState<string>("todos")
@@ -88,8 +94,9 @@ export default function CoordinadorChecklistView() {
   // Función para obtener el nombre del proyecto formativo
   const getTrainingProjectName = useCallback((trainingProjectId: string | number | null | undefined): string => {
     console.log('=== DEBUG getTrainingProjectName ===');
-    console.log('trainingProjectId:', trainingProjectId);
+    console.log('trainingProjectId:', trainingProjectId, 'Type:', typeof trainingProjectId);
     console.log('trainingProjectsData available:', !!trainingProjectsData?.allTrainingProjects?.data);
+    console.log('Number of projects loaded:', trainingProjectsData?.allTrainingProjects?.data?.length || 0);
     
     if (!trainingProjectId || !trainingProjectsData?.allTrainingProjects?.data) {
       console.log('Returning default: Sin proyecto asociado');
@@ -102,6 +109,7 @@ export default function CoordinadorChecklistView() {
     
     console.log('Found project:', project);
     console.log('Project name:', project?.name || 'Proyecto no encontrado');
+    console.log('All available project IDs:', trainingProjectsData.allTrainingProjects.data.map((p: any) => p?.id));
     
     return project?.name || 'Proyecto no encontrado'
   }, [trainingProjectsData])
@@ -117,6 +125,7 @@ export default function CoordinadorChecklistView() {
     if (checklists.length > 0) {
       console.log('First checklist:', checklists[0]);
       console.log('First checklist trainingProjectId:', (checklists[0] as any).trainingProjectId);
+      console.log('All checklist trainingProjectIds:', checklists.map(c => ({ id: c.id, trainingProjectId: (c as any).trainingProjectId })));
     }
   }, [data, checklists])
   // Filtrar y ordenar checklists
@@ -190,11 +199,42 @@ export default function CoordinadorChecklistView() {
           associatedJuries: null,
           items: checklistData.items ? transformItems(checklistData.items) : []
         }
+        
+        console.log("🚀 Attempting to create checklist with data:", newChecklistData);
+        console.log("🔗 Using client:", client);
+        
         const { data: result } = await addChecklistMutation({
           variables: { input: newChecklistData }
         })
         if (result?.addChecklist?.code === "200") {
           toast.success("Lista de chequeo creada exitosamente")
+          
+          // Crear evaluación automáticamente para la nueva lista de chequeo
+          const checklistId = result?.addChecklist?.id
+          if (checklistId) {
+            try {
+              const evaluationData = {
+                observations: "Evaluación creada automáticamente al crear la lista de chequeo",
+                recommendations: "Pendiente de completar por el instructor",
+                valueJudgment: "PENDIENTE",
+                checklistId: parseInt(checklistId)
+              }
+              
+              const { data: evaluationResult } = await addEvaluationMutation({
+                variables: { input: evaluationData }
+              })
+              
+              if (evaluationResult?.addEvaluation?.code === "200") {
+                console.log("✅ Evaluación creada automáticamente con ID:", evaluationResult.addEvaluation.id)
+              } else {
+                console.warn("⚠️ Error al crear evaluación automática:", evaluationResult?.addEvaluation?.message)
+              }
+            } catch (evaluationError) {
+              console.error("❌ Error al crear evaluación automática:", evaluationError)
+              // No mostramos error al usuario ya que la lista de chequeo se creó exitosamente
+            }
+          }
+          
           await refetch()
           setModalOpen(false)
           return { id: result?.addChecklist?.id, success: true }
@@ -204,8 +244,20 @@ export default function CoordinadorChecklistView() {
         }
       }
     } catch (error: any) {
-      console.error("Error with checklist operation:", error)
-      toast.error(isEditing ? "Error al actualizar la lista de chequeo" : "Error al crear la lista de chequeo")
+      console.error("❌ Error with checklist operation:", error)
+      
+      // Manejo específico de errores de red
+      if (error.message?.includes('Failed to fetch') || error.networkError) {
+        toast.error("❌ Error de conexión: No se puede conectar al servidor. Verifique que el backend esté ejecutándose.")
+        console.error("Network error details:", error.networkError || error)
+      } else if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+        const graphQLError = error.graphQLErrors[0]
+        toast.error(`❌ Error GraphQL: ${graphQLError.message}`)
+        console.error("GraphQL error details:", graphQLError)
+      } else {
+        toast.error(isEditing ? "❌ Error al actualizar la lista de chequeo" : "❌ Error al crear la lista de chequeo")
+      }
+      
       return { success: false }
     }
   }
