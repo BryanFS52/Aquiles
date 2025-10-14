@@ -121,28 +121,36 @@ const evaluationService = {
     // Función para obtener evaluaciones por checklist ID
     fetchEvaluationsByChecklist: async (checklistId: number) => {
         try {
+            console.log("🔍 Fetching evaluations for checklist:", checklistId);
+            console.log("🔍 Using allEvaluations query and filtering");
+            
             const { data } = await client.query({
-                query: GET_EVALUATIONS_BY_CHECKLIST || GET_ALL_EVALUATIONS,
-                variables: GET_EVALUATIONS_BY_CHECKLIST ? { checklistId } : { page: 0, size: 100 },
+                query: GET_ALL_EVALUATIONS,
+                variables: { page: 0, size: 100 },
                 fetchPolicy: 'no-cache',
             });
             
-            if (GET_EVALUATIONS_BY_CHECKLIST) {
-                return data.evaluationsByChecklist;
-            } else {
-                // Filtrar por checklistId si no hay query específica
-                if (data.allEvaluations && data.allEvaluations.data) {
-                    const filteredEvaluations = data.allEvaluations.data.filter((evaluation: any) => {
-                        return safeIdComparison(evaluation.checklistId, checklistId);
-                    });
-                    
-                    return {
-                        ...data.allEvaluations,
-                        data: filteredEvaluations
-                    };
-                }
-                return data.allEvaluations;
+            console.log("🔍 Raw GraphQL response:", data);
+            
+            // Filtrar por checklistId
+            if (data.allEvaluations && data.allEvaluations.data) {
+                console.log("🔍 All evaluations before filtering:", data.allEvaluations.data);
+                const filteredEvaluations = data.allEvaluations.data.filter((evaluation: any) => {
+                    const matches = safeIdComparison(evaluation.checklistId, checklistId);
+                    console.log(`🔍 Evaluation ${evaluation.id}: checklistId=${evaluation.checklistId}, target=${checklistId}, matches=${matches}`);
+                    return matches;
+                });
+                
+                console.log("🔍 Filtered evaluations:", filteredEvaluations);
+                
+                return {
+                    ...data.allEvaluations,
+                    data: filteredEvaluations
+                };
             }
+            
+            console.log("❌ No allEvaluations data found");
+            return data.allEvaluations;
         } catch (error) {
             console.error('❌ Error fetching evaluations by checklist:', error);
             throw error;

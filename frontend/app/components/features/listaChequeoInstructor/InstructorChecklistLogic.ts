@@ -58,26 +58,44 @@ export class InstructorChecklistLogic {
     console.log('🔍 Extracting item states from evaluation:', evaluation.id);
     console.log('📝 Raw observations:', evaluation.observations);
     
-    if (!evaluation.observations) {
-      console.log('❌ No observations found in evaluation');
-      return {};
-    }
-
-    try {
-      const parsed = JSON.parse(evaluation.observations);
-      console.log('📊 Parsed observations:', parsed);
-      
-      if (parsed.itemStates && typeof parsed.itemStates === 'object') {
-        console.log('✅ Item states found:', parsed.itemStates);
-        return parsed.itemStates;
-      } else {
-        console.log('❌ No itemStates object found in parsed observations');
+    const checklistId = evaluation.checklistId;
+    
+    // Primero intentar cargar desde observaciones (formato legacy con JSON)
+    if (evaluation.observations) {
+      try {
+        const parsed = JSON.parse(evaluation.observations);
+        console.log('📊 Parsed observations (legacy format):', parsed);
+        
+        if (parsed.itemStates && typeof parsed.itemStates === 'object') {
+          console.log('✅ Item states found in legacy format:', parsed.itemStates);
+          // Guardar en localStorage para futuras cargas (migración a nuevo formato)
+          if (checklistId) {
+            localStorage.setItem(`itemStates_${checklistId}`, JSON.stringify(parsed.itemStates));
+            console.log('🔄 Migrated item states to localStorage');
+          }
+          return parsed.itemStates;
+        }
+      } catch (error) {
+        // No es JSON, es el nuevo formato de texto plano
+        console.log('� Observations are in new text format (not JSON)');
       }
-    } catch (error) {
-      console.log('❌ Error parsing observations as JSON:', error instanceof Error ? error.message : String(error));
-      console.log('Raw observations text:', evaluation.observations);
     }
-
+    
+    // Si no hay datos en formato legacy, intentar cargar desde localStorage
+    if (checklistId) {
+      const storedStates = localStorage.getItem(`itemStates_${checklistId}`);
+      if (storedStates) {
+        try {
+          const parsedStates = JSON.parse(storedStates);
+          console.log('✅ Item states loaded from localStorage:', parsedStates);
+          return parsedStates;
+        } catch (error) {
+          console.log('❌ Error parsing localStorage item states:', error);
+        }
+      }
+    }
+    
+    console.log('❌ No item states found in evaluation or localStorage');
     return {};
   };
 
@@ -219,28 +237,47 @@ export class InstructorChecklistLogic {
 
       const evaluationsResponse = await evaluationService.fetchEvaluationsByChecklist(checklistId);
       console.log("🔍 Raw evaluations response:", evaluationsResponse);
+      console.log("🔍 Response code:", evaluationsResponse?.code);
+      console.log("🔍 Response data:", evaluationsResponse?.data);
+      console.log("🔍 Data length:", evaluationsResponse?.data?.length);
 
       if (evaluationsResponse && evaluationsResponse.code === "200") {
         if (evaluationsResponse.data && evaluationsResponse.data.length > 0) {
+          console.log("✅ Found evaluations:", evaluationsResponse.data.length);
           setEvaluations(evaluationsResponse.data);
           const firstEvaluation = evaluationsResponse.data[0];
+          console.log("🎯 First evaluation:", firstEvaluation);
           setSelectedEvaluation(firstEvaluation);
           
           // Extraer datos de la evaluación
           const extractedItemStates = extractItemStatesFromEvaluation(firstEvaluation);
           const extractedObservations = extractGeneralObservationsFromEvaluation(firstEvaluation);
           
+          console.log("📊 Extracted item states:", extractedItemStates);
+          console.log("📝 Extracted observations:", extractedObservations);
+          
           setItemStates(extractedItemStates);
           setEvaluationObservations(extractedObservations);
           setEvaluationRecommendations(firstEvaluation.recommendations || "");
           setEvaluationJudgment(firstEvaluation.valueJudgment || "PENDIENTE");
           
+          // Asegurar que los datos se persistan en localStorage para futuras cargas
+          if (Object.keys(extractedItemStates).length > 0) {
+            localStorage.setItem(`itemStates_${checklistId}`, JSON.stringify(extractedItemStates));
+            console.log('💾 Item states persisted to localStorage for future loads');
+          }
+          
           console.log("✅ Evaluation loaded successfully");
           return;
+        } else {
+          console.log("❌ No evaluations found in response data");
         }
+      } else {
+        console.log("❌ Response code is not 200 or response is null:", evaluationsResponse?.code);
       }
 
       // No se encontraron evaluaciones
+      console.log("🔄 No evaluations found, setting empty state");
       setEvaluations([]);
       setSelectedEvaluation(null);
       setEvaluationObservations("");

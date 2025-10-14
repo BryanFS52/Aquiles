@@ -174,6 +174,9 @@ export class InstructorChecklistHandlers {
       // Los estados de items se manejan separadamente en el frontend
       const observationsToSave = evaluationObservations.trim();
       
+      // Guardar estados de items en localStorage para persistencia
+      localStorage.setItem(`itemStates_${selectedChecklist.id}`, JSON.stringify(currentItemStates));
+      
       const updateResponse = await evaluationService.completeEvaluation(
         parseInt(selectedEvaluation.id || "0"),
         observationsToSave,
@@ -183,6 +186,7 @@ export class InstructorChecklistHandlers {
       
       if (updateResponse && updateResponse.code === "200") {
         console.log('✅ Items auto-saved successfully');
+        console.log('💾 Item states saved to localStorage');
         setPendingChanges(false);
       }
     } catch (error) {
@@ -226,6 +230,9 @@ export class InstructorChecklistHandlers {
       // Guardar solo las observaciones generales como texto plano
       // Los estados de items se manejan separadamente en el frontend
       const observationsToSave = evaluationObservations.trim();
+
+      // Guardar estados de items en localStorage para persistencia
+      localStorage.setItem(`itemStates_${selectedChecklist.id}`, JSON.stringify(itemStates));
 
       const response = await evaluationService.completeEvaluation(
         parseInt(selectedEvaluation.id || "0"),
@@ -326,6 +333,9 @@ export class InstructorChecklistHandlers {
         // Guardar solo las observaciones generales como texto plano
         // Los estados de items se manejan separadamente en el frontend
         const observationsToSave = evaluationObservations.trim();
+
+        // Guardar estados de items en localStorage para persistencia
+        localStorage.setItem(`itemStates_${selectedChecklist.id}`, JSON.stringify(itemStates));
 
         const completeResult = await evaluationService.completeEvaluation(
           parseInt(newEvaluationResult.id),

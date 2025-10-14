@@ -37,7 +37,26 @@ public class EvaluationsBusiness {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
             Page<Evaluations> evaluationsPage = evaluationsService.findAll(pageRequest);
-            return evaluationsPage.map(evaluation -> modelMapper.map(evaluation, EvaluationsDto.class));
+            return evaluationsPage.map(evaluation -> {
+                // Mapear manualmente para asegurar que checklistId se incluya correctamente
+                EvaluationsDto dto = new EvaluationsDto();
+                dto.setId(evaluation.getId());
+                dto.setObservations(evaluation.getObservations());
+                dto.setRecommendations(evaluation.getRecommendations());
+                dto.setValueJudgment(evaluation.getValueJudgment());
+                
+                // Mapear checklistId desde la entidad Checklist asociada
+                if (evaluation.getChecklist() != null) {
+                    dto.setChecklistId(evaluation.getChecklist().getId());
+                }
+                
+                // Mapear teamScrumId desde la entidad TeamsScrum asociada
+                if (evaluation.getTeamsScrum() != null) {
+                    dto.setTeamScrumId(evaluation.getTeamsScrum().getId());
+                }
+                
+                return dto;
+            });
         } catch (Exception e) {
             throw new CustomException("Error retrieving evaluations: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -47,7 +66,25 @@ public class EvaluationsBusiness {
     public EvaluationsDto findById(Long id) {
         try {
             Evaluations evaluation = evaluationsService.getById(id);
-            return modelMapper.map(evaluation, EvaluationsDto.class);
+            
+            // Mapear manualmente para asegurar que checklistId se incluya correctamente
+            EvaluationsDto dto = new EvaluationsDto();
+            dto.setId(evaluation.getId());
+            dto.setObservations(evaluation.getObservations());
+            dto.setRecommendations(evaluation.getRecommendations());
+            dto.setValueJudgment(evaluation.getValueJudgment());
+            
+            // Mapear checklistId desde la entidad Checklist asociada
+            if (evaluation.getChecklist() != null) {
+                dto.setChecklistId(evaluation.getChecklist().getId());
+            }
+            
+            // Mapear teamScrumId desde la entidad TeamsScrum asociada
+            if (evaluation.getTeamsScrum() != null) {
+                dto.setTeamScrumId(evaluation.getTeamsScrum().getId());
+            }
+            
+            return dto;
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
@@ -105,8 +142,37 @@ public class EvaluationsBusiness {
                 }
             }
 
+            // Si se proporciona un teamScrumId, obtener la entidad TeamsScrum
+            if (evaluationsDto.getTeamScrumId() != null) {
+                try {
+                    // Aquí necesitarías un servicio para TeamsScrum, por ahora comentado
+                    // evaluation.setTeamsScrum(teamsScrumService.getById(evaluationsDto.getTeamScrumId()));
+                } catch (Exception e) {
+                    // Si hay error, continuar sin el team scrum
+                    System.out.println("Warning: Could not set TeamsScrum with ID " + evaluationsDto.getTeamScrumId());
+                }
+            }
+
             Evaluations savedEvaluation = evaluationsService.save(evaluation);
-            return modelMapper.map(savedEvaluation, EvaluationsDto.class);
+            
+            // Mapear manualmente para asegurar que checklistId se incluya correctamente
+            EvaluationsDto resultDto = new EvaluationsDto();
+            resultDto.setId(savedEvaluation.getId());
+            resultDto.setObservations(savedEvaluation.getObservations());
+            resultDto.setRecommendations(savedEvaluation.getRecommendations());
+            resultDto.setValueJudgment(savedEvaluation.getValueJudgment());
+            
+            // Mapear checklistId desde la entidad Checklist asociada
+            if (savedEvaluation.getChecklist() != null) {
+                resultDto.setChecklistId(savedEvaluation.getChecklist().getId());
+            }
+            
+            // Mapear teamScrumId desde la entidad TeamsScrum asociada
+            if (savedEvaluation.getTeamsScrum() != null) {
+                resultDto.setTeamScrumId(savedEvaluation.getTeamsScrum().getId());
+            }
+            
+            return resultDto;
         } catch (Exception e) {
             throw new CustomException("Error adding evaluation: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
