@@ -225,8 +225,6 @@
                 <reportElement x="380" y="102" width="120" height="40">
                     <printWhenExpression><![CDATA[$P{SIGNATURE_IMAGE} != null]]></printWhenExpression>
                 </reportElement>
-                <imageExpression><![CDATA[$P{SIGNATURE_IMAGE}]]></imageExpression>
-            </image>
         </band>
     </summary>
 

@@ -156,7 +156,7 @@ export const ActasInstructorContainer: React.FC = () => {
       if (addFinalReportAction.fulfilled.match(result)) {
         toast.success('Acta guardada correctamente', { autoClose: 2500 });
         // Refresh list so the new acta appears
-        dispatch(fetchFinalReportsAction({ page: 0, size: 200 }));
+        dispatch(fetchFinalReportsAction({ page: 0, size: 5 }));
         setStep(6);
       } else {
         const payload: any = (result as any).payload;
@@ -175,6 +175,7 @@ export const ActasInstructorContainer: React.FC = () => {
     <div className="p-4 md:p-6 pb-28 overflow-visible">
       <div className="mb-6">
         <BaseCard
+          className="py-8"
           header={
             <div className="flex items-center justify-between">
               <p className="text-sm text-darkGray">Registra y gestiona el Acta de Cierre para una ficha y competencia asignada.</p>
@@ -185,7 +186,7 @@ export const ActasInstructorContainer: React.FC = () => {
             </div>
           }
           body={
-            <div className="mt-2">
+            <div className="mt-3 pt-1 pb-2 min-h-[84px]">
               <Stepper steps={steps} current={step} />
             </div>
           }

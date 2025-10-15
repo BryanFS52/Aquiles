@@ -58,7 +58,7 @@ public class TeamsScrumResolver {
     @DgsQuery
     public Map<String , Object> teamScrumById(@InputArgument Long id){
         try {
-            TeamsScrumDto teamsScrumDto = this.teamsScrumBusiness.findById(id);
+            TeamsScrumDto teamsScrumDto = teamsScrumBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
                     teamsScrumDto,
                     ResponseHttpApi.CODE_OK,
