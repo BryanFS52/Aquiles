@@ -54,7 +54,7 @@ public class Checklist implements Serializable {
 
     // 2.Relation (1-1) con evaluations
     @OneToOne(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Evaluations evaluation;
+    private Evaluation evaluation;
 
     // 3.Relation (M-M) con teamsScrum
     @ManyToMany

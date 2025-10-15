@@ -3,13 +3,11 @@ package com.api.aquilesApi.Resolver;
 
 
 import com.api.aquilesApi.Business.EvaluationsBusiness;
-import com.api.aquilesApi.Dto.EvaluationsDto;
+import com.api.aquilesApi.Dto.EvaluationDto;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.*;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-
-import java.util.List;
 import java.util.Map;
 
 
@@ -26,7 +24,7 @@ public class EvaluationResolver {
     @DgsQuery
     public Map<String, Object> allEvaluations(@InputArgument("page") Integer page, @InputArgument("size") Integer size) {
         try {
-            Page<EvaluationsDto> evaluationsDtoPage = evaluationsBusiness.findAll(page, size);
+            Page<EvaluationDto> evaluationsDtoPage = evaluationsBusiness.findAll(page, size);
             return ResponseHttpApi .responseHttpFindAll(
                     evaluationsDtoPage.getContent(),
                     ResponseHttpApi.CODE_OK,
@@ -45,7 +43,7 @@ public class EvaluationResolver {
     @DgsQuery
     public Map<String, Object> evaluationById(@InputArgument("id") Long id) {
         try {
-            EvaluationsDto evaluationDto = evaluationsBusiness.findById(id);
+            EvaluationDto evaluationDto = evaluationsBusiness.findById(id);
             return ResponseHttpApi.responseHttpFindId(
                     evaluationDto,
                     ResponseHttpApi.CODE_OK,
@@ -59,9 +57,9 @@ public class EvaluationResolver {
     }
 
     @DgsMutation
-    public Map<String, Object> addEvaluation(@InputArgument("input") EvaluationsDto input) {
+    public Map<String, Object> addEvaluation(@InputArgument("input") EvaluationDto input) {
         try {
-            EvaluationsDto evaluationDto = evaluationsBusiness.add(input);
+            EvaluationDto evaluationDto = evaluationsBusiness.add(input);
             return ResponseHttpApi.responseHttpAction(
                     evaluationDto.getId(),
                     ResponseHttpApi.CODE_OK,
@@ -75,7 +73,7 @@ public class EvaluationResolver {
     }
 
     @DgsMutation
-    public Map<String, Object> updateEvaluation(@InputArgument("id") Long id, @InputArgument("input") EvaluationsDto input) {
+    public Map<String, Object> updateEvaluation(@InputArgument("id") Long id, @InputArgument("input") EvaluationDto input) {
         try {
             evaluationsBusiness.update(id, input);
             return ResponseHttpApi.responseHttpAction(

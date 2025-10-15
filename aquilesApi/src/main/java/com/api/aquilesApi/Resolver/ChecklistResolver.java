@@ -117,17 +117,6 @@ public class ChecklistResolver {
         }
     }
 
-    // Export PDF
-    @DgsQuery
-    public String exportChecklistToPdf(@InputArgument Long id) {
-        return checklistBusiness.exportChecklistPdf(id);
-    }
-
-    // Export Excel
-    @DgsQuery
-    public String exportChecklistToExcel(@InputArgument Long id) {
-        return checklistBusiness.exportChecklistExcel(id);
-    }
 
     // ✅ History Query
     @DgsQuery

@@ -3,7 +3,6 @@ package com.api.aquilesApi.Dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.List;
 import java.util.Set;
 
@@ -41,7 +40,7 @@ public class ChecklistDto {
     private Set<Long> associatedJuries;
 
     // Para la relación 1:1 con evaluación - solo uno de estos campos se usa según el contexto
-    private EvaluationsDto evaluation; // Objeto completo para respuestas
+    private EvaluationDto evaluation; // Objeto completo para respuestas
 
     private List<TeamsScrumDto> teamsScrum;
     private String studySheets;
