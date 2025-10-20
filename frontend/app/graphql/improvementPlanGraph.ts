@@ -2,8 +2,8 @@ import { gql } from '@apollo/client';
 
 // Queries and Mutations for ImprovementPlan
 export const GET_ALL_IMPROVEMENT_PLANS = gql`
-query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $idStudySheet: Long, $id: Long) {
-  allImprovementPlans(page: $page, size: $size, teacherCompetence: $teacherCompetence, idStudySheet: $idStudySheet, id: $id) {
+query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $id: Long) {
+  allImprovementPlans(page: $page, size: $size, teacherCompetence: $teacherCompetence, id: $id) {
     code
     message
     date

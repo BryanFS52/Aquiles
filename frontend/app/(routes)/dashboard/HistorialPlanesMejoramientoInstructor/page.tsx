@@ -110,13 +110,11 @@ const HistorialPlanesMejoramientoInstructor = () => {
         }
         console.log('✅ Dispatching fetchImprovementPlans con:', { 
             page: page - 1, 
-            size: 5, 
-            idStudySheet: fichaId 
+            size: 5
         });
         dispatch(fetchImprovementPlans({ 
             page: page - 1, // Backend espera páginas basadas en 0
-            size: 5,
-            idStudySheet: fichaId
+            size: 5
         }));
     }, [dispatch, page, fichaId]);
 

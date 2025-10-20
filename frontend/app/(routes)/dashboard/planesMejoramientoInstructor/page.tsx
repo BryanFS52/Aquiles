@@ -18,13 +18,56 @@ import {
 import { FiUsers, FiBookOpen, FiCalendar, FiTarget, FiClock, FiEye, FiCreditCard, FiPhone, FiArrowRight, FiMail } from 'react-icons/fi';
 import { IoPeople } from "react-icons/io5";
 
-// Estilos CSS para line-clamp
+// Estilos CSS para line-clamp y select con scroll
 const styles = `
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+/* Estilos para select con scroll personalizado */
+select {
+    max-height: 300px;
+}
+
+select option {
+    padding: 8px 12px;
+}
+
+/* Scroll personalizado para navegadores webkit */
+select::-webkit-scrollbar {
+    width: 8px;
+}
+
+select::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+select::-webkit-scrollbar-thumb {
+    background: #39A900;
+    border-radius: 10px;
+}
+
+select::-webkit-scrollbar-thumb:hover {
+    background: #2d8400;
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+    select::-webkit-scrollbar-track {
+        background: #374151;
+    }
+    
+    select::-webkit-scrollbar-thumb {
+        background: #10B981;
+    }
+    
+    select::-webkit-scrollbar-thumb:hover {
+        background: #059669;
+    }
 }
 `;
 
@@ -118,7 +161,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
         };
         
         loadData();
-    }, [dispatch]);
+    }, [dispatch, showLoader, hideLoader]);
 
     const handleViewStudents = (sheet: NonNullable<StudySheet>) => {
         setCurrentSheet(sheet);
@@ -237,136 +280,152 @@ const PlanMejoramientoInstructor: React.FC = () => {
                 </div>
             </div>
 
-            {/* Dashboard Stats */}
-            <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mb-3 mx-auto">
-                        <FiBookOpen className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-black dark:text-white mb-1">{filteredStudySheets.length}</h3>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium">Fichas {(filters.ficha || filters.jornada || filters.programa) ? 'Filtradas' : 'Totales'}</p>
-                </div>
-                <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-2xl mb-3 mx-auto">
-                        <FiTarget className="w-6 h-6 text-lightGreen dark:text-darkGreen" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
-                        {filteredStudySheets.filter(sheet => sheet?.state).length}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium">Fichas Activas</p>
-                </div>
-                <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-2xl mb-3 mx-auto">
-                        <FiUsers className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
-                        {filteredStudySheets.reduce((total, sheet) => total + (sheet?.studentStudySheets?.length || 0), 0)}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium">Total Aprendices</p>
-                </div>
-            </div>
-
             {/* Filtros */}
-            <div className="mb-8 bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-6">
-                <h3 className="text-lg font-semibold text-black dark:text-white mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-primary dark:text-lightGreen" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.134 17 3 13.866 3 10C3 6.134 6.134 3 10 3C13.866 3 17 6.134 17 10Z" />
-                    </svg>
-                    Filtros
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {/* Filtro por Ficha */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Número de Ficha
-                        </label>
-                        <input
-                            type="text"
-                            value={filters.ficha}
-                            onChange={(e) => handleFilterChange('ficha', e.target.value)}
-                            placeholder="Buscar por ficha..."
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
-                        />
-                    </div>
-
-                    {/* Filtro por Jornada */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Jornada
-                        </label>
-                        <div className="relative">
-                            <select
-                                value={filters.jornada}
-                                onChange={(e) => handleFilterChange('jornada', e.target.value)}
-                                className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200 appearance-none cursor-pointer hover:border-gray-400 dark:hover:border-gray-500"
-                            >
-                                <option value="">Todas las jornadas</option>
-                                {uniqueJornadas.map((jornada) => (
-                                    <option key={jornada ?? 'no-especificado'} value={jornada ?? ''}>
-                                        {capitalizeText(jornada) || 'Jornada no especificada'}
-                                    </option>
-                                ))}
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
+            <div className="mb-8 bg-gradient-to-br from-white via-gray-50 to-white dark:from-shadowBlue dark:via-gray-800 dark:to-shadowBlue rounded-3xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-visible relative z-50">
+                {/* Header con gradiente */}
+                <div className="bg-gradient-to-r from-primary/10 via-lightGreen/10 to-primary/10 dark:from-secondary/10 dark:via-darkBlue/10 dark:to-secondary/10 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-3xl">
+                    <h3 className="text-xl font-bold text-black dark:text-white flex items-center gap-3">
+                        <div className="p-2 bg-gradient-to-br from-primary to-lightGreen dark:from-secondary dark:to-darkBlue rounded-xl shadow-md">
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.134 17 3 13.866 3 10C3 6.134 6.134 3 10 3C13.866 3 17 6.134 17 10Z" />
+                            </svg>
                         </div>
-                    </div>
-
-                    {/* Filtro por Programa */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Programa
-                        </label>
-                        <div className="relative">
-                            <select
-                                value={filters.programa}
-                                onChange={(e) => handleFilterChange('programa', e.target.value)}
-                                className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200 appearance-none cursor-pointer hover:border-gray-400 dark:hover:border-gray-500"
-                            >
-                                <option value="">Todos los programas</option>
-                                {uniqueProgramas.map((programa) => (
-                                    <option key={programa ?? 'no-especificado'} value={programa ?? ''}>
-                                        {capitalizeText(programa) || 'Programa no especificado'}
-                                    </option>
-                                ))}
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Botón limpiar filtros */}
-                    <div className="flex items-end">
-                        <button
-                            onClick={clearFilters}
-                            className="w-full px-4 py-2 bg-gradient-to-r from-lightGreen to-darkGreen hover:from-lightGreen/90 hover:to-darkGreen/90 dark:bg-gradient-to-r dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90 text-white rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
-                        >
-                            Limpiar
-                        </button>
-                    </div>
+                        <span className="bg-gradient-to-r from-primary to-lightGreen dark:from-secondary dark:to-darkBlue bg-clip-text text-transparent">
+                            Filtros de Búsqueda
+                        </span>
+                    </h3>
                 </div>
 
-                {/* Contador de resultados */}
-                {(filters.ficha || filters.jornada || filters.programa) && (
-                    <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                        Mostrando {filteredStudySheets.length} de {studySheets.length} fichas
+                {/* Contenido de filtros */}
+                <div className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        {/* Filtro por Ficha */}
+                        <div className="group">
+                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2.5 flex items-center gap-2">
+                                <FiBookOpen className="w-4 h-4 text-primary dark:text-lightGreen" />
+                                Número de Ficha
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={filters.ficha}
+                                    onChange={(e) => handleFilterChange('ficha', e.target.value)}
+                                    placeholder="Ej: 2558190..."
+                                    className="w-full px-4 py-3 pl-10 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary/50 dark:focus:ring-lightGreen/50 focus:border-primary dark:focus:border-lightGreen transition-all duration-300 hover:border-gray-300 dark:hover:border-gray-500 shadow-sm hover:shadow-md relative z-10"
+                                />
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20L7 4M17 20L17 4M3 12L21 12" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Filtro por Jornada */}
+                        <div className="group">
+                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2.5 flex items-center gap-2">
+                                <FiClock className="w-4 h-4 text-primary dark:text-lightGreen" />
+                                Jornada
+                            </label>
+                            <div className="relative">
+                                <select
+                                    value={filters.jornada}
+                                    onChange={(e) => handleFilterChange('jornada', e.target.value)}
+                                    className="w-full px-4 py-3 pl-10 pr-10 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary/50 dark:focus:ring-lightGreen/50 focus:border-primary dark:focus:border-lightGreen transition-all duration-300 appearance-none cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 shadow-sm hover:shadow-md relative z-[60]"
+                                    style={{ 
+                                        backgroundImage: 'none'
+                                    }}
+                                >
+                                    <option value="">Todas las jornadas</option>
+                                    {uniqueJornadas.map((jornada) => (
+                                        <option key={jornada ?? 'no-especificado'} value={jornada ?? ''}>
+                                            {capitalizeText(jornada) || 'Jornada no especificada'}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="absolute left-3 top-3.5 pointer-events-none z-10">
+                                    <FiClock className="w-4 h-4 text-gray-400" />
+                                </div>
+                                <div className="absolute right-3 top-3.5 pointer-events-none z-10">
+                                    <svg className="w-5 h-5 text-primary dark:text-lightGreen group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Filtro por Programa */}
+                        <div className="group">
+                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2.5 flex items-center gap-2">
+                                <FiTarget className="w-4 h-4 text-primary dark:text-lightGreen" />
+                                Programa
+                            </label>
+                            <div className="relative">
+                                <select
+                                    value={filters.programa}
+                                    onChange={(e) => handleFilterChange('programa', e.target.value)}
+                                    className="w-full px-4 py-3 pl-10 pr-10 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary/50 dark:focus:ring-lightGreen/50 focus:border-primary dark:focus:border-lightGreen transition-all duration-300 appearance-none cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 shadow-sm hover:shadow-md relative z-[60]"
+                                    style={{ 
+                                        backgroundImage: 'none'
+                                    }}
+                                >
+                                    <option value="">Todos los programas</option>
+                                    {uniqueProgramas.map((programa) => (
+                                        <option key={programa ?? 'no-especificado'} value={programa ?? ''}>
+                                            {capitalizeText(programa) || 'Programa no especificado'}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="absolute left-3 top-3.5 pointer-events-none z-10">
+                                    <FiTarget className="w-4 h-4 text-gray-400" />
+                                </div>
+                                <div className="absolute right-3 top-3.5 pointer-events-none z-10">
+                                    <svg className="w-5 h-5 text-primary dark:text-lightGreen group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Botón limpiar filtros */}
+                        <div className="flex items-end">
+                            <button
+                                onClick={clearFilters}
+                                className="w-full px-5 py-3 bg-gradient-to-r from-lightGreen to-darkGreen hover:from-lightGreen/90 hover:to-darkGreen/90 dark:bg-gradient-to-r dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90 text-white rounded-xl text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 group relative z-10"
+                            >
+                                <svg className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                Limpiar
+                            </button>
+                        </div>
                     </div>
-                )}
+
+                    {/* Contador de resultados con diseño mejorado */}
+                    {(filters.ficha || filters.jornada || filters.programa) && (
+                        <div className="mt-5 pt-5 border-t border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center justify-center gap-2 text-sm">
+                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/10 to-lightGreen/10 dark:from-secondary/10 dark:to-darkBlue/10 rounded-full border border-primary/20 dark:border-secondary/20">
+                                    <svg className="w-4 h-4 text-primary dark:text-lightGreen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span className="text-gray-700 dark:text-gray-200 font-medium">
+                                        Mostrando <span className="font-bold text-primary dark:text-lightGreen">{filteredStudySheets.length}</span> de <span className="font-bold">{studySheets.length}</span> fichas
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Grid de Fichas (más compacto y responsive) */}
             {filteredStudySheets.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 relative z-10">
                     {filteredStudySheets.map((sheet) => (
                         <div
                             key={sheet.id}
-                            className="bg-white dark:bg-shadowBlue rounded-2xl shadow-md border border-lightGray dark:border-grayText overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-gray-50 dark:hover:bg-darkBlue"
+                            className="bg-white dark:bg-shadowBlue rounded-2xl shadow-md border border-lightGray dark:border-grayText overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-gray-50 dark:hover:bg-darkBlue relative z-10"
                         >
                             {/* Header */}
                             <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
@@ -610,4 +669,4 @@ const PlanMejoramientoInstructor: React.FC = () => {
     );
 };
 
-export default PlanMejoramientoInstructor;
+export default PlanMejoramientoInstructor; 

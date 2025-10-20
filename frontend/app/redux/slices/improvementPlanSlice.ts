@@ -71,14 +71,14 @@ const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPla
   };
 };
 
-type FetchImprovementPlansVars = { page?: number; size?: number; teacherCompetence?: number; idStudySheet?: number; id?: number };
+type FetchImprovementPlansVars = { page?: number; size?: number; teacherCompetence?: number; id?: number };
 
 export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], FetchImprovementPlansVars>(
     'improvementPlan/fetchAll',
-    async ({ page, size, teacherCompetence, idStudySheet }) => {
+    async ({ page, size, teacherCompetence }) => {
         const { data } = await clientLAN.query<GetAllImprovementPlansQuery, FetchImprovementPlansVars>({
             query: GET_ALL_IMPROVEMENT_PLANS,
-            variables: { page, size, teacherCompetence, idStudySheet },
+            variables: { page, size, teacherCompetence },
             fetchPolicy: 'no-cache',
         });
         return data.allImprovementPlans;

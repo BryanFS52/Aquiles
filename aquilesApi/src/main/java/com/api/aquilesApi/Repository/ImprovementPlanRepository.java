@@ -28,7 +28,5 @@ public interface ImprovementPlanRepository extends JpaRepository<ImprovementPlan
     @Query("SELECT ip FROM ImprovementPlan ip WHERE ip.teacherCompetence = :teacherCompetence")
     List<ImprovementPlan> findByTeacherCompetence(@Param("teacherCompetence") Long teacherCompetence);
 
-    // Plans de mejora por ficha (StudySheet): estudiante pertenece a equipos de esa ficha
-    @Query("SELECT ip FROM ImprovementPlan ip WHERE ip.studentId IN (SELECT m.studentId FROM TeamsScrum t JOIN t.memberIds m WHERE t.studySheetId = :studySheetId)")
-    Page<ImprovementPlan> findByStudySheetId(Pageable pageable, @Param("studySheetId") Long studySheetId);
+    
 }
