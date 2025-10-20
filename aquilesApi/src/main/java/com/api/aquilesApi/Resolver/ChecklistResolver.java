@@ -8,6 +8,8 @@ import com.api.aquilesApi.Service.ChecklistHistoryService;
 import com.api.aquilesApi.Service.ItemService;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.api.aquilesApi.Utilities.Mapper.ChecklistMap;
+import com.api.aquilesApi.Utilities.Exception.BadRequestException;
+import com.api.aquilesApi.Utilities.Exception.NotFoundException;
 import com.netflix.graphql.dgs.*;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -35,17 +37,20 @@ public class ChecklistResolver {
     public Map<String, Object> allChecklists(@InputArgument Integer page, @InputArgument Integer size) {
         try {
             Page<ChecklistDto> checklistDtoPage = checklistBusiness.findAll(page, size);
-            return ResponseHttpApi.responseHttpFindAll(
-                    checklistDtoPage.getContent(),
-                    ResponseHttpApi.CODE_OK,
-                    "Query ok",
-                    checklistDtoPage.getTotalPages(),
-                    page,
-                    (int) checklistDtoPage.getTotalElements()
-            );
+            if (!checklistDtoPage.isEmpty()) {
+                return ResponseHttpApi.responseHttpFindAll(
+                        checklistDtoPage.getContent(),
+                        ResponseHttpApi.CODE_OK,
+                        "Query ok",
+                        checklistDtoPage.getTotalPages(),
+                        page,
+                        (int) checklistDtoPage.getTotalElements()
+                );
+            } else {
+                throw new NotFoundException("No Checklists found");
+            }
         } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error retrieving checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("Unexpected error in allChecklists: " + e.getMessage(), e);
         }
     }
 
@@ -54,15 +59,16 @@ public class ChecklistResolver {
     public Map<String, Object> checklistById(@InputArgument Long id) {
         try {
             ChecklistDto checklistDto = checklistBusiness.findById(id);
+            if (checklistDto == null) {
+                throw new NotFoundException("Checklist not found for id: " + id);
+            }
             return ResponseHttpApi.responseHttpFindId(
                     checklistDto,
                     ResponseHttpApi.CODE_OK,
                     "Query by id ok"
             );
         } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error retrieving attendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            throw new RuntimeException("Unexpected error in checklistById: " + e.getMessage(), e);
         }
     }
 
@@ -70,6 +76,9 @@ public class ChecklistResolver {
     @DgsMutation
     public Map<String, Object> addChecklist(@InputArgument(name = "input") ChecklistDto checklistDto) {
         try {
+            if (checklistDto == null) {
+                throw new BadRequestException("Checklist input cannot be null");
+            }
             ChecklistDto checklistDto1 = checklistBusiness.add(checklistDto);
             return ResponseHttpApi.responseHttpAction(
                     checklistDto1.getId(),
@@ -77,9 +86,7 @@ public class ChecklistResolver {
                     "Add ok"
             );
         } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error adding Checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            throw new RuntimeException("Unexpected error in addChecklist: " + e.getMessage(), e);
         }
     }
 
@@ -94,9 +101,7 @@ public class ChecklistResolver {
                     "Update ok"
             );
         } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error updating Checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            throw new RuntimeException("Unexpected error in updateChecklist: " + e.getMessage(), e);
         }
     }
 
@@ -111,9 +116,7 @@ public class ChecklistResolver {
                     "Delete ok"
             );
         } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error deleting Checklist: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            throw new RuntimeException("Unexpected error in deleteChecklist: " + e.getMessage(), e);
         }
     }
 
@@ -138,9 +141,7 @@ public class ChecklistResolver {
                     "Item status updated successfully"
             );
         } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error updating item status: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            throw new RuntimeException("Unexpected error in updateItemStatus: " + e.getMessage(), e);
         }
     }
 
@@ -162,9 +163,7 @@ public class ChecklistResolver {
                 );
             }
         } catch (Exception e) {
-            return ResponseHttpApi.responseHttpError(
-                    "Error refreshing training project name: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            throw new RuntimeException("Unexpected error in refreshTrainingProjectName: " + e.getMessage(), e);
         }
     }
 }
