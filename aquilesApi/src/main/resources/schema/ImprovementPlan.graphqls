@@ -8,7 +8,7 @@ type ImprovementPlan {
     student: Student
     teacherCompetence: TeacherStudySheet
     faultType: ImprovementPlanFaultType
-    
+
 }
 
 input ImprovementPlanDto {
