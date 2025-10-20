@@ -41,6 +41,7 @@ input FinalReportDto {
 extend type Query {
     allFinalReports(page: Int, size: Int): FinalReportPage
     finalReportById(id: Long!): FinalReportPageId
+    generateFinalReport(id: Long!): FinalReportPageId
 }
 
 extend type Mutation {

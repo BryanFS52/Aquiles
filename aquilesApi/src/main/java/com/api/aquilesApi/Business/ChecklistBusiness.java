@@ -26,7 +26,6 @@ public class ChecklistBusiness {
     private final ChecklistService checklistService;
     private final ModelMapper modelMapper;
     private final EvaluationsService evaluationsService;
-    private final ChecklistExportService exportService;
     private final ChecklistHistoryBusiness checklistHistoryBusiness;
     private final ItemTypeRepository itemTypeRepository;
     private final ItemService itemService;
@@ -36,7 +35,6 @@ public class ChecklistBusiness {
             JuriesRepository juriesRepository,
             ModelMapper modelMapper,
             EvaluationsService evaluationsService,
-            ChecklistExportService exportService,
             ChecklistHistoryBusiness checklistHistoryBusiness,
             ItemTypeRepository itemTypeRepository,
             ItemService itemService
@@ -44,7 +42,6 @@ public class ChecklistBusiness {
         this.checklistService = checklistService;
         this.modelMapper = modelMapper;
         this.evaluationsService = evaluationsService;
-        this.exportService = exportService;
         this.checklistHistoryBusiness = checklistHistoryBusiness;
         this.itemTypeRepository = itemTypeRepository;
         this.itemService = itemService;
@@ -300,18 +297,6 @@ public class ChecklistBusiness {
         }
     }
 
-    // Export documents
-    // Export PDF
-    public String exportChecklistPdf(Long checklistId) {
-        Checklist checklist = checklistService.getById(checklistId);
-        return exportService.exportPdfBase64(checklist);
-    }
-
-    // Export Excel
-    public String exportChecklistExcel(Long checklistId) {
-        Checklist checklist = checklistService.getById(checklistId);
-        return exportService.exportExcelBase64(checklist);
-    }
 
     /*
     // Helper method to get or create default ItemType

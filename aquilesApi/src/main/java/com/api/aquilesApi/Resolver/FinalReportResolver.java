@@ -11,6 +11,7 @@ import com.netflix.graphql.dgs.InputArgument;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
+import java.util.Base64;
 import java.util.Map;
 
 @DgsComponent
@@ -110,6 +111,26 @@ public class FinalReportResolver {
         catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error deleting finalReport: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    // Generate PDF finalReport (GraphQL)
+    @DgsQuery
+    public Map<String, Object> generateFinalReport(@InputArgument Long id) {
+        try {
+            byte[] pdfBytes = finalReportBusiness.generatePdf(id);
+            String base64Pdf = Base64.getEncoder().encodeToString(pdfBytes);
+
+            return ResponseHttpApi.responseHttpFindId(
+                    base64Pdf,
+                    ResponseHttpApi.CODE_OK,
+                    "PDF generado correctamente"
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error generando PDF: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }

@@ -34,6 +34,7 @@ export const ADD_FAULT_TYPE = gql`
     addImprovementPlanFaultType(input: $input) {
       code
       message
+      id
     }
   }
 `;
@@ -43,6 +44,7 @@ export const UPDATE_FAULT_TYPE = gql`
     updateImprovementPlanFaultType(id: $id, input: $input) {
       code
       message
+      id
     }
   }
 `;
@@ -52,6 +54,7 @@ export const DELETE_FAULT_TYPE = gql`
     deleteImprovementPlanFaultType(id: $id) {
       code
       message
+      id
     }
   }
 `;

@@ -3,6 +3,7 @@ package com.api.aquilesApi.Business;
 import com.api.aquilesApi.Dto.FinalReportDto;
 import com.api.aquilesApi.Entity.FinalReport;
 import com.api.aquilesApi.Service.FinalReportService;
+import com.api.aquilesApi.Service.JasperReportService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Mapper.FinalReportMap;
 import org.modelmapper.ModelMapper;
@@ -12,12 +13,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.util.*;
+
 @Component
 public class FinalReportBusiness {
-    private final FinalReportService finalReportService;
 
-    public FinalReportBusiness(FinalReportService finalReportService ) {
+    private final FinalReportService finalReportService;
+    private final JasperReportService jasperReportService;
+
+    public FinalReportBusiness(FinalReportService finalReportService, JasperReportService jasperReportService) {
         this.finalReportService = finalReportService;
+        this.jasperReportService = jasperReportService;
     }
 
     // Validation Object
@@ -108,6 +114,70 @@ public class FinalReportBusiness {
             throw e;
         } catch (Exception e) {
             throw new CustomException("Error Deleting finalReport: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Generate finalReport PDF
+    public byte[] generatePdf(Long id) {
+        try {
+            FinalReportDto dto = findById(id);
+            if (dto == null) {
+                throw new CustomException("FinalReport not found for ID: " + id, HttpStatus.NOT_FOUND);
+            }
+
+            // Construir parámetros para Jasper
+            Map<String, Object> params = new HashMap<>();
+            params.put("ACTA_NUMERO", dto.getId() != null ? dto.getId().toString() : "N/A");
+            params.put("FICHA", dto.getFileNumber());
+            params.put("PROGRAMA", "Tecnólogo en Gestión Administrativa");
+            params.put("CIUDAD_FECHA", "Bogotá D.C., " + new Date());
+            params.put("HORA_INICIO", "08:00");
+            params.put("HORA_FIN", "10:00");
+            params.put("LUGAR", "SENA - CGA");
+            params.put("OBJETIVOS", dto.getObjectives());
+            params.put("AGENDA", "Evaluación de trimestre y revisión de compromisos");
+            params.put("CONCLUSIONES", dto.getConclusions());
+            params.put("COMPROMISOS", dto.getAnnexes() != null ? dto.getAnnexes() : "Sin compromisos");
+            params.put("LOGO_PATH", "Reports/images/logo_Sena.png");
+
+            // Inicializar SIGNATURE_IMAGE como null por defecto
+            params.put("SIGNATURE_IMAGE", null);
+
+            // Manejo correcto de la imagen de firma
+            if (dto.getSignature() != null && !dto.getSignature().isEmpty()) {
+                try {
+                    // Si es base64, decodificarlo
+                    String signatureData = dto.getSignature();
+                    if (signatureData.startsWith("data:image/")) {
+                        // Remover el prefijo data:image/...;base64,
+                        signatureData = signatureData.substring(signatureData.indexOf(",") + 1);
+                    }
+
+                    byte[] signatureBytes = Base64.getDecoder().decode(signatureData);
+
+                    // Crear BufferedImage desde los bytes
+                    java.io.ByteArrayInputStream bis = new java.io.ByteArrayInputStream(signatureBytes);
+                    java.awt.image.BufferedImage bufferedImage = javax.imageio.ImageIO.read(bis);
+
+                    if (bufferedImage != null) {
+                        params.put("SIGNATURE_IMAGE", bufferedImage);
+                        System.out.println("✅ Imagen de firma cargada correctamente");
+                    } else {
+                        System.out.println("⚠️ No se pudo cargar la imagen de firma");
+                    }
+                } catch (Exception e) {
+                    System.out.println("❌ Error procesando firma: " + e.getMessage());
+                }
+            } else {
+                System.out.println("ℹ️ No hay firma disponible para el reporte");
+            }
+
+            // Sin datasource por ahora
+            return jasperReportService.generate("finalReport.jrxml", params, Collections.emptyList(), JasperReportService.ExportType.PDF);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CustomException("Error generating PDF: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

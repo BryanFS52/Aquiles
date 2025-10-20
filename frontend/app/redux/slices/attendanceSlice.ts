@@ -109,9 +109,7 @@ export const processAndSummarizeAttendances = (attendances: Attendance[]): Stude
     return result;
 };
 
-export const fetchAttendances = createAsyncThunk<
-    GetAttendancesQuery['allAttendances'],
-    GetAttendancesQueryVariables
+export const fetchAttendances = createAsyncThunk<GetAttendancesQuery['allAttendances'],GetAttendancesQueryVariables
 >(
     'attendance/fetchAll',
     async ({ page, size }) => {
@@ -124,16 +122,12 @@ export const fetchAttendances = createAsyncThunk<
     }
 );
 
-export const fetchAttendancesByStudent = createAsyncThunk<
-    Attendance[],
-    AllAttendancesByStudentIdQueryVariables
+export const fetchAttendancesByStudent = createAsyncThunk<Attendance[],AllAttendancesByStudentIdQueryVariables
 >(
     'attendance/fetchByStudent',
     async ({ id, stateId }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.query<
-                AllAttendancesByStudentIdQuery,
-                AllAttendancesByStudentIdQueryVariables
+            const { data } = await clientLAN.query<AllAttendancesByStudentIdQuery,AllAttendancesByStudentIdQueryVariables
             >({
                 query: GET_ATTENDANCES_BY_STUDENT,
                 variables: { id, stateId },
