@@ -12,11 +12,13 @@ import { FiMapPin, FiCalendar, FiFileText, FiStar, FiBook, FiPlus, FiArrowLeft }
 import { ImprovementPlan } from "@graphql/generated";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useUser } from "@context/UserContext";
 
 const HistorialPlanesMejoramientoInstructor = () => {
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { user } = useUser();
     const { 
         data: allImprovementPlans, 
         loading, 
@@ -29,6 +31,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
         console.log('Redux state improvementPlan:', state.improvementPlan);
         return state.improvementPlan;
     });
+    // const { teacherCompetences, loadingCompetences } = useSelector((state: any) => state.improvementPlan);
 
     // Obtener parámetros de la URL - puede venir como fichaData (JSON) o como ficha (número)
     const fichaDataString = searchParams.get('fichaData');
@@ -71,6 +74,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
     
     // Estado para manejar la página actual (Paginator espera páginas basadas en 1)
     const [page, setPage] = React.useState(1);
+    // const [selectedTeacherCompetenceId, setSelectedTeacherCompetenceId] = React.useState<number | null>(null);
 
     const [isDarkMode, setIsDarkMode] = React.useState(false);
     
@@ -101,17 +105,20 @@ const HistorialPlanesMejoramientoInstructor = () => {
         console.log('🔍 DEBUG fichaId cambió:', fichaId);
     }, [fichaId]);
 
-    // useEffect para hacer fetch de datos - ahora sí filtra por ficha en el backend
+    // Ya no necesitamos cargar competencias; filtramos por ficha directamente en backend
     useEffect(() => {
-        console.log('🚀 useEffect ejecutado - fichaId:', fichaId, 'page:', page, 'tipo fichaId:', typeof fichaId);
+        if (!fichaId) return;
+        setPage(1); // Reiniciar a la primera página al cambiar de ficha
+    }, [fichaId]);
+
+    // useEffect para hacer fetch de datos - ahora filtra por studySheetId directamente (backend)
+    useEffect(() => {
+        console.log('🚀 useEffect ejecutado - fichaId:', fichaId, 'page:', page);
         if (!fichaId) {
-            console.log('❌ No hay fichaId, no se ejecuta dispatch');
+            console.log('❌ Falta fichaId, no se ejecuta dispatch');
             return;
         }
-        console.log('✅ Dispatching fetchImprovementPlans con:', { 
-            page: page - 1, 
-            size: 5
-        });
+        console.log('✅ Dispatching fetchImprovementPlans con:', { page: page - 1, size: 5 });
         dispatch(fetchImprovementPlans({ 
             page: page - 1, // Backend espera páginas basadas en 0
             size: 5

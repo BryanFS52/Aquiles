@@ -8,6 +8,7 @@ type ImprovementPlan {
     student: Student
     teacherCompetence: TeacherStudySheet
     faultType: ImprovementPlanFaultType
+    
 }
 
 input ImprovementPlanDto {
@@ -41,7 +42,7 @@ type ImprovementPlanPageId {
 }
 
 extend type Query {
-    allImprovementPlans(page: Int, size: Int, teacherCompetence: Long, id: Long): ImprovementPlanPage
+    allImprovementPlans(page: Int, size: Int, teacherCompetence: Long, id: Long, studySheetId: Long): ImprovementPlanPage
     improvementPlanById(id: Long!): ImprovementPlanPageId
 
 }

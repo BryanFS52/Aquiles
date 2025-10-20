@@ -22,7 +22,7 @@ public class ImprovementPlanResolver {
 
     // FindAll ImprovementPlan (GraphQL)
     @DgsQuery
-    public Map<String, Object> allImprovementPlans(@InputArgument Integer page, @InputArgument Integer size, @InputArgument Long teacherCompetence, @InputArgument Long id) {
+    public Map<String, Object> allImprovementPlans(@InputArgument Integer page, @InputArgument Integer size, @InputArgument Long teacherCompetence, @InputArgument Long id, @InputArgument Long studySheetId) {
         try {
             // Validación básica de paginación (sin variables intermedias para evitar warnings)
             if (page == null || page < 0) page = 0;
@@ -40,6 +40,8 @@ public class ImprovementPlanResolver {
                 );
             } else if (teacherCompetence != null) {
                 improvementPlanPage = improvementPlanBusiness.findByFilter(page, size, teacherCompetence);
+            } else if (studySheetId != null) {
+                improvementPlanPage = improvementPlanBusiness.findByStudySheetId(page, size, studySheetId);
             } else  {
                 improvementPlanPage = improvementPlanBusiness.findAll(page, size);
             }
@@ -78,7 +80,7 @@ public class ImprovementPlanResolver {
     @DgsMutation
     public Map<String, Object> addImprovementPlan(@InputArgument(name = "input") ImprovementPlanDto improvementplanDto) {
         try {
-        ImprovementPlanDto improvementPlanDto1 = improvementPlanBusiness.add(improvementplanDto);
+        improvementPlanBusiness.add(improvementplanDto);
             return ResponseHttpApi.responseHttpAction(
             null,
                     ResponseHttpApi.CODE_OK,

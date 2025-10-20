@@ -79,6 +79,22 @@ public class ImprovementPlanBusiness {
         }
     }
 
+    // Get improvementPlans by StudySheetId (Ficha)
+    public Page<ImprovementPlanDto> findByStudySheetId(int page, int size, Long studySheetId) {
+        try {
+            PageRequest pageRequest = PageRequest.of(page, size);
+            Page<ImprovementPlan> improvementPlanPage = improvementPlanService.findByStudySheetId(pageRequest, studySheetId);
+
+            System.out.println("Total improvementPlans (by studySheetId): " + improvementPlanPage.getTotalElements());
+
+            return ImprovementPlanMap.INSTANCE.EntityToDTOs(improvementPlanPage);
+        } catch (DataAccessException e) {
+            throw new CustomException("Error retrieving improvementPlans by studySheetId due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            throw new CustomException("An unexpected error occurred while retrieving improvementPlans by studySheetId.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // Get improvementPlan by teacherCompetence
     public List<Long> findAllByTeacherCompetence(Long teacherCompetence) {
         try {

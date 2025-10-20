@@ -38,6 +38,10 @@ public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
         return improvementPlanRepository.findAll(pageable);
     }
 
+    public Page<ImprovementPlan> findByStudySheetId(PageRequest pageRequest, Long studySheetId) {
+        return improvementPlanRepository.findByStudySheetId(pageRequest, studySheetId);
+    }
+
     @Override
     public ImprovementPlan getById(Long id) {
         return improvementPlanRepository.findById(id)
