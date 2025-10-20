@@ -1,18 +1,17 @@
 package com.api.aquilesApi.Utilities.Seeder;
 
-import com.api.aquilesApi.Entity.AttendanceState;
 import com.api.aquilesApi.Entity.ImprovementPlanFaultType;
 import com.api.aquilesApi.Repository.ImprovementPlanFaultTypeRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FaultTypeSeeder implements CommandLineRunner {
+public class ImprovementPlanFaultTypeSeeder implements CommandLineRunner {
 
     private final ImprovementPlanFaultTypeRepository improvementPlanFaultTypeRepository;
 
 
-    public FaultTypeSeeder(ImprovementPlanFaultTypeRepository improvementPlanFaultTypeRepository) {
+    public ImprovementPlanFaultTypeSeeder(ImprovementPlanFaultTypeRepository improvementPlanFaultTypeRepository) {
         this.improvementPlanFaultTypeRepository = improvementPlanFaultTypeRepository;
     }
 

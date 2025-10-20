@@ -2,8 +2,8 @@ import { gql } from '@apollo/client';
 
 // Queries and Mutations for ImprovementPlan
 export const GET_ALL_IMPROVEMENT_PLANS = gql`
-query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long) {
-  allImprovementPlans(page: $page, size: $size, teacherCompetence: $teacherCompetence) {
+query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $id: Long) {
+  allImprovementPlans(page: $page, size: $size, teacherCompetence: $teacherCompetence, id: $id) {
     code
     message
     date
@@ -39,7 +39,6 @@ query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long) {
     }
   }
 }
-
 `;
 
 export const GET_IMPROVEMENT_PLAN_BY_ID = gql`

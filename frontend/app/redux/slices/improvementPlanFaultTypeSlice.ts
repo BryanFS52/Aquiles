@@ -2,7 +2,14 @@ import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_FAULT_TYPES, GET_FAULT_TYPE_BY_ID } from '@graphql/improvementPlanFaultTypeGraph'
-import {ImprovementPlanFaultType } from '@graphql/generated'
+import {ImprovementPlanFaultType, 
+    GetAllImprovementPlanFaultTypesQuery, 
+    GetAllImprovementPlanFaultTypesQueryVariables,
+    GetImprovementPlanFaultTypeByIdQuery,
+    GetImprovementPlanFaultTypeByIdQueryVariables, 
+    AddImprovementPlanFaultTypeMutation, 
+    AddImprovementPlanFaultTypeMutationVariables 
+} from '@graphql/generated'
 
 // Función para transformar datos de GraphQL a ImprovementPlanFaultType
 const transformGraphQLToFaultTypeItem = (graphqlData: any): ImprovementPlanFaultType => {
@@ -35,6 +42,8 @@ export const fetchFaultTypeById = createAsyncThunk<any, any>(
     }
 );
 
+// export const addFaultType = createAsyncThunk<any, any, {}>(); // Comentado por ahora - se implementará cuando sea necesario
+
 const initialState = createInitialPaginatedState<ImprovementPlanFaultType>();
 
 const faultTypeSlice = createSlice({
@@ -49,9 +58,18 @@ const faultTypeSlice = createSlice({
             })
             .addCase(fetchFaultTypes.fulfilled, (state, action: PayloadAction<any>) => {
                 if (action.payload?.data) {
-                    state.data = action.payload.data
+                    // Filtrar items null y transformar
+                    const mappedItems = action.payload.data
                         .filter((item: any): item is NonNullable<typeof item> => item !== null)
                         .map(transformGraphQLToFaultTypeItem);
+                    
+                    // Eliminar duplicados basados en ID
+                    const uniqueItems = Array.from(
+                        new Map(mappedItems.map((item: ImprovementPlanFaultType) => [item.id, item])).values()
+                    ) as ImprovementPlanFaultType[];
+                    
+                    console.log('Tipos de falta después de eliminar duplicados:', uniqueItems);
+                    state.data = uniqueItems;
                     state.totalItems = action.payload.totalItems ?? 0;
                     state.totalPages = action.payload.totalPages ?? 0;
                     state.currentPage = action.payload.currentPage ?? 0;

@@ -1,4 +1,4 @@
-    type ImprovementPlan {
+type ImprovementPlan {
     id: ID
     city: String
     date: String
@@ -8,9 +8,11 @@
     student: Student
     teacherCompetence: TeacherStudySheet
     faultType: ImprovementPlanFaultType
+    
 }
 
 input ImprovementPlanDto {
+    id: ID
     city: String
     date: String
     reason: String
@@ -29,6 +31,7 @@ type ImprovementPlanPage {
     totalItems: Int
     currentPage: Int
     message: String
+    studySheet: StudySheet
 }
 
 type ImprovementPlanPageId {
@@ -39,7 +42,7 @@ type ImprovementPlanPageId {
 }
 
 extend type Query {
-    allImprovementPlans(page: Int, size: Int, teacherCompetence : Long): ImprovementPlanPage
+    allImprovementPlans(page: Int, size: Int, teacherCompetence: Long, id: Long, studySheetId: Long): ImprovementPlanPage
     improvementPlanById(id: Long!): ImprovementPlanPageId
 
 }

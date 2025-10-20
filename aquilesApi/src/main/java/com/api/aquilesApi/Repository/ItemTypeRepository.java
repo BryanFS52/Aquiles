@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ItemTypeRepository extends JpaRepository<ItemType, Long> {
+     // Method to check existence by name
+    boolean existsByName(String name);
 }

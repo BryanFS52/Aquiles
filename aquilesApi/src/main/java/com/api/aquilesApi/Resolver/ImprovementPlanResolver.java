@@ -22,13 +22,27 @@ public class ImprovementPlanResolver {
 
     // FindAll ImprovementPlan (GraphQL)
     @DgsQuery
-    public Map<String, Object> allImprovementPlans(@InputArgument Integer page, @InputArgument Integer size, @InputArgument Long teacherCompetence) {
+    public Map<String, Object> allImprovementPlans(@InputArgument Integer page, @InputArgument Integer size, @InputArgument Long teacherCompetence, @InputArgument Long id, @InputArgument Long studySheetId) {
         try {
-            System.out.println(teacherCompetence);
+            // Validación básica de paginación (sin variables intermedias para evitar warnings)
+            if (page == null || page < 0) page = 0;
+            if (size == null || size <= 0) size = 10;
             Page<ImprovementPlanDto> improvementPlanPage;
-            if (teacherCompetence != null) {
+            if (id != null) {
+                ImprovementPlanDto dto = improvementPlanBusiness.findById(id);
+                return ResponseHttpApi.responseHttpFindAll(
+                        java.util.List.of(dto),
+                        ResponseHttpApi.CODE_OK,
+                        "Query ok",
+                        1,
+                        page,
+                        1
+                );
+            } else if (teacherCompetence != null) {
                 improvementPlanPage = improvementPlanBusiness.findByFilter(page, size, teacherCompetence);
-            }else  {
+            } else if (studySheetId != null) {
+                improvementPlanPage = improvementPlanBusiness.findByStudySheetId(page, size, studySheetId);
+            } else  {
                 improvementPlanPage = improvementPlanBusiness.findAll(page, size);
             }
             return ResponseHttpApi.responseHttpFindAll(
@@ -66,9 +80,9 @@ public class ImprovementPlanResolver {
     @DgsMutation
     public Map<String, Object> addImprovementPlan(@InputArgument(name = "input") ImprovementPlanDto improvementplanDto) {
         try {
-            ImprovementPlanDto improvementPlanDto1 = improvementPlanBusiness.add(improvementplanDto);
+        improvementPlanBusiness.add(improvementplanDto);
             return ResponseHttpApi.responseHttpAction(
-                    improvementPlanDto1.getId(),
+            null,
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
             );

@@ -1,4 +1,4 @@
-import { clientLAN } from '@lib/apollo-client'
+import { client, clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_IMPROVEMENT_PLANS, GET_IMPROVEMENT_PLAN_BY_ID, ADD_IMPROVEMENT_PLAN, UPDATE_IMPROVEMENT_PLAN, DELETE_IMPROVEMENT_PLAN } from '@graphql/improvementPlanGraph'
@@ -31,7 +31,6 @@ export interface TeacherCompetence {
         name: string;
     };
 }
-
 
 // Función para transformar datos de GraphQL a ImprovementPlan
 const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPlan => {
@@ -71,26 +70,46 @@ const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPla
   };
 };
 
-export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], GetAllImprovementPlansQueryVariables>(
+    type FetchImprovementPlansVars = { page?: number; size?: number; teacherCompetence?: number; id?: number; studySheetId?: number };
+
+export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], FetchImprovementPlansVars, { rejectValue: { code: string; message: string } }>(
     'improvementPlan/fetchAll',
-    async ({ page, size, teacherCompetence }) => {
-        const { data } = await clientLAN.query<GetAllImprovementPlansQuery, GetAllImprovementPlansQueryVariables>({
-            query: GET_ALL_IMPROVEMENT_PLANS,
-            variables: { page, size, teacherCompetence },
-            fetchPolicy: 'no-cache',
-        });
-        return data.allImprovementPlans;
+    async ({ page, size, teacherCompetence, studySheetId }, { rejectWithValue }) => {
+        try {
+            // Use federated gateway so Student.person is resolvable
+            const { data } = await clientLAN.query<GetAllImprovementPlansQuery, GetAllImprovementPlansQueryVariables>({
+                query: GET_ALL_IMPROVEMENT_PLANS,
+                // Enviar variables incluyendo filtro por ficha si está presente
+                variables: {
+                    page,
+                    size,
+                    teacherCompetence: teacherCompetence as any,
+                } as any,
+                fetchPolicy: 'no-cache',
+            });
+            return data.allImprovementPlans;
+        } catch (error: any) {
+            const msg = error?.graphQLErrors?.[0]?.message || error?.message || 'Error al cargar planes de mejoramiento';
+            return rejectWithValue({ code: '500', message: msg });
+        }
     }
 );
 
-export const fetchImprovementPlanById = createAsyncThunk<GetImprovementPlanByIdQuery['improvementPlanById'], GetImprovementPlanByIdQueryVariables>(
+export const fetchImprovementPlanById = createAsyncThunk<GetImprovementPlanByIdQuery['improvementPlanById'], GetImprovementPlanByIdQueryVariables, { rejectValue: { code: string; message: string } }>(
     'improvementPlan/fetchById',
-    async ({ id }) => {
-        const { data } = await clientLAN.query<GetImprovementPlanByIdQuery, GetImprovementPlanByIdQueryVariables>({
-            query: GET_IMPROVEMENT_PLAN_BY_ID,
-            variables: { id },
-        });
-        return data.improvementPlanById;
+    async ({ id }, { rejectWithValue }) => {
+        try {
+            // Use federated gateway so Student.person is resolvable
+            const { data } = await clientLAN.query<GetImprovementPlanByIdQuery, GetImprovementPlanByIdQueryVariables>({
+                query: GET_IMPROVEMENT_PLAN_BY_ID,
+                variables: { id },
+                fetchPolicy: 'no-cache',
+            });
+            return data.improvementPlanById;
+        } catch (error: any) {
+            const msg = error?.graphQLErrors?.[0]?.message || error?.message || 'Error al cargar el plan de mejoramiento';
+            return rejectWithValue({ code: '500', message: msg });
+        }
     }
 );
 
@@ -189,19 +208,31 @@ export const deleteImprovementPlan = createAsyncThunk<string, string,
 export const fetchTeacherCompetencesByStudySheet = createAsyncThunk<TeacherCompetence[], { studySheetId: string; teacherId: string }>(
     'improvementPlan/fetchTeacherCompetencesByStudySheet',
     async ({ studySheetId, teacherId }) => {
-        const { data } = await clientLAN.query({
-            query: GET_TEACHER_COMPETENCES_BY_STUDY_SHEET,
-            variables: { id: parseInt(studySheetId), teacherId: parseInt(teacherId) },
-            fetchPolicy: 'no-cache',
-        });
+        console.log('Solicitando competencias con:', { studySheetId, teacherId });
         
-        return data.studySheetById?.data?.teacherStudySheets?.map((item: any) => ({
-            id: item.id,
-            competence: {
-                id: item.competence.id,
-                name: item.competence.name,
-            },
-        })) || [];
+        try {
+            const { data } = await clientLAN.query({
+                query: GET_TEACHER_COMPETENCES_BY_STUDY_SHEET,
+                variables: { id: parseInt(studySheetId), teacherId: parseInt(teacherId) },
+                fetchPolicy: 'no-cache',
+            });
+            
+            console.log('Respuesta completa de GET_TEACHER_COMPETENCES_BY_STUDY_SHEET:', data);
+            
+            const result = data.studySheetById?.data?.teacherStudySheets?.map((item: any) => ({
+                id: item.id,
+                competence: {
+                    id: item.competence.id,
+                    name: item.competence.name,
+                },
+            })) || [];
+            
+            console.log('Competencias procesadas:', result);
+            return result;
+        } catch (error) {
+            console.error('Error al obtener competencias:', error);
+            throw error;
+        }
     }
 );
 
@@ -221,18 +252,35 @@ const improvementPlanSlice = createSlice({
                 state.loading = true;
             })
             .addCase(fetchImprovementPlans.fulfilled, (state, action: PayloadAction<any>) => {
-                if (action.payload?.data) {
-                    state.data = action.payload.data
+                const pagePayload = action.payload ?? {};
+                const dataArray = pagePayload.data ?? [];
+                state.data = Array.isArray(dataArray)
+                    ? dataArray
                         .filter((item: any): item is NonNullable<typeof item> => item !== null)
-                        .map(transformGraphQLToImprovementPlanItem);
-                    state.totalItems = action.payload.totalItems ?? 0;
-                    state.totalPages = action.payload.totalPages ?? 0;
-                    state.currentPage = action.payload.currentPage ?? 0;
-                }
+                        .map(transformGraphQLToImprovementPlanItem)
+                    : [];
+                state.totalItems = pagePayload.totalItems ?? 0;
+                state.totalPages = pagePayload.totalPages ?? 0;
+                state.currentPage = pagePayload.currentPage ?? 0;
+                state.error = null;
                 state.loading = false;
             })
-            .addCase(fetchImprovementPlans.rejected, (state, action) => {
-                state.error = action.error.message || 'Error fetching improvement plans';
+            .addCase(fetchImprovementPlans.rejected, (state, action: any) => {
+                // Si la petición fue abortada (p.ej., cambio de ficha/página), no mostramos error ruidoso
+                if (action?.meta?.aborted || action?.error?.name === 'AbortError') {
+                    state.loading = false;
+                    return;
+                }
+                const payload = action.payload as RejectedPayload | undefined;
+                if (payload?.message) {
+                    state.error = { code: payload.code, message: payload.message };
+                } else {
+                    // Evitar mostrar 'Rejected' sin contexto
+                    const fallback = action.error?.message && action.error.message !== 'Rejected'
+                        ? action.error.message
+                        : 'No fue posible cargar los planes de mejoramiento.';
+                    state.error = fallback;
+                }
                 state.loading = false;
             })
             // fetchImprovementPlanById
@@ -252,11 +300,7 @@ const improvementPlanSlice = createSlice({
                 state.loading = false;
             })
             // addImprovementPlan
-            .addCase(addImprovementPlan.fulfilled, (state, action: PayloadAction<any>) => {
-                if (action.payload) {
-                    const newItem = transformGraphQLToImprovementPlanItem(action.payload);
-                    state.data.push(newItem);
-                }
+            .addCase(addImprovementPlan.fulfilled, (state) => {
                 state.error = null;
             })
             .addCase(addImprovementPlan.rejected, (state, action) => {

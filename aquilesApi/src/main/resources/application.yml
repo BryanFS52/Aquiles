@@ -7,7 +7,7 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/DB_Aquiles
-    username: fabrica
+    username: postgres
     password: fabrica2024*
     driver-class-name: org.postgresql.Driver
 
@@ -59,4 +59,4 @@ spring:
       max-age: 3600
 
 frontend:
-  url: https://fought-constitution-journey-gel.trycloudflare.com
+  url: https://collect-techno-surf-foo.trycloudflare.com

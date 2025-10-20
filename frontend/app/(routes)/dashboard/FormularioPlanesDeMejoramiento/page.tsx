@@ -6,8 +6,10 @@ import { FiArrowLeft, FiUser, FiUsers, FiMapPin, FiCalendar, FiFileText, FiStar,
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@redux/store";
-import { fetchFaultTypes } from "@slice/faultTypeSlice";
-import { addImprovementPlan } from "@slice/improvementPlanSlice";
+import { fetchFaultTypes } from "@/redux/slices/improvementPlanFaultTypeSlice";
+import { addImprovementPlan, fetchTeacherCompetencesByStudySheet } from "@slice/improvementPlanSlice";
+import { clientLAN } from "@lib/apollo-client";
+import { GET_All_STUDENTS, GET_STUDENT_LIST } from "@graphql/olympo/studentsGraph";
 import { toast } from "react-toastify";
 import { useLoader } from "@context/LoaderContext";
 
@@ -21,8 +23,11 @@ const FormularioPlanesDeMejoramientoPage =() => {
     const { data: faultTypes, loading: faultTypesLoading } = useSelector((state: any) => state.faultType);
 
     // Estado del formulario
+    // Estado para selección y listado de estudiantes (normalizados)
     const [selectedStudent, setSelectedStudent] = useState('');
-        const [students, setStudents] = useState<any[]>([]);
+    const [students, setStudents] = useState<any[]>([]); // Cada item tendrá shape: { id: string, person: { name, lastname, document, email } }
+    const [studentsLoading, setStudentsLoading] = useState(false);
+    const [studentsError, setStudentsError] = useState<string | null>(null);
     const [fichaData, setFichaData] = useState<any>(null);
     const [competencies, setCompetencies] = useState<any[]>([]);
     const [formData, setFormData] = useState({
@@ -89,44 +94,148 @@ const FormularioPlanesDeMejoramientoPage =() => {
         }
     }, [searchParams]);
 
-    // Usar los datos reales de los estudiantes de la ficha
+    // Cargar / normalizar estudiantes: origen directo (students/studentStudySheets) o fetch por idStudySheet
     useEffect(() => {
-        if (fichaData && fichaData.students) {
-            // Usar los datos completos de los estudiantes que ya vienen de la ficha
-            setStudents(fichaData.students);
-        }
-    }, [fichaData]);
+        const loadStudents = async () => {
+            if (!fichaData) return;
+            setStudentsLoading(true);
+            setStudentsError(null);
+            try {
+                let rawStudents: any[] = [];
+                console.log('Cargando estudiantes desde fichaData:', fichaData);
+                
+                // Intentar recuperar estudiantes del objeto fichaData
+                if (fichaData.students && Array.isArray(fichaData.students)) {
+                    console.log('Utilizando students directo del fichaData:', fichaData.students);
+                    rawStudents = fichaData.students;
+                } 
+                else if (fichaData.studentStudySheets && Array.isArray(fichaData.studentStudySheets)) {
+                    console.log('Utilizando studentStudySheets del fichaData:', fichaData.studentStudySheets);
+                    // Este formato viene en la estructura que recibimos del backend
+                    rawStudents = fichaData.studentStudySheets;
+                } 
+                else if (fichaData.fichaNumber || fichaData.number || fichaData.id) {
+                    console.log('Intentando fetch de estudiantes por API');
+                    // Si sólo vienen IDs, intentar fetch por idStudySheet
+                    const idStudySheet = parseInt(fichaData.id || fichaData.fichaNumber || fichaData.number, 10);
+                    if (!isNaN(idStudySheet)) {
+                        const { data } = await clientLAN.query({
+                            query: GET_All_STUDENTS,
+                            variables: { idStudySheet, page: 0, size: 200 },
+                            fetchPolicy: 'no-cache'
+                        });
+                        rawStudents = data?.allStudents?.data || [];
+                        console.log('Datos de estudiantes recibidos por GET_All_STUDENTS:', data?.allStudents);
+                        // Fallback: si vienen studentIds y el fetch por ficha devolvió vacío
+                        if ((!rawStudents || rawStudents.length === 0) && Array.isArray(fichaData.studentIds) && fichaData.studentIds.length > 0) {
+                            try {
+                                const { data: listData } = await clientLAN.query({
+                                    query: GET_STUDENT_LIST,
+                                    fetchPolicy: 'no-cache'
+                                });
+                                const allList = listData?.allStudentList?.data || [];
+                                const wantedIds = new Set(fichaData.studentIds.map((id: any) => String(id)));
+                                rawStudents = allList.filter((st: any) => wantedIds.has(String(st.id)));
+                            } catch (fallbackErr) {
+                                console.warn('Fallback GET_STUDENT_LIST falló:', fallbackErr);
+                            }
+                        }
+                    }
+                }
 
-    // Cargar competencias de la ficha y tipos de falta
+                const normalized = rawStudents
+                    .filter(Boolean)
+                    .map((item: any) => {
+                        const s = item.student ? item.student : item; // studentStudySheet vs student directo
+                        const person = s.person || {};
+                        return {
+                            id: String(s.id ?? ''),
+                            person: {
+                                name: person.name || '',
+                                lastname: person.lastname || person.lastName || '',
+                                document: person.document || person.documentNumber || '',
+                                email: person.email || ''
+                            }
+                        };
+                    })
+                    .filter(st => st.id);
+
+                setStudents(normalized);
+                if (selectedStudent && !normalized.find(s => s.id === selectedStudent)) {
+                    setSelectedStudent('');
+                }
+            } catch (e) {
+                console.error('Error cargando/normalizando estudiantes:', e);
+                setStudentsError('Error al cargar estudiantes de la ficha');
+            } finally {
+                setStudentsLoading(false);
+            }
+        };
+        loadStudents();
+    }, [fichaData, selectedStudent]);
+
+    // Cargar competencias (si no vienen en fichaData) y tipos de falta
     useEffect(() => {
         const loadInitialData = async () => {
             try {
-                // Usar las competencias reales de la ficha seleccionada
-                if (fichaData && fichaData.teacherCompetences) {
-                    console.log('Cargando competencias de la ficha:', fichaData.teacherCompetences);
-                    setCompetencies(fichaData.teacherCompetences);
-                } else {
-                    // Si no hay competencias de la ficha, usar array vacío
-                    setCompetencies([]);
+                let loadedCompetences: any[] = [];
+                console.log('FichaData completo recibido en formulario:', fichaData);
+                
+                // Primera opción: teacherCompetences es un array directamente disponible
+                if (fichaData?.teacherCompetences && Array.isArray(fichaData.teacherCompetences)) {
+                    console.log('Utilizando teacherCompetences del fichaData directamente:', fichaData.teacherCompetences);
+                    loadedCompetences = fichaData.teacherCompetences;
+                } 
+                // Segunda opción: teacherStudySheets está disponible (formato desde backend)
+                else if (fichaData?.teacherStudySheets && Array.isArray(fichaData.teacherStudySheets)) {
+                    console.log('Transformando teacherStudySheets a formato de competencias:', fichaData.teacherStudySheets);
+                    loadedCompetences = fichaData.teacherStudySheets.map((item: any) => ({
+                        id: item.id,
+                        competence: {
+                            id: item.competence?.id,
+                            name: item.competence?.name
+                        }
+                    })).filter((comp: any) => comp.competence && comp.competence.id);
+                } 
+                // Tercera opción: recuperar desde API
+                else if (fichaData?.fichaNumber || fichaData?.number || fichaData?.id) {
+                    console.log('Intentando fetch de competencias por API');
+                    // Intentar fetch si tenemos número de ficha
+                    const studySheetIdentifier = (fichaData.id || fichaData.fichaNumber || fichaData.number);
+                    const teacherId = 1; // TODO: reemplazar con user.id si está en contexto
+                    if (studySheetIdentifier) {
+                        try {
+                            const res = await dispatch(fetchTeacherCompetencesByStudySheet({
+                                studySheetId: String(studySheetIdentifier),
+                                teacherId: String(teacherId)
+                            })).unwrap();
+                            loadedCompetences = res || [];
+                            console.log('Respuesta de fetchTeacherCompetencesByStudySheet:', res);
+                        } catch (competenceErr) {
+                            console.warn('No se pudieron cargar competencias vía thunk:', competenceErr);
+                        }
+                    }
                 }
+                
+                console.log('Competencias finales a establecer:', loadedCompetences);
+                setCompetencies(loadedCompetences);
 
-                await dispatch(fetchFaultTypes({ page: 0, size: 10})).unwrap();
+                // Asegurar que se traigan todos los tipos de falta disponibles
+                const faultTypesResult = await dispatch(fetchFaultTypes({ page: 0, size: 100})).unwrap();
+                console.log('Tipos de falta recibidos:', faultTypesResult);
             } catch (error) {
-                console.error('Error al cargar tipos de falta:', error);
-                toast.error('Error al cargar los tipos de falta', {
+                console.error('Error al cargar datos iniciales (competencias / tipos falta):', error);
+                toast.error('Error al cargar datos iniciales', {
                     position: "top-right",
                     autoClose: 4000,
                 });
             }
         };
-
         loadInitialData();
     }, [dispatch, fichaData]);
 
     // Obtener datos del estudiante seleccionado
-    const getSelectedStudentData = () => {
-        return students.find(s => s.id === selectedStudent);
-    };
+    const getSelectedStudentData = () => students.find(s => String(s.id) === String(selectedStudent));
 
     // Manejar cambios en el formulario
     const handleInputChange = (field: string, value: any) => {
@@ -139,26 +248,24 @@ const FormularioPlanesDeMejoramientoPage =() => {
     // Manejar selección de estudiante y rellenar campos automáticamente
     const handleStudentChange = (studentId: string) => {
         setSelectedStudent(studentId);
-
-        if (studentId) {
-            const student = students.find(s => s.id === studentId);
-            if (student) {
-                setFormData(prev => ({
-                    ...prev,
-                    studentName: student.person?.name || '',
-                    studentLastname: student.person?.lastname || '',
-                    studentDocument: student.person?.document || '',
-                    studentEmail: student.person?.email || ''
-                }));
-            }
-        } else {
-            // Limpiar campos del estudiante si no hay selección
+        if (!studentId) {
             setFormData(prev => ({
                 ...prev,
                 studentName: '',
                 studentLastname: '',
                 studentDocument: '',
                 studentEmail: ''
+            }));
+            return;
+        }
+        const student = students.find(s => String(s.id) === String(studentId));
+        if (student) {
+            setFormData(prev => ({
+                ...prev,
+                studentName: student.person?.name || '',
+                studentLastname: student.person?.lastname || '',
+                studentDocument: student.person?.document || '',
+                studentEmail: student.person?.email || ''
             }));
         }
     };
@@ -237,15 +344,16 @@ const FormularioPlanesDeMejoramientoPage =() => {
 
         try {
             const improvementPlanData = {
-                studentId: selectedStudent,
+                // En GraphQL ID suele mapear a string en TS; el backend lo convierte a Long
+                studentId: String(selectedStudent),
                 city: formData.city,
                 date: formData.date, // formato "YYYY-MM-DD"
                 reason: formData.reason,
                 state: formData.state,
                 qualification: false, // Siempre false ya que no se puede calificar al crear
-                teacherCompetence: formData.teacherCompetenceId,
-                faultTypeId: formData.faultTypeId
-            };
+                teacherCompetence: String(formData.teacherCompetenceId),
+                faultType: { id: String(formData.faultTypeId) }
+            } as const;
 
             // Logs corregidos para evitar errores de acceso
             console.log('=== DATOS ANTES DE ENVIAR ===');
@@ -253,10 +361,13 @@ const FormularioPlanesDeMejoramientoPage =() => {
             console.log('formData completo:', formData);
             console.log('improvementPlanData final:', improvementPlanData);
             console.log('Tipos de datos:');
-            console.log('- studentId:', typeof improvementPlanData.studentId, '=', improvementPlanData.studentId);
-            console.log('- teacherCompetence:', typeof improvementPlanData.teacherCompetence, '=', improvementPlanData.teacherCompetence);
-            console.log('- faultTypeId:', typeof improvementPlanData.faultTypeId, '=', improvementPlanData.faultTypeId);
+            console.log('- studentId (ID):', typeof improvementPlanData.studentId, '=', improvementPlanData.studentId);
+            console.log('- teacherCompetence (ID):', typeof improvementPlanData.teacherCompetence, '=', improvementPlanData.teacherCompetence);
+            console.log('- faultType.id (ID):', typeof improvementPlanData.faultType.id, '=', improvementPlanData.faultType.id);
             console.log('- qualification:', typeof improvementPlanData.qualification, '=', improvementPlanData.qualification);
+            console.log('- Estudiante seleccionado:', getSelectedStudentData());
+            console.log('- Competencias disponibles:', competencies);
+            console.log('- Tipos de falta disponibles:', faultTypes);
             console.log('===============================');
 
             const result = await dispatch(addImprovementPlan(improvementPlanData)).unwrap();
@@ -311,21 +422,12 @@ const FormularioPlanesDeMejoramientoPage =() => {
             <div className="space-y-6">
                 {/* Header */}
                 <div>
-                    <PageTitle>
+                    <PageTitle onBack={() => router.back()}>
                         {fichaData
                             ? `Crear Plan de Mejoramiento - Ficha N° ${fichaData.fichaNumber}`
                             : `Formulario De Planes De Mejoramiento`
                         }
                     </PageTitle>
-                    {fichaData && (
-                        <button
-                            onClick={() => router.back()}
-                            className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen transition-colors duration-200 mt-2"
-                        >
-                            <FiArrowLeft className="w-4 h-4 mr-1" />
-                            Volver al Historial
-                        </button>
-                    )}
                 </div>
 
                 {/* Contenedor del formulario */}
@@ -343,12 +445,13 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                 </h3>
                             </div>
 
-                            {fichaData && students.length > 0 ? (
+                            {fichaData ? (
                                 <div className="space-y-4">
+                                    {/* Select de estudiantes */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             Seleccionar Estudiante
-                                            <span className="text-gray-500 font-normal ml-1">({students.length} disponibles)</span>
+                                            <span className="text-gray-500 font-normal ml-1">({students.length})</span>
                                         </label>
                                         <div className="relative">
                                             <select
@@ -356,9 +459,18 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                                 onChange={(e) => handleStudentChange(e.target.value)}
                                                 className="w-full px-4 py-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200 appearance-none cursor-pointer"
                                                 required
+                                                disabled={studentsLoading || !!studentsError}
                                             >
-                                                <option value="">Seleccione un estudiante...</option>
-                                                {students.map((student) => (
+                                                <option value="">
+                                                    {studentsLoading
+                                                        ? 'Cargando estudiantes...'
+                                                        : studentsError
+                                                            ? 'Error al cargar estudiantes'
+                                                            : students.length === 0
+                                                                ? 'No hay estudiantes en esta ficha'
+                                                                : 'Seleccione un estudiante...'}
+                                                </option>
+                                                {!studentsLoading && !studentsError && students.map((student) => (
                                                     <option key={student.id} value={student.id}>
                                                         {(student.person?.name || '').toUpperCase()} {(student.person?.lastname || '').toUpperCase()}
                                                     </option>
@@ -368,6 +480,9 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                                 <FiUsers className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                                             </div>
                                         </div>
+                                        {studentsError && (
+                                            <p className="mt-2 text-xs text-red-600 dark:text-red-400">{studentsError}</p>
+                                        )}
                                     </div>
 
                                     {/* Campos de solo lectura del estudiante */}
@@ -381,7 +496,7 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                                 </label>
                                                 <input
                                                     type="text"
-                                                    value={formData.studentDocument}
+                                                    value={formData.studentDocument}    
                                                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed transition-all duration-200"
                                                     placeholder="Documento del estudiante..."
                                                     disabled
@@ -398,7 +513,7 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                                 <input
                                                     type="email"
                                                     value={formData.studentEmail}
-                                                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed transition-all duration-200"
+                                                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed transition-all duración-200"
                                                     placeholder="Email del estudiante..."
                                                     disabled
                                                     readOnly
@@ -412,12 +527,7 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                     <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full mb-4 mx-auto">
                                         <FiUsers className="w-8 h-8 text-gray-400 dark:text-gray-500" />
                                     </div>
-                                    <p>
-                                        {fichaData
-                                            ? "Cargando estudiantes de la ficha..."
-                                            : "No hay ficha seleccionada. Accede desde el historial de una ficha específica."
-                                        }
-                                    </p>
+                                    <p>No hay ficha seleccionada. Accede desde el historial de una ficha específica.</p>
                                 </div>
                             )}
                         </div>

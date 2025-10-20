@@ -84,7 +84,7 @@ mutation AddFinalReport($input: FinalReportDto) {
   addFinalReport(input: $input) {
     code
     message
-    date
+    id 
   }
 }
 `;
@@ -94,7 +94,7 @@ mutation UpdateFinalReport($id: Long!, $input: FinalReportDto) {
   updateFinalReport(id: $id, input: $input) {
     code
     message
-    date
+    id
   }
 }
 `;
@@ -104,7 +104,7 @@ mutation DeleteFinalReport($id: Long!) {
   deleteFinalReport(id: $id) {
     code
     message
-    date
+    id
   }
 }
 `;
