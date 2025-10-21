@@ -77,7 +77,6 @@ public class FinalReportBusiness {
             FinalReport finalReport = new FinalReport();
             System.out.println(">>> DTO recibido = " + finalreportDto);
             System.out.println(">>> Annexes recibido = " + finalreportDto.getAnnexes());
-            System.out.println(">>> Signature recibido = " + finalreportDto.getSignature());
             FinalReportMap.INSTANCE.updateFinalReport(finalreportDto, finalReport);
 
             // Set signature
@@ -87,9 +86,8 @@ public class FinalReportBusiness {
 
             FinalReport savedFinalReport = finalReportService.save(finalReport);
             return FinalReportMap.INSTANCE.EntityToDTO(savedFinalReport);
-        }catch ( Exception e){
-            e.printStackTrace();
-            throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);
+        } catch ( Exception exception){
+            throw new CustomException(exception.getMessage() , HttpStatus.BAD_REQUEST);
         }
     }
 

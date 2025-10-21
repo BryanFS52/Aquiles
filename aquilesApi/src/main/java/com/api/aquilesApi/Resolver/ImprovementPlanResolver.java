@@ -3,13 +3,13 @@ package com.api.aquilesApi.Resolver;
 import com.api.aquilesApi.Business.ImprovementPlanBusiness;
 import com.api.aquilesApi.Dto.ImprovementPlanDto;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
-import com.api.aquilesApi.Utilities.Exception.BadRequestException;
-import com.api.aquilesApi.Utilities.Exception.NotFoundException;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsQuery;
 import org.springframework.data.domain.Page;
 import com.netflix.graphql.dgs.InputArgument;
 import com.netflix.graphql.dgs.DgsMutation;
+import org.springframework.http.HttpStatus;
+
 import java.util.Map;
 
 @DgsComponent
@@ -22,38 +22,20 @@ public class ImprovementPlanResolver {
 
     // FindAll ImprovementPlan (GraphQL)
     @DgsQuery
-    public Map<String, Object> allImprovementPlans(@InputArgument Integer page, @InputArgument Integer size, @InputArgument Long teacherCompetence, @InputArgument Long id, @InputArgument Long studySheetId) {
+    public Map<String, Object> allImprovementPlans(@InputArgument Integer page, @InputArgument Integer size) {
         try {
-            Page<ImprovementPlanDto> improvementPlanPage;
-            if (id != null) {
-                ImprovementPlanDto dto = improvementPlanBusiness.findById(id);
-                return ResponseHttpApi.responseHttpFindAll(
-                        java.util.List.of(dto),
-                        ResponseHttpApi.CODE_OK,
-                        "Query ok",
-                        1,
-                        page,
-                        1
-                );
-            } else if (teacherCompetence != null) {
-                improvementPlanPage = improvementPlanBusiness.findByFilter(page, size, teacherCompetence);
-            } else {
-                improvementPlanPage = improvementPlanBusiness.findAll(page, size);
-            }
-            if (!improvementPlanPage.isEmpty()) {
-                return ResponseHttpApi.responseHttpFindAll(
-                        improvementPlanPage.getContent(),
-                        ResponseHttpApi.CODE_OK,
-                        "Query ok",
-                        improvementPlanPage.getTotalPages(),
-                        page,
-                        (int) improvementPlanPage.getTotalElements()
-                );
-            } else {
-                throw new NotFoundException("No ImprovementPlans found");
-            }
+            Page<ImprovementPlanDto> improvementPlanPage = improvementPlanBusiness.findAll(page, size);
+            return ResponseHttpApi.responseHttpFindAll(
+                    improvementPlanPage.getContent(),
+                    ResponseHttpApi.CODE_OK,
+                    "Query ok",
+                    improvementPlanPage.getTotalPages(),
+                    page,
+                    (int) improvementPlanPage.getTotalElements()
+            );
         } catch (Exception e) {
-            throw new RuntimeException("Unexpected error in allImprovementPlans: " + e.getMessage(), e);
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving improvementPlans: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -62,16 +44,15 @@ public class ImprovementPlanResolver {
     public Map<String, Object> improvementPlanById(@InputArgument Long id) {
         try {
             ImprovementPlanDto improvementplanDto = improvementPlanBusiness.findById(id);
-            if (improvementplanDto == null) {
-                throw new NotFoundException("ImprovementPlan not found for id: " + id);
-            }
             return ResponseHttpApi.responseHttpFindId(
                     improvementplanDto,
                     ResponseHttpApi.CODE_OK,
                     "Query by id ok"
             );
         } catch (Exception e) {
-            throw new RuntimeException("Unexpected error in improvementPlanById: " + e.getMessage(), e);
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving improvementPlan: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 
@@ -79,17 +60,16 @@ public class ImprovementPlanResolver {
     @DgsMutation
     public Map<String, Object> addImprovementPlan(@InputArgument(name = "input") ImprovementPlanDto improvementplanDto) {
         try {
-            if (improvementplanDto == null) {
-                throw new BadRequestException("ImprovementPlan input cannot be null");
-            }
             ImprovementPlanDto improvementPlanDto1 = improvementPlanBusiness.add(improvementplanDto);
             return ResponseHttpApi.responseHttpAction(
-            null,
+                    improvementPlanDto1.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
             );
         }catch (Exception e) {
-            throw new RuntimeException("Unexpected error in addImprovementPlan: " + e.getMessage(), e);
+            return ResponseHttpApi.responseHttpError(
+                    "Error adding ImprovementPlan: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 
@@ -105,7 +85,9 @@ public class ImprovementPlanResolver {
             );
         }
         catch (Exception e) {
-            throw new RuntimeException("Unexpected error in updateImprovementPlan: " + e.getMessage(), e);
+            return ResponseHttpApi.responseHttpError(
+                    "Error updating ImprovementPlan: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 
@@ -121,7 +103,9 @@ public class ImprovementPlanResolver {
             );
         }
         catch (Exception e) {
-            throw new RuntimeException("Unexpected error in deleteImprovementPlan: " + e.getMessage(), e);
+            return ResponseHttpApi.responseHttpError(
+                    "Error deleting ImprovementPlan: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
     }
 }

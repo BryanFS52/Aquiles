@@ -1130,13 +1130,12 @@ export type HeadquarterPage = {
 };
 
 export type ImprovementPlan = {
-  city?: Maybe<Scalars['String']['output']>;
-  date?: Maybe<Scalars['String']['output']>;
-  faultType?: Maybe<ImprovementPlanFaultType>;
-  id?: Maybe<Scalars['ID']['output']>;
-  qualification?: Maybe<Scalars['Boolean']['output']>;
-  reason?: Maybe<Scalars['String']['output']>;
-  state?: Maybe<Scalars['Boolean']['output']>;
+  city: Scalars['String']['output'];
+  date: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  qualification: Scalars['Boolean']['output'];
+  reason: Scalars['String']['output'];
+  state: Scalars['Boolean']['output'];
   student?: Maybe<Student>;
   teacherCompetence?: Maybe<TeacherStudySheet>;
 };
@@ -1203,15 +1202,13 @@ export type ImprovementPlanDeliveryPageId = {
 };
 
 export type ImprovementPlanDto = {
-  city?: InputMaybe<Scalars['String']['input']>;
-  date?: InputMaybe<Scalars['String']['input']>;
-  faultType?: InputMaybe<ImprovementPlanFaultTypeDto>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  qualification?: InputMaybe<Scalars['Boolean']['input']>;
-  reason?: InputMaybe<Scalars['String']['input']>;
-  state?: InputMaybe<Scalars['Boolean']['input']>;
-  studentId?: InputMaybe<Scalars['ID']['input']>;
-  teacherCompetence?: InputMaybe<Scalars['ID']['input']>;
+  city: Scalars['String']['input'];
+  date: Scalars['String']['input'];
+  qualification: Scalars['Boolean']['input'];
+  reason: Scalars['String']['input'];
+  state: Scalars['Boolean']['input'];
+  studentId: Scalars['ID']['input'];
+  teacherCompetence: Scalars['ID']['input'];
 };
 
 export type ImprovementPlanEvidenceType = {
@@ -1273,7 +1270,6 @@ export type ImprovementPlanPage = {
   data?: Maybe<Array<Maybe<ImprovementPlan>>>;
   date?: Maybe<Scalars['String']['output']>;
   message?: Maybe<Scalars['String']['output']>;
-  studySheet?: Maybe<StudySheet>;
   totalItems?: Maybe<Scalars['Int']['output']>;
   totalPages?: Maybe<Scalars['Int']['output']>;
 };
@@ -3739,7 +3735,6 @@ export type ProcessMethodologyById = {
   message?: Maybe<Scalars['String']['output']>;
 };
 
-
 export type ProcessMethodologyDto = {
   description?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
@@ -4150,11 +4145,13 @@ export type Query = {
   justificationByStudentId?: Maybe<JustificationPage>;
   justificationStatusById?: Maybe<JustificationStatusPageId>;
   justificationTypeById?: Maybe<JustificationTypePageId>;
-  /**  Obtiene el acta guardada para un evento de comité específico */
+  /**  Obtiene el acta guardada para un evento de comité específico (sin el contenido del archivo) */
   minuteByCommitteeEventId?: Maybe<Minute>;
   minuteById?: Maybe<Minute>;
   /**  Obtiene un archivo de acta temporal en Base64 por nombre de archivo */
   minuteFileBase64?: Maybe<Scalars['String']['output']>;
+  /**  Obtiene SOLO el contenido del archivo PDF en Base64 para un evento específico */
+  minuteFileContentByCommitteeEventId?: Maybe<Scalars['String']['output']>;
   noveltyById?: Maybe<Novelty>;
   noveltyStatusById?: Maybe<NoveltyStatus>;
   personById?: Maybe<PersonById>;
@@ -4411,11 +4408,8 @@ export type QueryAllImprovementPlanFaultTypesArgs = {
 
 
 export type QueryAllImprovementPlansArgs = {
-  id?: InputMaybe<Scalars['Long']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
-  studySheetId?: InputMaybe<Scalars['Long']['input']>;
-  teacherCompetence?: InputMaybe<Scalars['Long']['input']>;
 };
 
 
@@ -4996,6 +4990,11 @@ export type QueryMinuteByIdArgs = {
 
 export type QueryMinuteFileBase64Args = {
   filename: Scalars['String']['input'];
+};
+
+
+export type QueryMinuteFileContentByCommitteeEventIdArgs = {
+  committeeEventId: Scalars['ID']['input'];
 };
 
 
@@ -5784,6 +5783,8 @@ export type AllAttendancesByStudentIdQuery = { allAttendancesByStudentId?: { dat
 export type AllAttendancesWithJustificationsByStudentIdQueryVariables = Exact<{
   id?: InputMaybe<Scalars['Long']['input']>;
   stateId?: InputMaybe<Scalars['Long']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
@@ -5791,6 +5792,8 @@ export type AllAttendancesWithJustificationsByStudentIdQuery = { allAttendancesB
 
 export type GetAttendancesAndCompetenceByStudentIdQueryVariables = Exact<{
   id?: InputMaybe<Scalars['Long']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
@@ -5831,49 +5834,6 @@ export type DeleteAttendanceMutationVariables = Exact<{
 
 
 export type DeleteAttendanceMutation = { deleteAttendance?: { code?: string | null, message?: string | null, id?: any | null } | null };
-
-export type LoginMutationVariables = Exact<{
-  input: LoginRequestDto;
-}>;
-
-
-export type LoginMutation = { login?: { token?: string | null, code?: string | null, message?: string | null, refreshToken?: string | null, user?: { id?: string | null, roles?: Array<{ name?: string | null } | null> | null, person?: { document?: string | null, name?: string | null, photo?: string | null, lastname?: string | null } | null, processDetails?: Array<{ process?: { functionName?: string | null } | null } | null> | null } | null } | null };
-
-export type LogoutMutationVariables = Exact<{
-  idUser?: InputMaybe<Scalars['Long']['input']>;
-  token?: InputMaybe<Scalars['String']['input']>;
-}>;
-
-
-export type LogoutMutation = { logout?: { code?: string | null, message?: string | null } | null };
-
-export type RefreshTokenMutationVariables = Exact<{
-  token: Scalars['String']['input'];
-}>;
-
-
-export type RefreshTokenMutation = { refreshToken?: { refreshToken?: string | null, code?: string | null, message?: string | null } | null };
-
-export type ForgotPasswordMutationVariables = Exact<{
-  document: Scalars['Long']['input'];
-}>;
-
-
-export type ForgotPasswordMutation = { forgotPassword?: { code?: string | null, message?: string | null } | null };
-
-export type GetAuthTokenMutationVariables = Exact<{
-  token: Scalars['String']['input'];
-}>;
-
-
-export type GetAuthTokenMutation = { getAuthToken?: { code?: string | null, message?: string | null, token?: string | null, user?: { id?: string | null, roles?: Array<{ name?: string | null } | null> | null, person?: { name?: string | null, photo?: string | null, lastname?: string | null } | null, processDetails?: Array<{ process?: { functionName?: string | null } | null } | null> | null } | null } | null };
-
-export type UpdatePasswordMutationVariables = Exact<{
-  input: UpdatePasswordInputDto;
-}>;
-
-
-export type UpdatePasswordMutation = { updatePassword?: { code?: string | null, message?: string | null } | null };
 
 export type GetAllChecklistsQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -5941,28 +5901,6 @@ export type DeleteChecklistMutationVariables = Exact<{
 
 
 export type DeleteChecklistMutation = { deleteChecklist?: { code?: string | null, message?: string | null, id?: any | null } | null };
-
-export type UpdateItemStatusMutationVariables = Exact<{
-  itemId: Scalars['Long']['input'];
-  active: Scalars['Boolean']['input'];
-}>;
-
-
-export type UpdateItemStatusMutation = { updateItemStatus?: { code?: string | null, message?: string | null, id?: any | null } | null };
-
-export type ExportChecklistToPdfQueryVariables = Exact<{
-  id: Scalars['Long']['input'];
-}>;
-
-
-export type ExportChecklistToPdfQuery = { exportChecklistToPdf?: string | null };
-
-export type ExportChecklistToExcelQueryVariables = Exact<{
-  id: Scalars['Long']['input'];
-}>;
-
-
-export type ExportChecklistToExcelQuery = { exportChecklistToExcel?: string | null };
 
 export type SendNotificationMutationVariables = Exact<{
   emailRequest: EmailRequest;
@@ -6097,19 +6035,17 @@ export type DeleteImprovementPlanFaultTypeMutation = { deleteImprovementPlanFaul
 export type GetAllImprovementPlansQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
-  teacherCompetence?: InputMaybe<Scalars['Long']['input']>;
-  id?: InputMaybe<Scalars['Long']['input']>;
 }>;
 
 
-export type GetAllImprovementPlansQuery = { allImprovementPlans?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id?: string | null, city?: string | null, date?: string | null, reason?: string | null, state?: boolean | null, qualification?: boolean | null, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null, faultType?: { id?: string | null, name?: string | null } | null } | null> | null } | null };
+export type GetAllImprovementPlansQuery = { allImprovementPlans?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, city: string, date: string, reason: string, state: boolean, qualification: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
 
 export type GetImprovementPlanByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
 
 
-export type GetImprovementPlanByIdQuery = { improvementPlanById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id?: string | null, city?: string | null, date?: string | null, reason?: string | null, state?: boolean | null, qualification?: boolean | null, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null, faultType?: { id?: string | null, name?: string | null } | null } | null } | null };
+export type GetImprovementPlanByIdQuery = { improvementPlanById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id: string, city: string, date: string, reason: string, state: boolean, qualification: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null } | null };
 
 export type AddImprovementPlanMutationVariables = Exact<{
   input: ImprovementPlanDto;
@@ -6899,8 +6835,8 @@ export type AllAttendancesByStudentIdLazyQueryHookResult = ReturnType<typeof use
 export type AllAttendancesByStudentIdSuspenseQueryHookResult = ReturnType<typeof useAllAttendancesByStudentIdSuspenseQuery>;
 export type AllAttendancesByStudentIdQueryResult = Apollo.QueryResult<AllAttendancesByStudentIdQuery, AllAttendancesByStudentIdQueryVariables>;
 export const AllAttendancesWithJustificationsByStudentIdDocument = gql`
-    query allAttendancesWithJustificationsByStudentId($id: Long, $stateId: Long) {
-  allAttendancesByStudentId(id: $id, stateId: $stateId) {
+    query allAttendancesWithJustificationsByStudentId($id: Long, $stateId: Long, $page: Int, $size: Int) {
+  allAttendancesByStudentId(id: $id, stateId: $stateId, page: $page, size: $size) {
     data {
       id
       attendanceDate
@@ -6946,6 +6882,8 @@ export const AllAttendancesWithJustificationsByStudentIdDocument = gql`
  *   variables: {
  *      id: // value for 'id'
  *      stateId: // value for 'stateId'
+ *      page: // value for 'page'
+ *      size: // value for 'size'
  *   },
  * });
  */
@@ -6966,8 +6904,8 @@ export type AllAttendancesWithJustificationsByStudentIdLazyQueryHookResult = Ret
 export type AllAttendancesWithJustificationsByStudentIdSuspenseQueryHookResult = ReturnType<typeof useAllAttendancesWithJustificationsByStudentIdSuspenseQuery>;
 export type AllAttendancesWithJustificationsByStudentIdQueryResult = Apollo.QueryResult<AllAttendancesWithJustificationsByStudentIdQuery, AllAttendancesWithJustificationsByStudentIdQueryVariables>;
 export const GetAttendancesAndCompetenceByStudentIdDocument = gql`
-    query GetAttendancesAndCompetenceByStudentId($id: Long) {
-  allAttendancesByStudentId(id: $id) {
+    query GetAttendancesAndCompetenceByStudentId($id: Long, $page: Int, $size: Int) {
+  allAttendancesByStudentId(id: $id, page: $page, size: $size) {
     data {
       id
       attendanceDate
@@ -6998,6 +6936,8 @@ export const GetAttendancesAndCompetenceByStudentIdDocument = gql`
  * const { data, loading, error } = useGetAttendancesAndCompetenceByStudentIdQuery({
  *   variables: {
  *      id: // value for 'id'
+ *      page: // value for 'page'
+ *      size: // value for 'size'
  *   },
  * });
  */
@@ -7255,248 +7195,6 @@ export function useDeleteAttendanceMutation(baseOptions?: Apollo.MutationHookOpt
 export type DeleteAttendanceMutationHookResult = ReturnType<typeof useDeleteAttendanceMutation>;
 export type DeleteAttendanceMutationResult = Apollo.MutationResult<DeleteAttendanceMutation>;
 export type DeleteAttendanceMutationOptions = Apollo.BaseMutationOptions<DeleteAttendanceMutation, DeleteAttendanceMutationVariables>;
-export const LoginDocument = gql`
-    mutation Login($input: LoginRequestDTO!) {
-  login(input: $input) {
-    token
-    code
-    message
-    refreshToken
-    user {
-      id
-      roles {
-        name
-      }
-      person {
-        document
-        name
-        photo
-        lastname
-      }
-      processDetails {
-        process {
-          functionName
-        }
-      }
-    }
-  }
-}
-    `;
-export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
-
-/**
- * __useLoginMutation__
- *
- * To run a mutation, you first call `useLoginMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useLoginMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [loginMutation, { data, loading, error }] = useLoginMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
-      }
-export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
-export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
-export const LogoutDocument = gql`
-    mutation Logout($idUser: Long, $token: String) {
-  logout(idUser: $idUser, token: $token) {
-    code
-    message
-  }
-}
-    `;
-export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
-
-/**
- * __useLogoutMutation__
- *
- * To run a mutation, you first call `useLogoutMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useLogoutMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [logoutMutation, { data, loading, error }] = useLogoutMutation({
- *   variables: {
- *      idUser: // value for 'idUser'
- *      token: // value for 'token'
- *   },
- * });
- */
-export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
-      }
-export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
-export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
-export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
-export const RefreshTokenDocument = gql`
-    mutation refreshToken($token: String!) {
-  refreshToken(refreshTokenInput: $token) {
-    refreshToken
-    code
-    message
-  }
-}
-    `;
-export type RefreshTokenMutationFn = Apollo.MutationFunction<RefreshTokenMutation, RefreshTokenMutationVariables>;
-
-/**
- * __useRefreshTokenMutation__
- *
- * To run a mutation, you first call `useRefreshTokenMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRefreshTokenMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [refreshTokenMutation, { data, loading, error }] = useRefreshTokenMutation({
- *   variables: {
- *      token: // value for 'token'
- *   },
- * });
- */
-export function useRefreshTokenMutation(baseOptions?: Apollo.MutationHookOptions<RefreshTokenMutation, RefreshTokenMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RefreshTokenMutation, RefreshTokenMutationVariables>(RefreshTokenDocument, options);
-      }
-export type RefreshTokenMutationHookResult = ReturnType<typeof useRefreshTokenMutation>;
-export type RefreshTokenMutationResult = Apollo.MutationResult<RefreshTokenMutation>;
-export type RefreshTokenMutationOptions = Apollo.BaseMutationOptions<RefreshTokenMutation, RefreshTokenMutationVariables>;
-export const ForgotPasswordDocument = gql`
-    mutation ForgotPassword($document: Long!) {
-  forgotPassword(document: $document) {
-    code
-    message
-  }
-}
-    `;
-export type ForgotPasswordMutationFn = Apollo.MutationFunction<ForgotPasswordMutation, ForgotPasswordMutationVariables>;
-
-/**
- * __useForgotPasswordMutation__
- *
- * To run a mutation, you first call `useForgotPasswordMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useForgotPasswordMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [forgotPasswordMutation, { data, loading, error }] = useForgotPasswordMutation({
- *   variables: {
- *      document: // value for 'document'
- *   },
- * });
- */
-export function useForgotPasswordMutation(baseOptions?: Apollo.MutationHookOptions<ForgotPasswordMutation, ForgotPasswordMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ForgotPasswordMutation, ForgotPasswordMutationVariables>(ForgotPasswordDocument, options);
-      }
-export type ForgotPasswordMutationHookResult = ReturnType<typeof useForgotPasswordMutation>;
-export type ForgotPasswordMutationResult = Apollo.MutationResult<ForgotPasswordMutation>;
-export type ForgotPasswordMutationOptions = Apollo.BaseMutationOptions<ForgotPasswordMutation, ForgotPasswordMutationVariables>;
-export const GetAuthTokenDocument = gql`
-    mutation GetAuthToken($token: String!) {
-  getAuthToken(token: $token) {
-    code
-    message
-    token
-    user {
-      id
-      roles {
-        name
-      }
-      person {
-        name
-        photo
-        lastname
-      }
-      processDetails {
-        process {
-          functionName
-        }
-      }
-    }
-  }
-}
-    `;
-export type GetAuthTokenMutationFn = Apollo.MutationFunction<GetAuthTokenMutation, GetAuthTokenMutationVariables>;
-
-/**
- * __useGetAuthTokenMutation__
- *
- * To run a mutation, you first call `useGetAuthTokenMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useGetAuthTokenMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [getAuthTokenMutation, { data, loading, error }] = useGetAuthTokenMutation({
- *   variables: {
- *      token: // value for 'token'
- *   },
- * });
- */
-export function useGetAuthTokenMutation(baseOptions?: Apollo.MutationHookOptions<GetAuthTokenMutation, GetAuthTokenMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<GetAuthTokenMutation, GetAuthTokenMutationVariables>(GetAuthTokenDocument, options);
-      }
-export type GetAuthTokenMutationHookResult = ReturnType<typeof useGetAuthTokenMutation>;
-export type GetAuthTokenMutationResult = Apollo.MutationResult<GetAuthTokenMutation>;
-export type GetAuthTokenMutationOptions = Apollo.BaseMutationOptions<GetAuthTokenMutation, GetAuthTokenMutationVariables>;
-export const UpdatePasswordDocument = gql`
-    mutation UpdatePassword($input: UpdatePasswordInputDTO!) {
-  updatePassword(input: $input) {
-    code
-    message
-  }
-}
-    `;
-export type UpdatePasswordMutationFn = Apollo.MutationFunction<UpdatePasswordMutation, UpdatePasswordMutationVariables>;
-
-/**
- * __useUpdatePasswordMutation__
- *
- * To run a mutation, you first call `useUpdatePasswordMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdatePasswordMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updatePasswordMutation, { data, loading, error }] = useUpdatePasswordMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUpdatePasswordMutation(baseOptions?: Apollo.MutationHookOptions<UpdatePasswordMutation, UpdatePasswordMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdatePasswordMutation, UpdatePasswordMutationVariables>(UpdatePasswordDocument, options);
-      }
-export type UpdatePasswordMutationHookResult = ReturnType<typeof useUpdatePasswordMutation>;
-export type UpdatePasswordMutationResult = Apollo.MutationResult<UpdatePasswordMutation>;
-export type UpdatePasswordMutationOptions = Apollo.BaseMutationOptions<UpdatePasswordMutation, UpdatePasswordMutationVariables>;
 export const GetAllChecklistsDocument = gql`
     query GetAllChecklists($page: Int, $size: Int) {
   allChecklists(page: $page, size: $size) {
@@ -7997,118 +7695,6 @@ export function useDeleteChecklistMutation(baseOptions?: Apollo.MutationHookOpti
 export type DeleteChecklistMutationHookResult = ReturnType<typeof useDeleteChecklistMutation>;
 export type DeleteChecklistMutationResult = Apollo.MutationResult<DeleteChecklistMutation>;
 export type DeleteChecklistMutationOptions = Apollo.BaseMutationOptions<DeleteChecklistMutation, DeleteChecklistMutationVariables>;
-export const UpdateItemStatusDocument = gql`
-    mutation UpdateItemStatus($itemId: Long!, $active: Boolean!) {
-  updateItemStatus(itemId: $itemId, active: $active) {
-    code
-    message
-    id
-  }
-}
-    `;
-export type UpdateItemStatusMutationFn = Apollo.MutationFunction<UpdateItemStatusMutation, UpdateItemStatusMutationVariables>;
-
-/**
- * __useUpdateItemStatusMutation__
- *
- * To run a mutation, you first call `useUpdateItemStatusMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateItemStatusMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateItemStatusMutation, { data, loading, error }] = useUpdateItemStatusMutation({
- *   variables: {
- *      itemId: // value for 'itemId'
- *      active: // value for 'active'
- *   },
- * });
- */
-export function useUpdateItemStatusMutation(baseOptions?: Apollo.MutationHookOptions<UpdateItemStatusMutation, UpdateItemStatusMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateItemStatusMutation, UpdateItemStatusMutationVariables>(UpdateItemStatusDocument, options);
-      }
-export type UpdateItemStatusMutationHookResult = ReturnType<typeof useUpdateItemStatusMutation>;
-export type UpdateItemStatusMutationResult = Apollo.MutationResult<UpdateItemStatusMutation>;
-export type UpdateItemStatusMutationOptions = Apollo.BaseMutationOptions<UpdateItemStatusMutation, UpdateItemStatusMutationVariables>;
-export const ExportChecklistToPdfDocument = gql`
-    query ExportChecklistToPdf($id: Long!) {
-  exportChecklistToPdf(id: $id)
-}
-    `;
-
-/**
- * __useExportChecklistToPdfQuery__
- *
- * To run a query within a React component, call `useExportChecklistToPdfQuery` and pass it any options that fit your needs.
- * When your component renders, `useExportChecklistToPdfQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useExportChecklistToPdfQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useExportChecklistToPdfQuery(baseOptions: Apollo.QueryHookOptions<ExportChecklistToPdfQuery, ExportChecklistToPdfQueryVariables> & ({ variables: ExportChecklistToPdfQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ExportChecklistToPdfQuery, ExportChecklistToPdfQueryVariables>(ExportChecklistToPdfDocument, options);
-      }
-export function useExportChecklistToPdfLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ExportChecklistToPdfQuery, ExportChecklistToPdfQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ExportChecklistToPdfQuery, ExportChecklistToPdfQueryVariables>(ExportChecklistToPdfDocument, options);
-        }
-export function useExportChecklistToPdfSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ExportChecklistToPdfQuery, ExportChecklistToPdfQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<ExportChecklistToPdfQuery, ExportChecklistToPdfQueryVariables>(ExportChecklistToPdfDocument, options);
-        }
-export type ExportChecklistToPdfQueryHookResult = ReturnType<typeof useExportChecklistToPdfQuery>;
-export type ExportChecklistToPdfLazyQueryHookResult = ReturnType<typeof useExportChecklistToPdfLazyQuery>;
-export type ExportChecklistToPdfSuspenseQueryHookResult = ReturnType<typeof useExportChecklistToPdfSuspenseQuery>;
-export type ExportChecklistToPdfQueryResult = Apollo.QueryResult<ExportChecklistToPdfQuery, ExportChecklistToPdfQueryVariables>;
-export const ExportChecklistToExcelDocument = gql`
-    query ExportChecklistToExcel($id: Long!) {
-  exportChecklistToExcel(id: $id)
-}
-    `;
-
-/**
- * __useExportChecklistToExcelQuery__
- *
- * To run a query within a React component, call `useExportChecklistToExcelQuery` and pass it any options that fit your needs.
- * When your component renders, `useExportChecklistToExcelQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useExportChecklistToExcelQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useExportChecklistToExcelQuery(baseOptions: Apollo.QueryHookOptions<ExportChecklistToExcelQuery, ExportChecklistToExcelQueryVariables> & ({ variables: ExportChecklistToExcelQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ExportChecklistToExcelQuery, ExportChecklistToExcelQueryVariables>(ExportChecklistToExcelDocument, options);
-      }
-export function useExportChecklistToExcelLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ExportChecklistToExcelQuery, ExportChecklistToExcelQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ExportChecklistToExcelQuery, ExportChecklistToExcelQueryVariables>(ExportChecklistToExcelDocument, options);
-        }
-export function useExportChecklistToExcelSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ExportChecklistToExcelQuery, ExportChecklistToExcelQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<ExportChecklistToExcelQuery, ExportChecklistToExcelQueryVariables>(ExportChecklistToExcelDocument, options);
-        }
-export type ExportChecklistToExcelQueryHookResult = ReturnType<typeof useExportChecklistToExcelQuery>;
-export type ExportChecklistToExcelLazyQueryHookResult = ReturnType<typeof useExportChecklistToExcelLazyQuery>;
-export type ExportChecklistToExcelSuspenseQueryHookResult = ReturnType<typeof useExportChecklistToExcelSuspenseQuery>;
-export type ExportChecklistToExcelQueryResult = Apollo.QueryResult<ExportChecklistToExcelQuery, ExportChecklistToExcelQueryVariables>;
 export const SendNotificationDocument = gql`
     mutation SendNotification($emailRequest: EmailRequest!) {
   sendNotification(emailRequest: $emailRequest)
@@ -8885,13 +8471,8 @@ export type DeleteImprovementPlanFaultTypeMutationHookResult = ReturnType<typeof
 export type DeleteImprovementPlanFaultTypeMutationResult = Apollo.MutationResult<DeleteImprovementPlanFaultTypeMutation>;
 export type DeleteImprovementPlanFaultTypeMutationOptions = Apollo.BaseMutationOptions<DeleteImprovementPlanFaultTypeMutation, DeleteImprovementPlanFaultTypeMutationVariables>;
 export const GetAllImprovementPlansDocument = gql`
-    query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $id: Long) {
-  allImprovementPlans(
-    page: $page
-    size: $size
-    teacherCompetence: $teacherCompetence
-    id: $id
-  ) {
+    query GetAllImprovementPlans($page: Int, $size: Int) {
+  allImprovementPlans(page: $page, size: $size) {
     code
     message
     date
@@ -8920,10 +8501,6 @@ export const GetAllImprovementPlansDocument = gql`
           name
         }
       }
-      faultType {
-        id
-        name
-      }
     }
   }
 }
@@ -8943,8 +8520,6 @@ export const GetAllImprovementPlansDocument = gql`
  *   variables: {
  *      page: // value for 'page'
  *      size: // value for 'size'
- *      teacherCompetence: // value for 'teacherCompetence'
- *      id: // value for 'id'
  *   },
  * });
  */
@@ -8991,10 +8566,6 @@ export const GetImprovementPlanByIdDocument = gql`
           id
           name
         }
-      }
-      faultType {
-        id
-        name
       }
     }
   }

@@ -62,9 +62,9 @@ public class AttendancesResolver {
                         attendances.getContent(),
                         ResponseHttpApi.CODE_OK,
                         "query attendances by id ok",
+                        attendances.getTotalPages(),
                         attendances.getSize(),
-                        page,
-                        attendances.getTotalPages()
+                        page
                 );
             } else {
                 throw new NotFoundException("No Attendances found for student id: " + id);

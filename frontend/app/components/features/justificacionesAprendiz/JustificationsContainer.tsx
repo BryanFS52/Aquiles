@@ -68,9 +68,9 @@ export const JustificationsContainer: React.FC = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-    dispatch(fetchAttendancesWithJustificationsByStudentId({ id: TEMPORAL_APRENDIZ_ID, stateId: 2 }));
-    dispatch(fetchJustificationsByStudentId({ studentId: TEMPORAL_APRENDIZ_ID, page: 0, size: 10 }));
+    dispatch(fetchJustificationTypes({ page: 0, size: 5 }));
+    dispatch(fetchAttendancesWithJustificationsByStudentId({ id: TEMPORAL_APRENDIZ_ID, stateId: 2, page: 0, size: 5 }));
+    dispatch(fetchJustificationsByStudentId({ studentId: TEMPORAL_APRENDIZ_ID, page: 0, size: 5 }));
   }, [dispatch]);
 
   useEffect(() => {
