@@ -149,11 +149,11 @@ export const fetchAttendancesByStudent = createAsyncThunk<Attendance[],AllAttend
 // fetch para allAttendancesWithJustificationsByStudentId
 export const fetchAttendancesWithJustificationsByStudentId = createAsyncThunk<AllAttendancesWithJustificationsByStudentIdQuery['allAttendancesByStudentId'], AllAttendancesWithJustificationsByStudentIdQueryVariables>(
     'attendance/fetchWithJustificationsByStudent',
-    async ({ id }, { rejectWithValue }) => {
+    async ({ id, page, size }, { rejectWithValue }) => {
         try {
             const { data } = await clientLAN.query<AllAttendancesWithJustificationsByStudentIdQuery, AllAttendancesWithJustificationsByStudentIdQueryVariables>({
                 query: GET_ATTENDANCES_WITH_JUSTIFICATIONS_BY_STUDENT,
-                variables: { id },
+                variables: { id, page, size },
                 fetchPolicy: 'no-cache',
             });
             return data.allAttendancesByStudentId;
@@ -166,11 +166,11 @@ export const fetchAttendancesWithJustificationsByStudentId = createAsyncThunk<Al
 
 export const fetchAttendanceAndCompetenceByStudent = createAsyncThunk<GetAttendancesAndCompetenceByStudentIdQuery['allAttendancesByStudentId'], GetAttendancesAndCompetenceByStudentIdQueryVariables>(
     'attendance/fetchWithCompetence',
-    async ({ id }, { rejectWithValue }) => {
+    async ({ id, page, size }, { rejectWithValue }) => {
         try {
             const { data } = await clientLAN.query<GetAttendancesAndCompetenceByStudentIdQuery, GetAttendancesAndCompetenceByStudentIdQueryVariables>({
                 query: GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT,
-                variables: { id },
+                variables: { id, page, size },
                 fetchPolicy: 'no-cache',
             });
             return data.allAttendancesByStudentId;

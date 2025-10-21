@@ -104,7 +104,7 @@ export const GET_JUSTIFICATION_BY_STUDENT_ID = gql`
       }
     }
   }
-`
+`;
 
 
 export const ADD_JUSTIFICATION = gql`

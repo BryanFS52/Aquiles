@@ -1,12 +1,10 @@
 "use client";
 
 import ApprenticeContainer from "@/components/features/FichaAprendiz/FichaAprendizContainer";
-import React, { useEffect } from "react";
+import React from "react";
 
 const FichaAprendizPage: React.FC = () => {
-  return (
-    <ApprenticeContainer />
-  );
-}
+  return <ApprenticeContainer />
+};
 
 export default FichaAprendizPage;

@@ -32,7 +32,7 @@ const AsistenciaAprendizContainer: React.FC = () => {
 
   // Cargar asistencias del estudiante al montar el componente
   useEffect(() => {
-    dispatch(fetchAttendanceAndCompetenceByStudent({ id: TEMPORAL_APRENDIZ_ID }));
+    dispatch(fetchAttendanceAndCompetenceByStudent({ id: TEMPORAL_APRENDIZ_ID, page: 0, size: 5 }));
   }, [dispatch]);
 
   // Manejar el loader basado en el estado de loading

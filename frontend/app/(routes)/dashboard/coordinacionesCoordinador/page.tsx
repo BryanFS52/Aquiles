@@ -1,12 +1,10 @@
 "use client";
 
 import React from "react";
-import CoordinacionesContainer from "@/components/features/CoordinacionesCoordinador/CoordinacionesContainer";
+import CoordinacionesContainer from "@components/features/CoordinacionesCoordinador/CoordinacionesContainer";
 
 const CoordinacionesCoordinadorPage: React.FC = () => {
-    return (
-        <CoordinacionesContainer/>
-    )
+    return <CoordinacionesContainer/>
 };
 
 export default CoordinacionesCoordinadorPage;

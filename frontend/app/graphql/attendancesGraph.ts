@@ -54,8 +54,8 @@ export const GET_ATTENDANCES_BY_STUDENT = gql`
 `;
 
 export const GET_ATTENDANCES_WITH_JUSTIFICATIONS_BY_STUDENT = gql`
-  query allAttendancesWithJustificationsByStudentId($id: Long, $stateId: Long) {
-    allAttendancesByStudentId(id: $id, stateId: $stateId) {
+  query allAttendancesWithJustificationsByStudentId($id: Long, $stateId: Long, $page: Int, $size: Int) {
+    allAttendancesByStudentId(id: $id, stateId: $stateId, page: $page, size: $size) {
       data {
         id
         attendanceDate
@@ -88,8 +88,8 @@ export const GET_ATTENDANCES_WITH_JUSTIFICATIONS_BY_STUDENT = gql`
 `;
 
 export const GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT = gql`
-  query GetAttendancesAndCompetenceByStudentId($id: Long) {
-    allAttendancesByStudentId(id: $id) {
+  query GetAttendancesAndCompetenceByStudentId($id: Long, $page: Int, $size: Int) {
+    allAttendancesByStudentId(id: $id, page: $page, size: $size) {
       data {
         id
         attendanceDate
