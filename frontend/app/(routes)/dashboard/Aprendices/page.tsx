@@ -1,4 +1,5 @@
 // Pendiente sigue en api Rest
+/*
 'use client'
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react'
 import { Apprentice, NewApprentice } from '@type/slices/aprendices'
@@ -76,7 +77,7 @@ const ListaApprentices = () => {
       <PageTitle>Gestión de Aprendices</PageTitle>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Crear Nuevo Aprendiz */}
+        {/* Crear Nuevo Aprendiz *
         <div className="bg-white dark:bg-[#0b1f33] p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Crear Nuevo Aprendiz</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -125,8 +126,6 @@ const ListaApprentices = () => {
             <button type="submit" className="bg-lightGreen text-black font-bold dark:bg-darkBlue dark:text-white px-6 py-3 rounded-lg mt-4 ">Crear Aprendiz</button>
           </form>
         </div>
-
-        {/* Lista de Aprendices */}
         <div className="bg-white dark:bg-[#0b1f33] p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Lista de Aprendices</h2>
           <input
@@ -165,3 +164,4 @@ const ListaApprentices = () => {
 }
 
 export default ListaApprentices;
+*/

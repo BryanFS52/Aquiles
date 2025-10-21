@@ -170,7 +170,7 @@ public class AttendancesResolver {
     @Value("${frontend.url}")
     private String frontendUrl;
     @DgsMutation
-    public QRCodePayloadDto generateQRCode() throws Exception {
+    public QRCodePayloadDto generateQRCode() {
         try {
             String sessionId = UUID.randomUUID().toString();
             String qrUrl = frontendUrl + "/dashboard/FormularioQRAsistencia?session=" + sessionId;

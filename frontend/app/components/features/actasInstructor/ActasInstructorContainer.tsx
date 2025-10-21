@@ -15,6 +15,8 @@ import { Stepper } from './Stepper';
 import { FinalReportForm, Step, StudySheetItem, TeacherStudySheetItem } from './types';
 import { filesToBase64Joined, formatDateES } from './utils';
 import { FileDropzoneMulti, FileDropzoneSingle } from './FilePicker';
+import PageTitle from "@components/UI/pageTitle";
+
 
 const steps: Step[] = [
   { key: 1, label: 'Seleccionar ficha', icon: Search },
@@ -173,6 +175,7 @@ export const ActasInstructorContainer: React.FC = () => {
 
   return (
     <div className="p-4 md:p-6 pb-28 overflow-visible">
+            <PageTitle>Actas de Cierre de Trimestre</PageTitle>
       <div className="mb-6">
         <BaseCard
           className="py-8"

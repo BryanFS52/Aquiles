@@ -1,6 +1,7 @@
 import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
+import { GET_ALL_FINAL_REPORTS, GET_FINAL_REPORT_BY_ID, ADD_FINAL_REPORT, UPDATE_FINAL_REPORT, DELETE_FINAL_REPORT } from '@graphql/finalReportGraph';
 import {
     FinalReport,
     GetAllFinalReportsQuery,
@@ -14,7 +15,6 @@ import {
     DeleteFinalReportMutation,
     DeleteFinalReportMutationVariables,
 } from '@graphql/generated';
-import { GET_ALL_FINAL_REPORTS, GET_FINAL_REPORT_BY_ID, ADD_FINAL_REPORT, UPDATE_FINAL_REPORT, DELETE_FINAL_REPORT } from '@graphql/finalReportGraph';
 
 
 export const fetchFinalReport = createAsyncThunk<GetAllFinalReportsQuery['allFinalReports'], GetAllFinalReportsQueryVariables
