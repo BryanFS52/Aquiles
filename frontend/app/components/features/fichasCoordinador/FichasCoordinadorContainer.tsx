@@ -6,25 +6,23 @@ import { AssignmentCardComponent } from './AssignmentCard';
 import { AssignmentCard, FichasCoordinadorProps } from './types';
 
 const assignmentCards: AssignmentCard[] = [
-    {
-        id: 'instructor-tecnico',
-        title: 'Asignación de Instructor Técnico',
-        description: 'Asigne un instructor técnico a una ficha específica.',
-        route: './InstructorTechnicalAssign',
-        buttonText: 'Asignar'
-    },
-    {
-        id: 'instructor-multiple',
-        title: 'Asignación de Instructor a Múltiples Fichas',
-        description: 'Asigne un instructor a varias fichas simultáneamente.',
-        route: './InstructorAssignMultipleSheets',
-        buttonText: 'Asignar'
-    }
+    // {
+    //     id: 'instructor-tecnico',
+    //     title: 'Asignación de Instructor Técnico',
+    //     description: 'Asigne un instructor técnico a una ficha específica.',
+    //     route: './InstructorTechnicalAssign',
+    //     buttonText: 'Asignar'
+    // },
+    // {
+    //     id: 'instructor-multiple',
+    //     title: 'Asignación de Instructor a Múltiples Fichas',
+    //     description: 'Asigne un instructor a varias fichas simultáneamente.',
+    //     route: './InstructorAssignMultipleSheets',
+    //     buttonText: 'Asignar'
+    // }
 ];
 
-export const FichasCoordinadorContainer: React.FC<FichasCoordinadorProps> = ({
-    isDarkMode = false
-}) => {
+export const FichasCoordinadorContainer: React.FC<FichasCoordinadorProps> = () => {
     return (
         <>
             <PageTitle>
@@ -36,7 +34,6 @@ export const FichasCoordinadorContainer: React.FC<FichasCoordinadorProps> = ({
                     <AssignmentCardComponent
                         key={card.id}
                         card={card}
-                        isDarkMode={isDarkMode}
                     />
                 ))}
             </div>
