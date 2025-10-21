@@ -22,16 +22,6 @@ import {
   DeleteJustificationStatusMutationVariables
 } from '@graphql/generated'
 
-
-interface ExtendedJustificationStatusState extends ReturnType<typeof createInitialPaginatedState<JustificationStatus>> {
-  currentJustificationStatus: JustificationStatus | null;
-}
-
-const initialState: ExtendedJustificationStatusState = {
-  ...createInitialPaginatedState<JustificationStatus>(),
-  currentJustificationStatus: null,
-};
-
 export const fetchAllJustificationStatuses = createAsyncThunk<GetAllJustificationStatusQuery['allJustificationsStatus'], GetAllJustificationStatusQueryVariables>(
   'justificationStatus/fetchAll',
   async ({ page, size }) => {
@@ -134,6 +124,15 @@ export const deleteJustificationStatus = createAsyncThunk<string, string,
     }
   }
 );
+
+interface ExtendedJustificationStatusState extends ReturnType<typeof createInitialPaginatedState<JustificationStatus>> {
+  currentJustificationStatus: JustificationStatus | null;
+}
+
+const initialState: ExtendedJustificationStatusState = {
+  ...createInitialPaginatedState<JustificationStatus>(),
+  currentJustificationStatus: null,
+};
 
 // Funciones helper para usar en componentes
 export const getStatusNameById = (

@@ -21,6 +21,9 @@ public class ImprovementPlan implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "actNumber")
+    private  String actNumber;
+
     @Column(name = "city", nullable = false, length = 55)
     private String city;
 

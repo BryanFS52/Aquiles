@@ -1,10 +1,10 @@
-"use client"
+// "use client"
 
-import React from "react";
-import ApprenticesContent from "@/components/features/Apprentices/ApprenticesContent";
+// import React from "react";
+// import ApprenticesContent from "@/components/features/Apprentices/ApprenticesContent";
 
-const ApprenticesPage: React.FC = () => {
-  return <ApprenticesContent />;
-};
+// const ApprenticesPage: React.FC = () => {
+//   return <ApprenticesContent />;
+// };
 
-export default ApprenticesPage;
+// export default ApprenticesPage;
