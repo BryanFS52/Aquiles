@@ -5,7 +5,7 @@ import { InstructorChecklistLogic } from "@components/features/listaChequeoInstr
 import {
   Checklist,
   Evaluation,
-} from "@/types/checklist";
+} from "@graphql/generated";
 
 export class InstructorChecklistHandlers {
   // Handler para cambio de trimestre

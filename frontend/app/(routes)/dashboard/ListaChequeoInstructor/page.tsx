@@ -1,10 +1,9 @@
 'use client'
-
 import React from "react";
-import { InstructorChecklistContainer } from "@components/features/listaChequeoInstructor";
+import {InstructorChecklistContainer} from "@components/features/listaChequeoInstructor";
 
-const InstructorChecklistView = () => {
+const ListaChequeoInstructorPage: React.FC = () => {
   return <InstructorChecklistContainer />;
-}
+};
 
-export default InstructorChecklistView;
+export default ListaChequeoInstructorPage;
