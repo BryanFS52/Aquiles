@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@context/UserContext";
+import { useLoader } from "@context/LoaderContext";
 import { toast } from "react-toastify";
 import PageTitle from "@components/UI/pageTitle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -59,8 +60,8 @@ export default function InstructorSelection() {
   const [selectedTeamScrum, setSelectedTeamScrum] = useState<TeamScrum | null>(null);
   const [step, setStep] = useState(1); // 1: Seleccionar ficha, 2: Seleccionar team scrum
   const [studySheets, setStudySheets] = useState<StudySheet[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { showLoader, hideLoader } = useLoader();
 
   // Limpiar localStorage al cargar el componente
   useEffect(() => {
@@ -85,8 +86,8 @@ export default function InstructorSelection() {
     const loadStudySheets = async () => {
       if (!user?.id) return;
 
+      showLoader();
       try {
-        setLoading(true);
         setError(null);
 
         const { data } = await clientLAN.query({
@@ -106,7 +107,7 @@ export default function InstructorSelection() {
         setError("Error al cargar las fichas asignadas");
         toast.error("Error al cargar las fichas asignadas");
       } finally {
-        setLoading(false);
+        hideLoader();
       }
     };
 
@@ -144,27 +145,6 @@ export default function InstructorSelection() {
     // Navegar a la vista de lista de chequeo del instructor
     router.push('/dashboard/ListaChequeoInstructor');
   };
-
-  if (loading) {
-    return (
-      <div className="w-full min-h-screen">
-        <div className="p-6 space-y-8">
-          <PageTitle>Selección de Ficha y Team Scrum</PageTitle>
-          <div className="flex justify-center items-center py-16">
-            <div className="text-center">
-              <FontAwesomeIcon 
-                icon={faSpinner} 
-                className="text-4xl text-lime-600 dark:text-shadowBlue animate-spin mb-4" 
-              />
-              <p className="text-gray-600 dark:text-gray-400 text-lg">
-                Cargando fichas asignadas...
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (!studySheets.length) {
     return (

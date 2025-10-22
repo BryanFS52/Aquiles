@@ -5,13 +5,9 @@ import { AssignmentCard } from './types';
 
 interface AssignmentCardComponentProps {
     card: AssignmentCard;
-    isDarkMode?: boolean;
 }
 
-export const AssignmentCardComponent: React.FC<AssignmentCardComponentProps> = ({
-    card,
-    isDarkMode = false
-}) => {
+export const AssignmentCardComponent: React.FC<AssignmentCardComponentProps> = ({ card }) => {
     const router = useRouter();
 
     const handleClick = () => {
@@ -19,15 +15,13 @@ export const AssignmentCardComponent: React.FC<AssignmentCardComponentProps> = (
     };
 
     const header = (
-        <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'
-            }`}>
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
             {card.title}
         </h2>
     );
 
     const body = (
-        <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'
-            }`}>
+        <p className="text-gray-700 dark:text-gray-300">
             {card.description}
         </p>
     );
@@ -35,10 +29,9 @@ export const AssignmentCardComponent: React.FC<AssignmentCardComponentProps> = (
     const footer = (
         <button
             onClick={handleClick}
-            className={`px-6 py-3 rounded-lg w-full font-medium transition-all duration-200 ${isDarkMode
-                ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                : 'bg-green-500 hover:bg-green-600 text-white'
-                }`}
+            className="px-6 py-3 rounded-lg w-full font-medium transition-all duration-200 
+                       bg-green-500 hover:bg-green-600 text-white 
+                       dark:bg-blue-600 dark:hover:bg-blue-700"
         >
             {card.buttonText}
         </button>
@@ -49,7 +42,6 @@ export const AssignmentCardComponent: React.FC<AssignmentCardComponentProps> = (
             header={header}
             body={body}
             footer={footer}
-            isDarkMode={isDarkMode}
             className="w-full md:w-[400px] lg:w-[450px] flex flex-col justify-between"
         />
     );

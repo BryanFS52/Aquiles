@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ImprovementPlanEvidenceTypeRepository extends JpaRepository<ImprovementPlanEvidenceType, Long> {
+    // Custom query method to check existence by name
+    boolean existsByName(String name);
 }

@@ -5,15 +5,15 @@ import com.api.aquilesApi.Dto.ProcessMethodologyDto;
 import com.api.aquilesApi.Dto.TeamScrumMemberIdDto;
 import com.api.aquilesApi.Dto.TeamsScrumDto;
 import com.api.aquilesApi.Utilities.CustomException;
+import com.api.aquilesApi.Utilities.Exception.BadRequestException;
+import com.api.aquilesApi.Utilities.Exception.NotFoundException;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-
 import java.util.List;
 import java.util.Map;
 
@@ -22,10 +22,11 @@ public class TeamsScrumResolver {
 
     private final TeamsScrumBusiness teamsScrumBusiness;
 
-    public TeamsScrumResolver(TeamsScrumBusiness teamsScrumBusiness, ModelMapper modelMapper) {
+    public TeamsScrumResolver(TeamsScrumBusiness teamsScrumBusiness) {
         this.teamsScrumBusiness = teamsScrumBusiness;
     };
 
+    // FindAll TeamScrums (GraphQL)
     @DgsQuery
     public Map<String , Object> allTeamsScrums(@InputArgument Integer page, @InputArgument Integer size){
         try {
@@ -39,17 +40,10 @@ public class TeamsScrumResolver {
                         teamsScrumDtoPage.getTotalPages(),
                         (int) teamsScrumDtoPage.getTotalElements());
             } else {
-                return ResponseHttpApi.responseHttpFindAll(
-                        null,
-                        ResponseHttpApi.NO_CONTENT,
-                        "No TeamScrums found",
-                        0,
-                        0,
-                        0);
+                throw new NotFoundException("No TeamScrums found");
             }
         } catch (Exception e){
-            return ResponseHttpApi.responseHttpError(
-                    "Error retrieving TeamsScrums: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("Unexpected error in allTeamsScrums: " + e.getMessage(), e);
         }
     }
 
@@ -57,14 +51,16 @@ public class TeamsScrumResolver {
     @DgsQuery
     public Map<String , Object> teamScrumById(@InputArgument Long id){
         try {
-            TeamsScrumDto teamsScrumDto = this.teamsScrumBusiness.findById(id);
+            TeamsScrumDto teamsScrumDto = teamsScrumBusiness.findById(id);
+            if (teamsScrumDto == null) {
+                throw new NotFoundException("TeamScrum not found for id: " + id);
+            }
             return ResponseHttpApi.responseHttpFindId(
                     teamsScrumDto,
                     ResponseHttpApi.CODE_OK,
                     "Successfully Completed");
         } catch (Exception e){
-            return ResponseHttpApi.responseHttpError(
-                    "Error getting TeamScrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("Unexpected error in teamScrumById: " + e.getMessage(), e);
         }
     }
 
@@ -72,25 +68,24 @@ public class TeamsScrumResolver {
     @DgsMutation
     public Map<String , Object>addTeamScrum(@InputArgument(name = "input")TeamsScrumDto teamsScrumDto){
         try {
+            if (teamsScrumDto == null) {
+                throw new BadRequestException("TeamScrum input cannot be null");
+            }
             TeamsScrumDto teamsScrumDto1 = teamsScrumBusiness.add(teamsScrumDto);
             return ResponseHttpApi.responseHttpAction(
                     teamsScrumDto1.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Team Scrum added successfully");
-        } catch (CustomException e){
-            return ResponseHttpApi.responseHttpError(
-                    e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e){
-            return ResponseHttpApi.responseHttpError(
-                    "Error adding TeamScrum: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("Unexpected error in addTeamScrum: " + e.getMessage(), e);
         }
     }
 
     // Add a profile to a student (GraphQL)
     @DgsMutation
-    public Map<String, Object> addProfileToStudent(@InputArgument(name = "input") List <ProcessMethodologyDto> processMethdologyDtos) {
+    public Map<String, Object> addProfileToStudent(@InputArgument(name = "input") List <ProcessMethodologyDto> processMethodologyDto) {
         try {
-            List<TeamScrumMemberIdDto> updatedTeamsScrum = teamsScrumBusiness.addProfileToStudent(processMethdologyDtos);
+            List<TeamScrumMemberIdDto> updatedTeamsScrum = teamsScrumBusiness.addProfileToStudent(processMethodologyDto);
             return ResponseHttpApi.responseHttpMultiAction(
                     updatedTeamsScrum,
                     ResponseHttpApi.CODE_OK,

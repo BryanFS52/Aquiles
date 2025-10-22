@@ -79,7 +79,7 @@ const initialFormData: FormDataState = {
     descripcion: "",
     justificacionFile: null,
     justificacionFileBase64: "",
-    notificationId: "123456",
+    notificationId: "",
 };
 
 const loadFiltersFromStorage = (): Partial<FilterOptions> => {
@@ -139,30 +139,6 @@ const initialState: JustificationState = {
     isCompetenceQuarterMode: false,
 };
 
-const getMimeTypeFromBase64 = (base64: string): string => {
-    if (!base64) return "application/octet-stream";
-
-    const signatures = {
-        "iVBORw0KGgo": "image/png",
-        "/9j/": "image/jpeg",
-        "JVBERi0": "application/pdf",
-        "R0lGODdh": "image/gif",
-        "R0lGODlh": "image/gif",
-        "UEsDBBQ": "application/zip",
-    };
-
-    const prefix = base64.substring(0, 20);
-
-    for (const sig in signatures) {
-        if (prefix.startsWith(sig)) {
-            const key = sig as keyof typeof signatures;
-            return signatures[key];
-        }
-    }
-
-    return "application/octet-stream";
-};
-
 const getExtensionFromMime = (mimeType: string): string => {
     const map = {
         "image/png": "png",
@@ -172,51 +148,6 @@ const getExtensionFromMime = (mimeType: string): string => {
         "application/zip": "zip",
     };
     return map[mimeType as keyof typeof map] || "bin";
-};
-
-// Helper para formatear fechas
-const formatDateSafely = (dateString: string | null | undefined): string => {
-    if (!dateString) return "Sin fecha";
-    
-    try {
-        if (dateString.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-            const [day, month, year] = dateString.split('/').map(Number);
-            const date = new Date(year, month - 1, day);
-            
-            if (isNaN(date.getTime())) return "Fecha inválida";
-            
-            return date.toLocaleDateString("es-CO", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit"
-            });
-        }
-        
-        if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-            const [year, month, day] = dateString.split('-').map(Number);
-            const date = new Date(year, month - 1, day);
-            
-            if (isNaN(date.getTime())) return "Fecha inválida";
-            
-            return date.toLocaleDateString("es-CO", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit"
-            });
-        }
-        
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return "Fecha inválida";
-        
-        return date.toLocaleDateString("es-CO", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit"
-        });
-    } catch (error) {
-        console.error("Error formateando fecha:", error);
-        return "Fecha inválida";
-    }
 };
 
 const filterJustifications = (
@@ -310,11 +241,23 @@ const readFileAsBase64 = (file: File): Promise<string> => {
 };
 
 export const downloadBase64File = (base64Data: string, fileName: string, mimeType: string = "application/octet-stream") => {
-    const linkSource = `data:${mimeType};base64,${base64Data}`;
-    const downloadLink = document.createElement("a");
-    downloadLink.href = linkSource;
-    downloadLink.download = fileName;
-    downloadLink.click();
+    try {
+        if (!base64Data) {
+            throw new Error('No hay datos base64 para descargar');
+        }
+
+        const linkSource = `data:${mimeType};base64,${base64Data}`;
+        const downloadLink = document.createElement("a");
+        downloadLink.href = linkSource;
+        downloadLink.download = fileName;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+        alert(`Error al descargar el archivo: ${errorMessage}`);
+    }
 };
 
 export const generateFileName = (id: number, mimeType: string): string => {
@@ -373,7 +316,7 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
     GetAttendancesByCompetenceQuarterAndJustificationsQueryVariables
 >(
     'justifications/fetchByCompetenceQuarter',
-    async ({ competenceQuarterId }, { rejectWithValue }) => {
+    async ({ competenceQuarterId, page = 0, size = 5 }, { rejectWithValue }) => {
         try {
             
             const { data } = await clientLAN.query<
@@ -382,8 +325,8 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
             >({
                 
                 query: GET_ATTENDANCES_BY_COMPETENCE_QUARTER_AND_JUSTIFICATIONS,
-                variables: { competenceQuarterId },
-                fetchPolicy: 'no-cache',
+                variables: { competenceQuarterId, page, size },
+                fetchPolicy: 'network-only',
             });
 
             const rawData = data.allAttendanceByCompetenceQuarterIdWithJustifications?.data || [];
@@ -410,14 +353,15 @@ export const fetchJustificationsByCompetenceQuarter = createAsyncThunk<
                     justificationDate: justification?.justificationDate || '',
                     estado: statusName,
                     state: true,
-                    justificationType: 'Tipo no disponible',
+                    justificationType: (justification as any)?.justificationType?.name || '', // ✅ Mapear correctamente desde GraphQL
+                    description: (justification as any)?.description || '', // ✅ Agregar descripción desde GraphQL
                     archivoAdjunto: justification?.justificationFile || '',
                     archivoMime: '',
                     documento: person?.document || '',
                     aprendiz: `${person?.name || ''} ${person?.lastname || ''}`.trim(),
                     attendanceId: attendance.id,
                     justificationStatusId: statusId,
-                    justificationStatus: statusName
+                    justificationStatus: statusName,
                 };
                 return transformedItem;
             }).filter(item => item !== null) as any[];

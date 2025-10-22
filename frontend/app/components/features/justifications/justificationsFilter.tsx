@@ -8,6 +8,7 @@ import { useCallback, useMemo, useState, useEffect } from "react";
 import { ActiveFiltersDisplay } from "./Filters/FilterComponents";
 import { MultiFilterGrid } from "./Filters/MultiFilterGrid";
 import { SingleFilterMode } from "./Filters/SingleFilterMode";
+import LearningSelect from "./learningSelect";
 
 // Types
 type FilterOptions = {
@@ -152,16 +153,19 @@ export default function JustificationFilters({
             filterLabels={FILTER_LABELS}
             onMultiFilterChange={onMultiFilterChange}
             onClearSingleFilter={clearSingleFilter}
-          />
+            />
 
           {/* Refresh Button */}
-          <button
-            onClick={onRefresh}
-            className="px-6 py-2 bg-[#01b001] dark:bg-shadowBlue text-white rounded-lg hover:bg-green-600 dark:hover:bg-darkBlue transition-colors duration-300 disabled:opacity-50"
-            disabled={loading}
-          >
-            {loading ? "Cargando..." : "Recargar Justificaciones"}
-          </button>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={onRefresh}
+              className="px-6 py-2 bg-[#01b001] dark:bg-shadowBlue text-white rounded-lg hover:bg-green-600 dark:hover:bg-darkBlue transition-colors duration-300 disabled:opacity-50"
+              disabled={loading}
+            >
+              {loading ? "Cargando..." : "Recargar Justificaciones"}
+            </button>
+            <LearningSelect />
+          </div>
         </>
       )}
     </div>

@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "ImprovementPlan_evidence_types")
-public class ImprovementPlanEvidenceType implements Serializable {
+public class    ImprovementPlanEvidenceType implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +23,8 @@ public class ImprovementPlanEvidenceType implements Serializable {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    // ManyToMany
+    // Relations
+    // 1. Relation (M-M) with improvementPlan
     @ManyToMany(mappedBy = "evidenceTypes")
     private List<ImprovementPlan> improvementPlans = new ArrayList<>();
 

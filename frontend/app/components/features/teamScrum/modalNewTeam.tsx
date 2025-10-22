@@ -272,7 +272,7 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
           {/* Nombre del Team Scrum */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Nombre del Team Scrum *
+              Nombre del Team *
             </label>
             <input
               type="text"

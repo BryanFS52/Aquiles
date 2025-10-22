@@ -23,12 +23,12 @@ public class ImprovementPlanActivityDto {
     // Relations
     // @NotBlank(message = "The learning outcome is required")
     // @Size(max = 500, message = "The learning outcome cannot exceed 500 characters")
-    private Long learningOutcomeId;
+    private Long learningOutcome;
 
     // @NotNull(message = "The Improvement Plan ID is required")
-    private ImprovementPlanDto improvementPlanDto;
+    private ImprovementPlanDto improvementPlan;
 
     // @NotBlank(message = "The delivery format is required")
     // @Size(max = 100, message = "The delivery format cannot exceed 100 characters")
-    private ImprovementPlanDeliveryDto improvementPlanDeliveryDto;
+    private ImprovementPlanDeliveryDto improvementPlanDelivery;
 }

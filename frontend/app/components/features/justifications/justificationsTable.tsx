@@ -1,12 +1,16 @@
 "use client"
 
+import { useState } from "react";
 import Image from "next/image";
 import { useSelector } from "react-redux";
 import { GrAttachment } from "react-icons/gr";
+import { FaChevronLeft, FaChevronRight, FaEye } from "react-icons/fa";
 import persona from "@public/img/persona.jpg";
 import { RootState } from "@/redux/store";
-import { getStatusNameById, getActiveStatuses, JustificationStatus } from "@/redux/slices/justificationStatusSlice";
+import { getStatusNameById, getActiveStatuses } from "@/redux/slices/justificationStatusSlice";
+import { JustificationStatus } from "@graphql/generated";
 import EmptyState from "@components/UI/emptyState";
+import ModalJustificationDetails from "@components/Modals/modalJustificationDetails";
 
 interface JustificationTableProps {
   filteredData: any[];
@@ -31,11 +35,43 @@ export default function JustificationTable({
   isInstructorView = false,
 }: JustificationTableProps) {
   
-  const { justificationStatuses, loading: loadingStatuses } = useSelector(
+  // Estado para la paginación
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 10;
+
+  // Estado para el modal de detalles
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedJustification, setSelectedJustification] = useState<any>(null);
+
+  const { data: justificationStatuses, loading: loadingStatuses } = useSelector(
     (state: RootState) => state.justificationStatus
   );
 
-  const dataToRender = filteredData;
+  // Calcular datos de paginación
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const dataToRender = filteredData.slice(startIndex, endIndex);
+
+  // Funciones de navegación
+  const goToNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const goToPage = (page: number) => {
+    if (page >= 0 && page < totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   const handleSelectChange = (justificacionId: string, event: React.ChangeEvent<HTMLSelectElement>) => {
     const newStatusId = event.target.value;
@@ -56,6 +92,18 @@ export default function JustificationTable({
     return justificacion.justificationStatusId || "";
   };
 
+  // Función para abrir el modal de detalles
+  const handleViewDetails = (justificacion: any) => {
+    setSelectedJustification(justificacion);
+    setIsModalOpen(true);
+  };
+
+  // Función para cerrar el modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedJustification(null);
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -64,11 +112,11 @@ export default function JustificationTable({
     );
   }
 
-  if (hasError) {
-    return (
-      <EmptyState message="Ocurrió un error al cargar las justificaciones. Intenta recargar la página." />
-    );
-  }
+  // if (hasError) {
+  //   return (
+  //     <EmptyState message="Ocurrió un error al cargar las justificaciones. Intenta recargar la página." />
+  //   );
+  // }
 
   if (!hasAnyData) {
     const message = isInstructorView 
@@ -166,12 +214,84 @@ export default function JustificationTable({
                       Cargando...
                     </span>
                   )}
+                <button
+                  onClick={() => handleViewDetails(justificacion)}
+                  title="Ver detalles de la justificación"
+                  className="flex items-center justify-center p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <FaEye className="w-4 h-4" />
+                </button>
                 </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Controles de Paginación */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center text-sm text-gray-700 dark:text-gray-300">
+            <span>
+              Mostrando {startIndex + 1} a {Math.min(endIndex, totalItems)} de {totalItems} justificaciones
+            </span>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            {/* Botón Anterior */}
+            <button
+              onClick={goToPreviousPage}
+              disabled={currentPage === 0}
+              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                currentPage === 0
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+            >
+              <FaChevronLeft className="w-3 h-3 mr-1" />
+              Anterior
+            </button>
+
+            {/* Números de página */}
+            <div className="flex space-x-1">
+              {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToPage(index)}
+                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                    currentPage === index
+                      ? 'bg-blue-600 text-white dark:bg-blue-500'
+                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+            </div>
+
+            {/* Botón Siguiente */}
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages - 1}
+              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                currentPage === totalPages - 1
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+              }`}
+            >
+              Siguiente
+              <FaChevronRight className="w-3 h-3 ml-1" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de detalles de justificación */}
+      <ModalJustificationDetails
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        justificationData={selectedJustification}
+      />
     </div>
   );
 }

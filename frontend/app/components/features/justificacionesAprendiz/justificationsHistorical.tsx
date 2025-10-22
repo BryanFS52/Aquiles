@@ -1,7 +1,8 @@
 "use client"
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { FaCheckCircle, FaClock, FaFileAlt, FaRegFileAlt } from "react-icons/fa";
+import { FaCheckCircle, FaClock, FaFileAlt, FaRegFileAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { GrAttachment } from "react-icons/gr";
 import { MdHistory } from "react-icons/md";
 import { Justification } from "@graphql/generated";
@@ -17,6 +18,10 @@ export default function JustificationsHistorical({
   loading,
   handleDownloadFile,
 }: JustificationsHistoricalProps) {
+  // Estado para la paginación
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 5;
+
   // Ordenar justificaciones por fecha de ausencia (más reciente primero)
   const sortedData = [...data].sort((a, b) => {
     // Función para convertir DD/MM/YYYY a Date
@@ -40,6 +45,32 @@ export default function JustificationsHistorical({
     
     return dateB.getTime() - dateA.getTime(); // Descendente (más reciente primero)
   });
+
+  // Calcular datos de paginación
+  const totalItems = sortedData.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentData = sortedData.slice(startIndex, endIndex);
+
+  // Funciones de navegación
+  const goToNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const goToPage = (page: number) => {
+    if (page >= 0 && page < totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   const getStatusColor = (estado: string) => {
     const estadoLower = estado.toLowerCase();
@@ -128,13 +159,13 @@ export default function JustificationsHistorical({
                   </td>
                 </tr>
               ) : (
-                sortedData.map(
+                currentData.map(
                   (
                     justification: Justification,
                     index: number
                   ) => (
                     <motion.tr
-                      key={justification.id}
+                      key={justification.id ?? `just-${index}`}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -191,7 +222,6 @@ export default function JustificationsHistorical({
                                 : "text-gray-400 dark:text-gray-500"
                             }`}
                           >
-                            {justification.state ? 'Activo' : 'Inactivo'}
                           </span>
                         </div>
                       </td>
@@ -202,6 +232,64 @@ export default function JustificationsHistorical({
             </tbody>
           </table>
         </div>
+
+        {/* Controles de Paginación */}
+        {totalPages > 1 && (
+          <div className="mt-6 flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center text-sm text-gray-700 dark:text-gray-300">
+              <span>
+                Mostrando {startIndex + 1} a {Math.min(endIndex, totalItems)} de {totalItems} justificaciones
+              </span>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              {/* Botón Anterior */}
+              <button
+                onClick={goToPreviousPage}
+                disabled={currentPage === 0}
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                  currentPage === 0
+                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                <FaChevronLeft className="w-3 h-3 mr-1" />
+                Anterior
+              </button>
+
+              {/* Números de página */}
+              <div className="flex space-x-1">
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToPage(index)}
+                    className={`px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      currentPage === index
+                        ? 'bg-primary text-white dark:bg-secondary'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+              </div>
+
+              {/* Botón Siguiente */}
+              <button
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages - 1}
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                  currentPage === totalPages - 1
+                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                Siguiente
+                <FaChevronRight className="w-3 h-3 ml-1" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   );

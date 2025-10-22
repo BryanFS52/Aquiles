@@ -3,7 +3,7 @@
 import React, { use, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
-import type { AppDispatch } from '@/redux/store';
+import { AppDispatch } from '@/redux/store';
 import { fetchStudySheetByIdWithAttendances, fetchStudySheetByTeacher } from '@/redux/slices/olympo/studySheetSlice';
 import { TEMPORAL_INSTRUCTOR_ID } from '@/temporaryCredential';
 import { InstructorFollowUpContainer } from '@/components/features/InstructorFollowUp/InstructorFollowUpContainer';

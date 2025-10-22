@@ -1,14 +1,10 @@
-'use client'
+"use client";
 
-import PageTitle from "@components/UI/pageTitle";
 import React from "react";
+import { ActasInstructorContainer } from "@components/features/actasInstructor";
 
-const ActasInstructorPage = () => {
-    return (
-        <div>
-            <PageTitle>Actas Instructor</PageTitle>
-        </div>
-    );
+const ActasInstructorPage: React.FC = () => {
+  return <ActasInstructorContainer />
 };
 
 export default ActasInstructorPage;

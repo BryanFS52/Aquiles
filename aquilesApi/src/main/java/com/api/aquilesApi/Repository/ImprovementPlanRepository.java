@@ -2,7 +2,6 @@ package com.api.aquilesApi.Repository;
 
 
 import com.api.aquilesApi.Entity.ImprovementPlan;
-import com.netflix.graphql.dgs.InputArgument;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,9 +23,16 @@ public interface ImprovementPlanRepository extends JpaRepository<ImprovementPlan
     List<Long> findAllByTeacherCompetence(@Param("teacherCompetence") Long teacherCompetence);
 
     @Query("SELECT ip FROM ImprovementPlan ip WHERE ip.teacherCompetence = :teacherCompetence")
-    Page<ImprovementPlan> searchByFilter(Pageable pageable, @InputArgument("teacherCompetenceId") Long teacherCompetence);
+    Page<ImprovementPlan> searchByFilter(Pageable pageable, @Param("teacherCompetence") Long teacherCompetence);
 
     @Query("SELECT ip FROM ImprovementPlan ip WHERE ip.teacherCompetence = :teacherCompetence")
     List<ImprovementPlan> findByTeacherCompetence(@Param("teacherCompetence") Long teacherCompetence);
-}
 
+    // Find ImprovementPlans by StudySheetId through TeamsScrum membership (students in that StudySheet)
+    @Query("SELECT DISTINCT ip FROM ImprovementPlan ip " +
+            "WHERE ip.studentId IN (" +
+            "  SELECT DISTINCT m.studentId FROM TeamsScrum t JOIN t.memberIds m WHERE t.studySheetId = :studySheetId" +
+            ")")
+    Page<ImprovementPlan> findByStudySheetId(Pageable pageable, @Param("studySheetId") Long studySheetId);
+    
+}

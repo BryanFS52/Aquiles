@@ -34,7 +34,7 @@ public class AttendanceStateResolver {
             );
         } catch (Exception e){
             return  ResponseHttpApi.responseHttpError(
-                    "Error getting StateAttendances: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error getting AttendanceStates: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -49,7 +49,7 @@ public class AttendanceStateResolver {
                     "Successfully Completed");
         } catch (Exception e){
             return  ResponseHttpApi.responseHttpError(
-                    "Error getting StateAttendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error getting AttendanceState: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -65,7 +65,7 @@ public class AttendanceStateResolver {
             );
         }    catch (Exception e) {
             return  ResponseHttpApi.responseHttpError(
-                    "Error adding StateAttendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error adding AttendanceState: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -81,7 +81,7 @@ public class AttendanceStateResolver {
             );
         } catch (Exception e) {
             return  ResponseHttpApi.responseHttpError(
-                    "Error StateAttendance: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    "Error AttendanceState: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -97,7 +97,7 @@ public class AttendanceStateResolver {
             );
         } catch (Exception e) {
             return  ResponseHttpApi.responseHttpError(
-                    "Error StateAttendance : " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+                    "Error AttendanceState : " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }

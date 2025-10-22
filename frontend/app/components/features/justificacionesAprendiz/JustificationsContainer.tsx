@@ -24,7 +24,6 @@ import {
 } from '@slice/justificationSlice';
 
 import { AppDispatch, RootState } from '@/redux/store';
-import { Attendance } from '@graphql/generated';
 import PageTitle from '@components/UI/pageTitle';
 import { AbsencesList } from './AbsencesList';
 import { JustificationFormModal } from './JustificationFormModal';
@@ -40,61 +39,55 @@ export const JustificationsContainer: React.FC = () => {
   const [shouldLoadModal, setShouldLoadModal] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 
-  const {
-    data: justificationTypesData,
-    loading: loadingJustificationTypes,
-    error: errorJustificationTypes,
-  } = useSelector((state: RootState) => state.justificationType);
+  const { data: justificationTypesData, loading: loadingJustificationTypes, error: errorJustificationTypes } = 
+    useSelector((state: RootState) => state.justificationType);
 
-  const {
-    data: attendancesData,
-    loading: loadingAttendances,
-    error: errorAttendances,
-  } = useSelector((state: RootState) => state.attendances.studentAttendances);
+  const { data: attendancesData, loading: loadingAttendances, error: errorAttendances } = 
+    useSelector((state: RootState) => state.attendances.studentAttendances);
 
-  const {
-    transformedData: justificationsData,
-    loading: loadingJustifications,
-  } = useSelector((state: RootState) => state.justification);
+  const { transformedData: justificationsData, loading: loadingJustifications } = 
+    useSelector((state: RootState) => state.justification);
 
-  const {
-    loading: loadingJustification,
-    error: errorJustification,
-    form,
-  } = useSelector((state: RootState) => state.justification);
+  const { loading: loadingJustification, form } = 
+    useSelector((state: RootState) => state.justification);
 
   const currentAttendance = useSelector(
     (state: RootState) => state.justification.form.currentAttendance
   );
 
+  // Cargar datos iniciales
   useEffect(() => {
-    dispatch(fetchJustificationTypes({ page: 0, size: 10 }));
-    dispatch(fetchAttendancesWithJustificationsByStudentId({ id: TEMPORAL_APRENDIZ_ID, stateId: 2 }));
-    dispatch(fetchJustificationsByStudentId({ studentId: TEMPORAL_APRENDIZ_ID, page: 0, size: 10 }));
+    dispatch(fetchJustificationTypes({ page: 0, size: 5 }));
+    dispatch(fetchAttendancesWithJustificationsByStudentId({ 
+      id: TEMPORAL_APRENDIZ_ID, 
+      stateId: 2, 
+      page: 0, 
+      size: 5 
+    }));
+    dispatch(fetchJustificationsByStudentId({ 
+      studentId: TEMPORAL_APRENDIZ_ID, 
+      page: 0, 
+      size: 5 
+    }));
   }, [dispatch]);
 
+  // Controlar carga del modal
   useEffect(() => {
     if (form.showForm && !shouldLoadModal) {
-      const timer = setTimeout(() => {
-        setShouldLoadModal(true);
-      }, 100);
+      const timer = setTimeout(() => setShouldLoadModal(true), 100);
       return () => clearTimeout(timer);
-    } else if (!form.showForm && shouldLoadModal) {
+    } else if (!form.showForm) {
       setShouldLoadModal(false);
     }
   }, [form.showForm, shouldLoadModal]);
-  
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     dispatch(updateFormField({ field: name as keyof FormDataState, value }));
   };
 
   const handleNumericInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(
-      updateNumericField({ field: e.target.name, value: e.target.value })
-    );
+    dispatch(updateNumericField({ field: e.target.name, value: e.target.value }));
   };
 
   const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,11 +127,7 @@ export const JustificationsContainer: React.FC = () => {
       base64Ref.current = base64;
       toast.success('Archivo procesado correctamente.');
     } catch (error) {
-      toast.error(
-        typeof error === 'string'
-          ? error
-          : 'Error inesperado al procesar el archivo.'
-      );
+      toast.error(typeof error === 'string' ? error : 'Error inesperado al procesar el archivo.');
     }
   };
 
@@ -160,9 +149,7 @@ export const JustificationsContainer: React.FC = () => {
 
     try {
       const studentId = currentAttendance?.student?.id;
-      if (!studentId) {
-        throw new Error("No se pudo obtener el ID del estudiante");
-      }
+      if (!studentId) throw new Error("No se pudo obtener el ID del estudiante");
 
       const formDataWithFile = {
         studentId: parseInt(studentId.toString()),
@@ -189,21 +176,21 @@ export const JustificationsContainer: React.FC = () => {
       await dispatch(addJustification(formDataWithFile)).unwrap();
 
       toast.success('¡Tu justificación ha sido enviada exitosamente!');
-      dispatch(fetchJustificationsByStudentId({ studentId: TEMPORAL_APRENDIZ_ID, page: 0, size: 10 }));
+      dispatch(fetchJustificationsByStudentId({ 
+        studentId: TEMPORAL_APRENDIZ_ID, 
+        page: 0, 
+        size: 10 
+      }));
       dispatch(resetForm());
       fileRef.current = null;
       base64Ref.current = '';
 
-      setTimeout(() => {
-        topRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 200);
+      setTimeout(() => topRef.current?.scrollIntoView({ behavior: 'smooth' }), 200);
     } catch (error: any) {
       const errorString = JSON.stringify(error);
       let toastMessage = 'Error inesperado al enviar la justificación.';
 
-      if (
-        errorString.includes('duplicate key value violates unique constraint')
-      ) {
+      if (errorString.includes('duplicate key value violates unique constraint')) {
         toastMessage = 'Esta asistencia ya ha sido justificada.';
       } else if (error?.message) {
         toastMessage = error.message;
@@ -220,49 +207,34 @@ export const JustificationsContainer: React.FC = () => {
     base64Ref.current = '';
     setShouldLoadModal(false);
     toast.info('Formulario cancelado');
-
-    setTimeout(() => {
-      topRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 200);
+    setTimeout(() => topRef.current?.scrollIntoView({ behavior: 'smooth' }), 200);
   };
 
   const handleShowForm = (attendanceId?: string) => {
-    if (attendanceId && attendancesData) {
-      const currentAttendance = attendancesData.find(
-        (a) => a.id === attendanceId
-      );
+    if (!attendanceId || !attendancesData) return;
 
-      if (currentAttendance) {
-        const person = currentAttendance.student?.person;
-
-        if (person?.document && person?.name && person?.lastname) {
-          dispatch(
-            updateFormField({
-              field: 'numeroDocumento',
-              value: person.document,
-            })
-          );
-          dispatch(
-            updateFormField({
-              field: 'nombreAprendiz',
-              value: `${person.name} ${person.lastname}`,
-            })
-          );
-        }
-
-        dispatch(
-          updateFormField({ field: 'notificationId', value: attendanceId })
-        );
-
-        dispatch(setCurrentAttendance(currentAttendance));
-        setTimeout(() => {
-          dispatch(showForm());
-          formRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 10);
-      } else {
-        console.warn('No se encontró la asistencia con ID:', attendanceId);
-      }
+    const attendance = attendancesData.find((a) => a.id === attendanceId);
+    if (!attendance) {
+      console.warn('No se encontró la asistencia con ID:', attendanceId);
+      return;
     }
+
+    const person = attendance.student?.person;
+    if (person?.document && person?.name && person?.lastname) {
+      dispatch(updateFormField({ field: 'numeroDocumento', value: person.document }));
+      dispatch(updateFormField({ 
+        field: 'nombreAprendiz', 
+        value: `${person.name} ${person.lastname}` 
+      }));
+    }
+
+    dispatch(updateFormField({ field: 'notificationId', value: attendanceId }));
+    dispatch(setCurrentAttendance(attendance));
+    
+    setTimeout(() => {
+      dispatch(showForm());
+      formRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 10);
   };
 
   const handleUpdateJustificationTypeId = (value: any) => {
@@ -277,11 +249,8 @@ export const JustificationsContainer: React.FC = () => {
     }
   };
 
-  if (
-    loadingJustificationTypes ||
-    loadingAttendances ||
-    loadingJustifications
-  ) {
+  // Loading state
+  if (loadingJustificationTypes || loadingAttendances || loadingJustifications) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary"></div>
@@ -292,11 +261,10 @@ export const JustificationsContainer: React.FC = () => {
     );
   }
 
+  // Error state
   if (errorJustificationTypes || errorAttendances) {
     return <p>Error cargando datos</p>;
   }
-
-  const absences = attendancesData || [];
 
   return (
     <div className="h-auto">
@@ -315,7 +283,7 @@ export const JustificationsContainer: React.FC = () => {
               transition={{ duration: 0.4 }}
             >
               <AbsencesList
-                absences={absences}
+                absences={attendancesData || []}
                 onShowForm={handleShowForm}
               />
             </motion.div>

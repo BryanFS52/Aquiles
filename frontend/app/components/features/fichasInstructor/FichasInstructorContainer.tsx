@@ -12,13 +12,11 @@ import { StudySheetWithCompetence } from './types';
 import PageTitle from '@components/UI/pageTitle';
 import EmptyState from '@components/UI/emptyState';
 import { TEMPORAL_INSTRUCTOR_ID } from '@/temporaryCredential';
-import { fetchJustificationsByCompetenceQuarter } from '@/redux/slices/justificationSlice';
 
 export const FichasInstructorContainer: React.FC = () => {
     const [selectedFicha, setSelectedFicha] = useState<StudySheetWithCompetence | null>(null);
     const [isModalOpen, setModalOpen] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [loadingAttendance, setLoadingAttendance] = useState<string | null>(null);
 
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
@@ -28,17 +26,20 @@ export const FichasInstructorContainer: React.FC = () => {
     const fichas: StudySheetWithCompetence[] = data || [];
 
     useEffect(() => {
-        dispatch(clearAttendanceSelection());
-        dispatch(fetchStudySheetByTeacher({ idTeacher: TEMPORAL_INSTRUCTOR_ID, page: 0, size: 5 }));
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (loading) {
+        const loadData = async () => {
             showLoader();
-        } else {
-            hideLoader();
-        }
-    }, [loading, showLoader, hideLoader]);
+            try {
+                dispatch(clearAttendanceSelection());
+                await dispatch(fetchStudySheetByTeacher({ idTeacher: TEMPORAL_INSTRUCTOR_ID, page: 0, size: 5 })).unwrap();
+            } catch (error) {
+                console.error('Error al cargar fichas:', error);
+            } finally {
+                hideLoader();
+            }
+        };
+        
+        loadData();
+    }, [dispatch]);
     
     const handleViewApprentices = (ficha: StudySheetWithCompetence) => {
         setSelectedFicha(ficha);
@@ -55,7 +56,7 @@ export const FichasInstructorContainer: React.FC = () => {
 
         const competenceId = studySheet.competenceId ?? undefined;
 
-        setLoadingAttendance(studySheet.id);
+        showLoader();
         
         try {
             const urlParams = new URLSearchParams();
@@ -64,36 +65,42 @@ export const FichasInstructorContainer: React.FC = () => {
                 urlParams.set('competenceId', competenceId.toString());
             }
             
-            router.push(`/dashboard/asistencia?${urlParams.toString()}`);
-            
-            dispatch(fetchStudySheetByIdWithAttendances({
+            // Primero cargar los datos
+            await dispatch(fetchStudySheetByIdWithAttendances({
                 id: parseInt(studySheet.id),
                 competenceId
-            }));
+            })).unwrap();
             
-            setTimeout(() => {
-                setLoadingAttendance(null);
-            }, 200);
+            // Después navegar
+            router.push(`/dashboard/asistencia?${urlParams.toString()}`);
             
         } catch (error) {
             console.error('Error al cargar la ficha:', error);
-            setLoadingAttendance(null);
+        } finally {
+            // Delay mínimo para transición suave
+            setTimeout(() => {
+                hideLoader();
+            }, 300);
         }
     };
 
     const handleTakeJustification = async (studySheet: StudySheetWithCompetence) => {
         if (!studySheet.id) return;
 
-        setLoadingAttendance(studySheet.id);
+        showLoader();
 
         try {
+            // Delay mínimo para mostrar el loader
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
             router.push(`/dashboard/justificacionesInstructor?ficha=${studySheet.number}`);
-            setTimeout(() => {
-                setLoadingAttendance(null);
-            }, 200);
+            
         } catch (error) {
             console.error("Error al preparar justificaciones:", error);
-            setLoadingAttendance(null);
+        } finally {
+            setTimeout(() => {
+                hideLoader();
+            }, 300);
         }
     };
 
@@ -104,17 +111,21 @@ export const FichasInstructorContainer: React.FC = () => {
     const handleTakeFollowUp = async (studySheet: StudySheetWithCompetence) => {
         if (!studySheet.id) return;
 
-        setLoadingAttendance(studySheet.id);
+        showLoader();
         
         try {
+            // Delay mínimo para mostrar el loader
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
             router.push(`/dashboard/InstructorFollowUp?ficha=${studySheet.number}`);
-            setTimeout(() => {
-                setLoadingAttendance(null);
-            }, 200);
+            
         } catch (error) {
             console.error('Error al navegar a seguimiento:', error);
-            setLoadingAttendance(null);
-        }  
+        } finally {
+            setTimeout(() => {
+                hideLoader();
+            }, 300);
+        }
     };
 
     return (
@@ -131,7 +142,7 @@ export const FichasInstructorContainer: React.FC = () => {
                                         studySheet={studySheet}
                                         onViewApprentices={handleViewApprentices}
                                         onTakeAttendance={handleTakeAttendance}
-                                        loading={loadingAttendance === studySheet.id}
+                                        loading={false}
                                         onViewApprenticesJustifications={() => {
                                         }}
                                         onTakeJustification={handleTakeJustification}

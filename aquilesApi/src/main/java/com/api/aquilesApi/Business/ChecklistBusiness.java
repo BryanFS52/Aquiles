@@ -26,7 +26,6 @@ public class ChecklistBusiness {
     private final ChecklistService checklistService;
     private final ModelMapper modelMapper;
     private final EvaluationsService evaluationsService;
-    private final ChecklistExportService exportService;
     private final ChecklistHistoryBusiness checklistHistoryBusiness;
     private final ItemTypeRepository itemTypeRepository;
     private final ItemService itemService;
@@ -36,7 +35,6 @@ public class ChecklistBusiness {
             JuriesRepository juriesRepository,
             ModelMapper modelMapper,
             EvaluationsService evaluationsService,
-            ChecklistExportService exportService,
             ChecklistHistoryBusiness checklistHistoryBusiness,
             ItemTypeRepository itemTypeRepository,
             ItemService itemService
@@ -44,7 +42,6 @@ public class ChecklistBusiness {
         this.checklistService = checklistService;
         this.modelMapper = modelMapper;
         this.evaluationsService = evaluationsService;
-        this.exportService = exportService;
         this.checklistHistoryBusiness = checklistHistoryBusiness;
         this.itemTypeRepository = itemTypeRepository;
         this.itemService = itemService;
@@ -133,7 +130,6 @@ public class ChecklistBusiness {
 
             // Crear los items si se proporcionan
             if (checklistDto.getItems() != null && !checklistDto.getItems().isEmpty()) {
-                ItemType defaultItemType = getOrCreateDefaultItemType(saved.getTrimester());
                 if (saved.getItems() == null) {
                     saved.setItems(new java.util.ArrayList<>());
                 }
@@ -143,7 +139,6 @@ public class ChecklistBusiness {
                     item.setIndicator(itemDto.getIndicator());
                     item.setActive(itemDto.getActive() != null ? itemDto.getActive() : true);
                     item.setChecklist(saved);
-                    item.setItemType(defaultItemType);
                     saved.getItems().add(item);
                 }
                 saved = checklistService.save(saved);
@@ -254,13 +249,11 @@ public class ChecklistBusiness {
                         existingItem.setActive(itemDto.getActive() != null ? itemDto.getActive() : true);
                     } else {
                         System.out.println("➕ Creating new item: " + itemDto.getIndicator());
-                        ItemType defaultItemType = getOrCreateDefaultItemType(checklistAntes.getTrimester());
                         Item newItem = new Item();
                         newItem.setCode(itemDto.getCode());
                         newItem.setIndicator(itemDto.getIndicator());
                         newItem.setActive(itemDto.getActive() != null ? itemDto.getActive() : true);
                         newItem.setChecklist(checklistAntes);
-                        newItem.setItemType(defaultItemType);
                         existingItems.add(newItem);
                     }
                 }
@@ -304,19 +297,8 @@ public class ChecklistBusiness {
         }
     }
 
-    // Export documents
-    // Export PDF
-    public String exportChecklistPdf(Long checklistId) {
-        Checklist checklist = checklistService.getById(checklistId);
-        return exportService.exportPdfBase64(checklist);
-    }
 
-    // Export Excel
-    public String exportChecklistExcel(Long checklistId) {
-        Checklist checklist = checklistService.getById(checklistId);
-        return exportService.exportExcelBase64(checklist);
-    }
-
+    /*
     // Helper method to get or create default ItemType
     private ItemType getOrCreateDefaultItemType(String trimester) {
         List<ItemType> existingTypes = itemTypeRepository.findAll();
@@ -330,4 +312,5 @@ public class ChecklistBusiness {
         newItemType.setTrimester(trimester);
         return itemTypeRepository.save(newItemType);
     }
+     */
 }
