@@ -5,16 +5,23 @@ import Image from 'next/image';
 import React from 'react';
 
 const FormularioRedireccionEmail: React.FC = () => {
-  const logo = "URL_DEL_LOGO"; // Reemplazar con la URL del logo o importarlo
+
+  const URL_DEL_LOGO = "/img/Logo-sena-green.png";
+
+  const logo = URL_DEL_LOGO;
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-lg bg-white rounded-lg shadow-lg relative">
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="w-full max-w-lg bg-white dark:bg-gray-800 dark:border-gray-700 rounded-lg shadow-xl relative">
         <div className='bg-custom-blue rounded-t-lg w-full h-20 flex items-center relative'>
-          <Image src={logoSenaFormulario} alt="logo del sena" className="w-12 h-12 mx-2 sm:mx-5" />
-          <h2 className="text-xl sm:text-3xl font-inter font-semibold text-center text-green-500 mt-[-1px] sm:ml-4">qrformulario móvil</h2>
+          <div>
+            <h2 className="text-xl sm:text-3xl font-inter font-semibold text-center text-green-500 mt-[-1px] sm:ml-4">qrformulario móvil</h2>
+          </div>
+          <div>
+            <Image src={logoSenaFormulario} alt="logo del sena" width={70} height={70} className="mx-2 sm:mx-5" />
+          </div>
         </div>
-        <div className="pb-4 border-b-2 border-green-500 w-full lg:w-4/5 mb-4 sm:mb-12 mx-auto"></div>
+            <div className="pb-4 border-b-2 border-green-500 w-full lg:w-4/5 mb-4 sm:mb-12 mx-auto"></div>  
 
         <div className="p-4 sm:p-6">
           <div>
@@ -33,7 +40,7 @@ const FormularioRedireccionEmail: React.FC = () => {
               <span className="text-green-600 font-inter font-semibold">Si estás en tu computadora:</span> usa la cámara de tu teléfono para escanear el código QR adjunto.
             </li>
             <div className="flex justify-center mb-4">
-              <Image src={logo} alt="QR Code" className='w-24 h-24 sm:w-32 sm:h-32' />
+              <Image src={logo} alt="QR Code" width={30} height={30} className='w-24 h-24 sm:w-32 sm:h-32' />
             </div>
             <li className="text-custom-blue font-inter font-medium">
               <span className="text-green-600 font-inter font-semibold">Si has recibido un enlace:</span> haz clic en el enlace incluido para abrir el formulario en tu navegador y sigue las instrucciones para confirmar tu asistencia.

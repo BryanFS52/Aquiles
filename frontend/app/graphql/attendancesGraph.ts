@@ -128,8 +128,8 @@ export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
 `;
 
 export const GET_ATTENDANCES_BY_COMPETENCE_QUARTER_AND_JUSTIFICATIONS = gql`
-  query GetAttendancesByCompetenceQuarterAndJustifications($competenceQuarterId: Long!) {
-    allAttendanceByCompetenceQuarterIdWithJustifications(competenceQuarterId: $competenceQuarterId) {
+  query GetAttendancesByCompetenceQuarterAndJustifications($competenceQuarterId: Long!, $page: Int, $size: Int) {
+    allAttendanceByCompetenceQuarterIdWithJustifications(competenceQuarterId: $competenceQuarterId, page: $page, size: $size) {
       data {
         id
         justification {
@@ -158,6 +158,7 @@ export const GET_ATTENDANCES_BY_COMPETENCE_QUARTER_AND_JUSTIFICATIONS = gql`
               number
               teacherStudySheets{
                 competence{
+                  name
                     learningOutcome{
                         code
                         id

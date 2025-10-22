@@ -12,7 +12,6 @@ import { StudySheetWithCompetence } from './types';
 import PageTitle from '@components/UI/pageTitle';
 import EmptyState from '@components/UI/emptyState';
 import { TEMPORAL_INSTRUCTOR_ID } from '@/temporaryCredential';
-import { fetchJustificationsByCompetenceQuarter } from '@/redux/slices/justificationSlice';
 
 export const FichasInstructorContainer: React.FC = () => {
     const [selectedFicha, setSelectedFicha] = useState<StudySheetWithCompetence | null>(null);

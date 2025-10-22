@@ -15,12 +15,13 @@ import {
   setCompetenceQuarterMultiFilter,
   MultiFilterState,
   updateJustificationStatus, // thunk para cambio de estado
+  clearCompetenceQuarterJustifications,
 } from "@slice/justificationSlice";
 import { fetchAllJustificationStatuses } from "@/redux/slices/justificationStatusSlice";
 import type { AppDispatch, RootState } from "@/redux/store";
 import { JustificacionesInstructorContainerProps } from "./types";
 
-export const JustificacionesInstructorContainer: React.FC<
+const JustificacionesInstructorContainer: React.FC<
   JustificacionesInstructorContainerProps
 > = ({ competenceQuarterId, fichaNumber }) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -47,6 +48,9 @@ export const JustificacionesInstructorContainer: React.FC<
     dispatch(setCompetenceQuarterMode(true));
 
     if (competenceQuarterId) {
+      // 🔹 Limpiar datos anteriores antes de cargar nuevos
+      dispatch(clearCompetenceQuarterJustifications());
+      
       dispatch(
         fetchJustificationsByCompetenceQuarter({
           competenceQuarterId: Number(competenceQuarterId),
@@ -75,9 +79,14 @@ export const JustificacionesInstructorContainer: React.FC<
 
   const handleRefresh = () => {
     if (competenceQuarterId) {
+      // 🔹 Limpiar datos anteriores antes de refrescar
+      dispatch(clearCompetenceQuarterJustifications());
+      
       dispatch(
         fetchJustificationsByCompetenceQuarter({
-          competenceQuarterId: Number(competenceQuarterId),
+          competenceQuarterId: Number(competenceQuarterId), 
+          page: 0,
+          size: 5,
         })
       );
     }
@@ -141,3 +150,5 @@ export const JustificacionesInstructorContainer: React.FC<
     </div>
   );
 };
+
+export default JustificacionesInstructorContainer;

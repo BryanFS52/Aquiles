@@ -112,11 +112,11 @@ export default function JustificationTable({
     );
   }
 
-  if (hasError) {
-    return (
-      <EmptyState message="Ocurrió un error al cargar las justificaciones. Intenta recargar la página." />
-    );
-  }
+  // if (hasError) {
+  //   return (
+  //     <EmptyState message="Ocurrió un error al cargar las justificaciones. Intenta recargar la página." />
+  //   );
+  // }
 
   if (!hasAnyData) {
     const message = isInstructorView 

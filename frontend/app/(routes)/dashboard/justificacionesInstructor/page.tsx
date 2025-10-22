@@ -20,7 +20,7 @@ interface CompetenceOption {
   teacherStudySheetId?: string;
 }
 
-export default function JustificacionesInstructorSelector() {
+const JustificacionesInstructorSelector: React.FC = () => {
   const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
@@ -202,3 +202,5 @@ export default function JustificacionesInstructorSelector() {
     </div>
   );
 }
+
+export default JustificacionesInstructorSelector;

@@ -12,7 +12,7 @@ const client = new ApolloClient({
 // Cliente Lan por medio de la direccion IP
 const clientLAN = new ApolloClient({
     link: new HttpLink({
-        uri: "https://apr-hundred-lights-thinkpad.trycloudflare.com/graphql",
+        uri: "https://beside-luke-remote-aerospace.trycloudflare.com/graphql",
     }),
     cache: new InMemoryCache({
         addTypename: false,
