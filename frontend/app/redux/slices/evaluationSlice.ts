@@ -1,4 +1,4 @@
-import { client } from '@lib/apollo-client';
+import { clientLAN } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {GET_ALL_EVALUATIONS, GET_EVALUATION_BY_ID, ADD_EVALUATION, UPDATE_EVALUATION, DELETE_EVALUATION, GET_EVALUATIONS_BY_CHECKLIST} from '@graphql/evaluationsGraph';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
@@ -66,7 +66,7 @@ const evaluationService = {
                 checklistId: numericChecklistId
             };
 
-            const { data } = await client.mutate({
+            const { data } = await clientLAN.mutate({
                 mutation: ADD_EVALUATION,
                 variables: { input: evaluationInput },
             });
@@ -98,7 +98,7 @@ const evaluationService = {
                 checklistId: numericChecklistId
             };
 
-            const { data } = await client.mutate({
+            const { data } = await clientLAN.mutate({
                 mutation: ADD_EVALUATION,
                 variables: { input: evaluationInput },
             });
@@ -117,7 +117,7 @@ const evaluationService = {
     // Función para obtener evaluaciones por checklist ID
     fetchEvaluationsByChecklist: async (checklistId: number) => {
         try {
-            const { data } = await client.query({
+            const { data } = await clientLAN.query({
                 query: GET_EVALUATIONS_BY_CHECKLIST || GET_ALL_EVALUATIONS,
                 variables: GET_EVALUATIONS_BY_CHECKLIST ? { checklistId } : { page: 0, size: 100 },
                 fetchPolicy: 'no-cache',
@@ -148,7 +148,7 @@ const evaluationService = {
     // Función para obtener una evaluación por ID
     fetchEvaluationById: async (id: number) => {
         try {
-            const { data } = await client.query({
+            const { data } = await clientLAN.query({
                 query: GET_EVALUATION_BY_ID,
                 variables: { id },
                 fetchPolicy: 'no-cache',
@@ -163,7 +163,7 @@ const evaluationService = {
     // Función para actualizar una evaluación
     updateEvaluation: async (id: number, evaluationData: EvaluationInput) => {
         try {
-            const { data } = await client.mutate({
+            const { data } = await clientLAN.mutate({
                 mutation: UPDATE_EVALUATION,
                 variables: { id, input: evaluationData },
             });
@@ -212,7 +212,7 @@ export const fetchEvaluationsAllByChecklist = createAsyncThunk<
 >(
     'evaluations/fetchEvaluationsAllByChecklist',
     async ({page, size}) =>{
-        const { data } = await client.query<GetAllEvaluationsQuery, GetAllEvaluationsQueryVariables>({
+        const { data } = await clientLAN.query<GetAllEvaluationsQuery, GetAllEvaluationsQueryVariables>({
             query: GET_ALL_EVALUATIONS,
             variables: { page, size }
         });
@@ -226,7 +226,7 @@ export const fetchAllEvaluationsDebug = createAsyncThunk<
 >(
     'evaluations/fetchAllEvaluationsDebug',
     async ({ page, size }) => {
-        const { data } = await client.query<GetAllEvaluationsQuery, GetAllEvaluationsQueryVariables>({
+        const { data } = await clientLAN.query<GetAllEvaluationsQuery, GetAllEvaluationsQueryVariables>({
             query: GET_ALL_EVALUATIONS,
             variables: { page, size },
             fetchPolicy: 'no-cache',
@@ -242,7 +242,7 @@ export const fetchEvaluationById = createAsyncThunk<
     'evaluations/fetchById',
     async ({ id }, { rejectWithValue }) => {
         try {
-            const { data } = await client.query<GetEvaluationByIdQuery, GetEvaluationByIdQueryVariables>({
+            const { data } = await clientLAN.query<GetEvaluationByIdQuery, GetEvaluationByIdQueryVariables>({
                 query: GET_EVALUATION_BY_ID,
                 variables: { id }
             });
@@ -261,7 +261,7 @@ export const addEvaluation = createAsyncThunk<AddEvaluationMutation['addEvaluati
     'evaluations/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<AddEvaluationMutation, AddEvaluationMutationVariables>({
+            const { data } = await clientLAN.mutate<AddEvaluationMutation, AddEvaluationMutationVariables>({
                 mutation: ADD_EVALUATION,
                 variables: { input }
             });
@@ -283,7 +283,7 @@ export const updateEvaluation = createAsyncThunk<UpdateEvaluationMutation['updat
     'evaluations/update',
     async ({ id, input }, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<UpdateEvaluationMutation, UpdateEvaluationMutationVariables>({
+            const { data } = await clientLAN.mutate<UpdateEvaluationMutation, UpdateEvaluationMutationVariables>({
                 mutation: UPDATE_EVALUATION,
                 variables: { id, input },
             });
@@ -326,7 +326,7 @@ export const updateEvaluationItemStates = createAsyncThunk<UpdateEvaluationMutat
 
             console.log('Update input:', input);
 
-            const { data } = await client.mutate<UpdateEvaluationMutation, UpdateEvaluationMutationVariables>({
+            const { data } = await clientLAN.mutate<UpdateEvaluationMutation, UpdateEvaluationMutationVariables>({
                 mutation: UPDATE_EVALUATION,
                 variables: { id, input },
             });
@@ -352,7 +352,7 @@ export const deleteEvaluation = createAsyncThunk<string, string,
     'evaluations/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await client.mutate<DeleteEvaluationMutation, DeleteEvaluationMutationVariables>({
+            const { data } = await clientLAN.mutate<DeleteEvaluationMutation, DeleteEvaluationMutationVariables>({
                 mutation: DELETE_EVALUATION,
                 variables: { id },
             });
