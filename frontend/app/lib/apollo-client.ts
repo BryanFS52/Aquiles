@@ -1,22 +1,11 @@
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
-const client = new ApolloClient({
-    link: new HttpLink({
-        uri: 'http://localhost:8081/aquiles/graphql',
-    }),
-    cache: new InMemoryCache({
-        addTypename: false
-    }),
-});
-
 // Cliente Lan por medio de la direccion IP
 const clientLAN = new ApolloClient({
     link: new HttpLink({
-        uri: "https://beside-luke-remote-aerospace.trycloudflare.com/graphql",
+        uri: "https://informal-face-medicines-improving.trycloudflare.com/graphql",
     }),
-    cache: new InMemoryCache({
-        addTypename: false,
-    }),
+    cache: new InMemoryCache(),
     defaultOptions: {
         watchQuery: {
             fetchPolicy: 'no-cache',
@@ -25,7 +14,9 @@ const clientLAN = new ApolloClient({
             fetchPolicy: 'no-cache',
         },
     },
-    connectToDevTools: true,
+    devtools: {
+        enabled: true,
+    },
 });
 
-export { client, clientLAN };
+export { clientLAN };

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, ChangeEvent, FormEvent } from 'react';
 import { ApolloProvider } from '@apollo/client';
-import { client } from '@lib/apollo-client';
+import { clientLAN } from '@lib/apollo-client';
 import { useLoader } from '@context/LoaderContext';
 import { HiLockClosed } from "react-icons/hi";
 import { BsPersonCircle } from "react-icons/bs";
@@ -328,7 +328,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <ApolloProvider client={client}>
+    <ApolloProvider client={clientLAN}>
       <div className="font-inter min-h-screen flex flex-col lg:flex-row bg-white">
         {/* Panel de login */}
         <div className="lg:w-1/2 p-6 md:p-8 flex flex-col justify-center min-h-screen items-center">
