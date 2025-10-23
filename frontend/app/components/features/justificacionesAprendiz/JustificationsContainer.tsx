@@ -15,10 +15,8 @@ import {
   updateJustificationTypeId,
   addJustification,
   validateForm,
-  downloadBase64File,
   setSubmitting,
   setCurrentAttendance,
-  generateFileName,
   FormDataState,
   fetchJustificationsByStudentId,
 } from '@slice/justificationSlice';
@@ -241,14 +239,6 @@ export const JustificationsContainer: React.FC = () => {
     dispatch(updateJustificationTypeId(value));
   };
 
-  const handleDownloadFile = (justificacion: any) => {
-    if (justificacion.archivoAdjunto) {
-      const mimeType = justificacion.archivoMime || 'application/octet-stream';
-      const fileName = generateFileName(justificacion.id, mimeType);
-      downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
-    }
-  };
-
   // Loading state
   if (loadingJustificationTypes || loadingAttendances || loadingJustifications) {
     return (
@@ -312,7 +302,6 @@ export const JustificationsContainer: React.FC = () => {
           <JustificationsHistory
             data={justificationsData}
             loading={loadingJustifications}
-            onDownloadFile={handleDownloadFile}
           />
         </AnimatePresence>
       </div>

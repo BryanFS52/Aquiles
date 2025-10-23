@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { Apprentice } from '@type/slices/aprendices'
+import { Apprentice } from '@/components/features/Apprentices/aprendices'
 
 interface ApprenticeListProps {
   apprentices: Apprentice[]
@@ -28,7 +28,6 @@ const ApprenticeList = ({ apprentices }: ApprenticeListProps) => {
         onChange={(e) => setSearchTerm(e.target.value)}
         className="input px-4 py-2 border rounded-lg w-full mb-4"
       />
-      
       <div className="overflow-x-auto border rounded-lg">
         <table className="w-full text-sm">
           <thead className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">

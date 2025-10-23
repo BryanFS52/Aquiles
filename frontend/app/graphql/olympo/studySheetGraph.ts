@@ -395,3 +395,13 @@ query GetStudySheetByIdWithAttendances($id: Long!, $competenceId : Long, $teache
   }
 }
 `;
+
+export const ADD_STUDY_SHEET = gql`
+    mutation AddStudySheet($input: StudySheetDTO!) {
+        addStudySheet(input: $input) {
+            code
+            message
+            id
+        }
+    }
+`;

@@ -45,3 +45,13 @@ export const GET_STUDENT_LIST = gql`
         }
     }
 `;
+
+export const ADD_STUDENT = gql`
+    mutation AddStudent($input: StudentDTO!) {
+        addStudent(input: $input) {
+            code
+            message
+            id
+        }
+    }
+`;

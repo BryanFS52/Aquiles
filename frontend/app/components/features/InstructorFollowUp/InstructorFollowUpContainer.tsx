@@ -6,12 +6,15 @@ import { toast } from "react-toastify";
 import AttendanceTable from "@/components/features/InstructorFollowUp/attendanceTable";
 import PageTitle from "@components/UI/pageTitle";
 import NoveltyModal from "@components/Modals/noveltyModal";
+import StatCard from "@/components/features/AprendicesList/StatCard";
 import { StudentSummary, setAttendanceSummaryFromStudySheet } from "@redux/slices/attendanceSlice";
 import { openNoveltyModal } from "@redux/slices/themis/noveltySlice";
 import { AppDispatch, RootState } from "@redux/store";
 import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
 import { useRouter } from "next/navigation";
 import { InstructorFollowUpContainerProps } from "./types";
+import { PiStudentFill } from "react-icons/pi";
+import { MdWarning } from "react-icons/md";
 
 const getAuthenticatedInstructorId = (): number => {
     return TEMPORAL_INSTRUCTOR_ID;
@@ -63,6 +66,13 @@ export const InstructorFollowUpContainer: React.FC<InstructorFollowUpContainerPr
     const competenceName = getCompetenceName();
     const shouldShowData = selectedForAttendance && attendanceSummary.length > 0 && !loadingAttendanceSheet;
 
+    // Cálculo de estadísticas
+    const totalStudents = attendanceSummary.length;
+    const studentsWithAbsences = attendanceSummary.filter((s: StudentSummary) => s.cantidad > 0).length;
+    const studentsAtRisk = attendanceSummary.filter(
+        (s: StudentSummary) => s.cantidad >= 5 || (s.consecutivas ?? 0) >= 3
+    ).length;
+
     const handleReportNovelty = async (studentId?: number) => {
         if (!studentId) {
             toast.error("ID de estudiante no válido");
@@ -111,6 +121,33 @@ export const InstructorFollowUpContainer: React.FC<InstructorFollowUpContainerPr
                         Seguimiento de Ausencias - {competenceName}
                         {fichaNumber && ` - Ficha ${fichaNumber}`}
                     </PageTitle>
+
+                    {/* Estadísticas con Cards */}
+                    {shouldShowData && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <StatCard
+                                icon={PiStudentFill}
+                                color="blue"
+                                value={totalStudents}
+                                label="Total de aprendices"
+                            />
+
+                            <StatCard
+                                icon={PiStudentFill}
+                                color="yellow"
+                                value={studentsWithAbsences}
+                                label="Aprendices con ausencias"
+                            />
+
+                            <StatCard
+                                icon={MdWarning}
+                                color="red"
+                                value={studentsAtRisk}
+                                label="Aprendices en riesgo de deserción"
+                                className="sm:col-span-2 lg:col-span-1"
+                            />
+                        </div>
+                    )}
 
                     <AttendanceTable
                         data={shouldShowData ? attendanceSummary : []}

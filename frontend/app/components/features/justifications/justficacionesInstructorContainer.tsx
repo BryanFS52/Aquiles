@@ -136,7 +136,6 @@ const JustificacionesInstructorContainer: React.FC<
 
           <JustificationTable
             filteredData={filteredData}
-            handleDownloadFile={() => {}}
             handleStatusChange={handleStatusChange}
             hasAnyData={filteredData.length > 0}
             isLoading={loading}

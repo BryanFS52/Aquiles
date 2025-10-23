@@ -1,7 +1,10 @@
 "use client";
 
 import type { DataTableColumn } from "@components/UI/DataTable/types";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@redux/store";
+import { fetchStudentList } from "@slice/olympo/studentSlice";
 import { PiStudentFill } from "react-icons/pi";
 import { ImMail4 } from "react-icons/im";
 import { Card } from "@components/UI/Card";
@@ -30,53 +33,52 @@ interface SelectedStudent {
 }
 
 // --------------------
-// Mock Data
-// --------------------
-const mockStudents: Student[] = [
-  {
-    documentNumber: "1001",
-    fullName: "Juan Pérez",
-    email: "juan.perez@example.com",
-    isPresent: true,
-    date: "2025-09-15",
-  },
-  {
-    documentNumber: "1002",
-    fullName: "María Gómez",
-    email: "maria.gomez@example.com",
-    isPresent: false,
-    date: "2025-09-15",
-  },
-  {
-    documentNumber: "1003",
-    fullName: "Carlos Ramírez",
-    email: "carlos.ramirez@example.com",
-    isPresent: true,
-    date: "2025-09-15",
-  },
-];
-
-// --------------------
 // Componente Principal
 // --------------------
 export const AprendicesListContainer: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { data: studentsData, loading, error } = useSelector((state: RootState) => state.student);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<SelectedStudent | null>(null);
-  const [students, setStudents] = useState<Student[]>([]);
 
   useEffect(() => {
-    // Simula la llamada al servicio
-    const fetchStudents = async () => {
-      try {
-        // En el futuro aquí iría getAllApprentices()
-        setStudents(mockStudents);
-      } catch (error) {
-        console.error("Error al obtener la lista de aprendices:", error);
-      }
-    };
+    dispatch(fetchStudentList({}));
+  }, [dispatch]);
 
-    fetchStudents();
-  }, []);
+  useEffect(() => {
+    if (error) {
+      const errorMessage = typeof error === 'string' ? error : error.message || 'Error desconocido';
+      toast.error(`Error al cargar estudiantes: ${errorMessage}`);
+    }
+  }, [error]);
+
+  // Mapear datos de Redux al formato de la tabla
+  const [attendanceStatus, setAttendanceStatus] = useState<Record<string, boolean>>({});
+
+  const students: Student[] = useMemo(() => {
+    if (!studentsData || studentsData.length === 0) return [];
+    
+    const today = new Date().toISOString().split('T')[0];
+    
+    return studentsData.map((student) => {
+      const docNumber = student.person?.document || 'N/A';
+      return {
+        documentNumber: docNumber,
+        fullName: `${student.person?.name || ''} ${student.person?.lastname || ''}`.trim(),
+        email: student.person?.email || '',
+        isPresent: attendanceStatus[docNumber] !== undefined ? attendanceStatus[docNumber] : true,
+        date: today,
+      };
+    });
+  }, [studentsData, attendanceStatus]);
+
+  const toggleAttendance = (documentNumber: string) => {
+    setAttendanceStatus(prev => ({
+      ...prev,
+      [documentNumber]: !(prev[documentNumber] !== undefined ? prev[documentNumber] : true)
+    }));
+  };
 
   const toggleModal = (student: SelectedStudent) => {
     setSelectedStudent(student);
@@ -121,15 +123,16 @@ export const AprendicesListContainer: React.FC = () => {
       header: "Estado",
       className: "text-center",
       render: (student) => (
-        <span
-          className={`font-semibold ${
+        <button
+          onClick={() => toggleAttendance(student.documentNumber)}
+          className={`font-semibold px-3 py-1 rounded-lg transition-colors ${
             student.isPresent
-              ? "text-green-600 dark:text-green-400"
-              : "text-red-600 dark:text-red-400"
+              ? "text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30"
+              : "text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
           }`}
         >
           {student.isPresent ? "✓ Presente" : "✗ Ausente"}
-        </span>
+        </button>
       ),
     },
     {
@@ -175,6 +178,17 @@ export const AprendicesListContainer: React.FC = () => {
       toast.error("Hubo un error al guardar la asistencia");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Cargando estudiantes...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

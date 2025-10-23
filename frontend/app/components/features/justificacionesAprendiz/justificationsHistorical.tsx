@@ -3,20 +3,18 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { FaCheckCircle, FaClock, FaFileAlt, FaRegFileAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { GrAttachment } from "react-icons/gr";
 import { MdHistory } from "react-icons/md";
 import { Justification } from "@graphql/generated";
+import DownloadButton from "@components/UI/DownloadButton";
 
 interface JustificationsHistoricalProps {
   data: Justification[];
   loading: boolean;
-  handleDownloadFile: (justificacion: Justification) => void;
 }
 
 export default function JustificationsHistorical({
   data,
   loading,
-  handleDownloadFile,
 }: JustificationsHistoricalProps) {
   // Estado para la paginación
   const [currentPage, setCurrentPage] = useState(0);
@@ -188,17 +186,13 @@ export default function JustificationsHistorical({
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">
-                          {justification.justificationFile ? (
-                            <GrAttachment
-                              title="Descargar archivo"
-                              className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
-                              onClick={() => handleDownloadFile(justification)}
-                            />
-                          ) : (
-                            <span className="text-gray-400 dark:text-gray-500">
-                              No hay archivo
-                            </span>
-                          )}
+                          <DownloadButton
+                            fileBase64={justification.justificationFile || undefined}
+                            mimeType="application/pdf"
+                            fileName={`justificacion_${justification.absenceDate?.replace(/\//g, '-')}_${justification.justificationType?.name || 'novedad'}.pdf`}
+                            variant="icon"
+                            iconSize="md"
+                          />
                         </div>
                       </td>
                       <td className="w-auto">

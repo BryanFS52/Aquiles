@@ -1,13 +1,13 @@
 'use client'
 import { useState, ChangeEvent, FormEvent } from 'react'
-import { NewApprentice, Apprentice } from '@type/slices/aprendices'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '@redux/store'
+import { addStudent, fetchStudentList } from '@slice/olympo/studentSlice'
+import { NewApprentice } from '@/components/features/Apprentices/aprendices'
 import { toast } from 'react-toastify'
 
-interface ApprenticeFormProps {
-  onApprenticeCreated: (apprentice: Apprentice) => void
-}
-
-const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
+const ApprenticeForm = () => {
+  const dispatch = useDispatch<AppDispatch>()
   const [newApprentice, setNewApprentice] = useState<NewApprentice>({
     name: '',
     lastName: '',
@@ -17,6 +17,7 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
     email: '',
     teamNumber: '',
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -25,27 +26,32 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setIsSubmitting(true)
+
     try {
-      const response = await fetch('http://localhost:8081/api/students', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newApprentice),
-      })
-      const createdApprentice: Apprentice = await response.json()
-      onApprenticeCreated(createdApprentice)
-      setNewApprentice({
-        name: '',
-        lastName: '',
-        documentType: '',
-        documentNumber: '',
-        program: '',
-        email: '',
-        teamNumber: '',
-      })
-      toast.success("Aprendiz creado correctamente.")
-    } catch (error) {
+      const result = await dispatch(addStudent(newApprentice as any)).unwrap()
+      
+      if (result && result.code === '200') {
+        toast.success(result.message || "Aprendiz creado correctamente.")
+        setNewApprentice({
+          name: '',
+          lastName: '',
+          documentType: '',
+          documentNumber: '',
+          program: '',
+          email: '',
+          teamNumber: '',
+        })
+        // Recargar la lista de estudiantes
+        dispatch(fetchStudentList({}))
+      } else {
+        toast.error(result?.message || "No se pudo crear el aprendiz.")
+      }
+    } catch (error: any) {
       console.error('Error al crear el aprendiz:', error)
-      toast.error("No se pudo crear el aprendiz. Por favor, intente de nuevo.")
+      toast.error(error.message || "No se pudo crear el aprendiz. Por favor, intente de nuevo.")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -147,9 +153,10 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
 
         <button 
           type="submit" 
-          className="bg-lightGreen text-black font-bold dark:bg-darkBlue dark:text-white px-6 py-3 rounded-lg mt-4"
+          disabled={isSubmitting}
+          className="bg-lightGreen text-black font-bold dark:bg-darkBlue dark:text-white px-6 py-3 rounded-lg mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Crear Aprendiz
+          {isSubmitting ? 'Creando...' : 'Crear Aprendiz'}
         </button>
       </form>
     </div>

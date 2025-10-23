@@ -16,8 +16,6 @@ import {
   goToNextPage,
   formatErrorMessage,
   setLocalCurrentPage,
-  downloadBase64File,
-  generateFileName,
   updateJustificationStatus,
   toggleMultiFilter,
   setMultiFilter,
@@ -78,17 +76,6 @@ export default function JustificacionesCoordinator() {
 
   const handleNextPage = () => {
     dispatch(goToNextPage());
-  };
-
-  const handleDownloadFile = (justificacion: any) => {
-    try {
-      const mimeType = justificacion.archivoMime || "application/pdf";
-      const fileName = generateFileName(justificacion.id, mimeType);     
-      downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
-    } catch (error) {
-      console.error('❌ Error durante la descarga:', error);
-      alert('Error al intentar descargar el archivo');
-    }
   };
 
   const handleStatusChange = (justificacionId: string, newStatusId: string) => {
@@ -181,7 +168,6 @@ export default function JustificacionesCoordinator() {
         <>
           <JustificationTable
             filteredData={filteredData}
-            handleDownloadFile={handleDownloadFile}
             handleStatusChange={handleStatusChange}
             hasAnyData={totalItems > 0}
             isLoading={loading}

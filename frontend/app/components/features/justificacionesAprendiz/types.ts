@@ -33,5 +33,4 @@ export interface AbsencesListProps {
 export interface JustificationsHistoricalProps {
   data: any[];
   loading: boolean;
-  onDownloadFile: (justification: any) => void;
 }

@@ -5818,6 +5818,13 @@ export type GetStudentListQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetStudentListQuery = { allStudentList?: { code?: string | null, message?: string | null, totalItems?: number | null, data?: Array<{ id?: string | null, state?: boolean | null, person?: { id?: string | null, name?: string | null, lastname?: string | null, document?: string | null } | null } | null> | null } | null };
 
+export type AddStudentMutationVariables = Exact<{
+  input: StudentDto;
+}>;
+
+
+export type AddStudentMutation = { addStudent?: { code?: string | null, message?: string | null, id?: any | null } | null };
+
 export type GetStudySheetsQueryVariables = Exact<{
   name?: InputMaybe<Scalars['String']['input']>;
   idJourney?: InputMaybe<Scalars['Long']['input']>;
@@ -9295,6 +9302,41 @@ export type GetStudentListQueryHookResult = ReturnType<typeof useGetStudentListQ
 export type GetStudentListLazyQueryHookResult = ReturnType<typeof useGetStudentListLazyQuery>;
 export type GetStudentListSuspenseQueryHookResult = ReturnType<typeof useGetStudentListSuspenseQuery>;
 export type GetStudentListQueryResult = Apollo.QueryResult<GetStudentListQuery, GetStudentListQueryVariables>;
+export const AddStudentDocument = gql`
+    mutation AddStudent($input: StudentDTO!) {
+  addStudent(input: $input) {
+    code
+    message
+    id
+  }
+}
+    `;
+export type AddStudentMutationFn = Apollo.MutationFunction<AddStudentMutation, AddStudentMutationVariables>;
+
+/**
+ * __useAddStudentMutation__
+ *
+ * To run a mutation, you first call `useAddStudentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddStudentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addStudentMutation, { data, loading, error }] = useAddStudentMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAddStudentMutation(baseOptions?: Apollo.MutationHookOptions<AddStudentMutation, AddStudentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddStudentMutation, AddStudentMutationVariables>(AddStudentDocument, options);
+      }
+export type AddStudentMutationHookResult = ReturnType<typeof useAddStudentMutation>;
+export type AddStudentMutationResult = Apollo.MutationResult<AddStudentMutation>;
+export type AddStudentMutationOptions = Apollo.BaseMutationOptions<AddStudentMutation, AddStudentMutationVariables>;
 export const GetStudySheetsDocument = gql`
     query GetStudySheets($name: String, $idJourney: Long, $page: Int, $size: Int) {
   allStudySheets(name: $name, idJourney: $idJourney, page: $page, size: $size) {

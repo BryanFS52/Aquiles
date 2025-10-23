@@ -6,7 +6,6 @@ import JustificationsHistorical from '@/components/features/justificacionesApren
 export const JustificationsHistory: React.FC<JustificationsHistoricalProps> = ({
     data,
     loading,
-    onDownloadFile,
 }) => {
     return (
         <motion.div
@@ -20,7 +19,6 @@ export const JustificationsHistory: React.FC<JustificationsHistoricalProps> = ({
             <JustificationsHistorical
                 data={data}
                 loading={loading}
-                handleDownloadFile={onDownloadFile}
             />
         </motion.div>
     );
