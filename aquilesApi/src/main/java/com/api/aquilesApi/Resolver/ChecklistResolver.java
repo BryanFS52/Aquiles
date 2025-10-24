@@ -2,34 +2,22 @@ package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.ChecklistBusiness;
 import com.api.aquilesApi.Dto.ChecklistDto;
-import com.api.aquilesApi.Entity.Checklist;
-import com.api.aquilesApi.Entity.ChecklistHistory;
-import com.api.aquilesApi.Service.ChecklistHistoryService;
-import com.api.aquilesApi.Service.ItemService;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
-import com.api.aquilesApi.Utilities.Mapper.ChecklistMap;
 import com.api.aquilesApi.Utilities.Exception.BadRequestException;
 import com.api.aquilesApi.Utilities.Exception.NotFoundException;
 import com.netflix.graphql.dgs.*;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 
-import java.util.List;
 import java.util.Map;
 
 @DgsComponent
 public class ChecklistResolver {
 
     private final ChecklistBusiness checklistBusiness;
-    private final ChecklistHistoryService checklistHistoryService;
-    private final ItemService itemService;
 
     public ChecklistResolver(
-            ChecklistBusiness checklistBusiness,
-            ChecklistHistoryService checklistHistoryService, ItemService itemService) {
+            ChecklistBusiness checklistBusiness) {
         this.checklistBusiness = checklistBusiness;
-        this.checklistHistoryService = checklistHistoryService;
-        this.itemService = itemService;
     }
 
     // FindAll Checklist
@@ -117,53 +105,6 @@ public class ChecklistResolver {
             );
         } catch (Exception e) {
             throw new RuntimeException("Unexpected error in deleteChecklist: " + e.getMessage(), e);
-        }
-    }
-
-    // ✅ History Query
-    @DgsQuery
-    public List<ChecklistHistory> checklistHistoryById(@InputArgument("id") String id) {
-        System.out.println("🔍 Buscando historial para id: " + id);
-        Long checklistId = Long.parseLong(id);
-        List<ChecklistHistory> result = checklistHistoryService.findByChecklistId(checklistId);
-        System.out.println("📊 Encontrados " + result.size() + " registros de historial");
-        return result;
-    }
-
-    // Update Item Status
-    @DgsMutation
-    public Map<String, Object> updateItemStatus(@InputArgument Long itemId, @InputArgument Boolean active) {
-        try {
-            itemService.updateStatus(itemId, active);
-            return ResponseHttpApi.responseHttpAction(
-                    itemId,
-                    ResponseHttpApi.CODE_OK,
-                    "Item status updated successfully"
-            );
-        } catch (Exception e) {
-            throw new RuntimeException("Unexpected error in updateItemStatus: " + e.getMessage(), e);
-        }
-    }
-
-    // Refresh training project name for a checklist
-    @DgsMutation
-    public Map<String, Object> refreshTrainingProjectName(@InputArgument Long checklistId) {
-        try {
-            ChecklistDto checklist = checklistBusiness.findById(checklistId);
-            if (checklist.getTrainingProjectId() != null) {
-                // This will automatically refresh the training project name
-                return ResponseHttpApi.responseHttpAction(
-                        checklistId,
-                        ResponseHttpApi.CODE_OK,
-                        "Training project name refreshed successfully"
-                );
-            } else {
-                return ResponseHttpApi.responseHttpError(
-                        "Checklist has no training project associated", HttpStatus.BAD_REQUEST
-                );
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Unexpected error in refreshTrainingProjectName: " + e.getMessage(), e);
         }
     }
 }

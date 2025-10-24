@@ -1,5 +1,7 @@
 package com.api.aquilesApi.Dto;
 
+import com.api.aquilesApi.Entity.Checklist;
+import com.api.aquilesApi.Entity.ItemType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -21,5 +23,11 @@ public class ItemDto {
     @Size(max = 100, message = "El indicador no puede exceder los 100 caracteres")
     private String indicator;
 
-    private Boolean active = true;
+    @NotBlank(message = "El tipo de ítem es obligatorio")
+    private Boolean state = true;
+
+    // Relations
+    private ItemType itemType;
+
+    private Checklist checklist;
 }

@@ -2,6 +2,7 @@ package com.api.aquilesApi.Service;
 
 import com.api.aquilesApi.Entity.Item;
 import com.api.aquilesApi.Repository.ItemRepository;
+import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ItemService {
+public class ItemService implements Idao<Item, Long> {
 
     private final ItemRepository itemRepository;
 
@@ -18,35 +19,32 @@ public class ItemService {
         this.itemRepository = itemRepository;
     }
 
+    // Get all Items paginated
+    @Override
     public Page<Item> findAll(PageRequest pageRequest) {
-        try {
-            return itemRepository.findAll(pageRequest);
-        } catch (Exception e) {
-            System.err.println("Error using findAllWithRelations, falling back to regular findAll: " + e.getMessage());
-            return itemRepository.findAll(pageRequest);
-        }
+        return itemRepository.findAll(pageRequest);
     }
 
-    public Item findById(Long id) {
-        return itemRepository.findById(id)
-                .orElseThrow(() -> new CustomException("Item with ID " + id + " not found", HttpStatus.NOT_FOUND));
+    // Get Item by ID or throw exception if not found
+    @Override
+    public Item getById(Long id) {
+        return itemRepository.findById(id).orElseThrow(() ->
+                new CustomException("Item with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
-    public Item save(Item item) {
-        return itemRepository.save(item);
-    }
+    // Update an existing Item
+    @Override
+    public void update(Item entity) {this.itemRepository.save(entity); }
 
-    public Item updateStatus(Long itemId, Boolean active) {
-        Item item = findById(itemId);
-        item.setActive(active);
-        return save(item);
-    }
+    // Save an Item (create or update)
+    @Override
+    public Item save(Item entity) {return itemRepository.save(entity); }
 
-    public void delete(Item item) {
-        itemRepository.delete(item);
-    }
+    // Delete an Item
+    @Override
+    public void delete(Item entity) {this.itemRepository.delete(entity); }
 
-    public void deleteById(Long id) {
-        itemRepository.deleteById(id);
-    }
+    // Create a new Item
+    @Override
+    public void create(Item entity) {this.itemRepository.save(entity); }
 }

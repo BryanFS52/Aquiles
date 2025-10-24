@@ -40,7 +40,7 @@ public class ItemBusiness {
     // Get an item by ID
     public ItemDto findById(Long id){
         try {
-            Item item = itemService.findById(id);
+            Item item = itemService.getById(id);
             return ItemMap.INSTANCE.EntityToDTO(item);
         } catch (CustomException e) {
             throw e;
@@ -66,7 +66,7 @@ public class ItemBusiness {
     public void update(Long itemId, ItemDto itemDto) {
         try {
             itemDto.setId(itemId);
-            Item item = itemService.findById(itemId);
+            Item item = itemService.getById(itemId);
             ItemMap.INSTANCE.updateItem(itemDto, item);
             itemService.save(item);
         } catch (Exception e) {
@@ -77,7 +77,7 @@ public class ItemBusiness {
     // Delete an item
     public void delete(Long itemId) {
         try {
-            Item item = itemService.findById(itemId);
+            Item item = itemService.getById(itemId);
             itemService.delete(item);
         } catch (CustomException e) {
             throw e;

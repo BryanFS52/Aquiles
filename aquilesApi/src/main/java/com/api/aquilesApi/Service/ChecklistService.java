@@ -4,7 +4,6 @@ import com.api.aquilesApi.Entity.Checklist;
 import com.api.aquilesApi.Repository.ChecklistRepository;
 import com.api.aquilesApi.Service.Dao.Idao;
 import com.api.aquilesApi.Utilities.CustomException;
-import com.api.aquilesApi.Business.ChecklistHistoryBusiness;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;

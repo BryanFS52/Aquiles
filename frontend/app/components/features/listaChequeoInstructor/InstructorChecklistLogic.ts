@@ -1,11 +1,10 @@
 import { toast } from "react-toastify";
 import { evaluationService } from "@redux/slices/evaluationSlice";
-import { checkListService } from "@redux/slices/checklistSlice";
-import { exportService } from "@redux/slices/exportSlice";
+import { fetchChecklists}  from "@redux/slices/checklistSlice";
 import {
   Checklist,
   Evaluation,
-} from "@/types/checklist";
+} from "@graphql/generated";
 
 export class InstructorChecklistLogic {
   // Función para cargar firmas existentes desde el checklist
@@ -131,13 +130,13 @@ export class InstructorChecklistLogic {
       const instructorStudySheetId = localStorage.getItem('selectedStudySheetId');
       const instructorStudySheetNumber = localStorage.getItem('selectedStudySheetNumber');
       console.log("🔍 Instructor study sheet:", { id: instructorStudySheetId, number: instructorStudySheetNumber });
-      
-      const response = await checkListService.fetchAllChecklists(0, 100);
+
+      const response = await fetchChecklists({ page: 0, size: 5 });
       console.log("Raw checklists response:", response);
 
-      if (response.code === "200" && response.data) {
+      if (response.arguments === "200" && response.arguments) {
         // Filtrar solo las listas activas
-        let activeLists = response.data.filter((checklist: Checklist) => checklist.state === true);
+        let activeLists = response.arguments.filter((checklist: Checklist) => checklist.state === true);
         console.log("All active checklists:", activeLists.length);
         
         // Si el instructor tiene una ficha asignada, filtrar por esa ficha
@@ -259,33 +258,4 @@ export class InstructorChecklistLogic {
     });
   };
 
-  // Exportar PDF
-  static exportToPDF = async (selectedChecklist: Checklist): Promise<void> => {
-    if (!selectedChecklist) return;
-    try {
-      toast.info("📄 Generando PDF...");
-      const base64Data = await exportService.exportChecklistToPdf(parseInt(selectedChecklist.id));
-      const fileName = `checklist_${selectedChecklist.id}_trimestre_${selectedChecklist.trimester || 'NA'}.pdf`;
-      exportService.downloadFileFromBase64(base64Data, fileName, 'application/pdf');
-      toast.success("📥 PDF descargado exitosamente");
-    } catch (error) {
-      console.error("Error exporting PDF:", error);
-      toast.error("Error al exportar a PDF");
-    }
-  };
-
-  // Exportar Excel
-  static exportToExcel = async (selectedChecklist: Checklist): Promise<void> => {
-    if (!selectedChecklist) return;
-    try {
-      toast.info("📊 Generando Excel...");
-      const base64Data = await exportService.exportChecklistToExcel(parseInt(selectedChecklist.id));
-      const fileName = `checklist_${selectedChecklist.id}_trimestre_${selectedChecklist.trimester || 'NA'}.xlsx`;
-      exportService.downloadFileFromBase64(base64Data, fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      toast.success("📥 Excel descargado exitosamente");
-    } catch (error) {
-      console.error("Error exporting Excel:", error);
-      toast.error("Error al exportar a Excel");
-    }
-  };
 }

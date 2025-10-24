@@ -47,9 +47,6 @@ public class Checklist implements Serializable {
     @Column(name = "training_project_id")
     private Long trainingProjectId;
 
-    @Column(name = "training_project_name", length = 255)
-    private String trainingProjectName;
-
     // Relations
     // 1.Relation (1-M) con item
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)

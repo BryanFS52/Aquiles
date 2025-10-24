@@ -48,5 +48,5 @@ public class ChecklistDto {
     private List<TeamsScrumDto> teamsScrum;
     private String studySheets;
     private List<ItemDto> items;
-    private List<Long> deletedItemIds; // ← Lista de IDs de items a eliminar
+    private List<Long> deletedItemIds;
 }
