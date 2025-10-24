@@ -4,6 +4,7 @@ import com.api.aquilesApi.Entity.ImprovementPlanDelivery;
 import com.api.aquilesApi.Repository.ImprovementPlanDeliveryRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import java.time.LocalDate;
 
 @Component
 public class ImprovementPlanDeliverySeeder implements CommandLineRunner {
@@ -24,6 +25,8 @@ public class ImprovementPlanDeliverySeeder implements CommandLineRunner {
         if(!improvementPlanDeliveryRepository.existsByDeliveryFormat(deliveryFormat)) {
             ImprovementPlanDelivery improvementPlanDelivery = new ImprovementPlanDelivery();
             improvementPlanDelivery.setDeliveryFormat(deliveryFormat);
+            LocalDate date = "Físico".equals(deliveryFormat) ? LocalDate.now() : LocalDate.now().plusDays(1);
+            improvementPlanDelivery.setFinalDeliveryDate(date);
             improvementPlanDeliveryRepository.save(improvementPlanDelivery);
         }
     }

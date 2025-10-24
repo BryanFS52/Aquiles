@@ -1,22 +1,37 @@
 type ImprovementPlan {
-    id: ID!
-    city: String!
-    date: String!
-    reason: String!
-    state: Boolean!
-    qualification: Boolean!
+    id: ID
+    actNumber: String
+    city: String
+    date: String
+    startTime: String
+    endTime: String
+    place: String
+    reason: String
+    objectives: String
+    state: Boolean
+    qualification: Boolean
+    conclusions: String
     student: Student
     teacherCompetence: TeacherStudySheet
+    faultType: ImprovementPlanFaultType
 }
 
 input ImprovementPlanDto {
-    city: String!
-    date: String!
-    reason: String!
-    state: Boolean!
-    qualification: Boolean!
-    studentId: ID!
-    teacherCompetence: ID!
+    id: ID
+    actNumber: String
+    city: String
+    date: String
+    startTime: String
+    endTime: String
+    place: String
+    reason: String
+    objectives: String
+    state: Boolean
+    qualification: Boolean
+    conclusions: String
+    studentId: ID
+    teacherCompetence: ID
+    faultType: ImprovementPlanFaultTypeDto
 }
 
 type ImprovementPlanPage {
@@ -27,6 +42,7 @@ type ImprovementPlanPage {
     totalItems: Int
     currentPage: Int
     message: String
+    studySheet: StudySheet
 }
 
 type ImprovementPlanPageId {
@@ -37,7 +53,7 @@ type ImprovementPlanPageId {
 }
 
 extend type Query {
-    allImprovementPlans(page: Int, size: Int): ImprovementPlanPage
+    allImprovementPlans(page: Int, size: Int, teacherCompetence: Long, id: Long): ImprovementPlanPage
     improvementPlanById(id: Long!): ImprovementPlanPageId
 }
 

@@ -57,6 +57,7 @@ public class ImprovementPlan implements Serializable {
     private Boolean qualification;
 
     private Long studentId;
+
     private Long teacherCompetence;
 
     // Relations

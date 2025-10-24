@@ -23,7 +23,7 @@ public class ImprovementPlanDelivery implements Serializable {
     @Column(name = "delivery_format", nullable = false, unique = true)
     private String deliveryFormat;
 
-    @Column(name = "finalDeliveryDate", nullable = false, unique = true)
+    @Column(name = "final_delivery_date", nullable = false)
     private LocalDate finalDeliveryDate;
 
     // Relations
