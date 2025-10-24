@@ -10,6 +10,7 @@ import { fetchStudySheetWithStudents, clearStudySheetState } from "@slice/olympo
 import Image from "next/image";
 import PageTitle from "@components/UI/pageTitle";
 import EmptyState from "@components/UI/emptyState";
+import { TEMPORAL_APRENDIZ_ID } from "@/temporaryCredential";
 
 const ApprenticeContainer: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -22,7 +23,7 @@ const ApprenticeContainer: React.FC = () => {
   useEffect(() => {
     // Limpiar estado anterior antes de cargar nueva ficha
     dispatch(clearStudySheetState());
-    dispatch(fetchStudySheetWithStudents({ id: 5 }));
+    dispatch(fetchStudySheetWithStudents({ id: TEMPORAL_APRENDIZ_ID }));
   }, [dispatch]);
 
   useEffect(() => {
