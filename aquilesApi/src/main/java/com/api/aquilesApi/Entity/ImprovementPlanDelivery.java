@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 
 @AllArgsConstructor
@@ -21,6 +22,9 @@ public class ImprovementPlanDelivery implements Serializable {
 
     @Column(name = "delivery_format", nullable = false, unique = true)
     private String deliveryFormat;
+
+    @Column(name = "finalDeliveryDate", nullable = false, unique = true)
+    private LocalDate finalDeliveryDate;
 
     // Relations
     // 1. (1-M) with ImprovementPlanActivity

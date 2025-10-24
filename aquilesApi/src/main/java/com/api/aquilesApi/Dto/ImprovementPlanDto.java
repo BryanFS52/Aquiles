@@ -12,6 +12,8 @@ import java.util.List;
 public class ImprovementPlanDto {
     private Long id;
 
+    private String actNumber;
+
     // @NotBlank(message = "La ciudad es obligatoria")
     // @Size(max = 55, message = "La ciudad no puede exceder los 55 caracteres")
     private String city;
@@ -19,9 +21,17 @@ public class ImprovementPlanDto {
     // @NotNull(message = "La fecha es obligatoria")
     private String date;
 
+    private String startTime;
+
+    private String endTime;
+
+    private String place;
+
     // @NotBlank(message = "El motivo es obligatorio")
     // @Size(max = 255, message = "El motivo no puede exceder los 255 caracteres")
     private String reason;
+
+    private String objectives;
 
     // @NotNull(message = "El estado es obligatorio")
     private Boolean state;
@@ -29,12 +39,12 @@ public class ImprovementPlanDto {
     // @NotNull(message = "La calificación es obligatoria")
     private Boolean qualification;
 
+    private String conclusions;
     // @NotNull(message = "El estudiante es obligatorio")
     private Long studentId;
 
     // @NotNull(message = "La competencia del instructor es obligatoria")
     private Long teacherCompetence;
-
 
     // Relations
     private List<ImprovementPlanActivityDto> improvementPlanActivity;

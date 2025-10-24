@@ -2,9 +2,11 @@ package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.w3c.dom.Text;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
@@ -21,17 +23,35 @@ public class ImprovementPlan implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "actNumber", nullable = false)
+    private String actNumber;
+
     @Column(name = "city", nullable = false, length = 55)
     private String city;
 
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
+    @Column(name = "startTime", nullable = false)
+    private LocalTime startTime;
+
+    @Column(name = "endTime", nullable = false)
+    private LocalTime endTime;
+
+    @Column(name = "place", nullable = false, length = 255)
+    private String place;
+
     @Column(name = "reason", nullable = false, length = 255)
     private String reason;
 
+    @Column(name = "objectives", nullable = false, length = 255)
+    private String objectives;
+
     @Column(name = "state", nullable = false)
     private Boolean state;
+
+    @Column(name = "conclusions", nullable = false)
+    private String conclusions;
 
     @Column(name = "qualification", nullable = true)
     private Boolean qualification;
