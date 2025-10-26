@@ -20,14 +20,14 @@ const ApprenticesContent = () => {
   const apprentices = students.map(mapStudentToApprentice)
 
   return (
-    <>
+    <div className="px-2 sm:px-4 lg:px-0 py-4 sm:py-6">
       <PageTitle>Gestión de Aprendices</PageTitle>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 xl:grid-cols-2">
         <ApprenticeForm />
         <ApprenticeList apprentices={apprentices} />
       </div>
-    </>
+    </div>
   )
 }
 

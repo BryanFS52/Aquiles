@@ -11,6 +11,7 @@ import evaluationReducer from "@slice/evaluationSlice";
 import studySheetReducer from "@slice/olympo/studySheetSlice";
 import studentReducer from "@slice/olympo/studentSlice";
 import programReducer from "@slice/olympo/programSlice";
+import collaboratorReducer from "@/redux/slices/olympo/coordinationSlice";
 import teamScrumReducer from "@slice/teamScrumSlice"
 import processMethodologiesReducer from "@slice/atlas/processMethodologiesSlice";
 import profileReducer from "@slice/atlas/profileSlice";
@@ -32,6 +33,7 @@ const store = configureStore({
         student: studentReducer,
         program: programReducer,
         studySheet: studySheetReducer,
+        collaborator: collaboratorReducer,
         teamScrum: teamScrumReducer,
         attendances: attendancesReducer,
         attendanceState: attendanceStateReducer,

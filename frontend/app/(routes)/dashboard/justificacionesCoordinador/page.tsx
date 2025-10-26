@@ -142,7 +142,7 @@ export default function JustificacionesCoordinator() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 px-2 sm:px-4 lg:px-0">
       <PageTitle>Justificaciones de aprendices</PageTitle>
 
       {/* Filters */}
@@ -158,8 +158,8 @@ export default function JustificacionesCoordinator() {
 
       {/* Error Message */}
       {errorMessage && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-red-600 dark:text-red-400">{errorMessage}</p>
+        <div className="p-3 sm:p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <p className="text-sm sm:text-base text-red-600 dark:text-red-400">{errorMessage}</p>
         </div>
       )}
 
@@ -179,9 +179,9 @@ export default function JustificacionesCoordinator() {
 
           {/* Pagination - solo mostrar si hay datos */}
           {!loading && filteredData.length > 0 && (
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 pt-4 sm:pt-6">
               <button
-                className="flex items-center px-4 py-2 text-sm font-medium text-black dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+                className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-xs sm:text-sm font-medium text-black dark:text-white bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
                 onClick={handlePreviousPage}
                 disabled={!canGoPrevious}
               >
@@ -189,12 +189,12 @@ export default function JustificacionesCoordinator() {
                 Anterior
               </button>
 
-              <span className="text-sm text-gray-700 dark:text-gray-300">
+              <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 text-center">
                 Página {localCurrentPage} de {totalPages} ({totalItems} registros)
               </span>
 
               <button
-                className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+                className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
                 onClick={handleNextPage}
                 disabled={!canGoNext}
               >

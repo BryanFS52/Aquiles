@@ -3,7 +3,7 @@ import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 // Cliente Lan por medio de la direccion IP
 const clientLAN = new ApolloClient({
     link: new HttpLink({
-        uri: "https://roland-linking-makes-workout.trycloudflare.com/graphql",
+        uri: "https://wilderness-sand-monsters-investigate.trycloudflare.com/graphql",
     }),
     cache: new InMemoryCache(),
     defaultOptions: {

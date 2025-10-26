@@ -12,6 +12,7 @@ import Loader from '@components/UI/Loader';
 import EmptyState from '@components/UI/emptyState';
 import { Users,Building2, Check, X, Grid3X3, List, User, UserCheck } from 'lucide-react';
 import { useLoader } from '@/context/LoaderContext';
+import { TEMPORAL_COLLABORATOR_ID } from '@/temporaryCredential';
 
 type ViewMode = 'cards' | 'table';
 
@@ -20,6 +21,7 @@ const CoordinacionesContainer: React.FC = () => {
     const { showLoader, hideLoader } = useLoader();
     const [viewMode, setViewMode] = useState<ViewMode>('cards');
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const [expandedCards, setExpandedCards] = useState<Set<string | number>>(new Set());
 
     const { data: coordinaciones, loading, error } = useSelector(
         (state: RootState) => state.coordination
@@ -54,7 +56,7 @@ const CoordinacionesContainer: React.FC = () => {
         const loadCoordinations = async () => {
             showLoader();
             try {
-                await dispatch(fetchCoordinationByColaborator({ collaboratorId: 7, page: 0, size: 5 })).unwrap();
+                await dispatch(fetchCoordinationByColaborator({ collaboratorId: TEMPORAL_COLLABORATOR_ID, page: 0, size: 5 })).unwrap();
             } catch (error) {
                 console.error('Error loading coordinations:', error);
             } finally {
@@ -65,8 +67,25 @@ const CoordinacionesContainer: React.FC = () => {
         loadCoordinations();
     }, [dispatch]);
 
+    // Función para alternar la expansión de una card
+    const toggleExpanded = (coordinationId: string | number) => {
+        setExpandedCards(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(coordinationId)) {
+                newSet.delete(coordinationId);
+            } else {
+                newSet.add(coordinationId);
+            }
+            return newSet;
+        });
+    };
+
     // Función para renderizar las cards de coordinaciones
-    const renderCoordinationCard = (coordination: Coordination) => (
+    const renderCoordinationCard = (coordination: Coordination) => {
+        const isExpanded = expandedCards.has(coordination.id!);
+        const teachersToShow = isExpanded ? coordination.teachers : coordination.teachers?.slice(0, 3);
+        
+        return (
         <Card
             key={coordination.id}
             isDarkMode={isDarkMode}
@@ -110,8 +129,8 @@ const CoordinacionesContainer: React.FC = () => {
                             <p className="text-xs sm:text-sm font-medium text-darkGray dark:text-gray-300 mb-2">
                                 Instructores ({coordination.teachers?.length || 0})
                             </p>
-                            <div className="space-y-2 max-h-28 sm:max-h-32 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
-                                {coordination.teachers?.slice(0, 3).map((teacher, index) =>
+                            <div className={`space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent transition-all duration-300 ${isExpanded ? 'max-h-64' : 'max-h-28 sm:max-h-32'}`}>
+                                {teachersToShow?.map((teacher, index) =>
                                     teacher ? (
                                         <div
                                             key={teacher.id || index}
@@ -137,9 +156,12 @@ const CoordinacionesContainer: React.FC = () => {
                                     ) : null
                                 )}
                                 {(coordination.teachers?.length || 0) > 3 && (
-                                    <p className="text-xs text-grayText dark:text-gray-400 text-center py-1">
-                                        +{(coordination.teachers?.length || 0) - 3} instructores más
-                                    </p>
+                                    <button
+                                        onClick={() => toggleExpanded(coordination.id!)}
+                                        className="w-full text-xs text-primary dark:text-blue-300 hover:text-primary/80 dark:hover:text-blue-400 text-center py-1.5 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-medium"
+                                    >
+                                        {isExpanded ? 'Ver menos' : `+${(coordination.teachers?.length || 0) - 3} instructores más`}
+                                    </button>
                                 )}
                             </div>
                         </div>
@@ -148,7 +170,8 @@ const CoordinacionesContainer: React.FC = () => {
             }
             className="hover:shadow-xl transition-all duration-300 w-full"
         />
-    );
+        );
+    };
 
     // Columnas para la tabla
     const tableColumns = [

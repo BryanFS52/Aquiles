@@ -81,11 +81,11 @@ const AttendanceContainer: React.FC = () => {
     }
 
     return (
-        <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+        <div className="space-y-3 sm:space-y-4 md:space-y-6 p-2 sm:p-4 md:p-6">
             {/* Título */}
             <PageTitle>Lista de asistencia</PageTitle>
             {/* Sección de información del curso y estadísticas */}
-            <div className="flex flex-col space-y-4 xl:flex-row xl:space-y-0 xl:space-x-6">
+            <div className="flex flex-col space-y-3 sm:space-y-4 xl:flex-row xl:space-y-0 xl:space-x-4 lg:space-x-6">
                 {/* Nombre del curso */}
                 <AttendanceSheet 
                     studySheetData={studySheet} 

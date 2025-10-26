@@ -42,7 +42,7 @@ export default function StudySheetsPage() {
   }, [studySheetLoading, showLoader, hideLoader]);
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
+    <div className="w-full px-2 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6">
       <div className="max-w-[1600px] mx-auto">
         <PageTitle>Seguimiento de Fichas</PageTitle>
 
