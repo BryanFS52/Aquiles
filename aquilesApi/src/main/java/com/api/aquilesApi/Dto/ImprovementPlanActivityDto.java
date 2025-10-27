@@ -20,10 +20,7 @@ public class ImprovementPlanActivityDto {
     // @NotNull(message = "The delivery date is required")
     private String deliveryDate;
 
-    // Relations
-    // @NotBlank(message = "The learning outcome is required")
-    // @Size(max = 500, message = "The learning outcome cannot exceed 500 characters")
-    private Long learningOutcome;
+
 
     // @NotNull(message = "The Improvement Plan ID is required")
     private ImprovementPlanDto improvementPlan;

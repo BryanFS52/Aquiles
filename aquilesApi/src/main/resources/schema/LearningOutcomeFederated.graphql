@@ -1,0 +1,4 @@
+type LearningOutcome @key(fields: "id") @extends {
+    id: ID! @external
+    improvementPlans: [ImprovementPlan]
+}

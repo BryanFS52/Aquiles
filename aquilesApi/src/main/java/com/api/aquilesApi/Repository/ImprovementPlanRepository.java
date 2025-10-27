@@ -35,5 +35,6 @@ public interface ImprovementPlanRepository extends JpaRepository<ImprovementPlan
             ")")
     Page<ImprovementPlan> findByStudySheetId(Pageable pageable, @Param("studySheetId") Long studySheetId);
 
-
+    @Query("SELECT ip FROM ImprovementPlan ip WHERE ip.learningOutcome = :learningOutcome")
+    List<ImprovementPlan> findAllByLearningOutcome(@Param("learningOutcome") Long learningOutcome);
 }

@@ -86,4 +86,8 @@ public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
     public List<Long> findAllByTeacherCompetence(Long teacherCompetence) {
         return improvementPlanRepository.findAllByTeacherCompetence(teacherCompetence);
     }
+
+    public List<ImprovementPlan> findAllByLearningOutcome(Long learningOutcome) {
+        return improvementPlanRepository.findAllByLearningOutcome(learningOutcome);
+    }
 }

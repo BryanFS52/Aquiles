@@ -60,22 +60,19 @@ public class ImprovementPlan implements Serializable {
 
     private Long teacherCompetence;
 
+    private Long learningOutcome;
+
     // Relations
     // 1. Relation (M-1) with improvementPlanActivity
     @OneToMany(mappedBy = "improvementPlan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImprovementPlanActivity> ImprovementPlanActivities;
 
-    // 2. Relation (M-M) with improvementPlanEvidenceMap
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "improvement_plan_evidence_map",
-            joinColumns = @JoinColumn(name = "improvement_plan_id"),
-            inverseJoinColumns = @JoinColumn(name = "evidence_type_id")
-    )
-    private List<ImprovementPlanEvidenceType> evidenceTypes;
-
-    // 3. Relation (M-1) with faultType
+    // 2. Relation (M-1) with faultType
     @ManyToOne
     @JoinColumn(name = "fault_type_id", nullable = false)
     private ImprovementPlanFaultType faultType;
+
+    // 3. Relation (1-1) with ImprovementPlanEvaluation (inverse side)
+    @OneToOne(mappedBy = "improvementPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ImprovementPlanEvaluation improvementPlanEvaluation;
 }

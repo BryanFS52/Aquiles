@@ -104,6 +104,15 @@ public class ImprovementPlanBusiness {
         }
     }
 
+    // Get improvementPlan by learningOutcome
+    public List<ImprovementPlan> findAllByLearningOutcome(Long learningOutcome) {
+        try {
+            return improvementPlanService.findAllByLearningOutcome(learningOutcome);
+        } catch (Exception e) {
+            throw new CustomException("Error Getting Improvement Plans by Learning Outcome: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
     // Add new improvementPlan
     public ImprovementPlanDto add(ImprovementPlanDto improvementplanDto) {
         try {

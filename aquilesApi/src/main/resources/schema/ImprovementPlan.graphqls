@@ -13,6 +13,7 @@ type ImprovementPlan {
     conclusions: String
     student: Student
     teacherCompetence: TeacherStudySheet
+    learningOutcome: LearningOutcome
     faultType: ImprovementPlanFaultType
 }
 
@@ -31,6 +32,7 @@ input ImprovementPlanDto {
     conclusions: String
     studentId: ID
     teacherCompetence: ID
+    learningOutcome: ID
     faultType: ImprovementPlanFaultTypeDto
 }
 
