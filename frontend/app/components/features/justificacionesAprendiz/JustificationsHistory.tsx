@@ -6,7 +6,6 @@ import JustificationsHistorical from '@/components/features/justificacionesApren
 export const JustificationsHistory: React.FC<JustificationsHistoricalProps> = ({
     data,
     loading,
-    onDownloadFile,
 }) => {
     return (
         <motion.div
@@ -15,12 +14,11 @@ export const JustificationsHistory: React.FC<JustificationsHistoricalProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -30, scale: 0.95 }}
             transition={{ duration: 0.5, ease: 'easeInOut' }}
-            className="bg-white rounded-xl shadow-2xl p-6 border border-gray-100 dark:border-gray-800 dark:bg-[#002033]"
+            className="bg-white rounded-xl shadow-2xl p-3 sm:p-4 md:p-6 border border-gray-100 dark:border-gray-800 dark:bg-[#002033]"
         >
             <JustificationsHistorical
                 data={data}
                 loading={loading}
-                handleDownloadFile={onDownloadFile}
             />
         </motion.div>
     );

@@ -24,12 +24,12 @@ const assignmentCards: AssignmentCard[] = [
 
 export const FichasCoordinadorContainer: React.FC<FichasCoordinadorProps> = () => {
     return (
-        <>
+        <div className="px-2 sm:px-4 lg:px-0">
             <PageTitle>
                 Asignación de Instructores
             </PageTitle>
 
-            <div className="flex flex-col md:flex-row flex-wrap gap-y-12 gap-x-8 items-stretch">
+            <div className="flex flex-col md:flex-row flex-wrap gap-y-8 sm:gap-y-12 gap-x-6 sm:gap-x-8 items-stretch mt-4 sm:mt-6">
                 {assignmentCards.map((card) => (
                     <AssignmentCardComponent
                         key={card.id}
@@ -37,6 +37,6 @@ export const FichasCoordinadorContainer: React.FC<FichasCoordinadorProps> = () =
                     />
                 ))}
             </div>
-        </>
+        </div>
     );
 };

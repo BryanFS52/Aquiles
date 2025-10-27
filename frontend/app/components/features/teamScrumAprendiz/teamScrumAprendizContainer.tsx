@@ -187,7 +187,7 @@ const TeamScrumAprendizContainer: React.FC = () => {
     }
 
     return (
-        <div className="w-full">
+        <div className="w-full px-2 sm:px-4 lg:px-0">
             <PageTitle>Mi Team Scrum</PageTitle>
 
             <TeamHeader
@@ -196,7 +196,7 @@ const TeamScrumAprendizContainer: React.FC = () => {
                 studySheet={dataForTeamScrumById?.studySheet}
             />
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
                 <TeamMembers students={dataForTeamScrumById?.students} />
                 
                 <ProjectInfo

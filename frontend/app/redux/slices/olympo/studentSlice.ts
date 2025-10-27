@@ -1,13 +1,15 @@
 import { clientLAN } from "@lib/apollo-client";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
-import { GET_All_STUDENTS, GET_STUDENT_LIST } from '@graphql/olympo/studentsGraph';
+import { ADD_STUDENT, GET_All_STUDENTS, GET_STUDENT_LIST } from '@graphql/olympo/studentsGraph';
 import {
     Student,
     GetStudentsQuery,
     GetStudentsQueryVariables,
     GetStudentListQuery,
     GetStudentListQueryVariables,
+    AddStudentMutation,
+    AddStudentMutationVariables,
 } from '@graphql/generated'
 
 
@@ -31,6 +33,28 @@ export const fetchStudentList = createAsyncThunk<GetStudentListQuery['allStudent
             fetchPolicy: 'no-cache',
         });
         return data.allStudentList;
+    }
+);
+
+export const addStudent = createAsyncThunk<AddStudentMutation['addStudent'], AddStudentMutationVariables['input'],
+    { rejectValue: { code: string; message: string } }
+>(
+    'student/addStudent',
+    async (Input, { rejectWithValue }) => {
+        try {
+            const { data } = await clientLAN.mutate<AddStudentMutation, AddStudentMutationVariables>({
+                mutation: ADD_STUDENT,
+                variables: { input: Input },
+            });
+            const res = data?.addStudent;
+
+            if (!res || res.code !== '200') {
+                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
+            }
+            return res;
+        } catch (error: any) {
+            return rejectWithValue({ code: '500', message: error.message});
+        }
     }
 );
 
@@ -95,6 +119,16 @@ const studentSlice = createSlice({
                     message: error?.message ?? 'Error al obtener lista de estudiantes',
                 };
                 state.loading = false;
+            });
+        // addStudent
+        builder
+            .addCase(addStudent.fulfilled, (state, action: PayloadAction<AddStudentMutation['addStudent']>) => {
+                state.error = null;
+            })
+            .addCase(addStudent.rejected, (state, action) => {
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
+                state.error = { code, message };
             });
     },
 });

@@ -395,3 +395,86 @@ query GetStudySheetByIdWithAttendances($id: Long!, $competenceId : Long, $teache
   }
 }
 `;
+
+export const GET_STUDY_SHEETS_WITH_COORDINATION_ID = gql`
+  query GetStudySheetsWithCoordinationId($coordinationId: Long!, $page: Int, $size: Int) {
+    getStudySheetsWithCoordinationId(coordinationId: $coordinationId, page: $page, size: $size) {
+      date
+      code
+      message
+      data {
+        id
+        number
+        numberStudents
+        startLective
+        endLective
+        state
+        quarter{
+          id
+          name {
+            extension
+            number
+          }
+        }
+        offer {
+          id
+          name
+        }
+        journey {
+          id
+          name
+        }
+        trainingProject {
+          id
+          name
+          program {
+            name
+          }
+        }
+        studySheetState {
+          id
+          name
+        }
+        teacherStudySheets {
+          id
+          teacher {
+            id
+            totalHours
+            classTypes {
+              id
+              name
+            }
+            collaborator {
+              person {
+                name
+                lastname
+                document
+              }
+            }
+          }
+          teacherStudySheetType {
+            id
+            name
+          }
+          competence {
+            id
+            name
+          }
+        }
+      }
+      currentPage
+      totalPages
+      totalItems
+    }
+  }
+`;
+
+export const ADD_STUDY_SHEET = gql`
+    mutation AddStudySheet($input: StudySheetDTO!) {
+        addStudySheet(input: $input) {
+            code
+            message
+            id
+        }
+    }
+`;

@@ -12,9 +12,11 @@ import PageTitle from '@components/UI/pageTitle';
 import EmptyState from '@components/UI/emptyState';
 import ModalNewTeam from '@components/features/teamScrum/modalNewTeam';
 import ModalTeamInformation from '@/components/features/teamScrum/modalTeamScrumInfo';
+import { useRouter } from 'next/navigation';
 
 export const TeamScrumContainer: React.FC<TeamScrumContainerProps> = ({ studySheetId }) => {
     const { showLoader, hideLoader } = useLoader();
+    const router = useRouter();
 
     const {
         // State
@@ -75,7 +77,7 @@ export const TeamScrumContainer: React.FC<TeamScrumContainerProps> = ({ studyShe
     // Render
     return (
         <div className="p-6">
-            <PageTitle>
+            <PageTitle onBack={() => router.back()}>
                 Teams Scrum de la Ficha {studySheet ? `N° ${studySheet.number}` : ""}
             </PageTitle>
 

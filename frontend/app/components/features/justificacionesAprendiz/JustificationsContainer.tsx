@@ -15,10 +15,8 @@ import {
   updateJustificationTypeId,
   addJustification,
   validateForm,
-  downloadBase64File,
   setSubmitting,
   setCurrentAttendance,
-  generateFileName,
   FormDataState,
   fetchJustificationsByStudentId,
 } from '@slice/justificationSlice';
@@ -57,7 +55,10 @@ export const JustificationsContainer: React.FC = () => {
 
   // Cargar datos iniciales
   useEffect(() => {
-    dispatch(fetchJustificationTypes({ page: 0, size: 5 }));
+    dispatch(fetchJustificationTypes({ 
+      page: 0, 
+      size: 5 
+    }));
     dispatch(fetchAttendancesWithJustificationsByStudentId({ 
       id: TEMPORAL_APRENDIZ_ID, 
       stateId: 2, 
@@ -179,7 +180,7 @@ export const JustificationsContainer: React.FC = () => {
       dispatch(fetchJustificationsByStudentId({ 
         studentId: TEMPORAL_APRENDIZ_ID, 
         page: 0, 
-        size: 10 
+        size: 5
       }));
       dispatch(resetForm());
       fileRef.current = null;
@@ -241,14 +242,6 @@ export const JustificationsContainer: React.FC = () => {
     dispatch(updateJustificationTypeId(value));
   };
 
-  const handleDownloadFile = (justificacion: any) => {
-    if (justificacion.archivoAdjunto) {
-      const mimeType = justificacion.archivoMime || 'application/octet-stream';
-      const fileName = generateFileName(justificacion.id, mimeType);
-      downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
-    }
-  };
-
   // Loading state
   if (loadingJustificationTypes || loadingAttendances || loadingJustifications) {
     return (
@@ -267,12 +260,12 @@ export const JustificationsContainer: React.FC = () => {
   }
 
   return (
-    <div className="h-auto">
-      <div ref={topRef} className="mb-6">
+    <div className="h-auto px-2 sm:px-4 lg:px-0">
+      <div ref={topRef} className="mb-4 sm:mb-6">
         <PageTitle>Justificaciones</PageTitle>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5" ref={formRef}>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5" ref={formRef}>
         <AnimatePresence mode='sync'>
           {!form.showForm && !shouldLoadModal && (
             <motion.div
@@ -312,7 +305,6 @@ export const JustificationsContainer: React.FC = () => {
           <JustificationsHistory
             data={justificationsData}
             loading={loadingJustifications}
-            onDownloadFile={handleDownloadFile}
           />
         </AnimatePresence>
       </div>

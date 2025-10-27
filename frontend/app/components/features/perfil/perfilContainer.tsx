@@ -61,9 +61,9 @@ const ProfileField: React.FC<ProfileFieldProps> = ({
     disabled = false,
     required = false
 }) => (
-    <div className="space-y-2">
-        <label htmlFor={name} className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
-            {Icon && <Icon className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-400" />}
+    <div className="space-y-1 sm:space-y-2">
+        <label htmlFor={name} className="flex items-center text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+            {Icon && <Icon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-gray-500 dark:text-gray-400" />}
             {label}
             {required && <span className="text-red-500 ml-1">*</span>}
         </label>
@@ -75,7 +75,7 @@ const ProfileField: React.FC<ProfileFieldProps> = ({
             onChange={onChange}
             placeholder={placeholder}
             disabled={disabled}
-            className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 
+            className={`w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg border-2 transition-all duration-200 
                 ${error
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-200 dark:border-red-400 dark:focus:border-red-400'
                     : 'border-gray-300 focus:border-blue-500 focus:ring-blue-200 dark:border-gray-600 dark:focus:border-blue-400'
@@ -87,8 +87,8 @@ const ProfileField: React.FC<ProfileFieldProps> = ({
                 focus:outline-none focus:ring-2 placeholder-gray-400 dark:placeholder-gray-500`}
         />
         {error && (
-            <p className="text-sm text-red-600 dark:text-red-400 flex items-center">
-                <HiExclamationCircle className="w-4 h-4 mr-1" />
+            <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 flex items-center">
+                <HiExclamationCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                 {error}
             </p>
         )}
@@ -305,16 +305,16 @@ const PerfilContainer: React.FC = () => {
 
     if (isLoadingData) {
         return (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6 px-2 sm:px-4 lg:px-0">
                 <PageTitle>Perfil</PageTitle>
                 <div className="animate-pulse">
-                    <div className="flex flex-col lg:flex-row items-start space-y-6 lg:space-y-0 lg:space-x-8">
-                        <div className="w-48 h-48 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto lg:mx-0"></div>
-                        <div className="flex-1 space-y-4 w-full">
-                            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/4"></div>
-                            <div className="h-10 bg-gray-300 dark:bg-gray-600 rounded"></div>
-                            <div className="h-10 bg-gray-300 dark:bg-gray-600 rounded"></div>
-                            <div className="h-10 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                    <div className="flex flex-col lg:flex-row items-start space-y-4 sm:space-y-6 lg:space-y-0 lg:space-x-6 xl:space-x-8">
+                        <div className="w-32 h-32 sm:w-48 sm:h-48 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto lg:mx-0"></div>
+                        <div className="flex-1 space-y-3 sm:space-y-4 w-full">
+                            <div className="h-3 sm:h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/4"></div>
+                            <div className="h-8 sm:h-10 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                            <div className="h-8 sm:h-10 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                            <div className="h-8 sm:h-10 bg-gray-300 dark:bg-gray-600 rounded"></div>
                         </div>
                     </div>
                 </div>
@@ -323,7 +323,7 @@ const PerfilContainer: React.FC = () => {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6 px-2 sm:px-4 lg:px-0">
             <PageTitle>Mi Perfil</PageTitle>
 
             {alert && (
@@ -335,15 +335,15 @@ const PerfilContainer: React.FC = () => {
             )}
 
             {/* Header con botones de acción */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Información del Perfil</h1>
-                <div className="flex flex-wrap gap-3">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">Información del Perfil</h1>
+                <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
                     {!isEditing ? (
                         <button
                             onClick={handleEdit}
-                            className="flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors duration-200 dark:text-blue-400 dark:bg-blue-900/20 dark:border-blue-700 dark:hover:bg-blue-900/30"
+                            className="flex-1 sm:flex-none flex items-center justify-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors duration-200 dark:text-blue-400 dark:bg-blue-900/20 dark:border-blue-700 dark:hover:bg-blue-900/30"
                         >
-                            <HiPencil className="w-4 h-4 mr-2" />
+                            <HiPencil className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                             Editar
                         </button>
                     ) : (
@@ -351,19 +351,19 @@ const PerfilContainer: React.FC = () => {
                             <button
                                 onClick={handleCancel}
                                 disabled={isLoading}
-                                className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors duration-200 disabled:opacity-50 dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
+                                className="flex-1 sm:flex-none flex items-center justify-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors duration-200 disabled:opacity-50 dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
                             >
-                                <HiX className="w-4 h-4 mr-2" />
+                                <HiX className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                                 Cancelar
                             </button>
                             <button
                                 onClick={handleSave}
                                 disabled={isLoading || !hasChanges}
-                                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 sm:flex-none flex items-center justify-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isLoading ? (
                                     <>
-                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <svg className="animate-spin -ml-1 mr-2 h-3 w-3 sm:h-4 sm:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
@@ -371,8 +371,8 @@ const PerfilContainer: React.FC = () => {
                                     </>
                                 ) : (
                                     <>
-                                        <HiCheck className="w-4 h-4 mr-2" />
-                                        Guardar Cambios
+                                        <HiCheck className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                                        Guardar
                                     </>
                                 )}
                             </button>
@@ -381,23 +381,23 @@ const PerfilContainer: React.FC = () => {
                 </div>
             </div>
 
-            <div className="flex flex-col xl:flex-row items-start space-y-8 xl:space-y-0 xl:space-x-12">
+            <div className="flex flex-col xl:flex-row items-start space-y-6 sm:space-y-8 xl:space-y-0 xl:space-x-8 lg:space-x-12">
                 {/* Sección de foto */}
-                <div className="flex flex-col items-center space-y-4 w-full xl:w-auto">
+                <div className="flex flex-col items-center space-y-3 sm:space-y-4 w-full xl:w-auto mx-auto xl:mx-0">
                     <div className="relative group">
                         <Image
                             src={profileImage}
                             alt="Foto de perfil"
                             width={200}
                             height={200}
-                            className="rounded-full object-cover border-4 border-gray-200 dark:border-gray-600 shadow-lg"
+                            className="rounded-full object-cover border-4 border-gray-200 dark:border-gray-600 shadow-lg w-32 h-32 sm:w-48 sm:h-48 md:w-52 md:h-52 lg:w-56 lg:h-56"
                         />
                         {isEditing && (
                             <button
                                 onClick={() => fileInputRef.current?.click()}
                                 className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                             >
-                                <HiCamera className="w-8 h-8 text-white" />
+                                <HiCamera className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                             </button>
                         )}
                     </div>
@@ -405,7 +405,7 @@ const PerfilContainer: React.FC = () => {
                         <div className="text-center">
                             <button
                                 onClick={() => fileInputRef.current?.click()}
-                                className="text-sm text-blue-600 hover:text-blue-700 font-medium dark:text-blue-400 dark:hover:text-blue-300"
+                                className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium dark:text-blue-400 dark:hover:text-blue-300"
                             >
                                 Cambiar foto
                             </button>
@@ -424,13 +424,13 @@ const PerfilContainer: React.FC = () => {
                 </div>
 
                 {/* Formulario */}
-                <div className="flex-1 space-y-8 w-full min-w-0">
+                <div className="flex-1 space-y-6 sm:space-y-8 w-full min-w-0">
                     {/* Datos Personales */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6 pb-2 border-b border-gray-200 dark:border-gray-600">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 pb-2 border-b border-gray-200 dark:border-gray-600">
                             Datos Personales
                         </h3>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                             <ProfileField
                                 label="Nombres"
                                 name="nombres"
@@ -495,10 +495,10 @@ const PerfilContainer: React.FC = () => {
 
                     {/* Información Académica */}
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6 pb-2 border-b border-gray-200 dark:border-gray-600">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 pb-2 border-b border-gray-200 dark:border-gray-600">
                             Información Académica
                         </h3>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                             <ProfileField
                                 label="Centro de Formación"
                                 name="centro"
@@ -523,8 +523,8 @@ const PerfilContainer: React.FC = () => {
 
             {/* Información adicional */}
             {hasChanges && isEditing && (
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg dark:bg-yellow-900/20 dark:border-yellow-700">
-                    <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                <div className="p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg dark:bg-yellow-900/20 dark:border-yellow-700">
+                    <p className="text-xs sm:text-sm text-yellow-800 dark:text-yellow-300">
                         Tienes cambios sin guardar. No olvides hacer clic en &quot;Guardar Cambios&quot; para confirmar las modificaciones.
                     </p>
                 </div>

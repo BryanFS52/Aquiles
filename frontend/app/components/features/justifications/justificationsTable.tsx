@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useSelector } from "react-redux";
-import { GrAttachment } from "react-icons/gr";
 import { FaChevronLeft, FaChevronRight, FaEye } from "react-icons/fa";
 import persona from "@public/img/persona.jpg";
 import { RootState } from "@/redux/store";
@@ -11,10 +10,10 @@ import { getStatusNameById, getActiveStatuses } from "@/redux/slices/justificati
 import { JustificationStatus } from "@graphql/generated";
 import EmptyState from "@components/UI/emptyState";
 import ModalJustificationDetails from "@components/Modals/modalJustificationDetails";
+import DownloadButton from "@components/UI/DownloadButton";
 
 interface JustificationTableProps {
   filteredData: any[];
-  handleDownloadFile: (justificacion: any) => void;
   handleStatusChange: (justificacionId: string, newStatus: string) => void;
   hasAnyData?: boolean;
   isLoading?: boolean;
@@ -26,7 +25,6 @@ interface JustificationTableProps {
 
 export default function JustificationTable({
   filteredData,
-  handleDownloadFile,
   handleStatusChange,
   hasAnyData = false,
   isLoading = false,
@@ -82,14 +80,27 @@ export default function JustificationTable({
   };
 
   const getCurrentStatusName = (justificacion: any) => {
-    if (justificacion.justificationStatus && justificacion.justificationStatus !== "Sin status") {
-      return justificacion.justificationStatus;
+    // Si justificationStatus es un objeto, extraer el nombre
+    if (justificacion.justificationStatus) {
+      if (typeof justificacion.justificationStatus === 'object' && justificacion.justificationStatus.name) {
+        return justificacion.justificationStatus.name;
+      }
+      if (typeof justificacion.justificationStatus === 'string' && justificacion.justificationStatus !== "Sin status") {
+        return justificacion.justificationStatus;
+      }
     }
     return justificacion.estado || "En proceso";
   };
 
   const getCurrentSelectValue = (justificacion: any) => {
-    return justificacion.justificationStatusId || "";
+    // Si justificationStatus es un objeto, extraer el id
+    if (justificacion.justificationStatusId) {
+      return justificacion.justificationStatusId.toString();
+    }
+    if (justificacion.justificationStatus && typeof justificacion.justificationStatus === 'object') {
+      return justificacion.justificationStatus.id?.toString() || "";
+    }
+    return "";
   };
 
   // Función para abrir el modal de detalles
@@ -166,18 +177,13 @@ export default function JustificationTable({
               <td className="px-6 py-4">{justificacion.absenceDate}</td>
               <td className="px-6 py-4">{justificacion.justificationDate}</td>
               <td className="px-6 py-4">
-                {justificacion.archivoAdjunto ? (
-                  <GrAttachment
-                    title={`Descargar archivo (${justificacion.archivoMime || "desconocido"
-                      })`}
-                    className="w-5 h-5 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer transition-colors duration-200"
-                    onClick={() => handleDownloadFile(justificacion)}
-                  />
-                ) : (
-                  <span className="text-gray-400 dark:text-gray-500">
-                    No hay archivo
-                  </span>
-                )}
+                <DownloadButton
+                  fileBase64={justificacion.archivoAdjunto}
+                  mimeType={justificacion.archivoMime}
+                  fileName={`justificacion_${justificacion.documento}_${justificacion.absenceDate?.replace(/\//g, '-')}.${justificacion.archivoMime?.includes('pdf') ? 'pdf' : 'jpg'}`}
+                  variant="icon"
+                  iconSize="md"
+                />
               </td>
               <td className="px-6 py-4">
                 <span

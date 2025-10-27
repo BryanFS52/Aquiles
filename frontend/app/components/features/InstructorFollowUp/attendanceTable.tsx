@@ -91,7 +91,7 @@ export default function AttendanceTable({
       transition={{ duration: 0.5 }}
       className="w-full px-1 sm:px-2 md:px-4 lg:px-6 xl:px-8"
     >
-      <div className="overflow-x-auto w-full">
+      <div className="w-full">
         <DataTable
           columns={columns}
           data={data}

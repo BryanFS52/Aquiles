@@ -1,13 +1,13 @@
 'use client'
 import { useState, ChangeEvent, FormEvent } from 'react'
-import { NewApprentice, Apprentice } from '@type/slices/aprendices'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '@redux/store'
+import { addStudent, fetchStudentList } from '@slice/olympo/studentSlice'
+import { NewApprentice } from '@/components/features/Apprentices/aprendices'
 import { toast } from 'react-toastify'
 
-interface ApprenticeFormProps {
-  onApprenticeCreated: (apprentice: Apprentice) => void
-}
-
-const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
+const ApprenticeForm = () => {
+  const dispatch = useDispatch<AppDispatch>()
   const [newApprentice, setNewApprentice] = useState<NewApprentice>({
     name: '',
     lastName: '',
@@ -17,6 +17,7 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
     email: '',
     teamNumber: '',
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -25,39 +26,44 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setIsSubmitting(true)
+
     try {
-      const response = await fetch('http://localhost:8081/api/students', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newApprentice),
-      })
-      const createdApprentice: Apprentice = await response.json()
-      onApprenticeCreated(createdApprentice)
-      setNewApprentice({
-        name: '',
-        lastName: '',
-        documentType: '',
-        documentNumber: '',
-        program: '',
-        email: '',
-        teamNumber: '',
-      })
-      toast.success("Aprendiz creado correctamente.")
-    } catch (error) {
+      const result = await dispatch(addStudent(newApprentice as any)).unwrap()
+      
+      if (result && result.code === '200') {
+        toast.success(result.message || "Aprendiz creado correctamente.")
+        setNewApprentice({
+          name: '',
+          lastName: '',
+          documentType: '',
+          documentNumber: '',
+          program: '',
+          email: '',
+          teamNumber: '',
+        })
+        // Recargar la lista de estudiantes
+        dispatch(fetchStudentList({}))
+      } else {
+        toast.error(result?.message || "No se pudo crear el aprendiz.")
+      }
+    } catch (error: any) {
       console.error('Error al crear el aprendiz:', error)
-      toast.error("No se pudo crear el aprendiz. Por favor, intente de nuevo.")
+      toast.error(error.message || "No se pudo crear el aprendiz. Por favor, intente de nuevo.")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="bg-white dark:bg-[#0b1f33] p-6 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Crear Nuevo Aprendiz</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-800 dark:text-gray-100" htmlFor="name">Nombres</label>
+    <div className="bg-white dark:bg-shadowBlue p-4 sm:p-6 rounded-xl shadow-md border border-lightGray dark:border-grayText">
+      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-primary dark:text-secondary">Crear Nuevo Aprendiz</h2>
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-1.5 sm:space-y-2">
+            <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="name">Nombres</label>
             <input 
-              className="input px-4 py-2 border rounded-lg w-full" 
+              className="input px-3 sm:px-4 py-2 border border-lightGray dark:border-grayText rounded-lg w-full text-sm sm:text-base bg-white dark:bg-shadowBlue text-grayText dark:text-white focus:border-primary dark:focus:border-secondary focus:ring-2 focus:ring-primary/20 dark:focus:ring-secondary/20 transition-all" 
               id="name" 
               name="name" 
               value={newApprentice.name} 
@@ -65,10 +71,10 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
               required 
             />
           </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-800 dark:text-gray-100" htmlFor="lastName">Apellidos</label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="lastName">Apellidos</label>
             <input 
-              className="input px-4 py-2 border rounded-lg w-full" 
+              className="input px-3 sm:px-4 py-2 border border-lightGray dark:border-grayText rounded-lg w-full text-sm sm:text-base bg-white dark:bg-shadowBlue text-grayText dark:text-white focus:border-primary dark:focus:border-secondary focus:ring-2 focus:ring-primary/20 dark:focus:ring-secondary/20 transition-all" 
               id="lastName" 
               name="lastName" 
               value={newApprentice.lastName} 
@@ -78,11 +84,11 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-800 dark:text-gray-100" htmlFor="documentType">Tipo de Documento</label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-1.5 sm:space-y-2">
+            <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="documentType">Tipo de Documento</label>
             <select 
-              className="input px-4 py-2 border rounded-lg w-full" 
+              className="input px-3 sm:px-4 py-2 border border-lightGray dark:border-grayText rounded-lg w-full text-sm sm:text-base bg-white dark:bg-shadowBlue text-grayText dark:text-white focus:border-primary dark:focus:border-secondary focus:ring-2 focus:ring-primary/20 dark:focus:ring-secondary/20 transition-all" 
               id='documentType' 
               name="documentType" 
               value={newApprentice.documentType} 
@@ -95,10 +101,10 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
               <option value="CE">Cédula de Extranjería</option>
             </select>
           </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-800 dark:text-gray-100" htmlFor="documentNumber">Número de Documento</label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="documentNumber">Número de Documento</label>
             <input 
-              className="input px-4 py-2 border rounded-lg w-full" 
+              className="input px-3 sm:px-4 py-2 border border-lightGray dark:border-grayText rounded-lg w-full text-sm sm:text-base bg-white dark:bg-shadowBlue text-grayText dark:text-white focus:border-primary dark:focus:border-secondary focus:ring-2 focus:ring-primary/20 dark:focus:ring-secondary/20 transition-all" 
               id="documentNumber" 
               name="documentNumber" 
               value={newApprentice.documentNumber} 
@@ -108,10 +114,10 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
           </div>
         </div>
 
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-800 dark:text-gray-100" htmlFor="program">Programa</label>
+        <div className="space-y-1.5 sm:space-y-2">
+          <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="program">Programa</label>
           <input 
-            className="input px-4 py-2 border rounded-lg w-full" 
+            className="input px-3 sm:px-4 py-2 border border-lightGray dark:border-grayText rounded-lg w-full text-sm sm:text-base bg-white dark:bg-shadowBlue text-grayText dark:text-white focus:border-primary dark:focus:border-secondary focus:ring-2 focus:ring-primary/20 dark:focus:ring-secondary/20 transition-all" 
             id="program" 
             name="program" 
             value={newApprentice.program} 
@@ -120,10 +126,10 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-800 dark:text-gray-100" htmlFor="email">Correo Institucional</label>
+        <div className="space-y-1.5 sm:space-y-2">
+          <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="email">Correo Institucional</label>
           <input 
-            className="input px-4 py-2 border rounded-lg w-full" 
+            className="input px-3 sm:px-4 py-2 border border-lightGray dark:border-grayText rounded-lg w-full text-sm sm:text-base bg-white dark:bg-shadowBlue text-grayText dark:text-white focus:border-primary dark:focus:border-secondary focus:ring-2 focus:ring-primary/20 dark:focus:ring-secondary/20 transition-all" 
             type="email" 
             id="email" 
             name="email" 
@@ -133,10 +139,10 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
           />
         </div>
 
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-800 dark:text-gray-100" htmlFor="teamNumber">Número del Team</label>
+        <div className="space-y-1.5 sm:space-y-2">
+          <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="teamNumber">Número del Team</label>
           <input 
-            className="input px-4 py-2 border rounded-lg w-full" 
+            className="input px-3 sm:px-4 py-2 border border-lightGray dark:border-grayText rounded-lg w-full text-sm sm:text-base bg-white dark:bg-shadowBlue text-grayText dark:text-white focus:border-primary dark:focus:border-secondary focus:ring-2 focus:ring-primary/20 dark:focus:ring-secondary/20 transition-all" 
             id="teamNumber" 
             name="teamNumber" 
             value={newApprentice.teamNumber} 
@@ -147,9 +153,10 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
 
         <button 
           type="submit" 
-          className="bg-lightGreen text-black font-bold dark:bg-darkBlue dark:text-white px-6 py-3 rounded-lg mt-4"
+          disabled={isSubmitting}
+          className="w-full bg-gradient-to-r from-primary to-lightGreen dark:from-secondary dark:to-blue-900 text-white font-semibold px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 active:scale-95"
         >
-          Crear Aprendiz
+          {isSubmitting ? 'Creando...' : 'Crear Aprendiz'}
         </button>
       </form>
     </div>
