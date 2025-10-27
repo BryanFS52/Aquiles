@@ -2,6 +2,7 @@ package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.FinalReportBusiness;
 import com.api.aquilesApi.Dto.FinalReportDto;
+import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Http.ResponseHttpApi;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsMutation;
@@ -10,6 +11,7 @@ import com.netflix.graphql.dgs.InputArgument;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
+import java.util.Base64;
 import java.util.Map;
 
 @DgsComponent
@@ -59,19 +61,16 @@ public class FinalReportResolver {
     @DgsMutation
     public Map<String, Object> addFinalReport(@InputArgument( name = "input") FinalReportDto finalreportDto) {
         try {
-            // Converted the base64 signature to byte[]
-            if (finalreportDto.getSignature() != null && !finalreportDto.getSignature().isEmpty()) {
-                // Decode the signature from base64
-                byte[] signatureBytes = java.util.Base64.getDecoder().decode(finalreportDto.getSignature());
-                finalreportDto.setSignature(new String(signatureBytes));
-            } else {
-                throw new IllegalArgumentException("Signature is required");
-            }
             FinalReportDto finalReportDto1 = finalReportBusiness.add(finalreportDto);
             return ResponseHttpApi.responseHttpAction(
                     finalReportDto1.getId(),
                     ResponseHttpApi.CODE_OK,
                     "Add ok"
+            );
+        } catch (CustomException e) {
+            return ResponseHttpApi.responseHttpError(
+                    e.getMessage(),
+                    HttpStatus.BAD_REQUEST
             );
         } catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
@@ -112,6 +111,26 @@ public class FinalReportResolver {
         catch (Exception e) {
             return ResponseHttpApi.responseHttpError(
                     "Error deleting finalReport: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    // Generate PDF finalReport (GraphQL)
+    @DgsQuery
+    public Map<String, Object> generateFinalReport(@InputArgument Long id) {
+        try {
+            byte[] pdfBytes = finalReportBusiness.generatePdf(id);
+            String base64Pdf = Base64.getEncoder().encodeToString(pdfBytes);
+
+            return ResponseHttpApi.responseHttpFindId(
+                    base64Pdf,
+                    ResponseHttpApi.CODE_OK,
+                    "PDF generado correctamente"
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error generando PDF: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
     }

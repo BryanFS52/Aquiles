@@ -3,46 +3,127 @@
 import React, { useEffect } from "react";
 import PageTitle from "@components/UI/pageTitle";
 import DataTable from "@components/UI/DataTable";
-import { DataTableColumn } from "@components/UI/DataTable/types";
-import { AppDispatch } from "@redux/store"
+import type { DataTableColumn } from "@components/UI/DataTable/types";
+import Paginator from "@components/UI/Paginator/Paginator";
+import type { AppDispatch } from "@redux/store"
 import { useDispatch, useSelector } from "react-redux"
 import {fetchImprovementPlans} from "@slice/improvementPlanSlice";
 import { FiMapPin, FiCalendar, FiFileText, FiStar, FiBook, FiPlus, FiArrowLeft } from "react-icons/fi";
 import { ImprovementPlan } from "@graphql/generated";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useUser } from "@context/UserContext";
 
 const HistorialPlanesMejoramientoInstructor = () => {
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { data: allImprovementPlans, loading, error } = useSelector((state: any) => state.improvementPlan);
+    const { user } = useUser();
+    const { 
+        data: allImprovementPlans, 
+        loading, 
+        error, 
+        totalPages, 
+        totalItems, 
+        currentPage,
+        metaStudySheet
+    } = useSelector((state: any) => {
+        console.log('Redux state improvementPlan:', state.improvementPlan);
+        return state.improvementPlan;
+    });
+    // const { teacherCompetences, loadingCompetences } = useSelector((state: any) => state.improvementPlan);
 
+    // Obtener parámetros de la URL - puede venir como fichaData (JSON) o como ficha (número)
     const fichaDataString = searchParams.get('fichaData');
-    const fichaData = fichaDataString ? JSON.parse(decodeURIComponent(fichaDataString)) : null;
-    const improvementPlans = React.useMemo(() => {
-        if (!fichaData || !allImprovementPlans) return allImprovementPlans || [];
-        return allImprovementPlans.filter((plan: ImprovementPlan) => plan.student?.id && fichaData.studentIds.includes(plan.student.id));
-    }, [allImprovementPlans, fichaData]);
+    const fichaNumber = searchParams.get('ficha');
+    const studentIds = searchParams.get('studentIds');
+    
+    const fichaData = React.useMemo(() => {
+        if (fichaDataString) {
+            // Si viene como JSON en fichaData
+            const data = JSON.parse(decodeURIComponent(fichaDataString));
+            console.log('fichaData desde JSON:', data);
+            return data;
+        } else if (fichaNumber) {
+            // Si viene como parámetros separados
+            const data = {
+                id: null,
+                fichaNumber: fichaNumber,
+                number: fichaNumber,
+                studentIds: studentIds ? studentIds.split(',') : []
+            };
+            console.log('fichaData desde parámetros:', data);
+            return data;
+        }
+        return null;
+    }, [fichaDataString, fichaNumber, studentIds]);
+    
+    // Memorizar el ID de la ficha para evitar renders innecesarios
+    // Usar tanto id como fichaNumber según lo que esté disponible
+    const fichaId = React.useMemo(() => {
+        const id = fichaData?.id || fichaData?.fichaNumber || fichaData?.number || null;
+        // Convertir a número si es un string, ya que el backend puede esperarlo así
+        const finalId = id ? (typeof id === 'string' ? parseInt(id, 10) : id) : null;
+        console.log('fichaId calculado:', finalId, 'desde fichaData:', fichaData);
+        return finalId;
+    }, [fichaData]);
+    
+    // Usar directamente los datos del backend ya filtrados por ficha
+    const improvementPlans = allImprovementPlans || [];
+    const fichaNameOrNumber = metaStudySheet?.number ?? fichaData?.fichaNumber ?? fichaData?.number ?? fichaData?.id ?? '';
+    
+    // Estado para manejar la página actual (Paginator espera páginas basadas en 1)
+    const [page, setPage] = React.useState(1);
+    // const [selectedTeacherCompetenceId, setSelectedTeacherCompetenceId] = React.useState<number | null>(null);
 
     const [isDarkMode, setIsDarkMode] = React.useState(false);
+    
+    // Función para manejar cambio de página
+    const handlePageChange = React.useCallback((newPage: number) => {
+        if (loading || newPage === page) return; // Evitar llamadas duplicadas
+        
+        setPage(newPage);
+        // No necesitamos dispatch aquí porque el useEffect se encargará cuando page cambie
+    }, [loading, page]);
+
+    // useEffect para detectar modo oscuro - solo se ejecuta una vez
     useEffect(() => {
-        const checkDarkMode = () => setIsDarkMode(document.documentElement.classList.contains('dark'));
+        const checkDarkMode = () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            setIsDarkMode(isDark);
+        };
+
+        // Verificar inmediatamente
         checkDarkMode();
         const observer = new MutationObserver(() => checkDarkMode());
         observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
         return () => observer.disconnect();
-    }, []);
+    }, []); // Array vacío - solo se ejecuta una vez
 
+    // useEffect separado para debug de fichaId
     useEffect(() => {
-        console.log('fichaData en HistorialPlanesMejoramientoInstructor:', fichaData);
-        
-        // Traer todos los planes de mejoramiento y filtrar del lado del cliente
+        console.log('🔍 DEBUG fichaId cambió:', fichaId);
+    }, [fichaId]);
+
+    // Ya no necesitamos cargar competencias; filtramos por ficha directamente en backend
+    useEffect(() => {
+        if (!fichaId) return;
+        setPage(1); // Reiniciar a la primera página al cambiar de ficha
+    }, [fichaId]);
+
+    // useEffect para hacer fetch de datos - ahora filtra por studySheetId directamente (backend)
+    useEffect(() => {
+        console.log('🚀 useEffect ejecutado - fichaId:', fichaId, 'page:', page);
+        if (!fichaId) {
+            console.log('❌ Falta fichaId, no se ejecuta dispatch');
+            return;
+        }
+        console.log('✅ Dispatching fetchImprovementPlans con:', { page: page - 1, size: 5 });
         dispatch(fetchImprovementPlans({ 
-            page: 0, 
-            size: 5 
+            page: page - 1, // Backend espera páginas basadas en 0
+            size: 5
         }));
-    }, [dispatch, fichaData]);
+    }, [dispatch, page, fichaId]);
 
     const formatDate = (dateString: string) => {
         if (!dateString) return 'No especificada';
@@ -279,7 +360,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
         return (
             <div className="mx-auto px-4 py-8 space-y-6">
                 <PageTitle>
-                    {fichaData ? `Planes de Mejoramiento - Ficha N° ${fichaData.fichaNumber}` : `Historial De Planes De Mejoramiento`}
+                    {fichaNameOrNumber ? `Planes de Mejoramiento - Ficha N° ${fichaNameOrNumber}` : `Historial De Planes De Mejoramiento`}
                 </PageTitle>
                 {fichaData && (
                     <button onClick={() => router.back()} className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen mt-2">
@@ -293,8 +374,8 @@ const HistorialPlanesMejoramientoInstructor = () => {
                         </button>
                     </Link>
                 </div>
-                {fichaData && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Mostrando planes de mejoramiento de {fichaData.totalStudents} estudiantes de la ficha N° {fichaData.fichaNumber}</p>
+                {fichaNameOrNumber && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Mostrando planes de mejoramiento de la ficha N° {fichaNameOrNumber}</p>
                 )}
                 <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
@@ -336,54 +417,86 @@ const HistorialPlanesMejoramientoInstructor = () => {
     
     
     return (
-        <div className="mx-auto px-4 py-8 space-y-6">
-            <PageTitle>Historial De Planes De Mejoramiento</PageTitle>
-            <button onClick={() => router.back()} className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen mt-2">
-                <FiArrowLeft className="w-4 h-4 mr-1" /> Volver
-            </button>
-            <div className="mt-4">
-                <Link href={fichaData ? `./FormularioPlanesDeMejoramiento?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}` : "./FormularioPlanesDeMejoramiento"}>
-                    <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen shadow-lg">
-                        <FiPlus className="w-4 h-4 mr-2" /> Crear Nuevo Plan de Mejoramiento
-                    </button>
-                </Link>
+        <div className="mx-auto px-4 py-8">
+            <div className="space-y-6">
+                <div>
+                    <PageTitle  onBack={() => router.back()}>
+                        {fichaNameOrNumber ? `Historial - Ficha N° ${fichaNameOrNumber}` : 'Historial De Planes De Mejoramiento'}
+                    </PageTitle>
+                    {/* Botón debajo del título, con degradado verde */}
+                    <div className="mt-4">
+                        <Link href={fichaData 
+                            ? `./FormularioPlanesDeMejoramiento?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}`
+                            : "./FormularioPlanesDeMejoramiento"
+                        }>
+                            <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-lightGreen transition-colors duration-200 shadow-lg">
+                                <FiPlus className="w-4 h-4 mr-2" />
+                                Crear Nuevo Plan de Mejoramiento
+                            </button>
+                        </Link>
+                    </div>
+                </div>
+
+                {/* Dashboard Stats */}
+                <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
+                        <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mb-3 mx-auto">
+                            <FiFileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">{improvementPlans?.length || 0}</h3>
+                        <p className="text-gray-600 dark:text-gray-300 font-medium">Planes Totales (Ficha)</p>
+                    </div>
+                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
+                        <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-2xl mb-3 mx-auto">
+                            <FiStar className="w-6 h-6 text-lightGreen dark:text-darkGreen" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
+                            {improvementPlans?.filter((plan: ImprovementPlan) => 
+                                (typeof plan.qualification === "boolean" && plan.qualification === true) ||
+                                (typeof plan.qualification === "number" && plan.qualification >= 3.0)
+                            ).length || 0}
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-300 font-medium">Aprobados (página actual)</p>
+                    </div>
+                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
+                        <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-2xl mb-3 mx-auto">
+                            <FiFileText className="w-6 h-6 text-red-600 dark:text-red-400" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
+                            {improvementPlans?.filter((plan: ImprovementPlan) => 
+                                (typeof plan.qualification === "boolean" && plan.qualification === false) ||
+                                plan.qualification === null || 
+                                plan.qualification === undefined ||
+                                (typeof plan.qualification === "number" && plan.qualification < 3.0)
+                            ).length || 0}
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-300 font-medium">No Aprobados (página actual)</p>
+                    </div>
+                </div>
+
+                <DataTable<ImprovementPlan>
+                    columns={columns}
+                    data={improvementPlans || []}
+                    filterPlaceholder="Buscar..."
+                    filterFunction={filterFunction}
+                    className="shadow-lg"
+                    isDarkMode={isDarkMode}
+                />
+                
+                {/* Paginación externa para manejar paginación del servidor */}
+                {totalPages > 1 && (
+                    <div className="mt-6">
+                        <Paginator
+                            page={page}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                            isDarkMode={isDarkMode}
+                        />
+                    </div>
+                )}
+                
+
             </div>
-            <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mb-3 mx-auto">
-                        <FiFileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-black dark:text-white mb-1">{improvementPlans?.length || 0}</h3>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium">Planes Totales</p>
-                </div>
-                <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-2xl mb-3 mx-auto">
-                        <FiStar className="w-6 h-6 text-lightGreen dark:text-darkGreen" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
-                        {improvementPlans?.filter((plan: ImprovementPlan) => (typeof plan.qualification === "boolean" && plan.qualification === true) || (typeof plan.qualification === "number" && plan.qualification >= 3.0)).length || 0}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium">Aprobados</p>
-                </div>
-                <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-2xl mb-3 mx-auto">
-                        <FiFileText className="w-6 h-6 text-red-600 dark:text-red-400" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
-                        {improvementPlans?.filter((plan: ImprovementPlan) => (typeof plan.qualification === "boolean" && plan.qualification === false) || plan.qualification === null || plan.qualification === undefined || (typeof plan.qualification === "number" && plan.qualification < 3.0)).length || 0}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium">No Aprobados</p>
-                </div>
-            </div>
-            <DataTable<ImprovementPlan>
-                columns={columns}
-                data={improvementPlans || []}
-                pageSize={5}
-                filterPlaceholder="Buscar..."
-                filterFunction={filterFunction}
-                className="shadow-lg"
-                isDarkMode={isDarkMode}
-            />
         </div>
     );
 }

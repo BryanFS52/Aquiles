@@ -20,8 +20,11 @@ public class EvaluationsBusiness {
         this.evaluationsService = evaluationsService;
     }
 
-    // Get all evaluations (paginated)
-    public Page<EvaluationDto> findAll(int page, int size) {
+    // Validation Object
+
+
+    // Get all evaluations (Paginated)
+    public Page<EvaluationsDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
             Page<Evaluation> evaluationsPage = evaluationsService.findAll(pageRequest);
@@ -33,8 +36,8 @@ public class EvaluationsBusiness {
         }
     }
 
-    // Get evaluation by ID
-    public EvaluationDto findById(Long id) {
+    // Get Evaluation by ID
+    public EvaluationsDto findById(Long id) {
         try {
             Evaluation evaluation = evaluationsService.getById(id);
             return EvaluationMap.INSTANCE.EntityToDTO(evaluation);

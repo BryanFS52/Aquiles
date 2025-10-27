@@ -20,19 +20,14 @@ interface CompetenceOption {
   teacherStudySheetId?: string;
 }
 
-export default function JustificacionesInstructorSelector() {
+const JustificacionesInstructorSelector: React.FC = () => {
   const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { showLoader, hideLoader } = useLoader();
   const fichaNumber = searchParams.get('ficha');
-
-  const handleBackToFichas = () => {
-    router.push('/dashboard/FichasInstructor');
-  };
 
   const handleCompetenceSelect = (competence: CompetenceOption) => {
     const competenceQuarterId = competence.teacherStudySheetId || competence.id;
@@ -90,8 +85,8 @@ export default function JustificacionesInstructorSelector() {
 
   useEffect(() => {
     const loadCompetences = async () => {
+      showLoader();
       try {
-        setLoading(true);        
         const result = await dispatch(fetchStudySheetByTeacher({ 
           idTeacher: TEMPORAL_INSTRUCTOR_ID, 
           page: 0, 
@@ -133,25 +128,17 @@ export default function JustificacionesInstructorSelector() {
         console.error('Error loading competences:', error);
         setError("Error al cargar las competencias disponibles");
       } finally {
-        setLoading(false);
+        hideLoader();
       }
     };
 
     loadCompetences();
   }, [dispatch, fichaNumber]);
 
-  useEffect(() => {
-    if (loading) {
-      showLoader();
-    } else {
-      hideLoader();
-    }
-  }, [loading, showLoader, hideLoader]);
-
   if (!fichaNumber) {
     return (
       <div className="space-y-6">
-        <PageTitle onBack={handleBackToFichas}>
+        <PageTitle onBack={() => router.back()}>
           Seleccionar Competencia para Justificaciones
         </PageTitle>
         <EmptyState message="No se encontró ficha" />
@@ -159,26 +146,16 @@ export default function JustificacionesInstructorSelector() {
     );
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-          <PageTitle onBack={handleBackToFichas}>
-          {getPageTitle()}
-        </PageTitle>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="space-y-6">
-          <PageTitle onBack={handleBackToFichas}>
+          <PageTitle onBack={() => router.back()}>
           {getPageTitle()}
         </PageTitle>
         <EmptyState message={error} />
         <div className="flex justify-center">
           <button
-            onClick={handleBackToFichas}
+            onClick={() => router.back()}
             className="px-4 py-2 bg-primary dark:bg-secondary text-white rounded-md hover:bg-primary/90 dark:hover:bg-secondary/90 transition-colors duration-200"
           >
             Volver a Fichas Instructor
@@ -191,13 +168,13 @@ export default function JustificacionesInstructorSelector() {
   if (availableCompetences.length === 0) {
     return (
       <div className="space-y-6">
-          <PageTitle onBack={handleBackToFichas}>
+          <PageTitle onBack={() => router.back()}>
           {getPageTitle()}
         </PageTitle>
         <EmptyState message={`No se encontraron competencias disponibles para la ficha ${fichaNumber}.`} />
         <div className="flex justify-center">
           <button
-            onClick={handleBackToFichas}
+            onClick={() => router.back()}
             className="px-4 py-2 bg-primary dark:bg-secondary text-white rounded-md hover:bg-primary/90 dark:hover:bg-secondary/90 transition-colors duration-200"
           >
             Volver a Fichas Instructor
@@ -209,7 +186,7 @@ export default function JustificacionesInstructorSelector() {
 
   return (
     <div className="space-y-6">
-        <PageTitle onBack={handleBackToFichas}>
+        <PageTitle onBack={() => router.back()}>
         {getPageTitle()}
       </PageTitle>
       
@@ -225,3 +202,5 @@ export default function JustificacionesInstructorSelector() {
     </div>
   );
 }
+
+export default JustificacionesInstructorSelector;

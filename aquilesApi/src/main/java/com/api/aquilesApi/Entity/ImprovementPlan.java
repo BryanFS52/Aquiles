@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class ImprovementPlan implements Serializable {
     private String city;
 
     @Column(name = "date", nullable = false)
-    private Date date;
+    private LocalDate date;
 
     @Column(name = "reason", nullable = false, length = 255)
     private String reason;
@@ -32,10 +33,14 @@ public class ImprovementPlan implements Serializable {
     @Column(name = "state", nullable = false)
     private Boolean state;
 
-    @Column(name = "qualification", nullable = true)
+    @Column(name = "qualification")
     private Boolean qualification;
 
+    // Reference IDs (Gateway)
+    @Column (name = "student_id")
     private Long studentId;
+
+    @Column (name = "teacher_competence")
     private Long teacherCompetence;
 
     // Relations
@@ -53,8 +58,7 @@ public class ImprovementPlan implements Serializable {
     private List<ImprovementPlanEvidenceType> evidenceTypes;
 
     // 3. Relation (M-1) with faultType
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn(name = "fault_type_id", nullable = false)
     private ImprovementPlanFaultType faultType;
-
 }

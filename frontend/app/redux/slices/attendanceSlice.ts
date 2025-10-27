@@ -25,13 +25,6 @@ interface FilterOptions {
     searchTerm: string;
 }
 
-export interface TransformedAttendanceItem {
-    id: string;
-    estado: string;
-    documento: string;
-    aprendiz: string;
-}
-
 export interface StudentSummary {
     id: number;
     documento: string;
@@ -49,39 +42,10 @@ interface StudentAttendances {
 interface AttendanceState extends ReturnType<typeof createInitialPaginatedState> {
     studentAttendances: StudentAttendances;
     data: Attendance[];
-    transformedData: TransformedAttendanceItem[];
-    filteredData: TransformedAttendanceItem[];
     filterOptions: FilterOptions;
     attendanceSummary: StudentSummary[];
 }
-const transformGraphQLToAttendanceItem = (graphqlData: any): Attendance => {
-    return {
-        id: graphqlData.id,
-        attendanceDate: graphqlData.attendanceDate,
-        attendanceState: {
-            id: graphqlData.attendanceState?.id ?? '',
-            status: graphqlData.attendanceState?.status ?? '',
-        },
-        competenceQuarter: graphqlData.competenceQuarter ?? '',
-        student: {
-            id: graphqlData.student?.id ?? '',
-            person: {
-                name: graphqlData.student?.person?.name ?? '',
-                lastname: graphqlData.student?.person?.lastname ?? '',
-                document: graphqlData.student?.person?.document ?? '',
-            },
-            studentStudySheets: graphqlData.student?.studentStudySheets ?? []
-        },
-        justification: graphqlData.justification ? {
-            id: graphqlData.justification.id,
-            description: graphqlData.justification.description,
-            justificationStatus: graphqlData.justification.justificationStatus ? {
-                id: graphqlData.justification.justificationStatus.id,
-                name: graphqlData.justification.justificationStatus.name,
-            } : null
-        } : null
-    };
-}
+
 
 export const processAndSummarizeAttendances = (attendances: Attendance[]): StudentSummary[] => {
     if (!attendances) return [];
@@ -145,9 +109,7 @@ export const processAndSummarizeAttendances = (attendances: Attendance[]): Stude
     return result;
 };
 
-export const fetchAttendances = createAsyncThunk<
-    GetAttendancesQuery['allAttendances'],
-    GetAttendancesQueryVariables
+export const fetchAttendances = createAsyncThunk<GetAttendancesQuery['allAttendances'],GetAttendancesQueryVariables
 >(
     'attendance/fetchAll',
     async ({ page, size }) => {
@@ -160,16 +122,12 @@ export const fetchAttendances = createAsyncThunk<
     }
 );
 
-export const fetchAttendancesByStudent = createAsyncThunk<
-    Attendance[],
-    AllAttendancesByStudentIdQueryVariables
+export const fetchAttendancesByStudent = createAsyncThunk<Attendance[],AllAttendancesByStudentIdQueryVariables
 >(
     'attendance/fetchByStudent',
     async ({ id, stateId }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.query<
-                AllAttendancesByStudentIdQuery,
-                AllAttendancesByStudentIdQueryVariables
+            const { data } = await clientLAN.query<AllAttendancesByStudentIdQuery,AllAttendancesByStudentIdQueryVariables
             >({
                 query: GET_ATTENDANCES_BY_STUDENT,
                 variables: { id, stateId },
@@ -180,9 +138,7 @@ export const fetchAttendancesByStudent = createAsyncThunk<
 
             if (!raw) return [];
 
-            const cleanData = raw.filter((a): a is NonNullable<typeof a> & { id: string } => !!a && !!a.id);
-
-            return cleanData.map(transformGraphQLToAttendanceItem);
+            return raw.filter((a): a is NonNullable<typeof a> & { id: string } => !!a && !!a.id) as Attendance[];
         } catch (error) {
             console.error("Error al obtener asistencias por estudiante", error);
             return rejectWithValue({ message: (error as Error).message || 'Unknown error' });
@@ -193,11 +149,11 @@ export const fetchAttendancesByStudent = createAsyncThunk<
 // fetch para allAttendancesWithJustificationsByStudentId
 export const fetchAttendancesWithJustificationsByStudentId = createAsyncThunk<AllAttendancesWithJustificationsByStudentIdQuery['allAttendancesByStudentId'], AllAttendancesWithJustificationsByStudentIdQueryVariables>(
     'attendance/fetchWithJustificationsByStudent',
-    async ({ id }, { rejectWithValue }) => {
+    async ({ id, page, size }, { rejectWithValue }) => {
         try {
             const { data } = await clientLAN.query<AllAttendancesWithJustificationsByStudentIdQuery, AllAttendancesWithJustificationsByStudentIdQueryVariables>({
                 query: GET_ATTENDANCES_WITH_JUSTIFICATIONS_BY_STUDENT,
-                variables: { id },
+                variables: { id, page, size },
                 fetchPolicy: 'no-cache',
             });
             return data.allAttendancesByStudentId;
@@ -210,11 +166,11 @@ export const fetchAttendancesWithJustificationsByStudentId = createAsyncThunk<Al
 
 export const fetchAttendanceAndCompetenceByStudent = createAsyncThunk<GetAttendancesAndCompetenceByStudentIdQuery['allAttendancesByStudentId'], GetAttendancesAndCompetenceByStudentIdQueryVariables>(
     'attendance/fetchWithCompetence',
-    async ({ id }, { rejectWithValue }) => {
+    async ({ id, page, size }, { rejectWithValue }) => {
         try {
             const { data } = await clientLAN.query<GetAttendancesAndCompetenceByStudentIdQuery, GetAttendancesAndCompetenceByStudentIdQueryVariables>({
                 query: GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT,
-                variables: { id },
+                variables: { id, page, size },
                 fetchPolicy: 'no-cache',
             });
             return data.allAttendancesByStudentId;
@@ -296,13 +252,11 @@ export const deleteAttendance = createAsyncThunk<string, string,
 const initialState: AttendanceState = {
     ...createInitialPaginatedState<Attendance>(),
     studentAttendances: {
-        data: [] as any[],
+        data: [] as Attendance[],
         loading: false,
         error: null as string | null,
         showForm: false,
     },
-    transformedData: [],
-    filteredData: [],
     filterOptions: {
         selectedFiltro: '',
         searchTerm: ''
@@ -349,9 +303,7 @@ const attendanceSlice = createSlice({
             .addCase(fetchAttendances.fulfilled, (state, action: PayloadAction<GetAttendancesQuery['allAttendances']>) => {
                 const payload = action.payload;
                 if (payload?.data) {
-                    state.data = payload.data
-                        .filter((item): item is NonNullable<typeof item> => item !== null)
-                        .map(transformGraphQLToAttendanceItem);
+                    state.data = payload.data.filter((item): item is NonNullable<typeof item> => item !== null) as Attendance[];
                     state.totalItems = payload.totalItems ?? 0;
                     state.totalPages = payload.totalPages ?? 0;
                     state.currentPage = payload.currentPage ?? 0;
@@ -390,8 +342,7 @@ const attendanceSlice = createSlice({
             ) => {
                 const payload = action.payload;
                 if (payload?.data) {
-                    const cleanData = payload.data.filter((item): item is NonNullable<typeof item> & { id: string } => !!item && !!item.id);
-                    state.studentAttendances.data = cleanData.map(transformGraphQLToAttendanceItem);
+                    state.studentAttendances.data = payload.data.filter((item): item is NonNullable<typeof item> & { id: string } => !!item && !!item.id) as Attendance[];
                 } else {
                     state.studentAttendances.data = [];
                 }
@@ -409,8 +360,7 @@ const attendanceSlice = createSlice({
             .addCase(fetchAttendanceAndCompetenceByStudent.fulfilled, (state, action) => {
                 const payload = action.payload;
                 if (payload?.data) {
-                    const cleanData = payload.data.filter((item): item is NonNullable<typeof item> & { id: string } => !!item && !!item.id);
-                    state.studentAttendances.data = cleanData.map(transformGraphQLToAttendanceItem);
+                    state.studentAttendances.data = payload.data.filter((item): item is NonNullable<typeof item> & { id: string } => !!item && !!item.id) as Attendance[];
                 }
                 state.studentAttendances.loading = false;
                 state.studentAttendances.error = null;
@@ -420,10 +370,6 @@ const attendanceSlice = createSlice({
                 state.studentAttendances.error = (action.payload as RejectedPayload)?.message ?? action.error.message ?? 'Error al cargar asistencias y competencias del estudiante';
             })
             .addCase(addAttendance.fulfilled, (state, action: PayloadAction<AddAttendanceMutation['addAttendance']>) => {
-                if (action.payload && action.payload.id) {
-                    const newAttendance = transformGraphQLToAttendanceItem(action.payload);
-                    state.data.push(newAttendance);
-                }
                 state.error = null;
             })
             .addCase(addAttendance.rejected, (state, action) => {
@@ -432,13 +378,6 @@ const attendanceSlice = createSlice({
                 state.error = { code, message };
             })
             .addCase(updateAttendance.fulfilled, (state, action: PayloadAction<UpdateAttendanceMutation['updateAttendance']>) => {
-                if (action.payload && action.payload.id) {
-                    const updatedAttendance = transformGraphQLToAttendanceItem(action.payload);
-                    const index = state.data.findIndex((attendance: Attendance) => attendance.id === updatedAttendance.id);
-                    if (index !== -1) {
-                        state.data[index] = updatedAttendance;
-                    }
-                }
                 state.error = null;
             })
             .addCase(updateAttendance.rejected, (state, action) => {

@@ -152,11 +152,7 @@ export class InstructorChecklistLogic {
       const instructorStudySheetNumber = localStorage.getItem('selectedStudySheetNumber');
       console.log("🔍 Instructor study sheet:", { id: instructorStudySheetId, number: instructorStudySheetNumber });
       
-      const response = await client.query({
-        query: GET_ALL_CHECKLISTS,
-        variables: { page: 0, size: 100 },
-        fetchPolicy: 'network-only'
-      });
+      const response = await fetchChecklists.arguments(0, 5);
       console.log("Raw checklists response:", response);
 
       const checklistData = response.data?.allChecklists;
@@ -174,7 +170,7 @@ export class InstructorChecklistLogic {
             }
             
             // studySheets es un string con IDs separados por comas
-            const assignedSheets = checklist.studySheets.split(',').map(s => s.trim());
+            const assignedSheets = checklist.studySheets.split(',').map((s: string) => s.trim());
             const isAssigned = assignedSheets.includes(instructorStudySheetId);
             
             console.log(`🔍 Checklist ${checklist.id}: assigned sheets [${assignedSheets.join(', ')}], instructor sheet ID: ${instructorStudySheetId}, match: ${isAssigned}`);

@@ -139,7 +139,7 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
             });
             
             // Usar el tunnel de Cloudflare en lugar de window.location.origin
-            const baseUrl = ' https://voted-mile-planners-handmade.trycloudflare.com';
+            const baseUrl = 'https://fought-constitution-journey-gel.trycloudflare.com';
             
             // Obtener competenceQuarterId del contexto actual
             // Primero intentar desde la URL actual

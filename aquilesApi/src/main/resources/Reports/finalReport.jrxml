@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+        http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="ACTA_CIERRE" pageWidth="595" pageHeight="842"
+              columnWidth="515" leftMargin="40" rightMargin="40" topMargin="40" bottomMargin="40"
+              uuid="a1b2c3d4-e5f6-47a1-9bcd-000000000001">
+
+    <!-- ========================================================= -->
+    <!-- =============== ESTILOS GLOBALES ========================= -->
+    <!-- ========================================================= -->
+    <style name="Title" fontSize="13" isBold="true"/>
+    <style name="SectionTitle" fontSize="11" isBold="true"/>
+    <style name="Normal" fontSize="10"/>
+
+    <!-- ========================================================= -->
+    <!-- =============== PARÁMETROS DEL REPORTE ================== -->
+    <!-- ========================================================= -->
+    <parameter name="ACTA_NUMERO" class="java.lang.String"/>
+    <parameter name="FICHA" class="java.lang.String"/>
+    <parameter name="PROGRAMA" class="java.lang.String"/>
+    <parameter name="CIUDAD_FECHA" class="java.lang.String"/>
+    <parameter name="HORA_INICIO" class="java.lang.String"/>
+    <parameter name="HORA_FIN" class="java.lang.String"/>
+    <parameter name="LUGAR" class="java.lang.String"/>
+    <parameter name="OBJETIVOS" class="java.lang.String"/>
+    <parameter name="AGENDA" class="java.lang.String"/>
+    <parameter name="CONCLUSIONES" class="java.lang.String"/>
+    <parameter name="COMPROMISOS" class="java.lang.String"/>
+    <parameter name="SIGNATURE_IMAGE" class="java.awt.Image"/>
+    <parameter name="LOGO_PATH" class="java.lang.String"/>
+
+    <!-- ========================================================= -->
+    <!-- =============== CAMPOS DEL DETALLE ====================== -->
+    <!-- ========================================================= -->
+    <field name="documentNumber" class="java.lang.String"/>
+    <field name="fullName" class="java.lang.String"/>
+    <field name="contabilizarPercent" class="java.lang.String"/>
+    <field name="contabilizarStatus" class="java.lang.String"/>
+    <field name="coordinarPercent" class="java.lang.String"/>
+    <field name="coordinarStatus" class="java.lang.String"/>
+    <field name="proponerPercent" class="java.lang.String"/>
+    <field name="proponerStatus" class="java.lang.String"/>
+
+    <!-- ========================================================= -->
+    <!-- =============== ENCABEZADO DEL ACTA ===================== -->
+    <!-- ========================================================= -->
+    <title>
+        <band height="110">
+            <image>
+                <reportElement x="0" y="0" width="80" height="80"/>
+                <imageExpression><![CDATA[$P{LOGO_PATH}]]></imageExpression>
+            </image>
+
+            <staticText>
+                <reportElement x="95" y="5" width="420" height="20"/>
+                <textElement textAlignment="Center"><font size="14" isBold="true"/></textElement>
+                <text><![CDATA[ACTA DE CIERRE DE TRIMESTRE]]></text>
+            </staticText>
+
+            <textField>
+                <reportElement x="95" y="28" width="420" height="14"/>
+                <textElement textAlignment="Center"><font size="10"/></textElement>
+                <textFieldExpression><![CDATA["ACTA No. " + $P{ACTA_NUMERO} + "   |   FICHA: " + $P{FICHA}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="95" y="45" width="420" height="14"/>
+                <textElement textAlignment="Center"><font size="10"/></textElement>
+                <textFieldExpression><![CDATA[$P{PROGRAMA}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="0" y="85" width="515" height="12"/>
+                <textElement><font size="9"/></textElement>
+                <textFieldExpression><![CDATA[$P{CIUDAD_FECHA} + "  | Inicio: " + $P{HORA_INICIO} + "  | Fin: " + $P{HORA_FIN}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <!-- ========================================================= -->
+    <!-- =============== CONTENIDO ESTÁTICO ====================== -->
+    <!-- ========================================================= -->
+    <pageHeader>
+        <band height="260" splitType="Stretch">
+            <staticText>
+                <reportElement x="0" y="0" width="515" height="16"/>
+                <textElement><font size="11" isBold="true"/></textElement>
+                <text><![CDATA[OBJETIVO(S) DE LA REUNIÓN:]]></text>
+            </staticText>
+
+            <textField isStretchWithOverflow="true">
+                <reportElement x="0" y="18" width="515" height="54"/>
+                <textElement markup="html" textAlignment="Justified" verticalAlignment="Top"/>
+                <textFieldExpression><![CDATA[$P{OBJETIVOS}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="0" y="80" width="515" height="16"/>
+                <textElement><font size="11" isBold="true"/></textElement>
+                <text><![CDATA[AGENDA / PUNTOS:]]></text>
+            </staticText>
+
+            <textField isStretchWithOverflow="true">
+                <reportElement x="0" y="98" width="515" height="60"/>
+                <textElement markup="html" textAlignment="Left" verticalAlignment="Top"/>
+                <textFieldExpression><![CDATA[$P{AGENDA}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="0" y="162" width="515" height="16"/>
+                <textElement><font size="11" isBold="true"/></textElement>
+                <text><![CDATA[LISTADO CONSOLIDADO DE APRENDICES]]></text>
+            </staticText>
+
+            <!-- Encabezado de tabla -->
+            <frame>
+                <reportElement x="0" y="180" width="515" height="22"/>
+                <staticText>
+                    <reportElement x="0" y="0" width="90" height="22" />
+                    <textElement textAlignment="Center"><font isBold="true" size="9"/></textElement>
+                    <text><![CDATA[Documento]]></text>
+                </staticText>
+                <staticText>
+                    <reportElement x="92" y="0" width="240" height="22" />
+                    <textElement textAlignment="Left"><font isBold="true" size="9"/></textElement>
+                    <text><![CDATA[Apellidos y Nombres]]></text>
+                </staticText>
+                <staticText>
+                    <reportElement x="335" y="0" width="60" height="22" />
+                    <textElement textAlignment="Center"><font isBold="true" size="9"/></textElement>
+                    <text><![CDATA[% Cont.]]></text>
+                </staticText>
+                <staticText>
+                    <reportElement x="395" y="0" width="60" height="22" />
+                    <textElement textAlignment="Center"><font isBold="true" size="9"/></textElement>
+                    <text><![CDATA[% Coord.]]></text>
+                </staticText>
+                <staticText>
+                    <reportElement x="455" y="0" width="60" height="22" />
+                    <textElement textAlignment="Center"><font isBold="true" size="9"/></textElement>
+                    <text><![CDATA[% Prop.]]></text>
+                </staticText>
+            </frame>
+        </band>
+    </pageHeader>
+
+    <!-- ========================================================= -->
+    <!-- =============== DETALLE DE APRENDICES =================== -->
+    <!-- ========================================================= -->
+    <detail>
+        <band height="18">
+            <textField>
+                <reportElement x="0" y="0" width="90" height="18"/>
+                <textElement textAlignment="Center"><font size="9"/></textElement>
+                <textFieldExpression><![CDATA[$F{documentNumber}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="92" y="0" width="240" height="18"/>
+                <textElement textAlignment="Left"><font size="9"/></textElement>
+                <textFieldExpression><![CDATA[$F{fullName}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="335" y="0" width="60" height="18"/>
+                <textElement textAlignment="Center"><font size="9"/></textElement>
+                <textFieldExpression><![CDATA[$F{contabilizarPercent}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="395" y="0" width="60" height="18"/>
+                <textElement textAlignment="Center"><font size="9"/></textElement>
+                <textFieldExpression><![CDATA[$F{coordinarPercent}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="455" y="0" width="60" height="18"/>
+                <textElement textAlignment="Center"><font size="9"/></textElement>
+                <textFieldExpression><![CDATA[$F{proponerPercent}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <!-- ========================================================= -->
+    <!-- =============== PIE DE PÁGINA =========================== -->
+    <!-- ========================================================= -->
+    <pageFooter>
+        <band height="30">
+            <staticText>
+                <reportElement x="0" y="6" width="515" height="18"/>
+                <textElement textAlignment="Center"><font size="8"/></textElement>
+                <text><![CDATA[De acuerdo con La Ley 1581 de 2012, Protección de Datos Personales - GOR-F-084 V02]]></text>
+            </staticText>
+        </band>
+    </pageFooter>
+
+    <!-- ========================================================= -->
+    <!-- =============== RESUMEN Y FIRMAS ======================== -->
+    <!-- ========================================================= -->
+    <summary>
+        <band height="160" splitType="Stretch">
+            <staticText>
+                <reportElement x="0" y="0" width="515" height="16"/>
+                <textElement><font size="11" isBold="true"/></textElement>
+                <text><![CDATA[CONCLUSIONES]]></text>
+            </staticText>
+
+            <textField isStretchWithOverflow="true">
+                <reportElement x="0" y="18" width="515" height="60"/>
+                <textElement markup="html" textAlignment="Justified" verticalAlignment="Top"/>
+                <textFieldExpression><![CDATA[$P{CONCLUSIONES}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="0" y="86" width="200" height="14"/>
+                <textElement><font size="10" isBold="true"/></textElement>
+                <text><![CDATA[COMPROMISOS]]></text>
+            </staticText>
+
+            <textField isStretchWithOverflow="true">
+                <reportElement x="0" y="102" width="515" height="30"/>
+                <textElement markup="html" textAlignment="Left" verticalAlignment="Top"/>
+                <textFieldExpression><![CDATA[$P{COMPROMISOS}]]></textFieldExpression>
+            </textField>
+
+            <image>
+                <reportElement x="380" y="102" width="120" height="40">
+                    <printWhenExpression><![CDATA[$P{SIGNATURE_IMAGE} != null]]></printWhenExpression>
+                </reportElement>
+        </band>
+    </summary>
+
+</jasperReport>

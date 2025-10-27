@@ -1,24 +1,22 @@
 type ImprovementPlan {
-    id: ID
-    city: String
-    date: String
-    reason: String
-    state: Boolean
-    qualification: Boolean
+    id: ID!
+    city: String!
+    date: String!
+    reason: String!
+    state: Boolean!
+    qualification: Boolean!
     student: Student
     teacherCompetence: TeacherStudySheet
-    faultType: ImprovementPlanFaultType
 }
 
 input ImprovementPlanDto {
-    city: String
-    date: String
-    reason: String
-    state: Boolean
-    qualification: Boolean
-    studentId: ID
-    teacherCompetence: ID
-    faultType: ImprovementPlanFaultTypeDto
+    city: String!
+    date: String!
+    reason: String!
+    state: Boolean!
+    qualification: Boolean!
+    studentId: ID!
+    teacherCompetence: ID!
 }
 
 type ImprovementPlanPage {
@@ -39,9 +37,8 @@ type ImprovementPlanPageId {
 }
 
 extend type Query {
-    allImprovementPlans(page: Int, size: Int, teacherCompetence : Long): ImprovementPlanPage
+    allImprovementPlans(page: Int, size: Int): ImprovementPlanPage
     improvementPlanById(id: Long!): ImprovementPlanPageId
-
 }
 
 extend type Mutation {

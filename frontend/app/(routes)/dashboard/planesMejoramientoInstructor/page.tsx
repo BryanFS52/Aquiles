@@ -5,28 +5,16 @@ import { useRouter } from 'next/navigation';
 import { useLoader } from '@context/LoaderContext';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import PageTitle from '@components/UI/pageTitle';
-import Modal from '@components/UI/Modal';
 import { fetchStudySheetByTeacher } from '@redux/slices/olympo/studySheetSlice';
 import { fetchTeacherCompetencesByStudySheet } from '@redux/slices/improvementPlanSlice';
 import { AppDispatch } from '@redux/store';
-import EmptyState from '@components/UI/emptyState';
-import {
-    StudySheet,
-    StudentStudySheet,
-} from '@graphql/generated';
-import { FiUsers, FiBookOpen, FiCalendar, FiTarget, FiClock, FiEye, FiCreditCard, FiPhone, FiArrowRight, FiMail } from 'react-icons/fi';
+import {StudySheet,StudentStudySheet} from '@graphql/generated';
+import { FiBookOpen, FiCalendar, FiTarget, FiClock, FiEye, FiCreditCard, FiPhone, FiArrowRight, FiMail } from 'react-icons/fi';
 import { IoPeople } from "react-icons/io5";
+import PageTitle from '@components/UI/pageTitle';
+import EmptyState from '@components/UI/emptyState';
+import Modal from '@components/UI/Modal';
 
-// Estilos CSS para line-clamp
-const styles = `
-.line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-`;
 
 const PlanMejoramientoInstructor: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -99,11 +87,12 @@ const PlanMejoramientoInstructor: React.FC = () => {
 
     useEffect(() => {
         const loadData = async () => {
+            showLoader();
             try {
                 await dispatch(fetchStudySheetByTeacher({
                     idTeacher: 1,
                     page: 0,
-                    size: 50 // Aumentado para obtener más fichas
+                    size: 5
                 })).unwrap();
             } catch (error) {
                 console.error('Error al cargar fichas:', error);
@@ -111,19 +100,13 @@ const PlanMejoramientoInstructor: React.FC = () => {
                     position: "top-right",
                     autoClose: 4000,
                 });
+            } finally {
+                hideLoader();
             }
         };
         
         loadData();
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (loading) {
-            showLoader();
-        } else {
-            hideLoader();
-        }
-    }, [loading, showLoader, hideLoader]);
+    }, [dispatch, showLoader, hideLoader]);
 
     const handleViewStudents = (sheet: NonNullable<StudySheet>) => {
         setCurrentSheet(sheet);
@@ -135,80 +118,73 @@ const PlanMejoramientoInstructor: React.FC = () => {
     const handleSelectSheet = async (sheet: NonNullable<StudySheet>) => {
         console.log('Ficha seleccionada:', sheet);
         
-        // Usar el loader global en lugar de estado local
         showLoader();
         
-        // Primero cargar las competencias de esta ficha
-        const teacherId = 1; // Obtener el ID del instructor actual
-        let currentCompetences: any[] = [];
-        
         try {
-            const competencesResult = await dispatch(fetchTeacherCompetencesByStudySheet({
-                studySheetId: sheet.id?.toString() || '',
-                teacherId: teacherId.toString()
-            })).unwrap();
+            // Primero cargar las competencias de esta ficha
+            const teacherId = 1;
+            let currentCompetences: any[] = [];
             
-            currentCompetences = competencesResult || [];
-            console.log('Competencias cargadas para la ficha:', currentCompetences);
-        } catch (error) {
-            console.error('Error al cargar competencias:', error);
-            toast.error('Error al cargar las competencias de la ficha', {
-                position: "top-right",
-                autoClose: 4000,
-            });
-            currentCompetences = [];
-        }
-        
-        // Obtener los estudiantes de la ficha (misma lógica que el modal)
-        const validStudents = (sheet.studentStudySheets || []).filter((ss): ss is NonNullable<StudentStudySheet> => ss !== null);
-        const studentIds = validStudents.map(ss => ss.student?.id).filter(Boolean);
-        
-        console.log('Estudiantes de la ficha:', validStudents);
-        console.log('IDs de estudiantes:', studentIds);
-        
-        if (validStudents.length > 0) {
-            // Navegar pasando información completa de la ficha, estudiantes Y competencias
+            try {
+                const competencesResult = await dispatch(fetchTeacherCompetencesByStudySheet({
+                    studySheetId: sheet.id?.toString() || '',
+                    teacherId: teacherId.toString()
+                })).unwrap();
+                
+                currentCompetences = competencesResult || [];
+                console.log('Competencias cargadas para la ficha:', currentCompetences);
+            } catch (error) {
+                console.error('Error al cargar competencias:', error);
+                toast.error('Error al cargar las competencias de la ficha', {
+                    position: "top-right",
+                    autoClose: 4000,
+                });
+                currentCompetences = [];
+            }
+            
+            // Obtener los estudiantes de la ficha (misma lógica que el modal)
+            const validStudents = (sheet.studentStudySheets || []).filter((ss): ss is NonNullable<StudentStudySheet> => ss !== null);
+            const studentIds = validStudents.map(ss => ss.student?.id).filter(Boolean);
+            
+            console.log('Estudiantes de la ficha:', validStudents);
+            console.log('IDs de estudiantes:', studentIds);
+            
+            // Crear un objeto fichaData completo con toda la información necesaria
             const fichaData = {
                 id: sheet.id,
                 fichaNumber: sheet.number,
+                number: sheet.number,
                 studentIds: studentIds,
-                totalStudents: validStudents.length,
-                quarter: (sheet.quarter && sheet.quarter[0]) ? {
-                    id: sheet.quarter[0].id,
-                    name: sheet.quarter[0].name
-                } : null,
-                students: validStudents.map(ss => ({
-                    id: ss.student?.id,
-                    person: {
-                        name: ss.student?.person?.name,
-                        lastname: ss.student?.person?.lastname,
-                        document: ss.student?.person?.document,
-                        email: ss.student?.person?.email,
-                        phone: ss.student?.person?.phone
-                    },
-                    studentStudySheetState: ss.studentStudySheetState
-                })),
-                // Incluir las competencias que acabamos de cargar
-                teacherCompetences: currentCompetences
+                teacherCompetences: currentCompetences,
+                students: validStudents.map(ss => ss.student),
+                studentStudySheets: validStudents
             };
             
-            // Convertir a string para pasar como query parameter
-            const fichaDataString = encodeURIComponent(JSON.stringify(fichaData));
-            const url = `./HistorialPlanesMejoramientoInstructor?fichaData=${fichaDataString}`;
+            console.log('FichaData completo a enviar:', fichaData);
             
-            console.log('Navegando a:', url);
-            console.log('Datos de la ficha con competencias:', fichaData);
-            
-            hideLoader();
-            router.push(url);
-        } else {
-            hideLoader();
-            toast.warning('Esta ficha no tiene estudiantes asignados', {
+            if (validStudents.length > 0) {
+                // Navegación con objeto completo en JSON
+                const url = `./HistorialPlanesMejoramientoInstructor?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}`;
+                
+                console.log('Navegando a:', url);
+                
+                router.push(url);
+            } else {
+                toast.warning('Esta ficha no tiene estudiantes asignados', {
+                    position: "top-right",
+                    autoClose: 4000,
+                });
+                // Si no hay estudiantes, navegar sin filtro
+                router.push(`./HistorialPlanesMejoramientoInstructor`);
+            }
+        } catch (error) {
+            console.error('Error general en handleSelectSheet:', error);
+            toast.error('Error al procesar la selección de ficha', {
                 position: "top-right",
                 autoClose: 4000,
             });
-            // Si no hay estudiantes, navegar sin filtro
-            router.push(`./HistorialPlanesMejoramientoInstructor`);
+        } finally {
+            hideLoader();
         }
     };
 
@@ -233,152 +209,165 @@ const PlanMejoramientoInstructor: React.FC = () => {
         );
     }
 
-    if (!loading && (!studySheets || studySheets.length === 0)) {
+    if ((!studySheets || studySheets.length === 0) && !error) {
         return <EmptyState message="No se encontraron fichas de mejoramiento." />;
     }
 
     return (
         <div className="mx-auto px-4 py-8">
-            {/* Estilos CSS personalizados */}
-            <style jsx>{styles}</style>
-
             {/* Título */}
-            <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <PageTitle>Planes De Mejoramiento</PageTitle>
                 </div>
             </div>
 
-            {/* Dashboard Stats */}
-            <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mb-3 mx-auto">
-                        <FiBookOpen className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-black dark:text-white mb-1">{filteredStudySheets.length}</h3>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium">Fichas {(filters.ficha || filters.jornada || filters.programa) ? 'Filtradas' : 'Totales'}</p>
-                </div>
-                <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-2xl mb-3 mx-auto">
-                        <FiTarget className="w-6 h-6 text-lightGreen dark:text-darkGreen" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
-                        {filteredStudySheets.filter(sheet => sheet?.state).length}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium">Fichas Activas</p>
-                </div>
-                <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center">
-                    <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-2xl mb-3 mx-auto">
-                        <FiUsers className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
-                        {filteredStudySheets.reduce((total, sheet) => total + (sheet?.studentStudySheets?.length || 0), 0)}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 font-medium">Total Aprendices</p>
-                </div>
-            </div>
-
             {/* Filtros */}
-            <div className="mb-8 bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-6">
-                <h3 className="text-lg font-semibold text-black dark:text-white mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-primary dark:text-lightGreen" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.134 17 3 13.866 3 10C3 6.134 6.134 3 10 3C13.866 3 17 6.134 17 10Z" />
-                    </svg>
-                    Filtros
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {/* Filtro por Ficha */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Número de Ficha
-                        </label>
-                        <input
-                            type="text"
-                            value={filters.ficha}
-                            onChange={(e) => handleFilterChange('ficha', e.target.value)}
-                            placeholder="Buscar por ficha..."
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
-                        />
-                    </div>
-
-                    {/* Filtro por Jornada */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Jornada
-                        </label>
-                        <div className="relative">
-                            <select
-                                value={filters.jornada}
-                                onChange={(e) => handleFilterChange('jornada', e.target.value)}
-                                className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200 appearance-none cursor-pointer hover:border-gray-400 dark:hover:border-gray-500"
-                            >
-                                <option value="">Todas las jornadas</option>
-                                {uniqueJornadas.map((jornada) => (
-                                    <option key={jornada ?? 'no-especificado'} value={jornada ?? ''}>
-                                        {capitalizeText(jornada) || 'Jornada no especificada'}
-                                    </option>
-                                ))}
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
+            <div className="mb-8 bg-gradient-to-br from-white via-gray-50 to-white dark:from-shadowBlue dark:via-gray-800 dark:to-shadowBlue rounded-3xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-visible relative z-50">
+                {/* Header con gradiente */}
+                <div className="bg-gradient-to-r from-primary/10 via-lightGreen/10 to-primary/10 dark:from-secondary/10 dark:via-darkBlue/10 dark:to-secondary/10 px-6 py-4 border-b border-gray-200 dark:border-gray-700 rounded-t-3xl">
+                    <h3 className="text-xl font-bold text-black dark:text-white flex items-center gap-3">
+                        <div className="p-2 bg-gradient-to-br from-primary to-lightGreen dark:from-secondary dark:to-darkBlue rounded-xl shadow-md">
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.134 17 3 13.866 3 10C3 6.134 6.134 3 10 3C13.866 3 17 6.134 17 10Z" />
+                            </svg>
                         </div>
-                    </div>
-
-                    {/* Filtro por Programa */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Programa
-                        </label>
-                        <div className="relative">
-                            <select
-                                value={filters.programa}
-                                onChange={(e) => handleFilterChange('programa', e.target.value)}
-                                className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200 appearance-none cursor-pointer hover:border-gray-400 dark:hover:border-gray-500"
-                            >
-                                <option value="">Todos los programas</option>
-                                {uniqueProgramas.map((programa) => (
-                                    <option key={programa ?? 'no-especificado'} value={programa ?? ''}>
-                                        {capitalizeText(programa) || 'Programa no especificado'}
-                                    </option>
-                                ))}
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Botón limpiar filtros */}
-                    <div className="flex items-end">
-                        <button
-                            onClick={clearFilters}
-                            className="w-full px-4 py-2 bg-gradient-to-r from-lightGreen to-darkGreen hover:from-lightGreen/90 hover:to-darkGreen/90 dark:bg-gradient-to-r dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90 text-white rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center shadow-sm hover:shadow-md"
-                        >
-                            Limpiar
-                        </button>
-                    </div>
+                        <span className="bg-gradient-to-r from-primary to-lightGreen dark:from-secondary dark:to-darkBlue bg-clip-text text-transparent">
+                            Filtros de Búsqueda
+                        </span>
+                    </h3>
                 </div>
 
-                {/* Contador de resultados */}
-                {(filters.ficha || filters.jornada || filters.programa) && (
-                    <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                        Mostrando {filteredStudySheets.length} de {studySheets.length} fichas
+                {/* Contenido de filtros */}
+                <div className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        {/* Filtro por Ficha */}
+                        <div className="group">
+                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2.5 flex items-center gap-2">
+                                <FiBookOpen className="w-4 h-4 text-primary dark:text-lightGreen" />
+                                Número de Ficha
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={filters.ficha}
+                                    onChange={(e) => handleFilterChange('ficha', e.target.value)}
+                                    placeholder="Ej: 2558190..."
+                                    className="w-full px-4 py-3 pl-10 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary/50 dark:focus:ring-lightGreen/50 focus:border-primary dark:focus:border-lightGreen transition-all duration-300 hover:border-gray-300 dark:hover:border-gray-500 shadow-sm hover:shadow-md relative z-10"
+                                />
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20L7 4M17 20L17 4M3 12L21 12" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Filtro por Jornada */}
+                        <div className="group">
+                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2.5 flex items-center gap-2">
+                                <FiClock className="w-4 h-4 text-primary dark:text-lightGreen" />
+                                Jornada
+                            </label>
+                            <div className="relative">
+                                <select
+                                    value={filters.jornada}
+                                    onChange={(e) => handleFilterChange('jornada', e.target.value)}
+                                    className="w-full px-4 py-3 pl-10 pr-10 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary/50 dark:focus:ring-lightGreen/50 focus:border-primary dark:focus:border-lightGreen transition-all duration-300 appearance-none cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 shadow-sm hover:shadow-md relative z-[60]"
+                                    style={{ 
+                                        backgroundImage: 'none'
+                                    }}
+                                >
+                                    <option value="">Todas las jornadas</option>
+                                    {uniqueJornadas.map((jornada) => (
+                                        <option key={jornada ?? 'no-especificado'} value={jornada ?? ''}>
+                                            {capitalizeText(jornada) || 'Jornada no especificada'}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="absolute left-3 top-3.5 pointer-events-none z-10">
+                                    <FiClock className="w-4 h-4 text-gray-400" />
+                                </div>
+                                <div className="absolute right-3 top-3.5 pointer-events-none z-10">
+                                    <svg className="w-5 h-5 text-primary dark:text-lightGreen group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Filtro por Programa */}
+                        <div className="group">
+                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2.5 flex items-center gap-2">
+                                <FiTarget className="w-4 h-4 text-primary dark:text-lightGreen" />
+                                Programa
+                            </label>
+                            <div className="relative">
+                                <select
+                                    value={filters.programa}
+                                    onChange={(e) => handleFilterChange('programa', e.target.value)}
+                                    className="w-full px-4 py-3 pl-10 pr-10 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary/50 dark:focus:ring-lightGreen/50 focus:border-primary dark:focus:border-lightGreen transition-all duration-300 appearance-none cursor-pointer hover:border-gray-300 dark:hover:border-gray-500 shadow-sm hover:shadow-md relative z-[60]"
+                                    style={{ 
+                                        backgroundImage: 'none'
+                                    }}
+                                >
+                                    <option value="">Todos los programas</option>
+                                    {uniqueProgramas.map((programa) => (
+                                        <option key={programa ?? 'no-especificado'} value={programa ?? ''}>
+                                            {capitalizeText(programa) || 'Programa no especificado'}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="absolute left-3 top-3.5 pointer-events-none z-10">
+                                    <FiTarget className="w-4 h-4 text-gray-400" />
+                                </div>
+                                <div className="absolute right-3 top-3.5 pointer-events-none z-10">
+                                    <svg className="w-5 h-5 text-primary dark:text-lightGreen group-hover:translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Botón limpiar filtros */}
+                        <div className="flex items-end">
+                            <button
+                                onClick={clearFilters}
+                                className="w-full px-5 py-3 bg-gradient-to-r from-lightGreen to-darkGreen hover:from-lightGreen/90 hover:to-darkGreen/90 dark:bg-gradient-to-r dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90 text-white rounded-xl text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5 group relative z-10"
+                            >
+                                <svg className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                Limpiar
+                            </button>
+                        </div>
                     </div>
-                )}
+
+                    {/* Contador de resultados con diseño mejorado */}
+                    {(filters.ficha || filters.jornada || filters.programa) && (
+                        <div className="mt-5 pt-5 border-t border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center justify-center gap-2 text-sm">
+                                <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/10 to-lightGreen/10 dark:from-secondary/10 dark:to-darkBlue/10 rounded-full border border-primary/20 dark:border-secondary/20">
+                                    <svg className="w-4 h-4 text-primary dark:text-lightGreen" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span className="text-gray-700 dark:text-gray-200 font-medium">
+                                        Mostrando <span className="font-bold text-primary dark:text-lightGreen">{filteredStudySheets.length}</span> de <span className="font-bold">{studySheets.length}</span> fichas
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Grid de Fichas (más compacto y responsive) */}
             {filteredStudySheets.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 relative z-10">
                     {filteredStudySheets.map((sheet) => (
                         <div
                             key={sheet.id}
-                            className="bg-white dark:bg-shadowBlue rounded-2xl shadow-md border border-lightGray dark:border-grayText overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-gray-50 dark:hover:bg-darkBlue"
+                            className="bg-white dark:bg-shadowBlue rounded-2xl shadow-md border border-lightGray dark:border-grayText overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-gray-50 dark:hover:bg-darkBlue relative z-10"
                         >
                             {/* Header */}
                             <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
@@ -476,24 +465,15 @@ const PlanMejoramientoInstructor: React.FC = () => {
                                         </button>
                                         <button
                                             onClick={() => handleSelectSheet(sheet)}
-                                            disabled={loading}
-                                            className={`flex items-center justify-between w-full px-2 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-800 dark:hover:from-gray-600 dark:hover:to-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-all duration-200 font-medium group text-xs ${
-                                                loading ? 'opacity-50 cursor-not-allowed' : ''
-                                            }`}
+                                            className="flex items-center justify-between w-full px-2 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-800 dark:hover:from-gray-600 dark:hover:to-gray-700 text-gray-700 dark:text-gray-200 rounded-md transition-all duration-200 font-medium group text-xs"
                                         >
                                             <div className="flex items-center gap-1.5">
-                                                {loading ? (
-                                                    <div className="inline-block animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-gray-600 dark:border-gray-300"></div>
-                                                ) : (
-                                                    <FiEye className="w-3.5 h-3.5" />
-                                                )}
+                                                <FiEye className="w-3.5 h-3.5" />
                                                 <span>
                                                     Ver Historial
                                                 </span>
                                             </div>
-                                            {!loading && (
-                                                <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                                            )}
+                                            <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                                         </button>
                                     </div>
                                 </div>
@@ -631,4 +611,4 @@ const PlanMejoramientoInstructor: React.FC = () => {
     );
 };
 
-export default PlanMejoramientoInstructor;
+export default PlanMejoramientoInstructor; 

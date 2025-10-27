@@ -5,6 +5,6 @@ import { JustificationsContainer } from '@components/features/justificacionesApr
 
 const JustificacionAprendizPage: React.FC = () => {
   return <JustificationsContainer />;
-}
+};
 
 export default JustificacionAprendizPage;

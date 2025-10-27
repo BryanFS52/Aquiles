@@ -39,7 +39,7 @@ export default function JustificacionesCoordinator() {
     itemsPerPage
   } = useSelector((state: RootState) => state.justification);
 
-  const { justificationStatuses } = useSelector(
+  const { data: justificationStatuses } = useSelector(
     (state: RootState) => state.justificationStatus
   );
 
@@ -81,10 +81,13 @@ export default function JustificacionesCoordinator() {
   };
 
   const handleDownloadFile = (justificacion: any) => {
-    if (justificacion.archivoAdjunto) {
-      const mimeType = justificacion.archivoMime || "application/octet-stream";
-      const fileName = generateFileName(justificacion.id, mimeType);
+    try {
+      const mimeType = justificacion.archivoMime || "application/pdf";
+      const fileName = generateFileName(justificacion.id, mimeType);     
       downloadBase64File(justificacion.archivoAdjunto, fileName, mimeType);
+    } catch (error) {
+      console.error('❌ Error durante la descarga:', error);
+      alert('Error al intentar descargar el archivo');
     }
   };
 
@@ -93,7 +96,7 @@ export default function JustificacionesCoordinator() {
     const statusName = selectedStatus?.name || "Estado actualizado";
 
     const currentJustification = filteredData.find((j: any) => j.id.toString() === justificacionId);
-    const currentStatusId = currentJustification?.justificationStatusId?.toString() || currentJustification?.justificationStatus?.toString();
+    const currentStatusId = currentJustification?.justificationStatus?.toString();
 
     if (currentStatusId === newStatusId) {
       return;
@@ -185,6 +188,7 @@ export default function JustificacionesCoordinator() {
             hasError={Boolean(error)}
             hasFiltersApplied={hasFiltersApplied}
             isInstructorView={false}
+            justificationStatuses={justificationStatuses}
           />
 
           {/* Pagination - solo mostrar si hay datos */}

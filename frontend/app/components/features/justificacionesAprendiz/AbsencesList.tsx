@@ -88,6 +88,11 @@ export const AbsencesList: React.FC<AbsencesListProps> = ({
                                             <div className={`text-sm font-medium ${
                                                 isProcessing ? 'text-yellow-600' : 'text-red-600'
                                             }`}>
+                                                {attendance.competenceQuarter?.competence?.name && (
+                                                    <span className="block text-x text-gray-900 dark:text-gray-900 mt-1">
+                                                        {attendance.competenceQuarter.competence.name}
+                                                    </span>
+                                                )}
                                                 {attendance.justification?.justificationStatus?.name === "En proceso" 
                                                     ? "Justificacion por evaluar" 
                                                     : `${attendance.attendanceState?.status === 'Ausente' ? 'Ausencia' : attendance.attendanceState?.status || 'Ausencia'} por justificar`

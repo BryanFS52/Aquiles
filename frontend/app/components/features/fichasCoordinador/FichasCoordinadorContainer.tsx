@@ -22,9 +22,7 @@ const assignmentCards: AssignmentCard[] = [
     }
 ];
 
-export const FichasCoordinadorContainer: React.FC<FichasCoordinadorProps> = ({
-    isDarkMode = false
-}) => {
+export const FichasCoordinadorContainer: React.FC<FichasCoordinadorProps> = () => {
     return (
         <>
             <PageTitle>
@@ -36,7 +34,6 @@ export const FichasCoordinadorContainer: React.FC<FichasCoordinadorProps> = ({
                     <AssignmentCardComponent
                         key={card.id}
                         card={card}
-                        isDarkMode={isDarkMode}
                     />
                 ))}
             </div>

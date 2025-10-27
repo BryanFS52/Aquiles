@@ -25,7 +25,7 @@ public class AttendanceStateBusiness {
 
     }
 
-    // Get all attendanceStates (paginated)
+    // Get all attendanceStates (Paginated)
     public Page<AttendanceStateDto> findAll(int page , int size){
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
@@ -76,7 +76,7 @@ public class AttendanceStateBusiness {
         }
     }
 
-    // Delete attendance state by ID
+    // Delete attendanceState by ID
     public void delete (Long stateAttendanceId){
         try {
             AttendanceState attendanceState = attendanceStateService.getById(stateAttendanceId);

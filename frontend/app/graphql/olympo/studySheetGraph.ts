@@ -265,7 +265,7 @@ export const GET_STUDY_SHEET_WITH_STUDENTS = gql`
 `;
 
 export const GET_TEACHER_COMPETENCES_BY_STUDY_SHEET = gql`
-query GetCStudySheets($id: Long, $teacherId : Long) {
+query GetTeacherCompetenceByStudySheets($id: Long, $teacherId : Long) {
   studySheetById(id: $id, teacherId : $teacherId) {
     code
     message

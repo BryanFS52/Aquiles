@@ -39,18 +39,13 @@ function DataTable<T extends object>({
         );
     }, [data, filter, filterFunction, onSearchChange]);
 
-    // Si hay búsqueda remota, paginación la controla el padre
-    const totalPages = onSearchChange
-        ? Math.ceil(data.length / pageSize) || 1
-        : Math.ceil(filteredData.length / pageSize) || 1;
+    // Calcular número total de páginas según el conjunto de datos (remoto o filtrado)
+    const totalPages = Math.ceil((onSearchChange ? data : filteredData).length / pageSize) || 1;
 
-    const paginatedData = useMemo(
-        () =>
-            onSearchChange
-                ? data
-                : filteredData.slice((page - 1) * pageSize, page * pageSize),
-        [filteredData, page, pageSize, data, onSearchChange],
-    );
+    const paginatedData = useMemo(() => {
+        const source = onSearchChange ? data : filteredData;
+        return source.slice((page - 1) * pageSize, page * pageSize);
+    }, [filteredData, page, pageSize, data, onSearchChange]);
 
     // Si se pasa onSearchChange, hacer debounce y llamar al padre
     useEffect(() => {
