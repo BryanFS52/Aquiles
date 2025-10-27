@@ -6,36 +6,7 @@ import CrearListaChequeo from "@components/Modals/modalNewChecklist"
 import PageTitle from "@components/UI/pageTitle"
 
 export default function CoordinadorChecklistView() {
-  const [modalOpen, setModalOpen] = useState(false)
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false)
-  const [selectedTrimestre, setSelectedTrimestre] = useState("todos")
-  const [isEditing, setIsEditing] = useState(false)
-
-  const handleCloseModal = () => {
-    setModalOpen(false)
-    setIsEditing(false)
-  }
-
-  const handleOpenCreateModal = () => {
-    setIsEditing(false)
-    setModalOpen(true)
-  }
-
-  const handleOpenEditModal = (checklist: any) => {
-    setIsEditing(true)
-    setModalOpen(true)
-  }
-
-  const handleOpenConfirmModal = () => {
-    setConfirmModalOpen(true)
-  }
-
-  const handleDeleteChecklist = () => {
-    setConfirmModalOpen(false)
-  }
-
-  // Datos estáticos de ejemplo
-  const checklists = [
+  const [checklists, setChecklists] = useState([
     {
       id: "1",
       trimester: "1",
@@ -56,7 +27,74 @@ export default function CoordinadorChecklistView() {
       state: false,
       remarks: "Evaluar desempeño grupal"
     }
-  ]
+  ])
+
+  const [modalOpen, setModalOpen] = useState(false)
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false)
+  const [selectedTrimestre, setSelectedTrimestre] = useState("todos")
+  const [isEditing, setIsEditing] = useState(false)
+  const [selectedChecklist, setSelectedChecklist] = useState<any>(null)
+
+  // 🔹 Cerrar modal
+  const handleCloseModal = () => {
+    setModalOpen(false)
+    setIsEditing(false)
+    setSelectedChecklist(null)
+  }
+
+  // 🔹 Abrir modal para crear
+  const handleOpenCreateModal = () => {
+    setIsEditing(false)
+    setSelectedChecklist(null)
+    setModalOpen(true)
+  }
+
+  // 🔹 Abrir modal para editar (se envían los datos al modal)
+  const handleOpenEditModal = (checklist: any) => {
+    setIsEditing(true)
+    setSelectedChecklist(checklist)
+    setModalOpen(true)
+  }
+
+  // 🔹 Abrir modal de confirmación
+  const handleOpenConfirmModal = (checklist: any) => {
+    setSelectedChecklist(checklist)
+    setConfirmModalOpen(true)
+  }
+
+  // 🔹 Eliminar lista
+  const handleDeleteChecklist = () => {
+    if (selectedChecklist) {
+      setChecklists(prev => prev.filter(c => c.id !== selectedChecklist.id))
+    }
+    setConfirmModalOpen(false)
+  }
+
+  // ✅ Crear o actualizar lista
+  const handleSaveChecklist = (data: any) => {
+    if (isEditing) {
+      // 🔹 Actualiza la lista existente
+      setChecklists(prev =>
+        prev.map(c =>
+          c.id === data.id ? { ...c, ...data } : c
+        )
+      )
+    } else {
+      // 🔹 Crea nueva lista
+      const newChecklist = {
+        id: String(Date.now()),
+        ...data,
+        items: data.items || [],
+        state: true
+      }
+      setChecklists(prev => [...prev, newChecklist])
+    }
+
+    // Cierra el modal
+    setModalOpen(false)
+    setIsEditing(false)
+    setSelectedChecklist(null)
+  }
 
   const getFormattedStudySheets = (studySheets: string): string => {
     if (!studySheets) return 'Sin fichas asociadas'
@@ -65,17 +103,21 @@ export default function CoordinadorChecklistView() {
     return `${sheetIds.length} fichas asociadas`
   }
 
-  const filteredChecklists = checklists.filter((checklist) =>
-    selectedTrimestre === "todos" || checklist.trimester === selectedTrimestre
+  const filteredChecklists = checklists.filter(
+    (checklist) => selectedTrimestre === "todos" || checklist.trimester === selectedTrimestre
   )
 
   return (
     <>
       <PageTitle>Listas de Chequeo Trimestrales</PageTitle>
 
+      {/* Filtro y botón */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
-          <label htmlFor="trimestre-select" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor="trimestre-select"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Filtrar por trimestre:
           </label>
           <select
@@ -88,6 +130,10 @@ export default function CoordinadorChecklistView() {
             <option value="1">Primer Trimestre</option>
             <option value="2">Segundo Trimestre</option>
             <option value="3">Tercer Trimestre</option>
+            <option value="4">Cuarto Trimestre</option>
+            <option value="5">Quinto Trimestre</option>
+            <option value="6">Sexto Trimestre</option>
+            <option value="7">Séptimo Trimestre</option>
           </select>
         </div>
 
@@ -99,6 +145,7 @@ export default function CoordinadorChecklistView() {
         </button>
       </div>
 
+      {/* Listas */}
       <div className="mt-6 overflow-visible">
         {filteredChecklists.length === 0 ? (
           <div className="text-center py-8">
@@ -127,11 +174,12 @@ export default function CoordinadorChecklistView() {
                             onClick={() => handleOpenEditModal(checklist)}
                             className="text-white hover:text-yellow-300 transition-colors p-2 rounded-full hover:bg-white/10"
                             title="Editar"
+                            
                           >
                             <FaEdit className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleOpenConfirmModal()}
+                            onClick={() => handleOpenConfirmModal(checklist)}
                             className="text-white hover:text-red-300 transition-colors p-2 rounded-full hover:bg-white/10"
                             title="Eliminar"
                           >
@@ -219,13 +267,16 @@ export default function CoordinadorChecklistView() {
         )}
       </div>
 
+      {/* 🔹 Modal Crear/Editar */}
       <CrearListaChequeo
         isOpen={modalOpen}
         onClose={handleCloseModal}
-        onCreate={() => {}}
+        onCreate={handleSaveChecklist}
         isEditing={isEditing}
+        checklist={selectedChecklist}
       />
 
+      {/* 🔹 Modal Confirmar eliminación */}
       {confirmModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
