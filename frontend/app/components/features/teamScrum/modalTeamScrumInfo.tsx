@@ -25,12 +25,12 @@ interface TeamInfoData {
     memberIds: { studentId: number; profileId: string }[];
 }
 
-export default function ModalTeamInformation({
+const ModalTeamInformation: React.FC<ModalTeamInformationProps> = ({
     isOpen,
     onClose,
     team,
     onSave
-}: ModalTeamInformationProps) {
+}) => {
     const [formData, setFormData] = useState<TeamInfoData>({
         projectName: String(team?.projectName || ""),
         teamName: String(team?.teamName || ""),
@@ -292,3 +292,5 @@ export default function ModalTeamInformation({
         </Modal>
     );
 }
+
+export default ModalTeamInformation;

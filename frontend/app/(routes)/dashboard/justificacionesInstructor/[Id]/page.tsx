@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import JustificacionesInstructorContainer from "@/components/features/justifications/justficacionesInstructorContainer";
+import JustificacionesInstructorContainer from "@/components/features/JustificacionesInstructor/justficacionesInstructorContainer";
 
 const JustificationInstructorPage: React.FC = () => {
   const params = useParams<{ Id: string }>();

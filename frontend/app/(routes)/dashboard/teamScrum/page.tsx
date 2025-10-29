@@ -10,7 +10,7 @@ import PageTitle from "@components/UI/pageTitle";
 import EmptyState from "@components/UI/emptyState";
 import Link from "next/link";
 
-export default function StudySheetsPage() {
+const StudySheetsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { data: studySheets, loading: studySheetLoading, error } = useSelector((state: RootState) => state.studySheet);
   const { showLoader, hideLoader } = useLoader();
@@ -176,3 +176,5 @@ export default function StudySheetsPage() {
     </div>
   );
 }
+
+export default StudySheetsPage;

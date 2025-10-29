@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import PageTitle from "@components/UI/pageTitle";
-import JustificationFilters from "@components/features/justifications/justificationsFilter";
-import JustificationTable from "@components/features/justifications/justificationsTable";
+import JustificationFilters from "@components/features/JustificacionesInstructor/justificationsFilter";
+import JustificationTable from "@components/features/JustificacionesInstructor/justificationsTable";
 import {
   toggleCompetenceQuarterMultiFilter,
   clearCompetenceQuarterMultiFilters,

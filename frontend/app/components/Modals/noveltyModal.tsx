@@ -18,7 +18,9 @@ interface NoveltyModalProps {
   onClose: () => void
 }
 
-export default function NoveltyModal({ isOpen, onClose }: NoveltyModalProps) {
+const NoveltyModal: React.FC<
+  NoveltyModalProps
+> = ({ isOpen, onClose }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const dispatch = useDispatch<AppDispatch>()
 
@@ -237,3 +239,5 @@ export default function NoveltyModal({ isOpen, onClose }: NoveltyModalProps) {
     </div>
   )
 }
+
+export default NoveltyModal;

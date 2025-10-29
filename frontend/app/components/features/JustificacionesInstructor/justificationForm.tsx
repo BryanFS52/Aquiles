@@ -18,7 +18,7 @@ interface Props {
     fileInputRefPrev: RefObject<HTMLInputElement>;
 }
 
-export default function JustificationFormComponent({
+const JustificationFormComponent: React.FC<Props> = ({
     form,
     justificationTypesData,
     loadingJustificationTypes,
@@ -32,7 +32,7 @@ export default function JustificationFormComponent({
     updateJustificationTypeId,
     fileRef,
     fileInputRefPrev,
-}: Props) {
+}) => {
     return (
         <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -165,3 +165,5 @@ export default function JustificationFormComponent({
         </motion.div>
     );
 }
+
+export default JustificationFormComponent;

@@ -6,7 +6,7 @@ interface Option {
   label: string;
 }
 
-export default function LearningSelect() {
+const LearningSelect: React.FC = () => {
   const [selectedValue, setSelectedValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
@@ -77,3 +77,5 @@ export default function LearningSelect() {
     </div>
   );
 }
+
+export default LearningSelect;
