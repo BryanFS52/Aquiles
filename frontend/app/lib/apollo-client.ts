@@ -3,9 +3,11 @@ import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 // Cliente Lan por medio de la direccion IP
 const clientLAN = new ApolloClient({
     link: new HttpLink({
-        uri: "https://wilderness-sand-monsters-investigate.trycloudflare.com/graphql",
+        uri: "http://localhost:4000/graphql",
     }),
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+        addTypename: false
+    }),
     defaultOptions: {
         watchQuery: {
             fetchPolicy: 'no-cache',
