@@ -11,11 +11,7 @@ import {
   StudySheetGrid
 } from "@components/features/seguimiento";
 
-/**
- * StudySheetsPage
- * Página principal del dashboard de seguimiento de fichas
- */
-export default function StudySheetsPage() {
+const StudySheetsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { showLoader, hideLoader } = useLoader();
 
@@ -57,3 +53,5 @@ export default function StudySheetsPage() {
     </div>
   );
 }
+
+export default StudySheetsPage;

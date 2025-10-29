@@ -45,7 +45,7 @@ const FILTER_STATUS: Record<string, string> = {
   "En proceso": "En proceso"
 } as const;
 
-export default function JustificationFilters({
+const JustificationFilters: React.FC<Props> = ({
   filterOptions,
   loading,
   showMultiFilterToggle = true,
@@ -54,7 +54,7 @@ export default function JustificationFilters({
   onToggleMultiFilter,
   onClearMultiFilters,
   onRefresh,
-}: Props) {
+}) => {
   // State for hydration safety
   const [isClient, setIsClient] = useState(false);
   
@@ -171,3 +171,5 @@ export default function JustificationFilters({
     </div>
   );
 }
+
+export default JustificationFilters;

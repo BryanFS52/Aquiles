@@ -12,7 +12,9 @@ interface PageProps {
   params: Promise<{ Id: string }>;
 }
 
-export default function InstructorFollowUpPage({ params }: PageProps) {
+const InstructorFollowUpPage: React.FC<
+  PageProps
+> = ({ params }: PageProps) => {
   const resolvedParams = use(params);
   const competenceQuarterId = parseInt(resolvedParams.Id);
   
@@ -63,3 +65,5 @@ export default function InstructorFollowUpPage({ params }: PageProps) {
     />
   );
 }
+
+export default InstructorFollowUpPage;

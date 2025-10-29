@@ -11,11 +11,9 @@ interface AttendanceTableProps {
   onReportNovelty?: (studentId?: number) => void;
 }
 
-export default function AttendanceTable({
-  data,
-  loading,
-  onReportNovelty
-}: AttendanceTableProps) {
+const AttendanceTable: React.FC<
+  AttendanceTableProps
+> = ({data, loading, onReportNovelty }) => {
   // Auto-detect dark mode
   const [isDarkMode, setIsDarkMode] = useState(false);
 

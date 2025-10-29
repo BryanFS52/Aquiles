@@ -23,7 +23,7 @@ interface JustificationTableProps {
   justificationStatuses: JustificationStatus[];
 }
 
-export default function JustificationTable({
+const JustificationTable: React.FC<JustificationTableProps> = ({
   filteredData,
   handleStatusChange,
   hasAnyData = false,
@@ -31,7 +31,7 @@ export default function JustificationTable({
   hasError = false,
   hasFiltersApplied = false,
   isInstructorView = false,
-}: JustificationTableProps) {
+}) => {
   
   // Estado para la paginación
   const [currentPage, setCurrentPage] = useState(0);
@@ -301,3 +301,5 @@ export default function JustificationTable({
     </div>
   );
 }
+
+export default JustificationTable;

@@ -68,7 +68,7 @@ const MENU_CONFIG: MenuConfig = {
         { href: "/dashboard/asistenciaAprendiz", label: "Asistencia", icon: IconAsistencia },
         { href: "/dashboard/teamScrumAprendiz", label: "Team", icon: IconTeams },
         { href: "/dashboard/ListaChequeoAprendiz", label: "Sustentaciones", icon: IconSustentaciones },
-        { href: "/dashboard/justificacionesAprendiz", label: "Justificaciones", icon: IconJustificaciones },
+        { href: "/dashboard/JustificacionesAprendiz", label: "Justificaciones", icon: IconJustificaciones },
         { href: "/dashboard/planesMejoramientoAprendiz", label: "P. Mejoramiento", icon: IconPlanesMejoramiento },
     ],
     coordinador: [
@@ -77,7 +77,7 @@ const MENU_CONFIG: MenuConfig = {
         { href: "/dashboard/InstructoresCoordinador", label: "Instructores", icon: IconProfesor },
         { href: "/dashboard/ProgramasCoordinador", label: "Programas", icon: IconProgramas },
         { href: "/dashboard/ListaChequeoCoordinador", label: "Sustentaciones", icon: IconSustentaciones },
-        { href: "/dashboard/justificacionesCoordinador", label: "Justificaciones", icon: IconJustificaciones },
+        { href: "/dashboard/JustificacionesCoordinador", label: "Justificaciones", icon: IconJustificaciones },
         { href: "/dashboard/Aprendices", label: "Aprendices", icon: IconAprendices },
     ]
 };

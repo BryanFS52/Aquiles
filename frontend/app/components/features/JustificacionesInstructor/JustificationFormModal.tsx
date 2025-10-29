@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { FaRegListAlt } from 'react-icons/fa';
 import { JustificationFormProps } from './types';
-import JustificationFormComponent from '@components/features/justifications/justificationForm';
+import JustificationFormComponent from '@components/features/JustificacionesInstructor/justificationForm';
 
 interface JustificationFormModalProps extends JustificationFormProps {
     formRef?: React.RefObject<HTMLDivElement>;

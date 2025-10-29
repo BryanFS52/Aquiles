@@ -12,10 +12,9 @@ interface JustificationsHistoricalProps {
   loading: boolean;
 }
 
-export default function JustificationsHistorical({
-  data,
-  loading,
-}: JustificationsHistoricalProps) {
+const JustificationsHistorical: React.FC<
+  JustificationsHistoricalProps
+> = ({data, loading}) => {
   // Estado para la paginación
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 6;
@@ -278,3 +277,5 @@ export default function JustificationsHistorical({
     </motion.div>
   );
 }
+
+export default JustificationsHistorical;
