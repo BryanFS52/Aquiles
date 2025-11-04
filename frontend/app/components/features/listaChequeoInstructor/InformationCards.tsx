@@ -4,10 +4,29 @@ import React from 'react';
 import { Card } from "@components/UI/Card";
 import { InformationCardsProps } from './types';
 
-export const InformationCards: React.FC<InformationCardsProps> = ({
+interface StudySheetInfo {
+  fichaNumber: string;
+  jornada: string;
+  fechas: string;
+  programa: string;
+}
+
+interface TeamScrumInfo {
+  teamName: string;
+  projectName: string;
+}
+
+interface InformationCardsPropsExtended extends InformationCardsProps {
+  studySheetInfo?: StudySheetInfo;
+  teamScrumInfo?: TeamScrumInfo;
+}
+
+export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
   selectedTeamScrumName,
   selectedStudySheetNumber,
-  selectedChecklist
+  selectedChecklist,
+  studySheetInfo,
+  teamScrumInfo
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -21,11 +40,15 @@ export const InformationCards: React.FC<InformationCardsProps> = ({
         }
         body={
           <div className="text-center">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Centro de Formación</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300 leading-tight">Centro de Servicios Financieros</p>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Programa de Formación</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300 leading-tight">
+              {studySheetInfo?.programa || selectedChecklist?.trainingProjectName || "Centro de Servicios Financieros"}
+            </p>
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-              <p className="text-xs font-semibold text-[#5cb800] dark:text-[#5cb800]">Fecha</p>
-              <p className="text-xs text-gray-600 dark:text-gray-300">05/02/2024 - 05/05/2024</p>
+              <p className="text-xs font-semibold text-[#5cb800] dark:text-[#5cb800]">Fechas Lectivas</p>
+              <p className="text-xs text-gray-600 dark:text-gray-300">
+                {studySheetInfo?.fechas || "No disponible"}
+              </p>
             </div>
           </div>
         }
@@ -43,11 +66,13 @@ export const InformationCards: React.FC<InformationCardsProps> = ({
           <div className="text-center">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Datos de Formación</h3>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              <span className="font-semibold text-gray-900 dark:text-white">Jornada:</span> Diurna
+              <span className="font-semibold text-gray-900 dark:text-white">Jornada:</span> {studySheetInfo?.jornada || "Diurna"}
             </p>
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
               <p className="text-xs font-semibold text-[#538dda] dark:text-blue-400">Ficha N°</p>
-              <p className="text-xs text-gray-600 dark:text-gray-300">{selectedStudySheetNumber || "No disponible"}</p>
+              <p className="text-xs text-gray-600 dark:text-gray-300">
+                {studySheetInfo?.fichaNumber || selectedStudySheetNumber || "No disponible"}
+              </p>
             </div>
           </div>
         }
@@ -64,10 +89,14 @@ export const InformationCards: React.FC<InformationCardsProps> = ({
         body={
           <div className="text-center">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Team Scrum</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{selectedTeamScrumName || "No seleccionado"}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+              {teamScrumInfo?.teamName || selectedTeamScrumName || "No seleccionado"}
+            </p>
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-              <p className="text-xs font-semibold text-purple-600 dark:text-purple-400">Evaluando</p>
-              <p className="text-xs text-gray-600 dark:text-gray-300">Equipo de desarrollo</p>
+              <p className="text-xs font-semibold text-purple-600 dark:text-purple-400">Proyecto</p>
+              <p className="text-xs text-gray-600 dark:text-gray-300">
+                {teamScrumInfo?.projectName || "No disponible"}
+              </p>
             </div>
           </div>
         }
@@ -83,13 +112,15 @@ export const InformationCards: React.FC<InformationCardsProps> = ({
         }
         body={
           <div className="text-center">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Instructor Calificador</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Juan Pérez</p>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Lista de Chequeo</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+              {selectedChecklist?.name || "No seleccionada"}
+            </p>
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-              <p className="text-xs font-semibold text-orange-600 dark:text-orange-400">Lista Seleccionada</p>
+              <p className="text-xs font-semibold text-orange-600 dark:text-orange-400">Trimestre</p>
               {selectedChecklist ? (
                 <p className="text-xs text-gray-600 dark:text-gray-300 leading-tight">
-                  ID: {selectedChecklist.id} - {selectedChecklist.component || 'N/A'}
+                  {selectedChecklist.trimester || 'Sin trimestre asignado'}
                 </p>
               ) : (
                 <p className="text-xs text-gray-500 dark:text-gray-400">Ninguna lista seleccionada</p>

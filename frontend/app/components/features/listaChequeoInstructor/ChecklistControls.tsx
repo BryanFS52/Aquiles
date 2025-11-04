@@ -1,12 +1,18 @@
 import React from 'react';
-import { Save, FileDown, Edit } from "lucide-react";
 import { ChecklistControlsProps } from './types';
+import { Card } from "@components/UI/Card";
+import { FileText, Download, Edit3, Filter } from 'lucide-react';
 
-export const ChecklistControls: React.FC<ChecklistControlsProps> = ({
+interface ChecklistControlsPropsExtended extends ChecklistControlsProps {
+  availableTrimester: string[];
+}
+
+export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
   selectedTrimester,
   filteredChecklists,
   selectedChecklist,
   activeChecklists,
+  availableTrimester,
   isFinalSaved,
   onTrimesterChange,
   onChecklistChange,
@@ -16,108 +22,140 @@ export const ChecklistControls: React.FC<ChecklistControlsProps> = ({
   onExportExcel
 }) => {
   return (
-    <div className="relative">
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-3xl border border-gray-200 dark:border-gray-700 shadow-xl p-6">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-          <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-            <div className="relative group">
+    <Card
+      header={
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue rounded-xl flex items-center justify-center">
+            <Filter className="w-5 h-5 text-white" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Controles de Lista de Chequeo</h3>
+        </div>
+      }
+      body={
+        <div className="space-y-6">
+          {/* Selectores */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Selector de Trimestre - Ahora dinámico */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                <span className="w-2 h-2 bg-[#5cb800] dark:bg-shadowBlue rounded-full"></span>
+                Trimestre (del Coordinador)
+              </label>
               <select
-                onChange={(e) => onTrimesterChange(e.target.value)}
                 value={selectedTrimester}
-                className="hexagon-input appearance-none p-4 pl-12 pr-10 border-2 border-darkBlue dark:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white rounded-full focus:ring-4 focus:ring-[#5cb800]/30 dark:focus:ring-shadowBlue/30 focus:border-[#5cb800] dark:focus:border-shadowBlue transition-all duration-300 shadow-lg hover:shadow-xl font-semibold cursor-pointer"
+                onChange={(e) => onTrimesterChange(e.target.value)}
+                disabled={isFinalSaved}
+                className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200 ${
+                  isFinalSaved 
+                    ? 'opacity-50 cursor-not-allowed' 
+                    : 'focus:ring-2 focus:ring-[#5cb800] dark:focus:ring-shadowBlue focus:border-[#5cb800] dark:focus:border-shadowBlue hover:border-[#5cb800] dark:hover:border-shadowBlue'
+                }`}
               >
-                <option value="todos">Todos los Trimestres</option>
-                {[...Array(7)].map((_, i) => (
-                  <option key={i + 1} value={i + 1}>Trimestre {i + 1}</option>
+                <option value="">Todos los Trimestres</option>
+                {availableTrimester.map((trimester) => (
+                  <option key={trimester} value={trimester}>
+                    {trimester}
+                  </option>
                 ))}
               </select>
-
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-darkBlue dark:text-shadowBlue pointer-events-none">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </div>
+              {availableTrimester.length === 0 && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  No hay trimestres creados por el coordinador
+                </p>
+              )}
             </div>
 
-            <div className="relative group">
+            {/* Selector de Lista de Chequeo */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                <span className="w-2 h-2 bg-[#538dda] dark:bg-blue-400 rounded-full"></span>
+                Lista de Chequeo
+              </label>
               <select
+                value={selectedChecklist?.id || ''}
                 onChange={(e) => onChecklistChange(e.target.value)}
-                value={selectedChecklist?.id || ""}
-                className="hexagon-input appearance-none p-4 pl-12 pr-10 border-2 border-darkBlue dark:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-darkBlue dark:text-white rounded-full focus:ring-4 focus:ring-[#5cb800]/30 dark:focus:ring-shadowBlue/30 focus:border-[#5cb800] dark:focus:border-shadowBlue transition-all duration-300 shadow-lg hover:shadow-xl font-semibold cursor-pointer"
-                disabled={filteredChecklists.length === 0}
+                disabled={isFinalSaved}
+                className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200 ${
+                  isFinalSaved 
+                    ? 'opacity-50 cursor-not-allowed' 
+                    : 'focus:ring-2 focus:ring-[#538dda] dark:focus:ring-blue-400 focus:border-[#538dda] dark:focus:border-blue-400 hover:border-[#538dda] dark:hover:border-blue-400'
+                }`}
               >
                 <option value="">Seleccionar Lista de Chequeo</option>
                 {filteredChecklists.map((checklist) => (
                   <option key={checklist.id} value={checklist.id}>
-                    ID: {checklist.id} - {checklist.component || 'Lista de Chequeo'} (T{checklist.trimester || 'N/A'})
+                    {checklist.name || `ID: ${checklist.id}`} - {checklist.trainingProjectName || 'Sin proyecto'} - {checklist.trimester || 'Sin trimestre'}
                   </option>
                 ))}
               </select>
-
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-darkBlue dark:text-shadowBlue pointer-events-none">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </div>
             </div>
+          </div>
 
+          {/* Botones de acción */}
+          <div className="flex flex-wrap gap-3 justify-center md:justify-end">
             <button
               onClick={onSaveChecklist}
               disabled={!selectedChecklist || isFinalSaved}
-              className={`hexagon-button flex items-center gap-3 px-6 py-4 rounded-full border-2 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${selectedChecklist && !isFinalSaved
-                  ? 'border-[#5cb800] dark:border-shadowBlue bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue text-white hover:from-[#4a9600] hover:to-[#7bc300] dark:hover:from-darkBlue dark:hover:to-shadowBlue'
-                  : 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
-                }`}
+              className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
             >
-              <Save className="w-5 h-5" />
-              <span>{isFinalSaved ? 'Lista Guardada' : 'Vista Previa y Guardar'}</span>
+              <FileText className="w-4 h-4" />
+              Vista Previa y Guardar
             </button>
-
-            {/* Botón de modificar lista (aparece después del guardado final) */}
-            {isFinalSaved && (
-              <button
-                onClick={onEnableModification}
-                className="hexagon-button flex items-center gap-3 px-6 py-4 rounded-full border-2 border-[#5cb800] dark:border-blue-400 bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-blue-500 dark:to-blue-600 text-white hover:from-[#4a9600] hover:to-[#7bc300] dark:hover:from-blue-400 dark:hover:to-blue-500 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                <Edit className="w-5 h-5" />
-                <span>Modificar Lista</span>
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue text-white px-4 py-2 rounded-full shadow-md">
-              <span className="text-sm font-semibold">
-                Activas: {activeChecklists.length} | Filtradas: {filteredChecklists.length}
-              </span>
-            </div>
-
+            
             <button
               onClick={onExportPDF}
               disabled={!selectedChecklist}
-              className={`hexagon-export flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${selectedChecklist
-                  ? 'bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue text-white hover:from-[#4a9600] hover:to-[#7bc300] dark:hover:from-darkBlue dark:hover:to-shadowBlue'
-                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                }`}
+              className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
             >
-              <FileDown className="w-5 h-5" />
-              <span>PDF</span>
+              <Download className="w-4 h-4" />
+              PDF
             </button>
 
             <button
               onClick={onExportExcel}
               disabled={!selectedChecklist}
-              className={`hexagon-export flex items-center gap-2 px-5 py-3 rounded-full transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 ${selectedChecklist
-                  ? 'bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue text-white hover:from-[#4a9600] hover:to-[#7bc300] dark:hover:from-darkBlue dark:hover:to-shadowBlue'
-                  : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                }`}
+              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
             >
-              <FileDown className="w-5 h-5" />
-              <span>Excel</span>
+              <Download className="w-4 h-4" />
+              Excel
             </button>
+
+            {isFinalSaved && (
+              <button
+                onClick={onEnableModification}
+                className="flex items-center gap-2 bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                <Edit3 className="w-4 h-4" />
+                Habilitar Modificación
+              </button>
+            )}
           </div>
         </div>
-      </div>
-    </div>
+      }
+      footer={
+        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 font-medium">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span>Activas: <b className="text-gray-900 dark:text-white">{activeChecklists.length}</b></span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <span>Filtradas: <b className="text-gray-900 dark:text-white">{filteredChecklists.length}</b></span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+              <span>Trimestres: <b className="text-gray-900 dark:text-white">{availableTrimester.length}</b></span>
+            </div>
+          </div>
+          {selectedChecklist && (
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              Lista seleccionada: {selectedChecklist.name || `ID ${selectedChecklist.id}`}
+            </div>
+          )}
+        </div>
+      }
+      className="mb-6"
+    />
   );
 };
