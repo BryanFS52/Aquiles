@@ -11,9 +11,15 @@ export default function CoordinadorChecklistView() {
       id: "1",
       trimester: "1",
       trainingProjectName: "Proyecto de Software",
-      component: "Desarrollo Frontend",
       studySheets: "2835109,2856210",
-      items: [{}, {}, {}, {}],
+      indicadoresTecnicos: [
+        "Aplica correctamente los principios de desarrollo de interfaces.",
+        "Implementa componentes reutilizables con buenas prácticas."
+      ],
+      indicadoresActitudinales: [
+        "Trabaja en equipo de forma colaborativa.",
+        "Comunica claramente el progreso del trabajo."
+      ],
       state: true,
       remarks: "Competencia técnica avanzada"
     },
@@ -21,9 +27,15 @@ export default function CoordinadorChecklistView() {
       id: "2",
       trimester: "2",
       trainingProjectName: "Proyecto de Redes",
-      component: "Infraestructura",
       studySheets: "2901321",
-      items: [{}, {}],
+      indicadoresTecnicos: [
+        "Implementa correctamente la topología de red.",
+        "Configura dispositivos según estándares."
+      ],
+      indicadoresActitudinales: [
+        "Apoya a sus compañeros en la resolución de problemas.",
+        "Muestra actitud proactiva ante los retos."
+      ],
       state: false,
       remarks: "Evaluar desempeño grupal"
     }
@@ -35,34 +47,29 @@ export default function CoordinadorChecklistView() {
   const [isEditing, setIsEditing] = useState(false)
   const [selectedChecklist, setSelectedChecklist] = useState<any>(null)
 
-  // 🔹 Cerrar modal
   const handleCloseModal = () => {
     setModalOpen(false)
     setIsEditing(false)
     setSelectedChecklist(null)
   }
 
-  // 🔹 Abrir modal para crear
   const handleOpenCreateModal = () => {
     setIsEditing(false)
     setSelectedChecklist(null)
     setModalOpen(true)
   }
 
-  // 🔹 Abrir modal para editar (se envían los datos al modal)
   const handleOpenEditModal = (checklist: any) => {
     setIsEditing(true)
     setSelectedChecklist(checklist)
     setModalOpen(true)
   }
 
-  // 🔹 Abrir modal de confirmación
   const handleOpenConfirmModal = (checklist: any) => {
     setSelectedChecklist(checklist)
     setConfirmModalOpen(true)
   }
 
-  // 🔹 Eliminar lista
   const handleDeleteChecklist = () => {
     if (selectedChecklist) {
       setChecklists(prev => prev.filter(c => c.id !== selectedChecklist.id))
@@ -70,27 +77,22 @@ export default function CoordinadorChecklistView() {
     setConfirmModalOpen(false)
   }
 
-  // ✅ Crear o actualizar lista
   const handleSaveChecklist = (data: any) => {
     if (isEditing) {
-      // 🔹 Actualiza la lista existente
       setChecklists(prev =>
         prev.map(c =>
           c.id === data.id ? { ...c, ...data } : c
         )
       )
     } else {
-      // 🔹 Crea nueva lista
       const newChecklist = {
         id: String(Date.now()),
         ...data,
-        items: data.items || [],
         state: true
       }
       setChecklists(prev => [...prev, newChecklist])
     }
 
-    // Cierra el modal
     setModalOpen(false)
     setIsEditing(false)
     setSelectedChecklist(null)
@@ -111,7 +113,6 @@ export default function CoordinadorChecklistView() {
     <>
       <PageTitle>Listas de Chequeo Trimestrales</PageTitle>
 
-      {/* Filtro y botón */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
           <label
@@ -145,7 +146,6 @@ export default function CoordinadorChecklistView() {
         </button>
       </div>
 
-      {/* Listas */}
       <div className="mt-6 overflow-visible">
         {filteredChecklists.length === 0 ? (
           <div className="text-center py-8">
@@ -174,7 +174,6 @@ export default function CoordinadorChecklistView() {
                             onClick={() => handleOpenEditModal(checklist)}
                             className="text-white hover:text-yellow-300 transition-colors p-2 rounded-full hover:bg-white/10"
                             title="Editar"
-                            
                           >
                             <FaEdit className="w-4 h-4" />
                           </button>
@@ -201,15 +200,6 @@ export default function CoordinadorChecklistView() {
 
                       <div>
                         <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
-                          Componente
-                        </span>
-                        <p className="text-sm text-gray-700 dark:text-white mt-1 font-medium">
-                          {checklist.component}
-                        </p>
-                      </div>
-
-                      <div>
-                        <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                           Fichas Asociadas
                         </span>
                         <span className="inline-block mt-1 px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-blue-800/20 dark:to-blue-600/20 text-gray-800 dark:text-blue-300 rounded-full text-xs font-bold border border-gray-300 dark:border-blue-500/30">
@@ -219,11 +209,24 @@ export default function CoordinadorChecklistView() {
 
                       <div>
                         <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
-                          Indicadores
+                          Indicadores Técnicos
                         </span>
-                        <span className="inline-block mt-1 px-3 py-1 bg-gradient-to-r from-lime-100 to-lime-200 dark:from-shadowBlue/20 dark:to-darkBlue/20 text-lime-800 dark:text-gray-300 rounded-full text-xs font-bold border border-lime-300 dark:border-shadowBlue/30">
-                          {checklist.items.length} indicadores
+                        <ul className="list-disc list-inside text-sm text-gray-700 dark:text-white mt-1 leading-relaxed space-y-1">
+                          {checklist.indicadoresTecnicos.map((ind, i) => (
+                            <li key={i}>{ind}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div>
+                        <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
+                          Indicadores Actitudinales
                         </span>
+                        <ul className="list-disc list-inside text-sm text-gray-700 dark:text-white mt-1 leading-relaxed space-y-1">
+                          {checklist.indicadoresActitudinales.map((ind, i) => (
+                            <li key={i}>{ind}</li>
+                          ))}
+                        </ul>
                       </div>
 
                       <div>
@@ -267,7 +270,6 @@ export default function CoordinadorChecklistView() {
         )}
       </div>
 
-      {/* 🔹 Modal Crear/Editar */}
       <CrearListaChequeo
         isOpen={modalOpen}
         onClose={handleCloseModal}
@@ -276,7 +278,6 @@ export default function CoordinadorChecklistView() {
         checklist={selectedChecklist}
       />
 
-      {/* 🔹 Modal Confirmar eliminación */}
       {confirmModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
@@ -306,3 +307,4 @@ export default function CoordinadorChecklistView() {
     </>
   )
 }
+
