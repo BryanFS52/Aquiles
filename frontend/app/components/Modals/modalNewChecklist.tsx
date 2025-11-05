@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -6,26 +7,26 @@ import { trainingProjectService } from '@redux/slices/olympo/trainingProjectSlic
 import { studySheetService } from '@redux/slices/olympo/studySheetSlice'
 
 interface ChecklistItem {
-  id?: string
-  code?: string
-  indicator: string
-  active?: boolean
+  indicador: string
 }
 
 interface Checklist {
-  id: string
+  id?: string
   state: boolean
   remarks?: string
   trimester?: string
   indicadoresTecnicos?: string[]
   indicadoresActitudinales?: string[]
+  trainingProjectId?: number | null
+  studySheets?: string | null
+  note?: string
   [key: string]: any
 }
 
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
-  onCreate: (checklistData: any) => Promise<void>
+  onCreate: (checklistData: Checklist) => Promise<void> | void
   editingData?: Checklist | null
   isEditing?: boolean
 }
@@ -37,27 +38,24 @@ export default function CrearListaChequeo({
   editingData = null,
   isEditing = false
 }: ModalProps) {
-  const [trimestre, setTrimestre] = useState<string>('')
-  const [observaciones, setObservaciones] = useState<string>('')
+  const [trimestre, setTrimestre] = useState('')
+  const [observaciones, setObservaciones] = useState('')
+  const [checklistNote, setChecklistNote] = useState('')
 
-  // Indicadores separados
-  const [indicadoresTecnicos, setIndicadoresTecnicos] = useState<{ indicador: string }[]>([{ indicador: '' }])
-  const [indicadoresActitudinales, setIndicadoresActitudinales] = useState<{ indicador: string }[]>([{ indicador: '' }])
+  const [indicadoresTecnicos, setIndicadoresTecnicos] = useState<ChecklistItem[]>([{ indicador: '' }])
+  const [indicadoresActitudinales, setIndicadoresActitudinales] = useState<ChecklistItem[]>([{ indicador: '' }])
 
-  // Estados para proyectos formativos y fichas
-  const [selectedTrainingProject, setSelectedTrainingProject] = useState<string>('')
+  const [selectedTrainingProject, setSelectedTrainingProject] = useState('')
   const [selectedStudySheets, setSelectedStudySheets] = useState<string[]>([])
   const [trainingProjects, setTrainingProjects] = useState<any[]>([])
   const [studySheets, setStudySheets] = useState<any[]>([])
-  const [loadingProjects, setLoadingProjects] = useState<boolean>(false)
-  const [loadingSheets, setLoadingSheets] = useState<boolean>(false)
+  const [loadingProjects, setLoadingProjects] = useState(false)
+  const [loadingSheets, setLoadingSheets] = useState(false)
 
-  // Cargar proyectos formativos al abrir el modal
   useEffect(() => {
     if (isOpen) loadTrainingProjects()
   }, [isOpen])
 
-  // Cargar fichas cuando se selecciona un proyecto formativo
   useEffect(() => {
     if (selectedTrainingProject) loadStudySheets(selectedTrainingProject)
     else {
@@ -71,9 +69,8 @@ export default function CrearListaChequeo({
     try {
       const response = await trainingProjectService.getAllTrainingProjects({ size: 100 })
       setTrainingProjects(response.data || [])
-    } catch (error) {
-      console.error('Error loading training projects:', error)
-      toast.error('Error al cargar los proyectos formativos')
+    } catch {
+      toast.error('Error al cargar proyectos formativos')
     } finally {
       setLoadingProjects(false)
     }
@@ -87,27 +84,22 @@ export default function CrearListaChequeo({
         size: 100
       })
       setStudySheets(response.data || [])
-    } catch (error) {
-      console.error('Error loading study sheets:', error)
-      toast.error('Error al cargar las fichas de formación')
+    } catch {
+      toast.error('Error al cargar fichas de formación')
     } finally {
       setLoadingSheets(false)
     }
   }
 
-  // Cargar datos al editar
   useEffect(() => {
     if (isOpen && isEditing && editingData) {
       setTrimestre(editingData.trimester?.toString() || '')
       setObservaciones(editingData.remarks || '')
+      setChecklistNote(editingData.note || '')
       setSelectedTrainingProject(editingData.trainingProjectId?.toString() || '')
       setSelectedStudySheets(editingData.studySheets ? editingData.studySheets.split(',') : [])
-      setIndicadoresTecnicos(
-        editingData.indicadoresTecnicos?.map((i: string) => ({ indicador: i })) || [{ indicador: '' }]
-      )
-      setIndicadoresActitudinales(
-        editingData.indicadoresActitudinales?.map((i: string) => ({ indicador: i })) || [{ indicador: '' }]
-      )
+      setIndicadoresTecnicos(editingData.indicadoresTecnicos?.map(i => ({ indicador: i })) || [{ indicador: '' }])
+      setIndicadoresActitudinales(editingData.indicadoresActitudinales?.map(i => ({ indicador: i })) || [{ indicador: '' }])
     } else if (isOpen && !isEditing) {
       resetForm()
     }
@@ -116,58 +108,54 @@ export default function CrearListaChequeo({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (!trimestre || indicadoresTecnicos.some(i => !i.indicador) || indicadoresActitudinales.some(i => !i.indicador)) {
-      toast.error('Por favor, completa todos los campos obligatorios.')
-      return
-    }
+    // ✅ Validaciones
+    if (!trimestre) return toast.error('Debes seleccionar un trimestre')
+    if (!selectedTrainingProject) return toast.error('Debes seleccionar un proyecto formativo')
+    if (!observaciones.trim()) return toast.error('Debes ingresar una competencia')
+    if (indicadoresTecnicos.some(i => !i.indicador.trim())) return toast.error('Todos los indicadores técnicos son requeridos')
+    if (indicadoresActitudinales.some(i => !i.indicador.trim())) return toast.error('Todos los indicadores actitudinales son requeridos')
 
-    if (selectedTrainingProject && selectedStudySheets.length === 0) {
-      toast.error('Debe seleccionar al menos una ficha de formación para el proyecto formativo seleccionado.')
-      return
+    const checklistData: Checklist = {
+      state: false,
+      remarks: observaciones || 'Sin observaciones',
+      trimester: trimestre,
+      instructorSignature: JSON.stringify({}),
+      evaluationCriteria: false,
+      studySheets: selectedStudySheets.length > 0 ? selectedStudySheets.join(',') : null,
+      trainingProjectId: selectedTrainingProject ? parseInt(selectedTrainingProject) : null,
+      indicadoresTecnicos: indicadoresTecnicos.map(i => i.indicador),
+      indicadoresActitudinales: indicadoresActitudinales.map(i => i.indicador),
+      note: checklistNote
     }
 
     try {
-      const newChecklist = {
-        state: false,
-        remarks: observaciones || "Sin observaciones",
-        trimester: trimestre,
-        instructorSignature: JSON.stringify({}),
-        evaluationCriteria: false,
-        studySheets: selectedStudySheets.length > 0 ? selectedStudySheets.join(',') : null,
-        trainingProjectId: selectedTrainingProject ? parseInt(selectedTrainingProject) : null,
-        indicadoresTecnicos: indicadoresTecnicos.map(i => i.indicador),
-        indicadoresActitudinales: indicadoresActitudinales.map(i => i.indicador)
-      }
-
-      await onCreate(newChecklist)
+      await onCreate(checklistData)
+      toast.success(isEditing ? 'Lista actualizada correctamente' : 'Lista creada correctamente')
+      resetForm()
+      onClose()
     } catch (error) {
-      console.error('Error in modal:', error)
-      toast.error(isEditing ? 'Error al actualizar la lista de chequeo' : 'Error al crear la lista de chequeo')
+      console.error(error)
+      toast.error('Error al guardar la lista de chequeo')
     }
   }
 
-  // Funciones dinámicas
-  const handleChange = (setter: any, index: number, value: string) => {
-    const newItems = [...setter]
-    newItems[index].indicador = value
-    return newItems
-  }
+  const handleAdd = (setter: React.Dispatch<React.SetStateAction<ChecklistItem[]>>) =>
+    setter(prev => [...prev, { indicador: '' }])
 
-  const handleAdd = (setter: any) => [...setter, { indicador: '' }]
-  const handleRemove = (setter: any, index: number) => setter.filter((_: any, i: number) => i !== index)
+  const handleRemove = (setter: React.Dispatch<React.SetStateAction<ChecklistItem[]>>, index: number) =>
+    setter(prev => prev.filter((_, i) => i !== index))
 
-  const handleTrainingProjectChange = (value: string) => {
-    setSelectedTrainingProject(value)
-    setSelectedStudySheets([])
-  }
-
-  const handleStudySheetChange = (sheetId: string, checked: boolean) => {
-    setSelectedStudySheets(prev => checked ? [...prev, sheetId] : prev.filter(id => id !== sheetId))
-  }
+  const handleChange = (setter: React.Dispatch<React.SetStateAction<ChecklistItem[]>>, index: number, value: string) =>
+    setter(prev => {
+      const copy = [...prev]
+      copy[index].indicador = value
+      return copy
+    })
 
   const resetForm = () => {
     setTrimestre('')
     setObservaciones('')
+    setChecklistNote('')
     setIndicadoresTecnicos([{ indicador: '' }])
     setIndicadoresActitudinales([{ indicador: '' }])
     setSelectedTrainingProject('')
@@ -177,32 +165,33 @@ export default function CrearListaChequeo({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl space-y-6 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-semibold text-gray-800">
-          {isEditing ? 'Editar Lista de Chequeo' : 'Crear Lista de Chequeo'}
-        </h2>
+    <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white/95 dark:bg-gray-800/95 p-8 rounded-2xl shadow-2xl w-full max-w-3xl space-y-8 max-h-[90vh] overflow-y-auto border-2 border-lime-500/30"
+      >
+        <div className="text-center">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-lime-600 to-lime-500 bg-clip-text text-transparent">
+            {isEditing ? 'Editar Lista de Chequeo' : 'Crear Lista de Chequeo'}
+          </h2>
+        </div>
 
-        {/* Información */}
-        <div className="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-blue-800 text-sm flex items-start space-x-2">
-            <span className="text-green-600 font-bold">✅</span>
-            <span>
-              <strong>Nuevo:</strong> Esta lista de chequeo generará una evaluación asociada en la base de datos,
-              disponible para el instructor.
-            </span>
+        <div className="flex items-start gap-3 bg-lime-50 border border-lime-200 text-lime-700 rounded-xl p-4">
+          <span className="text-2xl">💡</span>
+          <p className="text-sm leading-relaxed">
+            <strong>Nota:</strong> Se creará automáticamente una evaluación vinculada a esta lista.
+            El instructor podrá completarla desde su vista.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Trimestre */}
+        {/* Trimestre y Proyecto Formativo en la misma fila */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="trimestre" className="block text-sm font-medium text-gray-700">Trimestre</label>
+            <label className="block text-sm font-bold text-lime-600 uppercase">Trimestre</label>
             <select
-              id="trimestre"
               value={trimestre}
               onChange={(e) => setTrimestre(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00324d]"
+              className="w-full px-4 py-3 border-2 border-lime-400 rounded-xl focus:ring-4 focus:ring-lime-500/30"
             >
               <option value="">Selecciona un trimestre</option>
               {[...Array(7)].map((_, i) => (
@@ -211,145 +200,101 @@ export default function CrearListaChequeo({
             </select>
           </div>
 
-          {/* Competencia */}
           <div>
-            <label htmlFor="observaciones" className="block text-sm font-medium text-gray-700">Competencia</label>
-            <textarea
-              id="observaciones"
-              value={observaciones}
-              onChange={(e) => setObservaciones(e.target.value)}
-              placeholder="Describe la competencia asociada a esta lista de chequeo..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00324d] h-24 resize-none"
-            />
-          </div>
-
-          {/* Proyecto Formativo */}
-          <div>
-            <label htmlFor="trainingProject" className="block text-sm font-medium text-gray-700">
-              Proyecto Formativo
-            </label>
+            <label className="block text-sm font-bold text-lime-600 uppercase">Proyecto Formativo</label>
             <select
-              id="trainingProject"
               value={selectedTrainingProject}
-              onChange={(e) => handleTrainingProjectChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00324d]"
-              disabled={loadingProjects}
+              onChange={(e) => setSelectedTrainingProject(e.target.value)}
+              className="w-full px-4 py-3 border-2 border-lime-400 rounded-xl focus:ring-4 focus:ring-lime-500/30"
             >
               <option value="">Selecciona un proyecto formativo</option>
               {trainingProjects.map((project) => (
                 <option key={project.id} value={project.id}>
-                  {project.name} - {project.program?.name || 'Sin programa'}
+                  {project.trainingProjectName || `Proyecto ${project.id}`}
                 </option>
               ))}
             </select>
-            {loadingProjects && <p className="text-sm text-gray-500 mt-1">Cargando proyectos formativos...</p>}
           </div>
+        </div>
 
-          {/* Fichas */}
-          {selectedTrainingProject && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Fichas de Formación Asociadas <span className="text-red-500">*</span>
-              </label>
-              {loadingSheets ? (
-                <p className="text-sm text-gray-500">Cargando fichas...</p>
-              ) : (
-                <div className="max-h-32 overflow-y-auto border border-gray-300 rounded-md p-2 space-y-2">
-                  {studySheets.map((sheet) => (
-                    <label key={sheet.id} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={selectedStudySheets.includes(sheet.id.toString())}
-                        onChange={(e) => handleStudySheetChange(sheet.id.toString(), e.target.checked)}
-                        className="h-4 w-4 text-[#00324d] border-gray-300 rounded"
-                      />
-                      <span className="text-sm">
-                        Ficha {sheet.number} - {sheet.journey?.name} ({sheet.numberStudents} estudiantes)
-                      </span>
-                    </label>
-                  ))}
-                </div>
+        {/* Competencia */}
+        <div>
+          <label className="block text-sm font-bold text-lime-600 uppercase">Competencia</label>
+          <textarea
+            value={observaciones}
+            onChange={(e) => setObservaciones(e.target.value)}
+            placeholder="Describe la competencia asociada..."
+            className="w-full px-4 py-3 border-2 border-lime-400 rounded-xl h-24 resize-none"
+          />
+        </div>
+
+        {/* Indicadores Técnicos */}
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-bold text-lime-600 uppercase">Indicadores Técnicos</h3>
+            <button type="button" onClick={() => handleAdd(setIndicadoresTecnicos)} className="text-lime-600 font-bold">
+              + Agregar
+            </button>
+          </div>
+          {indicadoresTecnicos.map((item, index) => (
+            <div key={index} className="flex items-start gap-3">
+              <textarea
+                value={item.indicador}
+                onChange={(e) => handleChange(setIndicadoresTecnicos, index, e.target.value)}
+                placeholder={`Indicador técnico ${index + 1}`}
+                className="flex-1 px-4 py-2 border-2 border-lime-400 rounded-xl h-20"
+              />
+              {indicadoresTecnicos.length > 1 && (
+                <button type="button" onClick={() => handleRemove(setIndicadoresTecnicos, index)} className="text-red-600">
+                  Eliminar
+                </button>
               )}
             </div>
-          )}
+          ))}
+        </div>
 
-          {/* Indicadores Técnicos */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-[#00324d]">Indicadores de Evaluación Técnicos</h3>
-            {indicadoresTecnicos.map((item, index) => (
-              <div key={index} className="flex space-x-3 items-start">
-                <textarea
-                  value={item.indicador}
-                  onChange={(e) => setIndicadoresTecnicos(handleChange(indicadoresTecnicos, index, e.target.value))}
-                  placeholder={`Indicador Técnico ${index + 1}`}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00324d] h-20 resize-none"
-                />
-                {indicadoresTecnicos.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => setIndicadoresTecnicos(handleRemove(indicadoresTecnicos, index))}
-                    className="text-red-500 mt-2"
-                  >
-                    Eliminar
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() => setIndicadoresTecnicos(handleAdd(indicadoresTecnicos))}
-              className="text-[#00324d] hover:text-[#40b003] transition-colors"
-            >
-              + Agregar Indicador Técnico
+        {/* Indicadores Actitudinales */}
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-bold text-lime-600 uppercase">Indicadores Actitudinales</h3>
+            <button type="button" onClick={() => handleAdd(setIndicadoresActitudinales)} className="text-lime-600 font-bold">
+              + Agregar
             </button>
           </div>
+          {indicadoresActitudinales.map((item, index) => (
+            <div key={index} className="flex items-start gap-3">
+              <textarea
+                value={item.indicador}
+                onChange={(e) => handleChange(setIndicadoresActitudinales, index, e.target.value)}
+                placeholder={`Indicador actitudinal ${index + 1}`}
+                className="flex-1 px-4 py-2 border-2 border-lime-400 rounded-xl h-20"
+              />
+              {indicadoresActitudinales.length > 1 && (
+                <button type="button" onClick={() => handleRemove(setIndicadoresActitudinales, index)} className="text-red-600">
+                  Eliminar
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
 
-          {/* Indicadores Actitudinales */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-[#00324d]">Indicadores de Evaluación Actitudinales</h3>
-            {indicadoresActitudinales.map((item, index) => (
-              <div key={index} className="flex space-x-3 items-start">
-                <textarea
-                  value={item.indicador}
-                  onChange={(e) => setIndicadoresActitudinales(handleChange(indicadoresActitudinales, index, e.target.value))}
-                  placeholder={`Indicador Actitudinal ${index + 1}`}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#00324d] h-20 resize-none"
-                />
-                {indicadoresActitudinales.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => setIndicadoresActitudinales(handleRemove(indicadoresActitudinales, index))}
-                    className="text-red-500 mt-2"
-                  >
-                    Eliminar
-                  </button>
-                )}
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={() => setIndicadoresActitudinales(handleAdd(indicadoresActitudinales))}
-              className="text-[#00324d] hover:text-[#40b003] transition-colors"
-            >
-              + Agregar Indicador Actitudinal
-            </button>
-          </div>
-
-          {/* Botones */}
-          <div className="space-y-2">
-            <button
-              type="submit"
-              className="w-full bg-[#00324d] text-white py-2 rounded hover:bg-[#40b003] transition-colors"
-            >
-              {isEditing ? 'Actualizar Lista de Chequeo' : 'Crear Lista de Chequeo'}
-            </button>
-          </div>
-        </form>
-
-        <button onClick={onClose} className="text-sm text-gray-500 underline mt-4">
-          Cancelar
-        </button>
-      </div>
+        {/* Botones */}
+        <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-lime-200">
+          <button
+            type="submit"
+            className="flex-1 bg-lime-600 text-white py-4 rounded-xl hover:bg-lime-700 font-bold text-lg transition-all"
+          >
+            {isEditing ? 'Actualizar Lista de chequeo' : 'Crear Lista de chequeo'}
+          </button>
+          <button
+            type="button"
+            onClick={() => { resetForm(); onClose() }}
+            className="sm:w-auto px-8 py-4 border-2 border-gray-300 rounded-xl text-gray-700 hover:border-lime-500 transition-all"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
     </div>
   )
 }
