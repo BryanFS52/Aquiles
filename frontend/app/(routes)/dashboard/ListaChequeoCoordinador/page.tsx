@@ -190,54 +190,52 @@ export default function CoordinadorChecklistView() {
 
                     <div className="p-6 space-y-4">
                       <div>
-                        <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
+                        <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
                           Proyecto Formativo
                         </span>
-                        <p className="text-sm text-gray-700 dark:text-white mt-1 font-medium">
+                        <p className="text-sm text-gray-700 mt-1 font-medium">
                           {checklist.trainingProjectName}
                         </p>
                       </div>
 
                       <div>
-                        <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
+                        <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
                           Fichas Asociadas
                         </span>
-                        <span className="inline-block mt-1 px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-blue-800/20 dark:to-blue-600/20 text-gray-800 dark:text-blue-300 rounded-full text-xs font-bold border border-gray-300 dark:border-blue-500/30">
+                        <span className="inline-block mt-1 px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 rounded-full text-xs font-bold border border-gray-300">
                           {getFormattedStudySheets(checklist.studySheets)}
                         </span>
                       </div>
 
+                      {/* 👇 Aquí el cambio principal */}
                       <div>
-                        <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
+                        <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
                           Indicadores Técnicos
                         </span>
-                        <ul className="list-disc list-inside text-sm text-gray-700 dark:text-white mt-1 leading-relaxed space-y-1">
-                          {checklist.indicadoresTecnicos.map((ind, i) => (
-                            <li key={i}>{ind}</li>
-                          ))}
-                        </ul>
+                        <p className="text-sm text-gray-700 mt-1 font-medium">
+                          {checklist.indicadoresTecnicos?.length ?? 0} {checklist.indicadoresTecnicos?.length === 1 ? "registrado" : "registrados"}
+                        </p>
                       </div>
 
                       <div>
-                        <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
+                        <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
                           Indicadores Actitudinales
                         </span>
-                        <ul className="list-disc list-inside text-sm text-gray-700 dark:text-white mt-1 leading-relaxed space-y-1">
-                          {checklist.indicadoresActitudinales.map((ind, i) => (
-                            <li key={i}>{ind}</li>
-                          ))}
-                        </ul>
+                        <p className="text-sm text-gray-700 mt-1 font-medium">
+                          {checklist.indicadoresActitudinales?.length ?? 0} {checklist.indicadoresActitudinales?.length === 1 ? "registrado" : "registrados"}
+                        </p>
                       </div>
+                      {/* 👆 Fin del cambio */}
 
                       <div>
-                        <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
+                        <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
                           Estado
                         </span>
                         <div className="mt-2 flex items-center">
                           <button
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out ${checklist.state
-                              ? 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-blue-600 dark:to-blue-500'
-                              : 'bg-gray-200 dark:bg-gray-600'
+                              ? 'bg-gradient-to-r from-lime-600 to-lime-500'
+                              : 'bg-gray-200'
                               }`}
                           >
                             <span
@@ -245,8 +243,8 @@ export default function CoordinadorChecklistView() {
                             />
                           </button>
                           <span className={`ml-3 text-xs font-bold ${checklist.state
-                            ? 'text-lime-600 dark:text-gray-300'
-                            : 'text-gray-500 dark:text-gray-400'
+                            ? 'text-lime-600'
+                            : 'text-gray-500'
                             }`}>
                             {checklist.state ? 'Activo' : 'Inactivo'}
                           </span>
@@ -254,10 +252,10 @@ export default function CoordinadorChecklistView() {
                       </div>
 
                       <div>
-                        <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
+                        <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
                           Competencia
                         </span>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
+                        <p className="text-sm text-gray-600 mt-1 leading-relaxed">
                           {checklist.remarks}
                         </p>
                       </div>
@@ -270,27 +268,28 @@ export default function CoordinadorChecklistView() {
         )}
       </div>
 
-      <CrearListaChequeo
-        isOpen={modalOpen}
-        onClose={handleCloseModal}
-        onCreate={handleSaveChecklist}
-        isEditing={isEditing}
-        checklist={selectedChecklist}
-      />
+    <CrearListaChequeo
+    isOpen={modalOpen}
+    onClose={handleCloseModal}
+    onCreate={handleSaveChecklist}
+    editingData={selectedChecklist}
+    isEditing={isEditing}
+  />
+
 
       {confirmModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Confirmar eliminación
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-gray-600 mb-6">
               ¿Estás seguro de que deseas eliminar esta lista de chequeo?
             </p>
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setConfirmModalOpen(false)}
-                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
               >
                 Cancelar
               </button>
@@ -307,4 +306,3 @@ export default function CoordinadorChecklistView() {
     </>
   )
 }
-
