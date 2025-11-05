@@ -116,17 +116,19 @@ export default function CrearListaChequeo({
     if (indicadoresActitudinales.some(i => !i.indicador.trim())) return toast.error('Todos los indicadores actitudinales son requeridos')
 
     const checklistData: Checklist = {
-      state: false,
-      remarks: observaciones || 'Sin observaciones',
-      trimester: trimestre,
-      instructorSignature: JSON.stringify({}),
-      evaluationCriteria: false,
-      studySheets: selectedStudySheets.length > 0 ? selectedStudySheets.join(',') : null,
-      trainingProjectId: selectedTrainingProject ? parseInt(selectedTrainingProject) : null,
-      indicadoresTecnicos: indicadoresTecnicos.map(i => i.indicador),
-      indicadoresActitudinales: indicadoresActitudinales.map(i => i.indicador),
-      note: checklistNote
-    }
+    id: isEditing ? editingData?.id : undefined, // ✅ agrega el id si estás editando
+    state: false,
+    remarks: observaciones || 'Sin observaciones',
+    trimester: trimestre,
+    instructorSignature: JSON.stringify({}),
+    evaluationCriteria: false,
+    studySheets: selectedStudySheets.length > 0 ? selectedStudySheets.join(',') : null,
+    trainingProjectId: selectedTrainingProject ? parseInt(selectedTrainingProject) : null,
+    indicadoresTecnicos: indicadoresTecnicos.map(i => i.indicador),
+    indicadoresActitudinales: indicadoresActitudinales.map(i => i.indicador),
+   note: checklistNote
+  }
+
 
     try {
       await onCreate(checklistData)
