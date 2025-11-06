@@ -164,11 +164,6 @@ export default function CrearListaChequeo({
     setSelectedStudySheets([])
   }
 
-  // Filtrar fichas por proyecto formativo
-  const filteredStudySheets = studySheets.filter(sheet => 
-    sheet.trainingProject?.id?.toString() === selectedTrainingProject
-  )
-
   if (!isOpen) return null
 
   return (
@@ -213,16 +208,59 @@ export default function CrearListaChequeo({
               value={selectedTrainingProject}
               onChange={(e) => setSelectedTrainingProject(e.target.value)}
               className="w-full px-4 py-3 border-2 border-lime-400 rounded-xl focus:ring-4 focus:ring-lime-500/30"
+              disabled={loadingProjects}
             >
-              <option value="">Selecciona un proyecto formativo</option>
+              <option value="">
+                {loadingProjects ? 'Cargando proyectos...' : 'Selecciona un proyecto formativo'}
+              </option>
               {trainingProjects.map((project) => (
                 <option key={project.id} value={project.id}>
-                  {project.trainingProjectName || `Proyecto ${project.id}`}
+                  {project.trainingProjectName || project.name || `Proyecto ${project.id}`}
                 </option>
               ))}
             </select>
           </div>
         </div>
+
+        {/* Selección de Fichas de Formación */}
+        {selectedTrainingProject && (
+          <div>
+            <label className="block text-sm font-bold text-lime-600 uppercase mb-3">
+              Fichas de Formación
+            </label>
+            {loadingSheets ? (
+              <div className="text-center py-4">
+                <p className="text-gray-500">Cargando fichas...</p>
+              </div>
+            ) : studySheets.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-40 overflow-y-auto border border-lime-200 rounded-xl p-4">
+                {studySheets.map((sheet) => (
+                  <label key={sheet.id} className="flex items-center space-x-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedStudySheets.includes(sheet.id.toString())}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedStudySheets(prev => [...prev, sheet.id.toString()]);
+                        } else {
+                          setSelectedStudySheets(prev => prev.filter(id => id !== sheet.id.toString()));
+                        }
+                      }}
+                      className="w-4 h-4 text-lime-600 bg-gray-100 border-gray-300 rounded focus:ring-lime-500 focus:ring-2"
+                    />
+                    <span className="text-sm text-gray-700">
+                      Ficha {sheet.number} - {sheet.journey?.name || 'Sin jornada'}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-4 bg-gray-50 rounded-xl">
+                <p className="text-gray-500">No se encontraron fichas para este proyecto formativo</p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Competencia */}
         <div>

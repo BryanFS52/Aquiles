@@ -1,6 +1,6 @@
 import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { GET_STUDY_SHEETS, GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER, GET_STUDY_SHEET_WITH_STUDENTS, GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM, GET_STUDY_SHEET_BY_ID_WITH_ATTENDANCES } from '@graphql/olympo/studySheetGraph'
+import { GET_STUDY_SHEETS, GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER, GET_STUDY_SHEET_WITH_STUDENTS, GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM, GET_STUDY_SHEET_BY_ID_WITH_ATTENDANCES, GET_STUDY_SHEETS_BY_TRAINING_PROJECT } from '@graphql/olympo/studySheetGraph'
 import { createInitialPaginatedState } from '@type/slices/common/generic';
 import {
     StudySheet,
@@ -19,7 +19,9 @@ import {
     StudySheetByTeacherIdWithTeamScrumQuery,
     StudySheetByTeacherIdWithTeamScrumQueryVariables,
     GetStudySheetByIdWithAttendancesQuery,
-    GetStudySheetByIdWithAttendancesQueryVariables
+    GetStudySheetByIdWithAttendancesQueryVariables,
+    GetStudySheetsByTrainingProjectQuery,
+    GetStudySheetsByTrainingProjectQueryVariables
 } from '@graphql/generated';
 
 export const fetchStudySheets = createAsyncThunk<GetStudySheetsQuery['allStudySheets'], GetStudySheetsQueryVariables>(
@@ -115,6 +117,36 @@ export const fetchStudySheetByIdWithAttendances = createAsyncThunk<GetStudySheet
             fetchPolicy: 'no-cache',
         });
         return data.studySheetById;
+    }
+);
+
+export const fetchStudySheetsByTrainingProject = createAsyncThunk<GetStudySheetsByTrainingProjectQuery['allStudySheets'], GetStudySheetsByTrainingProjectQueryVariables & { idTrainingProject: number }>(
+    'studySheet/fetchByTrainingProject',
+    async ({ idTrainingProject, page = 0, size = 100 }) => {
+        const { data } = await clientLAN.query<GetStudySheetsByTrainingProjectQuery, GetStudySheetsByTrainingProjectQueryVariables>({
+            query: GET_STUDY_SHEETS_BY_TRAINING_PROJECT,
+            variables: { page, size },
+            fetchPolicy: 'no-cache',
+        });
+        
+        // Filtrar las fichas por proyecto formativo en el frontend ya que no hay parámetro específico en el backend
+        if (data?.allStudySheets?.data) {
+            const filteredData = data.allStudySheets.data.filter((studySheet: any) => 
+                studySheet?.trainingProject?.id?.toString() === idTrainingProject.toString()
+            );
+            
+            const actualSize = size ?? 100;
+            
+            return {
+                ...data.allStudySheets,
+                data: filteredData,
+                totalItems: filteredData.length,
+                totalPages: Math.ceil(filteredData.length / actualSize),
+                currentPage: page ?? 0
+            };
+        }
+        
+        return data.allStudySheets;
     }
 );
 
@@ -334,9 +366,68 @@ const studySheetSlice = createSlice({
                 state.loadingAttendanceSheet = false;
                 state.selectedForAttendance = null;
             });
+
+        // Fetch StudySheets by Training Project
+        builder
+            .addCase(fetchStudySheetsByTrainingProject.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchStudySheetsByTrainingProject.fulfilled, (state, action) => {
+                const payload = action.payload;
+                if (payload?.data) {
+                    // Filtra nulls y usa los datos directamente
+                    state.data = payload.data
+                        .filter((item): item is NonNullable<typeof item> => item !== null) as StudySheet[];
+
+                    state.totalItems = payload.totalItems ?? 0;
+                    state.totalPages = payload.totalPages ?? 0;
+                    state.currentPage = payload.currentPage ?? 0;
+                } else {
+                    state.data = [];
+                    state.totalItems = 0;
+                    state.totalPages = 0;
+                    state.currentPage = 0;
+                }
+                state.loading = false;
+            })
+            .addCase(fetchStudySheetsByTrainingProject.rejected, (state, action) => {
+                state.error = action.error.message ?? 'Error fetching study sheets by training project';
+                state.loading = false;
+            });
     }
 });
 
 export const { clearStudySheetState, clearAttendanceSelection } = studySheetSlice.actions;
+
+// Service methods for compatibility with existing components
+export const studySheetService = {
+    getStudySheetsByTrainingProject: async ({ idTrainingProject, page = 0, size = 100 }: { idTrainingProject: number; page?: number; size?: number }) => {
+        try {
+            const { data } = await clientLAN.query({
+                query: GET_STUDY_SHEETS_BY_TRAINING_PROJECT,
+                variables: { page, size },
+                fetchPolicy: 'network-only',
+            });
+
+            if (data?.allStudySheets?.code === '200' || data?.allStudySheets?.code === 200) {
+                // Filtrar las fichas por proyecto formativo
+                const filteredData = data.allStudySheets.data?.filter((studySheet: any) => 
+                    studySheet?.trainingProject?.id?.toString() === idTrainingProject.toString()
+                ) || [];
+
+                return {
+                    ...data.allStudySheets,
+                    data: filteredData
+                };
+            } else {
+                throw new Error(data?.allStudySheets?.message || 'Error fetching study sheets by training project');
+            }
+        } catch (error) {
+            console.error('Error fetching study sheets by training project:', error);
+            throw error;
+        }
+    }
+};
 
 export default studySheetSlice.reducer;
