@@ -1,20 +1,20 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { StudentSummary, setAttendanceSummaryFromStudySheet } from "@redux/slices/attendanceSlice";
+import { InstructorFollowUpContainerProps } from "./types";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import AttendanceTable from "@/components/features/InstructorFollowUp/attendanceTable";
+import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
+import { AppDispatch, RootState } from "@redux/store";
+import { useEffect, useState } from "react";
+import { openNoveltyModal } from "@redux/slices/themis/noveltySlice";
+import { PiStudentFill } from "react-icons/pi";
+import { MdWarning } from "react-icons/md";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify"
 import PageTitle from "@components/UI/pageTitle";
 import NoveltyModal from "@components/Modals/noveltyModal";
 import StatCard from "@/components/features/AprendicesList/StatCard";
-import { StudentSummary, setAttendanceSummaryFromStudySheet } from "@redux/slices/attendanceSlice";
-import { openNoveltyModal } from "@redux/slices/themis/noveltySlice";
-import { AppDispatch, RootState } from "@redux/store";
-import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
-import { useRouter } from "next/navigation";
-import { InstructorFollowUpContainerProps } from "./types";
-import { PiStudentFill } from "react-icons/pi";
-import { MdWarning } from "react-icons/md";
+import AttendanceTable from "@/components/features/InstructorFollowUp/attendanceTable";
 
 const getAuthenticatedInstructorId = (): number => {
     return TEMPORAL_INSTRUCTOR_ID;
