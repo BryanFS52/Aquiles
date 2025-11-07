@@ -221,18 +221,10 @@ export default function CoordinadorChecklistView() {
                     </div>
 
                     <div className="p-6 space-y-4">
-                      <div>
-                        <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
-                          Componente
-                        </span>
-                        <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 font-medium">
-                          {checklist.component || 'No especificado'}
-                        </p>
-                      </div>
 
                       <div>
                         <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
-                          Fichas Asociadas
+                          Fichas Asociadas <br/>
                         </span>
                         <span className="inline-block mt-1 px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-800 dark:text-gray-200 rounded-full text-xs font-bold border border-gray-300 dark:border-gray-500">
                           {getFormattedStudySheets(checklist.studySheets || "")}
@@ -243,9 +235,24 @@ export default function CoordinadorChecklistView() {
                         <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
                           Indicadores
                         </span>
-                        <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 font-medium">
-                          {checklist.items?.length ?? 0} {checklist.items?.length === 1 ? "registrado" : "registrados"}
-                        </p>
+                        <div className="mt-2 space-y-2">
+                          <div className="flex items-center justify-between bg-lime-50 dark:bg-lime-900/20 rounded-lg px-3 py-2 border border-lime-200 dark:border-lime-700">
+                            <span className="text-xs font-medium text-lime-700 dark:text-lime-300">
+                              Técnicos
+                            </span>
+                            <span className="text-sm font-bold text-lime-800 dark:text-lime-200">
+                              {checklist.items?.filter((item: any) => item.code?.startsWith('TEC')).length ?? 0}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between bg-lime-50 dark:bg-lime-900/20 rounded-lg px-3 py-2 border border-lime-200 dark:border-lime-700">
+                            <span className="text-xs font-medium text-lime-700 dark:text-lime-300">
+                              Actitudinales
+                            </span>
+                            <span className="text-sm font-bold text-lime-800 dark:text-lime-200">
+                              {checklist.items?.filter((item: any) => item.code?.startsWith('ACT')).length ?? 0}
+                            </span>
+                          </div>
+                        </div>
                       </div>
 
                       <div>
@@ -274,7 +281,7 @@ export default function CoordinadorChecklistView() {
 
                       <div>
                         <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
-                          Observaciones
+                          Criterios de evaluación
                         </span>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
                           {checklist.remarks || 'Sin observaciones'}

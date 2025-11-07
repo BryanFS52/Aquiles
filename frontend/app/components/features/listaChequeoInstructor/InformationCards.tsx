@@ -28,8 +28,13 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
   studySheetInfo,
   teamScrumInfo
 }) => {
+  // Calcular conteo de indicadores
+  const technicalCount = selectedChecklist?.items?.filter((item: any) => item.code?.startsWith('TEC')).length ?? 0;
+  const attitudinalCount = selectedChecklist?.items?.filter((item: any) => item.code?.startsWith('ACT')).length ?? 0;
+  const totalIndicators = technicalCount + attitudinalCount;
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
       <Card 
         header={
           <div className="w-16 h-16 bg-[#5cb800]/10 dark:bg-[#5cb800]/20 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -120,11 +125,50 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
               <p className="text-xs font-semibold text-orange-600 dark:text-orange-400">Trimestre</p>
               {selectedChecklist ? (
                 <p className="text-xs text-gray-600 dark:text-gray-300 leading-tight">
-                  {selectedChecklist.trimester || 'Sin trimestre asignado'}
+                  {selectedChecklist.trimestre || 'Sin trimestre asignado'}
                 </p>
               ) : (
                 <p className="text-xs text-gray-500 dark:text-gray-400">Ninguna lista seleccionada</p>
               )}
+            </div>
+          </div>
+        }
+      />
+
+      <Card 
+        header={
+          <div className="w-16 h-16 bg-lime-100 dark:bg-lime-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+            <div className="w-8 h-8 bg-lime-500 dark:bg-lime-600 rounded-full flex items-center justify-center">
+              <span className="text-white text-sm"></span>
+            </div>
+          </div>
+        }
+        body={
+          <div className="text-center">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Indicadores</h3>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between bg-lime-50 dark:bg-lime-900/20 rounded-lg px-3 py-2 border border-lime-200 dark:border-lime-700">
+                <span className="text-xs font-medium text-lime-700 dark:text-lime-300">
+                  Técnicos
+                </span>
+                <span className="text-sm font-bold text-lime-800 dark:text-lime-200">
+                  {technicalCount}
+                </span>
+              </div>
+              <div className="flex items-center justify-between bg-lime-50 dark:bg-lime-900/20 rounded-lg px-3 py-2 border border-lime-200 dark:border-lime-700">
+                <span className="text-xs font-medium text-lime-700 dark:text-lime-300">
+                  Actitudinales
+                </span>
+                <span className="text-sm font-bold text-lime-800 dark:text-lime-200">
+                  {attitudinalCount}
+                </span>
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+              <p className="text-xs font-semibold text-gray-600 dark:text-gray-400">Total</p>
+              <p className="text-lg font-bold text-gray-900 dark:text-white">
+                {totalIndicators}
+              </p>
             </div>
           </div>
         }
