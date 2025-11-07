@@ -1,14 +1,14 @@
 type Checklist {
     id: ID!
     state: Boolean
-    remarks: String
+    remarks: String  # ← Se llena cuando el instructor califica
     trimester: String
     component: String
-    instructorSignature: String
-    evaluationCriteria: Boolean
+    instructorSignature: String  # ← Se llena cuando el instructor califica
+    evaluationCriteria: Boolean  # ← Se llena cuando el instructor califica
     studySheets: String
     trainingProjectId: Long
-    evaluations: Evaluation
+    evaluations: Evaluation  # ← Se llena cuando el instructor califica
     items: [Item]
     associatedJuries: [Juries]
 }
@@ -30,18 +30,19 @@ type ChecklistPageId {
     message: String
 }
 
-
+# Input para crear checklist (Coordinador)
+# Campos opcionales: instructorSignature, evaluationCriteria (se llenan al calificar)
 input ChecklistDto {
     state: Boolean!
-    remarks: String!
+    remarks: String  # ← Opcional al crear, obligatorio al calificar
     trimester: String!
     component: String
-    instructorSignature: String!
-    evaluationCriteria: Boolean!
+    instructorSignature: String  # ← NULL al crear, se llena al calificar
+    evaluationCriteria: Boolean  # ← NULL al crear, se llena al calificar
     studySheets: String
     trainingProjectId: Long
     evaluationId: Long
-    evaluations: [EvaluationDto]
+    evaluations: [EvaluationDto]  # ← NULL al crear, se llena al calificar
     items: [ItemDto]
     associatedJuries: [Long]
     deletedItemIds: [Long]  # ← Campo para IDs de items a eliminar

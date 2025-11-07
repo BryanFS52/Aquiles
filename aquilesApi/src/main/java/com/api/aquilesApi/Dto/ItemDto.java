@@ -22,4 +22,6 @@ public class ItemDto {
     private String indicator;
 
     private Boolean active = true;
+
+    private Long itemTypeId;
 }

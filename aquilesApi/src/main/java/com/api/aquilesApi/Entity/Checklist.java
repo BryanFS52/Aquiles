@@ -23,14 +23,17 @@ public class Checklist implements Serializable {
     @Column(name = "state", nullable = false)
     private Boolean state;
 
-    @Column(name = "remarks", nullable = false, length = 255)
+    // ← El coordinador puede dejar observaciones generales, pero el instructor las completa
+    @Column(name = "remarks", nullable = true, length = 500)
     private String remarks;
 
-    @Column(name = "instructor_signature", nullable = false)
+    // ← Se llena cuando el instructor firma la evaluación
+    @Column(name = "instructor_signature", nullable = true)
     private byte[] instructorSignature;
 
-    @Column(name = "evaluation_criteria", nullable = false)
-    private boolean evaluationCriteria;
+    // ← Se determina cuando el instructor evalúa
+    @Column(name = "evaluation_criteria", nullable = true)
+    private Boolean evaluationCriteria;
 
     @Column(name = "date_assigned", length = 30)
     private LocalDate dateAssigned;

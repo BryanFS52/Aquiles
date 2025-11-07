@@ -1,51 +1,60 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { AppDispatch, RootState } from "@redux/store"
+import { fetchChecklists, addChecklist, updateChecklist, deleteChecklist } from "@redux/slices/checklistSlice"
 import { FaTrashAlt, FaEdit } from "react-icons/fa"
 import CrearListaChequeo from "@components/Modals/modalNewChecklist"
 import PageTitle from "@components/UI/pageTitle"
+import { toast } from "react-toastify"
 
+/**
+ * Vista de Listas de Chequeo - ROL: COORDINADOR
+ * 
+ * RESPONSABILIDADES:
+ * ==================
+ * 1. Crear listas de chequeo con indicadores (técnicos/actitudinales)
+ * 2. Asociar listas a fichas de formación (studySheets)
+ * 3. Definir trimestre, componente y proyecto formativo
+ * 4. Activar/Desactivar listas
+ * 5. Editar/Eliminar listas creadas
+ * 
+ * CAMPOS QUE SE LLENAN AQUÍ:
+ * - state (activo/inactivo)
+ * - trimester
+ * - component
+ * - studySheets (fichas asociadas)
+ * - trainingProjectId
+ * - items (indicadores)
+ * 
+ * CAMPOS QUE SE LLENAN EN LA VISTA DEL INSTRUCTOR:
+ * - instructorSignature (firma digital)
+ * - evaluationCriteria (cumplimiento de criterios)
+ * - remarks (observaciones finales)
+ * - evaluations (relación 1:1 con evaluación)
+ */
 export default function CoordinadorChecklistView() {
-  const [checklists, setChecklists] = useState([
-    {
-      id: "1",
-      trimester: "1",
-      trainingProjectName: "Proyecto de Software",
-      studySheets: "2835109,2856210",
-      indicadoresTecnicos: [
-        "Aplica correctamente los principios de desarrollo de interfaces.",
-        "Implementa componentes reutilizables con buenas prácticas."
-      ],
-      indicadoresActitudinales: [
-        "Trabaja en equipo de forma colaborativa.",
-        "Comunica claramente el progreso del trabajo."
-      ],
-      state: true,
-      remarks: "Competencia técnica avanzada"
-    },
-    {
-      id: "2",
-      trimester: "2",
-      trainingProjectName: "Proyecto de Redes",
-      studySheets: "2901321",
-      indicadoresTecnicos: [
-        "Implementa correctamente la topología de red.",
-        "Configura dispositivos según estándares."
-      ],
-      indicadoresActitudinales: [
-        "Apoya a sus compañeros en la resolución de problemas.",
-        "Muestra actitud proactiva ante los retos."
-      ],
-      state: false,
-      remarks: "Evaluar desempeño grupal"
-    }
-  ])
+  const dispatch = useDispatch<AppDispatch>()
+  const { data: checklists, loading, error } = useSelector((state: RootState) => state.checklist)
 
   const [modalOpen, setModalOpen] = useState(false)
   const [confirmModalOpen, setConfirmModalOpen] = useState(false)
   const [selectedTrimestre, setSelectedTrimestre] = useState("todos")
   const [isEditing, setIsEditing] = useState(false)
   const [selectedChecklist, setSelectedChecklist] = useState<any>(null)
+
+  // Cargar listas al montar el componente
+  useEffect(() => {
+    dispatch(fetchChecklists({ page: 0, size: 100 }))
+  }, [dispatch])
+
+  // Mostrar errores si existen
+  useEffect(() => {
+    if (error) {
+      toast.error(`Error: ${error}`)
+    }
+  }, [error])
 
   const handleCloseModal = () => {
     setModalOpen(false)
@@ -70,32 +79,42 @@ export default function CoordinadorChecklistView() {
     setConfirmModalOpen(true)
   }
 
-  const handleDeleteChecklist = () => {
+  const handleDeleteChecklist = async () => {
     if (selectedChecklist) {
-      setChecklists(prev => prev.filter(c => c.id !== selectedChecklist.id))
+      try {
+        await dispatch(deleteChecklist(selectedChecklist.id)).unwrap()
+        toast.success("Lista de chequeo eliminada exitosamente")
+        // Recargar listas
+        dispatch(fetchChecklists({ page: 0, size: 100 }))
+      } catch (err: any) {
+        toast.error(`Error al eliminar: ${err.message || 'Error desconocido'}`)
+      }
     }
     setConfirmModalOpen(false)
+    setSelectedChecklist(null)
   }
 
-  const handleSaveChecklist = (data: any) => {
-    if (isEditing) {
-      setChecklists(prev =>
-        prev.map(c =>
-          c.id === data.id ? { ...c, ...data } : c
-        )
-      )
-    } else {
-      const newChecklist = {
-        id: String(Date.now()),
-        ...data,
-        state: true
+  const handleSaveChecklist = async (data: any) => {
+    try {
+      if (isEditing) {
+        // Actualizar lista existente
+        await dispatch(updateChecklist({ 
+          id: data.id, 
+          input: data 
+        })).unwrap()
+        toast.success("Lista de chequeo actualizada exitosamente")
+      } else {
+        // Crear nueva lista
+        await dispatch(addChecklist(data)).unwrap()
+        toast.success("Lista de chequeo creada exitosamente")
       }
-      setChecklists(prev => [...prev, newChecklist])
-    }
 
-    setModalOpen(false)
-    setIsEditing(false)
-    setSelectedChecklist(null)
+      // Recargar listas
+      dispatch(fetchChecklists({ page: 0, size: 100 }))
+      handleCloseModal()
+    } catch (err: any) {
+      toast.error(`Error: ${err.message || 'Error desconocido'}`)
+    }
   }
 
   const getFormattedStudySheets = (studySheets: string): string => {
@@ -105,8 +124,9 @@ export default function CoordinadorChecklistView() {
     return `${sheetIds.length} fichas asociadas`
   }
 
-  const filteredChecklists = checklists.filter(
-    (checklist) => selectedTrimestre === "todos" || checklist.trimester === selectedTrimestre
+  // Filtrar listas según el trimestre seleccionado
+  const filteredChecklists = (checklists || []).filter(
+    (checklist: any) => selectedTrimestre === "todos" || checklist.trimester === selectedTrimestre
   )
 
   return (
@@ -140,18 +160,30 @@ export default function CoordinadorChecklistView() {
 
         <button
           onClick={handleOpenCreateModal}
-          className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white px-6 py-3 rounded-full hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
+          disabled={loading}
+          className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white px-6 py-3 rounded-full hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           + Crear Lista de Chequeo
         </button>
       </div>
 
       <div className="mt-6 overflow-visible">
-        {filteredChecklists.length === 0 ? (
+        {loading ? (
           <div className="text-center py-8">
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border-2 border-dashed border-gray-300 dark:border-gray-600">
               <p className="text-gray-500 dark:text-gray-400 text-lg">
-                No hay listas de chequeo disponibles
+                Cargando listas de chequeo...
+              </p>
+            </div>
+          </div>
+        ) : filteredChecklists.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border-2 border-dashed border-gray-300 dark:border-gray-600">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
+                {selectedTrimestre === "todos" 
+                  ? "No hay listas de chequeo disponibles. Crea tu primera lista de chequeo."
+                  : `No hay listas de chequeo para el trimestre ${selectedTrimestre}`
+                }
               </p>
             </div>
           </div>
@@ -191,10 +223,10 @@ export default function CoordinadorChecklistView() {
                     <div className="p-6 space-y-4">
                       <div>
                         <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
-                          Proyecto Formativo
+                          Componente
                         </span>
-                        <p className="text-sm text-gray-700 mt-1 font-medium">
-                          {checklist.trainingProjectName}
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 font-medium">
+                          {checklist.component || 'No especificado'}
                         </p>
                       </div>
 
@@ -202,30 +234,19 @@ export default function CoordinadorChecklistView() {
                         <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
                           Fichas Asociadas
                         </span>
-                        <span className="inline-block mt-1 px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-800 rounded-full text-xs font-bold border border-gray-300">
-                          {getFormattedStudySheets(checklist.studySheets)}
+                        <span className="inline-block mt-1 px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-800 dark:text-gray-200 rounded-full text-xs font-bold border border-gray-300 dark:border-gray-500">
+                          {getFormattedStudySheets(checklist.studySheets || "")}
                         </span>
-                      </div>
-
-                      {/* 👇 Aquí el cambio principal */}
-                      <div>
-                        <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
-                          Indicadores Técnicos
-                        </span>
-                        <p className="text-sm text-gray-700 mt-1 font-medium">
-                          {checklist.indicadoresTecnicos?.length ?? 0} {checklist.indicadoresTecnicos?.length === 1 ? "registrado" : "registrados"}
-                        </p>
                       </div>
 
                       <div>
                         <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
-                          Indicadores Actitudinales
+                          Indicadores
                         </span>
-                        <p className="text-sm text-gray-700 mt-1 font-medium">
-                          {checklist.indicadoresActitudinales?.length ?? 0} {checklist.indicadoresActitudinales?.length === 1 ? "registrado" : "registrados"}
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 font-medium">
+                          {checklist.items?.length ?? 0} {checklist.items?.length === 1 ? "registrado" : "registrados"}
                         </p>
                       </div>
-                      {/* 👆 Fin del cambio */}
 
                       <div>
                         <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
@@ -235,7 +256,7 @@ export default function CoordinadorChecklistView() {
                           <button
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out ${checklist.state
                               ? 'bg-gradient-to-r from-lime-600 to-lime-500'
-                              : 'bg-gray-200'
+                              : 'bg-gray-200 dark:bg-gray-600'
                               }`}
                           >
                             <span
@@ -253,10 +274,10 @@ export default function CoordinadorChecklistView() {
 
                       <div>
                         <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
-                          Competencia
+                          Observaciones
                         </span>
-                        <p className="text-sm text-gray-600 mt-1 leading-relaxed">
-                          {checklist.remarks}
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
+                          {checklist.remarks || 'Sin observaciones'}
                         </p>
                       </div>
                     </div>
@@ -268,28 +289,27 @@ export default function CoordinadorChecklistView() {
         )}
       </div>
 
-    <CrearListaChequeo
-    isOpen={modalOpen}
-    onClose={handleCloseModal}
-    onCreate={handleSaveChecklist}
-    editingData={selectedChecklist}
-    isEditing={isEditing}
-  />
-
+      <CrearListaChequeo
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        onCreate={handleSaveChecklist}
+        editingData={selectedChecklist}
+        isEditing={isEditing}
+      />
 
       {confirmModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Confirmar eliminación
             </h3>
-            <p className="text-gray-600 mb-6">
-              ¿Estás seguro de que deseas eliminar esta lista de chequeo?
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              ¿Estás seguro de que deseas eliminar esta lista de chequeo? Esta acción no se puede deshacer.
             </p>
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setConfirmModalOpen(false)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
               >
                 Cancelar
               </button>

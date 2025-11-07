@@ -15,11 +15,14 @@ interface Checklist {
   state: boolean
   remarks?: string
   trimester?: string
-  indicadoresTecnicos?: string[]
-  indicadoresActitudinales?: string[]
+  items?: Array<{
+    id?: string
+    code: string
+    indicator: string
+    active: boolean
+  }>
   trainingProjectId?: number | null
   studySheets?: string | null
-  note?: string
   [key: string]: any
 }
 
@@ -40,7 +43,6 @@ export default function CrearListaChequeo({
 }: ModalProps) {
   const [trimestre, setTrimestre] = useState('')
   const [observaciones, setObservaciones] = useState('')
-  const [checklistNote, setChecklistNote] = useState('')
 
   const [indicadoresTecnicos, setIndicadoresTecnicos] = useState<ChecklistItem[]>([{ indicador: '' }])
   const [indicadoresActitudinales, setIndicadoresActitudinales] = useState<ChecklistItem[]>([{ indicador: '' }])
@@ -95,11 +97,25 @@ export default function CrearListaChequeo({
     if (isOpen && isEditing && editingData) {
       setTrimestre(editingData.trimester?.toString() || '')
       setObservaciones(editingData.remarks || '')
-      setChecklistNote(editingData.note || '')
       setSelectedTrainingProject(editingData.trainingProjectId?.toString() || '')
       setSelectedStudySheets(editingData.studySheets ? editingData.studySheets.split(',') : [])
-      setIndicadoresTecnicos(editingData.indicadoresTecnicos?.map(i => ({ indicador: i })) || [{ indicador: '' }])
-      setIndicadoresActitudinales(editingData.indicadoresActitudinales?.map(i => ({ indicador: i })) || [{ indicador: '' }])
+      
+      // ✅ Convertir items a indicadores técnicos y actitudinales
+      if (editingData.items && Array.isArray(editingData.items)) {
+        const tecnicos = editingData.items
+          .filter((item: any) => item.code?.startsWith('TEC-'))
+          .map((item: any) => ({ indicador: item.indicator }))
+        
+        const actitudinales = editingData.items
+          .filter((item: any) => item.code?.startsWith('ACT-'))
+          .map((item: any) => ({ indicador: item.indicator }))
+        
+        setIndicadoresTecnicos(tecnicos.length > 0 ? tecnicos : [{ indicador: '' }])
+        setIndicadoresActitudinales(actitudinales.length > 0 ? actitudinales : [{ indicador: '' }])
+      } else {
+        setIndicadoresTecnicos([{ indicador: '' }])
+        setIndicadoresActitudinales([{ indicador: '' }])
+      }
     } else if (isOpen && !isEditing) {
       resetForm()
     }
@@ -115,20 +131,35 @@ export default function CrearListaChequeo({
     if (indicadoresTecnicos.some(i => !i.indicador.trim())) return toast.error('Todos los indicadores técnicos son requeridos')
     if (indicadoresActitudinales.some(i => !i.indicador.trim())) return toast.error('Todos los indicadores actitudinales son requeridos')
 
-    const checklistData: Checklist = {
-    id: isEditing ? editingData?.id : undefined, // ✅ agrega el id si estás editando
-    state: false,
-    remarks: observaciones || 'Sin observaciones',
-    trimester: trimestre,
-    instructorSignature: JSON.stringify({}),
-    evaluationCriteria: false,
-    studySheets: selectedStudySheets.length > 0 ? selectedStudySheets.join(',') : null,
-    trainingProjectId: selectedTrainingProject ? parseInt(selectedTrainingProject) : null,
-    indicadoresTecnicos: indicadoresTecnicos.map(i => i.indicador),
-    indicadoresActitudinales: indicadoresActitudinales.map(i => i.indicador),
-   note: checklistNote
-  }
+    // ✅ Convertir indicadores al formato correcto para GraphQL
+    const items = [
+      ...indicadoresTecnicos.map((item, index) => ({
+        code: `TEC-${index + 1}`,
+        indicator: item.indicador,
+        active: true,
+        itemTypeId: 3 // ID del tipo "Técnico"
+      })),
+      ...indicadoresActitudinales.map((item, index) => ({
+        code: `ACT-${index + 1}`,
+        indicator: item.indicador,
+        active: true,
+        itemTypeId: 1 // ID del tipo "Actitudinal"
+      }))
+    ]
 
+    const checklistData: any = {
+      state: true, // ✅ Cambiar a true para que esté activa al crear
+      remarks: observaciones,
+      trimester: trimestre,
+      studySheets: selectedStudySheets.length > 0 ? selectedStudySheets.join(',') : null,
+      trainingProjectId: selectedTrainingProject ? parseInt(selectedTrainingProject) : null,
+      items: items // ✅ Enviar items en lugar de indicadores
+    }
+
+    // Si estamos editando, agregar el ID
+    if (isEditing && editingData?.id) {
+      checklistData.id = editingData.id
+    }
 
     try {
       await onCreate(checklistData)
@@ -157,7 +188,6 @@ export default function CrearListaChequeo({
   const resetForm = () => {
     setTrimestre('')
     setObservaciones('')
-    setChecklistNote('')
     setIndicadoresTecnicos([{ indicador: '' }])
     setIndicadoresActitudinales([{ indicador: '' }])
     setSelectedTrainingProject('')

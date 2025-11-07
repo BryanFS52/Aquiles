@@ -17,6 +17,7 @@ input ItemDto {
     code: String!
     indicator: String!
     active: Boolean
+    itemTypeId: Long
 }
 
 extend type Query {

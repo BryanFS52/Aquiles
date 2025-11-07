@@ -63,7 +63,7 @@ public class  ChecklistHistoryBusiness {
         dto.setId(checklist.getId());
         dto.setState(checklist.getState());
         dto.setRemarks(checklist.getRemarks());
-        dto.setEvaluationCriteria(checklist.isEvaluationCriteria());
+        dto.setEvaluationCriteria(checklist.getEvaluationCriteria());
         dto.setDateAssigned(String.valueOf(checklist.getDateAssigned()));
         dto.setStudySheets(checklist.getStudySheets());
         dto.setTrainingProjectId(checklist.getTrainingProjectId());

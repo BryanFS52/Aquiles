@@ -15,16 +15,14 @@ public class ChecklistDto {
     // @NotNull(message = "El estado es obligatorio")
     private Boolean state;
 
-    // @NotNull(message = "Las observaciones son obligatorias")
-    // @Size(max = 255, message = "Las observaciones no pueden exceder los 255 caracteres")
+    // ← OPCIONAL al crear (coordinador), se llena cuando el instructor califica
     private String remarks;
 
-    // @NotNull(message = "La firma del instructor es obligatoria") // ← Removido: la firma puede ser opcional inicialmente
-    // @Size(max = 255, message = "La firma del instructor no puede exceder los 255 caracteres")
+    // ← NULL al crear, se llena cuando el instructor firma
     private String instructorSignature;
 
-    // @NotNull(message = "El criterio de evaluación es obligatorio") // ← Removido: puede ser opcional inicialmente
-    private boolean evaluationCriteria;
+    // ← NULL al crear, se llena cuando el instructor evalúa
+    private Boolean evaluationCriteria;
 
     private String dateAssigned;
 

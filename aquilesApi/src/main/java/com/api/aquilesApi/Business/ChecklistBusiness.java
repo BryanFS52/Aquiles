@@ -11,12 +11,37 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-
+/**
+ * Business logic para la gestión de Listas de Chequeo
+ * 
+ * FLUJO DE VIDA DE UNA LISTA DE CHEQUEO:
+ * ========================================
+ * 
+ * 1. CREACIÓN (Coordinador):
+ *    - Crea la lista de chequeo con items (indicadores técnicos/actitudinales)
+ *    - Define: trimestre, componente, proyecto formativo, fichas asociadas
+ *    - Campos que PUEDEN ser NULL: remarks, instructorSignature, evaluationCriteria, evaluation
+ *    - Estado inicial: state = true (activa)
+ * 
+ * 2. VISUALIZACIÓN (Instructor):
+ *    - Instructor ve listas activas asignadas a sus fichas (studySheets)
+ *    - Puede ver los items a evaluar
+ *    - No puede ver campos de calificación porque aún son NULL
+ * 
+ * 3. CALIFICACIÓN (Instructor):
+ *    - Instructor evalúa cada item (activo: true/false)
+ *    - Completa: remarks (observaciones), instructorSignature (firma digital)
+ *    - Actualiza: evaluationCriteria (criterios cumplidos)
+ *    - Crea relación con Evaluation (1:1)
+ * 
+ * 4. CONSULTA (Coordinador/Instructor):
+ *    - Ambos pueden ver la lista completa con la calificación
+ *    - Histórico se guarda en ChecklistHistory
+ */
 @Component
 public class ChecklistBusiness {
 
     private final ChecklistService checklistService;
-    private Checklist save;
 
     public ChecklistBusiness(ChecklistService checklistService) {
         this.checklistService = checklistService;
@@ -47,28 +72,61 @@ public class ChecklistBusiness {
         }
     }
 
-    // Add a new Checklist
+    /**
+     * Crea una nueva Lista de Chequeo (ROL: COORDINADOR)
+     * 
+     * Campos OBLIGATORIOS al crear:
+     * - state (true = activa)
+     * - trimester
+     * - items (lista de indicadores)
+     * - studySheets (fichas asociadas)
+     * 
+     * Campos OPCIONALES (se llenan cuando el instructor califica):
+     * - remarks
+     * - instructorSignature
+     * - evaluationCriteria
+     * - evaluation
+     */
     public ChecklistDto add(ChecklistDto checklistDto) {
         try {
+            // Validaciones de creación (Coordinador)
+            validateChecklistCreation(checklistDto);
+            
             Checklist checklist = new Checklist();
             ChecklistMap.INSTANCE.updateChecklist(checklistDto, checklist);
+            
+            // Establecer relación bidireccional con Items
             if (checklist.getItems() != null) {
                 checklist.getItems().forEach(item -> item.setChecklist(checklist));
             }
+            
             Checklist savedChecklist = checklistService.save(checklist);
             return ChecklistMap.INSTANCE.EntityToDTO(savedChecklist);
+        } catch (CustomException e) {
+            throw e;
         } catch (Exception e) {
-            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Error creating checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    // Update an existing Checklist
+    /**
+     * Actualiza una Lista de Chequeo existente
+     * 
+     * Puede ser usado por:
+     * - COORDINADOR: para editar datos generales (trimestre, items, etc)
+     * - INSTRUCTOR: para completar la calificación (remarks, signature, evaluation)
+     */
     public void update(Long checklistId, ChecklistDto checklistDto) {
         try {
             checklistDto.setId(checklistId);
             Checklist checklist = checklistService.getById(checklistId);
+            
+            // Actualizar campos desde el DTO
             ChecklistMap.INSTANCE.updateChecklist(checklistDto, checklist);
+            
             checklistService.save(checklist);
+        } catch (CustomException e) {
+            throw e;
         } catch (Exception e) {
             throw new CustomException("Error Updating Checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -83,6 +141,28 @@ public class ChecklistBusiness {
             throw e;
         } catch (Exception e) {
             throw new CustomException("Error Deleting Checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+    
+    /**
+     * Validaciones específicas para la creación de una lista de chequeo
+     * (Coordinador)
+     */
+    private void validateChecklistCreation(ChecklistDto dto) {
+        if (dto.getState() == null) {
+            throw new CustomException("El estado de la lista de chequeo es obligatorio", HttpStatus.BAD_REQUEST);
+        }
+        
+        if (dto.getTrimester() == null || dto.getTrimester().trim().isEmpty()) {
+            throw new CustomException("El trimestre es obligatorio", HttpStatus.BAD_REQUEST);
+        }
+        
+        if (dto.getItems() == null || dto.getItems().isEmpty()) {
+            throw new CustomException("Debe agregar al menos un item (indicador) a la lista de chequeo", HttpStatus.BAD_REQUEST);
+        }
+        
+        if (dto.getStudySheets() == null || dto.getStudySheets().trim().isEmpty()) {
+            throw new CustomException("Debe asociar al menos una ficha de formación", HttpStatus.BAD_REQUEST);
         }
     }
 }
