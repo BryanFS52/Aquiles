@@ -1,3 +1,4 @@
+/*
 'use client'
 
 import { useState, useEffect, useCallback } from "react"
@@ -8,13 +9,11 @@ import { AppDispatch, RootState } from "@redux/store"
 import { addEvaluation } from "@slice/evaluationSlice"
 import CrearListaChequeo from "@components/Modals/modalNewChecklist"
 import PageTitle from "@components/UI/pageTitle"
-import { checklistEnhancementService } from "@redux/slices/checklistEnhancementSlice"
 import {
   fetchChecklists,
   fetchChecklistById,
   addChecklist,
   updateChecklist,
-  updateChecklistState,
   deleteChecklist
 } from "@slice/checklistSlice"
 
@@ -418,7 +417,7 @@ export default function CoordinadorChecklistView() {
                       className="group relative transform transition-all duration-300 hover:scale-105 hover:z-10"
                     >
                       <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border-2 border-lime-500/30 dark:border-shadowBlue/50 shadow-2xl hover:shadow-lime-200 dark:hover:shadow-shadowBlue/30 overflow-hidden">
-                        {/* Header de la tarjeta */}
+                        {/* Header de la tarjeta }
                         <div className="bg-gradient-to-br from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue p-4">
                           <div className="flex justify-between items-start">
                             <div>
@@ -445,9 +444,9 @@ export default function CoordinadorChecklistView() {
                           </div>
                         </div>
 
-                        {/* Contenido de la tarjeta */}
+                        {/* Contenido de la tarjeta }
                         <div className="p-6 space-y-4">
-                          {/* Proyecto Formativo */}
+                          {/* Proyecto Formativo }
                           <div>
                             <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Proyecto Formativo
@@ -459,7 +458,7 @@ export default function CoordinadorChecklistView() {
                             </p>
                           </div>
 
-                          {/* Componente */}
+                          {/* Componente }
                           <div>
                             <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Componente
@@ -469,7 +468,7 @@ export default function CoordinadorChecklistView() {
                             </p>
                           </div>
 
-                          {/* Fichas asociadas */}
+                          {/* Fichas asociadas}
                           <div>
                             <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Fichas Asociadas
@@ -491,7 +490,7 @@ export default function CoordinadorChecklistView() {
                             </div>
                           </div>
 
-                          {/* Indicadores */}
+                          {/* Indicadores }
                           <div>
                             <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Indicadores
@@ -503,7 +502,7 @@ export default function CoordinadorChecklistView() {
                             </div>
                           </div>
 
-                          {/* Estado */}
+                          {/* Estado }
                           <div>
                             <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Estado
@@ -531,7 +530,7 @@ export default function CoordinadorChecklistView() {
                             </div>
                           </div>
 
-                          {/* Observaciones */}
+                          {/* Observaciones }
                           <div>
                             <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
                               Competencia
@@ -551,7 +550,7 @@ export default function CoordinadorChecklistView() {
         </div>
       )}
 
-      {/* Modal de creación/edición */}
+      {/* Modal de creación/edición }
       <CrearListaChequeo
         isOpen={modalOpen}
         onClose={handleCloseModal}
@@ -560,7 +559,7 @@ export default function CoordinadorChecklistView() {
         isEditing={isEditing}
       />
 
-      {/* Modal de confirmación para eliminar */}
+      {/* Modal de confirmación para eliminar }
       {confirmModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
@@ -590,3 +589,4 @@ export default function CoordinadorChecklistView() {
     </>
   )
 }
+*/

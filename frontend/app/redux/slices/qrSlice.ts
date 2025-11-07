@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { createInitialPaginatedState } from '@type/slices/common/generic';
-import { client } from '@lib/apollo-client';
+import { clientLAN } from '@lib/apollo-client';
 import { GENERATE_QR_CODE } from '@graphql/generateQrGraph';
 
 // Async thunks
 export const generateQRCode = createAsyncThunk(
     'qr/generate',
     async () => {
-        const { data } = await client.mutate({
+        const { data } = await clientLAN.mutate({
             mutation: GENERATE_QR_CODE,
         });
         

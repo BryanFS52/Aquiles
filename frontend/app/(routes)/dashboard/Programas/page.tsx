@@ -1,3 +1,4 @@
+/*
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -10,7 +11,6 @@ import { BsPersonRolodex } from 'react-icons/bs';
 import { SlCalculator } from 'react-icons/sl';
 import { GrUserSettings } from 'react-icons/gr';
 import { LiaLanguageSolid } from 'react-icons/lia';
-import { Program, IconMapType, programsData, ITEMS_PER_PAGE } from '@type/pages/programs';
 import { PaginationState } from '@type/global/pagination'
 import PageTitle from '@components/UI/pageTitle';
 
@@ -120,14 +120,14 @@ const Programas: React.FC = () => {
           </div>
         </div>
 
-        {/* Icon Container en la pestañita */}
+        {/* Icon Container en la pestañita }
         <div className="absolute top-0 right-0 w-0 h-0 z-20 flex items-start justify-end pt-5 sm:pt-7 pr-1">
           <div className="absolute top-2 right-2">
             <Icon className="text-2xl sm:text-3xl md:text-4xl drop-shadow-lg text-black/75 dark:text-white transition-colors duration-300" />
           </div>
         </div>
 
-        {/* Decorative Triangle */}
+        {/* Decorative Triangle }
         <div className="absolute top-0 right-0 w-0 h-0 border-l-[90px] sm:border-l-[120px] border-l-transparent border-t-[100px] sm:border-t-[130px] border-t-lime-500/85 dark:border-t-blue-900 opacity-90 transition-colors duration-300"></div>
       </div>
     );
@@ -135,10 +135,10 @@ const Programas: React.FC = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6 px-2 sm:px-4 lg:px-0">
-      {/* Title */}
+      {/* Title }
       <PageTitle>Programas</PageTitle>
 
-      {/* Search Field */}
+      {/* Search Field }
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center">
         <input
           type="text"
@@ -149,7 +149,7 @@ const Programas: React.FC = () => {
           aria-label="Buscar programa"
         />
 
-        {/* Results counter */}
+        {/* Results counter }
         {searchTerm && (
           <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 sm:pt-3">
             {filteredPrograms.length} programa{filteredPrograms.length !== 1 ? 's' : ''} encontrado{filteredPrograms.length !== 1 ? 's' : ''}
@@ -157,7 +157,7 @@ const Programas: React.FC = () => {
         )}
       </div>
 
-      {/* Programs Grid */}
+      {/* Programs Grid }
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4 sm:gap-5 lg:gap-6 py-2 sm:py-4">
         {displayedPrograms.length > 0 ? (
           displayedPrograms.map(renderProgramCard)
@@ -170,7 +170,7 @@ const Programas: React.FC = () => {
         )}
       </div>
 
-      {/* Pagination */}
+      {/* Pagination }
       {pagination.totalPages > 1 && (
         <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-2 pt-4 sm:pt-6">
           <button
@@ -199,7 +199,7 @@ const Programas: React.FC = () => {
         </div>
       )}
 
-      {/* Page info */}
+      {/* Page info }
       {pagination.totalPages > 1 && (
         <div className="text-center text-xs sm:text-sm text-gray-600 dark:text-gray-400 px-4">
           Página {pagination.currentPage} de {pagination.totalPages} ({pagination.totalItems} programas en total)
@@ -210,3 +210,4 @@ const Programas: React.FC = () => {
 };
 
 export default Programas;
+*/

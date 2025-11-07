@@ -1,7 +1,6 @@
 "use client"
 
 import { motion } from "framer-motion";
-import { FaRegFileAlt } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import DataTable from "@components/UI/DataTable";
 
@@ -11,7 +10,7 @@ interface AttendanceTableProps {
   onReportNovelty?: (studentId?: number) => void;
 }
 
-const AttendanceTable: React.FC<
+export const AttendanceTable: React.FC<
   AttendanceTableProps
 > = ({data, loading, onReportNovelty }) => {
   // Auto-detect dark mode

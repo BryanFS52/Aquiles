@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import AttendanceTable from "@/components/features/InstructorFollowUp/attendanceTable";
+import {AttendanceTable} from "@components/features/InstructorFollowUp/attendanceTable";
 import PageTitle from "@components/UI/pageTitle";
 import NoveltyModal from "@components/Modals/noveltyModal";
 import StatCard from "@/components/features/AprendicesList/StatCard";

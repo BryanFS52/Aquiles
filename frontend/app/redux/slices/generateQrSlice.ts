@@ -1,28 +1,15 @@
 import { clientLAN } from '@lib/apollo-client';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GENERATE_QR_CODE } from '@graphql/generateQrGraph';
 import { RejectedPayload } from '@type/slices/common/generic';
-import { QrCodePayload, GenerateQrCodeMutation, GenerateQrCodeMutationVariables } from '@graphql/generated';
+import { GenerateQrCodeMutation, GenerateQrCodeMutationVariables } from '@graphql/generated';
 
 interface GenerateQRState {
-    data: QrCodePayload | null;
+    data: GenerateQrCodeMutation['generateQRCode'] | null;
     loading: boolean;
     error: { code?: string; message?: string } | null;
 }
 
-const initialState: GenerateQRState = {
-    data: null,
-    loading: false,
-    error: null,
-};
-
-export const transformGraphQLToGenerateQRItem = (graphqlData: any): QrCodePayload => {
-    return {
-        sessionId: graphqlData.sessionId,
-        qrCodeBase64: graphqlData.qrCodeBase64,
-        qrUrl: graphqlData.qrUrl,
-    };
-};
 
 export const generateQrCode = createAsyncThunk<GenerateQrCodeMutation['generateQRCode'], GenerateQrCodeMutationVariables,
     { rejectValue: { code: string; message: string } }
@@ -47,6 +34,11 @@ export const generateQrCode = createAsyncThunk<GenerateQrCodeMutation['generateQ
     }
 );
 
+const initialState: GenerateQRState = {
+    data: null,
+    loading: false,
+    error: null,
+};
 const generateQrSlice = createSlice({
     name: 'generateQr',
     initialState,
@@ -57,13 +49,14 @@ const generateQrSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(generateQrCode.fulfilled, (state, action) => {
-                state.data = transformGraphQLToGenerateQRItem(action.payload);
+            .addCase(generateQrCode.fulfilled, (state, action: PayloadAction<GenerateQrCodeMutation['generateQRCode']>) => {
+                state.data = action.payload;
                 state.loading = false;
                 state.error = null;
             })
             .addCase(generateQrCode.rejected, (state, action) => {
-                const { code, message } = (action.payload as RejectedPayload) || {};
+                const payload = action.payload as RejectedPayload;
+                const { code, message } = payload || {};
                 state.error = { code, message };
                 state.loading = false;
             });

@@ -4,9 +4,7 @@ import { GET_ALL_METHODOLOGIES_AND_PROFILES } from "@graphql/atlas/processMethod
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import { ProcessMethodology,GetAllProcessMethodologiesAndProfilesQuery, GetAllProcessMethodologiesAndProfilesQueryVariables } from "@/graphql/generated";
 
-export const fetchAllProcessMethodologiesAndProfiles = createAsyncThunk<
-    GetAllProcessMethodologiesAndProfilesQuery['allProcessMethodology'],
-    GetAllProcessMethodologiesAndProfilesQueryVariables
+export const fetchAllProcessMethodologiesAndProfiles = createAsyncThunk<GetAllProcessMethodologiesAndProfilesQuery['allProcessMethodology'],GetAllProcessMethodologiesAndProfilesQueryVariables
 >(
     'processMethodologies/fetchAll',
     async ({ page, size, search }, { rejectWithValue }) => {
@@ -22,7 +20,7 @@ export const fetchAllProcessMethodologiesAndProfiles = createAsyncThunk<
 
             return data.allProcessMethodology;
         } catch (error: any) {
-            console.error("❌ Error al fetch:", error);
+            console.error("Error al fetch:", error);
             return rejectWithValue({
                 message: error.message,
                 code: 'ERR_FETCH',

@@ -1,13 +1,7 @@
 import { clientLAN } from '@lib/apollo-client';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
-import {
-  GET_ALL_JUSTIFICATION_STATUS,
-  GET_JUSTIFICATION_STATUS_BY_ID,
-  ADD_JUSTIFICATION_STATUS,
-  UPDATE_JUSTIFICATION_STATUS,
-  DELETE_JUSTIFICATION_STATUS
-} from '@graphql/justificationStatusGraph';
+import { GET_ALL_JUSTIFICATION_STATUS,GET_JUSTIFICATION_STATUS_BY_ID,ADD_JUSTIFICATION_STATUS, UPDATE_JUSTIFICATION_STATUS, DELETE_JUSTIFICATION_STATUS} from '@graphql/justificationStatusGraph';
 import {
   JustificationStatus,
   GetAllJustificationStatusQuery,
