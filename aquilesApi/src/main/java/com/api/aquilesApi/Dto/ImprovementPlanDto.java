@@ -52,4 +52,5 @@ public class ImprovementPlanDto {
     private List<ImprovementPlanActivityDto> improvementPlanActivity;
     private ImprovementPlanFaultTypeDto faultType;
     private ImprovementPlanEvidenceMapDto improvementPlanEvidenceMapDto;
+    private ImprovementPlanEvaluationDto improvementPlanEvaluation;
 }

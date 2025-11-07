@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,4 +30,7 @@ public class ImprovementPlanActivityDto {
     // @NotBlank(message = "The delivery format is required")
     // @Size(max = 100, message = "The delivery format cannot exceed 100 characters")
     private ImprovementPlanDeliveryDto improvementPlanDelivery;
+
+    // Evidence types list
+    private List<ImprovementPlanEvidenceTypeDto> evidenceTypes;
 }

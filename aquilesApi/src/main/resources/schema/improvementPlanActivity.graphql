@@ -4,6 +4,7 @@ type ImprovementPlanActivity {
     deliveryDate: String
     improvementPlan: ImprovementPlan
     improvementPlanDelivery: ImprovementPlanDelivery
+    evidenceTypes: [ImprovementPlanEvidenceType]
 }
 
 input ImprovementPlanActivityDto {
@@ -11,6 +12,7 @@ input ImprovementPlanActivityDto {
     deliveryDate: String
     improvementPlan: ImprovementPlanDto
     improvementPlanDelivery: ImprovementPlanDeliveryDto
+    evidenceTypes: [ImprovementPlanEvidenceTypeDto]
 }
 
 type ImprovementPlanActivityPage {
