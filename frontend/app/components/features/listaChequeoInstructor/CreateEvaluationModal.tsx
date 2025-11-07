@@ -10,6 +10,7 @@ export const CreateEvaluationModal: React.FC<CreateEvaluationModalProps> = ({
   evaluationObservations,
   evaluationRecommendations,
   evaluationJudgment,
+  evaluationCriteria,
   isFinalSaved,
   isCreating,
   onClose,
@@ -25,7 +26,7 @@ export const CreateEvaluationModal: React.FC<CreateEvaluationModalProps> = ({
     >
       {/* Información del checklist con diseño moderno */}
       <Card
-        header={<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">📋 Lista de Chequeo: {selectedChecklist?.trimester ? `Trimestre ${selectedChecklist.trimester}` : 'Sin trimestre'}</h3>}
+        header={<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Lista de Chequeo: {selectedChecklist?.trimester ? `Trimestre ${selectedChecklist.trimester}` : 'Sin trimestre'}</h3>}
         body={<p className="text-gray-700 dark:text-gray-300 text-sm">Complete los siguientes campos para crear la evaluación de esta lista de chequeo.</p>}
         className="mb-6"
       />
@@ -35,7 +36,7 @@ export const CreateEvaluationModal: React.FC<CreateEvaluationModalProps> = ({
         <div className="space-y-4">
           <label className="block text-lg font-semibold text-darkBlue dark:text-white mb-2">
             <span className="flex items-center gap-2">
-              📝 Observaciones: <span className="text-red-500">*</span>
+              Observaciones: <span className="text-red-500">*</span>
             </span>
           </label>
           <textarea
@@ -58,7 +59,7 @@ export const CreateEvaluationModal: React.FC<CreateEvaluationModalProps> = ({
         <div className="space-y-4">
           <label className="block text-lg font-semibold text-darkBlue dark:text-white mb-2">
             <span className="flex items-center gap-2">
-              💡 Recomendaciones: <span className="text-red-500">*</span>
+              Recomendaciones: <span className="text-red-500">*</span>
             </span>
           </label>
           <textarea
@@ -80,7 +81,7 @@ export const CreateEvaluationModal: React.FC<CreateEvaluationModalProps> = ({
       <div className="mb-6">
         <label className="block text-lg font-semibold text-darkBlue dark:text-white mb-4">
           <span className="flex items-center gap-2">
-            ⚖️ Juicio de Valor: <span className="text-red-500">*</span>
+            Juicio de Valor: <span className="text-red-500">*</span>
           </span>
         </label>
         <select
@@ -97,7 +98,7 @@ export const CreateEvaluationModal: React.FC<CreateEvaluationModalProps> = ({
 
       {/* Indicador de progreso con diseño moderno */}
       <Card
-        header={<h4 className="font-semibold text-gray-900 dark:text-gray-100">📊 Progreso de Evaluación</h4>}
+        header={<h4 className="font-semibold text-gray-900 dark:text-gray-100">Progreso de Evaluación</h4>}
         body={
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30">

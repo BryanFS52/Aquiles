@@ -32,12 +32,13 @@ export interface EvaluationSectionProps {
   evaluationObservations: string;
   evaluationRecommendations: string;
   evaluationJudgment: string;
+  evaluationCriteria: boolean | null;
   isFinalSaved: boolean;
   onUpdateClick: () => void;
   onCancelUpdate: () => void;
   onCompleteEvaluation: () => Promise<void>;
   onCreateEvaluation: () => void;
-  onFieldChange: (field: string, value: string) => void;
+  onFieldChange: (field: string, value: string | boolean) => void;
   extractGeneralObservationsFromEvaluation: (evaluation: Evaluation) => string;
 }
 
@@ -64,11 +65,12 @@ export interface CreateEvaluationModalProps {
   evaluationObservations: string;
   evaluationRecommendations: string;
   evaluationJudgment: string;
+  evaluationCriteria: boolean | null;
   isFinalSaved: boolean;
   isCreating: boolean;
   onClose: () => void;
   onCreate: () => Promise<void>;
-  onFieldChange: (field: string, value: string) => void;
+  onFieldChange: (field: string, value: string | boolean) => void;
 }
 
 export interface ChecklistControlsProps {

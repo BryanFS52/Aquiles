@@ -9,6 +9,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
   evaluationObservations,
   evaluationRecommendations,
   evaluationJudgment,
+  evaluationCriteria,
   isFinalSaved,
   onUpdateClick,
   onCancelUpdate,
@@ -45,9 +46,10 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                   {/* Headers de la tabla */}
                   <div className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                     <div className="grid grid-cols-12 gap-4 px-6 py-5 text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                      <div className="col-span-4 text-left">OBSERVACIONES</div>
-                      <div className="col-span-4 text-left">RECOMENDACIONES</div>
+                      <div className="col-span-3 text-left">OBSERVACIONES</div>
+                      <div className="col-span-3 text-left">RECOMENDACIONES</div>
                       <div className="col-span-2 text-center">JUICIO DE VALOR</div>
+                      <div className="col-span-2 text-center">CRITERIO</div>
                       <div className="col-span-2 text-center">ACCIONES</div>
                     </div>
                   </div>
@@ -56,7 +58,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                   <div className="px-6 py-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200">
                     <div className="grid grid-cols-12 gap-4 items-start">
                       {/* OBSERVACIONES */}
-                      <div className="col-span-4">
+                      <div className="col-span-3">
                         <textarea
                           value={evaluationObservations}
                           onChange={(e) => onFieldChange('observations', e.target.value)}
@@ -72,7 +74,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                       </div>
 
                       {/* RECOMENDACIONES */}
-                      <div className="col-span-4">
+                      <div className="col-span-3">
                         <textarea
                           value={evaluationRecommendations}
                           onChange={(e) => onFieldChange('recommendations', e.target.value)}
@@ -101,6 +103,23 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                           <option value="">Seleccionar...</option>
                           <option value="APROBADO">Aprobado</option>
                           <option value="NO APROBADO">No Aprobado</option>
+                        </select>
+                      </div>
+
+                      {/* CRITERIO DE EVALUACIÓN */}
+                      <div className="col-span-2 flex items-center justify-center">
+                        <select
+                          value={evaluationCriteria === null ? "" : evaluationCriteria ? "true" : "false"}
+                          onChange={(e) => onFieldChange('criteria', e.target.value === "true")}
+                          disabled={isFinalSaved}
+                          className={`w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium ${
+                            isFinalSaved ? 'opacity-50 cursor-not-allowed' : 'focus:ring-2 focus:ring-[#5cb800] dark:focus:ring-shadowBlue focus:border-[#5cb800] dark:focus:border-shadowBlue'
+                          }`}
+                          required
+                        >
+                          <option value="">Seleccionar...</option>
+                          <option value="true">✓ Aprueba</option>
+                          <option value="false">✗ No Aprueba</option>
                         </select>
                       </div>
 
@@ -145,9 +164,10 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                   {/* Headers de la tabla */}
                   <div className="bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
                     <div className="grid grid-cols-12 gap-4 px-6 py-5 text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                      <div className="col-span-4 text-left">OBSERVACIONES</div>
-                      <div className="col-span-4 text-left">RECOMENDACIONES</div>
+                      <div className="col-span-3 text-left">OBSERVACIONES</div>
+                      <div className="col-span-3 text-left">RECOMENDACIONES</div>
                       <div className="col-span-2 text-center">JUICIO DE VALOR</div>
+                      <div className="col-span-2 text-center">CRITERIO</div>
                       <div className="col-span-2 text-center">ACCIONES</div>
                     </div>
                   </div>
@@ -156,7 +176,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                   <div className="px-6 py-5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200">
                     <div className="grid grid-cols-12 gap-4 items-start">
                       {/* OBSERVACIONES */}
-                      <div className="col-span-4">
+                      <div className="col-span-3">
                         <div className="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-300 dark:border-gray-600">
                           <p className="text-base text-gray-900 dark:text-white leading-relaxed break-words whitespace-pre-wrap overflow-wrap-anywhere evaluation-text">
                             {selectedEvaluation ? extractGeneralObservationsFromEvaluation(selectedEvaluation) || "Sin observaciones" : "Sin observaciones"}
@@ -165,7 +185,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                       </div>
 
                       {/* RECOMENDACIONES */}
-                      <div className="col-span-4">
+                      <div className="col-span-3">
                         <div className="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-300 dark:border-gray-600">
                           <p className="text-base text-gray-900 dark:text-white leading-relaxed break-words whitespace-pre-wrap overflow-wrap-anywhere evaluation-text">
                             {selectedEvaluation.recommendations || "Sin recomendaciones"}
@@ -182,6 +202,19 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                           'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
                         }`}>
                           {selectedEvaluation.valueJudgment || "PENDIENTE"}
+                        </span>
+                      </div>
+
+                      {/* CRITERIO DE EVALUACIÓN */}
+                      <div className="col-span-2 flex items-center justify-center">
+                        <span className={`inline-flex px-4 py-2 rounded-full text-sm font-bold shadow-lg ${
+                          selectedChecklist?.evaluationCriteria === true ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
+                          selectedChecklist?.evaluationCriteria === false ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
+                          'bg-gradient-to-r from-gray-400 to-gray-500 text-white'
+                        }`}>
+                          {selectedChecklist?.evaluationCriteria === true ? '✓ Aprueba' :
+                           selectedChecklist?.evaluationCriteria === false ? '✗ No Aprueba' :
+                           'Sin definir'}
                         </span>
                       </div>
 
@@ -215,14 +248,11 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                 {/* Contenido de la tabla */}
                 <div className="px-6 py-8 text-center">
                   <div className="space-y-6">
-                    <div className="w-16 h-16 bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue rounded-full flex items-center justify-center mx-auto">
-                      <span className="text-white text-2xl">📋</span>
-                    </div>
+                   
                     <h4 className="text-2xl font-bold text-gray-900 dark:text-white">
                       Esta lista no tiene evaluación
                     </h4>
                     <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                      Se creará automáticamente una <strong>evaluación única</strong> vinculada a esta lista de chequeo (relación 1:1 en la base de datos). 
                       Complete los campos para establecer la evaluación final.
                     </p>
 

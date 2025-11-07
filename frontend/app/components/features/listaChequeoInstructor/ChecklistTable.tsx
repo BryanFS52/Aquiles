@@ -16,16 +16,23 @@ export const ChecklistTable: React.FC<ChecklistTableProps> = ({
 }) => {
   const columns: DataTableColumn<any>[] = [
     {
-      key: 'id',
-      header: 'ITEM',
-      className: 'text-center w-20',
-      render: (item) => (
-        <div className="flex justify-center">
-          <div className="w-8 h-8 bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue rounded-full flex items-center justify-center">
-            <span className="text-white font-semibold text-sm">{item.id}</span>
+      key: 'type',
+      header: 'TIPO',
+      className: 'text-center w-32',
+      render: (item) => {
+        const isTechnical = item.code?.startsWith('TEC');
+        return (
+          <div className="flex justify-center">
+            <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold border ${
+              isTechnical 
+                ? 'bg-lime-50 dark:bg-lime-900/20 text-lime-700 dark:text-lime-300 border-lime-200 dark:border-lime-700'
+                : 'bg-lime-50 dark:bg-lime-900/20 text-lime-700 dark:text-lime-300 border-lime-200 dark:border-lime-700'
+            }`}>
+              {isTechnical ? 'Técnico' : 'Actitudinal'}
+            </span>
           </div>
-        </div>
-      )
+        );
+      }
     },
     {
       key: 'indicator',

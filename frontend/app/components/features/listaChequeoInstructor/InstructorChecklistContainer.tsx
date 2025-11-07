@@ -10,6 +10,8 @@ import PageTitle from "@components/UI/pageTitle";
 import { InformationCards } from './InformationCards';
 import { ChecklistControls } from './ChecklistControls';
 import { ChecklistTable } from './ChecklistTable';
+import { EvaluationSection } from './EvaluationSection';
+import { CreateEvaluationModal } from './CreateEvaluationModal';
 import { PreviewModal } from './PreviewModal';
 import { Checklist, StudySheet, TeamsScrum } from '@graphql/generated';
 
@@ -27,6 +29,15 @@ export const InstructorChecklistContainer: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isFinalSaved, setIsFinalSaved] = useState(false);
   const [itemStates, setItemStates] = useState<{ [key: number]: { completed: boolean | null, observations: string } }>({});
+
+  // Estados para la evaluación
+  const [showEvaluationForm, setShowEvaluationForm] = useState(false);
+  const [showCreateEvaluationModal, setShowCreateEvaluationModal] = useState(false);
+  const [evaluationObservations, setEvaluationObservations] = useState("");
+  const [evaluationRecommendations, setEvaluationRecommendations] = useState("");
+  const [evaluationJudgment, setEvaluationJudgment] = useState("");
+  const [evaluationCriteria, setEvaluationCriteria] = useState<boolean | null>(null);
+  const [isCreatingEvaluation, setIsCreatingEvaluation] = useState(false);
 
   const itemsPerPage = 5;
 
@@ -226,6 +237,97 @@ export const InstructorChecklistContainer: React.FC = () => {
   const studySheetInfo = getStudySheetInfo();
   const teamScrumInfo = getTeamScrumInfo();
 
+  // Funciones para manejo de evaluación
+  const handleEvaluationFieldChange = (field: string, value: string | boolean) => {
+    switch (field) {
+      case 'observations':
+        setEvaluationObservations(value as string);
+        break;
+      case 'recommendations':
+        setEvaluationRecommendations(value as string);
+        break;
+      case 'judgment':
+        setEvaluationJudgment(value as string);
+        break;
+      case 'criteria':
+        setEvaluationCriteria(value as boolean);
+        break;
+    }
+  };
+
+  const handleCreateEvaluation = () => {
+    setShowCreateEvaluationModal(true);
+  };
+
+  const handleCreateEvaluationSubmit = async () => {
+    if (!selectedChecklist) return;
+    
+    setIsCreatingEvaluation(true);
+    try {
+      // TODO: Implementar la mutación GraphQL para crear evaluación
+      console.log("Creando evaluación con:", {
+        observations: evaluationObservations,
+        recommendations: evaluationRecommendations,
+        judgment: evaluationJudgment,
+        criteria: evaluationCriteria,
+        checklistId: selectedChecklist.id
+      });
+      
+      // Simular creación exitosa
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setShowCreateEvaluationModal(false);
+      alert("Evaluación creada exitosamente!");
+      
+      // Recargar checklist para obtener la evaluación
+      dispatch(fetchChecklists({ page: 0, size: 50 }));
+    } catch (error) {
+      console.error("Error al crear evaluación:", error);
+      alert("Error al crear la evaluación");
+    } finally {
+      setIsCreatingEvaluation(false);
+    }
+  };
+
+  const handleUpdateEvaluationClick = () => {
+    setShowEvaluationForm(true);
+  };
+
+  const handleCancelUpdate = () => {
+    setShowEvaluationForm(false);
+  };
+
+  const handleCompleteEvaluation = async () => {
+    if (!selectedChecklist) return;
+    
+    try {
+      // TODO: Implementar la mutación GraphQL para actualizar evaluación y checklist
+      console.log("Actualizando evaluación con:", {
+        observations: evaluationObservations,
+        recommendations: evaluationRecommendations,
+        judgment: evaluationJudgment,
+        criteria: evaluationCriteria,
+        checklistId: selectedChecklist.id
+      });
+      
+      // Simular actualización exitosa
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setShowEvaluationForm(false);
+      alert("Evaluación actualizada exitosamente!");
+      
+      // Recargar checklist
+      dispatch(fetchChecklists({ page: 0, size: 50 }));
+    } catch (error) {
+      console.error("Error al actualizar evaluación:", error);
+      alert("Error al actualizar la evaluación");
+    }
+  };
+
+  const extractGeneralObservationsFromEvaluation = (evaluation: any) => {
+    return evaluation?.observations || "";
+  };
+
   return (
     <div className="p-8 bg-gray-100 dark:bg-[#00111f] min-h-screen text-gray-900 dark:text-white">
       <PageTitle>Lista de Chequeo - Instructor</PageTitle>
@@ -268,6 +370,41 @@ export const InstructorChecklistContainer: React.FC = () => {
           onPageChange={handlePageChange}
         />
       )}
+
+      {/* Sección de Evaluación */}
+      {selectedChecklist && currentItems.length > 0 && (
+        <EvaluationSection
+          selectedChecklist={selectedChecklist}
+          selectedEvaluation={(selectedChecklist as any).evaluations || null}
+          showEvaluationForm={showEvaluationForm}
+          evaluationObservations={evaluationObservations}
+          evaluationRecommendations={evaluationRecommendations}
+          evaluationJudgment={evaluationJudgment}
+          evaluationCriteria={evaluationCriteria}
+          isFinalSaved={isFinalSaved}
+          onUpdateClick={handleUpdateEvaluationClick}
+          onCancelUpdate={handleCancelUpdate}
+          onCompleteEvaluation={handleCompleteEvaluation}
+          onCreateEvaluation={handleCreateEvaluation}
+          onFieldChange={handleEvaluationFieldChange}
+          extractGeneralObservationsFromEvaluation={extractGeneralObservationsFromEvaluation}
+        />
+      )}
+
+      {/* Modal de Crear Evaluación */}
+      <CreateEvaluationModal
+        showModal={showCreateEvaluationModal}
+        selectedChecklist={selectedChecklist}
+        evaluationObservations={evaluationObservations}
+        evaluationRecommendations={evaluationRecommendations}
+        evaluationJudgment={evaluationJudgment}
+        evaluationCriteria={evaluationCriteria}
+        isFinalSaved={isFinalSaved}
+        isCreating={isCreatingEvaluation}
+        onClose={() => setShowCreateEvaluationModal(false)}
+        onCreate={handleCreateEvaluationSubmit}
+        onFieldChange={handleEvaluationFieldChange}
+      />
 
       {/* Estado de carga */}
       {loading && (
