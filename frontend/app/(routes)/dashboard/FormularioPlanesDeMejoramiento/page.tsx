@@ -7,7 +7,9 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@redux/store";
 import { fetchFaultTypes } from "@/redux/slices/improvementPlanFaultTypeSlice";
-import { addImprovementPlan } from "@slice/improvementPlanSlice";
+import { addImprovementPlan, fetchTeacherCompetencesByStudySheet } from "@slice/improvementPlanSlice";
+import { clientLAN } from "@lib/apollo-client";
+import { GET_All_STUDENTS, GET_STUDENT_LIST } from "@graphql/olympo/studentsGraph";
 import { toast } from "react-toastify";
 import { useLoader } from "@context/LoaderContext";
 

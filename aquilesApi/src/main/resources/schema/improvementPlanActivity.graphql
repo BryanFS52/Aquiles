@@ -4,15 +4,15 @@ type ImprovementPlanActivity {
     deliveryDate: String
     improvementPlan: ImprovementPlan
     improvementPlanDelivery: ImprovementPlanDelivery
-    learningOutcome: Long
+    evidenceTypes: [ImprovementPlanEvidenceType]
 }
 
 input ImprovementPlanActivityDto {
     description: String
     deliveryDate: String
-    learningOutcome: Long
     improvementPlan: ImprovementPlanDto
     improvementPlanDelivery: ImprovementPlanDeliveryDto
+    evidenceTypes: [ImprovementPlanEvidenceTypeDto]
 }
 
 type ImprovementPlanActivityPage {

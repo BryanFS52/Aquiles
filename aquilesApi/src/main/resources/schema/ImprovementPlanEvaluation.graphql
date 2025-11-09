@@ -1,0 +1,48 @@
+type ImprovementPlanEvaluation {
+    id: ID
+    pertinence: Boolean
+    validity: Boolean
+    authenticity: Boolean
+    quality: Boolean
+    judgment: Boolean
+    improvementPlan: ImprovementPlan
+}
+
+input ImprovementPlanEvaluationDto {
+    id: ID
+    pertinence: Boolean
+    validity: Boolean
+    authenticity: Boolean
+    quality: Boolean
+    judgment: Boolean
+    improvementPlan: ImprovementPlanDto
+}
+
+type ImprovementPlanEvaluationPage {
+    code: String
+    data: [ImprovementPlanEvaluation]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type ImprovementPlanEvaluationPageId {
+    data: ImprovementPlanEvaluation
+    date: String
+    code: String
+    message: String
+}
+
+extend type Query {
+    allImprovementPlanEvaluations(page: Int, size: Int): ImprovementPlanEvaluationPage
+    improvementPlanEvaluationById(id: Long!): ImprovementPlanEvaluationPageId
+    improvementPlanEvaluationByImprovementPlanId(improvementPlanId: Long!): ImprovementPlanEvaluationPageId
+}
+
+extend type Mutation {
+    addImprovementPlanEvaluation(input: ImprovementPlanEvaluationDto): Response
+    updateImprovementPlanEvaluation(id: Long!, input: ImprovementPlanEvaluationDto): Response
+    deleteImprovementPlanEvaluation(id: Long!): Response
+}

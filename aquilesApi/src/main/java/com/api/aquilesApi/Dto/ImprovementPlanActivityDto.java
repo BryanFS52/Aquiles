@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,10 +22,7 @@ public class ImprovementPlanActivityDto {
     // @NotNull(message = "The delivery date is required")
     private String deliveryDate;
 
-    // Relations
-    // @NotBlank(message = "The learning outcome is required")
-    // @Size(max = 500, message = "The learning outcome cannot exceed 500 characters")
-    private Long learningOutcome;
+
 
     // @NotNull(message = "The Improvement Plan ID is required")
     private ImprovementPlanDto improvementPlan;
@@ -31,4 +30,7 @@ public class ImprovementPlanActivityDto {
     // @NotBlank(message = "The delivery format is required")
     // @Size(max = 100, message = "The delivery format cannot exceed 100 characters")
     private ImprovementPlanDeliveryDto improvementPlanDelivery;
+
+    // Evidence types list
+    private List<ImprovementPlanEvidenceTypeDto> evidenceTypes;
 }

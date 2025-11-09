@@ -13,8 +13,65 @@ import { FiBookOpen, FiCalendar, FiTarget, FiClock, FiEye, FiCreditCard, FiPhone
 import { IoPeople } from "react-icons/io5";
 import PageTitle from '@components/UI/pageTitle';
 import EmptyState from '@components/UI/emptyState';
-import Modal from '@components/UI/Modal';
+import {
+    StudySheet,
+    StudentStudySheet,
+} from '@graphql/generated';
+import { FiUsers, FiBookOpen, FiCalendar, FiTarget, FiClock, FiEye, FiCreditCard, FiPhone, FiArrowRight, FiMail } from 'react-icons/fi';
+import { IoPeople } from "react-icons/io5";
 
+// Estilos CSS para line-clamp y select con scroll
+const styles = `
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Estilos para select con scroll personalizado */
+select {
+    max-height: 300px;
+}
+
+select option {
+    padding: 8px 12px;
+}
+
+/* Scroll personalizado para navegadores webkit */
+select::-webkit-scrollbar {
+    width: 8px;
+}
+
+select::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+select::-webkit-scrollbar-thumb {
+    background: #39A900;
+    border-radius: 10px;
+}
+
+select::-webkit-scrollbar-thumb:hover {
+    background: #2d8400;
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+    select::-webkit-scrollbar-track {
+        background: #374151;
+    }
+    
+    select::-webkit-scrollbar-thumb {
+        background: #10B981;
+    }
+    
+    select::-webkit-scrollbar-thumb:hover {
+        background: #059669;
+    }
+}
+`;
 
 const PlanMejoramientoInstructor: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();

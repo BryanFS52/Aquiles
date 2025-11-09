@@ -34,5 +34,7 @@ public interface ImprovementPlanRepository extends JpaRepository<ImprovementPlan
             "  SELECT DISTINCT m.studentId FROM TeamsScrum t JOIN t.memberIds m WHERE t.studySheetId = :studySheetId" +
             ")")
     Page<ImprovementPlan> findByStudySheetId(Pageable pageable, @Param("studySheetId") Long studySheetId);
-    
+
+    @Query("SELECT ip FROM ImprovementPlan ip WHERE ip.learningOutcome = :learningOutcome")
+    List<ImprovementPlan> findAllByLearningOutcome(@Param("learningOutcome") Long learningOutcome);
 }
