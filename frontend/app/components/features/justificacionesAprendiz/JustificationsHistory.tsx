@@ -1,7 +1,9 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+"use client";
+
 import { JustificationsHistoricalProps } from './types';
-import JustificationsHistorical from '@/components/features/JustificacionesAprendiz/justificationsHistorical';
+import { motion } from 'framer-motion';
+import React from 'react';
+import JustificationsHistorical from '@/components/features/justificacionesAprendiz/justificationsHistorical';
 
 export const JustificationsHistory: React.FC<JustificationsHistoricalProps> = ({
     data,
