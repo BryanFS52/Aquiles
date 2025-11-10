@@ -2,7 +2,9 @@ package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.ChecklistDto;
 import com.api.aquilesApi.Entity.Checklist;
+import com.api.aquilesApi.Entity.ItemType;
 import com.api.aquilesApi.Service.ChecklistService;
+import com.api.aquilesApi.Service.ItemTypeService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Mapper.ChecklistMap;
 import org.springframework.dao.DataAccessException;
@@ -42,9 +44,11 @@ import org.springframework.stereotype.Component;
 public class ChecklistBusiness {
 
     private final ChecklistService checklistService;
+    private final ItemTypeService itemTypeService;
 
-    public ChecklistBusiness(ChecklistService checklistService) {
+    public ChecklistBusiness(ChecklistService checklistService, ItemTypeService itemTypeService) {
         this.checklistService = checklistService;
+        this.itemTypeService = itemTypeService;
     }
 
     // Get all Checklists (Paginated)
@@ -95,9 +99,19 @@ public class ChecklistBusiness {
             Checklist checklist = new Checklist();
             ChecklistMap.INSTANCE.updateChecklist(checklistDto, checklist);
             
-            // Establecer relación bidireccional con Items
+            // Establecer relación bidireccional con Items y validar ItemTypes
             if (checklist.getItems() != null) {
-                checklist.getItems().forEach(item -> item.setChecklist(checklist));
+                checklist.getItems().forEach(item -> {
+                    // Validar y establecer ItemType desde la base de datos
+                    if (item.getItemType() != null && item.getItemType().getId() != null) {
+                        ItemType itemType = itemTypeService.getById(item.getItemType().getId());
+                        item.setItemType(itemType);
+                    } else {
+                        throw new CustomException("ItemType es obligatorio para cada item", HttpStatus.BAD_REQUEST);
+                    }
+                    // Establecer relación bidireccional con Checklist
+                    item.setChecklist(checklist);
+                });
             }
             
             Checklist savedChecklist = checklistService.save(checklist);

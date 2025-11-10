@@ -3,6 +3,7 @@ package com.api.aquilesApi.Utilities.Mapper;
 import com.api.aquilesApi.Dto.ChecklistDto;
 import com.api.aquilesApi.Entity.Checklist;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
@@ -14,6 +15,7 @@ import java.util.List;
 public interface ChecklistMap {
     ChecklistMap INSTANCE = Mappers.getMapper(ChecklistMap.class);
 
+    @Mapping(target = "evaluation.checklist", ignore = true)
     ChecklistDto EntityToDTO(Checklist checklist);
 
     Checklist DTOToEntity(ChecklistDto checklist);
