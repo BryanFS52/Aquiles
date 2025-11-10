@@ -37,18 +37,15 @@ public class ChecklistResolver {
     public Map<String, Object> allChecklists(@InputArgument Integer page, @InputArgument Integer size) {
         try {
             Page<ChecklistDto> checklistDtoPage = checklistBusiness.findAll(page, size);
-            if (!checklistDtoPage.isEmpty()) {
-                return ResponseHttpApi.responseHttpFindAll(
-                        checklistDtoPage.getContent(),
-                        ResponseHttpApi.CODE_OK,
-                        "Query ok",
-                        checklistDtoPage.getTotalPages(),
-                        page,
-                        (int) checklistDtoPage.getTotalElements()
-                );
-            } else {
-                throw new NotFoundException("No Checklists found");
-            }
+            // Devolver respuesta exitosa incluso si la lista está vacía
+            return ResponseHttpApi.responseHttpFindAll(
+                    checklistDtoPage.getContent(),
+                    ResponseHttpApi.CODE_OK,
+                    checklistDtoPage.isEmpty() ? "No hay listas de chequeo disponibles" : "Query ok",
+                    checklistDtoPage.getTotalPages(),
+                    page,
+                    (int) checklistDtoPage.getTotalElements()
+            );
         } catch (Exception e) {
             throw new RuntimeException("Unexpected error in allChecklists: " + e.getMessage(), e);
         }

@@ -180,12 +180,11 @@ export default function CrearListaChequeo({
 
     try {
       await onCreate(checklistData)
-      toast.success(isEditing ? 'Lista actualizada correctamente' : 'Lista creada correctamente')
       resetForm()
       onClose()
     } catch (error) {
       console.error(error)
-      toast.error('Error al guardar la lista de chequeo')
+      // El componente padre maneja los toasts de éxito/error
     }
   }
 
