@@ -98,9 +98,10 @@ export default function CoordinadorChecklistView() {
     try {
       if (isEditing) {
         // Actualizar lista existente
+        const { id, ...inputData } = data // Separar id del resto de datos
         await dispatch(updateChecklist({ 
-          id: data.id, 
-          input: data 
+          id, 
+          input: inputData 
         })).unwrap()
         toast.success("Lista de chequeo actualizada exitosamente")
       } else {

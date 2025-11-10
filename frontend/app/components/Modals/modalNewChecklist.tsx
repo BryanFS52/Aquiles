@@ -62,7 +62,8 @@ export default function CrearListaChequeo({
     if (selectedTrainingProject) loadStudySheets(selectedTrainingProject)
     else {
       setStudySheets([])
-      setSelectedStudySheets([])
+      // ✅ NO limpiar selectedStudySheets si estamos editando
+      if (!isEditing) setSelectedStudySheets([])
     }
   }, [selectedTrainingProject])
 
@@ -93,12 +94,28 @@ export default function CrearListaChequeo({
     }
   }
 
+  // ✅ Efecto para cargar datos cuando se edita
   useEffect(() => {
     if (isOpen && isEditing && editingData) {
+      // Primero establecer el proyecto formativo
+      const projectId = editingData.trainingProjectId?.toString() || ''
+      setSelectedTrainingProject(projectId)
+      
+      // Establecer otros campos
       setTrimestre(editingData.trimester?.toString() || '')
       setObservaciones(editingData.remarks || '')
-      setSelectedTrainingProject(editingData.trainingProjectId?.toString() || '')
-      setSelectedStudySheets(editingData.studySheets ? editingData.studySheets.split(',') : [])
+      
+      // Las fichas se establecerán después de que se carguen desde el proyecto
+      const sheetsToSelect = editingData.studySheets ? editingData.studySheets.split(',') : []
+      
+      // ✅ Si hay un proyecto, cargar las fichas y luego seleccionarlas
+      if (projectId) {
+        loadStudySheets(projectId).then(() => {
+          setSelectedStudySheets(sheetsToSelect)
+        })
+      } else {
+        setSelectedStudySheets(sheetsToSelect)
+      }
       
       // ✅ Convertir items a indicadores técnicos y actitudinales
       if (editingData.items && Array.isArray(editingData.items)) {

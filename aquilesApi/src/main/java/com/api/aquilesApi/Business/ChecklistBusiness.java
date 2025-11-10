@@ -123,10 +123,11 @@ public class ChecklistBusiness {
         }
     }
 
-    /**
-     * Actualiza una Lista de Chequeo existente
+        /**
+     * Actualiza una lista de chequeo existente
      * 
-     * Puede ser usado por:
+     * IMPORTANTE: Solo se actualizan los campos que vienen en el DTO (no-null)
+     * Permite dos tipos de actualización:
      * - COORDINADOR: para editar datos generales (trimestre, items, etc)
      * - INSTRUCTOR: para completar la calificación (remarks, signature, evaluation)
      */
@@ -135,8 +136,26 @@ public class ChecklistBusiness {
             checklistDto.setId(checklistId);
             Checklist checklist = checklistService.getById(checklistId);
             
-            // Actualizar campos desde el DTO
+            // ✅ Guardar items actuales antes de mapear
+            var currentItems = checklist.getItems();
+            
+            // Actualizar campos desde el DTO (MapStruct ignora valores null gracias a NullValuePropertyMappingStrategy.IGNORE)
             ChecklistMap.INSTANCE.updateChecklist(checklistDto, checklist);
+            
+            // ✅ Si el DTO no trae items, restaurar los items originales
+            if (checklistDto.getItems() == null || checklistDto.getItems().isEmpty()) {
+                checklist.setItems(currentItems);
+            } else {
+                // ✅ Si el DTO trae items, validar los ItemTypes y actualizar relaciones
+                for (var item : checklist.getItems()) {
+                    // Validar que el ItemType existe en la base de datos
+                    ItemType itemType = itemTypeService.getById(item.getItemType().getId());
+                    item.setItemType(itemType);
+                    
+                    // Establecer la relación bidireccional
+                    item.setChecklist(checklist);
+                }
+            }
             
             checklistService.save(checklist);
         } catch (CustomException e) {
