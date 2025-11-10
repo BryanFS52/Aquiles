@@ -2,6 +2,7 @@ package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.ChecklistBusiness;
 import com.api.aquilesApi.Dto.ChecklistDto;
+import com.api.aquilesApi.Dto.EvaluationDto;
 import com.api.aquilesApi.Entity.Checklist;
 import com.api.aquilesApi.Entity.ChecklistHistory;
 import com.api.aquilesApi.Service.ChecklistHistoryService;
@@ -30,6 +31,13 @@ public class ChecklistResolver {
         this.checklistBusiness = checklistBusiness;
         this.checklistHistoryService = checklistHistoryService;
         this.itemService = itemService;
+    }
+
+    // Field resolver para mapear evaluation a evaluations
+    @DgsData(parentType = "Checklist", field = "evaluations")
+    public EvaluationDto getEvaluations(DgsDataFetchingEnvironment dfe) {
+        ChecklistDto checklist = dfe.getSource();
+        return checklist.getEvaluation();
     }
 
     // FindAll Checklist

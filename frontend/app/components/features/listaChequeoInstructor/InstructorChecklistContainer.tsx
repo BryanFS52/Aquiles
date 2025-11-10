@@ -6,6 +6,7 @@ import { AppDispatch, RootState } from '@redux/store';
 import { fetchChecklists } from '@redux/slices/checklistSlice';
 import { fetchStudySheetWithTeamScrum } from '@redux/slices/olympo/studySheetSlice';
 import { fetchTeamScrumById } from '@redux/slices/teamScrumSlice';
+import { addEvaluation, updateEvaluation } from '@redux/slices/evaluationSlice';
 import PageTitle from "@components/UI/pageTitle";
 import { InformationCards } from './InformationCards';
 import { ChecklistControls } from './ChecklistControls';
@@ -14,6 +15,7 @@ import { EvaluationSection } from './EvaluationSection';
 import { CreateEvaluationModal } from './CreateEvaluationModal';
 import { PreviewModal } from './PreviewModal';
 import { Checklist, StudySheet, TeamsScrum } from '@graphql/generated';
+import { toast } from 'react-toastify';
 
 export const InstructorChecklistContainer: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -89,6 +91,11 @@ export const InstructorChecklistContainer: React.FC = () => {
     
     const checklist = checklists.find((c: Checklist) => c.id === checklistId);
     if (checklist) {
+      console.log("🔍 Checklist seleccionado:", checklist);
+      console.log("📊 Evaluación del checklist:", (checklist as any).evaluations);
+      console.log("📊 Tipo de evaluations:", typeof (checklist as any).evaluations);
+      console.log("📊 ¿Tiene evaluations?:", !!(checklist as any).evaluations);
+      
       setSelectedChecklist(checklist);
       setCurrentPage(1);
       
@@ -111,6 +118,28 @@ export const InstructorChecklistContainer: React.FC = () => {
         } catch (error) {
           console.error("Error al cargar ficha de estudio:", error);
         }
+      }
+      
+      // Cargar datos de evaluación si existe
+      const evaluation = (checklist as any).evaluations;
+      console.log("✅ Evaluación encontrada:", evaluation);
+      
+      if (evaluation) {
+        console.log("📝 Cargando datos de evaluación:", {
+          observations: evaluation.observations,
+          recommendations: evaluation.recommendations,
+          valueJudgment: evaluation.valueJudgment
+        });
+        setEvaluationObservations(evaluation.observations || "");
+        setEvaluationRecommendations(evaluation.recommendations || "");
+        setEvaluationJudgment(evaluation.valueJudgment || "");
+      } else {
+        console.log("❌ No hay evaluación, limpiando campos");
+        // Limpiar campos si no hay evaluación
+        setEvaluationObservations("");
+        setEvaluationRecommendations("");
+        setEvaluationJudgment("");
+        setEvaluationCriteria(null);
       }
       
       // Inicializar estados de items
@@ -264,26 +293,37 @@ export const InstructorChecklistContainer: React.FC = () => {
     
     setIsCreatingEvaluation(true);
     try {
-      // TODO: Implementar la mutación GraphQL para crear evaluación
-      console.log("Creando evaluación con:", {
-        observations: evaluationObservations,
-        recommendations: evaluationRecommendations,
-        judgment: evaluationJudgment,
-        criteria: evaluationCriteria,
-        checklistId: selectedChecklist.id
-      });
-      
-      // Simular creación exitosa
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const evaluationInput = {
+        observations: evaluationObservations.trim(),
+        recommendations: evaluationRecommendations.trim(),
+        valueJudgment: evaluationJudgment,
+        checklistId: parseInt(selectedChecklist.id as string),
+        teamScrumId: selectedTeamScrum?.id ? parseInt(selectedTeamScrum.id as string) : undefined
+      };
+
+      const response = await dispatch(addEvaluation(evaluationInput)).unwrap();
       
       setShowCreateEvaluationModal(false);
-      alert("Evaluación creada exitosamente!");
+      toast.success("✅ Evaluación creada exitosamente!");
       
-      // Recargar checklist para obtener la evaluación
-      dispatch(fetchChecklists({ page: 0, size: 50 }));
-    } catch (error) {
+      // Actualizar el checklist con la evaluación usando los valores que ya tenemos
+      const updatedChecklist = {
+        ...selectedChecklist,
+        evaluations: {
+          id: response?.id || '',
+          observations: evaluationObservations.trim(),
+          recommendations: evaluationRecommendations.trim(),
+          valueJudgment: evaluationJudgment,
+          checklistId: parseInt(selectedChecklist.id as string)
+        }
+      };
+      
+      // Forzar actualización del estado
+      setSelectedChecklist(updatedChecklist as Checklist);
+      
+    } catch (error: any) {
       console.error("Error al crear evaluación:", error);
-      alert("Error al crear la evaluación");
+      toast.error(`❌ Error al crear la evaluación: ${error.message || 'Error desconocido'}`);
     } finally {
       setIsCreatingEvaluation(false);
     }
@@ -298,29 +338,49 @@ export const InstructorChecklistContainer: React.FC = () => {
   };
 
   const handleCompleteEvaluation = async () => {
-    if (!selectedChecklist) return;
+    if (!selectedChecklist || !(selectedChecklist as any).evaluations) return;
     
     try {
-      // TODO: Implementar la mutación GraphQL para actualizar evaluación y checklist
-      console.log("Actualizando evaluación con:", {
-        observations: evaluationObservations,
-        recommendations: evaluationRecommendations,
-        judgment: evaluationJudgment,
-        criteria: evaluationCriteria,
-        checklistId: selectedChecklist.id
-      });
-      
-      // Simular actualización exitosa
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const evaluationInput = {
+        observations: evaluationObservations.trim(),
+        recommendations: evaluationRecommendations.trim(),
+        valueJudgment: evaluationJudgment,
+        checklistId: parseInt(selectedChecklist.id as string),
+        teamScrumId: selectedTeamScrum?.id ? parseInt(selectedTeamScrum.id as string) : undefined
+      };
+
+      const evaluationId = (selectedChecklist as any).evaluations.id;
+      if (!evaluationId) {
+        toast.error("❌ No se encontró el ID de la evaluación");
+        return;
+      }
+
+      await dispatch(updateEvaluation({ 
+        id: parseInt(evaluationId as string), 
+        input: evaluationInput 
+      })).unwrap();
       
       setShowEvaluationForm(false);
-      alert("Evaluación actualizada exitosamente!");
+      toast.success("✅ Evaluación actualizada exitosamente!");
       
-      // Recargar checklist
-      dispatch(fetchChecklists({ page: 0, size: 50 }));
-    } catch (error) {
+      // Actualizar el checklist con la evaluación usando los valores actualizados
+      const updatedChecklist = {
+        ...selectedChecklist,
+        evaluations: {
+          id: evaluationId,
+          observations: evaluationObservations.trim(),
+          recommendations: evaluationRecommendations.trim(),
+          valueJudgment: evaluationJudgment,
+          checklistId: parseInt(selectedChecklist.id as string)
+        }
+      };
+      
+      // Forzar actualización del estado
+      setSelectedChecklist(updatedChecklist as Checklist);
+      
+    } catch (error: any) {
       console.error("Error al actualizar evaluación:", error);
-      alert("Error al actualizar la evaluación");
+      toast.error(`❌ Error al actualizar la evaluación: ${error.message || 'Error desconocido'}`);
     }
   };
 

@@ -22,6 +22,14 @@ public class EvaluationDto {
     private String valueJudgment;
 
     private String instructorSignature;
+    
+    // Para recibir el ID del checklist desde el frontend
+    private Long checklistId;
+    
+    // Para recibir el ID del team scrum desde el frontend
+    private Long teamScrumId;
+    
+    // Para enviar el objeto completo en las respuestas
     private ChecklistDto checklist;
     private TeamsScrum teamsScrum;
 

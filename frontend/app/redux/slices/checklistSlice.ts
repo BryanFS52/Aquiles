@@ -1,7 +1,7 @@
 import { clientLAN } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
-import { GET_ALL_CHECKLISTS, GET_CHECKLIST_BY_ID, ADD_CHECKLIST, UPDATE_CHECKLIST, DELETE_CHECKLIST } from '@graphql/checklistGraph'
+import { GET_ALL_CHECKLISTS_INSTRUCTOR, GET_CHECKLIST_BY_ID, ADD_CHECKLIST, UPDATE_CHECKLIST, DELETE_CHECKLIST } from '@graphql/checklistGraph'
 import {
     Checklist,
     GetAllChecklistsQuery,
@@ -20,7 +20,7 @@ export const fetchChecklists = createAsyncThunk<GetAllChecklistsQuery['allCheckl
     'checklist/fetchAll',
     async ({ page, size }) => {
         const { data } = await clientLAN.query<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>({
-            query: GET_ALL_CHECKLISTS,
+            query: GET_ALL_CHECKLISTS_INSTRUCTOR,
             variables: { page, size },
             fetchPolicy: 'no-cache',
         });

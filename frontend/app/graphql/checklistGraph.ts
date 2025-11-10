@@ -156,6 +156,13 @@ export const GET_ALL_CHECKLISTS_INSTRUCTOR = gql`
           indicator
           active
         }
+        evaluations {
+          id
+          observations
+          recommendations
+          valueJudgment
+          checklistId
+        }
       }
     }
   }

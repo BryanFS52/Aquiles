@@ -2,7 +2,11 @@ package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.EvaluationDto;
 import com.api.aquilesApi.Entity.Evaluation;
+import com.api.aquilesApi.Entity.Checklist;
+import com.api.aquilesApi.Entity.TeamsScrum;
 import com.api.aquilesApi.Service.EvaluationsService;
+import com.api.aquilesApi.Service.ChecklistService;
+import com.api.aquilesApi.Service.TeamScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Mapper.EvaluationMap;
 import org.springframework.dao.DataAccessException;
@@ -15,9 +19,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class EvaluationsBusiness {
    private final EvaluationsService evaluationsService;
+   private final ChecklistService checklistService;
+   private final TeamScrumService teamScrumService;
 
-    public EvaluationsBusiness(EvaluationsService evaluationsService) {
+    public EvaluationsBusiness(EvaluationsService evaluationsService, 
+                               ChecklistService checklistService,
+                               TeamScrumService teamScrumService) {
         this.evaluationsService = evaluationsService;
+        this.checklistService = checklistService;
+        this.teamScrumService = teamScrumService;
     }
 
     // Validation Object
@@ -51,12 +61,36 @@ public class EvaluationsBusiness {
     // Add new evaluation
     public EvaluationDto add(EvaluationDto evaluationDto) {
         try {
-            Evaluation evaluation = new Evaluation();
-            EvaluationMap.INSTANCE.updateEvaluation(evaluationDto, evaluation);
-            Evaluation savedEvaluation = evaluationsService.save(evaluation);
-            return EvaluationMap.INSTANCE.EntityToDTO(savedEvaluation);
+            // Verificar si ya existe una evaluación para este checklist
+            if (evaluationDto.getChecklistId() != null) {
+                Checklist checklist = checklistService.getById(evaluationDto.getChecklistId());
+                
+                // Verificar si el checklist ya tiene una evaluación
+                if (checklist.getEvaluation() != null) {
+                    throw new CustomException("Este checklist ya tiene una evaluación asociada. ID de evaluación: " + checklist.getEvaluation().getId(), HttpStatus.CONFLICT);
+                }
+                
+                Evaluation evaluation = new Evaluation();
+                evaluation.setObservations(evaluationDto.getObservations());
+                evaluation.setRecommendations(evaluationDto.getRecommendations());
+                evaluation.setValueJudgment(evaluationDto.getValueJudgment());
+                evaluation.setChecklist(checklist);
+                
+                // Si se proporciona teamScrumId, asignarlo
+                if (evaluationDto.getTeamScrumId() != null) {
+                    TeamsScrum teamsScrum = teamScrumService.getById(evaluationDto.getTeamScrumId());
+                    evaluation.setTeamsScrum(teamsScrum);
+                }
+                
+                Evaluation savedEvaluation = evaluationsService.save(evaluation);
+                return EvaluationMap.INSTANCE.EntityToDTO(savedEvaluation);
+            } else {
+                throw new CustomException("El checklistId es obligatorio para crear una evaluación", HttpStatus.BAD_REQUEST);
+            }
+        } catch (CustomException e) {
+            throw e;
         } catch (Exception e) {
-            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Error creating evaluation: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
