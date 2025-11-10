@@ -205,15 +205,23 @@ export const InstructorChecklistContainer: React.FC = () => {
       };
     }).filter(Boolean) || [];
 
+    // Verificar si hay datos de evaluación
+    const evaluation = (selectedChecklist as any).evaluations;
+    const hasEvaluation = !!evaluation;
+
     return {
       checklist: selectedChecklist,
       items,
-      evaluation: {
+      evaluation: hasEvaluation ? {
+        observations: evaluation.observations || "",
+        recommendations: evaluation.recommendations || "",
+        judgment: evaluation.valueJudgment || "PENDIENTE"
+      } : {
         observations: "",
         recommendations: "",
         judgment: "PENDIENTE"
       },
-      hasEvaluationData: false
+      hasEvaluationData: hasEvaluation
     };
   };
 
