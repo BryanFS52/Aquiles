@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import java.util.List;
 
-@Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, uses =  FIleMapper.class)
 public interface ImprovementPlanMap {
     ImprovementPlanMap INSTANCE = Mappers.getMapper(ImprovementPlanMap.class);
 

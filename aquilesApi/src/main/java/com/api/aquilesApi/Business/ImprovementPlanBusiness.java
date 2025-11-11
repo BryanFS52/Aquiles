@@ -5,13 +5,17 @@ import com.api.aquilesApi.Entity.ImprovementPlan;
 import com.api.aquilesApi.Service.ImprovementPlanService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Mapper.ImprovementPlanMap;
-import org.modelmapper.ModelMapper;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import java.util.List;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.util.*;
 
 @Component
 public class ImprovementPlanBusiness {
@@ -116,12 +120,80 @@ public class ImprovementPlanBusiness {
     // Add new improvementPlan
     public ImprovementPlanDto add(ImprovementPlanDto improvementplanDto) {
         try {
+            // 1. Create and save the initial improvement plan
             ImprovementPlan improvementPlan = new ImprovementPlan();
             ImprovementPlanMap.INSTANCE.updateImprovementPlan(improvementplanDto, improvementPlan);
+
+            // Set default values
+            if (improvementPlan.getDate() == null) {
+                improvementPlan.setDate(LocalDate.now());
+            }
+            if (improvementPlan.getState() == null) {
+                improvementPlan.setState(true);
+            }
+
+            // Initial save
             ImprovementPlan savedImprovementPlan = improvementPlanService.save(improvementPlan);
+
+            // 2. Generate and attach PDF
+            try {
+                byte[] pdfContent = generatePdf(savedImprovementPlan);
+                if (pdfContent != null && pdfContent.length > 0) {
+                    savedImprovementPlan.setImprovementPlanFile(pdfContent);
+                    // Update with PDF
+                    improvementPlanService.update(savedImprovementPlan);
+                    // Refresh the entity after update
+                    savedImprovementPlan = improvementPlanService.getById(savedImprovementPlan.getId());
+                    System.out.println("PDF generado y guardado exitosamente para el Plan de Mejoramiento ID: " + savedImprovementPlan.getId());
+                } else {
+                    System.err.println("Error: PDF generado está vacío para el Plan de Mejoramiento ID: " + savedImprovementPlan.getId());
+                }
+            } catch (Exception e) {
+                System.err.println("Error al generar el PDF para el Plan de Mejoramiento ID " + savedImprovementPlan.getId() + ": " + e.getMessage());
+                // El plan se guarda aunque falle la generación del PDF
+            }
+
             return ImprovementPlanMap.INSTANCE.EntityToDto(savedImprovementPlan);
-        } catch ( Exception e){
-            throw new CustomException(e.getMessage() , HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            String errorMessage = "Error al crear el Plan de Mejoramiento: " + e.getMessage();
+            System.err.println(errorMessage);
+            throw new CustomException(errorMessage, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    private byte[] generatePdf(ImprovementPlan improvementPlan) {
+        try {
+            // Load the JasperReport template
+            InputStream jasperStream = new ClassPathResource("Reports/ImprovementPlanFile.jrxml").getInputStream();
+            JasperReport jasperReport = JasperCompileManager.compileReport(jasperStream);
+
+            // Create parameters for the report
+            Map<String, Object> parameters = new HashMap<>();
+            parameters.put("city", improvementPlan.getCity() != null ? improvementPlan.getCity() : "");
+            parameters.put("date", improvementPlan.getDate() != null ?
+                    improvementPlan.getDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "");
+            parameters.put("reason", improvementPlan.getReason() != null ? improvementPlan.getReason() : "");
+            parameters.put("studentId", improvementPlan.getStudentId() != null ? improvementPlan.getStudentId().toString() : "");
+            parameters.put("competence", improvementPlan.getTeacherCompetence() != null ?
+                    improvementPlan.getTeacherCompetence().toString() : "");
+
+            // Create the data source
+            List<ImprovementPlan> dataList = Collections.singletonList(improvementPlan);
+            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(dataList);
+
+            // Generate the report
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+            // Export to PDF
+            byte[] pdfContent = JasperExportManager.exportReportToPdf(jasperPrint);
+
+            if (pdfContent == null || pdfContent.length == 0) {
+                throw new CustomException("El PDF generado está vacío", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            return pdfContent;
+        } catch (Exception e) {
+            throw new CustomException("Error al generar el PDF: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

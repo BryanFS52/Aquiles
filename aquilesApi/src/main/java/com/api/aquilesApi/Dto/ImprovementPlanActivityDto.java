@@ -14,23 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 public class ImprovementPlanActivityDto {
     private Long id;
-
-    // @NotBlank(message = "The description is required")
-    // @Size(max = 500, message = "The description cannot exceed 500 characters")
     private String description;
-
-    // @NotNull(message = "The delivery date is required")
     private String deliveryDate;
-
-
-
-    // @NotNull(message = "The Improvement Plan ID is required")
     private ImprovementPlanDto improvementPlan;
-
-    // @NotBlank(message = "The delivery format is required")
-    // @Size(max = 100, message = "The delivery format cannot exceed 100 characters")
-    private ImprovementPlanDeliveryDto improvementPlanDelivery;
-
-    // Evidence types list
     private List<ImprovementPlanEvidenceTypeDto> evidenceTypes;
+    private ImprovementPlanDeliveryDto improvementPlanDelivery;
 }

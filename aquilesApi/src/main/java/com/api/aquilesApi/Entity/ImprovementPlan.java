@@ -2,7 +2,6 @@ package com.api.aquilesApi.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.w3c.dom.Text;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -26,7 +25,7 @@ public class ImprovementPlan implements Serializable {
     @Column(name = "actNumber", nullable = false)
     private String actNumber;
 
-    @Column(name = "city", nullable = false, length = 55)
+    @Column(name = "city", nullable = false)
     private String city;
 
     @Column(name = "date", nullable = false)
@@ -38,13 +37,13 @@ public class ImprovementPlan implements Serializable {
     @Column(name = "endTime", nullable = false)
     private LocalTime endTime;
 
-    @Column(name = "place", nullable = false, length = 255)
+    @Column(name = "place", nullable = false)
     private String place;
 
-    @Column(name = "reason", nullable = false, length = 255)
+    @Column(name = "reason", nullable = false)
     private String reason;
 
-    @Column(name = "objectives", nullable = false, length = 255)
+    @Column(name = "objectives", nullable = false)
     private String objectives;
 
     @Column(name = "state", nullable = false)
@@ -53,16 +52,21 @@ public class ImprovementPlan implements Serializable {
     @Column(name = "conclusions", nullable = false)
     private String conclusions;
 
-    @Column(name = "qualification", nullable = true)
+    @Column(name = "qualification")
     private Boolean qualification;
 
     // Reference IDs (Gateway)
     @Column (name = "student_id")
     private Long studentId;
 
+    @Column (name = "teacher_competence")
     private Long teacherCompetence;
 
+    @Column (name = "learning_outcome")
     private Long learningOutcome;
+
+    @Column (name = "improvement_plan_file")
+    private byte[] improvementPlanFile;
 
     // Relations
     // 1. Relation (M-1) with improvementPlanActivity

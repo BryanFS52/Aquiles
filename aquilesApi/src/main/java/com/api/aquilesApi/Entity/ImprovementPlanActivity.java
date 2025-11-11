@@ -35,14 +35,14 @@ public class ImprovementPlanActivity implements Serializable {
     @JoinColumn(name = "improvement_plan_id", nullable = false)
     private ImprovementPlan improvementPlan;
 
-    // 2. Relation (M-M) with ImprovementPlanEvidenceType (propietario)
+    // 2. Relation (M-M) with improvementPlanEvidenceMap
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-            name = "improvement_plan_activity_evidence_map",
-            joinColumns = @JoinColumn(name = "improvement_plan_activity_id"),
+            name = "improvement_plan_evidence_map",
+            joinColumns = @JoinColumn(name = "improvement_plan_id"),
             inverseJoinColumns = @JoinColumn(name = "evidence_type_id")
     )
-    private List<ImprovementPlanEvidenceType> evidenceTypes = new ArrayList<>();
+    private List<ImprovementPlanEvidenceType> evidenceTypes;
 
     // 3. Relation (M-1) with ImprovementPlanDelivery
     @ManyToOne
