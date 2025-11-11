@@ -62,7 +62,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
                 {previewData.items.map((item: any, index: number) => (
                   <div key={item.id} className={`p-4 rounded-xl border-2 transition-all duration-200 ${
                     item.completed === true 
-                      ? 'border-green-500/60 bg-green-50/50 dark:border-green-500/40 dark:bg-green-900/20' 
+                      ? 'border-[#5cb800]/60 bg-[#5cb800]/10 dark:border-[#5cb800]/40 dark:bg-[#5cb800]/20' 
                       : item.completed === false 
                         ? 'border-red-500/60 bg-red-50/50 dark:border-red-500/40 dark:bg-red-900/20'
                         : 'border-gray-300/60 bg-gray-50 dark:border-gray-600/40 dark:bg-gray-800/40'
@@ -71,7 +71,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
                       <div className="flex-shrink-0">
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold shadow-lg ${
                           item.completed === true 
-                            ? 'bg-gradient-to-br from-green-500 to-green-600' 
+                            ? 'bg-gradient-to-br from-[#5cb800] to-[#6bc500]' 
                             : item.completed === false 
                               ? 'bg-gradient-to-br from-red-500 to-red-600'
                               : 'bg-gradient-to-br from-gray-400 to-slate-500'
@@ -86,7 +86,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
                           </span>
                           <span className={`px-3 py-1 rounded-full text-sm font-bold ${
                             item.completed === true 
-                              ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' 
+                              ? 'bg-gradient-to-r from-[#5cb800] to-[#6bc500] text-white' 
                               : item.completed === false 
                                 ? 'bg-gradient-to-r from-red-500 to-red-600 text-white'
                                 : 'bg-gradient-to-r from-gray-400 to-slate-500 text-white'
@@ -143,7 +143,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
                     <h4 className="font-bold text-gray-900 dark:text-[#8fd400] mb-2">Juicio de Valor</h4>
                     <div className="bg-gray-50 dark:bg-gray-800/50 p-3 rounded-xl border border-gray-200/60 dark:border-gray-600/20 min-h-[100px] flex items-center justify-center">
                       <span className={`inline-flex px-4 py-2 rounded-xl text-sm font-bold shadow-lg ${
-                        previewData.evaluation.judgment === 'APROBADO' ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' :
+                        previewData.evaluation.judgment === 'APROBADO' ? 'bg-gradient-to-r from-[#5cb800] to-[#6bc500] text-white' :
                         previewData.evaluation.judgment === 'NO APROBADO' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' :
                         previewData.evaluation.judgment === 'PENDIENTE' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white' :
                         'bg-gradient-to-r from-gray-500 to-slate-600 text-white'

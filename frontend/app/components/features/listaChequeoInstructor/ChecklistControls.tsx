@@ -96,7 +96,7 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
             <button
               onClick={onSaveChecklist}
               disabled={!selectedChecklist || isFinalSaved}
-              className="flex items-center gap-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+              className="flex items-center gap-2 bg-gradient-to-r from-[#5cb800] to-[#6bc500] hover:from-[#4da600] hover:to-[#5cb800] disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
             >
               <FileText className="w-4 h-4" />
               Vista Previa y Guardar
@@ -105,7 +105,7 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
             <button
               onClick={onExportPDF}
               disabled={!selectedChecklist}
-              className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+              className="flex items-center gap-2 bg-gradient-to-r from-[#5cb800] to-[#6bc500] hover:from-[#4da600] hover:to-[#5cb800] disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
             >
               <Download className="w-4 h-4" />
               PDF
@@ -114,7 +114,7 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
             <button
               onClick={onExportExcel}
               disabled={!selectedChecklist}
-              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
+              className="flex items-center gap-2 bg-gradient-to-r from-[#5cb800] to-[#6bc500] hover:from-[#4da600] hover:to-[#5cb800] disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
             >
               <Download className="w-4 h-4" />
               Excel
