@@ -14,6 +14,7 @@ public interface ItemMap {
     ItemMap INSTANCE = Mappers.getMapper(ItemMap.class);
 
     @Mapping(target = "itemTypeId", source = "itemType.id")
+    @Mapping(target = "itemType", source = "itemType")
     ItemDto EntityToDTO(Item item);
 
     @Mapping(target = "itemType", expression = "java(mapItemType(itemDto.getItemTypeId()))")

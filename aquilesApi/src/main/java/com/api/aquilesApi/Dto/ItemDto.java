@@ -24,4 +24,6 @@ public class ItemDto {
     private Boolean active = true;
 
     private Long itemTypeId;
+    
+    private ItemTypeDto itemType;
 }

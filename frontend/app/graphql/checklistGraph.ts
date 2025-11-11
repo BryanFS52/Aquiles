@@ -23,6 +23,10 @@ export const GET_ALL_CHECKLISTS = gql`
           code
           indicator
           active
+          itemType {
+            id
+            name
+          }
         }
       }
     }
@@ -49,6 +53,10 @@ export const GET_CHECKLIST_BY_ID = gql`
           code
           indicator
           active
+          itemType {
+            id
+            name
+          }
         }
         evaluations {
           id
@@ -89,6 +97,10 @@ export const GET_ALL_CHECKLISTS_COORDINATOR = gql`
           code
           indicator
           active
+          itemType {
+            id
+            name
+          }
         }
       }
     }
@@ -116,6 +128,10 @@ export const GET_CHECKLIST_BY_ID_COORDINATOR = gql`
           code
           indicator
           active
+          itemType {
+            id
+            name
+          }
         }
         evaluations {
           id
@@ -155,6 +171,10 @@ export const GET_ALL_CHECKLISTS_INSTRUCTOR = gql`
           code
           indicator
           active
+          itemType {
+            id
+            name
+          }
         }
         evaluations {
           id
@@ -188,6 +208,10 @@ export const GET_CHECKLIST_BY_ID_INSTRUCTOR = gql`
           code
           indicator
           active
+          itemType {
+            id
+            name
+          }
         }
         evaluations {
           id

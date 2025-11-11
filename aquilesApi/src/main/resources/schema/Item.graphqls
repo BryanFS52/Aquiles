@@ -3,6 +3,7 @@ type Item {
     code: String!
     indicator: String!
     active: Boolean!
+    itemType: ItemType
 }
 
 type ItemPageId {

@@ -81,7 +81,9 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <span className="font-bold text-gray-900 dark:text-white">Item {item.id}</span>
+                          <span className="font-bold text-gray-900 dark:text-white">
+                            {item.itemType?.name || `Item ${item.id}`}
+                          </span>
                           <span className={`px-3 py-1 rounded-full text-sm font-bold ${
                             item.completed === true 
                               ? 'bg-gradient-to-r from-green-500 to-green-600 text-white' 
