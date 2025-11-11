@@ -54,8 +54,7 @@ export const addAttendanceState = createAsyncThunk<AddStateAttendanceMutation['a
     }
 );
 
-export const updateAttendanceState = createAsyncThunk<UpdateStateAttendanceMutation['updateStateAttendance'],
-    UpdateStateAttendanceMutationVariables,
+export const updateAttendanceState = createAsyncThunk<UpdateStateAttendanceMutation['updateStateAttendance'],UpdateStateAttendanceMutationVariables,
     { rejectValue: { code: string; message: string } }
 >(
     'attendanceState/update',

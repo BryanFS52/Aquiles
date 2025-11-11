@@ -399,6 +399,5 @@ const attendanceSlice = createSlice({
     }
 });
 
-export const { updateAttendanceSummary, setAttendanceSummaryFromStudySheet } = attendanceSlice.actions;
-
+export const { } = attendanceSlice.actions;
 export default attendanceSlice.reducer;

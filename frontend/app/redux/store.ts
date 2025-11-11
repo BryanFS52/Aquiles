@@ -21,10 +21,12 @@ import noveltyTypeReducer from "@slice/themis/noveltyTypeSlice";
 import coordinationReducer from "@slice/olympo/coordinationSlice";
 import faultTypeReducer from "@/redux/slices/improvementPlanFaultTypeSlice";
 import finalReportReducer from "@redux/slices/finalReportSlice"
+import authReducer from "@redux/slices/cerberos/authSlice";
 
 
 const store = configureStore({
     reducer: {
+        auth: authReducer,
         justification: justificationReducer,
         justificationType: justificationTypeReducer,
         justificationStatus: justificationStatusReducer,

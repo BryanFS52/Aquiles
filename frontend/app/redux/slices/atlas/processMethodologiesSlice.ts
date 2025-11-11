@@ -9,10 +9,7 @@ export const fetchAllProcessMethodologiesAndProfiles = createAsyncThunk<GetAllPr
     'processMethodologies/fetchAll',
     async ({ page, size, search }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.query<
-                GetAllProcessMethodologiesAndProfilesQuery,
-                GetAllProcessMethodologiesAndProfilesQueryVariables
-            >({
+            const { data } = await clientLAN.query<GetAllProcessMethodologiesAndProfilesQuery,GetAllProcessMethodologiesAndProfilesQueryVariables>({
                 query: GET_ALL_METHODOLOGIES_AND_PROFILES,
                 variables: { page, size, search },
                 fetchPolicy: 'no-cache',

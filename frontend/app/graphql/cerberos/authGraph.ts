@@ -68,6 +68,7 @@ export const GET_AUTH_TOKEN = gql`
           name
         }
         person {
+          document
           name
           photo
           lastname

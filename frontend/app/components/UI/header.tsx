@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { IoNotificationsOutline } from "react-icons/io5";
+import { IoNotificationsOutline, IoLogOutOutline } from "react-icons/io5";
 import { RiCheckboxBlankCircleFill } from "react-icons/ri";
 import { Notifications } from "@components/UI/notifications";
 import Link from "next/link";
 import Switch from '@components/UI/switch';
 import Image from "next/image";
 import { RoleType } from '@type/roles';
+import { useAuth } from "../../hooks/useAuth";
 
 interface HeaderProps {
   role: RoleType;
@@ -15,11 +16,43 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ role: initialRole }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState<boolean>(false);
   const [role, setRole] = useState(initialRole || 'instructor');
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const buttonRef = useRef<HTMLLIElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+  const profileButtonRef = useRef<HTMLDivElement>(null);
   const unreadCount = Notifications.unreadCount;
+  
+  // Hook de autenticación
+  const { user, logout } = useAuth();
+
+  // Obtener iniciales del nombre
+  const getInitials = (name?: string): string => {
+    if (!name) return "U";
+    const parts = name.trim().split(" ");
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+    return parts[0][0].toUpperCase();
+  };
+
+  // Obtener nombre corto para móvil
+  const getShortName = (name?: string): string => {
+    if (!name) return "Usuario";
+    const parts = name.trim().split(" ");
+    return parts[0];
+  };
+
+  // Manejar logout
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
 
   // Responsive detection
   useEffect(() => {
@@ -41,10 +74,20 @@ export const Header: React.FC<HeaderProps> = ({ role: initialRole }) => {
       ) {
         setIsOpen(false);
       }
+      
+      if (
+        isProfileMenuOpen &&
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(event.target as Node) &&
+        profileButtonRef.current &&
+        !profileButtonRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileMenuOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
+  }, [isOpen, isProfileMenuOpen]);
 
   // Close on Escape key
   useEffect(() => {
@@ -56,6 +99,15 @@ export const Header: React.FC<HeaderProps> = ({ role: initialRole }) => {
   }, [isOpen]);
 
   const toggleMenu = () => setIsOpen(!isOpen);
+  const toggleProfileMenu = () => setIsProfileMenuOpen(!isProfileMenuOpen);
+
+  // Obtener nombre y rol del usuario
+  const userName = user?.person?.name && user?.person?.lastname 
+    ? `${user.person.name} ${user.person.lastname}` 
+    : "Usuario";
+  const userRole = user?.roles?.[0]?.name || "Usuario";
+  const userInitials = getInitials(userName);
+  const userShortName = getShortName(userName);
 
   // Role-specific color/text
   const roleLabel: Record<RoleType, string> = {
@@ -146,38 +198,77 @@ export const Header: React.FC<HeaderProps> = ({ role: initialRole }) => {
         </div>
 
         {/* Perfil */}
-        <Link
-          href="/dashboard/perfil"
-          className="group flex items-center font-semibold text-black dark:text-white gap-1 sm:gap-2 py-1 px-1 sm:py-2 sm:px-2 lg:px-3 bg-transparent dark:bg-darkBlue rounded-lg shadow-lg border border-darkGreen/20 dark:border-shadowBlue/40 min-w-0 flex-shrink-0"
-        >
-          {/* Texto del usuario - Solo visible en pantallas medianas y grandes */}
-          <div className="hidden md:flex flex-col text-end min-w-0 max-w-[120px]">
-            <span className="text-[10px] sm:text-xs lg:text-sm text-black dark:text-white truncate">
-              Diego Boada
-            </span>
-            <span className="text-[8px] lg:text-xs text-white/80 dark:text-lightGreen truncate">
-              Administrador
-            </span>
-          </div>
-
-          {/* Avatar */}
-          <div className="relative flex-shrink-0">
-            <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 bg-[#5cb800] rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-              <span className="text-[8px] sm:text-xs md:text-sm font-bold text-white">DB</span>
+        <div className="relative">
+          <div
+            ref={profileButtonRef}
+            onClick={toggleProfileMenu}
+            className="group flex items-center font-semibold text-black dark:text-white gap-1 sm:gap-2 py-1 px-1 sm:py-2 sm:px-2 lg:px-3 bg-transparent dark:bg-darkBlue rounded-lg shadow-lg border border-darkGreen/20 dark:border-shadowBlue/40 min-w-0 flex-shrink-0 cursor-pointer hover:bg-white/10 transition-all"
+          >
+            {/* Texto del usuario - Solo visible en pantallas medianas y grandes */}
+            <div className="hidden md:flex flex-col text-end min-w-0 max-w-[120px]">
+              <span className="text-[10px] sm:text-xs lg:text-sm text-black dark:text-white truncate">
+                {userName}
+              </span>
+              <span className="text-[8px] lg:text-xs text-white/80 dark:text-lightGreen truncate">
+                {userRole}
+              </span>
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-2.5 md:h-2.5 lg:w-3 lg:h-3 bg-lightGreen border-2 border-white rounded-full"></div>
+
+            {/* Avatar */}
+            <div className="relative flex-shrink-0">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 bg-[#5cb800] rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                <span className="text-[8px] sm:text-xs md:text-sm font-bold text-white">{userInitials}</span>
+              </div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-2.5 md:h-2.5 lg:w-3 lg:h-3 bg-lightGreen border-2 border-white rounded-full"></div>
+            </div>
+
+            {/* Texto del usuario - Solo visible en móvil y tablet pequeño */}
+            <div className="flex md:hidden flex-col text-start min-w-0 max-w-[80px]">
+              <span className="text-[8px] sm:text-[10px] leading-tight text-white truncate">
+                {userShortName}
+              </span>
+              <span className="text-[7px] sm:text-[9px] text-white/80 dark:text-lightGreen leading-tight truncate">
+                {userRole}
+              </span>
+            </div>
           </div>
 
-          {/* Texto del usuario - Solo visible en móvil y tablet pequeño */}
-          <div className="flex md:hidden flex-col text-start min-w-0 max-w-[80px]">
-            <span className="text-[8px] sm:text-[10px] leading-tight text-white truncate">
-              Diego B.
-            </span>
-            <span className="text-[7px] sm:text-[9px] text-white/80 dark:text-lightGreen leading-tight truncate">
-              Admin
-            </span>
-          </div>
-        </Link>
+          {/* Menú desplegable del perfil */}
+          {isProfileMenuOpen && (
+            <div
+              ref={profileMenuRef}
+              className="absolute z-50 right-0 top-full mt-2 w-48 bg-white dark:bg-dark-card rounded-lg shadow-xl border border-gray-200 dark:border-dark-border overflow-hidden"
+            >
+              <div className="p-3 border-b border-gray-200 dark:border-dark-border">
+                <p className="text-sm font-semibold text-gray-800 dark:text-white truncate">
+                  {userName}
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                  {user?.person?.document || ""}
+                </p>
+              </div>
+              
+              <Link
+                href="/dashboard/perfil"
+                className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-hover transition-colors"
+                onClick={() => setIsProfileMenuOpen(false)}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Ver Perfil
+              </Link>
+              
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              >
+                <IoLogOutOutline className="w-4 h-4" />
+                Cerrar Sesión
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

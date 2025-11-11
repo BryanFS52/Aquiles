@@ -74,7 +74,8 @@ public class ItemResolver {
 
     // Update an existing Item (GraphQL)
     @DgsMutation
-    public Map<String, Object> updateItem(@InputArgument Long id, @InputArgument(name = "item") ItemDto itemDto) {        try {
+    public Map<String, Object> updateItem(@InputArgument Long id, @InputArgument(name = "item") ItemDto itemDto) {
+        try {
             itemBusiness.update(id, itemDto);
             return ResponseHttpApi.responseHttpAction(
                     id,
