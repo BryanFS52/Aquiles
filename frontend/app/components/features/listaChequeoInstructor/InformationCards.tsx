@@ -34,7 +34,7 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
   const totalIndicators = technicalCount + attitudinalCount;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
       <Card 
         header={
           <div className="w-16 h-16 bg-[#5cb800]/10 dark:bg-[#5cb800]/20 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -47,12 +47,12 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
           <div className="text-center">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Programa de Formación</h3>
             <p className="text-sm text-gray-600 dark:text-gray-300 leading-tight">
-              {studySheetInfo?.programa || selectedChecklist?.trainingProjectName || "Centro de Servicios Financieros"}
+              {studySheetInfo?.programa || selectedChecklist?.trainingProjectName || "No disponible"}
             </p>
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-              <p className="text-xs font-semibold text-[#5cb800] dark:text-[#5cb800]">Fechas Lectivas</p>
+              <p className="text-xs font-semibold text-[#5cb800] dark:text-[#5cb800]">Trimestre</p>
               <p className="text-xs text-gray-600 dark:text-gray-300">
-                {studySheetInfo?.fechas || "No disponible"}
+                {selectedChecklist?.trimestre || "Sin trimestre asignado"}
               </p>
             </div>
           </div>
@@ -71,7 +71,7 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
           <div className="text-center">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Datos de Formación</h3>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              <span className="font-semibold text-gray-900 dark:text-white">Jornada:</span> {studySheetInfo?.jornada || "Diurna"}
+              <span className="font-semibold text-gray-900 dark:text-white">Jornada:</span> {studySheetInfo?.jornada || "No disponible"}
             </p>
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
               <p className="text-xs font-semibold text-[#538dda] dark:text-blue-400">Ficha N°</p>
@@ -107,34 +107,6 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
         }
       />
       
-      <Card 
-        header={
-          <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
-            <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm"></span>
-            </div>
-          </div>
-        }
-        body={
-          <div className="text-center">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Lista de Chequeo</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-              {selectedChecklist?.name || "No seleccionada"}
-            </p>
-            <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-              <p className="text-xs font-semibold text-orange-600 dark:text-orange-400">Trimestre</p>
-              {selectedChecklist ? (
-                <p className="text-xs text-gray-600 dark:text-gray-300 leading-tight">
-                  {selectedChecklist.trimestre || 'Sin trimestre asignado'}
-                </p>
-              ) : (
-                <p className="text-xs text-gray-500 dark:text-gray-400">Ninguna lista seleccionada</p>
-              )}
-            </div>
-          </div>
-        }
-      />
-
       <Card 
         header={
           <div className="w-16 h-16 bg-lime-100 dark:bg-lime-900/30 rounded-full flex items-center justify-center mx-auto mb-3">

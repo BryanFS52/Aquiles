@@ -52,6 +52,38 @@ export const InstructorChecklistContainer: React.FC = () => {
 
   const itemsPerPage = 5;
 
+  // Cargar datos del localStorage cuando el componente se monta
+  useEffect(() => {
+    const loadFromLocalStorage = async () => {
+      const studySheetId = localStorage.getItem('selectedStudySheetId');
+      const teamScrumId = localStorage.getItem('selectedTeamScrumId');
+
+      if (studySheetId) {
+        try {
+          const studySheetResponse = await dispatch(fetchStudySheetWithTeamScrum({ 
+            id: parseInt(studySheetId) 
+          })).unwrap();
+          
+          if (studySheetResponse?.data) {
+            setSelectedStudySheet(studySheetResponse.data as StudySheet);
+          }
+        } catch (error) {
+          console.error("Error al cargar ficha desde localStorage:", error);
+        }
+      }
+
+      if (teamScrumId) {
+        try {
+          await dispatch(fetchTeamScrumById({ id: teamScrumId }));
+        } catch (error) {
+          console.error("Error al cargar team scrum desde localStorage:", error);
+        }
+      }
+    };
+
+    loadFromLocalStorage();
+  }, [dispatch]);
+
   useEffect(() => {
     dispatch(fetchChecklists({ page: 0, size: 50 }));
   }, [dispatch]);
