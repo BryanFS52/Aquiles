@@ -130,6 +130,7 @@ export const ChecklistTable: React.FC<ChecklistTableProps> = ({
         pageSize={currentItems.length} // Mostrar todos los items de la página actual
         filterPlaceholder="Buscar en lista de chequeo..."
         className="border-0 shadow-xl"
+        paginator={() => null} // Deshabilitar paginación interna del DataTable
         filterFunction={(item, filter) => 
           item.indicator?.toLowerCase().includes(filter.toLowerCase()) ||
           (itemStates[item.id]?.observations || '').toLowerCase().includes(filter.toLowerCase())
