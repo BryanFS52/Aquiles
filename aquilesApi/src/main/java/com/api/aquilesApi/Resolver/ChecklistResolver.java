@@ -1,7 +1,9 @@
 package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.ChecklistBusiness;
+import com.api.aquilesApi.Business.ChecklistQualificationBusiness;
 import com.api.aquilesApi.Dto.ChecklistDto;
+import com.api.aquilesApi.Dto.ChecklistQualificationDto;
 import com.api.aquilesApi.Dto.EvaluationDto;
 import com.api.aquilesApi.Entity.Checklist;
 import com.api.aquilesApi.Entity.ChecklistHistory;
@@ -24,13 +26,17 @@ public class ChecklistResolver {
     private final ChecklistBusiness checklistBusiness;
     private final ChecklistHistoryService checklistHistoryService;
     private final ItemService itemService;
+    private final ChecklistQualificationBusiness checklistQualificationBusiness;
 
     public ChecklistResolver(
             ChecklistBusiness checklistBusiness,
-            ChecklistHistoryService checklistHistoryService, ItemService itemService) {
+            ChecklistHistoryService checklistHistoryService, 
+            ItemService itemService,
+            ChecklistQualificationBusiness checklistQualificationBusiness) {
         this.checklistBusiness = checklistBusiness;
         this.checklistHistoryService = checklistHistoryService;
         this.itemService = itemService;
+        this.checklistQualificationBusiness = checklistQualificationBusiness;
     }
 
     // Field resolver para mapear evaluation a evaluations
@@ -38,6 +44,22 @@ public class ChecklistResolver {
     public EvaluationDto getEvaluations(DgsDataFetchingEnvironment dfe) {
         ChecklistDto checklist = dfe.getSource();
         return checklist.getEvaluation();
+    }
+
+    // Field resolver para obtener las calificaciones de un checklist por team
+    @DgsData(parentType = "Checklist", field = "qualifications")
+    public List<ChecklistQualificationDto> getQualifications(DgsDataFetchingEnvironment dfe) {
+        ChecklistDto checklist = dfe.getSource();
+        Long teamScrumId = dfe.getArgument("teamScrumId");
+        
+        if (teamScrumId == null) {
+            return List.of();
+        }
+        
+        return checklistQualificationBusiness.findByChecklistAndTeam(
+            Long.parseLong(checklist.getId().toString()), 
+            teamScrumId
+        );
     }
 
     // FindAll Checklist

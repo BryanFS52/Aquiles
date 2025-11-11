@@ -9,6 +9,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 
 @Service
 public class ChecklistQualificationService implements Idao<ChecklistQualification, Long> {
@@ -28,7 +31,7 @@ public class ChecklistQualificationService implements Idao<ChecklistQualificatio
     @Override
     public ChecklistQualification getById(Long id) {
         return checklistQualificationRepository.findById(id).orElseThrow(() ->
-                new CustomException("Team Scrum with id " + id + " not found", HttpStatus.NO_CONTENT));
+                new CustomException("ChecklistQualification with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
     // Update an existing checklistQualifications
@@ -53,5 +56,15 @@ public class ChecklistQualificationService implements Idao<ChecklistQualificatio
     @Override
     public void create(ChecklistQualification entity) {
         this.checklistQualificationRepository.save(entity);
+    }
+    
+    // Buscar calificación existente por item, team y checklist
+    public Optional<ChecklistQualification> findByItemTeamAndChecklist(Long itemId, Long teamScrumId, Long checklistId) {
+        return checklistQualificationRepository.findByItem_IdAndTeamsScrum_IdAndChecklist_Id(itemId, teamScrumId, checklistId);
+    }
+    
+    // Buscar todas las calificaciones de un checklist para un team
+    public List<ChecklistQualification> findByChecklistAndTeam(Long checklistId, Long teamScrumId) {
+        return checklistQualificationRepository.findByChecklist_IdAndTeamsScrum_Id(checklistId, teamScrumId);
     }
 }

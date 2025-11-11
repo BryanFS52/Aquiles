@@ -2,11 +2,16 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useMutation, useLazyQuery } from "@apollo/client";
 import { AppDispatch, RootState } from '@redux/store';
 import { fetchChecklists } from '@redux/slices/checklistSlice';
 import { fetchStudySheetWithTeamScrum } from '@redux/slices/olympo/studySheetSlice';
 import { fetchTeamScrumById } from '@redux/slices/teamScrumSlice';
 import { addEvaluation, updateEvaluation } from '@redux/slices/evaluationSlice';
+import { 
+  SAVE_OR_UPDATE_CHECKLIST_QUALIFICATION,
+  GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST 
+} from '@graphql/checklistQualificationGraph';
 import PageTitle from "@components/UI/pageTitle";
 import { InformationCards } from './InformationCards';
 import { ChecklistControls } from './ChecklistControls';
@@ -22,6 +27,10 @@ export const InstructorChecklistContainer: React.FC = () => {
   const { data: checklists, loading, error } = useSelector((state: RootState) => state.checklist);
   const { data: studySheets } = useSelector((state: RootState) => state.studySheet);
   const { dataForTeamScrumById: selectedTeamScrum } = useSelector((state: RootState) => state.teamScrum);
+  
+  // Mutations y queries
+  const [saveOrUpdateQualification] = useMutation(SAVE_OR_UPDATE_CHECKLIST_QUALIFICATION);
+  const [loadQualifications, { data: qualificationsData }] = useLazyQuery(GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST);
   
   // Estados locales
   const [selectedTrimester, setSelectedTrimester] = useState<string>("");
@@ -46,6 +55,55 @@ export const InstructorChecklistContainer: React.FC = () => {
   useEffect(() => {
     dispatch(fetchChecklists({ page: 0, size: 50 }));
   }, [dispatch]);
+
+  // Cargar calificaciones cuando se selecciona un checklist y teamScrum
+  useEffect(() => {
+    const loadChecklistQualifications = async () => {
+      if (selectedChecklist && selectedTeamScrum) {
+        try {
+          const result = await loadQualifications({
+            variables: {
+              checklistId: parseInt(selectedChecklist.id as string),
+              teamScrumId: parseInt(selectedTeamScrum.id as string)
+            }
+          });
+
+          if (result.data?.checklistQualificationsByChecklist) {
+            const qualifications = result.data.checklistQualificationsByChecklist;
+            
+            // Mapear las calificaciones a itemStates
+            const newItemStates: { [key: number]: { completed: boolean | null, observations: string } } = {};
+            
+            // Inicializar todos los items
+            selectedChecklist.items?.forEach((item: any) => {
+              if (item && item.id) {
+                newItemStates[item.id] = {
+                  completed: null,
+                  observations: ""
+                };
+              }
+            });
+
+            // Sobrescribir con las calificaciones existentes
+            qualifications.forEach((qual: any) => {
+              if (qual.itemId) {
+                newItemStates[qual.itemId] = {
+                  completed: qual.qualificationState,
+                  observations: qual.observations || ""
+                };
+              }
+            });
+
+            setItemStates(newItemStates);
+          }
+        } catch (error) {
+          console.error("Error al cargar calificaciones:", error);
+        }
+      }
+    };
+
+    loadChecklistQualifications();
+  }, [selectedChecklist, selectedTeamScrum, loadQualifications]);
 
   // Obtener trimestres únicos dinámicamente de las listas creadas por el coordinador
   const availableTrimester = useMemo(() => {
@@ -92,9 +150,6 @@ export const InstructorChecklistContainer: React.FC = () => {
     const checklist = checklists.find((c: Checklist) => c.id === checklistId);
     if (checklist) {
       console.log("🔍 Checklist seleccionado:", checklist);
-      console.log("📊 Evaluación del checklist:", (checklist as any).evaluations);
-      console.log("📊 Tipo de evaluations:", typeof (checklist as any).evaluations);
-      console.log("📊 ¿Tiene evaluations?:", !!(checklist as any).evaluations);
       
       setSelectedChecklist(checklist);
       setCurrentPage(1);
@@ -112,7 +167,7 @@ export const InstructorChecklistContainer: React.FC = () => {
             // Si la ficha tiene equipos scrum, obtener el primero (o el seleccionado)
             const teams = (studySheetResponse.data as StudySheet).teamsScrum;
             if (teams && teams.length > 0 && teams[0]?.id) {
-              dispatch(fetchTeamScrumById({ id: teams[0].id }));
+              await dispatch(fetchTeamScrumById({ id: teams[0].id }));
             }
           }
         } catch (error) {
@@ -122,19 +177,12 @@ export const InstructorChecklistContainer: React.FC = () => {
       
       // Cargar datos de evaluación si existe
       const evaluation = (checklist as any).evaluations;
-      console.log("✅ Evaluación encontrada:", evaluation);
       
       if (evaluation) {
-        console.log("📝 Cargando datos de evaluación:", {
-          observations: evaluation.observations,
-          recommendations: evaluation.recommendations,
-          valueJudgment: evaluation.valueJudgment
-        });
         setEvaluationObservations(evaluation.observations || "");
         setEvaluationRecommendations(evaluation.recommendations || "");
         setEvaluationJudgment(evaluation.valueJudgment || "");
       } else {
-        console.log("❌ No hay evaluación, limpiando campos");
         // Limpiar campos si no hay evaluación
         setEvaluationObservations("");
         setEvaluationRecommendations("");
@@ -142,30 +190,61 @@ export const InstructorChecklistContainer: React.FC = () => {
         setEvaluationCriteria(null);
       }
       
-      // Inicializar estados de items
-      const initialStates: { [key: number]: { completed: boolean | null, observations: string } } = {};
-      checklist.items?.forEach((item: any) => {
-        if (item && item.id) {
-          initialStates[item.id] = {
-            completed: item.completed || null,
-            observations: item.observations || ""
-          };
-        }
-      });
-      setItemStates(initialStates);
+      // Los itemStates se cargarán automáticamente en el useEffect cuando selectedTeamScrum cambie
     }
   };
 
-  const handleItemChange = (id: number, field: string, value: any) => {
+  const handleItemChange = async (id: number, field: string, value: any) => {
     if (isFinalSaved) return;
+    
+    // Obtener el estado actual del item
+    const currentItemState = itemStates[id] || { completed: null, observations: "" };
+    
+    // Actualizar estado local inmediatamente para mejor UX
+    const updatedState = {
+      ...currentItemState,
+      [field]: value
+    };
     
     setItemStates(prev => ({
       ...prev,
-      [id]: {
-        ...prev[id],
-        [field]: value
-      }
+      [id]: updatedState
     }));
+
+    // Validar que tengamos los datos necesarios
+    if (!selectedChecklist || !selectedTeamScrum) {
+      toast.error("Error: No se ha seleccionado un checklist o team scrum");
+      return;
+    }
+
+    // Guardar en la base de datos
+    try {
+      const qualificationInput = {
+        itemId: parseInt(id.toString()),
+        teamScrumId: parseInt(selectedTeamScrum.id as string),
+        checklistId: parseInt(selectedChecklist.id as string),
+        qualificationState: updatedState.completed,
+        observations: updatedState.observations || ""
+      };
+
+      const result = await saveOrUpdateQualification({
+        variables: { input: qualificationInput }
+      });
+
+      if (result.data?.saveOrUpdateChecklistQualification?.code === "200") {
+        // Guardado exitoso - podemos mostrar un indicador sutil
+        console.log("✅ Calificación guardada automáticamente");
+      }
+    } catch (error: any) {
+      console.error("Error al guardar calificación:", error);
+      toast.error(`Error al guardar: ${error.message || 'Error desconocido'}`);
+      
+      // Revertir el cambio en caso de error
+      setItemStates(prev => ({
+        ...prev,
+        [id]: currentItemState
+      }));
+    }
   };
 
   const handlePageChange = (page: number) => {

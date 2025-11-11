@@ -11,6 +11,7 @@ type Checklist {
     evaluations: Evaluation  # ← Se llena cuando el instructor califica
     items: [Item]
     associatedJuries: [Juries]
+    qualifications(teamScrumId: Long!): [ChecklistQualification]  # ← Nueva query para obtener calificaciones por team
 }
 
 type ChecklistPage {
