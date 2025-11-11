@@ -397,7 +397,7 @@ export const InstructorChecklistContainer: React.FC = () => {
   };
 
   return (
-    <div className="p-8 bg-gray-100 dark:bg-[#00111f] min-h-screen text-gray-900 dark:text-white">
+    <div className="p-8 dark:bg-[#00111f] min-h-screen text-gray-900 dark:text-white">
       <PageTitle>Lista de Chequeo - Instructor</PageTitle>
 
       {/* Tarjetas de información */}
