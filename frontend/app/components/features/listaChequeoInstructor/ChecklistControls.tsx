@@ -123,7 +123,7 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
             {isFinalSaved && (
               <button
                 onClick={onEnableModification}
-                className="flex items-center gap-2 bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="flex items-center gap-2 bg-gradient-to-r from-[#5cb800] to-[#6bc500] hover:from-[#4da600] hover:to-[#5cb800] text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <Edit3 className="w-4 h-4" />
                 Habilitar Modificación
