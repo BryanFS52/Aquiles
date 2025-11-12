@@ -58,6 +58,8 @@ export const InstructorChecklistContainer: React.FC = () => {
       const studySheetId = localStorage.getItem('selectedStudySheetId');
       const teamScrumId = localStorage.getItem('selectedTeamScrumId');
 
+      console.log("📋 Cargando desde localStorage:", { studySheetId, teamScrumId });
+
       if (studySheetId) {
         try {
           const studySheetResponse = await dispatch(fetchStudySheetWithTeamScrum({ 
@@ -65,18 +67,22 @@ export const InstructorChecklistContainer: React.FC = () => {
           })).unwrap();
           
           if (studySheetResponse?.data) {
+            console.log("✅ Ficha cargada:", studySheetResponse.data);
             setSelectedStudySheet(studySheetResponse.data as StudySheet);
           }
         } catch (error) {
-          console.error("Error al cargar ficha desde localStorage:", error);
+          console.error("❌ Error al cargar ficha desde localStorage:", error);
+          toast.error("Error al cargar la ficha seleccionada");
         }
       }
 
       if (teamScrumId) {
         try {
           await dispatch(fetchTeamScrumById({ id: teamScrumId }));
+          console.log("✅ Team Scrum cargado");
         } catch (error) {
-          console.error("Error al cargar team scrum desde localStorage:", error);
+          console.error("❌ Error al cargar team scrum desde localStorage:", error);
+          toast.error("Error al cargar el Team Scrum seleccionado");
         }
       }
     };
@@ -173,7 +179,6 @@ export const InstructorChecklistContainer: React.FC = () => {
   const handleChecklistChange = async (checklistId: string) => {
     if (!checklistId) {
       setSelectedChecklist(null);
-      setSelectedStudySheet(null);
       setItemStates({});
       setCurrentPage(1);
       return;
@@ -186,26 +191,8 @@ export const InstructorChecklistContainer: React.FC = () => {
       setSelectedChecklist(checklist);
       setCurrentPage(1);
       
-      // Cargar información de la ficha de estudio asociada
-      if (checklist.studySheets) {
-        try {
-          const studySheetResponse = await dispatch(fetchStudySheetWithTeamScrum({ 
-            id: parseInt(checklist.studySheets) 
-          })).unwrap();
-          
-          if (studySheetResponse?.data) {
-            setSelectedStudySheet(studySheetResponse.data as StudySheet);
-            
-            // Si la ficha tiene equipos scrum, obtener el primero (o el seleccionado)
-            const teams = (studySheetResponse.data as StudySheet).teamsScrum;
-            if (teams && teams.length > 0 && teams[0]?.id) {
-              await dispatch(fetchTeamScrumById({ id: teams[0].id }));
-            }
-          }
-        } catch (error) {
-          console.error("Error al cargar ficha de estudio:", error);
-        }
-      }
+      // NO sobrescribir selectedStudySheet ni selectedTeamScrum
+      // Estos ya fueron cargados desde localStorage y deben mantenerse
       
       // Cargar datos de evaluación si existe
       const evaluation = (checklist as any).evaluations;
@@ -349,6 +336,8 @@ export const InstructorChecklistContainer: React.FC = () => {
 
   // Datos dinámicos basados en la selección actual
   const getStudySheetInfo = () => {
+    console.log("📊 getStudySheetInfo - selectedStudySheet:", selectedStudySheet);
+    
     if (!selectedStudySheet) {
       return {
         fichaNumber: "No disponible",
@@ -358,7 +347,7 @@ export const InstructorChecklistContainer: React.FC = () => {
       };
     }
 
-    return {
+    const info = {
       fichaNumber: selectedStudySheet.number?.toString() || "No disponible",
       jornada: selectedStudySheet.journey?.name || "No disponible", 
       fechas: selectedStudySheet.startLective && selectedStudySheet.endLective 
@@ -366,9 +355,14 @@ export const InstructorChecklistContainer: React.FC = () => {
         : "No disponible",
       programa: selectedStudySheet.trainingProject?.name || "No disponible"
     };
+
+    console.log("📊 Información de la ficha:", info);
+    return info;
   };
 
   const getTeamScrumInfo = () => {
+    console.log("👥 getTeamScrumInfo - selectedTeamScrum:", selectedTeamScrum);
+    
     if (!selectedTeamScrum) {
       return {
         teamName: "No seleccionado",
@@ -376,10 +370,13 @@ export const InstructorChecklistContainer: React.FC = () => {
       };
     }
 
-    return {
+    const info = {
       teamName: selectedTeamScrum.teamName || "Sin nombre",
       projectName: selectedTeamScrum.projectName || selectedChecklist?.trainingProjectName || "Sin proyecto"
     };
+
+    console.log("👥 Información del Team Scrum:", info);
+    return info;
   };
 
   const studySheetInfo = getStudySheetInfo();
