@@ -61,13 +61,19 @@ public class EvaluationsBusiness {
     // Add new evaluation
     public EvaluationDto add(EvaluationDto evaluationDto) {
         try {
-            // Verificar si ya existe una evaluación para este checklist
+            // Verificar si ya existe una evaluación para este checklist y team scrum
             if (evaluationDto.getChecklistId() != null) {
                 Checklist checklist = checklistService.getById(evaluationDto.getChecklistId());
                 
-                // Verificar si el checklist ya tiene una evaluación
-                if (checklist.getEvaluation() != null) {
-                    throw new CustomException("Este checklist ya tiene una evaluación asociada. ID de evaluación: " + checklist.getEvaluation().getId(), HttpStatus.CONFLICT);
+                // Si se proporciona teamScrumId, verificar que no exista ya una evaluación para este checklist + team
+                if (evaluationDto.getTeamScrumId() != null) {
+                    Evaluation existingEvaluation = evaluationsService.findByChecklistAndTeam(
+                        evaluationDto.getChecklistId(), 
+                        evaluationDto.getTeamScrumId()
+                    );
+                    if (existingEvaluation != null) {
+                        throw new CustomException("Ya existe una evaluación para este checklist y team scrum. ID de evaluación: " + existingEvaluation.getId(), HttpStatus.CONFLICT);
+                    }
                 }
                 
                 Evaluation evaluation = new Evaluation();
@@ -116,5 +122,14 @@ public class EvaluationsBusiness {
         } catch (Exception e) {
             throw new CustomException("Error Deleting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    // Buscar evaluación por checklist y team scrum
+    public EvaluationDto findByChecklistAndTeam(Long checklistId, Long teamScrumId) {
+        Evaluation evaluation = evaluationsService.findByChecklistAndTeam(checklistId, teamScrumId);
+        if (evaluation == null) {
+            return null;
+        }
+        return EvaluationMap.INSTANCE.EntityToDTO(evaluation);
     }
 }

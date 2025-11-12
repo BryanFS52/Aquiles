@@ -38,6 +38,7 @@ extend type Query {
     evaluationsByChecklist(checklistId: Long!): EvaluationPage
     evaluationByChecklist(checklistId: Long!): EvaluationPageId
     evaluationExistsForChecklist(checklistId: Long!): EvaluationPageId
+    evaluationByChecklistAndTeam(checklistId: Long!, teamScrumId: Long!): EvaluationPageId
 }
 
 extend type Mutation {

@@ -11,7 +11,12 @@ import java.io.Serializable;
 @Setter
 @Builder
 @Entity
-@Table(name = "evaluations")
+@Table(name = "evaluations", 
+    uniqueConstraints = @UniqueConstraint(
+        name = "uk_evaluation_checklist_team", 
+        columnNames = {"checklist_id", "team_scrum_id"}
+    )
+)
 public class Evaluation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,14 +32,15 @@ public class Evaluation implements Serializable {
     @Column(name = "value_judgment", nullable = false, length = 60)
     private String valueJudgment;
 
-    // Relación uno a uno con Checklist - Esta evaluación pertenece a un único checklist
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "checklist_id", nullable = false, unique = true)
+    // Relación muchos a uno con Checklist - Múltiples evaluaciones pueden pertenecer al mismo checklist
+    // (una por cada team scrum)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "checklist_id", nullable = false)
     private Checklist checklist;
 
-    // Campo para asociar la evaluación a un team scrum específico
+    // Campo para asociar la evaluación a un team scrum específico (obligatorio)
     @ManyToOne
-    @JoinColumn(name = "team_scrum_id")
+    @JoinColumn(name = "team_scrum_id", nullable = false)
     private TeamsScrum teamsScrum;
 
 

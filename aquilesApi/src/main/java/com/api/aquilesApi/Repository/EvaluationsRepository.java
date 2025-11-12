@@ -18,5 +18,8 @@ public interface EvaluationsRepository extends JpaRepository<Evaluation, Long> {
 
     // Buscar la evaluación única de un checklist (relación 1:1)
     // Como la relación es 1:1, debería devolver un solo resultado
+
+    // Buscar evaluación por checklist y team scrum
+    Evaluation findByChecklistIdAndTeamsScrumId(Long checklistId, Long teamScrumId);
     Evaluation findEvaluationByChecklistId(Long checklistId);
 }

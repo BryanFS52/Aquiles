@@ -60,6 +60,11 @@ public class EvaluationsService implements Idao<Evaluation, Long> {
         return evaluationRepository.findEvaluationByChecklistId(checklistId);
     }
 
+    // Buscar evaluación por checklist y team scrum
+    public Evaluation findByChecklistAndTeam(Long checklistId, Long teamScrumId) {
+        return evaluationRepository.findByChecklistIdAndTeamsScrumId(checklistId, teamScrumId);
+    }
+
     // Verificar si existe una evaluación para un checklist
     public boolean existsByChecklistId(Long checklistId) {
         return evaluationRepository.existsByChecklistId(checklistId);

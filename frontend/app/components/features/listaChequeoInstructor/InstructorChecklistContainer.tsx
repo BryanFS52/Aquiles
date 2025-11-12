@@ -12,6 +12,7 @@ import {
   SAVE_OR_UPDATE_CHECKLIST_QUALIFICATION,
   GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST 
 } from '@graphql/checklistQualificationGraph';
+import { GET_EVALUATION_BY_CHECKLIST_AND_TEAM } from '@graphql/evaluationsGraph';
 import PageTitle from "@components/UI/pageTitle";
 import { InformationCards } from './InformationCards';
 import { ChecklistControls } from './ChecklistControls';
@@ -31,6 +32,7 @@ export const InstructorChecklistContainer: React.FC = () => {
   // Mutations y queries
   const [saveOrUpdateQualification] = useMutation(SAVE_OR_UPDATE_CHECKLIST_QUALIFICATION);
   const [loadQualifications, { data: qualificationsData }] = useLazyQuery(GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST);
+  const [loadEvaluation, { data: evaluationData }] = useLazyQuery(GET_EVALUATION_BY_CHECKLIST_AND_TEAM);
   
   // Estados locales
   const [selectedTrimester, setSelectedTrimester] = useState<string>("");
@@ -143,6 +145,22 @@ export const InstructorChecklistContainer: React.FC = () => {
     loadChecklistQualifications();
   }, [selectedChecklist, selectedTeamScrum, loadQualifications]);
 
+  // Efecto para actualizar los campos de evaluación cuando llegue la data del backend
+  useEffect(() => {
+    if (evaluationData?.evaluationByChecklistAndTeam?.data) {
+      const evaluation = evaluationData.evaluationByChecklistAndTeam.data;
+      setEvaluationObservations(evaluation.observations || "");
+      setEvaluationRecommendations(evaluation.recommendations || "");
+      setEvaluationJudgment(evaluation.valueJudgment || "");
+    } else {
+      // Limpiar campos si no hay evaluación
+      setEvaluationObservations("");
+      setEvaluationRecommendations("");
+      setEvaluationJudgment("");
+      setEvaluationCriteria(null);
+    }
+  }, [evaluationData]);
+
   // Obtener trimestres únicos dinámicamente de las listas creadas por el coordinador
   const availableTrimester = useMemo(() => {
     const trimesters = checklists
@@ -194,19 +212,14 @@ export const InstructorChecklistContainer: React.FC = () => {
       // NO sobrescribir selectedStudySheet ni selectedTeamScrum
       // Estos ya fueron cargados desde localStorage y deben mantenerse
       
-      // Cargar datos de evaluación si existe
-      const evaluation = (checklist as any).evaluations;
-      
-      if (evaluation) {
-        setEvaluationObservations(evaluation.observations || "");
-        setEvaluationRecommendations(evaluation.recommendations || "");
-        setEvaluationJudgment(evaluation.valueJudgment || "");
-      } else {
-        // Limpiar campos si no hay evaluación
-        setEvaluationObservations("");
-        setEvaluationRecommendations("");
-        setEvaluationJudgment("");
-        setEvaluationCriteria(null);
+      // Cargar evaluación específica para este checklist y team scrum
+      if (selectedTeamScrum?.id && checklist.id) {
+        loadEvaluation({
+          variables: {
+            checklistId: checklist.id,
+            teamScrumId: selectedTeamScrum.id
+          }
+        });
       }
       
       // Los itemStates se cargarán automáticamente en el useEffect cuando selectedTeamScrum cambie
@@ -303,8 +316,8 @@ export const InstructorChecklistContainer: React.FC = () => {
       };
     }).filter(Boolean) || [];
 
-    // Verificar si hay datos de evaluación
-    const evaluation = (selectedChecklist as any).evaluations;
+    // Verificar si hay datos de evaluación (usar evaluationData en lugar de checklist.evaluations)
+    const evaluation = evaluationData?.evaluationByChecklistAndTeam?.data;
     const hasEvaluation = !!evaluation;
 
     return {
@@ -405,7 +418,7 @@ export const InstructorChecklistContainer: React.FC = () => {
   };
 
   const handleCreateEvaluationSubmit = async () => {
-    if (!selectedChecklist) return;
+    if (!selectedChecklist || !selectedTeamScrum?.id) return;
     
     setIsCreatingEvaluation(true);
     try {
@@ -414,28 +427,21 @@ export const InstructorChecklistContainer: React.FC = () => {
         recommendations: evaluationRecommendations.trim(),
         valueJudgment: evaluationJudgment,
         checklistId: parseInt(selectedChecklist.id as string),
-        teamScrumId: selectedTeamScrum?.id ? parseInt(selectedTeamScrum.id as string) : undefined
+        teamScrumId: parseInt(selectedTeamScrum.id as string)
       };
 
-      const response = await dispatch(addEvaluation(evaluationInput)).unwrap();
+      await dispatch(addEvaluation(evaluationInput)).unwrap();
       
       setShowCreateEvaluationModal(false);
       toast.success("✅ Evaluación creada exitosamente!");
       
-      // Actualizar el checklist con la evaluación usando los valores que ya tenemos
-      const updatedChecklist = {
-        ...selectedChecklist,
-        evaluations: {
-          id: response?.id || '',
-          observations: evaluationObservations.trim(),
-          recommendations: evaluationRecommendations.trim(),
-          valueJudgment: evaluationJudgment,
-          checklistId: parseInt(selectedChecklist.id as string)
+      // Recargar la evaluación para este checklist y team scrum
+      loadEvaluation({
+        variables: {
+          checklistId: parseInt(selectedChecklist.id as string),
+          teamScrumId: parseInt(selectedTeamScrum.id as string)
         }
-      };
-      
-      // Forzar actualización del estado
-      setSelectedChecklist(updatedChecklist as Checklist);
+      });
       
     } catch (error: any) {
       console.error("Error al crear evaluación:", error);
@@ -454,18 +460,19 @@ export const InstructorChecklistContainer: React.FC = () => {
   };
 
   const handleCompleteEvaluation = async () => {
-    if (!selectedChecklist || !(selectedChecklist as any).evaluations) return;
+    if (!selectedChecklist || !selectedTeamScrum?.id || !evaluationData?.evaluationByChecklistAndTeam?.data) return;
     
     try {
+      const evaluation = evaluationData.evaluationByChecklistAndTeam.data;
       const evaluationInput = {
         observations: evaluationObservations.trim(),
         recommendations: evaluationRecommendations.trim(),
         valueJudgment: evaluationJudgment,
         checklistId: parseInt(selectedChecklist.id as string),
-        teamScrumId: selectedTeamScrum?.id ? parseInt(selectedTeamScrum.id as string) : undefined
+        teamScrumId: parseInt(selectedTeamScrum.id as string)
       };
 
-      const evaluationId = (selectedChecklist as any).evaluations.id;
+      const evaluationId = evaluation.id;
       if (!evaluationId) {
         toast.error("❌ No se encontró el ID de la evaluación");
         return;
@@ -479,20 +486,13 @@ export const InstructorChecklistContainer: React.FC = () => {
       setShowEvaluationForm(false);
       toast.success("✅ Evaluación actualizada exitosamente!");
       
-      // Actualizar el checklist con la evaluación usando los valores actualizados
-      const updatedChecklist = {
-        ...selectedChecklist,
-        evaluations: {
-          id: evaluationId,
-          observations: evaluationObservations.trim(),
-          recommendations: evaluationRecommendations.trim(),
-          valueJudgment: evaluationJudgment,
-          checklistId: parseInt(selectedChecklist.id as string)
+      // Recargar la evaluación actualizada
+      loadEvaluation({
+        variables: {
+          checklistId: parseInt(selectedChecklist.id as string),
+          teamScrumId: parseInt(selectedTeamScrum.id as string)
         }
-      };
-      
-      // Forzar actualización del estado
-      setSelectedChecklist(updatedChecklist as Checklist);
+      });
       
     } catch (error: any) {
       console.error("Error al actualizar evaluación:", error);
@@ -551,7 +551,7 @@ export const InstructorChecklistContainer: React.FC = () => {
       {selectedChecklist && currentItems.length > 0 && (
         <EvaluationSection
           selectedChecklist={selectedChecklist}
-          selectedEvaluation={(selectedChecklist as any).evaluations || null}
+          selectedEvaluation={evaluationData?.evaluationByChecklistAndTeam?.data || null}
           showEvaluationForm={showEvaluationForm}
           evaluationObservations={evaluationObservations}
           evaluationRecommendations={evaluationRecommendations}

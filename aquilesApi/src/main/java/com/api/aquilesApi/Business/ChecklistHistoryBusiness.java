@@ -67,8 +67,9 @@ public class  ChecklistHistoryBusiness {
         dto.setDateAssigned(String.valueOf(checklist.getDateAssigned()));
         dto.setStudySheets(checklist.getStudySheets());
         dto.setTrainingProjectId(checklist.getTrainingProjectId());
-        // ✅ Extraer ID de la evaluación única (relación 1:1)
-        dto.setEvaluations(checklist.getEvaluation() != null ? checklist.getEvaluation().getId() : null);
+        // Nota: Ahora checklist tiene múltiples evaluaciones, este campo podría necesitar ajuste
+        // Por ahora, dejamos null o se puede ajustar según la lógica de negocio
+        dto.setEvaluations(null);
         dto.setLearningOutcome(checklist.getLearningOutcome());
         return dto;
     }

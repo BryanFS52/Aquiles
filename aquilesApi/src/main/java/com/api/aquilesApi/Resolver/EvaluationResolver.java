@@ -103,4 +103,30 @@ public class EvaluationResolver {
             );
         }
     }
+
+    // Get evaluation by checklist and team scrum
+    @DgsQuery
+    public Map<String, Object> evaluationByChecklistAndTeam(
+            @InputArgument("checklistId") Long checklistId,
+            @InputArgument("teamScrumId") Long teamScrumId) {
+        try {
+            EvaluationDto evaluationDto = evaluationsBusiness.findByChecklistAndTeam(checklistId, teamScrumId);
+            if (evaluationDto == null) {
+                return ResponseHttpApi.responseHttpFindId(
+                        null,
+                        "404",
+                        "No evaluation found for this checklist and team"
+                );
+            }
+            return ResponseHttpApi.responseHttpFindId(
+                    evaluationDto,
+                    ResponseHttpApi.CODE_OK,
+                    "Evaluation found successfully"
+            );
+        } catch (Exception e) {
+            return ResponseHttpApi.responseHttpError(
+                    "Error retrieving evaluation: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }
