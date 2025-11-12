@@ -5,6 +5,8 @@ import { Provider } from "react-redux";
 import { useDispatch, useSelector } from "react-redux";
 import store, { AppDispatch, RootState } from "@redux/store";
 import { loadAuthFromStorage } from "@redux/slices/cerberos/authSlice";
+import { verifyTokenInStorage, debugStorageState, isTokenValid } from "@lib/tokenPersistence";
+import { LoaderProvider } from "@context/LoaderContext";
 import Loader from "@components/UI/Loader";
 
 function HomeContent() {
@@ -16,16 +18,59 @@ function HomeContent() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Primero intentar cargar la sesión existente
-        await dispatch(loadAuthFromStorage()).unwrap();
-        
-        // Si llegamos aquí, hay una sesión válida
-        router.replace("/dashboard");
+        console.log("[Home] Iniciando verificación de autenticación...");
+        console.log("[Home] Dominio Actual:", window.location.hostname);
+
+        // Verificar que el token está en localStorage
+        debugStorageState();
+
+        const hasValidToken = verifyTokenInStorage();
+        const isValid = isTokenValid();
+
+        console.log("[Home] Estado del Token:", {
+          existeEnStorage: hasValidToken,
+          esValido: isValid,
+        });
+
+        if (hasValidToken && isValid) {
+          console.log("[Home] Token válido encontrado en localStorage");
+          console.log("[Home] Intentando cargar sesión desde storage...");
+          
+          await dispatch(loadAuthFromStorage()).unwrap();
+          
+          console.log("[Home] Sesión cargada exitosamente");
+          console.log("[Home] Redirigiendo al dashboard...");
+          
+          setTimeout(() => {
+            router.replace("/dashboard");
+          }, 300);
+        } else {
+          console.warn("[Home] No hay token válido en storage");
+          console.log("[Home] Redirigiendo a Cerberos para login...");
+          
+          const cerberoUrl = "http://10.1.163.75:3001";
+          const callbackUrl = "http://10.1.175.79:3000/auth/callback";
+          const loginUrl = `${cerberoUrl}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
+          
+          console.log("[Home] URL de Cerberos:", loginUrl);
+          console.log("[Home] Callback URL:", callbackUrl);
+          
+          setTimeout(() => {
+            window.location.href = loginUrl;
+          }, 500);
+        }
       } catch (error) {
-        // No hay sesión válida, redirigir a Cerberos
-        const currentUrl = window.location.origin;
-        const redirectUri = encodeURIComponent(`${currentUrl}/dashboard/auth/callback`);
-        window.location.href = `http://10.1.163.75:3001/auth/login?project=Aquiles&redirectUri=${redirectUri}`;
+        console.error("[Home] Error verificando sesión:", error);
+
+        const cerberoUrl = "http://10.1.163.75:3001";
+        const callbackUrl = "http://10.1.175.79:3000/auth/callback";
+        const loginUrl = `${cerberoUrl}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
+        
+        console.log("[Home] URL de Cerberos (error flow):", loginUrl);
+        
+        setTimeout(() => {
+          window.location.href = loginUrl;
+        }, 800);
       } finally {
         setIsChecking(false);
       }
@@ -34,7 +79,6 @@ function HomeContent() {
     checkAuth();
   }, [dispatch, router]);
 
-  // Mostrar loader mientras verifica la autenticación
   if (isChecking || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -60,7 +104,9 @@ function HomeContent() {
 export default function Home() {
   return (
     <Provider store={store}>
-      <HomeContent />
+      <LoaderProvider>
+        <HomeContent />
+      </LoaderProvider>
     </Provider>
   );
 }

@@ -51,10 +51,12 @@ export const useAuth = (): UseAuthReturn => {
    */
   const checkAuth = useCallback(async (): Promise<boolean> => {
     try {
+      console.log("[useAuth] checkAuth: Iniciando verificación...");
       const result = await dispatch(loadAuthFromStorage()).unwrap();
+      console.log("[useAuth] checkAuth: Resultado:", result ? "Autenticado" : "No autenticado");
       return !!result;
     } catch (error) {
-      console.error("Error verificando autenticación:", error);
+      console.error("[useAuth] checkAuth: Error verificando autenticación:", error);
       return false;
     }
   }, [dispatch]);
@@ -89,7 +91,7 @@ export const useAuth = (): UseAuthReturn => {
             roles: [{ name: "Usuario" }],
           },
         };
-        localStorage.setItem("olympo_auth", JSON.stringify(tempAuth));
+        localStorage.setItem("aquiles_auth", JSON.stringify(tempAuth));
         
         // Intentar validar con backend
         try {
@@ -97,7 +99,7 @@ export const useAuth = (): UseAuthReturn => {
           console.log("✅ [useAuth] Token validado y guardado");
           
           // Actualizar con datos reales
-          localStorage.setItem("olympo_auth", JSON.stringify(result));
+          localStorage.setItem("aquiles_auth", JSON.stringify(result));
         } catch (validationError) {
           console.warn("⚠️ [useAuth] No se pudo validar con backend, usando token directo");
         }
@@ -116,12 +118,16 @@ export const useAuth = (): UseAuthReturn => {
   }, [dispatch]);
 
   /**
-   * �🔐 Redirigir a login de Cerberos
+   * 🔐 Redirigir a login de Cerberos
    */
   const login = useCallback(() => {
-    const currentUrl = window.location.origin;
-    const redirectUri = encodeURIComponent(`${currentUrl}/dashboard/auth/callback`);
-    window.location.href = `http://10.1.163.75:3001/auth/login?project=Aquiles&redirectUri=${redirectUri}`;
+    console.log("🚀 [useAuth] Redirigiendo a Cerberos login...");
+    const cerberoUrl = "http://10.1.163.75:3001";
+    const callbackUrl = "http://10.1.175.79:3000/auth/callback";
+    const loginUrl = `${cerberoUrl}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
+    console.log("🔗 [useAuth] Login URL:", loginUrl);
+    // Redirigir a Cerberos con callback
+    window.location.href = loginUrl;
   }, []);
 
   /**
@@ -129,14 +135,15 @@ export const useAuth = (): UseAuthReturn => {
    */
   const logout = useCallback(async () => {
     try {
+      console.log("🚪 [useAuth] Cerrando sesión...");
       await dispatch(logoutUser()).unwrap();
-      // Redirigir a Cerberos
-      window.location.href = "http://10.1.163.75:3001/auth/login?project=Aquiles";
+      // Redirigir a Cerberos (10.1.163.75:3001)
+      window.location.href = "http://10.1.163.75:3001/auth/login";
     } catch (error) {
-      console.error("Error en logout:", error);
+      console.error("❌ [useAuth] Error en logout:", error);
       // Limpiar sesión local de todas formas
       dispatch(clearAuth());
-      window.location.href = "http://10.1.163.75:3001/auth/login?project=Aquiles";
+      window.location.href = "http://10.1.163.75:3001/auth/login";
     }
   }, [dispatch]);
 

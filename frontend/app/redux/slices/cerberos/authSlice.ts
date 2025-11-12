@@ -52,8 +52,8 @@ export const validateCerberosToken = createAsyncThunk<
       };
       
       // Guardar en múltiples lugares para asegurar persistencia
-      localStorage.setItem("olympo_auth", JSON.stringify(authData));
-      sessionStorage.setItem("olympo_auth", JSON.stringify(authData));
+      localStorage.setItem("aquiles_auth", JSON.stringify(authData));
+      sessionStorage.setItem("aquiles_auth", JSON.stringify(authData));
       
       // También guardar en cookies como backup
       const cookieValue = btoa(JSON.stringify(authData)); // Base64 encode
@@ -88,11 +88,11 @@ export const logoutUser = createAsyncThunk<
       });
 
       // Limpiar localStorage de Olympo
-      localStorage.removeItem("olympo_auth");
+      localStorage.removeItem("aquiles_auth");
       
       return data.logout;
     } catch (error) {
-      localStorage.removeItem("olympo_auth");
+      localStorage.removeItem("aquiles_auth");
       return rejectWithValue({
         code: 500,
         message: (error as Error).message,
@@ -116,7 +116,7 @@ export const loadAuthFromStorage = createAsyncThunk<
       let source: string | null = null;
 
       // 1. Primero intentar localStorage
-      const localData = localStorage.getItem("olympo_auth");
+      const localData = localStorage.getItem("aquiles_auth");
       if (localData) {
         console.log("✅ [loadAuthFromStorage] Encontrado en localStorage");
         storedAuth = localData;
@@ -125,7 +125,7 @@ export const loadAuthFromStorage = createAsyncThunk<
       
       // 2. Si no está en localStorage, buscar en sessionStorage
       if (!storedAuth) {
-        const sessionData = sessionStorage.getItem("olympo_auth");
+        const sessionData = sessionStorage.getItem("aquiles_auth");
         if (sessionData) {
           console.log("✅ [loadAuthFromStorage] Encontrado en sessionStorage");
           storedAuth = sessionData;
@@ -155,7 +155,7 @@ export const loadAuthFromStorage = createAsyncThunk<
         
         // Restaurar en localStorage si se encontró en otro lugar
         if (source !== "localStorage") {
-          localStorage.setItem("olympo_auth", JSON.stringify(parsed));
+          localStorage.setItem("aquiles_auth", JSON.stringify(parsed));
           console.log("💾 [loadAuthFromStorage] Copiado a localStorage");
         }
         
@@ -167,8 +167,8 @@ export const loadAuthFromStorage = createAsyncThunk<
     } catch (error) {
       console.error("❌ [loadAuthFromStorage] Error:", error);
       // Limpiar todos los storages en caso de error
-      localStorage.removeItem("olympo_auth");
-      sessionStorage.removeItem("olympo_auth");
+      localStorage.removeItem("aquiles_auth");
+      sessionStorage.removeItem("aquiles_auth");
       document.cookie = "olympo_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       return rejectWithValue({
         code: 500,
@@ -206,8 +206,8 @@ const authSlice = createSlice({
       state.error = null;
       
       // Limpiar todos los storages
-      localStorage.removeItem("olympo_auth");
-      sessionStorage.removeItem("olympo_auth");
+      localStorage.removeItem("aquiles_auth");
+      sessionStorage.removeItem("aquiles_auth");
       document.cookie = "olympo_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     },
   },
@@ -255,14 +255,23 @@ const authSlice = createSlice({
         state.error = action.payload || null;
       })
       // loadAuthFromStorage
+      .addCase(loadAuthFromStorage.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(loadAuthFromStorage.fulfilled, (state, action) => {
+        state.loading = false;
         if (action.payload) {
           state.isAuthenticated = true;
           state.token = action.payload.token;
           state.user = action.payload.user;
+        } else {
+          state.isAuthenticated = false;
+          state.token = null;
+          state.user = null;
         }
       })
       .addCase(loadAuthFromStorage.rejected, (state) => {
+        state.loading = false;
         state.isAuthenticated = false;
         state.token = null;
         state.user = null;
