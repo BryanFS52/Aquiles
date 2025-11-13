@@ -84,7 +84,7 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
                 <option value="">Seleccionar Lista de Chequeo</option>
                 {filteredChecklists.map((checklist) => (
                   <option key={checklist.id} value={checklist.id}>
-                    {checklist.name || `ID: ${checklist.id}`} - {checklist.trainingProjectName || 'Sin proyecto'} - {checklist.trimester || 'Sin trimestre'}
+                    {checklist.component || checklist.remarks || `Lista de Chequeo ${checklist.id}`}
                   </option>
                 ))}
               </select>

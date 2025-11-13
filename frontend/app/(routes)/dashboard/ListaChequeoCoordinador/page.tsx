@@ -49,12 +49,12 @@ export default function CoordinadorChecklistView() {
     dispatch(fetchChecklists({ page: 0, size: 100 }))
   }, [dispatch])
 
-  // Mostrar errores si existen
-  useEffect(() => {
-    if (error) {
-      toast.error(`Error: ${error}`)
-    }
-  }, [error])
+  // Comentado para evitar dobles notificaciones - los errores se manejan en cada función
+  // useEffect(() => {
+  //   if (error) {
+  //     toast.error(`Error: ${error}`)
+  //   }
+  // }, [error])
 
   const handleCloseModal = () => {
     setModalOpen(false)
@@ -87,7 +87,18 @@ export default function CoordinadorChecklistView() {
         // Recargar listas
         dispatch(fetchChecklists({ page: 0, size: 100 }))
       } catch (err: any) {
-        toast.error(`Error al eliminar: ${err.message || 'Error desconocido'}`)
+        // Extraer solo el mensaje limpio del error
+        let errorMessage = err.message || 'Error desconocido';
+        
+        // Remover prefijos técnicos del mensaje
+        if (errorMessage.includes('Unexpected error in deleteChecklist:')) {
+          errorMessage = errorMessage.split('Unexpected error in deleteChecklist:')[1].trim();
+        }
+        if (errorMessage.startsWith('Error Deleting Checklist:')) {
+          errorMessage = errorMessage.replace('Error Deleting Checklist:', '').trim();
+        }
+        
+        toast.error(errorMessage);
       }
     }
     setConfirmModalOpen(false)
@@ -114,7 +125,18 @@ export default function CoordinadorChecklistView() {
       dispatch(fetchChecklists({ page: 0, size: 100 }))
       handleCloseModal()
     } catch (err: any) {
-      toast.error(`Error: ${err.message || 'Error desconocido'}`)
+      // Extraer solo el mensaje limpio del error
+      let errorMessage = err.message || 'Error desconocido';
+      
+      // Remover prefijos técnicos del mensaje
+      if (errorMessage.includes('Unexpected error in updateChecklist:')) {
+        errorMessage = errorMessage.split('Unexpected error in updateChecklist:')[1].trim();
+      }
+      if (errorMessage.startsWith('Error Updating Checklist:')) {
+        errorMessage = errorMessage.replace('Error Updating Checklist:', '').trim();
+      }
+      
+      toast.error(errorMessage);
     }
   }
 

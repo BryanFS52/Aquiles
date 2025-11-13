@@ -160,6 +160,20 @@ public class ChecklistBusiness {
             checklistService.save(checklist);
         } catch (CustomException e) {
             throw e;
+        } catch (DataAccessException e) {
+            // Detectar error de violación de clave foránea
+            String errorMessage = e.getMessage().toLowerCase();
+            if (errorMessage.contains("foreign key") || 
+                errorMessage.contains("llave foránea") || 
+                errorMessage.contains("checklist_qualifications") ||
+                errorMessage.contains("constraint")) {
+                throw new CustomException(
+                    "No se puede actualizar esta Lista de Chequeo porque ya ha sido evaluada por un instructor. " +
+                    "Los items no pueden ser modificados una vez que existen calificaciones asociadas.",
+                    HttpStatus.CONFLICT
+                );
+            }
+            throw new CustomException("Error al actualizar la Lista de Chequeo: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             throw new CustomException("Error Updating Checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -172,6 +186,22 @@ public class ChecklistBusiness {
             checklistService.delete(checklist);
         } catch (CustomException e) {
             throw e;
+        } catch (DataAccessException e) {
+            // Detectar error de violación de clave foránea
+            String errorMessage = e.getMessage().toLowerCase();
+            if (errorMessage.contains("foreign key") || 
+                errorMessage.contains("llave foránea") || 
+                errorMessage.contains("checklist_qualifications") ||
+                errorMessage.contains("evaluations") ||
+                errorMessage.contains("constraint") ||
+                errorMessage.contains("referida desde")) {
+                throw new CustomException(
+                    "No se puede eliminar esta Lista de Chequeo porque ya ha sido evaluada por un instructor. " +
+                    "Las listas con calificaciones o evaluaciones asociadas no pueden ser eliminadas.",
+                    HttpStatus.CONFLICT
+                );
+            }
+            throw new CustomException("Error al eliminar la Lista de Chequeo: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             throw new CustomException("Error Deleting Checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
