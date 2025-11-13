@@ -484,7 +484,7 @@ export const InstructorChecklistContainer: React.FC = () => {
       })).unwrap();
       
       setShowEvaluationForm(false);
-      toast.success("✅ Evaluación actualizada exitosamente!");
+      toast.success("Evaluación actualizada exitosamente!");
       
       // Recargar la evaluación actualizada forzando traer datos frescos del servidor
       await loadEvaluation({
