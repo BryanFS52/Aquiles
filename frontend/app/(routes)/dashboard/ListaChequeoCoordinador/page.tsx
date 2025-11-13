@@ -43,6 +43,7 @@ export default function CoordinadorChecklistView() {
   const [selectedTrimestre, setSelectedTrimestre] = useState("todos")
   const [isEditing, setIsEditing] = useState(false)
   const [selectedChecklist, setSelectedChecklist] = useState<any>(null)
+  const [expandedCriteria, setExpandedCriteria] = useState<{ [key: string]: boolean }>({})
 
   // Cargar listas al montar el componente
   useEffect(() => {
@@ -138,6 +139,14 @@ export default function CoordinadorChecklistView() {
       
       toast.error(errorMessage);
     }
+  }
+
+  // Toggle para expandir/contraer criterios
+  const toggleCriteria = (checklistId: string) => {
+    setExpandedCriteria(prev => ({
+      ...prev,
+      [checklistId]: !prev[checklistId]
+    }))
   }
 
   const getFormattedStudySheets = (studySheets: string): string => {
@@ -302,11 +311,39 @@ export default function CoordinadorChecklistView() {
                         </div>
                       </div>
 
-                      <div>
-                        <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
-                          Criterios de evaluación
-                        </span>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
+                      <div className="min-h-[60px]">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
+                            Criterios de evaluación
+                          </span>
+                          {checklist.remarks && checklist.remarks.length > 30 && (
+                            <button
+                              onClick={() => toggleCriteria(checklist.id)}
+                              className="flex items-center gap-1 text-xs text-lime-600 hover:text-lime-700 dark:text-lime-400 dark:hover:text-lime-300 font-medium transition-colors"
+                            >
+                              {expandedCriteria[checklist.id] ? (
+                                <>
+                                  <span>Ver menos</span>
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                  </svg>
+                                </>
+                              ) : (
+                                <>
+                                  <span>Ver más</span>
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                  </svg>
+                                </>
+                              )}
+                            </button>
+                          )}
+                        </div>
+                        <p className={`text-sm text-gray-600 dark:text-gray-400 leading-relaxed break-words overflow-wrap-anywhere whitespace-pre-wrap transition-all duration-300 ${
+                          !expandedCriteria[checklist.id] && checklist.remarks && checklist.remarks.length > 30
+                            ? 'line-clamp-2'
+                            : ''
+                        }`}>
                           {checklist.remarks || 'Sin observaciones'}
                         </p>
                       </div>

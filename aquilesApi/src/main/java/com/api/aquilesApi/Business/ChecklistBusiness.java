@@ -118,6 +118,30 @@ public class ChecklistBusiness {
             return ChecklistMap.INSTANCE.EntityToDTO(savedChecklist);
         } catch (CustomException e) {
             throw e;
+        } catch (DataAccessException e) {
+            // Detectar error de longitud de campo excedida
+            String errorMessage = e.getMessage().toLowerCase();
+            if (errorMessage.contains("demasiado largo") || 
+                errorMessage.contains("too long") ||
+                errorMessage.contains("character varying")) {
+                // Extraer el límite de caracteres del mensaje
+                String limit = "especificado";
+                if (errorMessage.contains("varying(")) {
+                    try {
+                        int start = errorMessage.indexOf("varying(") + 8;
+                        int end = errorMessage.indexOf(")", start);
+                        limit = errorMessage.substring(start, end);
+                    } catch (Exception ex) {
+                        // Si no se puede extraer, usar mensaje genérico
+                    }
+                }
+                throw new CustomException(
+                    "Uno de los campos (indicador técnico o actitudinal) excede el límite de " + limit + " caracteres permitidos. " +
+                    "Por favor, reduzca el texto e intente nuevamente.",
+                    HttpStatus.BAD_REQUEST
+                );
+            }
+            throw new CustomException("Error al crear la Lista de Chequeo: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             throw new CustomException("Error creating checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -161,8 +185,29 @@ public class ChecklistBusiness {
         } catch (CustomException e) {
             throw e;
         } catch (DataAccessException e) {
-            // Detectar error de violación de clave foránea
+            // Detectar error de longitud de campo excedida
             String errorMessage = e.getMessage().toLowerCase();
+            if (errorMessage.contains("demasiado largo") || 
+                errorMessage.contains("too long") ||
+                errorMessage.contains("character varying")) {
+                // Extraer el límite de caracteres del mensaje
+                String limit = "especificado";
+                if (errorMessage.contains("varying(")) {
+                    try {
+                        int start = errorMessage.indexOf("varying(") + 8;
+                        int end = errorMessage.indexOf(")", start);
+                        limit = errorMessage.substring(start, end);
+                    } catch (Exception ex) {
+                        // Si no se puede extraer, usar mensaje genérico
+                    }
+                }
+                throw new CustomException(
+                    "Uno de los campos (indicador técnico o actitudinal) excede el límite de " + limit + " caracteres permitidos. " +
+                    "Por favor, reduzca el texto e intente nuevamente.",
+                    HttpStatus.BAD_REQUEST
+                );
+            }
+            // Detectar error de violación de clave foránea
             if (errorMessage.contains("foreign key") || 
                 errorMessage.contains("llave foránea") || 
                 errorMessage.contains("checklist_qualifications") ||

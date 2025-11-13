@@ -82,11 +82,18 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
                 }`}
               >
                 <option value="">Seleccionar Lista de Chequeo</option>
-                {filteredChecklists.map((checklist) => (
-                  <option key={checklist.id} value={checklist.id}>
-                    {checklist.component || checklist.remarks || `Lista de Chequeo ${checklist.id}`}
-                  </option>
-                ))}
+                {filteredChecklists.map((checklist) => {
+                  const displayText = checklist.component || checklist.remarks || `Lista de Chequeo ${checklist.id}`;
+                  // Limitar a 100 caracteres con puntos suspensivos si es más largo
+                  const truncatedText = displayText.length > 100 
+                    ? displayText.substring(0, 100) + '...' 
+                    : displayText;
+                  return (
+                    <option key={checklist.id} value={checklist.id}>
+                      {truncatedText}
+                    </option>
+                  );
+                })}
               </select>
             </div>
           </div>
@@ -133,24 +140,43 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
         </div>
       }
       footer={
-        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 font-medium">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span>Activas: <b className="text-gray-900 dark:text-white">{activeChecklists.length}</b></span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span>Filtradas: <b className="text-gray-900 dark:text-white">{filteredChecklists.length}</b></span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-              <span>Trimestres: <b className="text-gray-900 dark:text-white">{availableTrimester.length}</b></span>
+        <div className="space-y-3">
+          {/* Estadísticas */}
+          <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 font-medium">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span>Activas: <b className="text-gray-900 dark:text-white">{activeChecklists.length}</b></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <span>Filtradas: <b className="text-gray-900 dark:text-white">{filteredChecklists.length}</b></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                <span>Trimestres: <b className="text-gray-900 dark:text-white">{availableTrimester.length}</b></span>
+              </div>
             </div>
           </div>
-          {selectedChecklist && (
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              Lista seleccionada: {selectedChecklist.name || `ID ${selectedChecklist.id}`}
+          
+          {/* Criterios de Evaluación */}
+          {selectedChecklist && (selectedChecklist.component || selectedChecklist.remarks) && (
+            <div className="bg-gradient-to-r from-green-50 to-lime-50 dark:from-gray-800 dark:to-gray-750 rounded-lg p-3 border border-green-200 dark:border-gray-600">
+              <div className="flex items-start gap-2">
+                <div className="flex-shrink-0 mt-0.5">
+                  <svg className="w-4 h-4 text-[#5cb800] dark:text-[#6bc500]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-[#5cb800] dark:text-[#6bc500] uppercase tracking-wide mb-1">
+                    Criterios de Evaluación
+                  </p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed break-words overflow-wrap-anywhere whitespace-pre-wrap">
+                    {selectedChecklist.component || selectedChecklist.remarks}
+                  </p>
+                </div>
+              </div>
             </div>
           )}
         </div>
