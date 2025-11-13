@@ -312,27 +312,27 @@ export default function CoordinadorChecklistView() {
                       </div>
 
                       <div className="min-h-[60px]">
-                        <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
                             Criterios de evaluación
                           </span>
                           {checklist.remarks && checklist.remarks.length > 30 && (
                             <button
                               onClick={() => toggleCriteria(checklist.id)}
-                              className="flex items-center gap-1 text-xs text-lime-600 hover:text-lime-700 dark:text-lime-400 dark:hover:text-lime-300 font-medium transition-colors"
+                              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 rounded-full shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200"
                             >
                               {expandedCriteria[checklist.id] ? (
                                 <>
                                   <span>Ver menos</span>
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" />
                                   </svg>
                                 </>
                               ) : (
                                 <>
                                   <span>Ver más</span>
-                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
                                   </svg>
                                 </>
                               )}
