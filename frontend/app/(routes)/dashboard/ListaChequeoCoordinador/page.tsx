@@ -152,8 +152,7 @@ export default function CoordinadorChecklistView() {
   const getFormattedStudySheets = (studySheets: string): string => {
     if (!studySheets) return 'Sin fichas asociadas'
     const sheetIds = studySheets.split(',')
-    if (sheetIds.length === 1) return `Ficha ${sheetIds[0]}`
-    return `${sheetIds.length} fichas asociadas`
+    return `${sheetIds.length} ${sheetIds.length === 1 ? 'ficha asociada' : 'fichas asociadas'}`
   }
 
   // Filtrar listas según el trimestre seleccionado

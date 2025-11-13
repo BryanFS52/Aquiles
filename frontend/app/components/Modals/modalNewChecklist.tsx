@@ -227,8 +227,7 @@ export default function CrearListaChequeo({
         <div className="flex items-start gap-3 bg-lime-50 border border-lime-200 text-lime-700 rounded-xl p-4">
           <span className="text-2xl">💡</span>
           <p className="text-sm leading-relaxed">
-            <strong>Nota:</strong> Se creará automáticamente una evaluación vinculada a esta lista.
-            El instructor podrá completarla desde su vista.
+            <strong>Nota:</strong> El instructor podrá crear y completar una evaluación asociada a una lista de chequeo desde su vista. Una vez que tanto la lista de chequeo como la evaluación hayan sido diligenciadas, la lista quedará bloqueada, impidiendo su eliminación o modificación posterior.
           </p>
         </div>
 
