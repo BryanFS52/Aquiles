@@ -161,25 +161,57 @@ export const InstructorChecklistContainer: React.FC = () => {
     }
   }, [evaluationData]);
 
-  // Obtener trimestres únicos dinámicamente de las listas creadas por el coordinador
+  // Filtrar listas de chequeo por la ficha seleccionada del instructor
+  const checklistsForStudySheet = useMemo(() => {
+    if (!selectedStudySheet?.id) return checklists;
+    
+    console.log("🔍 Filtrando listas de chequeo para la ficha:", selectedStudySheet.id);
+    console.log("📋 Total de listas disponibles:", checklists.length);
+    
+    const filtered = checklists.filter((checklist: Checklist) => {
+      // Verificar si la lista tiene fichas asociadas
+      if (!checklist.studySheets || checklist.studySheets.length === 0) {
+        console.log(`❌ Lista ${checklist.id} sin fichas asociadas`);
+        return false;
+      }
+      
+      // Verificar si la ficha del instructor está en la lista de fichas asociadas
+      const studySheetIds = checklist.studySheets.split(',').map(id => id.trim());
+      const isMatch = studySheetIds.includes(selectedStudySheet?.id?.toString() || '');
+      
+      console.log(`${isMatch ? '✅' : '⏭️'} Lista ${checklist.id} (${checklist.component || checklist.remarks}):`, {
+        studySheets: checklist.studySheets,
+        studySheetIds,
+        buscando: selectedStudySheet.id,
+        coincide: isMatch
+      });
+      
+      return isMatch;
+    });
+    
+    console.log("✅ Listas filtradas para esta ficha:", filtered.length);
+    return filtered;
+  }, [checklists, selectedStudySheet]);
+
+  // Obtener trimestres únicos dinámicamente de las listas asignadas a esta ficha
   const availableTrimester = useMemo(() => {
-    const trimesters = checklists
+    const trimesters = checklistsForStudySheet
       .map((checklist: Checklist) => checklist.trimester)
       .filter((trimester: string | null | undefined): trimester is string => Boolean(trimester))
       .filter((trimester: string, index: number, array: string[]) => array.indexOf(trimester) === index);
     
     return trimesters.sort();
-  }, [checklists]);
+  }, [checklistsForStudySheet]);
 
-  // Listas filtradas por trimestre
+  // Listas filtradas por trimestre (solo las de esta ficha)
   const filteredChecklists = useMemo(() => {
-    if (!selectedTrimester) return checklists;
-    return checklists.filter((checklist: Checklist) => checklist.trimester === selectedTrimester);
-  }, [checklists, selectedTrimester]);
+    if (!selectedTrimester) return checklistsForStudySheet;
+    return checklistsForStudySheet.filter((checklist: Checklist) => checklist.trimester === selectedTrimester);
+  }, [checklistsForStudySheet, selectedTrimester]);
 
   const activeChecklists = useMemo(() => {
-    return checklists.filter((checklist: Checklist) => checklist.state === true);
-  }, [checklists]);
+    return checklistsForStudySheet.filter((checklist: Checklist) => checklist.state === true);
+  }, [checklistsForStudySheet]);
 
   // Items paginados
   const currentItems = useMemo(() => {
@@ -609,6 +641,24 @@ export const InstructorChecklistContainer: React.FC = () => {
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
             Las listas de chequeo creadas por el coordinador aparecerán aquí.
+          </p>
+        </div>
+      )}
+
+      {/* Estado cuando hay listas pero ninguna está asignada a esta ficha */}
+      {!loading && !error && checklists.length > 0 && checklistsForStudySheet.length === 0 && selectedStudySheet && (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">📋</span>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            No hay listas de chequeo asignadas a tu ficha
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            La ficha {selectedStudySheet.number || selectedStudySheet.id} no tiene listas de chequeo asignadas.
+          </p>
+          <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">
+            Contacta al coordinador para que asigne listas de chequeo a esta ficha.
           </p>
         </div>
       )}
