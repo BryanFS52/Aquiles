@@ -486,12 +486,13 @@ export const InstructorChecklistContainer: React.FC = () => {
       setShowEvaluationForm(false);
       toast.success("✅ Evaluación actualizada exitosamente!");
       
-      // Recargar la evaluación actualizada
-      loadEvaluation({
+      // Recargar la evaluación actualizada forzando traer datos frescos del servidor
+      await loadEvaluation({
         variables: {
           checklistId: parseInt(selectedChecklist.id as string),
           teamScrumId: parseInt(selectedTeamScrum.id as string)
-        }
+        },
+        fetchPolicy: 'network-only' // Forzar traer datos del servidor, no del cache
       });
       
     } catch (error: any) {
