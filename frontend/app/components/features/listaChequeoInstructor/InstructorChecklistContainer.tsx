@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useMutation, useLazyQuery } from "@apollo/client";
+import { useRouter } from 'next/navigation';
 import { AppDispatch, RootState } from '@redux/store';
 import { fetchChecklists } from '@redux/slices/checklistSlice';
 import { fetchStudySheetWithTeamScrum } from '@redux/slices/olympo/studySheetSlice';
@@ -25,6 +26,7 @@ import { toast } from 'react-toastify';
 
 export const InstructorChecklistContainer: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
   const { data: checklists, loading, error } = useSelector((state: RootState) => state.checklist);
   const { data: studySheets } = useSelector((state: RootState) => state.studySheet);
   const { dataForTeamScrumById: selectedTeamScrum } = useSelector((state: RootState) => state.teamScrum);
@@ -430,6 +432,18 @@ export const InstructorChecklistContainer: React.FC = () => {
     }
   };
 
+  // Función para volver a la selección de fichas
+  const handleBackToStudySheets = () => {
+    // Limpiar localStorage
+    localStorage.removeItem('selectedStudySheetId');
+    localStorage.removeItem('selectedTeamScrumId');
+    localStorage.removeItem('selectedStudySheetNumber');
+    localStorage.removeItem('selectedTeamScrumName');
+    
+    // Navegar a la página de selección de fichas
+    router.push('/dashboard/InstructorSelection');
+  };
+
   // Datos dinámicos basados en la selección actual
   const getStudySheetInfo = () => {
     console.log("📊 getStudySheetInfo - selectedStudySheet:", selectedStudySheet);
@@ -593,6 +607,28 @@ export const InstructorChecklistContainer: React.FC = () => {
 
   return (
     <div className="p-8 dark:bg-[#00111f] min-h-screen text-gray-900 dark:text-white">
+      {/* Botón Volver a Fichas */}
+      <button
+        onClick={handleBackToStudySheets}
+        className="mb-6 flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-[#5cb800] dark:hover:text-[#6bc500] transition-colors duration-200"
+      >
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          className="h-5 w-5" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+        >
+          <path 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            strokeWidth={2} 
+            d="M10 19l-7-7m0 0l7-7m-7 7h18" 
+          />
+        </svg>
+        <span className="font-medium">Volver a Fichas</span>
+      </button>
+
       <PageTitle>Lista de Chequeo - Instructor</PageTitle>
 
       {/* Tarjetas de información */}

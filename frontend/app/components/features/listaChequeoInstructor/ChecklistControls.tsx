@@ -44,12 +44,7 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
               <select
                 value={selectedTrimester}
                 onChange={(e) => onTrimesterChange(e.target.value)}
-                disabled={isFinalSaved}
-                className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200 ${
-                  isFinalSaved 
-                    ? 'opacity-50 cursor-not-allowed' 
-                    : 'focus:ring-2 focus:ring-[#5cb800] dark:focus:ring-shadowBlue focus:border-[#5cb800] dark:focus:border-shadowBlue hover:border-[#5cb800] dark:hover:border-shadowBlue'
-                }`}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200 focus:ring-2 focus:ring-[#5cb800] dark:focus:ring-shadowBlue focus:border-[#5cb800] dark:focus:border-shadowBlue hover:border-[#5cb800] dark:hover:border-shadowBlue"
               >
                 <option value="">Todos los Trimestres</option>
                 {availableTrimester.map((trimester) => (
@@ -74,12 +69,7 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
               <select
                 value={selectedChecklist?.id || ''}
                 onChange={(e) => onChecklistChange(e.target.value)}
-                disabled={isFinalSaved}
-                className={`w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200 ${
-                  isFinalSaved 
-                    ? 'opacity-50 cursor-not-allowed' 
-                    : 'focus:ring-2 focus:ring-[#538dda] dark:focus:ring-blue-400 focus:border-[#538dda] dark:focus:border-blue-400 hover:border-[#538dda] dark:hover:border-blue-400'
-                }`}
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200 focus:ring-2 focus:ring-[#538dda] dark:focus:ring-blue-400 focus:border-[#538dda] dark:focus:border-blue-400 hover:border-[#538dda] dark:hover:border-blue-400"
               >
                 <option value="">Seleccionar Lista de Chequeo</option>
                 {filteredChecklists.map((checklist) => {
