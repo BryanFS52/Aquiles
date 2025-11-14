@@ -10,6 +10,9 @@ import { RoleType } from '../../types/roles';
 import LayoutContent from './layoutComponent';
 import Loader from '@components/UI/Loader';
 
+const CERBEROS_URL = process.env.NEXT_PUBLIC_CERBEROS_URL || "http://localhost:3001";
+const AQUILES_URL = process.env.NEXT_PUBLIC_AQUILES_URL || "http://localhost:3000";
+
 interface ClientLayoutWrapperProps {
     children: React.ReactNode;
     initialUserData: User;
@@ -48,18 +51,11 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const loadAuth = async () => {
             try {
-                console.log("[Dashboard] Montado, cargando autenticación...");
-                
-                // Disparar acción para cargar desde localStorage
                 await dispatch(loadAuthFromStorage()).unwrap();
-                
-                console.log("[Dashboard] Autenticación cargada");
             } catch (error) {
-                console.error("[Dashboard] Error cargando autenticación:", error);
                 // Si falla, redirigir a login
-                const cerberoUrl = "http://10.1.163.75:3001";
-                const callbackUrl = "http://10.1.175.79:3000/auth/callback";
-                const loginUrl = `${cerberoUrl}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
+                const callbackUrl = `${AQUILES_URL}/auth/callback`;
+                const loginUrl = `${CERBEROS_URL}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
                 window.location.href = loginUrl;
             } finally {
                 setIsChecking(false);
@@ -72,7 +68,6 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
     // Actualizar usuario cuando authUser cambie
     useEffect(() => {
         if (authUser) {
-            console.log("[Dashboard] Usuario autenticado:", authUser);
             const mappedUser = mapCerberosUserToContextUser(authUser);
             setUser(mappedUser);
         }

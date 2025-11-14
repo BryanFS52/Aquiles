@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { IoNotificationsOutline, IoLogOutOutline } from "react-icons/io5";
+import { IoNotificationsOutline } from "react-icons/io5";
 import { RiCheckboxBlankCircleFill } from "react-icons/ri";
 import { Notifications } from "@components/UI/notifications";
 import Link from "next/link";
@@ -26,7 +26,7 @@ export const Header: React.FC<HeaderProps> = ({ role: initialRole }) => {
   const unreadCount = Notifications.unreadCount;
   
   // Hook de autenticación
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   // Obtener iniciales del nombre
   const getInitials = (name?: string): string => {
@@ -43,15 +43,6 @@ export const Header: React.FC<HeaderProps> = ({ role: initialRole }) => {
     if (!name) return "Usuario";
     const parts = name.trim().split(" ");
     return parts[0];
-  };
-
-  // Manejar logout
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-    }
   };
 
   // Responsive detection
@@ -258,14 +249,6 @@ export const Header: React.FC<HeaderProps> = ({ role: initialRole }) => {
                 </svg>
                 Ver Perfil
               </Link>
-              
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-              >
-                <IoLogOutOutline className="w-4 h-4" />
-                Cerrar Sesión
-              </button>
             </div>
           )}
         </div>

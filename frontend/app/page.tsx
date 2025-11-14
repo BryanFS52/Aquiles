@@ -9,6 +9,9 @@ import { verifyTokenInStorage, debugStorageState, isTokenValid } from "@lib/toke
 import { LoaderProvider } from "@context/LoaderContext";
 import Loader from "@components/UI/Loader";
 
+const CERBEROS_URL = process.env.NEXT_PUBLIC_CERBEROS_URL || "http://localhost:3001";
+const AQUILES_URL = process.env.NEXT_PUBLIC_AQUILES_URL || "http://localhost:3000";
+
 function HomeContent() {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
@@ -18,42 +21,18 @@ function HomeContent() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        console.log("[Home] Iniciando verificación de autenticación...");
-        console.log("[Home] Dominio Actual:", window.location.hostname);
-
-        // Verificar que el token está en localStorage
-        debugStorageState();
-
         const hasValidToken = verifyTokenInStorage();
         const isValid = isTokenValid();
 
-        console.log("[Home] Estado del Token:", {
-          existeEnStorage: hasValidToken,
-          esValido: isValid,
-        });
-
         if (hasValidToken && isValid) {
-          console.log("[Home] Token válido encontrado en localStorage");
-          console.log("[Home] Intentando cargar sesión desde storage...");
-          
           await dispatch(loadAuthFromStorage()).unwrap();
-          
-          console.log("[Home] Sesión cargada exitosamente");
-          console.log("[Home] Redirigiendo al dashboard...");
           
           setTimeout(() => {
             router.replace("/dashboard");
           }, 300);
         } else {
-          console.warn("[Home] No hay token válido en storage");
-          console.log("[Home] Redirigiendo a Cerberos para login...");
-          
-          const cerberoUrl = "http://10.1.163.75:3001";
-          const callbackUrl = "http://10.1.175.79:3000/auth/callback";
-          const loginUrl = `${cerberoUrl}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
-          
-          console.log("[Home] URL de Cerberos:", loginUrl);
-          console.log("[Home] Callback URL:", callbackUrl);
+          const callbackUrl = `${AQUILES_URL}/auth/callback`;
+          const loginUrl = `${CERBEROS_URL}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
           
           setTimeout(() => {
             window.location.href = loginUrl;
@@ -62,11 +41,8 @@ function HomeContent() {
       } catch (error) {
         console.error("[Home] Error verificando sesión:", error);
 
-        const cerberoUrl = "http://10.1.163.75:3001";
-        const callbackUrl = "http://10.1.175.79:3000/auth/callback";
-        const loginUrl = `${cerberoUrl}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
-        
-        console.log("[Home] URL de Cerberos (error flow):", loginUrl);
+        const callbackUrl = `${AQUILES_URL}/auth/callback`;
+        const loginUrl = `${CERBEROS_URL}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
         
         setTimeout(() => {
           window.location.href = loginUrl;

@@ -6,6 +6,8 @@ import { AppDispatch } from "@redux/store";
 import { validateCerberosToken } from "@redux/slices/cerberos/authSlice";
 import Loader from "@components/UI/Loader";
 
+const AQUILES_URL = process.env.NEXT_PUBLIC_AQUILES_URL || "http://localhost:3000";
+
 export default function CerberosCallback() {
   const searchParams = useSearchParams();
   const dispatch = useDispatch<AppDispatch>();
@@ -13,40 +15,23 @@ export default function CerberosCallback() {
   useEffect(() => {
     const token = searchParams.get("token");
 
-    console.log("[Callback] Recibido en /auth/callback");
-    console.log("[Callback] URL:", window.location.href);
-    console.log("[Callback] Token:", token ? "SI (long: " + token.length + ")" : "NO");
-
     if (token) {
-      // Validar token usando Redux thunk
       validateTokenWithRedux(token);
     } else {
-      console.error("[Callback] No hay token en URL");
       setTimeout(() => {
-        window.location.href = "http://10.1.175.79:3000/";
+        window.location.href = `${AQUILES_URL}/`;
       }, 2000);
     }
   }, [searchParams, dispatch]);
 
   const validateTokenWithRedux = async (token: string) => {
     try {
-      console.log("[Callback] Validando token con Redux thunk...");
+      await dispatch(validateCerberosToken(token)).unwrap();
 
-      // Usar el thunk validateCerberosToken del Redux slice
-      const result = await dispatch(validateCerberosToken(token)).unwrap();
-
-      console.log("[Callback] Token validado exitosamente");
-      console.log("[Callback] Usuario:", result.user);
-
-      // El thunk ya guardó en localStorage, solo redirigir
       setTimeout(() => {
-        console.log("[Callback] Redirigiendo a dashboard...");
-        window.location.href = "http://10.1.175.79:3000/dashboard";
+        window.location.href = `${AQUILES_URL}/dashboard`;
       }, 500);
     } catch (error) {
-      console.error("[Callback] Error validando token:", error);
-
-      // Fallback: guardar datos temporales si falla
       const tempAuthData = {
         token,
         user: {
@@ -60,12 +45,11 @@ export default function CerberosCallback() {
         },
       };
 
-      console.log("[Callback] Guardando datos temporales...");
       localStorage.setItem("aquiles_auth", JSON.stringify(tempAuthData));
       sessionStorage.setItem("aquiles_auth", JSON.stringify(tempAuthData));
 
       setTimeout(() => {
-        window.location.href = "http://10.1.175.79:3000/dashboard";
+        window.location.href = `${AQUILES_URL}/dashboard`;
       }, 500);
     }
   };
@@ -74,8 +58,7 @@ export default function CerberosCallback() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
         <Loader />
-        <p className="mt-4 text-gray-600">Procesando autenticacion...</p>
-        <p className="mt-2 text-xs text-gray-500">Validando token con servidor...</p>
+        <p className="mt-4 text-gray-600">Procesando autenticación...</p>
       </div>
     </div>
   );

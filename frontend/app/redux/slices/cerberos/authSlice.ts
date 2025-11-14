@@ -110,15 +110,12 @@ export const loadAuthFromStorage = createAsyncThunk<
   "auth/loadAuthFromStorage",
   async (_, { rejectWithValue }) => {
     try {
-      console.log("📂 [loadAuthFromStorage] Iniciando carga...");
-      
       let storedAuth: string | null = null;
       let source: string | null = null;
 
       // 1. Primero intentar localStorage
       const localData = localStorage.getItem("aquiles_auth");
       if (localData) {
-        console.log("✅ [loadAuthFromStorage] Encontrado en localStorage");
         storedAuth = localData;
         source = "localStorage";
       }
@@ -127,7 +124,6 @@ export const loadAuthFromStorage = createAsyncThunk<
       if (!storedAuth) {
         const sessionData = sessionStorage.getItem("aquiles_auth");
         if (sessionData) {
-          console.log("✅ [loadAuthFromStorage] Encontrado en sessionStorage");
           storedAuth = sessionData;
           source = "sessionStorage";
         }
@@ -139,33 +135,27 @@ export const loadAuthFromStorage = createAsyncThunk<
         if (cookieMatch) {
           try {
             const decoded = atob(cookieMatch[1]); // Base64 decode
-            console.log("✅ [loadAuthFromStorage] Encontrado en cookie");
             storedAuth = decoded;
             source = "cookie";
           } catch (e) {
-            console.error("❌ [loadAuthFromStorage] Error decodificando cookie:", e);
+            // Error decodificando cookie, continuar
           }
         }
       }
       
       if (storedAuth) {
-        console.log(`📦 [loadAuthFromStorage] Cargando desde ${source}`);
         const parsed: AuthData = JSON.parse(storedAuth);
-        console.log("✅ [loadAuthFromStorage] Datos parseados:", parsed);
         
         // Restaurar en localStorage si se encontró en otro lugar
         if (source !== "localStorage") {
           localStorage.setItem("aquiles_auth", JSON.stringify(parsed));
-          console.log("💾 [loadAuthFromStorage] Copiado a localStorage");
         }
         
         return parsed;
       }
       
-      console.log("⚠️ [loadAuthFromStorage] No se encontraron datos");
       return null;
     } catch (error) {
-      console.error("❌ [loadAuthFromStorage] Error:", error);
       // Limpiar todos los storages en caso de error
       localStorage.removeItem("aquiles_auth");
       sessionStorage.removeItem("aquiles_auth");

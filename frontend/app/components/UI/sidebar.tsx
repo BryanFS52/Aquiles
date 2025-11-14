@@ -1,7 +1,10 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
+import { useSelector } from 'react-redux';
+import { RootState } from '@redux/store';
+import { useAuth } from '@hooks/useAuth';
 import {
     PiUsersDuotone,
     PiClipboardTextDuotone,
@@ -93,39 +96,39 @@ const getMenuByRole = (role: string | undefined): MenuItem[] => {
 export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
     const [showMenu, setShowMenu] = useState<boolean>(false);
     const pathname = usePathname();
-    const [isClientMounted, setIsClientMounted] = useState(false);
-    const [role, setRole] = useState<string>(initialRole || "instructor");
+    const { logout } = useAuth();
+    
+    // Obtener rol del Redux store
+    const { user } = useSelector((state: RootState) => state.auth);
+    const userRole = user?.roles?.[0]?.name || initialRole || "instructor";
 
-    // Inicializar después del montaje del cliente
-    useEffect(() => {
-        setIsClientMounted(true);
-        
-        // Cargar rol desde localStorage solo después del montaje
-        const savedRole = localStorage.getItem("sidebar-role");
-        if (savedRole) {
-            setRole(savedRole);
-        }
-    }, []);
+    // Normalizar rol
+    const getRoleKey = (roleName: string): string => {
+        const lower = roleName.toLowerCase();
+        if (lower.includes('coordinador')) return 'coordinador';
+        if (lower.includes('instructor')) return 'instructor';
+        if (lower.includes('aprendiz')) return 'aprendiz';
+        return 'instructor';
+    };
 
-    // 🔹 Guardar rol en localStorage cada vez que cambie (solo en cliente)
-    useEffect(() => {
-        if (isClientMounted) {
-            localStorage.setItem("sidebar-role", role);
-        }
-    }, [role, isClientMounted]);
-
-    const menuItems: MenuItem[] = useMemo(() => getMenuByRole(role), [role]);
+    const roleKey = getRoleKey(userRole);
+    const menuItems: MenuItem[] = useMemo(() => getMenuByRole(roleKey), [roleKey]);
 
     const handleLinkClick = (): void => {
         if (window.innerWidth < 1024) setShowMenu(false);
     };
 
-    const handleRoleChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
-        setRole(event.target.value);
-    };
-
     const toggleMenu = (): void => {
         setShowMenu(!showMenu);
+    };
+
+    const handleLogout = async (): Promise<void> => {
+        try {
+            if (window.innerWidth < 1024) setShowMenu(false);
+            await logout();
+        } catch (error) {
+            console.error("Error al cerrar sesión:", error);
+        }
     };
 
     return (
@@ -161,27 +164,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
                         <span className="text-base lg:text-lg font-bold text-black dark:text-dark-text tracking-wide drop-shadow-md leading-tight">
                             PROYECTOS FORMATIVOS<br />
                             <span className="text-xs lg:text-[13px] text-darkGreen dark:text-blue-300 font-extrabold tracking-widest">
-                                {isClientMounted ? role : (initialRole || "instructor")}
+                                {roleKey.toUpperCase()}
                             </span>
                         </span>
-                    </div>
-
-                    {/* Selector temporal de rol */}
-                    <div className="mb-6 lg:mb-8 flex items-center justify-center">
-                        <div className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-dark-sidebar rounded-xl shadow px-3 lg:px-4 py-2 flex gap-2 items-center text-sm font-semibold text-white backdrop-blur-md border border-white/20">
-                            <span className="font-bold tracking-wide drop-shadow">Rol:</span>
-                            <select
-                                value={isClientMounted ? role : (initialRole || "instructor")}
-                                onChange={handleRoleChange}
-                                className="sidebar-select rounded-lg px-2 lg:px-3 py-1 border-2 border-white/30 
-                            bg-white/90 text-gray-900 dark:bg-dark-card dark:text-dark-text dark:border-dark-border
-                            font-bold shadow text-sm focus:outline-none focus:ring-2 focus:ring-darkGreen/60 transition-all duration-200"
-                            >
-                                <option value="instructor">Instructor</option>
-                                <option value="aprendiz">Aprendiz</option>
-                                <option value="coordinador">Coordinador</option>
-                            </select>
-                        </div>
                     </div>
 
                     {/* Menú dinámico */}
@@ -224,6 +209,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
                             })}
                         </ul>
                     </nav>
+                </div>
+
+                {/* Botón de Logout - Centrado y más grande */}
+                <div className="flex items-center justify-center p-4 lg:p-6 border-t border-darkGreen/10 dark:border-dark-border/20">
+                    <button
+                        onClick={handleLogout}
+                        className="group flex items-center justify-start w-14 h-14 lg:w-16 lg:h-16 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 rounded-full cursor-pointer relative overflow-hidden transition-all duration-200 shadow-lg hover:w-40 lg:hover:w-48 hover:rounded-lg active:translate-x-1 active:translate-y-1 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 dark:focus:ring-offset-dark-sidebar"
+                        title="Cerrar sesión"
+                    >
+                        {/* Icono */}
+                        <div className="flex items-center justify-center w-full transition-all duration-300 group-hover:justify-start group-hover:pl-4">
+                            <svg className="w-5 h-5 lg:w-6 lg:h-6" viewBox="0 0 512 512" fill="white">
+                                <path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path>
+                            </svg>
+                        </div>
+                        
+                        {/* Texto - Aparece en hover */}
+                        <div className="absolute right-6 transform translate-x-full opacity-0 text-white text-lg lg:text-xl font-semibold transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+                            Logout
+                        </div>
+                    </button>
                 </div>
             </aside>
 

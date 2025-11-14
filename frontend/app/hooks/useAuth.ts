@@ -17,6 +17,9 @@ import {
 } from "@redux/slices/cerberos/authSlice";
 import type { User } from "@graphql/generated";
 
+const CERBEROS_URL = process.env.NEXT_PUBLIC_CERBEROS_URL || "http://localhost:3001";
+const AQUILES_URL = process.env.NEXT_PUBLIC_AQUILES_URL || "http://localhost:3000";
+
 interface UseAuthReturn {
   // Estados
   isAuthenticated: boolean;
@@ -121,12 +124,8 @@ export const useAuth = (): UseAuthReturn => {
    * 🔐 Redirigir a login de Cerberos
    */
   const login = useCallback(() => {
-    console.log("🚀 [useAuth] Redirigiendo a Cerberos login...");
-    const cerberoUrl = "http://10.1.163.75:3001";
-    const callbackUrl = "http://10.1.175.79:3000/auth/callback";
-    const loginUrl = `${cerberoUrl}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
-    console.log("🔗 [useAuth] Login URL:", loginUrl);
-    // Redirigir a Cerberos con callback
+    const callbackUrl = `${AQUILES_URL}/auth/callback`;
+    const loginUrl = `${CERBEROS_URL}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
     window.location.href = loginUrl;
   }, []);
 
@@ -135,15 +134,12 @@ export const useAuth = (): UseAuthReturn => {
    */
   const logout = useCallback(async () => {
     try {
-      console.log("🚪 [useAuth] Cerrando sesión...");
       await dispatch(logoutUser()).unwrap();
-      // Redirigir a Cerberos (10.1.163.75:3001)
-      window.location.href = "http://10.1.163.75:3001/auth/login";
+      window.location.href = `${CERBEROS_URL}/auth/login`;
     } catch (error) {
       console.error("❌ [useAuth] Error en logout:", error);
-      // Limpiar sesión local de todas formas
       dispatch(clearAuth());
-      window.location.href = "http://10.1.163.75:3001/auth/login";
+      window.location.href = `${CERBEROS_URL}/auth/login`;
     }
   }, [dispatch]);
 
