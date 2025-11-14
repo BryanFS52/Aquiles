@@ -152,12 +152,21 @@ export const InstructorChecklistContainer: React.FC = () => {
       setEvaluationObservations(evaluation.observations || "");
       setEvaluationRecommendations(evaluation.recommendations || "");
       setEvaluationJudgment(evaluation.valueJudgment || "");
+      
+      // ✅ Cargar el estado isFinalized desde la base de datos
+      if (evaluation.isFinalized !== undefined && evaluation.isFinalized !== null) {
+        setIsFinalSaved(evaluation.isFinalized);
+        console.log("📌 Estado isFinalized cargado desde DB:", evaluation.isFinalized);
+      } else {
+        setIsFinalSaved(false);
+      }
     } else {
       // Limpiar campos si no hay evaluación
       setEvaluationObservations("");
       setEvaluationRecommendations("");
       setEvaluationJudgment("");
       setEvaluationCriteria(null);
+      setIsFinalSaved(false);
     }
   }, [evaluationData]);
 
@@ -369,13 +378,55 @@ export const InstructorChecklistContainer: React.FC = () => {
   };
 
   const handleFinalSave = async () => {
+    if (!selectedChecklist || !selectedTeamScrum?.id || !evaluationData?.evaluationByChecklistAndTeam?.data) {
+      toast.error("❌ Debe existir una evaluación antes de guardar definitivamente");
+      return;
+    }
+
     try {
-      // TODO: Implementar guardado final
-      console.log("Guardando definitivamente...");
+      const evaluation = evaluationData.evaluationByChecklistAndTeam.data;
+      const evaluationId = evaluation.id;
+
+      if (!evaluationId) {
+        toast.error("❌ No se encontró el ID de la evaluación");
+        return;
+      }
+
+      console.log("💾 Guardando definitivamente con isFinalized: true");
+
+      // ✅ Actualizar la evaluación con isFinalized: true en la base de datos
+      const evaluationInput = {
+        observations: evaluationObservations.trim(),
+        recommendations: evaluationRecommendations.trim(),
+        valueJudgment: evaluationJudgment,
+        checklistId: parseInt(selectedChecklist.id as string),
+        teamScrumId: parseInt(selectedTeamScrum.id as string),
+        isFinalized: true // ✅ Marcar como finalizada en la DB
+      };
+
+      await dispatch(updateEvaluation({ 
+        id: parseInt(evaluationId as string), 
+        input: evaluationInput 
+      })).unwrap();
+
+      console.log("✅ Evaluación guardada definitivamente con isFinalized: true");
+      
+      // ✅ Recargar la evaluación desde el servidor para confirmar el cambio
+      await loadEvaluation({
+        variables: {
+          checklistId: parseInt(selectedChecklist.id as string),
+          teamScrumId: parseInt(selectedTeamScrum.id as string)
+        },
+        fetchPolicy: 'network-only' // Forzar datos frescos del servidor
+      });
+
       setIsFinalSaved(true);
       setShowPreview(false);
-    } catch (error) {
-      console.error("Error al guardar:", error);
+      toast.success("Lista de chequeo guardada definitivamente");
+      
+    } catch (error: any) {
+      console.error("❌ Error al guardar definitivamente:", error);
+      toast.error(`❌ Error al guardar: ${error.message || 'Error desconocido'}`);
     }
   };
 
@@ -459,7 +510,8 @@ export const InstructorChecklistContainer: React.FC = () => {
         recommendations: evaluationRecommendations.trim(),
         valueJudgment: evaluationJudgment,
         checklistId: parseInt(selectedChecklist.id as string),
-        teamScrumId: parseInt(selectedTeamScrum.id as string)
+        teamScrumId: parseInt(selectedTeamScrum.id as string),
+        isFinalized: false // ✅ Nueva evaluación siempre empieza sin finalizar
       };
 
       await dispatch(addEvaluation(evaluationInput)).unwrap();
@@ -472,7 +524,8 @@ export const InstructorChecklistContainer: React.FC = () => {
         variables: {
           checklistId: parseInt(selectedChecklist.id as string),
           teamScrumId: parseInt(selectedTeamScrum.id as string)
-        }
+        },
+        fetchPolicy: 'network-only'
       });
       
     } catch (error: any) {
@@ -501,7 +554,8 @@ export const InstructorChecklistContainer: React.FC = () => {
         recommendations: evaluationRecommendations.trim(),
         valueJudgment: evaluationJudgment,
         checklistId: parseInt(selectedChecklist.id as string),
-        teamScrumId: parseInt(selectedTeamScrum.id as string)
+        teamScrumId: parseInt(selectedTeamScrum.id as string),
+        isFinalized: false // ✅ Mantener false al actualizar (solo "Guardar Definitivamente" lo pone en true)
       };
 
       const evaluationId = evaluation.id;

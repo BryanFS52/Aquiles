@@ -15,6 +15,7 @@ export const GET_ALL_EVALUATIONS = gql`
         recommendations
         valueJudgment
         checklistId
+        isFinalized
       }
     }
   }
@@ -32,6 +33,7 @@ export const GET_EVALUATION_BY_ID = gql`
         recommendations
         valueJudgment
         checklistId
+        isFinalized
       }
     }
   }
@@ -83,6 +85,7 @@ export const GET_EVALUATIONS_BY_CHECKLIST = gql`
         valueJudgment
         checklistId
         teamScrumId
+        isFinalized
       }
     }
   }
@@ -101,6 +104,7 @@ export const GET_EVALUATION_BY_CHECKLIST_AND_TEAM = gql`
         valueJudgment
         checklistId
         teamScrumId
+        isFinalized
       }
     }
   }

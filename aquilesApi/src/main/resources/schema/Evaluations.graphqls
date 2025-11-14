@@ -5,6 +5,7 @@ type Evaluation {
     valueJudgment: String
     checklistId: Long
     teamScrumId: Long
+    isFinalized: Boolean
 }
 
 type EvaluationPage {
@@ -30,6 +31,7 @@ input EvaluationDto {
     valueJudgment: String
     checklistId: Long
     teamScrumId: Long
+    isFinalized: Boolean
 }
 
 extend type Query {

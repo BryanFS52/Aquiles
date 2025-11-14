@@ -21,6 +21,8 @@ public class EvaluationDto {
     // @Size(max = 60, message = "El juicio de valor no puede exceder los 60 caracteres")
     private String valueJudgment;
 
+    private Boolean isFinalized;
+
     private String instructorSignature;
     
     // Para recibir el ID del checklist desde el frontend

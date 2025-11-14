@@ -32,6 +32,10 @@ public class Evaluation implements Serializable {
     @Column(name = "value_judgment", nullable = false, length = 60)
     private String valueJudgment;
 
+    @Builder.Default
+    @Column(name = "is_finalized", nullable = false)
+    private Boolean isFinalized = false;
+
     // Relación muchos a uno con Checklist - Múltiples evaluaciones pueden pertenecer al mismo checklist
     // (una por cada team scrum)
     @ManyToOne(cascade = CascadeType.ALL)
