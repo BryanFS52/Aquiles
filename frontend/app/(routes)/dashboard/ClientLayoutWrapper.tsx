@@ -50,9 +50,17 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
     // Cargar autenticación al montar
     useEffect(() => {
         const loadAuth = async () => {
+            console.log('🔍 [ClientLayoutWrapper] Iniciando carga de autenticación...');
             try {
-                await dispatch(loadAuthFromStorage()).unwrap();
+                const result = await dispatch(loadAuthFromStorage()).unwrap();
+                console.log('✅ [ClientLayoutWrapper] Auth cargada:', result ? 'Sí' : 'No');
+
+                if (!result) {
+                    console.warn('⚠️ [ClientLayoutWrapper] No hay datos de auth, redirigiendo...');
+                    throw new Error('No authentication data');
+                }
             } catch (error) {
+                console.error('❌ [ClientLayoutWrapper] Error cargando auth:', error);
                 // Si falla, redirigir a login
                 const callbackUrl = `${AQUILES_URL}/auth/callback`;
                 const loginUrl = `${CERBEROS_URL}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
@@ -62,13 +70,21 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
             }
         };
 
-        loadAuth();
+        // Timeout de seguridad para evitar carga infinita
+        const timeoutId = setTimeout(() => {
+            console.warn('⏰ [ClientLayoutWrapper] Timeout de 10s alcanzado, desbloqueando...');
+            setIsChecking(false);
+        }, 10000);
+
+        loadAuth().finally(() => clearTimeout(timeoutId));
     }, [dispatch]);
 
     // Actualizar usuario cuando authUser cambie
     useEffect(() => {
+        console.log('👤 [ClientLayoutWrapper] authUser cambió:', authUser ? 'Presente' : 'Ausente');
         if (authUser) {
             const mappedUser = mapCerberosUserToContextUser(authUser);
+            console.log('✅ [ClientLayoutWrapper] Usuario mapeado:', mappedUser);
             setUser(mappedUser);
         }
     }, [authUser]);
@@ -101,6 +117,7 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
                     <Loader />
                     <p className="mt-4 text-gray-600">Cargando sesión...</p>
                     <p className="mt-2 text-gray-500 text-sm">Por favor espera...</p>
+                    <p className="mt-2 text-xs text-blue-500">Abre la consola (F12) para ver detalles</p>
                 </div>
             </div>
         );

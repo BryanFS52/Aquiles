@@ -6,6 +6,9 @@ import { AppDispatch, RootState } from "@redux/store";
 import { validateCerberosToken, loadAuthFromStorage } from "@redux/slices/cerberos/authSlice";
 import Loader from "@components/UI/Loader";
 
+const CERBEROS_URL = process.env.NEXT_PUBLIC_CERBEROS_URL || "http://localhost:3001";
+const AQUILES_URL = process.env.NEXT_PUBLIC_AQUILES_URL || "http://localhost:3000";
+
 export default function AuthHandler() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -30,19 +33,19 @@ export default function AuthHandler() {
             console.log("🚀 [AuthHandler] Iniciando procesamiento del callback...");
             console.log("📍 [AuthHandler] URL actual:", window.location.href);
             console.log("🔗 [AuthHandler] Search params:", window.location.search);
-            
+
             setHasAttemptedAuth(true);
 
             try {
                 // PASO 1: Buscar token en la URL
                 const token = searchParams.get("token");
-                
+
                 console.log("🔍 [AuthHandler] Buscando token...");
                 console.log("📦 [AuthHandler] Parámetros disponibles:", Array.from(searchParams.entries()));
-                
+
                 if (token) {
                     console.log("✅ [AuthHandler] Token en URL:", token.substring(0, 30) + "...");
-                    
+
                     // PASO 2: Guardar INMEDIATAMENTE en localStorage
                     const tempAuth = {
                         token,
@@ -52,15 +55,15 @@ export default function AuthHandler() {
                             roles: [{ name: "Usuario" }],
                         },
                     };
-                    
+
                     console.log("💾 [AuthHandler] Guardando en localStorage de Aquiles...");
                     localStorage.setItem("aquiles_auth", JSON.stringify(tempAuth));
                     sessionStorage.setItem("aquiles_auth", JSON.stringify(tempAuth));
-                    
+
                     // Verificar que se guardó
                     const verificacion = localStorage.getItem("aquiles_auth");
                     console.log("🔍 [AuthHandler] localStorage:", verificacion ? "✅ GUARDADO EXITOSAMENTE" : "❌ FALLO");
-                    
+
                     // PASO 3: Intentar validar con backend
                     console.log("📡 [AuthHandler] Validando token con backend...");
                     try {
@@ -71,7 +74,7 @@ export default function AuthHandler() {
                         console.warn("⚠️ [AuthHandler] Backend no pudo validar:", validationError?.message);
                         console.log("✅ [AuthHandler] Pero el token temporal ya está guardado, continuando...");
                     }
-                    
+
                     console.log("✅ [AuthHandler] Procesamiento completado");
                 } else {
                     // No hay token en URL, intentar cargar desde storage existente
@@ -83,7 +86,7 @@ export default function AuthHandler() {
                     }
                     console.log("✅ [AuthHandler] Sesión cargada desde storage");
                 }
-                
+
             } catch (err: any) {
                 console.error("❌ [AuthHandler] Error:", err?.message);
                 setError(err?.message || "Error en autenticación");
@@ -100,13 +103,13 @@ export default function AuthHandler() {
     useEffect(() => {
         if (isAuthenticated && !loading && !isInitializing) {
             console.log("✅ [AuthHandler] Redux state actualizado, redirigiendo...");
-            
+
             // Esperar un poquito para asegurar que el DOM está listo
             const timer = setTimeout(() => {
                 console.log("🚀 [AuthHandler] Redirección final al dashboard");
                 router.push("/dashboard");
             }, 500);
-            
+
             return () => clearTimeout(timer);
         }
     }, [isAuthenticated, loading, isInitializing, router]);
@@ -158,7 +161,9 @@ export default function AuthHandler() {
                                     console.log("🧹 [AuthHandler] Limpiando localStorage y redirigiendo...");
                                     localStorage.clear();
                                     sessionStorage.clear();
-                                    window.location.href = "http://10.1.163.75:3001/auth/login?project=aquiles";
+                                    const callbackUrl = `${AQUILES_URL}/auth/callback`;
+                                    const loginUrl = `${CERBEROS_URL}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
+                                    window.location.href = loginUrl;
                                 }}
                                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                             >
@@ -190,7 +195,9 @@ export default function AuthHandler() {
                     <button
                         onClick={() => {
                             console.log("🔐 [AuthHandler] Redirigiendo manualmente a Cerberos...");
-                            window.location.href = "http://10.1.163.75:3001/auth/login?project=aquiles";
+                            const callbackUrl = `${AQUILES_URL}/auth/callback`;
+                            const loginUrl = `${CERBEROS_URL}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
+                            window.location.href = loginUrl;
                         }}
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                     >

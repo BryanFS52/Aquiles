@@ -13,9 +13,7 @@ const clientLAN = new ApolloClient({
             mode: 'cors',
         },
     }),
-    cache: new InMemoryCache({
-        addTypename: false
-    }),
+    cache: new InMemoryCache(),
     defaultOptions: {
         watchQuery: {
             fetchPolicy: 'no-cache',

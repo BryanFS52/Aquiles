@@ -1,4 +1,3 @@
-/*
 import { gql } from "@apollo/client";
 
 export const GET_ALL_CHECKLISTS = gql`
@@ -229,4 +228,3 @@ export const DELETE_CHECKLIST = gql`
     }
   }
 `;
-*/

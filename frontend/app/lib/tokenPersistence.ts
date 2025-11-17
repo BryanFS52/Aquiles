@@ -2,7 +2,7 @@
  * 🔐 TOKEN PERSISTENCE UTILITY
  * ═════════════════════════════════════════════════
  * Maneja la persistencia de tokens entre dominios
- * Cerberos (10.1.163.75:3001) → Aquiles (10.1.175.79:3000)
+ * Cerberos (SSO) → Aquiles
  */
 
 export interface AuthData {
@@ -44,10 +44,10 @@ export const saveTokenToAquiles = (token: string, source: string = "manual"): bo
 
     // Guardar objeto completo
     localStorage.setItem("aquiles_auth", JSON.stringify(authData));
-    
+
     // Guardar token como string también (backup)
     localStorage.setItem("aquiles_token", token);
-    
+
     // Guardar timestamp
     localStorage.setItem("aquiles_auth_timestamp", Date.now().toString());
 
