@@ -1,7 +1,6 @@
 package com.api.aquilesApi.Business;
 
 import com.api.aquilesApi.Dto.ChecklistHistoryDto;
-import com.api.aquilesApi.Entity.Checklist;
 import com.api.aquilesApi.Entity.ChecklistHistory;
 import com.api.aquilesApi.Service.ChecklistHistoryService;
 import com.api.aquilesApi.Utilities.CustomException;
@@ -40,12 +39,12 @@ public class  ChecklistHistoryBusiness {
             history.setTeacher(teacher);
 
             if (antes != null) {
-                ChecklistHistoryDto dtoAntes = convertir(antes);
+                ChecklistHistoryDto dtoAntes = ChecklistHistoryMap.INSTANCE.checklistToHistoryDto(antes);
                 history.setDateBefore(objectMapper.writeValueAsString(dtoAntes));
             }
 
             if (despues != null) {
-                ChecklistHistoryDto dtoDespues = convertir(despues);
+                ChecklistHistoryDto dtoDespues = ChecklistHistoryMap.INSTANCE.checklistToHistoryDto(despues);
                 history.setDateAfter(objectMapper.writeValueAsString(dtoDespues));
             }
 
@@ -57,10 +56,6 @@ public class  ChecklistHistoryBusiness {
         }
     }
 
-    private ChecklistHistoryDto convertir(Checklist checklist) {
-        return ChecklistHistoryMap.INSTANCE.checklistToHistoryDto(checklist);
-    }
-    //validation object
 
 
     // Find all
