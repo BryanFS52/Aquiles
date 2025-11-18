@@ -62,8 +62,6 @@ export const InstructorChecklistContainer: React.FC = () => {
       const studySheetId = localStorage.getItem('selectedStudySheetId');
       const teamScrumId = localStorage.getItem('selectedTeamScrumId');
 
-      console.log("📋 Cargando desde localStorage:", { studySheetId, teamScrumId });
-
       if (studySheetId) {
         try {
           const studySheetResponse = await dispatch(fetchStudySheetWithTeamScrum({ 
@@ -71,11 +69,9 @@ export const InstructorChecklistContainer: React.FC = () => {
           })).unwrap();
           
           if (studySheetResponse?.data) {
-            console.log("✅ Ficha cargada:", studySheetResponse.data);
             setSelectedStudySheet(studySheetResponse.data as StudySheet);
           }
         } catch (error) {
-          console.error("❌ Error al cargar ficha desde localStorage:", error);
           toast.error("Error al cargar la ficha seleccionada");
         }
       }
@@ -83,9 +79,7 @@ export const InstructorChecklistContainer: React.FC = () => {
       if (teamScrumId) {
         try {
           await dispatch(fetchTeamScrumById({ id: teamScrumId }));
-          console.log("✅ Team Scrum cargado");
         } catch (error) {
-          console.error("❌ Error al cargar team scrum desde localStorage:", error);
           toast.error("Error al cargar el Team Scrum seleccionado");
         }
       }
@@ -139,7 +133,7 @@ export const InstructorChecklistContainer: React.FC = () => {
             setItemStates(newItemStates);
           }
         } catch (error) {
-          console.error("Error al cargar calificaciones:", error);
+          // Error al cargar calificaciones
         }
       }
     };
@@ -158,7 +152,6 @@ export const InstructorChecklistContainer: React.FC = () => {
       // ✅ Cargar el estado isFinalized desde la base de datos
       if (evaluation.isFinalized !== undefined && evaluation.isFinalized !== null) {
         setIsFinalSaved(evaluation.isFinalized);
-        console.log("📌 Estado isFinalized cargado desde DB:", evaluation.isFinalized);
       } else {
         setIsFinalSaved(false);
       }
@@ -176,13 +169,9 @@ export const InstructorChecklistContainer: React.FC = () => {
   const checklistsForStudySheet = useMemo(() => {
     if (!selectedStudySheet?.id) return checklists;
     
-    console.log("🔍 Filtrando listas de chequeo para la ficha:", selectedStudySheet.id);
-    console.log("📋 Total de listas disponibles:", checklists.length);
-    
     const filtered = checklists.filter((checklist: Checklist) => {
       // Verificar si la lista tiene fichas asociadas
       if (!checklist.studySheets || checklist.studySheets.length === 0) {
-        console.log(`❌ Lista ${checklist.id} sin fichas asociadas`);
         return false;
       }
       
@@ -190,17 +179,9 @@ export const InstructorChecklistContainer: React.FC = () => {
       const studySheetIds = checklist.studySheets.split(',').map(id => id.trim());
       const isMatch = studySheetIds.includes(selectedStudySheet?.id?.toString() || '');
       
-      console.log(`${isMatch ? '✅' : '⏭️'} Lista ${checklist.id} (${checklist.component || checklist.remarks}):`, {
-        studySheets: checklist.studySheets,
-        studySheetIds,
-        buscando: selectedStudySheet.id,
-        coincide: isMatch
-      });
-      
       return isMatch;
     });
     
-    console.log("✅ Listas filtradas para esta ficha:", filtered.length);
     return filtered;
   }, [checklists, selectedStudySheet]);
 
@@ -247,8 +228,6 @@ export const InstructorChecklistContainer: React.FC = () => {
     
     const checklist = checklists.find((c: Checklist) => c.id === checklistId);
     if (checklist) {
-      console.log("🔍 Checklist seleccionado:", checklist);
-      
       setSelectedChecklist(checklist);
       setCurrentPage(1);
       
@@ -308,10 +287,8 @@ export const InstructorChecklistContainer: React.FC = () => {
 
       if (result.data?.saveOrUpdateChecklistQualification?.code === "200") {
         // Guardado exitoso - podemos mostrar un indicador sutil
-        console.log("✅ Calificación guardada automáticamente");
       }
     } catch (error: any) {
-      console.error("Error al guardar calificación:", error);
       toast.error(`Error al guardar: ${error.message || 'Error desconocido'}`);
       
       // Revertir el cambio en caso de error
@@ -337,13 +314,11 @@ export const InstructorChecklistContainer: React.FC = () => {
 
   const handleExportPDF = async () => {
     if (!selectedChecklist) return;
-    console.log("Exportando PDF...");
     // TODO: Implementar exportación PDF
   };
 
   const handleExportExcel = async () => {
     if (!selectedChecklist) return;
-    console.log("Exportando Excel...");
     // TODO: Implementar exportación Excel
   };
 
@@ -394,8 +369,6 @@ export const InstructorChecklistContainer: React.FC = () => {
         return;
       }
 
-      console.log("💾 Guardando definitivamente con isFinalized: true");
-
       // ✅ Actualizar la evaluación con isFinalized: true en la base de datos
       const evaluationInput = {
         observations: evaluationObservations.trim(),
@@ -410,8 +383,6 @@ export const InstructorChecklistContainer: React.FC = () => {
         id: parseInt(evaluationId as string), 
         input: evaluationInput 
       })).unwrap();
-
-      console.log("✅ Evaluación guardada definitivamente con isFinalized: true");
       
       // ✅ Recargar la evaluación desde el servidor para confirmar el cambio
       await loadEvaluation({
@@ -427,7 +398,6 @@ export const InstructorChecklistContainer: React.FC = () => {
       toast.success("Lista de chequeo guardada definitivamente");
       
     } catch (error: any) {
-      console.error("❌ Error al guardar definitivamente:", error);
       toast.error(`❌ Error al guardar: ${error.message || 'Error desconocido'}`);
     }
   };
@@ -446,8 +416,6 @@ export const InstructorChecklistContainer: React.FC = () => {
 
   // Datos dinámicos basados en la selección actual
   const getStudySheetInfo = () => {
-    console.log("📊 getStudySheetInfo - selectedStudySheet:", selectedStudySheet);
-    
     if (!selectedStudySheet) {
       return {
         fichaNumber: "No disponible",
@@ -466,13 +434,10 @@ export const InstructorChecklistContainer: React.FC = () => {
       programa: selectedStudySheet.trainingProject?.name || "No disponible"
     };
 
-    console.log("📊 Información de la ficha:", info);
     return info;
   };
 
   const getTeamScrumInfo = () => {
-    console.log("👥 getTeamScrumInfo - selectedTeamScrum:", selectedTeamScrum);
-    
     if (!selectedTeamScrum) {
       return {
         teamName: "No seleccionado",
@@ -485,7 +450,6 @@ export const InstructorChecklistContainer: React.FC = () => {
       projectName: selectedTeamScrum.projectName || selectedChecklist?.trainingProjectName || "Sin proyecto"
     };
 
-    console.log("👥 Información del Team Scrum:", info);
     return info;
   };
 
@@ -543,7 +507,6 @@ export const InstructorChecklistContainer: React.FC = () => {
       });
       
     } catch (error: any) {
-      console.error("Error al crear evaluación:", error);
       toast.error(`❌ Error al crear la evaluación: ${error.message || 'Error desconocido'}`);
     } finally {
       setIsCreatingEvaluation(false);
@@ -596,7 +559,6 @@ export const InstructorChecklistContainer: React.FC = () => {
       });
       
     } catch (error: any) {
-      console.error("Error al actualizar evaluación:", error);
       toast.error(`❌ Error al actualizar la evaluación: ${error.message || 'Error desconocido'}`);
     }
   };

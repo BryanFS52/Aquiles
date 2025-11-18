@@ -1,45 +1,52 @@
 package com.api.aquilesApi.Service;
 
+import com.api.aquilesApi.Entity.Checklist;
 import com.api.aquilesApi.Entity.ChecklistHistory;
 import com.api.aquilesApi.Repository.ChecklistHistoryRepository;
+import com.api.aquilesApi.Service.Dao.Idao;
+import com.api.aquilesApi.Utilities.CustomException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Service
-public class ChecklistHistoryService {
+public class ChecklistHistoryService implements Idao<ChecklistHistory, Long> {
 
-    private final ChecklistHistoryRepository historyRepository;
+    private final ChecklistHistoryRepository checklistHistoryRepository;
 
     public ChecklistHistoryService(ChecklistHistoryRepository historyRepository) {
-        this.historyRepository = historyRepository;
+        this.checklistHistoryRepository = historyRepository;
     }
 
-    public Page<ChecklistHistory> findAll(Pageable pageable) {
-        return historyRepository.findAll(pageable);
+    @Override
+    public Page<ChecklistHistory> findAll(PageRequest pageRequest) {
+        return checklistHistoryRepository.findAll(pageRequest);
     }
 
+    @Override
     public ChecklistHistory getById(Long id) {
-        return historyRepository.findById(id).orElseThrow(() -> new RuntimeException("No existe historial con ID: " + id));
+        return checklistHistoryRepository.findById(id)
+                .orElseThrow(() -> new CustomException("CheckListHistory with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
-    public ChecklistHistory add(ChecklistHistory checklistHistory) {
-        return historyRepository.save(checklistHistory);
-    }
+    @Override
+    public void update (ChecklistHistory entity) {checklistHistoryRepository.save(entity);}
 
-    public void update(ChecklistHistory checklistHistory) {
-        if (!historyRepository.existsById(checklistHistory.getId())) {
-            throw new RuntimeException("No se encontró historial con ID: " + checklistHistory.getId());
-        }
-        historyRepository.save(checklistHistory);
-    }
+    @Override
+    public ChecklistHistory save (ChecklistHistory entity) {return checklistHistoryRepository.save(entity);}
 
+    @Override
     public void delete(ChecklistHistory checklistHistory) {
-        historyRepository.delete(checklistHistory);
+        checklistHistoryRepository.delete(checklistHistory);
     }
+
+    @Override
+    public void create(ChecklistHistory entity) {checklistHistoryRepository.save(entity);}
 
     public List<ChecklistHistory> findByChecklistId(Long checklistId) {
-        return historyRepository.findByChecklistId(checklistId);
+        return checklistHistoryRepository.findByChecklistId(checklistId);
     }
 }

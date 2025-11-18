@@ -183,7 +183,6 @@ export default function CrearListaChequeo({
       resetForm()
       onClose()
     } catch (error) {
-      console.error(error)
       // El componente padre maneja los toasts de éxito/error
     }
   }

@@ -72,12 +72,9 @@ export const updateChecklist = createAsyncThunk<UpdateChecklistMutation['updateC
                 mutation: UPDATE_CHECKLIST,
                 variables: { id, input },
             });
-
-            console.log('GraphQL update response:', data);
             
             const res = data?.updateChecklist;
             if (!res || res.code !== '200') {
-                console.log('Update failed with response:', res);
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
             }
             return res;
@@ -101,13 +98,11 @@ export const updateChecklistSignature = createAsyncThunk<UpdateChecklistMutation
             
             const res = data?.updateChecklist;
             if (!res || res.code !== '200') {
-                console.log('Signature update failed with response:', res);
                 return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
             }
 
             return res;
         } catch (error: any) {
-            console.error('Error updating checklist signature:', error);
             return rejectWithValue({ code: '500', message: error.message });
         }
     }

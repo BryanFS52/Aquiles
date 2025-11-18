@@ -69,7 +69,7 @@ export class InstructorChecklistHandlers {
               setEvaluationRecommendations(parsedData.recommendations || "");
               setEvaluationJudgment(parsedData.judgment || "PENDIENTE");
             } catch (error) {
-              console.error("Error parsing local evaluation data:", error);
+              // Error parsing local evaluation data
             }
           }
           
@@ -78,7 +78,7 @@ export class InstructorChecklistHandlers {
               const parsedStates = JSON.parse(localItemStates);
               setItemStates(parsedStates);
             } catch (error) {
-              console.error("Error parsing local item states:", error);
+              // Error parsing local item states
             }
           }
           
@@ -92,7 +92,6 @@ export class InstructorChecklistHandlers {
           }
         }
       } catch (error) {
-        console.error("Error loading checklist details:", error);
         setSelectedChecklist(checklist || null);
         if (checklist) {
           loadExistingSignatures(checklist);
@@ -185,12 +184,10 @@ export class InstructorChecklistHandlers {
       );
       
       if (updateResponse && updateResponse.code === "200") {
-        console.log('✅ Items auto-saved successfully');
-        console.log('💾 Item states saved to localStorage');
         setPendingChanges(false);
       }
     } catch (error) {
-      console.error("Error auto-saving items:", error);
+      // Error auto-saving items
     } finally {
       setIsSavingItems(false);
     }
@@ -267,7 +264,6 @@ export class InstructorChecklistHandlers {
         throw new Error(response?.message || "Error al guardar la evaluación");
       }
     } catch (error: any) {
-      console.error("Error completing evaluation:", error);
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
         toast.error(`❌ Error: ${error.graphQLErrors[0].message}`);
       } else if (error.networkError) {
@@ -374,7 +370,6 @@ export class InstructorChecklistHandlers {
         throw new Error(newEvaluationResult?.message || "Error al crear evaluación");
       }
     } catch (error: any) {
-      console.error('❌ Error creating evaluation from modal:', error);
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
         toast.error(`❌ Error: ${error.graphQLErrors[0].message}`);
       } else if (error.networkError) {
@@ -460,7 +455,6 @@ export class InstructorChecklistHandlers {
       // Implement signature saving logic here
       
     } catch (error) {
-      console.error('Error procesando archivo:', error);
       toast.error("Error al procesar el archivo de imagen");
     }
   };
