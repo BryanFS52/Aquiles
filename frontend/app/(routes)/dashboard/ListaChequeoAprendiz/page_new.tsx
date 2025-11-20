@@ -1,14 +1,15 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLazyQuery } from '@apollo/client';
 import { AppDispatch, RootState } from '@redux/store';
 import { fetchChecklists } from '@redux/slices/checklistSlice';
-import { fetchTeamScrumByIdWithStudents } from '@redux/slices/teamScrumSlice';
+import { fetchStudySheetWithStudents } from '@redux/slices/olympo/studySheetSlice';
 import { GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST } from '@graphql/checklistQualificationGraph';
 import { GET_EVALUATION_BY_CHECKLIST_AND_TEAM } from '@graphql/evaluationsGraph';
-import { clientLAN } from '@lib/apollo-client';
 import PageTitle from "@components/UI/pageTitle";
 import { Calendar, Users, User, Eye, X } from 'lucide-react';
+import { TEMPORAL_APRENDIZ_ID } from '@/temporaryCredential';
 import { toast } from 'react-toastify';
 
 // Interfaz para los items del checklist con sus calificaciones
@@ -46,7 +47,11 @@ export default function AprendizChecklistView() {
   
   // Redux state
   const { data: checklists, loading: loadingChecklists } = useSelector((state: RootState) => state.checklist);
-  const { dataForTeamScrumById } = useSelector((state: RootState) => state.teamScrum);
+  const { dataForStudents: studySheetData } = useSelector((state: RootState) => state.studySheet);
+  
+  // Queries para obtener calificaciones y evaluaciones
+  const [loadQualifications] = useLazyQuery(GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST);
+  const [loadEvaluation] = useLazyQuery(GET_EVALUATION_BY_CHECKLIST_AND_TEAM);
   
   // State management
   const [selectedTrimester, setSelectedTrimester] = useState<string>("todos");
@@ -59,29 +64,44 @@ export default function AprendizChecklistView() {
   const [loading, setLoading] = useState(true);
   
   const itemsPerPage = 5;
-  const teamScrumId = "1"; // ID del team scrum del aprendiz (igual que en TeamScrumAprendizContainer)
   
-  // Obtener el team scrum del aprendiz - REPLICANDO EXACTAMENTE TeamScrumAprendizContainer
+  // Obtener el team scrum del aprendiz desde su ficha
   const studentTeamScrum = useMemo(() => {
-    return dataForTeamScrumById;
-  }, [dataForTeamScrumById]);
+    if (!studySheetData?.studentStudySheets) return null;
+    
+    // Buscar el estudiante actual
+    const currentStudent: any = studySheetData.studentStudySheets.find(
+      (sss: any) => sss.student?.id === TEMPORAL_APRENDIZ_ID
+    );
+    
+    if (!currentStudent) return null;
+    
+    // Obtener el team scrum del estudiante
+    const student = currentStudent.student;
+    const teamScrums = student?.teamScrums || [];
+    return teamScrums.length > 0 ? teamScrums[0] : null;
+  }, [studySheetData]);
 
-  // Cargar el Team Scrum del aprendiz - EXACTAMENTE IGUAL que TeamScrumAprendizContainer
-  useEffect(() => {
-    if (teamScrumId) {
-      dispatch(fetchTeamScrumByIdWithStudents({ id: teamScrumId }));
-    }
-  }, [dispatch, teamScrumId]);
-
-  // Cargar todas las listas de chequeo
+  // Cargar datos iniciales
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         setLoading(true);
+        // Cargar todas las listas de chequeo
         await dispatch(fetchChecklists({ page: 0, size: 100 })).unwrap();
+        
+        // Cargar la ficha con estudiantes para obtener el team scrum del aprendiz
+        // Aquí deberías obtener el studySheetId de alguna manera (contexto, localStorage, etc.)
+        // Por ahora uso un ID temporal, ajusta según tu lógica
+        const studySheetId = localStorage.getItem('selectedStudySheetId');
+        if (studySheetId) {
+          await dispatch(fetchStudySheetWithStudents({ 
+            id: parseInt(studySheetId) 
+          })).unwrap();
+        }
       } catch (error) {
-        console.error("Error cargando listas de chequeo:", error);
-        toast.error("Error al cargar las listas de chequeo");
+        console.error("Error cargando datos iniciales:", error);
+        toast.error("Error al cargar los datos");
       } finally {
         setLoading(false);
       }
@@ -105,13 +125,11 @@ export default function AprendizChecklistView() {
 
           try {
             // Cargar calificaciones de los items
-            const qualificationsResult = await clientLAN.query({
-              query: GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST,
+            const qualificationsResult = await loadQualifications({
               variables: {
                 checklistId: parseInt(checklist.id as string),
                 teamScrumId: parseInt(studentTeamScrum.id as string)
-              },
-              fetchPolicy: 'no-cache'
+              }
             });
 
             const qualifications = qualificationsResult.data?.checklistQualificationsByChecklist || [];
@@ -131,13 +149,11 @@ export default function AprendizChecklistView() {
             });
 
             // Cargar evaluación general
-            const evaluationResult = await clientLAN.query({
-              query: GET_EVALUATION_BY_CHECKLIST_AND_TEAM,
+            const evaluationResult = await loadEvaluation({
               variables: {
                 checklistId: parseInt(checklist.id as string),
                 teamScrumId: parseInt(studentTeamScrum.id as string)
-              },
-              fetchPolicy: 'no-cache'
+              }
             });
 
             const evaluationData = evaluationResult.data?.evaluationByChecklistAndTeam?.data;
@@ -182,7 +198,7 @@ export default function AprendizChecklistView() {
     };
 
     loadEvaluatedChecklists();
-  }, [studentTeamScrum, checklists, dispatch]);
+  }, [studentTeamScrum, checklists, loadQualifications, loadEvaluation]);
 
   // Obtener trimestres y componentes únicos
   const availableTrimesters = useMemo(() => 
@@ -285,19 +301,20 @@ export default function AprendizChecklistView() {
     }
   };
 
-  // Información del estudiante desde el team scrum
+  // Información del estudiante desde studySheetData
   const studentInfo = useMemo(() => {
-    if (!studentTeamScrum?.studySheet) return null;
+    if (!studySheetData) return null;
     
-    const studySheet = studentTeamScrum.studySheet;
+    // studySheetData puede tener una estructura anidada
+    const sheet: any = studySheetData;
     
     return {
       centroFormacion: "Centro de Servicios Financieros",
-      programa: studySheet.trainingProject?.program?.name || "Análisis y Desarrollo de Software",
-      jornada: studySheet.journey?.name || "Diurna",
-      fichaNumber: studySheet.number?.toString() || "Sin número"
+      programa: sheet?.trainingProject?.program?.name || "Análisis y Desarrollo de Software",
+      jornada: sheet?.journey?.name || "Diurna",
+      fichaNumber: sheet?.number?.toString() || "Sin número"
     };
-  }, [studentTeamScrum]);
+  }, [studySheetData]);
 
   if (loading || loadingChecklists) {
     return (
@@ -416,11 +433,11 @@ export default function AprendizChecklistView() {
               </select>
 
               <select
-                className="w-full sm:w-[280px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5cb800] focus:border-transparent transition-all duration-300"
+                className="w-full sm:w-[200px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5cb800] focus:border-transparent transition-all duration-300"
                 value={selectedComponent}
                 onChange={(e) => setSelectedComponent(e.target.value)}
               >
-                <option value="todos">Seleccionar lista de chequeo</option>
+                <option value="todos">Todos los componentes</option>
                 {availableComponents.map((component) => (
                   <option key={component} value={component}>
                     {component}
