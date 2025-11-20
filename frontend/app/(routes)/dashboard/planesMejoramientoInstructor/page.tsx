@@ -9,16 +9,11 @@ import { fetchStudySheetByTeacher } from '@redux/slices/olympo/studySheetSlice';
 import { fetchTeacherCompetencesByStudySheet } from '@redux/slices/improvementPlanSlice';
 import { AppDispatch } from '@redux/store';
 import {StudySheet,StudentStudySheet} from '@graphql/generated';
-import { FiBookOpen, FiCalendar, FiTarget, FiClock, FiEye, FiCreditCard, FiPhone, FiArrowRight, FiMail } from 'react-icons/fi';
+import { FiBookOpen, FiCalendar, FiTarget, FiClock, FiEye, FiCreditCard, FiPhone, FiArrowRight, FiMail, FiUsers } from 'react-icons/fi';
 import { IoPeople } from "react-icons/io5";
 import PageTitle from '@components/UI/pageTitle';
 import EmptyState from '@components/UI/emptyState';
-import {
-    StudySheet,
-    StudentStudySheet,
-} from '@graphql/generated';
-import { FiUsers, FiBookOpen, FiCalendar, FiTarget, FiClock, FiEye, FiCreditCard, FiPhone, FiArrowRight, FiMail } from 'react-icons/fi';
-import { IoPeople } from "react-icons/io5";
+import Modal from '@components/UI/Modal';
 
 // Estilos CSS para line-clamp y select con scroll
 const styles = `
@@ -220,8 +215,8 @@ const PlanMejoramientoInstructor: React.FC = () => {
             console.log('FichaData completo a enviar:', fichaData);
             
             if (validStudents.length > 0) {
-                // Navegación con objeto completo en JSON
-                const url = `./HistorialPlanesMejoramientoInstructor?fichaData=${encodeURIComponent(JSON.stringify(fichaData))}`;
+                // Navegación con studySheetId
+                const url = `./HistorialPlanesMejoramientoInstructor?studySheetId=${fichaData.id}`;
                 
                 console.log('Navegando a:', url);
                 

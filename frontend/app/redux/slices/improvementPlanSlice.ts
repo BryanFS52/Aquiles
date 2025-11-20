@@ -30,11 +30,16 @@ export interface TeacherCompetence {
 const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPlan => {
   return {
     id: graphqlData.id,
+    actNumber: graphqlData.actNumber,
     city: graphqlData.city,
     date: graphqlData.date,
+    startTime: graphqlData.startTime,
+    endTime: graphqlData.endTime,
+    place: graphqlData.place,
     reason: graphqlData.reason,
-    qualification: graphqlData.qualification,
+    objectives: graphqlData.objectives,
     state: graphqlData.state,
+    conclusions: graphqlData.conclusions,
     student: graphqlData.student
       ? {
           id: graphqlData.student.id,
@@ -55,6 +60,18 @@ const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPla
           },
         }
       : null,
+    learningOutcome: graphqlData.learningOutcome
+            ? {
+                    id: graphqlData.learningOutcome.id,
+                    name: graphqlData.learningOutcome.name,
+                }
+            : (graphqlData.teacherCompetence?.competence?.learningOutcome
+                    ? {
+                            id: graphqlData.teacherCompetence.competence.learningOutcome.id,
+                            name: graphqlData.teacherCompetence.competence.learningOutcome.name,
+                        }
+                    : null),
+    improvementPlanFile: graphqlData.improvementPlanFile,
     faultType: graphqlData.faultType
       ? {
           id: graphqlData.faultType.id,
@@ -78,6 +95,7 @@ export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuer
                     page,
                     size,
                     teacherCompetence: teacherCompetence as any,
+                    studySheetId: studySheetId as any,
                 } as any,
                 fetchPolicy: 'no-cache',
             });
@@ -194,6 +212,7 @@ export const fetchTeacherCompetencesByStudySheet = createAsyncThunk<TeacherCompe
                 competence: {
                     id: item.competence.id,
                     name: item.competence.name,
+                    learningOutcome: item.competence.learningOutcome || []
                 },
             })) || [];
             

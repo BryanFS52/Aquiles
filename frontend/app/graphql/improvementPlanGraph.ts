@@ -1,9 +1,9 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 // Queries and Mutations for ImprovementPlan
 export const GET_ALL_IMPROVEMENT_PLANS = gql`
-query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $id: Long) {
-  allImprovementPlans(page: $page, size: $size, teacherCompetence: $teacherCompetence, id: $id) {
+query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $id: Long, $studySheetId: Long) {
+  allImprovementPlans(page: $page, size: $size, teacherCompetence: $teacherCompetence, id: $id, studySheetId: $studySheetId) {
     code
     message
     date
@@ -12,11 +12,16 @@ query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $
     currentPage
     data {
       id
+      actNumber
       city
       date
+      startTime
+      endTime
+      place
       reason
+      objectives
       state
-      qualification
+      conclusions
       student {
         id
         person {
@@ -30,8 +35,14 @@ query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $
         competence {
           id
           name
+          learningOutcome {
+            code
+            id
+            name
+          }
         }
       }
+      improvementPlanFile
       faultType {
         id
         name
@@ -52,8 +63,7 @@ export const GET_IMPROVEMENT_PLAN_BY_ID = gql`
         city
         date
         reason
-        state
-        qualification
+        state        
         student {
           id
           person {

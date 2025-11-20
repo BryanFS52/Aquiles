@@ -52,9 +52,6 @@ public class ImprovementPlan implements Serializable {
     @Column(name = "conclusions", nullable = false)
     private String conclusions;
 
-    @Column(name = "qualification")
-    private Boolean qualification;
-
     // Reference IDs (Gateway)
     @Column (name = "student_id")
     private Long studentId;

@@ -10,7 +10,6 @@ type ImprovementPlan {
     objectives: String
     state: Boolean
     conclusions: String
-    qualification: Boolean
     student: Student
     teacherCompetence: TeacherStudySheet
     learningOutcome: LearningOutcome
@@ -30,7 +29,6 @@ input ImprovementPlanDto {
     objectives: String
     state: Boolean
     conclusions: String
-    qualification: Boolean
     studentId: ID
     teacherCompetence: ID
     learningOutcome: ID
@@ -57,7 +55,7 @@ type ImprovementPlanPageId {
 }
 
 extend type Query {
-    allImprovementPlans(page: Int, size: Int): ImprovementPlanPage
+    allImprovementPlans(page: Int, size: Int, teacherCompetence: Long, id: Long, studySheetId: Long): ImprovementPlanPage
     improvementPlanById(id: Long!): ImprovementPlanPageId
 }
 

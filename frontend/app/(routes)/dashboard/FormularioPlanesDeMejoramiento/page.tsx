@@ -10,8 +10,10 @@ import { fetchFaultTypes } from "@/redux/slices/improvementPlanFaultTypeSlice";
 import { addImprovementPlan, fetchTeacherCompetencesByStudySheet } from "@slice/improvementPlanSlice";
 import { clientLAN } from "@lib/apollo-client";
 import { GET_All_STUDENTS, GET_STUDENT_LIST } from "@graphql/olympo/studentsGraph";
+import { GET_STUDY_SHEET_BY_ID, GET_LEARNING_OUTCOMES_BY_COMPETENCE } from "@graphql/olympo/studySheetGraph";
 import { toast } from "react-toastify";
 import { useLoader } from "@context/LoaderContext";
+import ModalLearningOutcome from "@components/Modals/ModalLearningOutcome";
 
 const FormularioPlanesDeMejoramientoPage =() => {
     const router = useRouter();
@@ -28,7 +30,8 @@ const FormularioPlanesDeMejoramientoPage =() => {
     const [students, setStudents] = useState<any[]>([]); // Cada item tendrá shape: { id: string, person: { name, lastname, document, email } }
     const [studentsLoading, setStudentsLoading] = useState(false);
     const [studentsError, setStudentsError] = useState<string | null>(null);
-    const [fichaData, setFichaData] = useState<any>(null);
+    const [studySheetId, setStudySheetId] = useState<number | null>(null);
+    const [studySheet, setStudySheet] = useState<any>(null);
     const [competencies, setCompetencies] = useState<any[]>([]);
     const [formData, setFormData] = useState({
         // Datos del estudiante
@@ -36,17 +39,26 @@ const FormularioPlanesDeMejoramientoPage =() => {
         studentLastname: '',
         studentDocument: '',
         studentEmail: '',
-        // Datos del plan de mejoramiento
-        reason: '',
+        actNumber: '',
         city: '',
         date: new Date().toISOString().split('T')[0],
+        startTime: '',
+        endTime: '',
+        place: '',
+        reason: '',
+        objectives: '',
+        state: true,
+        conclusions: '',
         teacherCompetenceId: '',
+        learningOutcomeId: '',
         faultTypeId: '',
-        qualification: false,
-        state: true
     });
 
     const [showSuccess, setShowSuccess] = useState(false);
+    const [isModalLearningOutcomeOpen, setIsModalLearningOutcomeOpen] = useState(false);
+    const [selectedCompetenceLearningOutcomes, setSelectedCompetenceLearningOutcomes] = useState<any[]>([]);
+    const [selectedCompetenceName, setSelectedCompetenceName] = useState('');
+    const [loadingLearningOutcomes, setLoadingLearningOutcomes] = useState(false);
 
     // Detectar modo oscuro
     const [isDarkMode, setIsDarkMode] = React.useState(false);
@@ -80,151 +92,91 @@ const FormularioPlanesDeMejoramientoPage =() => {
         return () => observer.disconnect();
     }, []);
 
-    // Parsear los datos de la ficha una sola vez
+    // Obtener el studySheetId de la URL
     useEffect(() => {
-        const fichaDataString = searchParams.get('fichaData');
-        if (fichaDataString) {
-            try {
-                const parsedFichaData = JSON.parse(decodeURIComponent(fichaDataString));
-                setFichaData(parsedFichaData);
-                console.log('fichaData en formulario:', parsedFichaData);
-            } catch (error) {
-                console.error('Error parsing fichaData:', error);
-            }
+        const id = searchParams.get('studySheetId');
+        if (id) {
+            setStudySheetId(parseInt(id, 10));
         }
     }, [searchParams]);
 
-    // Cargar / normalizar estudiantes: origen directo (students/studentStudySheets) o fetch por idStudySheet
+    // Fetch la ficha cuando tengamos studySheetId
+    useEffect(() => {
+        const fetchStudySheet = async () => {
+            if (!studySheetId) return;
+            try {
+                const { data } = await clientLAN.query({
+                    query: GET_STUDY_SHEET_BY_ID,
+                    variables: { id: studySheetId },
+                });
+                setStudySheet(data.studySheetById.data);
+                console.log('studySheet fetched:', data.studySheetById.data);
+            } catch (error) {
+                console.error('Error fetching studySheet:', error);
+            }
+        };
+        fetchStudySheet();
+    }, [studySheetId]);
+
+    // Cargar estudiantes por studySheetId
     useEffect(() => {
         const loadStudents = async () => {
-            if (!fichaData) return;
+            if (!studySheetId) return;
             setStudentsLoading(true);
             setStudentsError(null);
             try {
-                let rawStudents: any[] = [];
-                console.log('Cargando estudiantes desde fichaData:', fichaData);
+                const { data } = await clientLAN.query({
+                    query: GET_All_STUDENTS,
+                    variables: { idStudySheet: studySheetId, page: 0, size: 200 },
+                    fetchPolicy: 'no-cache'
+                });
+                const rawStudents = data?.allStudents?.data || [];
+                console.log('Estudiantes cargados:', rawStudents);
                 
-                // Intentar recuperar estudiantes del objeto fichaData
-                if (fichaData.students && Array.isArray(fichaData.students)) {
-                    console.log('Utilizando students directo del fichaData:', fichaData.students);
-                    rawStudents = fichaData.students;
-                } 
-                else if (fichaData.studentStudySheets && Array.isArray(fichaData.studentStudySheets)) {
-                    console.log('Utilizando studentStudySheets del fichaData:', fichaData.studentStudySheets);
-                    // Este formato viene en la estructura que recibimos del backend
-                    rawStudents = fichaData.studentStudySheets;
-                } 
-                else if (fichaData.fichaNumber || fichaData.number || fichaData.id) {
-                    console.log('Intentando fetch de estudiantes por API');
-                    // Si sólo vienen IDs, intentar fetch por idStudySheet
-                    const idStudySheet = parseInt(fichaData.id || fichaData.fichaNumber || fichaData.number, 10);
-                    if (!isNaN(idStudySheet)) {
-                        const { data } = await clientLAN.query({
-                            query: GET_All_STUDENTS,
-                            variables: { idStudySheet, page: 0, size: 200 },
-                            fetchPolicy: 'no-cache'
-                        });
-                        rawStudents = data?.allStudents?.data || [];
-                        console.log('Datos de estudiantes recibidos por GET_All_STUDENTS:', data?.allStudents);
-                        // Fallback: si vienen studentIds y el fetch por ficha devolvió vacío
-                        if ((!rawStudents || rawStudents.length === 0) && Array.isArray(fichaData.studentIds) && fichaData.studentIds.length > 0) {
-                            try {
-                                const { data: listData } = await clientLAN.query({
-                                    query: GET_STUDENT_LIST,
-                                    fetchPolicy: 'no-cache'
-                                });
-                                const allList = listData?.allStudentList?.data || [];
-                                const wantedIds = new Set(fichaData.studentIds.map((id: any) => String(id)));
-                                rawStudents = allList.filter((st: any) => wantedIds.has(String(st.id)));
-                            } catch (fallbackErr) {
-                                console.warn('Fallback GET_STUDENT_LIST falló:', fallbackErr);
-                            }
-                        }
-                    }
-                }
-
-                const normalized = rawStudents
-                    .filter(Boolean)
-                    .map((item: any) => {
-                        const s = item.student ? item.student : item; // studentStudySheet vs student directo
-                        const person = s.person || {};
-                        return {
-                            id: String(s.id ?? ''),
-                            person: {
-                                name: person.name || '',
-                                lastname: person.lastname || person.lastName || '',
-                                document: person.document || person.documentNumber || '',
-                                email: person.email || ''
-                            }
-                        };
-                    })
-                    .filter(st => st.id);
-
-                setStudents(normalized);
-                if (selectedStudent && !normalized.find(s => s.id === selectedStudent)) {
-                    setSelectedStudent('');
-                }
-            } catch (e) {
-                console.error('Error cargando/normalizando estudiantes:', e);
-                setStudentsError('Error al cargar estudiantes de la ficha');
+                // Normalizar estudiantes
+                const normalizedStudents = rawStudents.map((student: any) => ({
+                    id: student.id,
+                    person: student.person
+                }));
+                setStudents(normalizedStudents);
+            } catch (error) {
+                console.error('Error loading students:', error);
+                setStudentsError('Error al cargar estudiantes');
             } finally {
                 setStudentsLoading(false);
             }
         };
         loadStudents();
-    }, [fichaData, selectedStudent]);
+    }, [studySheetId]);
 
-    // Cargar competencias (si no vienen en fichaData) y tipos de falta
+    // Cargar competencias y tipos de falta
     useEffect(() => {
         const loadInitialData = async () => {
             try {
                 let loadedCompetences: any[] = [];
-                console.log('FichaData completo recibido en formulario:', fichaData);
                 
-                // Primera opción: teacherCompetences es un array directamente disponible
-                if (fichaData?.teacherCompetences && Array.isArray(fichaData.teacherCompetences)) {
-                    console.log('Utilizando teacherCompetences del fichaData directamente:', fichaData.teacherCompetences);
-                    loadedCompetences = fichaData.teacherCompetences;
-                } 
-                // Segunda opción: teacherStudySheets está disponible (formato desde backend)
-                else if (fichaData?.teacherStudySheets && Array.isArray(fichaData.teacherStudySheets)) {
-                    console.log('Transformando teacherStudySheets a formato de competencias:', fichaData.teacherStudySheets);
-                    loadedCompetences = fichaData.teacherStudySheets.map((item: any) => ({
-                        id: item.id,
-                        competence: {
-                            id: item.competence?.id,
-                            name: item.competence?.name
-                        }
-                    })).filter((comp: any) => comp.competence && comp.competence.id);
-                } 
-                // Tercera opción: recuperar desde API
-                else if (fichaData?.fichaNumber || fichaData?.number || fichaData?.id) {
-                    console.log('Intentando fetch de competencias por API');
-                    // Intentar fetch si tenemos número de ficha
-                    const studySheetIdentifier = (fichaData.id || fichaData.fichaNumber || fichaData.number);
+                if (studySheetId) {
+                    console.log('Cargando competencias para studySheetId:', studySheetId);
                     const teacherId = 1; // TODO: reemplazar con user.id si está en contexto
-                    if (studySheetIdentifier) {
-                        try {
-                            const res = await dispatch(fetchTeacherCompetencesByStudySheet({
-                                studySheetId: String(studySheetIdentifier),
-                                teacherId: String(teacherId)
-                            })).unwrap();
-                            loadedCompetences = res || [];
-                            console.log('Respuesta de fetchTeacherCompetencesByStudySheet:', res);
-                        } catch (competenceErr) {
-                            console.warn('No se pudieron cargar competencias vía thunk:', competenceErr);
-                        }
+                    try {
+                        const res = await dispatch(fetchTeacherCompetencesByStudySheet({
+                            studySheetId: String(studySheetId),
+                            teacherId: String(teacherId)
+                        })).unwrap();
+                        loadedCompetences = res || [];
+                        console.log('Competencias cargadas:', res);
+                    } catch (competenceErr) {
+                        console.warn('No se pudieron cargar competencias:', competenceErr);
                     }
                 }
                 
-                console.log('Competencias finales a establecer:', loadedCompetences);
                 setCompetencies(loadedCompetences);
 
                 // Asegurar que se traigan todos los tipos de falta disponibles
                 const faultTypesResult = await dispatch(fetchFaultTypes({ page: 0, size: 100})).unwrap();
                 console.log('Tipos de falta recibidos:', faultTypesResult);
             } catch (error) {
-                console.error('Error al cargar datos iniciales (competencias / tipos falta):', error);
+                console.error('Error al cargar datos iniciales:', error);
                 toast.error('Error al cargar datos iniciales', {
                     position: "top-right",
                     autoClose: 4000,
@@ -232,7 +184,7 @@ const FormularioPlanesDeMejoramientoPage =() => {
             }
         };
         loadInitialData();
-    }, [dispatch, fichaData]);
+    }, [dispatch, studySheetId]);
 
     // Obtener datos del estudiante seleccionado
     const getSelectedStudentData = () => students.find(s => String(s.id) === String(selectedStudent));
@@ -243,6 +195,24 @@ const FormularioPlanesDeMejoramientoPage =() => {
             ...prev,
             [field]: value
         }));
+    };
+
+    // Manejar selección de competencia
+    const handleCompetenceChange = (competenceId: string) => {
+        setFormData(prev => ({
+            ...prev,
+            teacherCompetenceId: competenceId,
+            learningOutcomeId: '' // Reset learning outcome when competence changes
+        }));
+    };
+
+    // Manejar selección de learning outcome
+    const handleLearningOutcomeSelect = (learningOutcomeId: string) => {
+        setFormData(prev => ({
+            ...prev,
+            learningOutcomeId
+        }));
+        setIsModalLearningOutcomeOpen(false);
     };
 
     // Manejar selección de estudiante y rellenar campos automáticamente
@@ -307,8 +277,104 @@ const FormularioPlanesDeMejoramientoPage =() => {
             return;
         }
 
-        if (!formData.reason.trim()) {
-            toast.error('Por favor describe la razón del plan de mejoramiento', {
+        if (!formData.actNumber.trim()) {
+            toast.error('Por favor ingresa el número de acta', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.startTime) {
+            toast.error('Por favor selecciona la hora de inicio', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.endTime) {
+            toast.error('Por favor selecciona la hora de fin', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.place.trim()) {
+            toast.error('Por favor ingresa el lugar', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.actNumber.trim()) {
+            toast.error('Por favor ingresa el número de acta', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.startTime) {
+            toast.error('Por favor ingresa la hora de inicio', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.endTime) {
+            toast.error('Por favor ingresa la hora de fin', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.place.trim()) {
+            toast.error('Por favor ingresa el lugar', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.objectives.trim()) {
+            toast.error('Por favor describe los objetivos del plan de mejoramiento', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.conclusions.trim()) {
+            toast.error('Por favor describe las conclusiones del plan de mejoramiento', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.learningOutcomeId) {
+            toast.error('Por favor selecciona un resultado de aprendizaje', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.objectives.trim()) {
+            toast.error('Por favor describe los objetivos del plan de mejoramiento', {
+                position: "top-right",
+                autoClose: 4000,
+            });
+            return;
+        }
+
+        if (!formData.conclusions.trim()) {
+            toast.error('Por favor describe las conclusiones del plan de mejoramiento', {
                 position: "top-right",
                 autoClose: 4000,
             });
@@ -346,12 +412,18 @@ const FormularioPlanesDeMejoramientoPage =() => {
             const improvementPlanData = {
                 // En GraphQL ID suele mapear a string en TS; el backend lo convierte a Long
                 studentId: String(selectedStudent),
+                actNumber: formData.actNumber,
                 city: formData.city,
                 date: formData.date, // formato "YYYY-MM-DD"
+                startTime: formData.startTime,
+                endTime: formData.endTime,
+                place: formData.place,
                 reason: formData.reason,
+                objectives: formData.objectives,
+                conclusions: formData.conclusions,
                 state: formData.state,
-                qualification: false, // Siempre false ya que no se puede calificar al crear
                 teacherCompetence: String(formData.teacherCompetenceId),
+                learningOutcome: formData.learningOutcomeId ? String(formData.learningOutcomeId) : undefined,
                 faultType: { id: String(formData.faultTypeId) }
             } as const;
 
@@ -364,7 +436,6 @@ const FormularioPlanesDeMejoramientoPage =() => {
             console.log('- studentId (ID):', typeof improvementPlanData.studentId, '=', improvementPlanData.studentId);
             console.log('- teacherCompetence (ID):', typeof improvementPlanData.teacherCompetence, '=', improvementPlanData.teacherCompetence);
             console.log('- faultType.id (ID):', typeof improvementPlanData.faultType.id, '=', improvementPlanData.faultType.id);
-            console.log('- qualification:', typeof improvementPlanData.qualification, '=', improvementPlanData.qualification);
             console.log('- Estudiante seleccionado:', getSelectedStudentData());
             console.log('- Competencias disponibles:', competencies);
             console.log('- Tipos de falta disponibles:', faultTypes);
@@ -423,8 +494,8 @@ const FormularioPlanesDeMejoramientoPage =() => {
                 {/* Header */}
                 <div>
                     <PageTitle onBack={() => router.back()}>
-                        {fichaData
-                            ? `Crear Plan de Mejoramiento - Ficha N° ${fichaData.fichaNumber}`
+                        {studySheet
+                            ? `Crear Plan de Mejoramiento - Ficha N° ${studySheet.number}`
                             : `Formulario De Planes De Mejoramiento`
                         }
                     </PageTitle>
@@ -441,11 +512,11 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                 </div>
 
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    Detalles del Plan de Mejoramiento
+                                         Mejoramiento
                                 </h3>
                             </div>
 
-                            {fichaData ? (
+                            {studySheet ? (
                                 <div className="space-y-4">
                                     {/* Select de estudiantes */}
                                     <div>
@@ -544,7 +615,7 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                         </label>
                                         <select
                                             value={formData.teacherCompetenceId}
-                                            onChange={(e) => handleInputChange('teacherCompetenceId', e.target.value)}
+                                            onChange={(e) => handleCompetenceChange(e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
                                             required
                                             disabled={!competencies || competencies.length === 0}
@@ -587,6 +658,53 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                         </select>
                                     </div>
 
+                                    {/* Resultado de Aprendizaje */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            <FiBook className="w-4 h-4 inline mr-2" />
+                                            Resultado de Aprendizaje
+                                        </label>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={selectedCompetenceLearningOutcomes.find(lo => String(lo.id) === String(formData.learningOutcomeId))?.name || ''}
+                                                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed"
+                                                placeholder="Seleccione una competencia primero..."
+                                                disabled
+                                                readOnly
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={async () => {
+                                                    if (!formData.teacherCompetenceId) return;
+                                                    setLoadingLearningOutcomes(true);
+                                                    try {
+                                                        const selectedComp = competencies.find((comp: any) => String(comp.id) === String(formData.teacherCompetenceId));
+                                                        setSelectedCompetenceName(selectedComp?.competence?.name || 'Competencia');
+                                                        
+                                                        const { data } = await clientLAN.query({
+                                                            query: GET_LEARNING_OUTCOMES_BY_COMPETENCE,
+                                                            variables: { idCompetence: selectedComp?.competence?.id, page: 0, size: 10 }
+                                                        });
+                                                        
+                                                        const learningOutcomes = data?.allLearningOutcomes?.data || [];
+                                                        setSelectedCompetenceLearningOutcomes(learningOutcomes);
+                                                        setIsModalLearningOutcomeOpen(true);
+                                                    } catch (error) {
+                                                        console.error('Error fetching learning outcomes:', error);
+                                                        toast.error('Error al cargar resultados de aprendizaje');
+                                                    } finally {
+                                                        setLoadingLearningOutcomes(false);
+                                                    }
+                                                }}
+                                                disabled={!formData.teacherCompetenceId || loadingLearningOutcomes}
+                                                className="px-4 py-3 bg-primary hover:bg-lightGreen text-white rounded-xl font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {loadingLearningOutcomes ? 'Cargando...' : <FiBook className="w-4 h-4" />}
+                                            </button>
+                                        </div>
+                                    </div>
+
                                     {/* Fecha */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -617,6 +735,68 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                             required
                                         />
                                     </div>
+
+                                    {/* Número de Acta */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            <FiFileText className="w-4 h-4 inline mr-2" />
+                                            Número de Acta
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={formData.actNumber}
+                                            onChange={(e) => handleInputChange('actNumber', e.target.value)}
+                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
+                                            placeholder="Ingrese el número de acta..."
+                                            required
+                                        />
+                                    </div>
+
+                                    {/* Hora de Inicio */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            <FiCalendar className="w-4 h-4 inline mr-2" />
+                                            Hora de Inicio
+                                        </label>
+                                        <input
+                                            type="time"
+                                            value={formData.startTime}
+                                            onChange={(e) => handleInputChange('startTime', e.target.value)}
+                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
+                                            required
+                                        />
+                                    </div>
+
+                                    {/* Hora de Fin */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            <FiCalendar className="w-4 h-4 inline mr-2" />
+                                            Hora de Fin
+                                        </label>
+                                        <input
+                                            type="time"
+                                            value={formData.endTime}
+                                            onChange={(e) => handleInputChange('endTime', e.target.value)}
+                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
+                                            required
+                                        />
+                                    </div>
+
+                                    {/* Lugar */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            <FiMapPin className="w-4 h-4 inline mr-2" />
+                                            Lugar
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={formData.place}
+                                            onChange={(e) => handleInputChange('place', e.target.value)}
+                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
+                                            placeholder="Ingrese el lugar..."
+                                            required
+                                        />
+                                    </div>
                                 </div>
 
                                 {/* Razón */}
@@ -631,6 +811,38 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
                                         rows={4}
                                         placeholder="Describe detalladamente la razón del plan de mejoramiento..."
+                                        required
+                                    />
+                                </div>
+
+                                {/* Objetivos */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <FiStar className="w-4 h-4 inline mr-2" />
+                                        Objetivos
+                                    </label>
+                                    <textarea
+                                        value={formData.objectives}
+                                        onChange={(e) => handleInputChange('objectives', e.target.value)}
+                                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
+                                        rows={4}
+                                        placeholder="Describe los objetivos del plan de mejoramiento..."
+                                        required
+                                    />
+                                </div>
+
+                                {/* Conclusiones */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <FiCheckCircle className="w-4 h-4 inline mr-2" />
+                                        Conclusiones
+                                    </label>
+                                    <textarea
+                                        value={formData.conclusions}
+                                        onChange={(e) => handleInputChange('conclusions', e.target.value)}
+                                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
+                                        rows={4}
+                                        placeholder="Describe las conclusiones del plan de mejoramiento..."
                                         required
                                     />
                                 </div>
@@ -662,6 +874,16 @@ const FormularioPlanesDeMejoramientoPage =() => {
                     </form>
                 </div>
             </div>
+
+            {/* Modal para seleccionar Learning Outcome */}
+            <ModalLearningOutcome
+                isOpen={isModalLearningOutcomeOpen}
+                onClose={() => setIsModalLearningOutcomeOpen(false)}
+                competenceName={selectedCompetenceName}
+                learningOutcomes={selectedCompetenceLearningOutcomes}
+                loading={loadingLearningOutcomes}
+                onSelectLearningOutcome={handleLearningOutcomeSelect}
+            />
         </div>
     );
 }

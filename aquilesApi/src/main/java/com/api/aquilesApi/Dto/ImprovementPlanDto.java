@@ -32,7 +32,6 @@ public class ImprovementPlanDto implements Serializable {
     private String objectives;
     private Boolean state;
     private String conclusions;
-    private Boolean qualification;
 
     // Reference IDs
     private Long studentId;
@@ -41,7 +40,7 @@ public class ImprovementPlanDto implements Serializable {
 
     private byte[] improvementPlanFile;
 
-        // Relations
+    // Relations
     private List<ImprovementPlanActivityDto> improvementPlanActivity;
     private ImprovementPlanFaultTypeDto faultType;
     private ImprovementPlanEvaluationDto improvementPlanEvaluation;

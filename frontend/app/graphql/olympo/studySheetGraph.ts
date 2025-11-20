@@ -275,8 +275,29 @@ query GetTeacherCompetenceByStudySheets($id: Long, $teacherId : Long) {
         competence {
           id
           name
+          learningOutcome {
+            id
+            name
+            description
+            code
+          }
         }
       }
+    }
+  }
+}
+`;
+
+export const GET_LEARNING_OUTCOMES_BY_COMPETENCE = gql`
+query GetLearningOutcomesByCompetence($idCompetence: Long, $page: Int, $size: Int) {
+  allLearningOutcomes(idCompetence: $idCompetence, page: $page, size: $size) {
+    code
+    message
+    data {
+      id
+      name
+      description
+      code
     }
   }
 }

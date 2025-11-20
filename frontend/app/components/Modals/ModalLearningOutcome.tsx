@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { BookOpen, ArrowRight } from "lucide-react";
+import { BookOpen, Check } from "lucide-react";
 import Modal from "@components/UI/Modal";
 
 interface LearningOutcome {
@@ -61,21 +61,18 @@ const ModalLearningOutcome: React.FC<ModalLearningOutcomeProps> = ({
       
       <div className="flex items-center justify-end">
         <span className="text-xs text-primary dark:text-secondary group-hover:translate-x-1 transition-transform duration-200 flex items-center gap-1">
-          Ver justificaciones
-          <ArrowRight className="h-3 w-3" />
+          Seleccionar
+          <Check className="h-3 w-3" />
         </span>
       </div>
     </div>
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} size="lg" title={"Seleccionar Resultado de Aprendizaje"}>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            Resultados de Aprendizaje
-          </h2>
+        {/* Competence info (moved inside modal body; title handled by Modal) */}
+        <div className="pb-1">
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             Competencia: <span className="font-medium">{competenceName}</span>
           </p>
@@ -100,7 +97,7 @@ const ModalLearningOutcome: React.FC<ModalLearningOutcomeProps> = ({
           ) : (
             <>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Selecciona un resultado de aprendizaje para ver las justificaciones asociadas:
+                Selecciona el resultado de aprendizaje relacionado con el plan de mejoramiento:
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
@@ -110,15 +107,7 @@ const ModalLearningOutcome: React.FC<ModalLearningOutcomeProps> = ({
           )}
         </div>
 
-        {/* Footer */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-4 flex justify-end">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
-          >
-            Cancelar
-          </button>
-        </div>
+        {/* Footer removed: no Cancel button as requested */}
       </div>
     </Modal>
   );

@@ -43,6 +43,59 @@ export const fetchFaultTypeById = createAsyncThunk<GetImprovementPlanFaultTypeBy
 
 // export const addFaultType = createAsyncThunk<any, any, {}>(); // Comentado por ahora - se implementará cuando sea necesario
 
+// Helper to normalize GraphQL items to the local ImprovementPlanFaultType shape
+const transformGraphQLToFaultTypeItem = (item: any): ImprovementPlanFaultType => {
+    // Map known fields and spread the rest to preserve additional properties
+    return {
+        id: item.id,
+        name: item.name ?? '',
+        description: item.description ?? '',
+        ...item,
+    } as ImprovementPlanFaultType;
+};
+
+export const addFaultType = createAsyncThunk<
+    AddImprovementPlanFaultTypeMutation['addImprovementPlanFaultType'],
+    AddImprovementPlanFaultTypeMutationVariables
+>(
+    'faultType/add',
+    async (variables) => {
+        const { data } = await clientLAN.mutate<AddImprovementPlanFaultTypeMutation, AddImprovementPlanFaultTypeMutationVariables>({
+            mutation: ADD_FAULT_TYPE,
+            variables,
+        });
+        return data?.addImprovementPlanFaultType as AddImprovementPlanFaultTypeMutation['addImprovementPlanFaultType'];
+    }
+);
+
+export const updateFaultType = createAsyncThunk<
+    UpdateImprovementPlanFaultTypeMutation['updateImprovementPlanFaultType'],
+    UpdateImprovementPlanFaultTypeMutationVariables
+>(
+    'faultType/update',
+    async (variables) => {
+        const { data } = await clientLAN.mutate<UpdateImprovementPlanFaultTypeMutation, UpdateImprovementPlanFaultTypeMutationVariables>({
+            mutation: UPDATE_FAULT_TYPE,
+            variables,
+        });
+        return data?.updateImprovementPlanFaultType as UpdateImprovementPlanFaultTypeMutation['updateImprovementPlanFaultType'];
+    }
+);
+
+export const deleteFaultType = createAsyncThunk<
+    DeleteImprovementPlanFaultTypeMutation['deleteImprovementPlanFaultType'],
+    DeleteImprovementPlanFaultTypeMutationVariables
+>(
+    'faultType/delete',
+    async (variables) => {
+        const { data } = await clientLAN.mutate<DeleteImprovementPlanFaultTypeMutation, DeleteImprovementPlanFaultTypeMutationVariables>({
+            mutation: DELETE_FAULT_TYPE,
+            variables,
+        });
+        return data?.deleteImprovementPlanFaultType as DeleteImprovementPlanFaultTypeMutation['deleteImprovementPlanFaultType'];
+    }
+);
+
 const initialState = createInitialPaginatedState<ImprovementPlanFaultType>();
 
 const faultTypeSlice = createSlice({
@@ -117,17 +170,20 @@ const faultTypeSlice = createSlice({
                 state.error = { code, message };
             })
             // deleteFaultType
-            .addCase(deleteFaultType.fulfilled, (state, action: PayloadAction<string>) => {
-                if (action.payload) {
-                    state.data = state.data.filter((faultType: ImprovementPlanFaultType) => faultType.id !== action.payload);
-                }
-                state.error = null;
-            })
-            .addCase(deleteFaultType.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                const { code, message } = payload || {};
-                state.error = { code, message };
-            });
+                        .addCase(deleteFaultType.fulfilled, (state, action) => {
+                            // action.payload is the mutation result (likely an object with an `id`), so read id safely
+                            const payload = action.payload as DeleteImprovementPlanFaultTypeMutation['deleteImprovementPlanFaultType'] | null | undefined;
+                            const id = payload?.id as string | undefined;
+                            if (id) {
+                                state.data = state.data.filter((faultType: ImprovementPlanFaultType) => faultType.id !== id);
+                            }
+                            state.error = null;
+                        })
+                        .addCase(deleteFaultType.rejected, (state, action) => {
+                            const payload = action.payload as RejectedPayload;
+                            const { code, message } = payload || {};
+                            state.error = { code, message };
+                        });
     }
 });
 

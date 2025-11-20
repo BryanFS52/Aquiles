@@ -1131,7 +1131,6 @@ export type ImprovementPlan = {
   city: Scalars['String']['output'];
   date: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  qualification: Scalars['Boolean']['output'];
   reason: Scalars['String']['output'];
   state: Scalars['Boolean']['output'];
   student?: Maybe<Student>;
@@ -1202,7 +1201,6 @@ export type ImprovementPlanDeliveryPageId = {
 export type ImprovementPlanDto = {
   city: Scalars['String']['input'];
   date: Scalars['String']['input'];
-  qualification: Scalars['Boolean']['input'];
   reason: Scalars['String']['input'];
   state: Scalars['Boolean']['input'];
   studentId: Scalars['ID']['input'];
@@ -5974,14 +5972,14 @@ export type GetAllImprovementPlansQueryVariables = Exact<{
 }>;
 
 
-export type GetAllImprovementPlansQuery = { allImprovementPlans?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, city: string, date: string, reason: string, state: boolean, qualification: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
+export type GetAllImprovementPlansQuery = { allImprovementPlans?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, city: string, date: string, reason: string, state: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
 
 export type GetImprovementPlanByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
 
 
-export type GetImprovementPlanByIdQuery = { improvementPlanById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id: string, city: string, date: string, reason: string, state: boolean, qualification: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null } | null };
+export type GetImprovementPlanByIdQuery = { improvementPlanById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id: string, city: string, date: string, reason: string, state: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null } | null };
 
 export type AddImprovementPlanMutationVariables = Exact<{
   input: ImprovementPlanDto;
@@ -7949,7 +7947,6 @@ export const GetAllImprovementPlansDocument = gql`
       date
       reason
       state
-      qualification
       student {
         id
         person {
@@ -8015,7 +8012,6 @@ export const GetImprovementPlanByIdDocument = gql`
       date
       reason
       state
-      qualification
       student {
         id
         person {
