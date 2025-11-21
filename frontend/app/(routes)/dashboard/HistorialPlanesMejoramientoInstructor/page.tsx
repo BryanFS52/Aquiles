@@ -4,12 +4,11 @@ import React, { useEffect } from "react";
 import PageTitle from "@components/UI/pageTitle";
 import DataTable from "@components/UI/DataTable";
 import type { DataTableColumn } from "@components/UI/DataTable/types";
-import Paginator from "@components/UI/Paginator/Paginator";
 import type { AppDispatch } from "@redux/store"
 import { useDispatch, useSelector } from "react-redux"
 import {fetchImprovementPlans} from "@slice/improvementPlanSlice";
 import { clientLAN } from "@lib/apollo-client";
-import { GET_STUDY_SHEET_BY_ID } from "@graphql/olympo/studySheetGraph";
+import { GET_STUDY_SHEET_BY_ID, GET_LEARNING_OUTCOMES_BY_COMPETENCE } from "@graphql/olympo/studySheetGraph";
 import { FiMapPin, FiCalendar, FiFileText, FiStar, FiBook, FiPlus, FiArrowLeft } from "react-icons/fi";
 import { ImprovementPlan } from "@graphql/generated";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -93,7 +92,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
     }, [studySheet, fichaData, studySheetIdParam]);
     
     // Usar directamente los datos del backend ya filtrados por ficha
-    const improvementPlans = allImprovementPlans || [];
+    const improvementPlans = React.useMemo(() => allImprovementPlans || [], [allImprovementPlans]);
     const fichaNameOrNumber = metaStudySheet?.number ?? studySheet?.number ?? fichaData?.fichaNumber ?? fichaData?.number ?? fichaData?.id ?? '';
     
     // Estado para manejar la página actual (Paginator espera páginas basadas en 1)
@@ -101,6 +100,8 @@ const HistorialPlanesMejoramientoInstructor = () => {
     // const [selectedTeacherCompetenceId, setSelectedTeacherCompetenceId] = React.useState<number | null>(null);
 
     const [isDarkMode, setIsDarkMode] = React.useState(false);
+    // Mapa local de learningOutcomeId -> { name, description }
+    const [learningOutcomeMap, setLearningOutcomeMap] = React.useState<Record<string, { name?: string; description?: string }>>({});
     
     // Función para manejar cambio de página
     const handlePageChange = React.useCallback((newPage: number) => {
@@ -149,6 +150,43 @@ const HistorialPlanesMejoramientoInstructor = () => {
             studySheetId: fichaId
         }));
     }, [dispatch, page, fichaId]);
+
+    // Cuando cambian los planes, obtener los nombres/descripciones de los learning outcomes por competencia
+    useEffect(() => {
+        const fetchOutcomesForCompetences = async () => {
+            try {
+                const plans: any[] = improvementPlans || [];
+                const competenceIds = Array.from(new Set(plans.map(p => p?.teacherCompetence?.competence?.id).filter(Boolean)));
+                if (competenceIds.length === 0) return;
+
+                const map: Record<string, { name?: string; description?: string }> = {};
+
+                await Promise.all(competenceIds.map(async (cid) => {
+                    try {
+                        const { data } = await clientLAN.query({
+                            query: GET_LEARNING_OUTCOMES_BY_COMPETENCE,
+                            variables: { idCompetence: Number(cid), page: 0, size: 5 },
+                            fetchPolicy: 'no-cache'
+                        });
+                        const items = data?.allLearningOutcomes?.data || [];
+                        items.forEach((it: any) => {
+                            if (it?.id) {
+                                map[String(it.id)] = { name: it.name, description: it.description };
+                            }
+                        });
+                    } catch (err) {
+                        console.error('Error al obtener learning outcomes para competence', cid, err);
+                    }
+                }));
+
+                setLearningOutcomeMap(map);
+            } catch (err) {
+                console.error('Error fetching learning outcomes for competences:', err);
+            }
+        };
+
+        fetchOutcomesForCompetences();
+    }, [improvementPlans]);
 
     const formatDate = (dateString: string) => {
         if (!dateString) return 'No especificada';
@@ -206,6 +244,21 @@ const HistorialPlanesMejoramientoInstructor = () => {
                         <span className="text-sm font-medium text-gray-700 dark:text-white">
                             {truncatedName}
                         </span>
+                    </div>
+                );
+            }
+        },
+        {
+            key: 'learningOutcome',
+            header: 'Resultado de Aprendizaje',
+            render: (row) => {
+                const r: any = row;
+                const loId = r.learningOutcome?.id ? String(r.learningOutcome.id) : null;
+                const lo = loId ? learningOutcomeMap[loId] : null;
+                const display = lo?.name || (r.learningOutcome?.id ? `ID ${r.learningOutcome.id}` : 'NO ASIGNADO');
+                return (
+                    <div className="text-sm text-gray-700 dark:text-white truncate" title={lo?.description || display}>
+                        {display.toString().toUpperCase()}
                     </div>
                 );
             }
@@ -400,39 +453,11 @@ const HistorialPlanesMejoramientoInstructor = () => {
                         <FiArrowLeft className="w-4 h-4 mr-1" /> Volver a Fichas
                     </button>
                 )}
-                <div className="mt-4">
-                    <Link href={fichaId ? `./FormularioPlanesDeMejoramiento?studySheetId=${fichaId}` : "./FormularioPlanesDeMejoramiento"}>
-                        <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen shadow-lg">
-                            <FiPlus className="w-4 h-4 mr-2" /> Crear Nuevo Plan de Mejoramiento
-                        </button>
-                    </Link>
-                </div>
+                {/* Botón Crear movido al header de la tabla (ver prop `onAddClick` de DataTable) */}
                 {fichaNameOrNumber && (
                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Mostrando planes de mejoramiento de la ficha N° {fichaNameOrNumber}</p>
                 )}
-                <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                        <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mb-3 mx-auto">
-                            <FiFileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">0</h3>
-                        <p className="text-gray-600 dark:text-gray-300 font-medium">Planes Totales</p>
-                    </div>
-                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                        <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-2xl mb-3 mx-auto">
-                            <FiStar className="w-6 h-6 text-lightGreen dark:text-darkGreen" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">0</h3>
-                        <p className="text-gray-600 dark:text-gray-300 font-medium">Activos</p>
-                    </div>
-                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                        <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-2xl mb-3 mx-auto">
-                            <FiFileText className="w-6 h-6 text-red-600 dark:text-red-400" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">0</h3>
-                        <p className="text-gray-600 dark:text-gray-300 font-medium">Inactivos</p>
-                    </div>
-                </div>
+                {/* Estadísticas eliminadas: se muestran directamente en la tabla */}
                 <div className="text-center py-12">
                     <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-8 border border-lightGray dark:border-grayText">
                         <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full mb-4 mx-auto">
@@ -457,47 +482,9 @@ const HistorialPlanesMejoramientoInstructor = () => {
                         {fichaNameOrNumber ? `Historial - Ficha N° ${fichaNameOrNumber}` : 'Historial De Planes De Mejoramiento'}
                     </PageTitle>
                     {/* Botón debajo del título, con degradado verde */}
-                    <div className="mt-4">
-                        <Link href={fichaId 
-                            ? `./FormularioPlanesDeMejoramiento?studySheetId=${fichaId}`
-                            : "./FormularioPlanesDeMejoramiento"
-                        }>
-                            <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-lightGreen transition-colors duration-200 shadow-lg">
-                                <FiPlus className="w-4 h-4 mr-2" />
-                                Crear Nuevo Plan de Mejoramiento
-                            </button>
-                        </Link>
-                    </div>
+                    {/* Botón Crear movido al header de la tabla (ver prop `onAddClick` de DataTable) */}
                 </div>
-
-                {/* Dashboard Stats */}
-                <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                        <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mb-3 mx-auto">
-                            <FiFileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">{improvementPlans?.length || 0}</h3>
-                        <p className="text-gray-600 dark:text-gray-300 font-medium">Planes Totales (Ficha)</p>
-                    </div>
-                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                        <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-2xl mb-3 mx-auto">
-                            <FiStar className="w-6 h-6 text-lightGreen dark:text-darkGreen" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
-                            {improvementPlans?.filter((plan: ImprovementPlan) => plan.state === true).length || 0}
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-300 font-medium">Activos (página actual)</p>
-                    </div>
-                    <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-5 text-center border border-lightGray dark:border-grayText">
-                        <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-2xl mb-3 mx-auto">
-                            <FiFileText className="w-6 h-6 text-red-600 dark:text-red-400" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-black dark:text-white mb-1">
-                            {improvementPlans?.filter((plan: ImprovementPlan) => plan.state === false).length || 0}
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-300 font-medium">Inactivos (página actual)</p>
-                    </div>
-                </div>
+                
 
                 <DataTable<ImprovementPlan>
                     columns={columns}
@@ -506,19 +493,15 @@ const HistorialPlanesMejoramientoInstructor = () => {
                     filterFunction={filterFunction}
                     className="shadow-lg"
                     isDarkMode={isDarkMode}
+                    onAddClick={() => router.push(fichaId ? `./FormularioPlanesDeMejoramiento?studySheetId=${fichaId}` : "./FormularioPlanesDeMejoramiento")}
+                    addButtonText={"ASIGNAR"}
+                    addButtonClassName={"inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-lightGreen transition-colors duration-200 shadow-lg"}
+                    externalPage={page}
+                    onExternalPageChange={handlePageChange}
+                    externalTotalPages={totalPages}
                 />
                 
-                {/* Paginación externa para manejar paginación del servidor */}
-                {totalPages > 1 && (
-                    <div className="mt-6">
-                        <Paginator
-                            page={page}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                            isDarkMode={isDarkMode}
-                        />
-                    </div>
-                )}
+                {/* Paginación: usar la que provee `DataTable` internamente. */}
                 
 
             </div>

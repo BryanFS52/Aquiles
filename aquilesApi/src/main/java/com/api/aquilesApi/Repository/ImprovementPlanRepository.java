@@ -16,6 +16,8 @@ public interface ImprovementPlanRepository extends JpaRepository<ImprovementPlan
 
     boolean existsByStudentIdAndStateTrue(Long studentId);
 
+    boolean existsByActNumber(String actNumber);
+
     @Query("SELECT ip FROM ImprovementPlan ip WHERE ip.studentId = :studentId")
     List<ImprovementPlan> findAllByStudentId(@Param("studentId") Long studentId);
 

@@ -35,12 +35,12 @@ query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $
         competence {
           id
           name
-          learningOutcome {
-            code
-            id
-            name
-          }
+        
         }
+      }
+      learningOutcome {
+        id
+        
       }
       improvementPlanFile
       faultType {

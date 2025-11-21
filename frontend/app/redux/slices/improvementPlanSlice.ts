@@ -65,12 +65,7 @@ const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPla
                     id: graphqlData.learningOutcome.id,
                     name: graphqlData.learningOutcome.name,
                 }
-            : (graphqlData.teacherCompetence?.competence?.learningOutcome
-                    ? {
-                            id: graphqlData.teacherCompetence.competence.learningOutcome.id,
-                            name: graphqlData.teacherCompetence.competence.learningOutcome.name,
-                        }
-                    : null),
+            : null,
     improvementPlanFile: graphqlData.improvementPlanFile,
     faultType: graphqlData.faultType
       ? {

@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
@@ -57,11 +58,15 @@ public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
 
     @Override
     public void update(ImprovementPlan entity) {
+        entity.setActNumber(generateUniqueActNumber());
         improvementPlanRepository.save(entity);
     }
 
     @Override
     public ImprovementPlan save(ImprovementPlan entity) {
+        if (entity.getActNumber() == null || entity.getActNumber().trim().isEmpty()) {
+            entity.setActNumber(generateUniqueActNumber());
+        }
         return improvementPlanRepository.save(entity);
     }
 
@@ -89,5 +94,23 @@ public class ImprovementPlanService implements Idao<ImprovementPlan, Long> {
 
     public List<ImprovementPlan> findAllByLearningOutcome(Long learningOutcome) {
         return improvementPlanRepository.findAllByLearningOutcome(learningOutcome);
+    }
+
+    private String generateUniqueActNumber() {
+        String actNumber;
+        do {
+            actNumber = "ACT-" + generateRandomAlphanumeric(4);
+        } while (improvementPlanRepository.existsByActNumber(actNumber));
+        return actNumber;
+    }
+
+    private String generateRandomAlphanumeric(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
     }
 }

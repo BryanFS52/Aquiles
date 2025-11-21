@@ -21,6 +21,16 @@ const FormularioPlanesDeMejoramientoPage =() => {
     const dispatch = useDispatch<AppDispatch>();
     const { showLoader, hideLoader } = useLoader();
 
+    // Función para generar actNumber único (temporal, se verificará en backend)
+    const generateActNumber = () => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = 'ACT-';
+        for (let i = 0; i < 4; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    };
+
     // Selectors de Redux
     const { data: faultTypes, loading: faultTypesLoading } = useSelector((state: any) => state.faultType);
 
@@ -39,8 +49,7 @@ const FormularioPlanesDeMejoramientoPage =() => {
         studentLastname: '',
         studentDocument: '',
         studentEmail: '',
-        actNumber: '',
-        city: '',
+        city: 'Bogotá',
         date: new Date().toISOString().split('T')[0],
         startTime: '',
         endTime: '',
@@ -269,22 +278,6 @@ const FormularioPlanesDeMejoramientoPage =() => {
             return;
         }
 
-        if (!formData.city.trim()) {
-            toast.error('Por favor ingresa la ciudad', {
-                position: "top-right",
-                autoClose: 4000,
-            });
-            return;
-        }
-
-        if (!formData.actNumber.trim()) {
-            toast.error('Por favor ingresa el número de acta', {
-                position: "top-right",
-                autoClose: 4000,
-            });
-            return;
-        }
-
         if (!formData.startTime) {
             toast.error('Por favor selecciona la hora de inicio', {
                 position: "top-right",
@@ -303,14 +296,6 @@ const FormularioPlanesDeMejoramientoPage =() => {
 
         if (!formData.place.trim()) {
             toast.error('Por favor ingresa el lugar', {
-                position: "top-right",
-                autoClose: 4000,
-            });
-            return;
-        }
-
-        if (!formData.actNumber.trim()) {
-            toast.error('Por favor ingresa el número de acta', {
                 position: "top-right",
                 autoClose: 4000,
             });
@@ -412,7 +397,6 @@ const FormularioPlanesDeMejoramientoPage =() => {
             const improvementPlanData = {
                 // En GraphQL ID suele mapear a string en TS; el backend lo convierte a Long
                 studentId: String(selectedStudent),
-                actNumber: formData.actNumber,
                 city: formData.city,
                 date: formData.date, // formato "YYYY-MM-DD"
                 startTime: formData.startTime,
@@ -664,7 +648,7 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                             <FiBook className="w-4 h-4 inline mr-2" />
                                             Resultado de Aprendizaje
                                         </label>
-                                        <div className="flex gap-2">
+                                        <div className="flex flex-col sm:flex-row gap-2">
                                             <input
                                                 type="text"
                                                 value={selectedCompetenceLearningOutcomes.find(lo => String(lo.id) === String(formData.learningOutcomeId))?.name || ''}
@@ -698,7 +682,7 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                                     }
                                                 }}
                                                 disabled={!formData.teacherCompetenceId || loadingLearningOutcomes}
-                                                className="px-4 py-3 bg-primary hover:bg-lightGreen text-white rounded-xl font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                className="w-full sm:w-auto px-4 py-3 bg-primary hover:bg-lightGreen text-white rounded-xl font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 {loadingLearningOutcomes ? 'Cargando...' : <FiBook className="w-4 h-4" />}
                                             </button>
@@ -729,26 +713,9 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                         <input
                                             type="text"
                                             value={formData.city}
-                                            onChange={(e) => handleInputChange('city', e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
-                                            placeholder="Ingrese la ciudad..."
-                                            required
-                                        />
-                                    </div>
-
-                                    {/* Número de Acta */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            <FiFileText className="w-4 h-4 inline mr-2" />
-                                            Número de Acta
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={formData.actNumber}
-                                            onChange={(e) => handleInputChange('actNumber', e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
-                                            placeholder="Ingrese el número de acta..."
-                                            required
+                                            readOnly
+                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-100 dark:bg-gray-600 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
+                                            placeholder="Bogotá"
                                         />
                                     </div>
 
@@ -850,11 +817,11 @@ const FormularioPlanesDeMejoramientoPage =() => {
                         )}
 
                         {/* Botones */}
-                        <div className="flex justify-end gap-3 p-6 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-600">
+                        <div className="flex flex-col sm:flex-row justify-end gap-3 p-6 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-600">
                             <button
                                 type="button"
                                 onClick={() => router.back()}
-                                className="inline-flex items-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 font-medium"
+                                className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 font-medium"
                             >
                                 <FiX className="w-4 h-4 mr-2" />
                                 Cancelar
@@ -862,13 +829,13 @@ const FormularioPlanesDeMejoramientoPage =() => {
                             <button
                                 type="submit"
                                 disabled={!selectedStudent}
-                                className={`inline-flex items-center px-6 py-3 bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen text-white rounded-xl font-medium shadow-lg transition-all duration-200 ${!selectedStudent
+                                className={`w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen text-white rounded-xl font-medium shadow-lg transition-all duration-200 ${!selectedStudent
                                     ? 'opacity-50 cursor-not-allowed'
                                     : 'hover:shadow-xl transform hover:-translate-y-0.5'
                                     }`}
                             >
                                 <FiSave className="w-4 h-4 mr-2" />
-                                Guardar Plan de Mejoramiento
+                                Guardar
                             </button>
                         </div>
                     </form>

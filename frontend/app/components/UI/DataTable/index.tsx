@@ -13,11 +13,18 @@ function DataTable<T extends object>({
     filterFunction,
     className = "",
     onAddClick,
+    addButtonText = "Agregar",
+    addButtonClassName = "flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700",
     paginator = Paginator,
+    externalPage,
+    onExternalPageChange,
+    externalTotalPages,
     onSearchChange,
     onRowClick,
 }: DataTableProps<T> & {
     onAddClick?: () => void;
+    addButtonText?: string;
+    addButtonClassName?: string;
     paginator?: React.FC<PaginationProps>;
     onSearchChange?: (search: string) => void;
     onRowClick?: (row: T) => void;
@@ -40,12 +47,22 @@ function DataTable<T extends object>({
     }, [data, filter, filterFunction, onSearchChange]);
 
     // Calcular número total de páginas según el conjunto de datos (remoto o filtrado)
-    const totalPages = Math.ceil((onSearchChange ? data : filteredData).length / pageSize) || 1;
+    const isServerControlled = typeof externalTotalPages === "number";
+
+    const totalPages = isServerControlled
+        ? Math.max(1, externalTotalPages as number)
+        : Math.ceil((onSearchChange ? data : filteredData).length / pageSize) || 1;
+
+    const currentPage = externalPage ?? page;
 
     const paginatedData = useMemo(() => {
+        // Si el paginado está controlado por el servidor, `data` ya contiene
+        // solo los items de la página actual, así que no hacemos slice.
+        if (isServerControlled) return data;
+
         const source = onSearchChange ? data : filteredData;
-        return source.slice((page - 1) * pageSize, page * pageSize);
-    }, [filteredData, page, pageSize, data, onSearchChange]);
+        return source.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    }, [filteredData, currentPage, pageSize, data, onSearchChange, isServerControlled]);
 
     // Si se pasa onSearchChange, hacer debounce y llamar al padre
     useEffect(() => {
@@ -59,7 +76,10 @@ function DataTable<T extends object>({
         };
     }, [filter, onSearchChange]);
 
-    useEffect(() => setPage(1), [filter, data]);
+    useEffect(() => {
+        // Si la paginación es controlada, no modificamos el estado interno.
+        if (externalPage === undefined) setPage(1);
+    }, [filter, data, externalPage]);
 
     // Clases para el contenedor principal
     const containerClasses = isDarkMode
@@ -93,7 +113,11 @@ function DataTable<T extends object>({
 
     const handlePageChange = (newPage: number) => {
         if (newPage < 1 || newPage > totalPages) return;
-        setPage(newPage);
+        if (typeof onExternalPageChange === "function") {
+            onExternalPageChange(newPage);
+        } else {
+            setPage(newPage);
+        }
     };
 
     return (
@@ -119,11 +143,11 @@ function DataTable<T extends object>({
                     {typeof onAddClick === "function" && (
                         <div>
                             <button
-                                className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                                className={addButtonClassName}
                                 onClick={onAddClick}
                             >
                                 <Plus className="h-4 w-4" />
-                                Agregar
+                                {addButtonText}
                             </button>
                         </div>
                     )}
@@ -199,7 +223,7 @@ function DataTable<T extends object>({
             {totalPages > 0 &&
                 paginator &&
                 React.createElement(paginator, {
-                    page,
+                    page: currentPage,
                     totalPages,
                     onPageChange: handlePageChange,
                     isDarkMode,
