@@ -310,20 +310,6 @@ const HistorialPlanesMejoramientoInstructor = () => {
             )
         },
         {
-            key: 'objectives',
-            header: 'Objetivos',
-            render: (row) => (
-                <div className="max-w-xs">
-                    <div 
-                        className="text-sm text-gray-700 dark:text-white truncate cursor-help uppercase" 
-                        title={(row as any).objectives?.toUpperCase()}
-                    >
-                        {((row as any).objectives || 'SIN OBJETIVOS ESPECIFICADOS').toUpperCase()}
-                    </div>
-                </div>
-            )
-        },
-        {
             key: 'state',
             header: 'Estado',
             render: (row) => (
@@ -383,6 +369,20 @@ const HistorialPlanesMejoramientoInstructor = () => {
                     </div>
                 </div>
             )
+        },
+        {
+            key: 'actions',
+            header: 'Acciones',
+            render: (row) => (
+                <div className="flex items-center justify-center">
+                    <button
+                        onClick={() => router.push(`./ActividadPlanesDeMejoramiento?improvementPlanId=${row.id}`)}
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-indigo-600 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 dark:focus:ring-indigo-300 transition-colors duration-200"
+                    >
+                        <FiStar className="w-4 h-4 mr-2" /> ASIGNAR ACTIVIDAD
+                    </button>
+                </div>
+            )
         }
     ];
 
@@ -415,8 +415,8 @@ const HistorialPlanesMejoramientoInstructor = () => {
                 ((row as any).actNumber ? (row as any).actNumber.toString().includes(searchTerm) : false) ||
                 // Búsqueda en place
                 ((row as any).place ? normalizeText((row as any).place).includes(normalizedSearch) : false) ||
-                // Búsqueda en objectives
-                ((row as any).objectives ? normalizeText((row as any).objectives).includes(normalizedSearch) : false)
+                // (Removed objectives search - objectives now live in activities)
+                false
             );
         }
 
@@ -445,19 +445,11 @@ const HistorialPlanesMejoramientoInstructor = () => {
     if (!loading && (!improvementPlans || improvementPlans.length === 0)) {
         return (
             <div className="mx-auto px-4 py-8 space-y-6">
-                <PageTitle>
+                <PageTitle onBack={() => router.back()}>
                     {fichaNameOrNumber ? `Planes de Mejoramiento - Ficha N° ${fichaNameOrNumber}` : `Historial De Planes De Mejoramiento`}
                 </PageTitle>
-                {fichaId && (
-                    <button onClick={() => router.back()} className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-lightGreen mt-2">
-                        <FiArrowLeft className="w-4 h-4 mr-1" /> Volver a Fichas
-                    </button>
-                )}
-                {/* Botón Crear movido al header de la tabla (ver prop `onAddClick` de DataTable) */}
-                {fichaNameOrNumber && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Mostrando planes de mejoramiento de la ficha N° {fichaNameOrNumber}</p>
-                )}
-                {/* Estadísticas eliminadas: se muestran directamente en la tabla */}
+
+                {/* Cuando no hay datos: mostrar boton de asignar para crear el primer plan y un mensaje limpio */}
                 <div className="text-center py-12">
                     <div className="bg-white dark:bg-shadowBlue rounded-2xl shadow-lg p-8 border border-lightGray dark:border-grayText">
                         <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full mb-4 mx-auto">
@@ -467,6 +459,18 @@ const HistorialPlanesMejoramientoInstructor = () => {
                         <p className="text-gray-600 dark:text-gray-400 mb-4">
                             {fichaId ? `No hay planes de mejoramiento registrados para los estudiantes de la ficha N° ${fichaNameOrNumber}.` : 'Aún no hay planes de mejoramiento registrados en el sistema.'}
                         </p>
+
+                        {/** Botón de asignar: solo cuando podemos identificar la ficha (redirige al formulario) */}
+                        {fichaId && (
+                            <div className="mt-4 flex items-center justify-center">
+                                <button
+                                    onClick={() => router.push(fichaId ? `./FormularioPlanesDeMejoramiento?studySheetId=${fichaId}` : './FormularioPlanesDeMejoramiento')}
+                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-lightGreen transition-colors duration-200 shadow-lg"
+                                >
+                                    <FiPlus className="w-4 h-4 mr-2" /> ASIGNAR
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -481,8 +485,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                     <PageTitle  onBack={() => router.back()}>
                         {fichaNameOrNumber ? `Historial - Ficha N° ${fichaNameOrNumber}` : 'Historial De Planes De Mejoramiento'}
                     </PageTitle>
-                    {/* Botón debajo del título, con degradado verde */}
-                    {/* Botón Crear movido al header de la tabla (ver prop `onAddClick` de DataTable) */}
+                    {/* Toolbar removed: assign actions are now per-row in the table to avoid duplicate 'ASIGNAR' buttons */}
                 </div>
                 
 

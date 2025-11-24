@@ -70,6 +70,8 @@ public class ImprovementPlanActivityBusiness {
 
            // Set basic fields
            improvementPlanActivity.setDescription(improvementPlanActivityDto.getDescription());
+           improvementPlanActivity.setObjectives(improvementPlanActivityDto.getObjectives());
+           improvementPlanActivity.setConclusions(improvementPlanActivityDto.getConclusions());
            if (improvementPlanActivityDto.getDeliveryDate() != null) {
                improvementPlanActivity.setDeliveryDate(java.time.LocalDate.parse(improvementPlanActivityDto.getDeliveryDate()));
            }
@@ -116,6 +118,12 @@ public class ImprovementPlanActivityBusiness {
             // Update basic fields
             if (improvementPlanActivityDto.getDescription() != null) {
                 improvementPlanActivity.setDescription(improvementPlanActivityDto.getDescription());
+            }
+            if (improvementPlanActivityDto.getObjectives() != null) {
+                improvementPlanActivity.setObjectives(improvementPlanActivityDto.getObjectives());
+            }
+            if (improvementPlanActivityDto.getConclusions() != null) {
+                improvementPlanActivity.setConclusions(improvementPlanActivityDto.getConclusions());
             }
             if (improvementPlanActivityDto.getDeliveryDate() != null) {
                 improvementPlanActivity.setDeliveryDate(java.time.LocalDate.parse(improvementPlanActivityDto.getDeliveryDate()));

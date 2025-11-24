@@ -24,8 +24,14 @@ public class ImprovementPlanActivity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, columnDefinition = "text")
     private String description;
+
+    @Column(name = "objectives", columnDefinition = "text")
+    private String objectives;
+
+    @Column(name = "conclusions", columnDefinition = "text")
+    private String conclusions;
 
     @Column(name = "delivery_date", nullable = false)
     private LocalDate deliveryDate;

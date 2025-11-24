@@ -55,9 +55,7 @@ const FormularioPlanesDeMejoramientoPage =() => {
         endTime: '',
         place: '',
         reason: '',
-        objectives: '',
         state: true,
-        conclusions: '',
         teacherCompetenceId: '',
         learningOutcomeId: '',
         faultTypeId: '',
@@ -200,10 +198,45 @@ const FormularioPlanesDeMejoramientoPage =() => {
 
     // Manejar cambios en el formulario
     const handleInputChange = (field: string, value: any) => {
+        // Si el formulario aún no tiene hora de inicio/fin, establecerlas al primer cambio
+        if (field !== 'startTime' && field !== 'endTime') {
+            setStartAndEndIfEmpty();
+        }
+
         setFormData(prev => ({
             ...prev,
             [field]: value
         }));
+    };
+
+    // Establecer hora de inicio (ahora) y fin (+1h) si aún no están definidas
+    const setStartAndEndIfEmpty = () => {
+        setFormData(prev => {
+            if (prev.startTime && prev.endTime) return prev;
+            const now = new Date();
+            const pad = (n: number) => String(n).padStart(2, '0');
+            const hh = pad(now.getHours());
+            const mm = pad(now.getMinutes());
+            const start = `${hh}:${mm}`;
+            const later = new Date(now.getTime() + 60 * 60 * 1000);
+            const end = `${pad(later.getHours())}:${pad(later.getMinutes())}`;
+            const today = new Date().toISOString().split('T')[0];
+            return {
+                ...prev,
+                startTime: prev.startTime || start,
+                endTime: prev.endTime || end,
+                date: prev.date || today,
+            };
+        });
+    };
+
+    // Establecer la fecha actual si está vacía
+    const setDateIfEmpty = () => {
+        setFormData(prev => {
+            if (prev.date) return prev;
+            const today = new Date().toISOString().split('T')[0];
+            return { ...prev, date: today };
+        });
     };
 
     // Manejar selección de competencia
@@ -246,6 +279,9 @@ const FormularioPlanesDeMejoramientoPage =() => {
                 studentDocument: student.person?.document || '',
                 studentEmail: student.person?.email || ''
             }));
+            // Registrar hora de inicio y fin al comenzar a diligenciar (si aún no hay)
+            setStartAndEndIfEmpty();
+            setDateIfEmpty();
         }
     };
 
@@ -326,21 +362,6 @@ const FormularioPlanesDeMejoramientoPage =() => {
             return;
         }
 
-        if (!formData.objectives.trim()) {
-            toast.error('Por favor describe los objetivos del plan de mejoramiento', {
-                position: "top-right",
-                autoClose: 4000,
-            });
-            return;
-        }
-
-        if (!formData.conclusions.trim()) {
-            toast.error('Por favor describe las conclusiones del plan de mejoramiento', {
-                position: "top-right",
-                autoClose: 4000,
-            });
-            return;
-        }
 
         if (!formData.learningOutcomeId) {
             toast.error('Por favor selecciona un resultado de aprendizaje', {
@@ -350,21 +371,6 @@ const FormularioPlanesDeMejoramientoPage =() => {
             return;
         }
 
-        if (!formData.objectives.trim()) {
-            toast.error('Por favor describe los objetivos del plan de mejoramiento', {
-                position: "top-right",
-                autoClose: 4000,
-            });
-            return;
-        }
-
-        if (!formData.conclusions.trim()) {
-            toast.error('Por favor describe las conclusiones del plan de mejoramiento', {
-                position: "top-right",
-                autoClose: 4000,
-            });
-            return;
-        }
 
         // Verificaciones adicionales antes de enviar
         if (!selectedStudent || selectedStudent === '') {
@@ -403,8 +409,6 @@ const FormularioPlanesDeMejoramientoPage =() => {
                 endTime: formData.endTime,
                 place: formData.place,
                 reason: formData.reason,
-                objectives: formData.objectives,
-                conclusions: formData.conclusions,
                 state: formData.state,
                 teacherCompetence: String(formData.teacherCompetenceId),
                 learningOutcome: formData.learningOutcomeId ? String(formData.learningOutcomeId) : undefined,
@@ -434,7 +438,13 @@ const FormularioPlanesDeMejoramientoPage =() => {
             });
             setTimeout(() => {
                 setShowSuccess(false);
-                router.back();
+                // Si el backend devolvió el id del plan en result.id, redirigir a la página de actividades
+                const planId = (result && (result as any).id) ? (result as any).id : null;
+                if (planId) {
+                    router.push(`/dashboard/ActividadPlanesDeMejoramiento?planId=${planId}`);
+                } else {
+                    router.back();
+                }
             }, 1500);
         } catch (error) {
             console.error('Error completo:', error);
@@ -540,42 +550,40 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                         )}
                                     </div>
 
-                                    {/* Campos de solo lectura del estudiante */}
-                                    {selectedStudent && (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                                            {/* Documento */}
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                                    <FiFileText className="w-4 h-4 inline mr-2" />
-                                                    Documento
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={formData.studentDocument}    
-                                                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed transition-all duration-200"
-                                                    placeholder="Documento del estudiante..."
-                                                    disabled
-                                                    readOnly
-                                                />
-                                            </div>
-
-                                            {/* Email */}
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                                    <FiUser className="w-4 h-4 inline mr-2" />
-                                                    Email
-                                                </label>
-                                                <input
-                                                    type="email"
-                                                    value={formData.studentEmail}
-                                                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed transition-all duración-200"
-                                                    placeholder="Email del estudiante..."
-                                                    disabled
-                                                    readOnly
-                                                />
-                                            </div>
+                                    {/* Campos de solo lectura del estudiante (siempre visibles) */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                        {/* Documento */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                <FiFileText className="w-4 h-4 inline mr-2" />
+                                                Documento
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={formData.studentDocument}
+                                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed transition-all duration-200"
+                                                placeholder="Documento del estudiante..."
+                                                disabled
+                                                readOnly
+                                            />
                                         </div>
-                                    )}
+
+                                        {/* Email */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                <FiUser className="w-4 h-4 inline mr-2" />
+                                                Email
+                                            </label>
+                                            <input
+                                                type="email"
+                                                value={formData.studentEmail}
+                                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed transition-all duración-200"
+                                                placeholder="Email del estudiante..."
+                                                disabled
+                                                readOnly
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -588,19 +596,18 @@ const FormularioPlanesDeMejoramientoPage =() => {
                         </div>
 
                         {/* Detalles del Plan de Mejoramiento */}
-                        {selectedStudent && (
                             <div className="p-6 space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* Competencia */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             <FiBook className="w-4 h-4 inline mr-2" />
-                                            Competencia
+                                            Competencia <span className="text-red-600">*</span>
                                         </label>
                                         <select
                                             value={formData.teacherCompetenceId}
                                             onChange={(e) => handleCompetenceChange(e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
+                                            className="w-full h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
                                             required
                                             disabled={!competencies || competencies.length === 0}
                                         >
@@ -622,12 +629,12 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             <FiAlertTriangle className="w-4 h-4 inline mr-2" />
-                                            Tipo de Falta
+                                            Tipo de Falta <span className="text-red-600">*</span>
                                         </label>
                                         <select
                                             value={formData.faultTypeId}
                                             onChange={(e) => handleInputChange('faultTypeId', e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
+                                            className="w-full h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
                                             required
                                             disabled={faultTypesLoading}
                                         >
@@ -646,13 +653,13 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             <FiBook className="w-4 h-4 inline mr-2" />
-                                            Resultado de Aprendizaje
+                                            Resultado de Aprendizaje <span className="text-red-600">*</span>
                                         </label>
                                         <div className="flex flex-col sm:flex-row gap-2">
                                             <input
                                                 type="text"
                                                 value={selectedCompetenceLearningOutcomes.find(lo => String(lo.id) === String(formData.learningOutcomeId))?.name || ''}
-                                                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed"
+                                                className="flex-1 h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed"
                                                 placeholder="Seleccione una competencia primero..."
                                                 disabled
                                                 readOnly
@@ -682,7 +689,7 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                                     }
                                                 }}
                                                 disabled={!formData.teacherCompetenceId || loadingLearningOutcomes}
-                                                className="w-full sm:w-auto px-4 py-3 bg-primary hover:bg-lightGreen text-white rounded-xl font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                className="w-full sm:w-auto h-12 px-4 py-3 bg-primary hover:bg-lightGreen text-white rounded-xl font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 {loadingLearningOutcomes ? 'Cargando...' : <FiBook className="w-4 h-4" />}
                                             </button>
@@ -695,13 +702,14 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                             <FiCalendar className="w-4 h-4 inline mr-2" />
                                             Fecha
                                         </label>
-                                        <input
-                                            type="date"
-                                            value={formData.date}
-                                            onChange={(e) => handleInputChange('date', e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
-                                            required
-                                        />
+                                            <input
+                                                type="date"
+                                                value={formData.date}
+                                                className="w-full h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed"
+                                                readOnly
+                                                disabled
+                                                aria-readonly
+                                            />
                                     </div>
 
                                     {/* Ciudad */}
@@ -728,9 +736,10 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                         <input
                                             type="time"
                                             value={formData.startTime}
-                                            onChange={(e) => handleInputChange('startTime', e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
-                                            required
+                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed"
+                                            readOnly
+                                            disabled
+                                            aria-readonly
                                         />
                                     </div>
 
@@ -743,9 +752,10 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                         <input
                                             type="time"
                                             value={formData.endTime}
-                                            onChange={(e) => handleInputChange('endTime', e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
-                                            required
+                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed"
+                                            readOnly
+                                            disabled
+                                            aria-readonly
                                         />
                                     </div>
 
@@ -753,7 +763,7 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             <FiMapPin className="w-4 h-4 inline mr-2" />
-                                            Lugar
+                                            Lugar <span className="text-red-600">*</span>
                                         </label>
                                         <input
                                             type="text"
@@ -768,10 +778,10 @@ const FormularioPlanesDeMejoramientoPage =() => {
 
                                 {/* Razón */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        <FiFileText className="w-4 h-4 inline mr-2" />
-                                        Razón del Plan de Mejoramiento
-                                    </label>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            <FiFileText className="w-4 h-4 inline mr-2" />
+                                            Razón del Plan de Mejoramiento <span className="text-red-600">*</span>
+                                        </label>
                                     <textarea
                                         value={formData.reason}
                                         onChange={(e) => handleInputChange('reason', e.target.value)}
@@ -782,39 +792,8 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                     />
                                 </div>
 
-                                {/* Objetivos */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        <FiStar className="w-4 h-4 inline mr-2" />
-                                        Objetivos
-                                    </label>
-                                    <textarea
-                                        value={formData.objectives}
-                                        onChange={(e) => handleInputChange('objectives', e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
-                                        rows={4}
-                                        placeholder="Describe los objetivos del plan de mejoramiento..."
-                                        required
-                                    />
-                                </div>
-
-                                {/* Conclusiones */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        <FiCheckCircle className="w-4 h-4 inline mr-2" />
-                                        Conclusiones
-                                    </label>
-                                    <textarea
-                                        value={formData.conclusions}
-                                        onChange={(e) => handleInputChange('conclusions', e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
-                                        rows={4}
-                                        placeholder="Describe las conclusiones del plan de mejoramiento..."
-                                        required
-                                    />
-                                </div>
+                                {/* Objetivos y conclusiones movidos a Actividades: campos eliminados del formulario de Plan */}
                             </div>
-                        )}
 
                         {/* Botones */}
                         <div className="flex flex-col sm:flex-row justify-end gap-3 p-6 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-600">

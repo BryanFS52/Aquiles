@@ -1,8 +1,6 @@
 package com.api.aquilesApi.Dto;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -29,9 +27,7 @@ public class ImprovementPlanDto implements Serializable {
     private String endTime;
     private String place;
     private String reason;
-    private String objectives;
     private Boolean state;
-    private String conclusions;
 
     // Reference IDs
     private Long studentId;

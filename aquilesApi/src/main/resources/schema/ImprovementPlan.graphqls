@@ -7,9 +7,7 @@ type ImprovementPlan {
     endTime: String
     place: String
     reason: String
-    objectives: String
     state: Boolean
-    conclusions: String
     student: Student
     teacherCompetence: TeacherStudySheet
     learningOutcome: LearningOutcome
@@ -26,9 +24,7 @@ input ImprovementPlanDto {
     endTime: String
     place: String
     reason: String
-    objectives: String
     state: Boolean
-    conclusions: String
     studentId: ID
     teacherCompetence: ID
     learningOutcome: ID

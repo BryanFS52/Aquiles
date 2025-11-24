@@ -19,9 +19,8 @@ query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $
       endTime
       place
       reason
-      objectives
       state
-      conclusions
+      
       student {
         id
         person {
@@ -87,6 +86,7 @@ export const GET_IMPROVEMENT_PLAN_BY_ID = gql`
 export const ADD_IMPROVEMENT_PLAN = gql`
   mutation AddImprovementPlan($input: ImprovementPlanDto!) {
     addImprovementPlan(input: $input) {
+      id
       code
       message
     }

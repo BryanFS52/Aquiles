@@ -37,9 +37,7 @@ const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPla
     endTime: graphqlData.endTime,
     place: graphqlData.place,
     reason: graphqlData.reason,
-    objectives: graphqlData.objectives,
     state: graphqlData.state,
-    conclusions: graphqlData.conclusions,
     student: graphqlData.student
       ? {
           id: graphqlData.student.id,

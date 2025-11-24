@@ -2,6 +2,8 @@ type ImprovementPlanActivity {
     id: ID!
     description: String
     deliveryDate: String
+    objectives: String
+    conclusions: String
     improvementPlan: ImprovementPlan
     improvementPlanDelivery: ImprovementPlanDelivery
     evidenceTypes: [ImprovementPlanEvidenceType]
@@ -10,6 +12,8 @@ type ImprovementPlanActivity {
 input ImprovementPlanActivityDto {
     description: String
     deliveryDate: String
+    objectives: String
+    conclusions: String
     improvementPlan: ImprovementPlanDto
     improvementPlanDelivery: ImprovementPlanDeliveryDto
     evidenceTypes: [ImprovementPlanEvidenceTypeDto]
@@ -33,7 +37,7 @@ type ImprovementPlanActivityPageId {
 }
 
 extend type Query {
-    allImprovementPlanActivities(page: Int, size: Int): ImprovementPlanActivityPage
+    allImprovementPlanActivities(page: Int, size: Int, id: Long,): ImprovementPlanActivityPage
     improvementPlanActivityById(id: Long!): ImprovementPlanActivityPageId
 }
 

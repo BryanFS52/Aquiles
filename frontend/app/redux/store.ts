@@ -16,6 +16,7 @@ import teamScrumReducer from "@slice/teamScrumSlice"
 import processMethodologiesReducer from "@slice/atlas/processMethodologiesSlice";
 import profileReducer from "@slice/atlas/profileSlice";
 import improvementPlanReducer from "@redux/slices/improvementPlanSlice"
+import improvementPlanActivityReducer from "@redux/slices/improvementPlanActivitySlice"
 import noveltyReducer from "@slice/themis/noveltySlice";
 import noveltyTypeReducer from "@slice/themis/noveltyTypeSlice";
 import coordinationReducer from "@slice/olympo/coordinationSlice";
@@ -42,6 +43,7 @@ const store = configureStore({
         generateQr: generateQrReducer,
         sendEmail: sendEmailReducer,
         improvementPlan: improvementPlanReducer,
+        improvementPlanActivity: improvementPlanActivityReducer,
         novelty: noveltyReducer,
         noveltyType: noveltyTypeReducer,
         coordination: coordinationReducer,

@@ -48,7 +48,8 @@ const transformGraphQLToFaultTypeItem = (item: any): ImprovementPlanFaultType =>
     // Map known fields and spread the rest to preserve additional properties
     return {
         id: item.id,
-        name: item.name ?? '',
+        // Accept both backend variants: prefer `name` if present, fall back to `faulType`
+            name: item.name ?? item.faulType ?? '',
         description: item.description ?? '',
         ...item,
     } as ImprovementPlanFaultType;
@@ -141,7 +142,10 @@ const faultTypeSlice = createSlice({
             .addCase(fetchFaultTypeById.fulfilled, (state, action: PayloadAction<GetImprovementPlanFaultTypeByIdQuery['improvementPlanFaultTypeById']>) => {
                 const payload = action.payload;
                 if (payload?.data) {
-                    state.data = [payload.data].filter((item): item is NonNullable<typeof item> => item !== null) as ImprovementPlanFaultType[];
+                    // Normalize the single item using the same transformer
+                    const item = payload.data;
+                    const mapped = transformGraphQLToFaultTypeItem(item);
+                    state.data = [mapped];
                 }
                 state.loading = false;
             })
