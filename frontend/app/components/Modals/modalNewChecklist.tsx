@@ -154,7 +154,7 @@ export default function CrearListaChequeo({
         code: `TEC-${index + 1}`,
         indicator: item.indicador,
         active: true,
-        itemTypeId: 3 // ID del tipo "Técnico"
+        itemTypeId: 2 // ID del tipo "Técnico"
       })),
       ...indicadoresActitudinales.map((item, index) => ({
         code: `ACT-${index + 1}`,
