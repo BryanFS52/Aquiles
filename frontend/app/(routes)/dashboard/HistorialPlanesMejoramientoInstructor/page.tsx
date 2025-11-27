@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux"
 import {fetchImprovementPlans} from "@slice/improvementPlanSlice";
 import { clientLAN } from "@lib/apollo-client";
 import { GET_STUDY_SHEET_BY_ID, GET_LEARNING_OUTCOMES_BY_COMPETENCE } from "@graphql/olympo/studySheetGraph";
-import { FiMapPin, FiCalendar, FiFileText, FiStar, FiBook, FiPlus, FiArrowLeft } from "react-icons/fi";
+import { FiMapPin, FiCalendar, FiFileText, FiStar, FiPlus, FiArrowLeft } from "react-icons/fi";
 import { ImprovementPlan } from "@graphql/generated";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -229,40 +229,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                 </div>
             )
         },
-        {
-            key: 'teacherCompetence',
-            header: 'Competencia',
-            render: (row) => {
-                const competenceName = (row.teacherCompetence?.competence?.name || 'NO ESPECIFICADA').toUpperCase();
-                const truncatedName = competenceName.length > 50 
-                    ? competenceName.substring(0, 50) + '...' 
-                    : competenceName;
-                
-                return (
-                    <div className="flex items-center gap-2 whitespace-nowrap" title={competenceName}>
-                        <FiBook className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                        <span className="text-sm font-medium text-gray-700 dark:text-white">
-                            {truncatedName}
-                        </span>
-                    </div>
-                );
-            }
-        },
-        {
-            key: 'learningOutcome',
-            header: 'Resultado de Aprendizaje',
-            render: (row) => {
-                const r: any = row;
-                const loId = r.learningOutcome?.id ? String(r.learningOutcome.id) : null;
-                const lo = loId ? learningOutcomeMap[loId] : null;
-                const display = lo?.name || (r.learningOutcome?.id ? `ID ${r.learningOutcome.id}` : 'NO ASIGNADO');
-                return (
-                    <div className="text-sm text-gray-700 dark:text-white truncate" title={lo?.description || display}>
-                        {display.toString().toUpperCase()}
-                    </div>
-                );
-            }
-        },
+        
         {
             key: 'date',
             header: 'Fecha',
@@ -283,28 +250,6 @@ const HistorialPlanesMejoramientoInstructor = () => {
                     <FiMapPin className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                     <span className="text-sm text-gray-700 dark:text-white uppercase">
                         {(row.city || 'NO ESPECIFICADA').toUpperCase()}
-                    </span>
-                </div>
-            )
-        },
-        {
-            key: 'actNumber',
-            header: 'N° Acta',
-            render: (row) => (
-                <div className="text-center">
-                    <span className="text-sm font-medium text-gray-700 dark:text-white">
-                        {(row as any).actNumber || 'Sin número'}
-                    </span>
-                </div>
-            )
-        },
-        {
-            key: 'place',
-            header: 'Lugar',
-            render: (row) => (
-                <div className="text-center">
-                    <span className="text-sm font-medium text-gray-700 dark:text-white uppercase">
-                        {(row as any).place || 'Sin lugar'}
                     </span>
                 </div>
             )
@@ -355,21 +300,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                 );
             }
         },
-        {
-            key: 'reason',
-            header: 'Razón',
-            render: (row) => (
-                <div className="max-w-xs">
-                    <div 
-                        className="text-sm text-gray-700 dark:text-white truncate cursor-help uppercase" 
-                        title={row.reason?.toUpperCase()}
-                    >
-                        <FiFileText className="w-4 h-4 inline mr-1 text-gray-500 dark:text-gray-400" />
-                        {(row.reason || 'SIN RAZÓN ESPECIFICADA').toUpperCase()}
-                    </div>
-                </div>
-            )
-        },
+        
         {
             key: 'actions',
             header: 'Acciones',
@@ -379,7 +310,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                         onClick={() => router.push(`./ActividadPlanesDeMejoramiento?improvementPlanId=${row.id}`)}
                         className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-indigo-600 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 dark:focus:ring-indigo-300 transition-colors duration-200"
                     >
-                        <FiStar className="w-4 h-4 mr-2" /> ASIGNAR ACTIVIDAD
+                        <FiPlus className="w-4 h-4 mr-2" /> ACTIVIDAD
                     </button>
                 </div>
             )
@@ -398,12 +329,8 @@ const HistorialPlanesMejoramientoInstructor = () => {
                 (row.student?.person?.name ? normalizeText(row.student.person.name).includes(normalizedSearch) : false) ||
                 (row.student?.person?.lastname ? normalizeText(row.student.person.lastname).includes(normalizedSearch) : false) ||
                 (row.student?.person?.document ? row.student.person.document.includes(searchTerm) : false) ||
-                // Búsqueda en competencia
-                (row.teacherCompetence?.competence?.name ? normalizeText(row.teacherCompetence.competence.name).includes(normalizedSearch) : false) ||
                 // Búsqueda en ciudad
                 (row.city ? normalizeText(row.city).includes(normalizedSearch) : false) ||
-                // Búsqueda en razón
-                (row.reason ? normalizeText(row.reason).includes(normalizedSearch) : false) ||
                 // Búsqueda en tipo de falta
                 ((row as any).faultType?.name ? normalizeText((row as any).faultType.name).includes(normalizedSearch) : false) ||
                 // Búsqueda por palabras clave específicas de tipo de falta
@@ -411,10 +338,6 @@ const HistorialPlanesMejoramientoInstructor = () => {
                     (normalizeText((row as any).faultType.name).includes('academica') && normalizedSearch.includes('academica')) ||
                     (normalizeText((row as any).faultType.name).includes('disciplinaria') && normalizedSearch.includes('disciplinaria'))
                 ) : false) ||
-                // Búsqueda en actNumber
-                ((row as any).actNumber ? (row as any).actNumber.toString().includes(searchTerm) : false) ||
-                // Búsqueda en place
-                ((row as any).place ? normalizeText((row as any).place).includes(normalizedSearch) : false) ||
                 // (Removed objectives search - objectives now live in activities)
                 false
             );
