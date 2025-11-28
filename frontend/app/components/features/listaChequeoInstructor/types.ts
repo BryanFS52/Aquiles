@@ -5,7 +5,7 @@ import {
   SimulatedChecklistItem, 
   InstructorChecklistState, 
   ValueJudgment 
-} from "@/types/checklist";
+} from "@type/checklist";
 
 // Base component props interfaces
 export interface InformationCardsProps {
@@ -17,11 +17,11 @@ export interface InformationCardsProps {
 export interface ChecklistTableProps {
   items: SimulatedChecklistItem[];
   currentItems: SimulatedChecklistItem[];
-  itemStates: { [key: number]: { completed: boolean | null, observations: string } };
+  itemStates: { [key: string | number]: { completed: boolean | null, observations: string } };
   currentPage: number;
   totalPages: number;
   isFinalSaved: boolean;
-  onItemChange: (id: number, field: string, value: any) => void;
+  onItemChange: (id: number | string, field: string, value: any) => void;
   onPageChange: (page: number) => void;
 }
 

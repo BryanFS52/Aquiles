@@ -2,15 +2,14 @@ import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/redux/store';
-import { checkListService } from "@redux/slices/checklistSlice";
-import { evaluationService } from "@redux/slices/evaluationSlice";
-import { exportService } from "@redux/slices/exportSlice";
+import { AppDispatch, RootState } from '@redux/store';
+import { evaluationService } from "@slice/evaluationSlice";
+import { exportService } from "@slice/exportSlice";
 import {
   Checklist,
   Evaluation,
   SimulatedChecklistItem,
-} from "@/types/checklist";
+} from "@type/checklist";
 
 export const useInstructorChecklistState = () => {
   const router = useRouter();

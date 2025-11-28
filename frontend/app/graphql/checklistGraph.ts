@@ -257,3 +257,12 @@ export const DELETE_CHECKLIST = gql`
     }
   }
 `;
+
+export const UPDATE_ITEM_STATUS = gql`
+  mutation UpdateItemStatus($itemId: Long!, $active: Boolean!) {
+    updateItemStatus(itemId: $itemId, active: $active) {
+      code
+      message
+    }
+  }
+`;

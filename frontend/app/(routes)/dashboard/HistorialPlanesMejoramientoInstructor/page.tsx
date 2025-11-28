@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import PageTitle from "@components/UI/pageTitle";
 import DataTable from "@components/UI/DataTable";
 import type { DataTableColumn } from "@components/UI/DataTable/types";
@@ -9,12 +9,20 @@ import type { AppDispatch } from "@redux/store"
 import { useDispatch, useSelector } from "react-redux"
 import {fetchImprovementPlans} from "@slice/improvementPlanSlice";
 import { FiMapPin, FiCalendar, FiFileText, FiStar, FiBook, FiPlus, FiArrowLeft } from "react-icons/fi";
-import { ImprovementPlan } from "@graphql/generated";
+import { ImprovementPlan as BaseImprovementPlan } from "@graphql/generated";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@context/UserContext";
 
-const HistorialPlanesMejoramientoInstructor = () => {
+// Extender el tipo para incluir faultType que puede venir del backend
+interface ImprovementPlan extends BaseImprovementPlan {
+  faultType?: {
+    id: string;
+    name: string;
+  } | null;
+}
+
+const HistorialPlanesMejoramientoInstructorContent = () => {
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -500,5 +508,19 @@ const HistorialPlanesMejoramientoInstructor = () => {
         </div>
     );
 }
+
+// Componente principal con Suspense para envolver useSearchParams
+const HistorialPlanesMejoramientoInstructor = () => {
+    return (
+        <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto mb-4"></div>
+                <p className="text-gray-600 dark:text-gray-400">Cargando...</p>
+            </div>
+        </div>}>
+            <HistorialPlanesMejoramientoInstructorContent />
+        </Suspense>
+    );
+};
 
 export default HistorialPlanesMejoramientoInstructor;

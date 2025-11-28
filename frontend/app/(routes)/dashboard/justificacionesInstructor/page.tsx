@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useDispatch } from "react-redux";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardGrid } from "@components/UI/Card";
@@ -20,7 +20,7 @@ interface CompetenceOption {
   teacherStudySheetId?: string;
 }
 
-const JustificacionesInstructorSelector: React.FC = () => {
+const JustificacionesInstructorSelectorContent: React.FC = () => {
   const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch<AppDispatch>();
@@ -202,5 +202,18 @@ const JustificacionesInstructorSelector: React.FC = () => {
     </div>
   );
 }
+
+const JustificacionesInstructorSelector = () => {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto mb-4"></div>
+        <p className="text-gray-600 dark:text-gray-400">Cargando justificaciones...</p>
+      </div>
+    </div>}>
+      <JustificacionesInstructorSelectorContent />
+    </Suspense>
+  );
+};
 
 export default JustificacionesInstructorSelector;

@@ -26,7 +26,12 @@ export interface TeacherCompetence {
     };
 }
 
-export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], GetAllImprovementPlansQueryVariables>(
+// Extender las variables del query para incluir teacherCompetence
+export interface ExtendedImprovementPlansQueryVariables extends GetAllImprovementPlansQueryVariables {
+    teacherCompetence?: any;
+}
+
+export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], ExtendedImprovementPlansQueryVariables>(
     'improvementPlan/fetchAll',
     async ({ page, size, teacherCompetence }) => {
         try {

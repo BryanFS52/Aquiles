@@ -52,7 +52,7 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
               <p className="text-xs font-semibold text-[#5cb800] dark:text-[#5cb800]">Trimestre</p>
               <p className="text-xs text-gray-600 dark:text-gray-300">
-                {selectedChecklist?.trimestre || "Sin trimestre asignado"}
+                {selectedChecklist?.trimester || "Sin trimestre asignado"}
               </p>
             </div>
           </div>

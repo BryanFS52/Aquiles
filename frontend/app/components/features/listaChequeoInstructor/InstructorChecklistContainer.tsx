@@ -43,7 +43,7 @@ export const InstructorChecklistContainer: React.FC = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isFinalSaved, setIsFinalSaved] = useState(false);
-  const [itemStates, setItemStates] = useState<{ [key: number]: { completed: boolean | null, observations: string } }>({});
+  const [itemStates, setItemStates] = useState<{ [key: string | number]: { completed: boolean | null, observations: string } }>({});
 
   // Estados para la evaluación
   const [showEvaluationForm, setShowEvaluationForm] = useState(false);
@@ -209,7 +209,9 @@ export const InstructorChecklistContainer: React.FC = () => {
   const currentItems = useMemo(() => {
     if (!selectedChecklist?.items) return [];
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return selectedChecklist.items.slice(startIndex, startIndex + itemsPerPage);
+    return selectedChecklist.items
+      .filter((item): item is NonNullable<typeof item> => item !== null)
+      .slice(startIndex, startIndex + itemsPerPage);
   }, [selectedChecklist, currentPage, itemsPerPage]);
 
   const totalPages = useMemo(() => {
@@ -248,7 +250,7 @@ export const InstructorChecklistContainer: React.FC = () => {
     }
   };
 
-  const handleItemChange = async (id: number, field: string, value: any) => {
+  const handleItemChange = async (id: number | string, field: string, value: any) => {
     if (isFinalSaved) return;
     
     // Obtener el estado actual del item
@@ -621,7 +623,7 @@ export const InstructorChecklistContainer: React.FC = () => {
       {/* Tabla de lista de chequeo */}
       {selectedChecklist && currentItems.length > 0 && (
         <ChecklistTable
-          items={selectedChecklist.items || []}
+          items={(selectedChecklist.items || []).filter((item): item is NonNullable<typeof item> => item !== null)}
           currentItems={currentItems}
           itemStates={itemStates}
           currentPage={currentPage}

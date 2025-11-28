@@ -3,15 +3,17 @@
 import PageTitle from "@components/UI/pageTitle";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FiArrowLeft, FiUser, FiUsers, FiMapPin, FiCalendar, FiFileText, FiStar, FiBook, FiSave, FiX, FiCheckCircle, FiAlertTriangle } from "react-icons/fi";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@redux/store";
 import { fetchFaultTypes } from "@/redux/slices/improvementPlanFaultTypeSlice";
-import { addImprovementPlan } from "@slice/improvementPlanSlice";
+import { addImprovementPlan, fetchTeacherCompetencesByStudySheet } from "@slice/improvementPlanSlice";
 import { toast } from "react-toastify";
 import { useLoader } from "@context/LoaderContext";
+import { clientLAN } from "@lib/apollo-client";
+import { GET_All_STUDENTS, GET_STUDENT_LIST } from "@graphql/olympo/studentsGraph";
 
-const FormularioPlanesDeMejoramientoPage =() => {
+const FormularioPlanesDeMejoramientoContent =() => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const dispatch = useDispatch<AppDispatch>();
@@ -663,5 +665,18 @@ const FormularioPlanesDeMejoramientoPage =() => {
         </div>
     );
 }
+
+const FormularioPlanesDeMejoramientoPage = () => {
+    return (
+        <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto mb-4"></div>
+                <p className="text-gray-600 dark:text-gray-400">Cargando formulario...</p>
+            </div>
+        </div>}>
+            <FormularioPlanesDeMejoramientoContent />
+        </Suspense>
+    );
+};
 
 export default FormularioPlanesDeMejoramientoPage;
