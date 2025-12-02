@@ -9,7 +9,8 @@ import { useDispatch, useSelector } from "react-redux"
 import {fetchImprovementPlans} from "@slice/improvementPlanSlice";
 import { clientLAN } from "@lib/apollo-client";
 import { GET_STUDY_SHEET_BY_ID, GET_LEARNING_OUTCOMES_BY_COMPETENCE } from "@graphql/olympo/studySheetGraph";
-import { FiMapPin, FiCalendar, FiFileText, FiStar, FiPlus, FiArrowLeft } from "react-icons/fi";
+import { GET_IMPROVEMENT_PLAN_EVALUATION_BY_PLAN_ID } from "@graphql/improvementPlanEvaluationGraph";
+import { FiMapPin, FiCalendar, FiFileText, FiStar, FiEye, FiPlus, FiArrowLeft, FiCheck } from "react-icons/fi";
 import { ImprovementPlan } from "@graphql/generated";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -102,6 +103,8 @@ const HistorialPlanesMejoramientoInstructor = () => {
     const [isDarkMode, setIsDarkMode] = React.useState(false);
     // Mapa local de learningOutcomeId -> { name, description }
     const [learningOutcomeMap, setLearningOutcomeMap] = React.useState<Record<string, { name?: string; description?: string }>>({});
+    // Mapa de evaluaciones: planId -> judgment
+    const [evaluationsMap, setEvaluationsMap] = React.useState<Record<string, boolean | null>>({});
     
     // Función para manejar cambio de página
     const handlePageChange = React.useCallback((newPage: number) => {
@@ -188,14 +191,48 @@ const HistorialPlanesMejoramientoInstructor = () => {
         fetchOutcomesForCompetences();
     }, [improvementPlans]);
 
+    // Cargar evaluaciones para cada plan de mejoramiento
+    useEffect(() => {
+        const fetchEvaluations = async () => {
+            try {
+                const plans: any[] = improvementPlans || [];
+                if (plans.length === 0) return;
+
+                const evaluations: Record<string, boolean | null> = {};
+
+                await Promise.all(plans.map(async (plan) => {
+                    try {
+                        const { data } = await clientLAN.query({
+                            query: GET_IMPROVEMENT_PLAN_EVALUATION_BY_PLAN_ID,
+                            variables: { improvementPlanId: Number(plan.id) },
+                            fetchPolicy: 'no-cache'
+                        });
+                        
+                        const evaluation = data?.improvementPlanEvaluationByImprovementPlanId?.data;
+                        evaluations[plan.id] = evaluation?.judgment ?? null;
+                    } catch (err) {
+                        console.error('Error al obtener evaluación para plan', plan.id, err);
+                        evaluations[plan.id] = null;
+                    }
+                }));
+
+                setEvaluationsMap(evaluations);
+            } catch (err) {
+                console.error('Error fetching evaluations:', err);
+            }
+        };
+
+        fetchEvaluations();
+    }, [improvementPlans]);
+
     const formatDate = (dateString: string) => {
         if (!dateString) return 'No especificada';
         return new Date(dateString).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
     };
     const getQualificationColor = (qualification: number | boolean | null) => {
         if (qualification === false || qualification === null || qualification === undefined) return 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30';
-        if (qualification === true) return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30';
-        return Number(qualification) >= 3.0 ? 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30' : 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30';
+        if (qualification === true) return 'text-green-600 bg-green-100 dark:text-blue-400 dark:bg-blue-900/30';
+        return Number(qualification) >= 3.0 ? 'text-green-600 bg-green-100 dark:text-blue-400 dark:bg-blue-900/30' : 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30';
     };
 
     const columns: DataTableColumn<ImprovementPlan>[] = [
@@ -204,7 +241,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
             header: 'Estudiante',
             render: (row) => (
                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-r from-primary to-lightGreen dark:from-secondary dark:to-darkBlue rounded-full flex items-center justify-center text-white font-bold text-xs">
+                    <div className="w-8 h-8 bg-gradient-to-r from-primary to-lightGreen dark:from-blue-600 dark:to-blue-800 rounded-full flex items-center justify-center text-white font-bold text-xs">
                         {row.student?.person?.name?.charAt(0)?.toUpperCase() || 'N'}
                     </div>
                     <div>
@@ -260,11 +297,11 @@ const HistorialPlanesMejoramientoInstructor = () => {
             render: (row) => (
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                     row.state 
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                        ? 'bg-green-100 text-green-800 dark:bg-blue-900/30 dark:text-blue-400'
                         : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                 }`}>
                     <span className={`w-1.5 h-1.5 mr-1.5 rounded-full ${
-                        row.state ? 'bg-green-400' : 'bg-red-400'
+                        row.state ? 'bg-green-400 dark:bg-blue-400' : 'bg-red-400'
                     }`}></span>
                     {row.state ? 'ACTIVO' : 'INACTIVO'}
                 </span>
@@ -300,18 +337,77 @@ const HistorialPlanesMejoramientoInstructor = () => {
                 );
             }
         },
+        {
+            key: 'evaluation',
+            header: 'Evaluación',
+            render: (row) => {
+                const judgment = evaluationsMap[row.id];
+                
+                if (judgment === null || judgment === undefined) {
+                    return (
+                        <div className="flex items-center justify-center">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400 whitespace-nowrap">
+                                <span className="w-1.5 h-1.5 mr-1.5 rounded-full bg-gray-400"></span>
+                                SIN EVALUAR
+                            </span>
+                        </div>
+                    );
+                }
+                
+                const isApproved = judgment === true;
+                
+                return (
+                    <div className="flex items-center justify-center">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                            isApproved 
+                                ? 'bg-green-100 text-green-800 dark:bg-blue-900/30 dark:text-blue-400'
+                                : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                        }`}>
+                            <span className={`w-1.5 h-1.5 mr-1.5 rounded-full ${
+                                isApproved ? 'bg-green-400 dark:bg-blue-400' : 'bg-red-400'
+                            }`}></span>
+                            {isApproved ? 'APROBADO' : 'NO APROBADO'}
+                        </span>
+                    </div>
+                );
+            }
+        },
         
         {
             key: 'actions',
             header: 'Acciones',
             render: (row) => (
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center gap-2">
+                    <button
+                        onClick={() => router.push(`./DetallePlanDeMejoramiento?id=${row.id}`)}
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:bg-gradient-to-r dark:from-blue-600 dark:to-blue-700 dark:hover:from-blue-700 dark:hover:to-blue-800 dark:focus:ring-blue-500 transition-colors duration-200"
+                    >
+                        <FiEye className="w-4 h-4 mr-2" /> VER
+                    </button>
+
                     <button
                         onClick={() => router.push(`./ActividadPlanesDeMejoramiento?improvementPlanId=${row.id}`)}
-                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-indigo-600 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-400 dark:focus:ring-indigo-300 transition-colors duration-200"
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-emerald-600 hover:to-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 dark:bg-gradient-to-r dark:from-blue-500 dark:to-indigo-600 dark:hover:from-indigo-600 dark:hover:to-blue-500 dark:focus:ring-indigo-400 transition-colors duration-200"
                     >
                         <FiPlus className="w-4 h-4 mr-2" /> ACTIVIDAD
                     </button>
+
+                    {evaluationsMap[row.id] === null || evaluationsMap[row.id] === undefined ? (
+                        <button
+                            onClick={() => router.push(`./EvaluarPlanMejoramiento?planId=${row.id}`)}
+                            className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:bg-gradient-to-r dark:from-blue-600 dark:to-blue-700 dark:hover:from-blue-700 dark:hover:to-blue-800 dark:focus:ring-blue-500 transition-colors duration-200"
+                        >
+                            <FiCheck className="w-4 h-4 mr-2" /> EVALUAR
+                        </button>
+                    ) : (
+                        <button
+                            disabled
+                            className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-lg text-gray-400 bg-gray-200 dark:bg-gray-800 dark:text-gray-500 cursor-not-allowed opacity-60"
+                            title="Ya evaluado"
+                        >
+                            <FiCheck className="w-4 h-4 mr-2" /> EVALUADO
+                        </button>
+                    )}
                 </div>
             )
         }
@@ -388,7 +484,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                             <div className="mt-4 flex items-center justify-center">
                                 <button
                                     onClick={() => router.push(fichaId ? `./FormularioPlanesDeMejoramiento?studySheetId=${fichaId}` : './FormularioPlanesDeMejoramiento')}
-                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-lightGreen transition-colors duration-200 shadow-lg"
+                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:bg-gradient-to-r dark:from-blue-600 dark:to-blue-700 dark:hover:from-blue-700 dark:hover:to-blue-800 dark:focus:ring-blue-500 transition-colors duration-200 shadow-lg"
                                 >
                                     <FiPlus className="w-4 h-4 mr-2" /> ASIGNAR
                                 </button>
@@ -421,7 +517,7 @@ const HistorialPlanesMejoramientoInstructor = () => {
                     isDarkMode={isDarkMode}
                     onAddClick={() => router.push(fichaId ? `./FormularioPlanesDeMejoramiento?studySheetId=${fichaId}` : "./FormularioPlanesDeMejoramiento")}
                     addButtonText={"ASIGNAR"}
-                    addButtonClassName={"inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-lightGreen transition-colors duration-200 shadow-lg"}
+                    addButtonClassName={"inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:bg-gradient-to-r dark:from-blue-600 dark:to-blue-700 dark:hover:from-blue-700 dark:hover:to-blue-800 dark:focus:ring-blue-500 transition-colors duration-200 shadow-lg"}
                     externalPage={page}
                     onExternalPageChange={handlePageChange}
                     externalTotalPages={totalPages}

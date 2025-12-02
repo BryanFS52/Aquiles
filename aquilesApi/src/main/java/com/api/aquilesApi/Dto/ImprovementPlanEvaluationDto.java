@@ -25,7 +25,7 @@ public class ImprovementPlanEvaluationDto {
     // @NotNull(message = "Judgment is required")
     private Boolean judgment;
 
-    // Relations
+    // Relations - Usar DTO light para evitar referencia circular
     // @NotNull(message = "Improvement Plan ID is required")
-    private ImprovementPlanDto improvementPlan;
+    private ImprovementPlanLightDto improvementPlan;
 }

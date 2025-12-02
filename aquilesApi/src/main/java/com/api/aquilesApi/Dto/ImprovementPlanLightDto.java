@@ -1,25 +1,23 @@
 package com.api.aquilesApi.Dto;
 
-import java.io.Serializable;
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+import java.io.Serializable;
+
+/**
+ * DTO "light" de ImprovementPlan sin referencias circulares
+ * Se usa para evitar bucles infinitos cuando se incluye en otros DTOs
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 @Builder
-public class ImprovementPlanDto implements Serializable {
+public class ImprovementPlanLightDto implements Serializable {
 
     private Long id;
-
     private String actNumber;
     private String city;
     private String date;
@@ -29,16 +27,11 @@ public class ImprovementPlanDto implements Serializable {
     private String reason;
     private Boolean state;
     private String additionalJustification;
-
-    // Reference IDs
+    
+    // Reference IDs only
     private Long studentId;
     private Long teacherCompetence;
     private Long learningOutcome;
-
-    private byte[] improvementPlanFile;
-
-    // Relations
-    private List<ImprovementPlanActivityDto> improvementPlanActivity;
-    private ImprovementPlanFaultTypeDto faultType;
-    private ImprovementPlanEvaluationDto improvementPlanEvaluation;
+    
+    // NO incluir improvementPlanEvaluation para evitar referencia circular
 }

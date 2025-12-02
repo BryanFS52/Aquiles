@@ -11,6 +11,7 @@ import { addImprovementPlan, fetchTeacherCompetencesByStudySheet } from "@slice/
 import { clientLAN } from "@lib/apollo-client";
 import { GET_All_STUDENTS, GET_STUDENT_LIST } from "@graphql/olympo/studentsGraph";
 import { GET_STUDY_SHEET_BY_ID, GET_LEARNING_OUTCOMES_BY_COMPETENCE } from "@graphql/olympo/studySheetGraph";
+import { GET_ALL_IMPROVEMENT_PLANS } from "@graphql/improvementPlanGraph";
 import { toast } from "react-toastify";
 import { useLoader } from "@context/LoaderContext";
 import ModalLearningOutcome from "@components/Modals/ModalLearningOutcome";
@@ -59,7 +60,11 @@ const FormularioPlanesDeMejoramientoPage =() => {
         teacherCompetenceId: '',
         learningOutcomeId: '',
         faultTypeId: '',
+        additionalJustification: '',
     });
+    
+    const [studentHasActivePlan, setStudentHasActivePlan] = useState(false);
+    const [checkingActivePlan, setCheckingActivePlan] = useState(false);
 
     const [showSuccess, setShowSuccess] = useState(false);
     const [isModalLearningOutcomeOpen, setIsModalLearningOutcomeOpen] = useState(false);
@@ -258,7 +263,7 @@ const FormularioPlanesDeMejoramientoPage =() => {
     };
 
     // Manejar selección de estudiante y rellenar campos automáticamente
-    const handleStudentChange = (studentId: string) => {
+    const handleStudentChange = async (studentId: string) => {
         setSelectedStudent(studentId);
         if (!studentId) {
             setFormData(prev => ({
@@ -266,10 +271,13 @@ const FormularioPlanesDeMejoramientoPage =() => {
                 studentName: '',
                 studentLastname: '',
                 studentDocument: '',
-                studentEmail: ''
+                studentEmail: '',
+                additionalJustification: ''
             }));
+            setStudentHasActivePlan(false);
             return;
         }
+        
         const student = students.find(s => String(s.id) === String(studentId));
         if (student) {
             setFormData(prev => ({
@@ -277,8 +285,42 @@ const FormularioPlanesDeMejoramientoPage =() => {
                 studentName: student.person?.name || '',
                 studentLastname: student.person?.lastname || '',
                 studentDocument: student.person?.document || '',
-                studentEmail: student.person?.email || ''
+                studentEmail: student.person?.email || '',
+                additionalJustification: ''
             }));
+            
+            // Verificar si el estudiante ya tiene un plan activo
+            setCheckingActivePlan(true);
+            try {
+                const { data } = await clientLAN.query({
+                    query: GET_ALL_IMPROVEMENT_PLANS,
+                    variables: { page: 0, size: 100 },
+                    fetchPolicy: 'no-cache'
+                });
+                
+                const allPlans = data?.allImprovementPlans?.data || [];
+                const hasActive = allPlans.some((plan: any) => 
+                    String(plan.student?.id) === String(studentId) && plan.state === true
+                );
+                
+                setStudentHasActivePlan(hasActive);
+                
+                if (hasActive) {
+                    toast.warning(
+                        'Este aprendiz ya tiene un plan de mejoramiento activo. Debe proporcionar una justificación para crear otro.',
+                        {
+                            position: "top-right",
+                            autoClose: 6000,
+                        }
+                    );
+                }
+            } catch (error) {
+                console.error('Error al verificar planes activos:', error);
+                setStudentHasActivePlan(false);
+            } finally {
+                setCheckingActivePlan(false);
+            }
+            
             // Registrar hora de inicio y fin al comenzar a diligenciar (si aún no hay)
             setStartAndEndIfEmpty();
             setDateIfEmpty();
@@ -396,6 +438,25 @@ const FormularioPlanesDeMejoramientoPage =() => {
             });
             return;
         }
+        
+        // Validar justificación adicional si el estudiante ya tiene un plan activo
+        if (studentHasActivePlan) {
+            if (!formData.additionalJustification || formData.additionalJustification.trim() === '') {
+                toast.error('Este aprendiz ya tiene un plan de mejoramiento activo. Debe proporcionar una justificación para crear otro plan.', {
+                    position: "top-right",
+                    autoClose: 6000,
+                });
+                return;
+            }
+            
+            if (formData.additionalJustification.trim().length < 20) {
+                toast.error('La justificación debe tener al menos 20 caracteres.', {
+                    position: "top-right",
+                    autoClose: 4000,
+                });
+                return;
+            }
+        }
 
         showLoader();
 
@@ -412,7 +473,8 @@ const FormularioPlanesDeMejoramientoPage =() => {
                 state: formData.state,
                 teacherCompetence: String(formData.teacherCompetenceId),
                 learningOutcome: formData.learningOutcomeId ? String(formData.learningOutcomeId) : undefined,
-                faultType: { id: String(formData.faultTypeId) }
+                faultType: { id: String(formData.faultTypeId) },
+                additionalJustification: formData.additionalJustification.trim() || undefined
             } as const;
 
             // Logs corregidos para evitar errores de acceso
@@ -787,10 +849,42 @@ const FormularioPlanesDeMejoramientoPage =() => {
                                         onChange={(e) => handleInputChange('reason', e.target.value)}
                                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
                                         rows={4}
-                                        placeholder="Describe detalladamente la razón del plan de mejoramiento..."
+                                        placeholder="Ingrese la razón del plan de mejoramiento..."
                                         required
                                     />
                                 </div>
+                                
+                                {/* Justificación Adicional - Solo si el estudiante ya tiene un plan activo */}
+                                {studentHasActivePlan && (
+                                    <div className="border-2 border-yellow-400 dark:border-yellow-500 rounded-xl p-4 bg-yellow-50 dark:bg-yellow-900/20">
+                                        <div className="flex items-start gap-3 mb-3">
+                                            <FiAlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                                            <div className="flex-1">
+                                                <h4 className="text-sm font-semibold text-yellow-800 dark:text-yellow-300 mb-1">
+                                                    Plan de Mejoramiento Activo Detectado
+                                                </h4>
+                                                <p className="text-xs text-yellow-700 dark:text-yellow-400 mb-3">
+                                                    Este aprendiz ya tiene un plan de mejoramiento activo. Para crear un nuevo plan, debe proporcionar una justificación detallada.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            <FiFileText className="w-4 h-4 inline mr-2" />
+                                            Justificación para Nuevo Plan <span className="text-red-600">*</span>
+                                        </label>
+                                        <textarea
+                                            value={formData.additionalJustification}
+                                            onChange={(e) => handleInputChange('additionalJustification', e.target.value)}
+                                            className="w-full px-4 py-3 border-2 border-yellow-400 dark:border-yellow-500 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
+                                            rows={4}
+                                            placeholder="Explique por qué es necesario crear un nuevo plan de mejoramiento cuando ya existe uno activo (mínimo 20 caracteres)..."
+                                            required
+                                        />
+                                        <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                                            {formData.additionalJustification.length} / 20 caracteres mínimos
+                                        </p>
+                                    </div>
+                                )}
 
                                 {/* Objetivos y conclusiones movidos a Actividades: campos eliminados del formulario de Plan */}
                             </div>

@@ -4,8 +4,11 @@ import React, { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import PageTitle from "@components/UI/pageTitle"
 import { clientLAN } from "@lib/apollo-client"
-import { GET_ALL_IMPROVEMENT_PLAN_EVIDENCE_TYPES } from "@graphql/improvementPlanActivityGraph"
-import { GET_ALL_IMPROVEMENT_PLAN_DELIVERIES } from "@graphql/improvementPlanActivityGraph"
+import {
+  GET_ALL_IMPROVEMENT_PLAN_EVIDENCE_TYPES,
+  GET_ALL_IMPROVEMENT_PLAN_DELIVERIES,
+  GET_ALL_IMPROVEMENT_PLAN_ACTIVITIES,
+} from "@graphql/improvementPlanActivityGraph"
 import { useDispatch, useSelector } from "react-redux"
 import type { AppDispatch } from "@redux/store"
 import { fetchImprovementPlans } from "@slice/improvementPlanSlice"
@@ -35,6 +38,7 @@ const AddImprovementPlanActivityPage = () => {
 
   const [deliveryId, setDeliveryId] = useState<string>("")
   const [selectedEvidenceIds, setSelectedEvidenceIds] = useState<string[]>([])
+  const [activitiesCount, setActivitiesCount] = useState<number>(0)
 
   useEffect(() => {
     dispatch(fetchImprovementPlans({ page: 0, size: 200 }))
@@ -74,9 +78,49 @@ const AddImprovementPlanActivityPage = () => {
     }
   }, [dispatch, improvementPlanId])
 
+  // cuando cambia el plan seleccionado, obtener el conteo de actividades existentes
+  useEffect(() => {
+    const fetchCount = async () => {
+      if (!improvementPlanId) {
+        setActivitiesCount(0)
+        return
+      }
+      try {
+        const planIdNumber = Number(improvementPlanId)
+        console.log(`🔍 Buscando actividades para el plan ID: ${planIdNumber}`)
+        
+        const { data } = await clientLAN.query({
+          query: GET_ALL_IMPROVEMENT_PLAN_ACTIVITIES,
+          variables: { page: 0, size: 200, id: planIdNumber },
+          fetchPolicy: "no-cache",
+        })
+        
+        const allItems = data?.allImprovementPlanActivities?.data || []
+        console.log(`📦 Total de actividades recibidas del backend:`, allItems.length)
+        console.log(`📋 Actividades completas:`, allItems)
+        
+        // Filtrar manualmente las actividades que pertenecen a este plan específico
+        const filteredItems = allItems.filter((activity: any) => {
+          const activityPlanId = activity?.improvementPlan?.id
+          console.log(`  - Actividad ${activity.id}: Plan ID = ${activityPlanId}`)
+          return Number(activityPlanId) === planIdNumber
+        })
+        
+        const count = filteredItems.length
+        console.log(`✅ Actividades filtradas para el plan ${planIdNumber}: ${count}`)
+        setActivitiesCount(count)
+      } catch (err) {
+        console.error('❌ Error al obtener conteo de actividades:', err)
+        setActivitiesCount(0)
+      }
+    }
+    fetchCount()
+  }, [improvementPlanId])
+
   const capturedRef = React.useRef(false)
   const [globalDeliveries, setGlobalDeliveries] = useState<any[]>([])
   const [globalEvidenceTypes, setGlobalEvidenceTypes] = useState<any[]>([])
+  const [preventNavigation, setPreventNavigation] = useState<boolean>(false)
 
   const improvementPlans = improvementPlansState?.data || []
   const deliveries = React.useMemo(() => activityState?.deliveries || [], [activityState?.deliveries])
@@ -91,6 +135,38 @@ const AddImprovementPlanActivityPage = () => {
       }
     }
   }, [deliveries, evidenceTypes])
+
+  // prevenir navegación si el plan seleccionado no tiene al menos 1 actividad
+  useEffect(() => {
+    const shouldPrevent = Boolean(improvementPlanId) && activitiesCount === 0
+    setPreventNavigation(shouldPrevent)
+
+    const beforeUnloadHandler = (e: BeforeUnloadEvent) => {
+      if (shouldPrevent) {
+        e.preventDefault()
+        e.returnValue = ''
+        return ''
+      }
+    }
+
+    const popstateHandler = (e: PopStateEvent) => {
+      if (shouldPrevent) {
+        const confirmed = window.confirm('Este plan no tiene actividades. ¿Seguro que desea salir sin registrar al menos una actividad?')
+        if (!confirmed) {
+          // volver a retroceder la navegación para permanecer en la página
+          history.pushState(null, document.title, window.location.href)
+        }
+      }
+    }
+
+    window.addEventListener('beforeunload', beforeUnloadHandler)
+    window.addEventListener('popstate', popstateHandler)
+
+    return () => {
+      window.removeEventListener('beforeunload', beforeUnloadHandler)
+      window.removeEventListener('popstate', popstateHandler)
+    }
+  }, [improvementPlanId, activitiesCount])
 
   const displayDeliveries = globalDeliveries && globalDeliveries.length > 0 ? globalDeliveries : deliveries || []
   const displayEvidenceTypes =
@@ -124,6 +200,14 @@ const AddImprovementPlanActivityPage = () => {
       return
     }
 
+
+    // validar límite máximo de actividades por plan (máximo 3)
+    console.log(`Validando actividades. Contador actual: ${activitiesCount}`)
+    if (activitiesCount >= 3) {
+      toast.error("No puede registrar más de 3 actividades para este plan de mejoramiento")
+      return
+    }
+
     const input = {
       description: description.trim(),
       objectives: objectives.trim() || null,
@@ -140,13 +224,12 @@ const AddImprovementPlanActivityPage = () => {
       hideLoader && hideLoader()
       if (res?.code === "200") {
         toast.success("Actividad registrada correctamente")
-        setDescription("")
-        setObjectives("")
-        setConclusions("")
-        setSelectedEvidenceIds([])
-        setDeliveryDate(new Date().toISOString().split("T")[0])
-        setImprovementPlanId("")
-        setDeliveryId("")
+        // actualizar contador local
+        const newCount = activitiesCount + 1
+        setActivitiesCount(newCount)
+        console.log(`Actividad registrada. Nuevo contador: ${newCount}`)
+        
+        // Redirigir siempre al historial después de registrar
         router.push("/dashboard/HistorialPlanesMejoramientoInstructor")
       } else {
         toast.error(res?.message ?? "Error al registrar actividad")
@@ -159,7 +242,7 @@ const AddImprovementPlanActivityPage = () => {
 
   return (
     <div className="min-h-screen bg-transparent">
-      <div className="mx-auto max-w-4xl px-4 py-6">
+      <div className="mx-auto max-w-7xl px-4 py-6">
         <PageTitle onBack={() => router.back()}>Registrar Actividad - Plan de Mejoramiento</PageTitle>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
@@ -174,14 +257,14 @@ const AddImprovementPlanActivityPage = () => {
 
             <div className="space-y-5 p-5">
               <div className="space-y-1.5">
-                <label htmlFor="description" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label htmlFor="description" className="block text-sm font-medium text-slate-700 dark:text-slate-200">
                   Descripción <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition-all duration-200 placeholder:text-slate-400 hover:border-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-slate-500 dark:focus:border-blue-400"
+                  className="w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition-all duration-200 placeholder:text-slate-400 hover:border-slate-400 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-slate-500 dark:focus:border-blue-400"
                   rows={4}
                   placeholder="Describa detalladamente la actividad a realizar..."
                   required
@@ -190,28 +273,28 @@ const AddImprovementPlanActivityPage = () => {
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label htmlFor="objectives" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <label htmlFor="objectives" className="block text-sm font-medium text-slate-700 dark:text-slate-200">
                     Objetivos
                   </label>
                   <textarea
                     id="objectives"
                     value={objectives}
                     onChange={(e) => setObjectives(e.target.value)}
-                    className="w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition-all duration-200 placeholder:text-slate-400 hover:border-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-slate-500 dark:focus:border-blue-400"
+                    className="w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition-all duration-200 placeholder:text-slate-400 hover:border-slate-400 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-slate-500 dark:focus:border-blue-400"
                     rows={3}
                     placeholder="Defina los objetivos que se esperan alcanzar..."
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label htmlFor="conclusions" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <label htmlFor="conclusions" className="block text-sm font-medium text-slate-700 dark:text-slate-200">
                     Conclusiones
                   </label>
                   <textarea
                     id="conclusions"
                     value={conclusions}
                     onChange={(e) => setConclusions(e.target.value)}
-                    className="w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition-all duration-200 placeholder:text-slate-400 hover:border-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-slate-500 dark:focus:border-blue-400"
+                    className="w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition-all duration-200 placeholder:text-slate-400 hover:border-slate-400 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-slate-500 dark:focus:border-blue-400"
                     rows={3}
                     placeholder="Registre las conclusiones obtenidas..."
                   />
@@ -227,31 +310,40 @@ const AddImprovementPlanActivityPage = () => {
             </div>
 
             <div className="space-y-5 p-5">
-              {!improvementPlanId && (
-                <div className="space-y-1.5">
-                  <label htmlFor="plan" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Plan de Mejoramiento <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    id="plan"
-                    value={improvementPlanId}
-                    onChange={(e) => setImprovementPlanId(e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition-all duration-200 hover:border-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:focus:border-blue-400"
-                    required
-                  >
-                    <option value="">Seleccione un plan</option>
-                    {improvementPlans?.data?.map((p: any) => (
-                      <option key={p.id} value={p.id}>
-                        {p.reason || `Plan ${p.id}`}
-                      </option>
-                    ))}
-                  </select>
+              {improvementPlanId ? (
+                <div className="rounded-lg border border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 p-4 dark:border-blue-700 dark:bg-gradient-to-r dark:from-blue-900/20 dark:to-blue-800/20">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-green-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-green-900 dark:text-blue-100">
+                        Plan de Mejoramiento
+                      </p>
+                      <p className="mt-1 text-sm text-green-700 dark:text-blue-200">
+                        Actividades registradas: <span className="font-semibold">{activitiesCount} de 3</span>
+                        {activitiesCount >= 3 ? (
+                          <span className="ml-2 text-red-600 dark:text-red-400 font-medium">⚠️ Límite alcanzado</span>
+                        ) : (
+                          <span className="ml-2">• Puede agregar {3 - activitiesCount} más</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
+                  <p className="text-sm text-red-700 dark:text-red-300">
+                    ⚠️ No se pudo identificar el plan de mejoramiento. Por favor, regrese al historial y seleccione un plan.
+                  </p>
                 </div>
               )}
 
-              <div className="grid gap-5 lg:grid-cols-[200px_1fr]">
+              <div className="grid gap-5 md:grid-cols-[auto_1fr]">
                 <div className="space-y-1.5">
-                  <label htmlFor="date" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <label htmlFor="date" className="block text-sm font-medium text-slate-700 dark:text-slate-200">
                     Fecha de Entrega <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -259,24 +351,24 @@ const AddImprovementPlanActivityPage = () => {
                     type="date"
                     value={deliveryDate}
                     onChange={(e) => setDeliveryDate(e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition-all duration-200 hover:border-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:focus:border-blue-400"
+                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition-all duration-200 hover:border-slate-400 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:hover:border-slate-500 dark:focus:border-blue-400"
                     required
                   />
                 </div>
 
                 {/* Tipo de Entrega con Radio Buttons */}
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">
                     Tipo de Entrega <span className="text-red-500">*</span>
                   </label>
-                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  <div className="flex gap-2 justify-center">
                     {displayDeliveries?.map((d: any) => (
                       <label
                         key={d.id}
                         className={`group relative flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 transition-all duration-200 hover:shadow-sm active:scale-[0.98] ${
                           deliveryId === String(d.id)
-                            ? "border-blue-500 bg-blue-50 shadow-sm dark:border-blue-400 dark:bg-blue-900/30"
-                            : "border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-blue-500 dark:hover:bg-blue-900/20"
+                            ? "border-green-500 bg-gradient-to-r from-green-50 to-emerald-50 shadow-sm dark:border-blue-500 dark:bg-blue-900/30"
+                            : "border-slate-200 bg-white hover:border-green-300 hover:bg-green-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:border-blue-400 dark:hover:bg-blue-900/20"
                         }`}
                       >
                         <input
@@ -284,13 +376,13 @@ const AddImprovementPlanActivityPage = () => {
                           name="deliveryType"
                           checked={deliveryId === String(d.id)}
                           onChange={() => selectDelivery(String(d.id))}
-                          className="h-4 w-4 shrink-0 cursor-pointer border-slate-300 text-blue-600 shadow-sm transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 group-hover:scale-110 dark:border-slate-600 dark:bg-slate-900"
+                          className="h-4 w-4 shrink-0 cursor-pointer border-slate-300 text-green-600 shadow-sm transition-all duration-200 focus:ring-2 focus:ring-green-500/20 group-hover:scale-110 dark:border-slate-500 dark:bg-slate-800 dark:text-blue-500"
                         />
                         <span
                           className={`text-sm transition-colors duration-200 ${
                             deliveryId === String(d.id)
-                              ? "font-medium text-blue-700 dark:text-blue-300"
-                              : "text-slate-700 group-hover:text-blue-700 dark:text-slate-300 dark:group-hover:text-blue-300"
+                              ? "font-medium text-green-700 dark:text-blue-400"
+                              : "text-slate-700 group-hover:text-green-700 dark:text-slate-300 dark:group-hover:text-blue-400"
                           }`}
                         >
                           {d.deliveryFormat}
@@ -334,16 +426,23 @@ const AddImprovementPlanActivityPage = () => {
           <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
             <button
               type="button"
-              onClick={() => router.back()}
+              onClick={() => {
+                if (preventNavigation) {
+                  const ok = window.confirm('Este plan no tiene actividades. ¿Seguro que desea salir sin registrar al menos una actividad?')
+                  if (!ok) return
+                }
+                router.back()
+              }}
               className="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all duration-200 hover:bg-slate-50 hover:shadow active:scale-[0.98] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md active:scale-[0.98] dark:bg-blue-500 dark:hover:bg-blue-600"
+              disabled={!improvementPlanId || activitiesCount >= 3}
+              className="rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:from-green-700 hover:to-emerald-700 hover:shadow-md active:scale-[0.98] dark:from-blue-600 dark:to-blue-700 dark:hover:from-blue-700 dark:hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-green-600 disabled:hover:to-emerald-600 dark:disabled:hover:from-blue-600 dark:disabled:hover:to-blue-700"
             >
-              Registrar Actividad
+              {activitiesCount >= 3 ? 'Límite de actividades alcanzado' : 'Registrar Actividad'}
             </button>
           </div>
         </form>

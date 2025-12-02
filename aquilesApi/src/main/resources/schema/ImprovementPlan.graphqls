@@ -8,6 +8,7 @@ type ImprovementPlan {
     place: String
     reason: String
     state: Boolean
+    additionalJustification: String
     student: Student
     teacherCompetence: TeacherStudySheet
     learningOutcome: LearningOutcome
@@ -25,6 +26,7 @@ input ImprovementPlanDto {
     place: String
     reason: String
     state: Boolean
+    additionalJustification: String
     studentId: ID
     teacherCompetence: ID
     learningOutcome: ID

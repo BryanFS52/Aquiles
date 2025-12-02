@@ -206,14 +206,14 @@ const PlanMejoramientoInstructor: React.FC = () => {
           {filteredStudySheets.map((sheet, index) => (
             <article
               key={sheet.id}
-              className="relative h-full bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-500 hover:shadow-[0_20px_60px_-15px_rgba(57,143,15,0.3)] dark:hover:shadow-[0_20px_60px_-15px_rgba(57,169,0,0.4)] hover:-translate-y-1 flex flex-col group"
+              className="relative h-full bg-white dark:bg-gradient-to-br dark:from-gray-900 dark:to-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 transition-all duration-500 hover:shadow-[0_20px_60px_-15px_rgba(57,143,15,0.3)] dark:hover:shadow-[0_20px_60px_-15px_rgba(59,130,246,0.4)] hover:-translate-y-1 flex flex-col group"
               style={{
                 animation: `fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${index * 0.1}s both`,
               }}
             >
               {/* Barra lateral de color según estado */}
               <div
-                className={`absolute left-0 top-0 bottom-0 w-1.5 ${sheet.state ? "bg-gradient-to-b from-primary to-lightGreen" : "bg-gradient-to-b from-gray-400 to-gray-600"} transition-all duration-300 group-hover:w-2`}
+                className={`absolute left-0 top-0 bottom-0 w-1.5 ${sheet.state ? "bg-gradient-to-b from-primary to-lightGreen dark:from-blue-600 dark:to-blue-800" : "bg-gradient-to-b from-gray-400 to-gray-600"} transition-all duration-300 group-hover:w-2`}
               ></div>
 
               {/* Header minimalista */}
@@ -233,7 +233,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
                 <div className="relative flex items-start justify-between gap-4 mb-4">
                   {/* Número de ficha - Diseño limpio */}
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 shadow-lg group-hover:shadow-green-500/30 transition-all duration-300 group-hover:scale-110">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-green-500 to-green-600 dark:from-blue-600 dark:to-blue-700 shadow-lg group-hover:shadow-green-500/30 dark:group-hover:shadow-blue-500/30 transition-all duration-300 group-hover:scale-110">
                       <GraduationCap className="w-6 h-6 text-white" strokeWidth={2} />
                     </div>
                     <div>
@@ -247,9 +247,9 @@ const PlanMejoramientoInstructor: React.FC = () => {
                   {/* Badge de estado - Discreto */}
                   <div className="flex items-center gap-2">
                     {sheet.state ? (
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span className="text-xs font-semibold text-green-700 dark:text-green-400">Activa</span>
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-50 dark:bg-blue-900/20 border border-green-200 dark:border-blue-800/50">
+                        <div className="w-2 h-2 bg-green-500 dark:bg-blue-400 rounded-full animate-pulse"></div>
+                        <span className="text-xs font-semibold text-green-700 dark:text-blue-400">Activa</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
@@ -263,12 +263,12 @@ const PlanMejoramientoInstructor: React.FC = () => {
                 {/* Programa - Tipografía elegante */}
                 <div className="relative">
                   <div className="flex items-center gap-2 mb-2">
-                    <Award className="w-4 h-4 text-primary dark:text-lightGreen" />
+                    <Award className="w-4 h-4 text-primary dark:text-blue-400" />
                     <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       Programa de Formación
                     </span>
                   </div>
-                  <h3 className="text-lg font-semibold text-black dark:text-white leading-snug line-clamp-2 group-hover:text-primary dark:group-hover:text-lightGreen transition-colors duration-300 uppercase">
+                  <h3 className="text-lg font-semibold text-black dark:text-white leading-snug line-clamp-2 group-hover:text-primary dark:group-hover:text-blue-400 transition-colors duration-300 uppercase">
                     {sheet.trainingProject?.program?.name ?? "No especificado"}
                   </h3>
                 </div>
@@ -287,7 +287,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
                   />
                   <div className="col-span-2 relative bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-900/50 rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-4">
-                      <Calendar className="w-4 h-4 text-primary dark:text-lightGreen" />
+                      <Calendar className="w-4 h-4 text-primary dark:text-blue-400" />
                       <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                         Período Lectivo
                       </span>
@@ -309,9 +309,9 @@ const PlanMejoramientoInstructor: React.FC = () => {
                 <div className="flex items-center justify-between">
                   {/* Contador de aprendices - Limpio */}
                   <div className="flex items-center gap-4">
-                    <div className="relative flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-primary/10 to-lightGreen/10 dark:from-primary/20 dark:to-lightGreen/20 border border-primary/20 dark:border-lightGreen/20 group-hover:border-primary dark:group-hover:border-lightGreen transition-all duration-300">
-                      <IoPeople className="w-6 h-6 text-primary dark:text-lightGreen" strokeWidth={2} />
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary dark:bg-lightGreen rounded-full flex items-center justify-center">
+                    <div className="relative flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br from-primary/10 to-lightGreen/10 dark:from-blue-500/20 dark:to-blue-600/20 transition-all duration-300">
+                      <IoPeople className="w-6 h-6 text-primary dark:text-blue-400" strokeWidth={2} />
+                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary dark:bg-blue-600 rounded-full flex items-center justify-center">
                         <span className="text-[10px] font-bold text-white">
                           {sheet.studentStudySheets?.length || 0}
                         </span>
@@ -338,7 +338,7 @@ const PlanMejoramientoInstructor: React.FC = () => {
                     </button>
                     <button
                       onClick={() => handleSelectSheet(sheet)}
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-black dark:bg-white hover:bg-primary dark:hover:bg-lightGreen transition-all duration-300 hover:shadow-lg hover:scale-105"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-black dark:bg-white hover:bg-primary dark:hover:bg-blue-600 transition-all duration-300 hover:shadow-lg hover:scale-105"
                     >
                       <span className="text-xs font-semibold text-white dark:text-black uppercase tracking-wide">
                         Historial
@@ -511,7 +511,7 @@ const TimelinePoint: React.FC<{
   <div className="relative flex flex-col items-center">
     <div
       className={`relative z-10 w-6 h-6 rounded-full border-4 ${
-        color === "green"
+          color === "green"
           ? "bg-green-500 border-green-200 dark:border-green-800"
           : color === "blue"
             ? "bg-blue-500 border-blue-200 dark:border-blue-800"

@@ -120,6 +120,23 @@ public class ImprovementPlanBusiness {
     // Add new improvementPlan
     public ImprovementPlanDto add(ImprovementPlanDto improvementplanDto) {
         try {
+            // Validar si el estudiante ya tiene un plan activo
+            if (improvementplanDto.getStudentId() != null) {
+                boolean hasActivePlan = improvementPlanService.existsActivePlanForStudent(improvementplanDto.getStudentId());
+                
+                if (hasActivePlan) {
+                    // Si ya tiene un plan activo, la justificación adicional es OBLIGATORIA
+                    if (improvementplanDto.getAdditionalJustification() == null || 
+                        improvementplanDto.getAdditionalJustification().trim().isEmpty()) {
+                        throw new CustomException(
+                            "El aprendiz ya tiene un plan de mejoramiento activo. " +
+                            "Debe proporcionar una justificación para crear un nuevo plan.",
+                            HttpStatus.BAD_REQUEST
+                        );
+                    }
+                }
+            }
+            
             // 1. Create and save the initial improvement plan
             ImprovementPlan improvementPlan = new ImprovementPlan();
             ImprovementPlanMap.INSTANCE.updateImprovementPlan(improvementplanDto, improvementPlan);

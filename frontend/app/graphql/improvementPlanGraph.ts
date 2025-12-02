@@ -20,7 +20,7 @@ query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $
       place
       reason
       state
-      
+      additionalJustification
       student {
         id
         person {
@@ -39,7 +39,6 @@ query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $
       }
       learningOutcome {
         id
-        
       }
       improvementPlanFile
       faultType {
@@ -59,10 +58,15 @@ export const GET_IMPROVEMENT_PLAN_BY_ID = gql`
       date
       data {
         id
+        actNumber
         city
         date
+        startTime
+        endTime
+        place
         reason
-        state        
+        state
+        additionalJustification
         student {
           id
           person {
@@ -77,6 +81,14 @@ export const GET_IMPROVEMENT_PLAN_BY_ID = gql`
             id
             name
           }
+        }
+        learningOutcome {
+          id
+        }
+        improvementPlanFile
+        faultType {
+          id
+          name
         }
       }
     }
@@ -107,6 +119,20 @@ export const DELETE_IMPROVEMENT_PLAN = gql`
     deleteImprovementPlan(id: $id) {
       code
       message
+    }
+  }
+`;
+
+export const CHECK_STUDENT_HAS_ACTIVE_PLAN = gql`
+  query CheckStudentHasActivePlan($studentId: ID!, $page: Int, $size: Int) {
+    allImprovementPlans(page: $page, size: $size) {
+      data {
+        id
+        state
+        student {
+          id
+        }
+      }
     }
   }
 `;

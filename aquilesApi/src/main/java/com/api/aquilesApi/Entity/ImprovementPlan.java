@@ -46,6 +46,8 @@ public class ImprovementPlan implements Serializable {
     @Column(name = "state", nullable = false)
     private Boolean state;
 
+    @Column(name = "additional_justification", columnDefinition = "TEXT")
+    private String additionalJustification;
 
     // Reference IDs (Gateway)
     @Column (name = "student_id")

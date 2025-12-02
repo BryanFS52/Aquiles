@@ -1,9 +1,13 @@
 package com.api.aquilesApi.Utilities.Mapper;
 
 import com.api.aquilesApi.Dto.ImprovementPlanEvaluationDto;
+import com.api.aquilesApi.Dto.ImprovementPlanLightDto;
+import com.api.aquilesApi.Entity.ImprovementPlan;
 import com.api.aquilesApi.Entity.ImprovementPlanEvaluation;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
@@ -14,6 +18,8 @@ import java.util.List;
 public interface ImprovementPlanEvaluationMap {
     ImprovementPlanEvaluationMap INSTANCE = Mappers.getMapper(ImprovementPlanEvaluationMap.class);
 
+    // Mapeo de Entity a DTO usando el método personalizado para evitar ciclo infinito
+    @Mapping(target = "improvementPlan", source = "improvementPlan", qualifiedByName = "improvementPlanToLightDto")
     ImprovementPlanEvaluationDto EntityToDto(ImprovementPlanEvaluation improvementPlanEvaluation);
 
     ImprovementPlanEvaluation DtoToEntity(ImprovementPlanEvaluationDto improvementPlanEvaluationDto);
@@ -25,5 +31,14 @@ public interface ImprovementPlanEvaluationMap {
     default Page<ImprovementPlanEvaluationDto> EntityToDTOs(Page<ImprovementPlanEvaluation> improvementPlanEvaluations) {
         List<ImprovementPlanEvaluationDto> dtos = EntityToDTOs(improvementPlanEvaluations.getContent());
         return new PageImpl<>(dtos, improvementPlanEvaluations.getPageable(), improvementPlanEvaluations.getTotalElements());
+    }
+    
+    // Método helper para convertir ImprovementPlan a ImprovementPlanLightDto
+    @Named("improvementPlanToLightDto")
+    default ImprovementPlanLightDto improvementPlanToLightDto(ImprovementPlan improvementPlan) {
+        if (improvementPlan == null) {
+            return null;
+        }
+        return ImprovementPlanMap.INSTANCE.EntityToLightDto(improvementPlan);
     }
 }
