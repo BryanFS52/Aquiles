@@ -34,7 +34,7 @@ const ApprenticeContainer: React.FC = () => {
   }, [loading, showLoader, hideLoader]);
 
   if (!loading && !studySheet) {
-    return <EmptyState message="No se encontró la ficha." />;
+    return <EmptyState message="No se encontró la ficha ." />;
   }
 
   return (
