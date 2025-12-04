@@ -119,10 +119,15 @@ export const transformGraphQLToTrainingProjectItem = (graphqlData: any): Trainin
 
 export const fetchAllTrainingProjects = createAsyncThunk<GetAllTrainingProjectsQuery['allTrainingProjects'], GetAllTrainingProjectsQueryVariables>(
     'trainingProject/fetchAll',
-    async ({ name, idProgram, page, size }) => {
+    async ({ name, idProgram, page = 0, size = 100 }) => {
         const { data } = await clientLAN.query<GetAllTrainingProjectsQuery, GetAllTrainingProjectsQueryVariables>({
             query: GET_ALL_TRAINING_PROJECTS,
-            variables: { name, idProgram, page, size },
+            variables: { 
+                name, 
+                idProgram, 
+                page: page ?? 0, 
+                size: size ?? 100 
+            },
             fetchPolicy: 'no-cache',
         });
         return data.allTrainingProjects;
@@ -131,10 +136,14 @@ export const fetchAllTrainingProjects = createAsyncThunk<GetAllTrainingProjectsQ
 
 export const fetchTrainingProjectsByProgram = createAsyncThunk<GetTrainingProjectsByProgramQuery['allTrainingProjects'], GetTrainingProjectsByProgramQueryVariables>(
     'trainingProject/fetchByProgram',
-    async ({ idProgram, page, size }) => {
+    async ({ idProgram, page = 0, size = 100 }) => {
         const { data } = await clientLAN.query<GetTrainingProjectsByProgramQuery, GetTrainingProjectsByProgramQueryVariables>({
             query: GET_TRAINING_PROJECTS_BY_PROGRAM,
-            variables: { idProgram, page, size },
+            variables: { 
+                idProgram, 
+                page: page ?? 0, 
+                size: size ?? 100 
+            },
             fetchPolicy: 'no-cache',
         });
         return data.allTrainingProjects;
@@ -143,10 +152,13 @@ export const fetchTrainingProjectsByProgram = createAsyncThunk<GetTrainingProjec
 
 export const fetchTrainingProjectById = createAsyncThunk<GetTrainingProjectByIdQuery['allTrainingProjects'], { id: number; page?: number; size?: number }>(
     'trainingProject/fetchById',
-    async ({ id, page, size }) => {
+    async ({ id, page = 0, size = 100 }) => {
         const { data } = await clientLAN.query<GetTrainingProjectByIdQuery, GetTrainingProjectByIdQueryVariables>({
             query: GET_TRAINING_PROJECT_BY_ID,
-            variables: { page: page || 0, size: size || 100 },
+            variables: { 
+                page: page ?? 0, 
+                size: size ?? 100 
+            },
             fetchPolicy: 'no-cache',
         });
 

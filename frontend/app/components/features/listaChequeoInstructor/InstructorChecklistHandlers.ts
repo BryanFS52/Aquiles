@@ -1,11 +1,12 @@
 import { toast } from "react-toastify";
 import { evaluationService } from "@redux/slices/evaluationSlice";
-import { checkListService } from "@redux/slices/checklistSlice";
+import { client } from "@lib/apollo-client";
+import { GET_CHECKLIST_BY_ID } from "@graphql/checklistGraph";
 import { InstructorChecklistLogic } from "@components/features/listaChequeoInstructor/InstructorChecklistLogic";
 import {
   Checklist,
   Evaluation,
-} from "@/types/checklist";
+} from "@graphql/generated";
 
 export class InstructorChecklistHandlers {
   // Handler para cambio de trimestre
@@ -45,11 +46,14 @@ export class InstructorChecklistHandlers {
       localStorage.setItem('selectedChecklistId', checklistId);
       
       try {
-        const checklistResponse = await checkListService.fetchChecklistById(parseInt(checklistId));
+        const { data } = await client.query({
+          query: GET_CHECKLIST_BY_ID,
+          variables: { id: parseInt(checklistId) }
+        });
 
-        if (checklistResponse.code === "200" && checklistResponse.data) {
-          setSelectedChecklist(checklistResponse.data);
-          loadExistingSignatures(checklistResponse.data);
+        if (data?.checklistById?.code === "200" && data?.checklistById?.data) {
+          setSelectedChecklist(data.checklistById.data);
+          loadExistingSignatures(data.checklistById.data);
           
           // Verificar si tenemos una evaluación guardada localmente
           const localEvaluationData = localStorage.getItem(`evaluationData_${checklistId}`);
@@ -65,7 +69,7 @@ export class InstructorChecklistHandlers {
               setEvaluationRecommendations(parsedData.recommendations || "");
               setEvaluationJudgment(parsedData.judgment || "PENDIENTE");
             } catch (error) {
-              console.error("Error parsing local evaluation data:", error);
+              // Error parsing local evaluation data
             }
           }
           
@@ -74,7 +78,7 @@ export class InstructorChecklistHandlers {
               const parsedStates = JSON.parse(localItemStates);
               setItemStates(parsedStates);
             } catch (error) {
-              console.error("Error parsing local item states:", error);
+              // Error parsing local item states
             }
           }
           
@@ -88,7 +92,6 @@ export class InstructorChecklistHandlers {
           }
         }
       } catch (error) {
-        console.error("Error loading checklist details:", error);
         setSelectedChecklist(checklist || null);
         if (checklist) {
           loadExistingSignatures(checklist);
@@ -166,25 +169,25 @@ export class InstructorChecklistHandlers {
     try {
       setIsSavingItems(true);
       
-      // Estructura para guardar: observaciones generales + estados de items
-      const observationsToSave = JSON.stringify({
-        generalObservations: evaluationObservations,
-        itemStates: currentItemStates
-      });
+      // Guardar solo las observaciones generales como texto plano
+      // Los estados de items se manejan separadamente en el frontend
+      const observationsToSave = evaluationObservations.trim();
+      
+      // Guardar estados de items en localStorage para persistencia
+      localStorage.setItem(`itemStates_${selectedChecklist.id}`, JSON.stringify(currentItemStates));
       
       const updateResponse = await evaluationService.completeEvaluation(
-        parseInt(selectedEvaluation.id),
+        parseInt(selectedEvaluation.id || "0"),
         observationsToSave,
         evaluationRecommendations,
         evaluationJudgment
       );
       
       if (updateResponse && updateResponse.code === "200") {
-        console.log('✅ Items auto-saved successfully');
         setPendingChanges(false);
       }
     } catch (error) {
-      console.error("Error auto-saving items:", error);
+      // Error auto-saving items
     } finally {
       setIsSavingItems(false);
     }
@@ -221,14 +224,15 @@ export class InstructorChecklistHandlers {
     try {
       toast.info("💾 Guardando evaluación...");
       
-      // Estructura para guardar: observaciones generales + estados de items
-      const observationsToSave = JSON.stringify({
-        generalObservations: evaluationObservations,
-        itemStates: itemStates
-      });
+      // Guardar solo las observaciones generales como texto plano
+      // Los estados de items se manejan separadamente en el frontend
+      const observationsToSave = evaluationObservations.trim();
+
+      // Guardar estados de items en localStorage para persistencia
+      localStorage.setItem(`itemStates_${selectedChecklist.id}`, JSON.stringify(itemStates));
 
       const response = await evaluationService.completeEvaluation(
-        parseInt(selectedEvaluation.id),
+        parseInt(selectedEvaluation.id || "0"),
         observationsToSave,
         evaluationRecommendations,
         evaluationJudgment
@@ -260,7 +264,6 @@ export class InstructorChecklistHandlers {
         throw new Error(response?.message || "Error al guardar la evaluación");
       }
     } catch (error: any) {
-      console.error("Error completing evaluation:", error);
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
         toast.error(`❌ Error: ${error.graphQLErrors[0].message}`);
       } else if (error.networkError) {
@@ -290,6 +293,11 @@ export class InstructorChecklistHandlers {
       return;
     }
 
+    if (!selectedTeamScrumId) {
+      toast.error("Por favor seleccione un Team Scrum antes de crear la evaluación");
+      return;
+    }
+
     if (!evaluationObservations.trim() || !evaluationRecommendations.trim()) {
       toast.error("Por favor complete las observaciones y recomendaciones");
       return;
@@ -305,17 +313,25 @@ export class InstructorChecklistHandlers {
       toast.info("🚀 Creando evaluación...");
 
       const teamScrumIdNumber = selectedTeamScrumId ? parseInt(selectedTeamScrumId) : undefined;
+      
+      if (!teamScrumIdNumber) {
+        toast.error("ID de Team Scrum inválido");
+        setIsCreatingEvaluation(false);
+        return;
+      }
+
       const newEvaluationResult = await evaluationService.createEvaluationForChecklist(
         parseInt(selectedChecklist.id), 
         teamScrumIdNumber
       );
 
       if (newEvaluationResult && newEvaluationResult.code === "200" && newEvaluationResult.id) {
-        // Estructura para guardar: observaciones generales + estados de items
-        const observationsToSave = JSON.stringify({
-          generalObservations: evaluationObservations,
-          itemStates: itemStates
-        });
+        // Guardar solo las observaciones generales como texto plano
+        // Los estados de items se manejan separadamente en el frontend
+        const observationsToSave = evaluationObservations.trim();
+
+        // Guardar estados de items en localStorage para persistencia
+        localStorage.setItem(`itemStates_${selectedChecklist.id}`, JSON.stringify(itemStates));
 
         const completeResult = await evaluationService.completeEvaluation(
           parseInt(newEvaluationResult.id),
@@ -354,7 +370,6 @@ export class InstructorChecklistHandlers {
         throw new Error(newEvaluationResult?.message || "Error al crear evaluación");
       }
     } catch (error: any) {
-      console.error('❌ Error creating evaluation from modal:', error);
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
         toast.error(`❌ Error: ${error.graphQLErrors[0].message}`);
       } else if (error.networkError) {
@@ -440,7 +455,6 @@ export class InstructorChecklistHandlers {
       // Implement signature saving logic here
       
     } catch (error) {
-      console.error('Error procesando archivo:', error);
       toast.error("Error al procesar el archivo de imagen");
     }
   };

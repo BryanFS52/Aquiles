@@ -83,7 +83,7 @@ const evaluationService = {
     },
 
     // Función para crear una evaluación automáticamente al crear una lista de chequeo
-    createEvaluationForChecklist: async (checklistId: number, checklistData?: any) => {
+    createEvaluationForChecklist: async (checklistId: number, teamScrumId?: number) => {
         try {
             const numericChecklistId = parseInt(checklistId.toString());
             
@@ -95,8 +95,11 @@ const evaluationService = {
                 observations: "",
                 recommendations: "",
                 valueJudgment: "PENDIENTE",
-                checklistId: numericChecklistId
+                checklistId: numericChecklistId,
+                teamScrumId: teamScrumId // Incluir teamScrumId para hacer la evaluación única
             };
+
+            console.log("🚀 Creando evaluación con datos:", evaluationInput);
 
             const { data } = await clientLAN.mutate({
                 mutation: ADD_EVALUATION,
@@ -104,6 +107,7 @@ const evaluationService = {
             });
             
             if (data && data.addEvaluation && data.addEvaluation.code === "200") {
+                console.log("✅ Evaluación creada exitosamente:", data.addEvaluation);
                 return data.addEvaluation;
             } else {
                 throw new Error(`Error creating evaluation: ${data?.addEvaluation?.message}`);
@@ -117,28 +121,36 @@ const evaluationService = {
     // Función para obtener evaluaciones por checklist ID
     fetchEvaluationsByChecklist: async (checklistId: number) => {
         try {
+            console.log("🔍 Fetching evaluations for checklist:", checklistId);
+            console.log("🔍 Using allEvaluations query and filtering");
+            
             const { data } = await clientLAN.query({
-                query: GET_EVALUATIONS_BY_CHECKLIST || GET_ALL_EVALUATIONS,
-                variables: GET_EVALUATIONS_BY_CHECKLIST ? { checklistId } : { page: 0, size: 100 },
+                query: GET_ALL_EVALUATIONS,
+                variables: { page: 0, size: 100 },
                 fetchPolicy: 'no-cache',
             });
             
-            if (GET_EVALUATIONS_BY_CHECKLIST) {
-                return data.evaluationsByChecklist;
-            } else {
-                // Filtrar por checklistId si no hay query específica
-                if (data.allEvaluations && data.allEvaluations.data) {
-                    const filteredEvaluations = data.allEvaluations.data.filter((evaluation: any) => {
-                        return safeIdComparison(evaluation.checklistId, checklistId);
-                    });
-                    
-                    return {
-                        ...data.allEvaluations,
-                        data: filteredEvaluations
-                    };
-                }
-                return data.allEvaluations;
+            console.log("🔍 Raw GraphQL response:", data);
+            
+            // Filtrar por checklistId
+            if (data.allEvaluations && data.allEvaluations.data) {
+                console.log("🔍 All evaluations before filtering:", data.allEvaluations.data);
+                const filteredEvaluations = data.allEvaluations.data.filter((evaluation: any) => {
+                    const matches = safeIdComparison(evaluation.checklistId, checklistId);
+                    console.log(`🔍 Evaluation ${evaluation.id}: checklistId=${evaluation.checklistId}, target=${checklistId}, matches=${matches}`);
+                    return matches;
+                });
+                
+                console.log("🔍 Filtered evaluations:", filteredEvaluations);
+                
+                return {
+                    ...data.allEvaluations,
+                    data: filteredEvaluations
+                };
             }
+            
+            console.log("❌ No allEvaluations data found");
+            return data.allEvaluations;
         } catch (error) {
             console.error('❌ Error fetching evaluations by checklist:', error);
             throw error;
@@ -312,14 +324,10 @@ export const updateEvaluationItemStates = createAsyncThunk<UpdateEvaluationMutat
             console.log('Item states:', itemStates);
             console.log('General observations:', generalObservations);
 
-            // Crear el JSON estructurado que incluye tanto los estados de items como las observaciones generales
-            const observationsData = {
-                itemStates: itemStates,
-                generalObservations: generalObservations || ""
-            };
-
+            // Guardar solo las observaciones generales como texto plano
+            // Los estados de items se mantienen en localStorage y se sincronizan con la evaluación
             const input = {
-                observations: JSON.stringify(observationsData),
+                observations: generalObservations || "",
                 recommendations: recommendations || "",
                 valueJudgment: valueJudgment || "PENDIENTE"
             };

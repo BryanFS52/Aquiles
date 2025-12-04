@@ -23,6 +23,10 @@ export const GET_ALL_CHECKLISTS = gql`
           code
           indicator
           active
+          itemType {
+            id
+            name
+          }
         }
       }
     }
@@ -49,6 +53,10 @@ export const GET_CHECKLIST_BY_ID = gql`
           code
           indicator
           active
+          itemType {
+            id
+            name
+          }
         }
         evaluations {
           id
@@ -84,12 +92,15 @@ export const GET_ALL_CHECKLISTS_COORDINATOR = gql`
         component
         studySheets
         trainingProjectId
-        trainingProjectName
         items {
           id
           code
           indicator
           active
+          itemType {
+            id
+            name
+          }
         }
       }
     }
@@ -112,12 +123,15 @@ export const GET_CHECKLIST_BY_ID_COORDINATOR = gql`
         component
         studySheets
         trainingProjectId
-        trainingProjectName
         items {
           id
           code
           indicator
           active
+          itemType {
+            id
+            name
+          }
         }
         evaluations {
           id
@@ -157,6 +171,17 @@ export const GET_ALL_CHECKLISTS_INSTRUCTOR = gql`
           code
           indicator
           active
+          itemType {
+            id
+            name
+          }
+        }
+        evaluations {
+          id
+          observations
+          recommendations
+          valueJudgment
+          checklistId
         }
       }
     }
@@ -183,6 +208,10 @@ export const GET_CHECKLIST_BY_ID_INSTRUCTOR = gql`
           code
           indicator
           active
+          itemType {
+            id
+            name
+          }
         }
         evaluations {
           id
@@ -225,6 +254,15 @@ export const DELETE_CHECKLIST = gql`
       code
       message
       id
+    }
+  }
+`;
+
+export const UPDATE_ITEM_STATUS = gql`
+  mutation UpdateItemStatus($itemId: Long!, $active: Boolean!) {
+    updateItemStatus(itemId: $itemId, active: $active) {
+      code
+      message
     }
   }
 `;

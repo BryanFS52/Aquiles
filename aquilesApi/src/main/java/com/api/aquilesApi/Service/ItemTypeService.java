@@ -27,7 +27,7 @@ public class ItemTypeService implements Idao<ItemType, Long> {
     @Override
     public ItemType getById(Long id) {
         return itemTypeRepository.findById(id).orElseThrow(() ->
-                new CustomException("Team Scrum with id " + id + " not found", HttpStatus.NO_CONTENT));
+                new CustomException("ItemType with id " + id + " not found", HttpStatus.NO_CONTENT));
     }
 
     // Update an existing ItemType

@@ -9,6 +9,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
   evaluationObservations,
   evaluationRecommendations,
   evaluationJudgment,
+  evaluationCriteria,
   isFinalSaved,
   onUpdateClick,
   onCancelUpdate,
@@ -99,18 +100,17 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                           required
                         >
                           <option value="">Seleccionar...</option>
-                          <option value="PENDIENTE">Pendiente</option>
                           <option value="APROBADO">Aprobado</option>
                           <option value="NO APROBADO">No Aprobado</option>
                         </select>
                       </div>
 
                       {/* ACCIONES */}
-                      <div className="col-span-2 flex items-center justify-center space-x-2">
+                      <div className="col-span-2 flex flex-col items-center justify-center space-y-2">
                         <button
                           onClick={onCancelUpdate}
                           disabled={isFinalSaved}
-                          className={`px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-all duration-300 flex items-center space-x-2 text-sm font-medium ${
+                          className={`w-full px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 text-sm font-medium ${
                             isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
                         >
@@ -120,7 +120,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                         <button
                           onClick={onCompleteEvaluation}
                           disabled={isFinalSaved || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE"}
-                          className={`px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2 text-sm font-medium ${(isFinalSaved || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
+                          className={`w-full px-4 py-2 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 text-sm font-medium ${(isFinalSaved || !evaluationObservations?.trim() || !evaluationRecommendations?.trim() || !evaluationJudgment || evaluationJudgment === "PENDIENTE")
                               ? 'bg-gray-400 cursor-not-allowed text-white'
                               : 'bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue hover:from-[#4a9600] hover:to-[#7bc300] dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white'
                             }`}
@@ -138,7 +138,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                   {/* Estado de la evaluación */}
                   <div className="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-800 dark:to-blue-900/50 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
                     <p className="text-blue-800 dark:text-blue-200 text-center font-medium flex items-center justify-center gap-2">
-                      <span className="text-2xl">✅</span>
+                      <span className="text-2xl"></span>
                       <strong>Evaluación Completada</strong>
                     </p>
                   </div>
@@ -191,7 +191,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                         <button
                           onClick={onUpdateClick}
                           disabled={isFinalSaved}
-                          className={`px-4 py-2 bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue hover:from-[#4a9600] hover:to-[#7bc300] dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white rounded-lg transition-all duration-300 flex items-center space-x-2 text-sm font-medium ${
+                          className={`px-4 py-2 bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue hover:from-[#4a9600] hover:to-[#7bc300] dark:hover:from-darkBlue dark:hover:to-shadowBlue text-white rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 text-sm font-medium ${
                             isFinalSaved ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
                         >
@@ -216,14 +216,11 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                 {/* Contenido de la tabla */}
                 <div className="px-6 py-8 text-center">
                   <div className="space-y-6">
-                    <div className="w-16 h-16 bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue rounded-full flex items-center justify-center mx-auto">
-                      <span className="text-white text-2xl">📋</span>
-                    </div>
+                   
                     <h4 className="text-2xl font-bold text-gray-900 dark:text-white">
                       Esta lista no tiene evaluación
                     </h4>
                     <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                      Se creará automáticamente una <strong>evaluación única</strong> vinculada a esta lista de chequeo (relación 1:1 en la base de datos). 
                       Complete los campos para establecer la evaluación final.
                     </p>
 

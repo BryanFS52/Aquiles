@@ -1,14 +1,15 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLazyQuery } from '@apollo/client';
 import { AppDispatch, RootState } from '@redux/store';
 import { fetchChecklists } from '@redux/slices/checklistSlice';
-import { fetchTeamScrumByIdWithStudents } from '@redux/slices/teamScrumSlice';
+import { fetchStudySheetWithStudents } from '@redux/slices/olympo/studySheetSlice';
 import { GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST } from '@graphql/checklistQualificationGraph';
 import { GET_EVALUATION_BY_CHECKLIST_AND_TEAM } from '@graphql/evaluationsGraph';
-import { clientLAN } from '@lib/apollo-client';
 import PageTitle from "@components/UI/pageTitle";
-import { Calendar, Users, User, Eye, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Calendar, Users, User, Eye, X } from 'lucide-react';
+import { TEMPORAL_APRENDIZ_ID } from '@/temporaryCredential';
 import { toast } from 'react-toastify';
 
 // Interfaz para los items del checklist con sus calificaciones
@@ -46,7 +47,11 @@ export default function AprendizChecklistView() {
   
   // Redux state
   const { data: checklists, loading: loadingChecklists } = useSelector((state: RootState) => state.checklist);
-  const { dataForTeamScrumById } = useSelector((state: RootState) => state.teamScrum);
+  const { dataForStudents: studySheetData } = useSelector((state: RootState) => state.studySheet);
+  
+  // Queries para obtener calificaciones y evaluaciones
+  const [loadQualifications] = useLazyQuery(GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST);
+  const [loadEvaluation] = useLazyQuery(GET_EVALUATION_BY_CHECKLIST_AND_TEAM);
   
   // State management
   const [selectedTrimester, setSelectedTrimester] = useState<string>("todos");
@@ -58,36 +63,45 @@ export default function AprendizChecklistView() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState(true);
   
-  // Estados para manejar expansión de texto
-  const [expandedObservations, setExpandedObservations] = useState<{ [key: string]: boolean }>({});
-  const [expandedRecommendations, setExpandedRecommendations] = useState<boolean>(false);
-  const [expandedEvaluationObs, setExpandedEvaluationObs] = useState<boolean>(false);
-  const [expandedCardDescriptions, setExpandedCardDescriptions] = useState<{ [key: string]: boolean }>({});
-  
   const itemsPerPage = 5;
-  const teamScrumId = "1"; // ID del team scrum del aprendiz (igual que en TeamScrumAprendizContainer)
   
-  // Obtener el team scrum del aprendiz - REPLICANDO EXACTAMENTE TeamScrumAprendizContainer
+  // Obtener el team scrum del aprendiz desde su ficha
   const studentTeamScrum = useMemo(() => {
-    return dataForTeamScrumById;
-  }, [dataForTeamScrumById]);
+    if (!studySheetData?.studentStudySheets) return null;
+    
+    // Buscar el estudiante actual
+    const currentStudent: any = studySheetData.studentStudySheets.find(
+      (sss: any) => sss.student?.id === TEMPORAL_APRENDIZ_ID
+    );
+    
+    if (!currentStudent) return null;
+    
+    // Obtener el team scrum del estudiante
+    const student = currentStudent.student;
+    const teamScrums = student?.teamScrums || [];
+    return teamScrums.length > 0 ? teamScrums[0] : null;
+  }, [studySheetData]);
 
-  // Cargar el Team Scrum del aprendiz - EXACTAMENTE IGUAL que TeamScrumAprendizContainer
-  useEffect(() => {
-    if (teamScrumId) {
-      dispatch(fetchTeamScrumByIdWithStudents({ id: teamScrumId }));
-    }
-  }, [dispatch, teamScrumId]);
-
-  // Cargar todas las listas de chequeo
+  // Cargar datos iniciales
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         setLoading(true);
+        // Cargar todas las listas de chequeo
         await dispatch(fetchChecklists({ page: 0, size: 100 })).unwrap();
+        
+        // Cargar la ficha con estudiantes para obtener el team scrum del aprendiz
+        // Aquí deberías obtener el studySheetId de alguna manera (contexto, localStorage, etc.)
+        // Por ahora uso un ID temporal, ajusta según tu lógica
+        const studySheetId = localStorage.getItem('selectedStudySheetId');
+        if (studySheetId) {
+          await dispatch(fetchStudySheetWithStudents({ 
+            id: parseInt(studySheetId) 
+          })).unwrap();
+        }
       } catch (error) {
-        console.error("Error cargando listas de chequeo:", error);
-        toast.error("Error al cargar las listas de chequeo");
+        console.error("Error cargando datos iniciales:", error);
+        toast.error("Error al cargar los datos");
       } finally {
         setLoading(false);
       }
@@ -111,13 +125,11 @@ export default function AprendizChecklistView() {
 
           try {
             // Cargar calificaciones de los items
-            const qualificationsResult = await clientLAN.query({
-              query: GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST,
+            const qualificationsResult = await loadQualifications({
               variables: {
                 checklistId: parseInt(checklist.id as string),
                 teamScrumId: parseInt(studentTeamScrum.id as string)
-              },
-              fetchPolicy: 'no-cache'
+              }
             });
 
             const qualifications = qualificationsResult.data?.checklistQualificationsByChecklist || [];
@@ -137,13 +149,11 @@ export default function AprendizChecklistView() {
             });
 
             // Cargar evaluación general
-            const evaluationResult = await clientLAN.query({
-              query: GET_EVALUATION_BY_CHECKLIST_AND_TEAM,
+            const evaluationResult = await loadEvaluation({
               variables: {
                 checklistId: parseInt(checklist.id as string),
                 teamScrumId: parseInt(studentTeamScrum.id as string)
-              },
-              fetchPolicy: 'no-cache'
+              }
             });
 
             const evaluationData = evaluationResult.data?.evaluationByChecklistAndTeam?.data;
@@ -188,7 +198,7 @@ export default function AprendizChecklistView() {
     };
 
     loadEvaluatedChecklists();
-  }, [studentTeamScrum, checklists, dispatch]);
+  }, [studentTeamScrum, checklists, loadQualifications, loadEvaluation]);
 
   // Obtener trimestres y componentes únicos
   const availableTrimesters = useMemo(() => 
@@ -247,63 +257,11 @@ export default function AprendizChecklistView() {
   const handleOpenPreview = (checklist: EvaluatedChecklistData) => {
     setSelectedChecklistForPreview(checklist);
     setShowPreview(true);
-    // Resetear estados de expansión
-    setExpandedObservations({});
-    setExpandedRecommendations(false);
-    setExpandedEvaluationObs(false);
-    setExpandedCardDescriptions({});
   };
 
   const handleClosePreview = () => {
     setShowPreview(false);
     setSelectedChecklistForPreview(null);
-    // Resetear estados de expansión
-    setExpandedObservations({});
-    setExpandedRecommendations(false);
-    setExpandedEvaluationObs(false);
-    setExpandedCardDescriptions({});
-  };
-
-  // Funciones para manejar expansión de texto
-  const truncateText = (text: string, maxLength: number = 150) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
-  };
-
-  // Función para formatear el trimestre
-  const formatTrimester = (trimester: string) => {
-    // Si ya contiene la palabra "Trimestre", retornarlo tal como está
-    if (trimester.toLowerCase().includes('trimestre')) {
-      return trimester;
-    }
-    // Si es solo un número, agregar "Trimestre" al inicio
-    if (/^\d+$/.test(trimester.trim())) {
-      return `Trimestre ${trimester}`;
-    }
-    // Si no es un número simple, agregar "Trimestre" si no está presente
-    return `Trimestre ${trimester}`;
-  };
-
-  const toggleObservationExpansion = (itemId: number) => {
-    setExpandedObservations(prev => ({
-      ...prev,
-      [itemId]: !prev[itemId]
-    }));
-  };
-
-  const toggleRecommendationsExpansion = () => {
-    setExpandedRecommendations(prev => !prev);
-  };
-
-  const toggleEvaluationObsExpansion = () => {
-    setExpandedEvaluationObs(prev => !prev);
-  };
-
-  const toggleCardDescriptionExpansion = (checklistId: string) => {
-    setExpandedCardDescriptions(prev => ({
-      ...prev,
-      [checklistId]: !prev[checklistId]
-    }));
   };
 
   // Función para formatear fecha
@@ -343,19 +301,20 @@ export default function AprendizChecklistView() {
     }
   };
 
-  // Información del estudiante desde el team scrum
+  // Información del estudiante desde studySheetData
   const studentInfo = useMemo(() => {
-    if (!studentTeamScrum?.studySheet) return null;
+    if (!studySheetData) return null;
     
-    const studySheet = studentTeamScrum.studySheet;
+    // studySheetData puede tener una estructura anidada
+    const sheet: any = studySheetData;
     
     return {
       centroFormacion: "Centro de Servicios Financieros",
-      programa: studySheet.trainingProject?.program?.name || "Análisis y Desarrollo de Software",
-      jornada: studySheet.journey?.name || "Diurna",
-      fichaNumber: studySheet.number?.toString() || "Sin número"
+      programa: sheet?.trainingProject?.program?.name || "Análisis y Desarrollo de Software",
+      jornada: sheet?.journey?.name || "Diurna",
+      fichaNumber: sheet?.number?.toString() || "Sin número"
     };
-  }, [studentTeamScrum]);
+  }, [studySheetData]);
 
   if (loading || loadingChecklists) {
     return (
@@ -468,17 +427,17 @@ export default function AprendizChecklistView() {
                 <option value="todos">Todos los trimestres</option>
                 {availableTrimesters.map((trimester) => (
                   <option key={trimester} value={trimester}>
-                    {formatTrimester(trimester)}
+                    {trimester}
                   </option>
                 ))}
               </select>
 
               <select
-                className="w-full sm:w-[280px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5cb800] focus:border-transparent transition-all duration-300"
+                className="w-full sm:w-[200px] p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#5cb800] focus:border-transparent transition-all duration-300"
                 value={selectedComponent}
                 onChange={(e) => setSelectedComponent(e.target.value)}
               >
-                <option value="todos">Seleccionar lista de chequeo</option>
+                <option value="todos">Todos los componentes</option>
                 {availableComponents.map((component) => (
                   <option key={component} value={component}>
                     {component}
@@ -517,64 +476,18 @@ export default function AprendizChecklistView() {
               {currentItems.map((checklist) => (
                 <div
                   key={checklist.checklistId}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 word-break-break-word"
-                  style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}
+                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                 >
                   {/* Header de la card */}
                   <div className="bg-gradient-to-r from-[#5cb800] to-[#8fd400] p-4">
-                    <div className="flex items-start justify-between gap-3 min-w-0">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold text-white break-words mb-1">{formatTrimester(checklist.trimester)}</h3>
-                        <div className="text-sm text-white/80 min-w-0 flex-1">
-                          {checklist.component.length > 50 ? (
-                            <div className="w-full min-w-0">
-                              <div 
-                                className={`break-all overflow-wrap-anywhere text-wrap ${
-                                  expandedCardDescriptions[checklist.checklistId] ? 'whitespace-pre-wrap' : 'truncate'
-                                }`}
-                                style={{ 
-                                  wordBreak: 'break-all',
-                                  overflowWrap: 'anywhere',
-                                  maxWidth: '100%',
-                                  width: '100%',
-                                  minWidth: '0',
-                                  hyphens: 'auto'
-                                }}
-                              >
-                                {expandedCardDescriptions[checklist.checklistId] 
-                                  ? checklist.component 
-                                  : truncateText(checklist.component, 50)
-                                }
-                              </div>
-                              <button
-                                onClick={() => toggleCardDescriptionExpansion(checklist.checklistId)}
-                                className="mt-1 text-white/90 hover:text-white font-medium text-xs transition-colors duration-200 flex items-center gap-1"
-                              >
-                                {expandedCardDescriptions[checklist.checklistId] ? (
-                                  <>
-                                    <ChevronUp className="w-3 h-3" />
-                                    <span>Ver menos</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <ChevronDown className="w-3 h-3" />
-                                    <span>Ver más</span>
-                                  </>
-                                )}
-                              </button>
-                            </div>
-                          ) : (
-                            <p className="break-all overflow-wrap-anywhere" style={{ wordBreak: 'break-all', overflowWrap: 'anywhere' }}>
-                              {checklist.component}
-                            </p>
-                          )}
-                        </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-bold text-white">{checklist.trimester}</h3>
+                        <p className="text-sm text-white/80">{checklist.component}</p>
                       </div>
-                      <div className="flex-shrink-0">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${getStatusBadgeColor(checklist.status)}`}>
-                          {checklist.status.toUpperCase()}
-                        </span>
-                      </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusBadgeColor(checklist.status)}`}>
+                        {checklist.status.toUpperCase()}
+                      </span>
                     </div>
                   </div>
 
@@ -583,9 +496,9 @@ export default function AprendizChecklistView() {
                     {/* Información de evaluación */}
                     <div className="space-y-3">
                       <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                        <span className="text-sm text-gray-600 dark:text-gray-400 flex-shrink-0">Team:</span>
-                        <span className="text-sm font-semibold text-gray-900 dark:text-white break-words">{checklist.teamScrumName}</span>
+                        <Users className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Team:</span>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white">{checklist.teamScrumName}</span>
                       </div>
                       {checklist.evaluation && (
                         <div className="flex items-center gap-2">
@@ -698,23 +611,8 @@ export default function AprendizChecklistView() {
             </div>
 
             {/* Contenido scrolleable */}
-            <div 
-              className="flex-1 overflow-y-auto overflow-x-hidden" 
-              style={{ 
-                wordWrap: 'break-word', 
-                overflowWrap: 'anywhere',
-                maxWidth: '100%'
-              }}
-            >
-              <div 
-                className="p-8 space-y-8 max-w-full" 
-                style={{ 
-                  wordBreak: 'break-all',
-                  overflowWrap: 'anywhere',
-                  maxWidth: '100%',
-                  minWidth: '0'
-                }}
-              >
+            <div className="flex-1 overflow-y-auto overflow-x-hidden">
+              <div className="p-8 space-y-8">
                 {(() => {
                   const previewData = generatePreviewData();
                   if (!previewData) return null;
@@ -736,15 +634,15 @@ export default function AprendizChecklistView() {
                           </div>
                           <div className="bg-white/70 dark:bg-[#5cb800]/10 p-4 rounded-2xl border border-[#5cb800]/30 dark:border-[#5cb800]/20">
                             <span className="font-bold text-darkBlue dark:text-[#8fd400] text-sm uppercase tracking-wide">Trimestre:</span>
-                            <div className="text-xl font-bold text-[#5cb800] dark:text-[#8fd400] mt-1">{formatTrimester(previewData.checklist.trimester)}</div>
+                            <div className="text-xl font-bold text-[#5cb800] dark:text-[#8fd400] mt-1">{previewData.checklist.trimester}</div>
                           </div>
                           <div className="bg-white/70 dark:bg-[#5cb800]/10 p-4 rounded-2xl border border-[#5cb800]/30 dark:border-[#5cb800]/20">
                             <span className="font-bold text-darkBlue dark:text-[#8fd400] text-sm uppercase tracking-wide">Componente:</span>
-                            <div className="text-lg font-bold text-[#5cb800] dark:text-[#8fd400] mt-1 break-words" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>{previewData.checklist.component}</div>
+                            <div className="text-xl font-bold text-[#5cb800] dark:text-[#8fd400] mt-1">{previewData.checklist.component}</div>
                           </div>
                           <div className="bg-white/70 dark:bg-[#5cb800]/10 p-4 rounded-2xl border border-[#5cb800]/30 dark:border-[#5cb800]/20">
                             <span className="font-bold text-darkBlue dark:text-[#8fd400] text-sm uppercase tracking-wide">Team:</span>
-                            <div className="text-lg font-bold text-[#5cb800] dark:text-[#8fd400] mt-1 break-words" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>{previewData.checklist.teamScrum}</div>
+                            <div className="text-xl font-bold text-[#5cb800] dark:text-[#8fd400] mt-1">{previewData.checklist.teamScrum}</div>
                           </div>
                         </div>
                       </div>
@@ -795,7 +693,7 @@ export default function AprendizChecklistView() {
                                     </span>
                                   </div>
                                 </div>
-                                <p className="text-darkBlue dark:text-gray-200 mb-4 text-base leading-relaxed font-medium break-words" style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}>
+                                <p className="text-darkBlue dark:text-gray-200 mb-4 text-base leading-relaxed font-medium">
                                   {item.indicator}
                                 </p>
                                 {item.observations && (
@@ -806,50 +704,9 @@ export default function AprendizChecklistView() {
                                       </div>
                                       <span className="text-sm font-bold text-darkBlue dark:text-[#8fd400] uppercase tracking-wide">Observaciones</span>
                                     </div>
-                                    <div className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed min-w-0 w-full">
-                                      {item.observations.length > 150 ? (
-                                        <div className="w-full">
-                                          <div 
-                                            className={`w-full min-w-0 ${
-                                              expandedObservations[item.id] ? 'whitespace-pre-wrap break-all' : 'break-all'
-                                            }`}
-                                            style={{ 
-                                              wordBreak: 'break-all',
-                                              overflowWrap: 'anywhere',
-                                              maxWidth: '100%',
-                                              width: '100%',
-                                              minWidth: '0',
-                                              hyphens: 'auto'
-                                            }}
-                                          >
-                                            {expandedObservations[item.id] 
-                                              ? item.observations 
-                                              : truncateText(item.observations, 150)
-                                            }
-                                          </div>
-                                          <button
-                                            onClick={() => toggleObservationExpansion(item.id)}
-                                            className="mt-2 text-[#5cb800] dark:text-[#8fd400] hover:text-[#4a9600] dark:hover:text-[#7bc300] font-semibold text-xs transition-colors duration-200 flex items-center gap-1 hover:bg-[#5cb800]/10 dark:hover:bg-[#8fd400]/10 px-2 py-1 rounded-md"
-                                          >
-                                            {expandedObservations[item.id] ? (
-                                              <>
-                                                <ChevronUp className="w-3 h-3" />
-                                                <span>Ver menos</span>
-                                              </>
-                                            ) : (
-                                              <>
-                                                <ChevronDown className="w-3 h-3" />
-                                                <span>Ver más</span>
-                                              </>
-                                            )}
-                                          </button>
-                                        </div>
-                                      ) : (
-                                        <div className="break-all w-full" style={{ wordBreak: 'break-all', overflowWrap: 'anywhere' }}>
-                                          {item.observations}
-                                        </div>
-                                      )}
-                                    </div>
+                                    <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                                      {item.observations}
+                                    </p>
                                   </div>
                                 )}
                               </div>
@@ -877,48 +734,9 @@ export default function AprendizChecklistView() {
                                   <h4 className="font-bold text-darkBlue dark:text-[#8fd400] text-lg">Observaciones</h4>
                                 </div>
                                 <div className="bg-gradient-to-br from-gray-50 to-white dark:from-[#5cb800]/5 dark:to-[#8fd400]/5 p-4 rounded-2xl border border-gray-200/60 dark:border-[#5cb800]/20 min-h-[120px]">
-                                  {previewData.evaluation.observations && previewData.evaluation.observations.length > 200 ? (
-                                    <div className="w-full min-w-0">
-                                      <div 
-                                        className={`text-gray-700 dark:text-gray-300 text-sm leading-relaxed w-full min-w-0 ${
-                                          expandedEvaluationObs ? 'whitespace-pre-wrap break-all' : 'break-all'
-                                        }`}
-                                        style={{ 
-                                          wordBreak: 'break-all',
-                                          overflowWrap: 'anywhere',
-                                          maxWidth: '100%',
-                                          width: '100%',
-                                          minWidth: '0',
-                                          hyphens: 'auto'
-                                        }}
-                                      >
-                                        {expandedEvaluationObs 
-                                          ? previewData.evaluation.observations 
-                                          : truncateText(previewData.evaluation.observations, 200)
-                                        }
-                                      </div>
-                                      <button
-                                        onClick={toggleEvaluationObsExpansion}
-                                        className="mt-3 text-[#5cb800] dark:text-[#8fd400] hover:text-[#4a9600] dark:hover:text-[#7bc300] font-semibold text-xs transition-colors duration-200 flex items-center gap-1 hover:bg-[#5cb800]/10 dark:hover:bg-[#8fd400]/10 px-2 py-1 rounded-md"
-                                      >
-                                        {expandedEvaluationObs ? (
-                                          <>
-                                            <ChevronUp className="w-3 h-3" />
-                                            <span>Ver menos</span>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <ChevronDown className="w-3 h-3" />
-                                            <span>Ver más</span>
-                                          </>
-                                        )}
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    <div className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed break-all w-full" style={{ wordBreak: 'break-all', overflowWrap: 'anywhere' }}>
-                                      {previewData.evaluation.observations || 'Sin observaciones'}
-                                    </div>
-                                  )}
+                                  <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed break-words whitespace-pre-wrap">
+                                    {previewData.evaluation.observations || 'Sin observaciones'}
+                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -931,48 +749,9 @@ export default function AprendizChecklistView() {
                                   <h4 className="font-bold text-darkBlue dark:text-[#8fd400] text-lg">Recomendaciones</h4>
                                 </div>
                                 <div className="bg-gradient-to-br from-gray-50 to-white dark:from-[#5cb800]/5 dark:to-[#8fd400]/5 p-4 rounded-2xl border border-gray-200/60 dark:border-[#5cb800]/20 min-h-[120px]">
-                                  {previewData.evaluation.recommendations && previewData.evaluation.recommendations.length > 200 ? (
-                                    <div className="w-full min-w-0">
-                                      <div 
-                                        className={`text-gray-700 dark:text-gray-300 text-sm leading-relaxed w-full min-w-0 ${
-                                          expandedRecommendations ? 'whitespace-pre-wrap break-all' : 'break-all'
-                                        }`}
-                                        style={{ 
-                                          wordBreak: 'break-all',
-                                          overflowWrap: 'anywhere',
-                                          maxWidth: '100%',
-                                          width: '100%',
-                                          minWidth: '0',
-                                          hyphens: 'auto'
-                                        }}
-                                      >
-                                        {expandedRecommendations 
-                                          ? previewData.evaluation.recommendations 
-                                          : truncateText(previewData.evaluation.recommendations, 200)
-                                        }
-                                      </div>
-                                      <button
-                                        onClick={toggleRecommendationsExpansion}
-                                        className="mt-3 text-[#5cb800] dark:text-[#8fd400] hover:text-[#4a9600] dark:hover:text-[#7bc300] font-semibold text-xs transition-colors duration-200 flex items-center gap-1 hover:bg-[#5cb800]/10 dark:hover:bg-[#8fd400]/10 px-2 py-1 rounded-md"
-                                      >
-                                        {expandedRecommendations ? (
-                                          <>
-                                            <ChevronUp className="w-3 h-3" />
-                                            <span>Ver menos</span>
-                                          </>
-                                        ) : (
-                                          <>
-                                            <ChevronDown className="w-3 h-3" />
-                                            <span>Ver más</span>
-                                          </>
-                                        )}
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    <div className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed break-all w-full" style={{ wordBreak: 'break-all', overflowWrap: 'anywhere' }}>
-                                      {previewData.evaluation.recommendations || 'Sin recomendaciones'}
-                                    </div>
-                                  )}
+                                  <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed break-words whitespace-pre-wrap">
+                                    {previewData.evaluation.recommendations || 'Sin recomendaciones'}
+                                  </p>
                                 </div>
                               </div>
                             </div>

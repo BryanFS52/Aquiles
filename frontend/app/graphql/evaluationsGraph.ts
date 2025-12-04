@@ -15,6 +15,7 @@ export const GET_ALL_EVALUATIONS = gql`
         recommendations
         valueJudgment
         checklistId
+        isFinalized
       }
     }
   }
@@ -32,6 +33,7 @@ export const GET_EVALUATION_BY_ID = gql`
         recommendations
         valueJudgment
         checklistId
+        isFinalized
       }
     }
   }
@@ -82,6 +84,27 @@ export const GET_EVALUATIONS_BY_CHECKLIST = gql`
         recommendations
         valueJudgment
         checklistId
+        teamScrumId
+        isFinalized
+      }
+    }
+  }
+`;
+
+export const GET_EVALUATION_BY_CHECKLIST_AND_TEAM = gql`
+  query GetEvaluationByChecklistAndTeam($checklistId: Long!, $teamScrumId: Long!) {
+    evaluationByChecklistAndTeam(checklistId: $checklistId, teamScrumId: $teamScrumId) {
+      code
+      message
+      date
+      data {
+        id
+        observations
+        recommendations
+        valueJudgment
+        checklistId
+        teamScrumId
+        isFinalized
       }
     }
   }

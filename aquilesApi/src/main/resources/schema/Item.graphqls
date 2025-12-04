@@ -3,6 +3,7 @@ type Item {
     code: String!
     indicator: String!
     active: Boolean!
+    itemType: ItemType
 }
 
 type ItemPageId {
@@ -17,6 +18,7 @@ input ItemDto {
     code: String!
     indicator: String!
     active: Boolean
+    itemTypeId: Long
 }
 
 extend type Query {

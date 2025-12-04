@@ -1,7 +1,10 @@
 package com.api.aquilesApi.Resolver;
 
 import com.api.aquilesApi.Business.ChecklistBusiness;
+import com.api.aquilesApi.Business.ChecklistQualificationBusiness;
 import com.api.aquilesApi.Dto.ChecklistDto;
+import com.api.aquilesApi.Dto.ChecklistQualificationDto;
+import com.api.aquilesApi.Dto.EvaluationDto;
 import com.api.aquilesApi.Entity.Checklist;
 import com.api.aquilesApi.Entity.ChecklistHistory;
 import com.api.aquilesApi.Service.ChecklistHistoryService;
@@ -23,13 +26,40 @@ public class ChecklistResolver {
     private final ChecklistBusiness checklistBusiness;
     private final ChecklistHistoryService checklistHistoryService;
     private final ItemService itemService;
+    private final ChecklistQualificationBusiness checklistQualificationBusiness;
 
     public ChecklistResolver(
             ChecklistBusiness checklistBusiness,
-            ChecklistHistoryService checklistHistoryService, ItemService itemService) {
+            ChecklistHistoryService checklistHistoryService, 
+            ItemService itemService,
+            ChecklistQualificationBusiness checklistQualificationBusiness) {
         this.checklistBusiness = checklistBusiness;
         this.checklistHistoryService = checklistHistoryService;
         this.itemService = itemService;
+        this.checklistQualificationBusiness = checklistQualificationBusiness;
+    }
+
+    // Field resolver para mapear evaluation a evaluations
+    @DgsData(parentType = "Checklist", field = "evaluations")
+    public EvaluationDto getEvaluations(DgsDataFetchingEnvironment dfe) {
+        ChecklistDto checklist = dfe.getSource();
+        return checklist.getEvaluation();
+    }
+
+    // Field resolver para obtener las calificaciones de un checklist por team
+    @DgsData(parentType = "Checklist", field = "qualifications")
+    public List<ChecklistQualificationDto> getQualifications(DgsDataFetchingEnvironment dfe) {
+        ChecklistDto checklist = dfe.getSource();
+        Long teamScrumId = dfe.getArgument("teamScrumId");
+        
+        if (teamScrumId == null) {
+            return List.of();
+        }
+        
+        return checklistQualificationBusiness.findByChecklistAndTeam(
+            Long.parseLong(checklist.getId().toString()), 
+            teamScrumId
+        );
     }
 
     // FindAll Checklist
@@ -37,18 +67,15 @@ public class ChecklistResolver {
     public Map<String, Object> allChecklists(@InputArgument Integer page, @InputArgument Integer size) {
         try {
             Page<ChecklistDto> checklistDtoPage = checklistBusiness.findAll(page, size);
-            if (!checklistDtoPage.isEmpty()) {
-                return ResponseHttpApi.responseHttpFindAll(
-                        checklistDtoPage.getContent(),
-                        ResponseHttpApi.CODE_OK,
-                        "Query ok",
-                        checklistDtoPage.getTotalPages(),
-                        page,
-                        (int) checklistDtoPage.getTotalElements()
-                );
-            } else {
-                throw new NotFoundException("No Checklists found");
-            }
+            // Devolver respuesta exitosa incluso si la lista está vacía
+            return ResponseHttpApi.responseHttpFindAll(
+                    checklistDtoPage.getContent(),
+                    ResponseHttpApi.CODE_OK,
+                    checklistDtoPage.isEmpty() ? "No hay listas de chequeo disponibles" : "Query ok",
+                    checklistDtoPage.getTotalPages(),
+                    page,
+                    (int) checklistDtoPage.getTotalElements()
+            );
         } catch (Exception e) {
             throw new RuntimeException("Unexpected error in allChecklists: " + e.getMessage(), e);
         }

@@ -1,33 +1,42 @@
 'use client'
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@redux/store'
-import { fetchStudentList } from '@slice/olympo/studentSlice'
-import { mapStudentToApprentice } from '@/components/features/Apprentices/aprendices'
+import { useState, useEffect } from 'react'
+import { Apprentice } from '@type/slices/aprendices'
 import { toast } from 'react-toastify'
 import PageTitle from '@components/UI/pageTitle'
 import ApprenticeForm from './ApprenticeForm'
 import ApprenticeList from './ApprenticeList'
 
 const ApprenticesContent = () => {
-  const dispatch = useDispatch<AppDispatch>()
-  const { data: students, } = useSelector((state: RootState) => state.student)
+  const [apprentices, setApprentices] = useState<Apprentice[]>([])
 
   useEffect(() => {
-    dispatch(fetchStudentList({}))
-  }, [dispatch])
-  
-  const apprentices = students.map(mapStudentToApprentice)
+    const fetchApprentices = async () => {
+      try {
+        const response = await fetch('http://localhost:8081/api/students')
+        const data = await response.json()
+        setApprentices(data)
+      } catch (error) {
+        console.error('Error al obtener los aprendices:', error)
+        toast.error("No se pudieron cargar los aprendices. Por favor, intente de nuevo más tarde.")
+      }
+    }
+
+    fetchApprentices()
+  }, [])
+
+  const handleApprenticeCreated = (newApprentice: Apprentice) => {
+    setApprentices(prev => [...prev, newApprentice])
+  }
 
   return (
-    <div className="px-2 sm:px-4 lg:px-0 py-4 sm:py-6">
+    <>
       <PageTitle>Gestión de Aprendices</PageTitle>
 
-      <div className="grid gap-4 sm:gap-6 grid-cols-1 xl:grid-cols-2">
-        <ApprenticeForm />
+      <div className="grid gap-6 md:grid-cols-2">
+        <ApprenticeForm onApprenticeCreated={handleApprenticeCreated} />
         <ApprenticeList apprentices={apprentices} />
       </div>
-    </div>
+    </>
   )
 }
 

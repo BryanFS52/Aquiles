@@ -23,14 +23,17 @@ public class Checklist implements Serializable {
     @Column(name = "state", nullable = false)
     private Boolean state;
 
-    @Column(name = "remarks", nullable = false, length = 255)
+    // ← El coordinador puede dejar observaciones generales, pero el instructor las completa
+    @Column(name = "remarks", nullable = true, length = 500)
     private String remarks;
 
-    @Column(name = "instructor_signature", nullable = false)
+    // ← Se llena cuando el instructor firma la evaluación
+    @Column(name = "instructor_signature", nullable = true)
     private byte[] instructorSignature;
 
-    @Column(name = "evaluation_criteria", nullable = false)
-    private boolean evaluationCriteria;
+    // ← Se determina cuando el instructor evalúa
+    @Column(name = "evaluation_criteria", nullable = true)
+    private Boolean evaluationCriteria;
 
     @Column(name = "date_assigned", length = 30)
     private LocalDate dateAssigned;
@@ -47,17 +50,14 @@ public class Checklist implements Serializable {
     @Column(name = "training_project_id")
     private Long trainingProjectId;
 
-    @Column(name = "training_project_name", length = 255)
-    private String trainingProjectName;
-
     // Relations
     // 1.Relation (1-M) con item
     @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items;
 
-    // 2.Relation (1-1) con evaluations
-    @OneToOne(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Evaluations evaluation;
+    // 2.Relation (1-M) con evaluations - Un checklist puede tener múltiples evaluaciones (una por team scrum)
+    @OneToMany(mappedBy = "checklist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Evaluation> evaluations;
 
     // 3.Relation (M-M) con teamsScrum
     @ManyToMany

@@ -1,349 +1,164 @@
 'use client'
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { FaTrashAlt, FaEdit } from "react-icons/fa"
-import { toast } from "react-toastify"
 import { AppDispatch, RootState } from "@redux/store"
-import { addEvaluation } from "@slice/evaluationSlice"
+import { fetchChecklists, addChecklist, updateChecklist, deleteChecklist } from "@redux/slices/checklistSlice"
+import { FaTrashAlt, FaEdit } from "react-icons/fa"
 import CrearListaChequeo from "@components/Modals/modalNewChecklist"
 import PageTitle from "@components/UI/pageTitle"
-import { checklistEnhancementService } from "@redux/slices/checklistEnhancementSlice"
-import {
-  fetchChecklists,
-  fetchChecklistById,
-  addChecklist,
-  updateChecklist,
-  updateChecklistState,
-  deleteChecklist
-} from "@slice/checklistSlice"
+import { toast } from "react-toastify"
 
-// Interfaces para tipado
-interface ChecklistItem {
-  id?: string
-  code?: string
-  indicator: string
-  active?: boolean
-}
-
-interface ChecklistData {
-  trimester?: string
-  component?: string
-  remarks?: string
-  items?: ChecklistItem[]
-  [key: string]: any
-}
-
-interface Checklist {
-  id: string
-  state: boolean
-  remarks?: string
-  trimester?: string
-  component?: string
-  trainingProjectId?: number
-  trainingProjectName?: string
-  studySheets?: string
-  items?: ChecklistItem[]
-  [key: string]: any
-}
-
+/**
+ * Vista de Listas de Chequeo - ROL: COORDINADOR
+ * 
+ * RESPONSABILIDADES:
+ * ==================
+ * 1. Crear listas de chequeo con indicadores (técnicos/actitudinales)
+ * 2. Asociar listas a fichas de formación (studySheets)
+ * 3. Definir trimestre, componente y proyecto formativo
+ * 4. Activar/Desactivar listas
+ * 5. Editar/Eliminar listas creadas
+ * 
+ * CAMPOS QUE SE LLENAN AQUÍ:
+ * - state (activo/inactivo)
+ * - trimester
+ * - component
+ * - studySheets (fichas asociadas)
+ * - trainingProjectId
+ * - items (indicadores)
+ * 
+ * CAMPOS QUE SE LLENAN EN LA VISTA DEL INSTRUCTOR:
+ * - instructorSignature (firma digital)
+ * - evaluationCriteria (cumplimiento de criterios)
+ * - remarks (observaciones finales)
+ * - evaluations (relación 1:1 con evaluación)
+ */
 export default function CoordinadorChecklistView() {
   const dispatch = useDispatch<AppDispatch>()
   const { data: checklists, loading, error } = useSelector((state: RootState) => state.checklist)
-  const [modalOpen, setModalOpen] = useState<boolean>(false)
-  const [selectedTrimestre, setSelectedTrimestre] = useState<string>("todos")
-  const [confirmModalOpen, setConfirmModalOpen] = useState<boolean>(false)
-  const [checklistToDelete, setChecklistToDelete] = useState<string | null>(null)
-  const [editingChecklist, setEditingChecklist] = useState<Checklist | null>(null)
-  const [isEditing, setIsEditing] = useState<boolean>(false)
-  const [enrichedChecklists, setEnrichedChecklists] = useState<any[]>([])
-  const [enrichmentLoading, setEnrichmentLoading] = useState<boolean>(false)
-  
-  
-  const loadChecklists = useCallback(async (): Promise<void> => {
-    try {
-      const result = await dispatch(
-        fetchChecklists({ page: 0, size: 100 })
-      ).unwrap()
-      
-      if (result?.data) {
-        // Enriquecer los checklists con información adicional
-        setEnrichmentLoading(true)
-        try {
-          const enriched = await checklistEnhancementService.enrichChecklists(result.data)
-          setEnrichedChecklists(enriched)
-        } catch (enrichmentError) {
-          console.warn('Error enriching checklists, using basic data:', enrichmentError)
-          setEnrichedChecklists(result.data)
-        } finally {
-          setEnrichmentLoading(false)
-        }
-      }
-    } catch (error) {
-      console.error("Error loading checklists:", error)
-      toast.error("Error al cargar las listas de chequeo")
-      setEnrichmentLoading(false)
-    }
-  }, [dispatch])
-  
-  // Cargar checklists al montar el componente
+
+  const [modalOpen, setModalOpen] = useState(false)
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false)
+  const [selectedTrimestre, setSelectedTrimestre] = useState("todos")
+  const [isEditing, setIsEditing] = useState(false)
+  const [selectedChecklist, setSelectedChecklist] = useState<any>(null)
+  const [expandedCriteria, setExpandedCriteria] = useState<{ [key: string]: boolean }>({})
+
+  // Cargar listas al montar el componente
   useEffect(() => {
-    loadChecklists();
-  }, [loadChecklists]);
-  
-  const transformItems = (items: ChecklistItem[]) => {
-    return items.map((item, index) => ({
-      ...(item.id && { id: item.id }), // ← Preservar ID si existe
-      code: item.code || `IND-${index + 1}`,
-      indicator: item.indicator,
-      active: item.active !== undefined ? item.active : true
-    }));
-  };
+    dispatch(fetchChecklists({ page: 0, size: 100 }))
+  }, [dispatch])
 
-  const handleCreateChecklist = async (checklistData: ChecklistData): Promise<void> => {
-    try {
-      if (isEditing && editingChecklist) {
-        // Actualizar checklist existente
-        
-        // Procesar items eliminados si los hay
-        if (checklistData.deletedItemIds && checklistData.deletedItemIds.length > 0) {
-          // Items will be processed for deletion
-        }
+  // Comentado para evitar dobles notificaciones - los errores se manejan en cada función
+  // useEffect(() => {
+  //   if (error) {
+  //     toast.error(`Error: ${error}`)
+  //   }
+  // }, [error])
 
-        const updateData = {
-          state: editingChecklist.state !== undefined ? editingChecklist.state : true,
-          remarks: checklistData.remarks || "Sin observaciones",
-          trimester: checklistData.trimester !== undefined ? checklistData.trimester : (editingChecklist.trimester || "1"),
-          component: checklistData.component !== undefined ? checklistData.component : (editingChecklist.component || ""),
-          evaluationCriteria: editingChecklist.evaluationCriteria || false,
-          instructorSignature: editingChecklist.instructorSignature || JSON.stringify({}),
-          studySheets: checklistData.studySheets || editingChecklist.studySheets || null,
-          trainingProjectId: checklistData.trainingProjectId || (editingChecklist as any).trainingProjectId || null,
-          evaluations: editingChecklist.evaluations || null,
-          associatedJuries: editingChecklist.associatedJuries || null,
-          items: checklistData.items ? transformItems(checklistData.items) : [],
-          // Agregar items eliminados para el backend
-          ...(checklistData.deletedItemIds && checklistData.deletedItemIds.length > 0 && { 
-            deletedItemIds: checklistData.deletedItemIds 
-          })
-        };
-
-        const result = await dispatch(updateChecklist({
-          id: parseInt(editingChecklist.id),
-          input: updateData
-        })).unwrap();
-
-        if (result && result.code === "200") {
-          toast.success("Lista de chequeo actualizada exitosamente");
-
-          // Pequeño delay para asegurar que la DB se actualice
-          await new Promise(resolve => setTimeout(resolve, 1000));
-
-          // Primero recargar el checklist específico por ID para forzar una actualización
-          await dispatch(fetchChecklistById({ id: parseInt(editingChecklist.id) })).unwrap();
-
-          // Luego recargar toda la lista para asegurar consistencia
-          await loadChecklists();
-
-          // Cerrar el modal
-          handleCloseModal();
-
-          // Buscar el checklist actualizado en los datos actuales
-          const updatedChecklistInState = normalizedChecklists.find(c => c.id === editingChecklist.id);
-          if (updatedChecklistInState) {
-            // Checklist updated successfully
-          }
-        } else {
-          toast.error(result?.message || "Error al actualizar la lista de chequeo");
-        }
-      } else {
-        // Crear nuevo checklist
-        const newChecklistData = {
-          state: true,
-          remarks: checklistData.remarks || "Sin observaciones",
-          trimester: checklistData.trimester || "1",
-          component: checklistData.component || "",
-          evaluationCriteria: false,
-          instructorSignature: JSON.stringify({}),
-          studySheets: checklistData.studySheets || null,
-          trainingProjectId: checklistData.trainingProjectId || null,
-          evaluations: null,
-          associatedJuries: null,
-          items: checklistData.items ? transformItems(checklistData.items) : []
-        };
-
-        const result = await dispatch(addChecklist(newChecklistData)).unwrap();
-
-        if (result && result.code === "200") {
-          const newChecklistId = result.id;
-
-          if (newChecklistId) {
-            // Crear automáticamente una evaluación para esta lista de chequeo usando Redux
-            try {
-              const evaluationInput = {
-                observations: "", // Valores vacíos iniciales
-                recommendations: "", // El instructor los completará después
-                valueJudgment: "PENDIENTE", // Estado inicial
-                checklistId: parseInt(newChecklistId) // Asegurar que es un número entero
-              };
-
-
-
-              const evaluationResponse = await dispatch(addEvaluation(evaluationInput)).unwrap();
-
-              if (evaluationResponse && evaluationResponse.code === "200") {
-                // Verificar que la relación se estableció correctamente
-                try {
-                  const { checkListService } = await import('@redux/slices/checklistSlice');
-                  
-                  // Pequeña pausa para que la DB se actualice
-                  await new Promise(resolve => setTimeout(resolve, 500));
-                  
-                  const isLinked = await checkListService.updateChecklistEvaluationLink(parseInt(newChecklistId), parseInt(evaluationResponse.id));
-                  
-                  if (isLinked) {
-                    toast.success("Lista de chequeo creada exitosamente")
-                    toast.success("Evaluación asociada creada y vinculada correctamente")
-                  } else {
-                    toast.success("Lista de chequeo creada exitosamente")
-                    toast.warning("Evaluación creada pero la verificación de vínculo falló")
-                  }
-                } catch (verificationError) {
-                  toast.success("Lista de chequeo creada exitosamente")
-                  toast.success("Evaluación asociada creada automáticamente")
-                }
-                
-                // Pequeña pausa para mostrar ambos toasts
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-              } else {
-                toast.success("Lista de chequeo creada exitosamente")
-                toast.warning("Evaluación no pudo crearse automáticamente: " + (evaluationResponse?.message || "Error desconocido"))
-              }
-            } catch (evaluationError: any) {
-              toast.success("Lista de chequeo creada exitosamente")
-              toast.error("Error al crear la evaluación automática: " + (evaluationError.message || "Error desconocido"))
-            }
-          } else {
-            toast.success("Lista de chequeo creada exitosamente")
-            toast.warning("No se pudo crear la evaluación automáticamente (ID no disponible)")
-          }
-
-          // Recargar la lista para mostrar el nuevo checklist
-          await loadChecklists()
-          setModalOpen(false)
-        } else {
-          toast.error(result?.message || "Error al crear la lista de chequeo")
-        }
-      }
-    } catch (error: any) {
-      console.error("Error with checklist operation:", error)
-      toast.error(isEditing ? "Error al actualizar la lista de chequeo" : "Error al crear la lista de chequeo")
-    }
-  }
-
-  const handleDeleteChecklist = async (): Promise<void> => {
-    if (!checklistToDelete) return
-
-    try {
-      await dispatch(deleteChecklist(checklistToDelete)).unwrap()
-      toast.success("Lista de chequeo eliminada exitosamente")
-      // Recargar la lista
-      await loadChecklists()
-    } catch (error: any) {
-      console.error("Error deleting checklist:", error)
-      toast.error("Error al eliminar la lista de chequeo")
-    } finally {
-      setConfirmModalOpen(false)
-      setChecklistToDelete(null)
-    }
-  }
-
-  const handleToggleState = async (checklistId: string, currentState: boolean | null | undefined): Promise<void> => {
-    try {
-      const newState = !currentState;
-      await dispatch(updateChecklistState({ id: checklistId, state: newState })).unwrap();
-      toast.success(`Lista de chequeo ${newState ? 'activada' : 'desactivada'} exitosamente`)
-    } catch (error: any) {
-      console.error("Error updating checklist state:", error)
-      toast.error("Error al actualizar el estado de la lista de chequeo")
-    }
-  }
-
-  const handleCloseModal = (): void => {
+  const handleCloseModal = () => {
     setModalOpen(false)
     setIsEditing(false)
-    setEditingChecklist(null)
+    setSelectedChecklist(null)
   }
 
-  const handleOpenCreateModal = (): void => {
+  const handleOpenCreateModal = () => {
     setIsEditing(false)
-    setEditingChecklist(null)
+    setSelectedChecklist(null)
     setModalOpen(true)
   }
 
-  const handleOpenEditModal = async (checklist: any): Promise<void> => {
-    try {
-      // Obtener el checklist completo con todos sus items/indicadores usando Redux
-      await dispatch(fetchChecklistById({ id: parseInt(checklist.id) })).unwrap();
-
-      // Buscar el checklist transformado en el estado de Redux
-      const updatedChecklist = checklists.find(item => item.id === checklist.id);
-
-      if (updatedChecklist) {
-        if (updatedChecklist.items) {
-          // Process items for modal
-        }
-        setIsEditing(true)
-        setEditingChecklist(updatedChecklist as any)
-        setModalOpen(true)
-      } else {
-        toast.error("Error al obtener los detalles del checklist")
-      }
-    } catch (error: any) {
-      console.error("Error fetching checklist details:", error)
-      toast.error("Error al cargar los detalles del checklist")
-    }
+  const handleOpenEditModal = (checklist: any) => {
+    setIsEditing(true)
+    setSelectedChecklist(checklist)
+    setModalOpen(true)
   }
 
-  const handleOpenConfirmModal = (checklistId: string): void => {
-    setChecklistToDelete(checklistId)
+  const handleOpenConfirmModal = (checklist: any) => {
+    setSelectedChecklist(checklist)
     setConfirmModalOpen(true)
   }
 
-  // Función auxiliar para formatear las fichas
-  const getFormattedStudySheets = (studySheets: string): string => {
-    if (!studySheets) return 'Sin fichas asociadas'
-    
-    const sheetIds = studySheets.split(',')
-    if (sheetIds.length === 1) {
-      return `Ficha ${sheetIds[0]}`
+  const handleDeleteChecklist = async () => {
+    if (selectedChecklist) {
+      try {
+        await dispatch(deleteChecklist(selectedChecklist.id)).unwrap()
+        toast.success("Lista de chequeo eliminada exitosamente")
+        // Recargar listas
+        dispatch(fetchChecklists({ page: 0, size: 100 }))
+      } catch (err: any) {
+        // Extraer solo el mensaje limpio del error
+        let errorMessage = err.message || 'Error desconocido';
+        
+        // Remover prefijos técnicos del mensaje
+        if (errorMessage.includes('Unexpected error in deleteChecklist:')) {
+          errorMessage = errorMessage.split('Unexpected error in deleteChecklist:')[1].trim();
+        }
+        if (errorMessage.startsWith('Error Deleting Checklist:')) {
+          errorMessage = errorMessage.replace('Error Deleting Checklist:', '').trim();
+        }
+        
+        toast.error(errorMessage);
+      }
     }
-    return `${sheetIds.length} fichas asociadas`
+    setConfirmModalOpen(false)
+    setSelectedChecklist(null)
   }
 
-  // Usar checklists enriquecidos si están disponibles, sino usar los datos de Redux
-  const checklistsToUse = enrichedChecklists.length > 0 ? enrichedChecklists : checklists;
-  
-  // Normalizar id a string para evitar exclusión por tipo
-  const normalizedChecklists = checklistsToUse.map(c => ({
-    ...c,
-    id: c.id != null ? c.id.toString() : ''
-  }));
-
-  const filteredChecklists = normalizedChecklists
-    .filter((checklist) => {
-      // Filtrar checklists inválidos
-      if (!checklist || checklist.id == null || checklist.id === '') {
-        return false;
+  const handleSaveChecklist = async (data: any) => {
+    try {
+      if (isEditing) {
+        // Actualizar lista existente
+        const { id, ...inputData } = data // Separar id del resto de datos
+        await dispatch(updateChecklist({ 
+          id, 
+          input: inputData 
+        })).unwrap()
+        toast.success("Lista de chequeo actualizada exitosamente")
+      } else {
+        // Crear nueva lista
+        await dispatch(addChecklist(data)).unwrap()
+        toast.success("Lista de chequeo creada exitosamente")
       }
 
-      if (selectedTrimestre === "todos") {
-        return true; // Mostrar todos los checklists válidos
+      // Recargar listas
+      dispatch(fetchChecklists({ page: 0, size: 100 }))
+      handleCloseModal()
+    } catch (err: any) {
+      // Extraer solo el mensaje limpio del error
+      let errorMessage = err.message || 'Error desconocido';
+      
+      // Remover prefijos técnicos del mensaje
+      if (errorMessage.includes('Unexpected error in updateChecklist:')) {
+        errorMessage = errorMessage.split('Unexpected error in updateChecklist:')[1].trim();
       }
-      return !checklist.trimester || checklist.trimester === selectedTrimestre;
-    })
-    .sort((a, b) => parseInt(b.id) - parseInt(a.id)) // Ordenar por ID descendente (más recientes primero)
+      if (errorMessage.startsWith('Error Updating Checklist:')) {
+        errorMessage = errorMessage.replace('Error Updating Checklist:', '').trim();
+      }
+      
+      toast.error(errorMessage);
+    }
+  }
+
+  // Toggle para expandir/contraer criterios
+  const toggleCriteria = (checklistId: string) => {
+    setExpandedCriteria(prev => ({
+      ...prev,
+      [checklistId]: !prev[checklistId]
+    }))
+  }
+
+  const getFormattedStudySheets = (studySheets: string): string => {
+    if (!studySheets) return 'Sin fichas asociadas'
+    const sheetIds = studySheets.split(',')
+    return `${sheetIds.length} ${sheetIds.length === 1 ? 'ficha asociada' : 'fichas asociadas'}`
+  }
+
+  // Filtrar listas según el trimestre seleccionado
+  const filteredChecklists = (checklists || []).filter(
+    (checklist: any) => selectedTrimestre === "todos" || checklist.trimester === selectedTrimestre
+  )
 
   return (
     <>
@@ -351,7 +166,10 @@ export default function CoordinadorChecklistView() {
 
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
-          <label htmlFor="trimestre-select" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            htmlFor="trimestre-select"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Filtrar por trimestre:
           </label>
           <select
@@ -373,198 +191,182 @@ export default function CoordinadorChecklistView() {
 
         <button
           onClick={handleOpenCreateModal}
-          className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white px-6 py-3 rounded-full hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold"
+          disabled={loading}
+          className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white px-6 py-3 rounded-full hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           + Crear Lista de Chequeo
         </button>
       </div>
 
-      {(loading || enrichmentLoading) ? (
-        <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lime-600 dark:border-shadowBlue"></div>
-          <span className="ml-2 text-gray-600 dark:text-gray-400">
-            {enrichmentLoading ? "Cargando información de proyectos y fichas..." : "Cargando listas de chequeo..."}
-          </span>
-        </div>
-      ) : (
-        <div className="mt-6 overflow-visible">
-          {filteredChecklists.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border-2 border-dashed border-gray-300 dark:border-gray-600">
-                <p className="text-gray-500 dark:text-gray-400 text-lg">
-                  {selectedTrimestre === "todos"
-                    ? "No hay listas de chequeo disponibles"
-                    : `No hay listas de chequeo para el trimestre ${selectedTrimestre}`
-                  }
-                </p>
-              </div>
+      <div className="mt-6 overflow-visible">
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border-2 border-dashed border-gray-300 dark:border-gray-600">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
+                Cargando listas de chequeo...
+              </p>
             </div>
-          ) : (
-            <div className="max-h-[calc(100vh-300px)] overflow-y-auto pb-8 px-2">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
-                {filteredChecklists.map((checklist) => {
-                  // Debug log para cada checklist en el render
-                  // Rendering checklist card
-
-                  // Verificación de seguridad adicional
-                  if (!checklist || !checklist.id) {
-                    console.error("Attempting to render invalid checklist:", checklist);
-                    return null; // No renderizar checklist inválido
-                  }
-
-                  return (
-                    <div
-                      key={`checklist-${checklist.id}`}
-                      className="group relative transform transition-all duration-300 hover:scale-105 hover:z-10"
-                    >
-                      <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border-2 border-lime-500/30 dark:border-shadowBlue/50 shadow-2xl hover:shadow-lime-200 dark:hover:shadow-shadowBlue/30 overflow-hidden">
-                        {/* Header de la tarjeta */}
-                        <div className="bg-gradient-to-br from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue p-4">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h3 className="text-lg font-bold text-white">
-                                {checklist.trimester ? `${checklist.trimester}° Trimestre` : 'No especificado'}
-                              </h3>
-                            </div>
-                            <div className="flex space-x-2">
-                              <button
-                                onClick={() => handleOpenEditModal(checklist)}
-                                className="text-white hover:text-yellow-300 transition-colors p-2 rounded-full hover:bg-white/10"
-                                title="Editar"
-                              >
-                                <FaEdit className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleOpenConfirmModal(checklist.id)}
-                                className="text-white hover:text-red-300 transition-colors p-2 rounded-full hover:bg-white/10"
-                                title="Eliminar"
-                              >
-                                <FaTrashAlt className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Contenido de la tarjeta */}
-                        <div className="p-6 space-y-4">
-                          {/* Proyecto Formativo */}
-                          <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
-                              Proyecto Formativo
-                            </span>
-                            <p className="text-sm text-gray-700 dark:text-white mt-1 font-medium">
-                              {(checklist as any).trainingProjectName || (
-                                <span className="text-gray-500 italic">Sin proyecto asociado</span>
-                              )}
-                            </p>
-                          </div>
-
-                          {/* Componente */}
-                          <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
-                              Componente
-                            </span>
-                            <p className="text-sm text-gray-700 dark:text-white mt-1 font-medium">
-                              {checklist.component || 'N/A'}
-                            </p>
-                          </div>
-
-                          {/* Fichas asociadas */}
-                          <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
-                              Fichas Asociadas
-                            </span>
-                            <div className="mt-1">
-                              {(checklist as any).studySheets ? (
-                                (checklist as any).formattedStudySheets ? (
-                                  <div className="text-xs text-gray-700 dark:text-white">
-                                    {(checklist as any).formattedStudySheets}
-                                  </div>
-                                ) : (
-                                  <span className="inline-block px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-blue-800/20 dark:to-blue-600/20 text-gray-800 dark:text-blue-300 rounded-full text-xs font-bold border border-gray-300 dark:border-blue-500/30">
-                                    {getFormattedStudySheets((checklist as any).studySheets)}
-                                  </span>
-                                )
-                              ) : (
-                                <span className="text-gray-500 italic text-sm">Sin fichas asociadas</span>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Indicadores */}
-                          <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
-                              Indicadores
-                            </span>
-                            <div className="mt-1">
-                              <span className="inline-block px-3 py-1 bg-gradient-to-r from-lime-100 to-lime-200 dark:from-shadowBlue/20 dark:to-darkBlue/20 text-lime-800 dark:text-gray-300 rounded-full text-xs font-bold border border-lime-300 dark:border-shadowBlue/30">
-                                {checklist.items ? checklist.items.length : 0} indicadores
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Estado */}
-                          <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
-                              Estado
-                            </span>
-                            <div className="mt-2 flex items-center">
-                              <button
-                                onClick={() => handleToggleState(checklist.id, checklist.state)}
-                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 ${checklist.state
-                                  ? 'bg-gradient-to-r from-lime-600 to-lime-500 dark:from-blue-600 dark:to-blue-500 focus:ring-lime-500 dark:focus:ring-blue-500'
-                                  : 'bg-gray-200 dark:bg-gray-600 focus:ring-gray-500'
-                                  }`}
-                                title={checklist.state ? 'Desactivar lista' : 'Activar lista'}
-                              >
-                                <span
-                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition duration-200 ease-in-out shadow-lg ${checklist.state ? 'translate-x-6' : 'translate-x-1'
-                                    }`}
-                                />
-                              </button>
-                              <span className={`ml-3 text-xs font-bold ${checklist.state
-                                ? 'text-lime-600 dark:text-gray-300'
-                                : 'text-gray-500 dark:text-gray-400'
-                                }`}>
-                                {checklist.state ? 'Activo' : 'Inactivo'}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Observaciones */}
-                          <div>
-                            <span className="text-xs font-semibold text-lime-600 dark:text-gray-300 uppercase tracking-wide">
-                              Competencia
-                            </span>
-                            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2 leading-relaxed">
-                              {checklist.remarks || 'Sin observaciones'}
-                            </p>
-                          </div>
+          </div>
+        ) : filteredChecklists.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border-2 border-dashed border-gray-300 dark:border-gray-600">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
+                {selectedTrimestre === "todos" 
+                  ? "No hay listas de chequeo disponibles. Crea tu primera lista de chequeo."
+                  : `No hay listas de chequeo para el trimestre ${selectedTrimestre}`
+                }
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="max-h-[calc(100vh-300px)] overflow-y-auto pb-8 px-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+              {filteredChecklists.map((checklist) => (
+                <div
+                  key={checklist.id}
+                  className="group relative transform transition-all duration-300 hover:scale-105 hover:z-10"
+                >
+                  <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border-2 border-lime-500/30 dark:border-shadowBlue/50 shadow-2xl hover:shadow-lime-200 dark:hover:shadow-shadowBlue/30 overflow-hidden">
+                    <div className="bg-gradient-to-br from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue p-4">
+                      <div className="flex justify-between items-start">
+                        <h3 className="text-lg font-bold text-white">
+                          {checklist.trimester}° Trimestre
+                        </h3>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleOpenEditModal(checklist)}
+                            className="text-white hover:text-yellow-300 transition-colors p-2 rounded-full hover:bg-white/10"
+                            title="Editar"
+                          >
+                            <FaEdit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleOpenConfirmModal(checklist)}
+                            className="text-white hover:text-red-300 transition-colors p-2 rounded-full hover:bg-white/10"
+                            title="Eliminar"
+                          >
+                            <FaTrashAlt className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
 
-      {/* Modal de creación/edición */}
+                    <div className="p-6 space-y-4">
+
+                      <div>
+                        <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
+                          Fichas Asociadas <br/>
+                        </span>
+                        <span className="inline-block mt-1 px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-800 dark:text-gray-200 rounded-full text-xs font-bold border border-gray-300 dark:border-gray-500">
+                          {getFormattedStudySheets(checklist.studySheets || "")}
+                        </span>
+                      </div>
+
+                      <div>
+                        <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
+                          Indicadores
+                        </span>
+                        <div className="mt-2 space-y-2">
+                          <div className="flex items-center justify-between bg-lime-50 dark:bg-lime-900/20 rounded-lg px-3 py-2 border border-lime-200 dark:border-lime-700">
+                            <span className="text-xs font-medium text-lime-700 dark:text-lime-300">
+                              Técnicos
+                            </span>
+                            <span className="text-sm font-bold text-lime-800 dark:text-lime-200">
+                              {checklist.items?.filter((item: any) => item.code?.startsWith('TEC')).length ?? 0}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between bg-lime-50 dark:bg-lime-900/20 rounded-lg px-3 py-2 border border-lime-200 dark:border-lime-700">
+                            <span className="text-xs font-medium text-lime-700 dark:text-lime-300">
+                              Actitudinales
+                            </span>
+                            <span className="text-sm font-bold text-lime-800 dark:text-lime-200">
+                              {checklist.items?.filter((item: any) => item.code?.startsWith('ACT')).length ?? 0}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
+                          Estado
+                        </span>
+                        <div className="mt-2 flex items-center">
+                          <button
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out ${checklist.state
+                              ? 'bg-gradient-to-r from-lime-600 to-lime-500'
+                              : 'bg-gray-200 dark:bg-gray-600'
+                              }`}
+                          >
+                            <span
+                              className={`inline-block h-4 w-4 transform rounded-full bg-white transition duration-200 ease-in-out shadow-lg ${checklist.state ? 'translate-x-6' : 'translate-x-1'}`}
+                            />
+                          </button>
+                          <span className={`ml-3 text-xs font-bold ${checklist.state
+                            ? 'text-lime-600'
+                            : 'text-gray-500'
+                            }`}>
+                            {checklist.state ? 'Activo' : 'Inactivo'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="min-h-[60px]">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-semibold text-lime-600 uppercase tracking-wide">
+                            Criterios de evaluación
+                          </span>
+                          {checklist.remarks && checklist.remarks.length > 30 && (
+                            <button
+                              onClick={() => toggleCriteria(checklist.id)}
+                              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-gradient-to-r from-lime-500 to-lime-600 hover:from-lime-600 hover:to-lime-700 rounded-full shadow-sm hover:shadow-md transform hover:scale-105 transition-all duration-200"
+                            >
+                              {expandedCriteria[checklist.id] ? (
+                                <>
+                                  <span>Ver menos</span>
+                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" />
+                                  </svg>
+                                </>
+                              ) : (
+                                <>
+                                  <span>Ver más</span>
+                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                                  </svg>
+                                </>
+                              )}
+                            </button>
+                          )}
+                        </div>
+                        <p className={`text-sm text-gray-600 dark:text-gray-400 leading-relaxed break-words overflow-wrap-anywhere whitespace-pre-wrap transition-all duration-300 ${
+                          !expandedCriteria[checklist.id] && checklist.remarks && checklist.remarks.length > 30
+                            ? 'line-clamp-2'
+                            : ''
+                        }`}>
+                          {checklist.remarks || 'Sin observaciones'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       <CrearListaChequeo
         isOpen={modalOpen}
         onClose={handleCloseModal}
-        onCreate={handleCreateChecklist}
-        editingData={editingChecklist || undefined}
+        onCreate={handleSaveChecklist}
+        editingData={selectedChecklist}
         isEditing={isEditing}
       />
 
-      {/* Modal de confirmación para eliminar */}
       {confirmModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Confirmar eliminación
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
@@ -573,7 +375,7 @@ export default function CoordinadorChecklistView() {
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setConfirmModalOpen(false)}
-                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
               >
                 Cancelar
               </button>

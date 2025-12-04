@@ -27,6 +27,7 @@ export const GET_STUDY_SHEETS = gql`
                     }
                 }
                 trainingProject {
+                    id
                     name
                     program {
                         id
@@ -88,6 +89,20 @@ export const GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID = gql`
     data {
       id
       number
+      startLective
+      endLective
+      journey {
+        id
+        name
+      }
+      trainingProject {
+        id
+        name
+        program {
+          id
+          name
+        }
+      }
       teamsScrum {
         id
         teamName

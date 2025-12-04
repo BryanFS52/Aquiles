@@ -22,6 +22,7 @@ import noveltyTypeReducer from "@slice/themis/noveltyTypeSlice";
 import coordinationReducer from "@slice/olympo/coordinationSlice";
 import faultTypeReducer from "@/redux/slices/improvementPlanFaultTypeSlice";
 import finalReportReducer from "@redux/slices/finalReportSlice"
+import trainingProjectReducer from "@redux/slices/olympo/trainingProjectSlice";
 
 
 const store = configureStore({
@@ -49,6 +50,7 @@ const store = configureStore({
         coordination: coordinationReducer,
         faultType: faultTypeReducer,
         finalReport: finalReportReducer,
+        trainingProject: trainingProjectReducer,
     }
 });
 

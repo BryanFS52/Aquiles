@@ -21,7 +21,17 @@ public class EvaluationDto {
     // @Size(max = 60, message = "El juicio de valor no puede exceder los 60 caracteres")
     private String valueJudgment;
 
+    private Boolean isFinalized;
+
     private String instructorSignature;
+    
+    // Para recibir el ID del checklist desde el frontend
+    private Long checklistId;
+    
+    // Para recibir el ID del team scrum desde el frontend
+    private Long teamScrumId;
+    
+    // Para enviar el objeto completo en las respuestas
     private ChecklistDto checklist;
     private TeamsScrum teamsScrum;
 

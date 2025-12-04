@@ -4,7 +4,7 @@ import com.api.aquilesApi.Dto.ChecklistHistoryDto;
 import com.api.aquilesApi.Entity.ChecklistHistory;
 import com.api.aquilesApi.Service.ChecklistHistoryService;
 import com.api.aquilesApi.Utilities.CustomException;
-import org.modelmapper.ModelMapper;
+import com.api.aquilesApi.Utilities.Mapper.ChecklistHistoryMap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -13,12 +13,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class  ChecklistHistoryBusiness {
     private final ChecklistHistoryService checklistHistoryService;
-    private final ModelMapper modelMapper;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
-    public ChecklistHistoryBusiness(ChecklistHistoryService checklistHistoryService, ModelMapper modelMapper, com.fasterxml.jackson.databind.ObjectMapper objectMapper) {
+    public ChecklistHistoryBusiness(ChecklistHistoryService checklistHistoryService, com.fasterxml.jackson.databind.ObjectMapper objectMapper) {
         this.checklistHistoryService = checklistHistoryService;
-        this.modelMapper = modelMapper;
         this.objectMapper = objectMapper;
     }
     // Guardar historial de cambios en checklist
@@ -41,16 +39,16 @@ public class  ChecklistHistoryBusiness {
             history.setTeacher(teacher);
 
             if (antes != null) {
-                ChecklistHistoryDto dtoAntes = convertir(antes);
+                ChecklistHistoryDto dtoAntes = ChecklistHistoryMap.INSTANCE.checklistToHistoryDto(antes);
                 history.setDateBefore(objectMapper.writeValueAsString(dtoAntes));
             }
 
             if (despues != null) {
-                ChecklistHistoryDto dtoDespues = convertir(despues);
+                ChecklistHistoryDto dtoDespues = ChecklistHistoryMap.INSTANCE.checklistToHistoryDto(despues);
                 history.setDateAfter(objectMapper.writeValueAsString(dtoDespues));
             }
 
-            checklistHistoryService.add(history);
+            checklistHistoryService.save(history);
             System.out.println("✅ Historial guardado para checklist ID: " + checklistId);
 
         } catch (Exception e) {
@@ -58,22 +56,6 @@ public class  ChecklistHistoryBusiness {
         }
     }
 
-    private ChecklistHistoryDto convertir(com.api.aquilesApi.Entity.Checklist checklist) {
-        ChecklistHistoryDto dto = new ChecklistHistoryDto();
-        dto.setId(checklist.getId());
-        dto.setState(checklist.getState());
-        dto.setRemarks(checklist.getRemarks());
-        dto.setEvaluationCriteria(checklist.isEvaluationCriteria());
-        dto.setDateAssigned(String.valueOf(checklist.getDateAssigned()));
-        dto.setStudySheets(checklist.getStudySheets());
-        dto.setTrainingProjectId(checklist.getTrainingProjectId());
-        dto.setTrainingProjectName(checklist.getTrainingProjectName());
-        // ✅ Extraer ID de la evaluación única (relación 1:1)
-        dto.setEvaluations(checklist.getEvaluation() != null ? checklist.getEvaluation().getId() : null);
-        dto.setLearningOutcome(checklist.getLearningOutcome());
-        return dto;
-    }
-    //validation object
 
 
     // Find all
@@ -81,7 +63,7 @@ public class  ChecklistHistoryBusiness {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
             Page<ChecklistHistory> checklistHistoryPage = checklistHistoryService.findAll(pageRequest);
-            return checklistHistoryPage.map(checklistHistory -> modelMapper.map(checklistHistory, ChecklistHistoryDto.class));
+            return ChecklistHistoryMap.INSTANCE.EntityToDTOs(checklistHistoryPage);
         } catch (Exception e) {
             throw new CustomException("Error retrieving checklist history: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -91,7 +73,7 @@ public class  ChecklistHistoryBusiness {
     public ChecklistHistoryDto findById(Long id) {
         try {
             ChecklistHistory checklistHistory = checklistHistoryService.getById(id);
-            return modelMapper.map(checklistHistory, ChecklistHistoryDto.class);
+            return ChecklistHistoryMap.INSTANCE.EntityToDTO(checklistHistory);
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
@@ -102,20 +84,22 @@ public class  ChecklistHistoryBusiness {
     // Add
     public ChecklistHistoryDto add(ChecklistHistoryDto checklistHistoryDTO) {
         try {
-            ChecklistHistory checklistHistory = modelMapper.map(checklistHistoryDTO, ChecklistHistory.class);
-            checklistHistory = checklistHistoryService.add(checklistHistory);
-            return modelMapper.map(checklistHistory, ChecklistHistoryDto.class);
+            ChecklistHistory checklistHistory = new ChecklistHistory();
+            ChecklistHistoryMap.INSTANCE.updateChecklistHistory(checklistHistoryDTO, checklistHistory);
+            ChecklistHistory savedChecklistHistory = checklistHistoryService.save(checklistHistory);
+            return ChecklistHistoryMap.INSTANCE.EntityToDTO(savedChecklistHistory);
         } catch (Exception e) {
             throw new CustomException("Error adding checklist history: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     // Update
-    public void update(Long ChecklistHistoryId, ChecklistHistoryDto checklistHistoryDTO) {
+    public void update(Long ChecklistHistoryId, ChecklistHistoryDto checklistHistoryDto) {
         try {
-            ChecklistHistory checklistHistory = modelMapper.map(checklistHistoryDTO, ChecklistHistory.class);
-            checklistHistory.setId(checklistHistory.getId());
-            checklistHistoryService.update(checklistHistory);
+            checklistHistoryDto.setId(ChecklistHistoryId);
+            ChecklistHistory checklistHistory = checklistHistoryService.getById(ChecklistHistoryId);
+            ChecklistHistoryMap.INSTANCE.updateChecklistHistory(checklistHistoryDto, checklistHistory);
+            checklistHistoryService.save(checklistHistory);
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {

@@ -3730,7 +3730,9 @@ export type ProcessMethodologyDto = {
   settings?: InputMaybe<ProcessSettingsDto>;
 };
 
-export type ProcessMethodologyDto = {
+// TODO: This type was duplicated in generated.ts - renamed to avoid conflicts
+// The backend schema should be updated to avoid this duplicate
+export type ProcessMethodologyAssignmentDto = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   isUnique?: InputMaybe<Scalars['Boolean']['input']>;
   profileId?: InputMaybe<Scalars['String']['input']>;

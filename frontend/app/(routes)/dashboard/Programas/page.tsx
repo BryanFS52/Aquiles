@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-
+import { ApolloProvider, useQuery } from '@apollo/client';
 import { FaComputer, FaPeopleRoof } from 'react-icons/fa6';
 import { FaPeopleCarry } from 'react-icons/fa';
 import { AiOutlineStock } from 'react-icons/ai';
@@ -10,11 +10,49 @@ import { BsPersonRolodex } from 'react-icons/bs';
 import { SlCalculator } from 'react-icons/sl';
 import { GrUserSettings } from 'react-icons/gr';
 import { LiaLanguageSolid } from 'react-icons/lia';
-import { Program, IconMapType, programsData, ITEMS_PER_PAGE } from '@type/pages/programs';
-import { PaginationState } from '@type/global/pagination'
-import PageTitle from '@components/UI/pageTitle';
+import { Program, IconMapType, ITEMS_PER_PAGE } from '../../../types/pages/programs';
+import { PaginationState } from '../../../types/global/pagination'
+import PageTitle from '../../../components/UI/pageTitle';
+import { GET_PROGRAMS } from '../../../graphql/olympo/programGraph';
+import { client } from '../../../lib/apollo-client';
 
-const Programas: React.FC = () => {
+// Función para mapear programas a iconos basándose en palabras clave
+const getIconForProgram = (name: string): keyof IconMapType => {
+  const nameLower = name.toLowerCase();
+  
+  if (nameLower.includes('software') || nameLower.includes('desarrollo') || nameLower.includes('móviles') || nameLower.includes('aplicaciones')) {
+    return 'FaComputer';
+  }
+  if (nameLower.includes('logística') || nameLower.includes('logistica')) {
+    return 'AiOutlineStock';
+  }
+  if (nameLower.includes('financiera') || nameLower.includes('finanzas')) {
+    return 'GiTakeMyMoney';
+  }
+  if (nameLower.includes('talento humano') || nameLower.includes('recursos humanos')) {
+    return 'BsPersonRolodex';
+  }
+  if (nameLower.includes('contabilidad')) {
+    return 'SlCalculator';
+  }
+  if (nameLower.includes('administrativa') || nameLower.includes('administración')) {
+    return 'FaPeopleRoof';
+  }
+  if (nameLower.includes('mercados') || nameLower.includes('mercadeo') || nameLower.includes('marketing')) {
+    return 'GrUserSettings';
+  }
+  if (nameLower.includes('internacional') || nameLower.includes('exterior')) {
+    return 'LiaLanguageSolid';
+  }
+  if (nameLower.includes('comunitarias') || nameLower.includes('asociativas')) {
+    return 'FaPeopleCarry';
+  }
+  
+  // Icono por defecto
+  return 'FaPeopleRoof';
+};
+
+const ProgramasContent: React.FC = () => {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [pagination, setPagination] = useState<PaginationState>({
@@ -24,25 +62,38 @@ const Programas: React.FC = () => {
     totalItems: 0
   });
 
-  useEffect(() => {
-    // Simula la obtención de datos locales
-    setPrograms(programsData);
-  }, []);
+  // Consulta GraphQL con paginación del lado del servidor
+  const { data, loading, error } = useQuery(GET_PROGRAMS, {
+    variables: {
+      name: searchTerm || null,
+      page: pagination.currentPage - 1, // Backend usa índice 0
+      size: pagination.itemsPerPage
+    },
+    fetchPolicy: 'cache-and-network'
+  });
 
-  const filteredPrograms: Program[] = programs.filter((program: Program) =>
-    program.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Actualizar paginación cuando cambian los programas filtrados
   useEffect(() => {
-    const totalPages = Math.ceil(filteredPrograms.length / ITEMS_PER_PAGE);
-    setPagination(prev => ({
-      ...prev,
-      totalPages,
-      totalItems: filteredPrograms.length,
-      currentPage: prev.currentPage > totalPages ? 1 : prev.currentPage
-    }));
-  }, [filteredPrograms.length]);
+    if (data?.allPrograms?.data) {
+      // Mapear los datos del backend al formato del frontend
+      const mappedPrograms: Program[] = data.allPrograms.data.map((program: any) => ({
+        id: program.id,
+        name: program.name,
+        description: program.description || 'Sin descripción disponible',
+        icon: getIconForProgram(program.name)
+      }));
+      
+      setPrograms(mappedPrograms);
+      
+      // Actualizar información de paginación desde el backend
+      setPagination(prev => ({
+        ...prev,
+        totalPages: data.allPrograms.totalPages || 0,
+        totalItems: data.allPrograms.totalItems || 0
+      }));
+    }
+  }, [data]);
+
+  const filteredPrograms: Program[] = programs;
 
   const handlePageChange = (page: number): void => {
     setPagination(prev => ({
@@ -55,14 +106,11 @@ const Programas: React.FC = () => {
     setSearchTerm(e.target.value);
     setPagination(prev => ({
       ...prev,
-      currentPage: 1
+      currentPage: 1 // Resetear a la primera página al buscar
     }));
   };
 
-  const displayedPrograms: Program[] = filteredPrograms.slice(
-    (pagination.currentPage - 1) * pagination.itemsPerPage,
-    pagination.currentPage * pagination.itemsPerPage
-  );
+  const displayedPrograms: Program[] = programs;
 
   const iconMap: IconMapType = {
     FaComputer: FaComputer,
@@ -147,32 +195,52 @@ const Programas: React.FC = () => {
           value={searchTerm}
           onChange={handleSearchChange}
           aria-label="Buscar programa"
+          disabled={loading}
         />
 
         {/* Results counter */}
-        {searchTerm && (
-          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 sm:pt-3">
-            {filteredPrograms.length} programa{filteredPrograms.length !== 1 ? 's' : ''} encontrado{filteredPrograms.length !== 1 ? 's' : ''}
+        {searchTerm && !loading && (
+          <span className="text-sm text-gray-600 dark:text-gray-400 pt-3">
+            {pagination.totalItems} programa{pagination.totalItems !== 1 ? 's' : ''} encontrado{pagination.totalItems !== 1 ? 's' : ''}
           </span>
         )}
       </div>
 
+      {/* Loading state */}
+      {loading && (
+        <div className="col-span-full text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#01b001] dark:border-blue-500"></div>
+          <p className="text-gray-500 dark:text-gray-400 text-lg mt-4">Cargando programas...</p>
+        </div>
+      )}
+
+      {/* Error state */}
+      {error && (
+        <div className="col-span-full text-center py-12">
+          <p className="text-red-500 dark:text-red-400 text-lg">
+            Error al cargar programas: {error.message}
+          </p>
+        </div>
+      )}
+
       {/* Programs Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4 sm:gap-5 lg:gap-6 py-2 sm:py-4">
-        {displayedPrograms.length > 0 ? (
-          displayedPrograms.map(renderProgramCard)
-        ) : (
-          <div className="col-span-full text-center py-8 sm:py-12">
-            <p className="text-gray-500 dark:text-gray-400 text-base sm:text-lg px-4">
-              No se encontraron programas que coincidan con "{searchTerm}"
-            </p>
-          </div>
-        )}
-      </div>
+      {!loading && !error && (
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 py-4">
+          {displayedPrograms.length > 0 ? (
+            displayedPrograms.map(renderProgramCard)
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
+                No se encontraron programas que coincidan con "{searchTerm}"
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Pagination */}
-      {pagination.totalPages > 1 && (
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-2 pt-4 sm:pt-6">
+      {!loading && !error && pagination.totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 pt-6">
           <button
             onClick={() => handlePageChange(Math.max(1, pagination.currentPage - 1))}
             disabled={pagination.currentPage === 1}
@@ -200,12 +268,20 @@ const Programas: React.FC = () => {
       )}
 
       {/* Page info */}
-      {pagination.totalPages > 1 && (
-        <div className="text-center text-xs sm:text-sm text-gray-600 dark:text-gray-400 px-4">
+      {!loading && !error && pagination.totalPages > 1 && (
+        <div className="text-center text-sm text-gray-600 dark:text-gray-400">
           Página {pagination.currentPage} de {pagination.totalPages} ({pagination.totalItems} programas en total)
         </div>
       )}
     </div>
+  );
+};
+
+const Programas: React.FC = () => {
+  return (
+    <ApolloProvider client={client}>
+      <ProgramasContent />
+    </ApolloProvider>
   );
 };
 

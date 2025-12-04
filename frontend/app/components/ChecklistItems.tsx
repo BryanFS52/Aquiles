@@ -41,7 +41,6 @@ export default function ChecklistItems({ items, onItemUpdate }: ChecklistItemsPr
         throw new Error(data?.updateItemStatus?.message || 'Error al actualizar el indicador')
       }
     } catch (error) {
-      console.error('Error updating item status:', error)
       toast.error('Error al actualizar el estado del indicador')
     } finally {
       setLoadingItems(prev => {

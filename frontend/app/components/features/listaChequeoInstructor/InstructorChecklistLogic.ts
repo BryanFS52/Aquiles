@@ -1,11 +1,13 @@
 import { toast } from "react-toastify";
 import { evaluationService } from "@redux/slices/evaluationSlice";
-import { checkListService } from "@redux/slices/checklistSlice";
+import { fetchChecklists } from "@redux/slices/checklistSlice";
 import { exportService } from "@redux/slices/exportSlice";
+import { client } from '@lib/apollo-client';
+import { GET_ALL_CHECKLISTS } from '@graphql/checklistGraph';
 import {
   Checklist,
   Evaluation,
-} from "@/types/checklist";
+} from "@graphql/generated";
 
 export class InstructorChecklistLogic {
   // Función para cargar firmas existentes desde el checklist
@@ -47,42 +49,50 @@ export class InstructorChecklistLogic {
       }
     } catch (error) {
       // Si no es JSON válido, puede ser formato legacy o datos corruptos
-      console.log("No se pudo parsear firmas como JSON, iniciando limpio:", error);
     }
   };
 
   // Funciones auxiliares para extraer y estructurar datos de evaluaciones
   static extractItemStatesFromEvaluation = (evaluation: Evaluation) => {
-    console.log('🔍 Extracting item states from evaluation:', evaluation.id);
-    console.log('📝 Raw observations:', evaluation.observations);
+    const checklistId = evaluation.checklistId;
     
-    if (!evaluation.observations) {
-      console.log('❌ No observations found in evaluation');
-      return {};
-    }
-
-    try {
-      const parsed = JSON.parse(evaluation.observations);
-      console.log('📊 Parsed observations:', parsed);
-      
-      if (parsed.itemStates && typeof parsed.itemStates === 'object') {
-        console.log('✅ Item states found:', parsed.itemStates);
-        return parsed.itemStates;
-      } else {
-        console.log('❌ No itemStates object found in parsed observations');
+    // Primero intentar cargar desde observaciones (formato legacy con JSON)
+    if (evaluation.observations) {
+      try {
+        const parsed = JSON.parse(evaluation.observations);
+        
+        if (parsed.itemStates && typeof parsed.itemStates === 'object') {
+          // Guardar en localStorage para futuras cargas (migración a nuevo formato)
+          if (checklistId) {
+            localStorage.setItem(`itemStates_${checklistId}`, JSON.stringify(parsed.itemStates));
+          }
+          return parsed.itemStates;
+        }
+      } catch (error) {
+        // No es JSON, es el nuevo formato de texto plano
       }
-    } catch (error) {
-      console.log('❌ Error parsing observations as JSON:', error instanceof Error ? error.message : String(error));
-      console.log('Raw observations text:', evaluation.observations);
     }
-
+    
+    // Si no hay datos en formato legacy, intentar cargar desde localStorage
+    if (checklistId) {
+      const storedStates = localStorage.getItem(`itemStates_${checklistId}`);
+      if (storedStates) {
+        try {
+          const parsedStates = JSON.parse(storedStates);
+          return parsedStates;
+        } catch (error) {
+          // Error parsing localStorage item states
+        }
+      }
+    }
+    
     return {};
   };
 
   static extractGeneralObservationsFromEvaluation = (evaluation: Evaluation) => {
     if (!evaluation.observations) return "";
 
-    // Si las observaciones no contienen caracteres JSON, asumir que son texto plano
+    // Si las observaciones no contienen caracteres JSON, asumir que son texto plano (nuevo formato)
     if (!evaluation.observations.includes('{') && !evaluation.observations.includes('"')) {
       return evaluation.observations.trim();
     }
@@ -90,16 +100,16 @@ export class InstructorChecklistLogic {
     try {
       const parsed = JSON.parse(evaluation.observations);
       if (parsed.generalObservations && typeof parsed.generalObservations === 'string') {
-        // Devolver solo el texto que el usuario digitó (formato anterior)
+        // Formato anterior: devolver el texto de generalObservations
         return parsed.generalObservations.trim();
       }
       
-      // Si no tiene generalObservations pero es JSON, devolver cadena vacía
+      // Si no tiene generalObservations pero es JSON válido, devolver cadena vacía
       if (typeof parsed === 'object') {
         return "";
       }
     } catch (error) {
-      // Si no se puede parsear como JSON, verificar si contiene formato JSON
+      // Si no se puede parsear como JSON pero contiene formato JSON, probablemente sea datos corruptos
       if (evaluation.observations.includes('itemStates') || 
           evaluation.observations.includes('generalObservations') || 
           evaluation.observations.startsWith('{')) {
@@ -107,12 +117,12 @@ export class InstructorChecklistLogic {
         return "";
       }
       
-      // Es texto plano, usar el valor completo
+      // Es texto plano, usar el valor completo (nuevo formato)
       return evaluation.observations.trim();
     }
 
-    // Por defecto, devolver cadena vacía
-    return "";
+    // Por defecto, devolver el texto completo si no es JSON válido
+    return evaluation.observations.trim();
   };
 
   // Cargar listas de chequeo activas
@@ -130,41 +140,37 @@ export class InstructorChecklistLogic {
       // Obtener la ficha del instructor desde localStorage
       const instructorStudySheetId = localStorage.getItem('selectedStudySheetId');
       const instructorStudySheetNumber = localStorage.getItem('selectedStudySheetNumber');
-      console.log("🔍 Instructor study sheet:", { id: instructorStudySheetId, number: instructorStudySheetNumber });
       
-      const response = await checkListService.fetchAllChecklists(0, 100);
-      console.log("Raw checklists response:", response);
+      const response = await fetchChecklists.arguments(0, 5);
 
-      if (response.code === "200" && response.data) {
+      const checklistData = response.data?.allChecklists;
+      if (checklistData?.code === "200" && checklistData.data) {
         // Filtrar solo las listas activas
-        let activeLists = response.data.filter((checklist: Checklist) => checklist.state === true);
-        console.log("All active checklists:", activeLists.length);
+        let activeLists = checklistData.data.filter((checklist: Checklist) => checklist.state === true);
         
         // Si el instructor tiene una ficha asignada, filtrar por esa ficha
         if (instructorStudySheetId) {
           activeLists = activeLists.filter((checklist: Checklist) => {
             if (!checklist.studySheets) {
-              console.log(`❌ Checklist ${checklist.id} has no study sheets assigned`);
               return false;
             }
             
             // studySheets es un string con IDs separados por comas
-            const assignedSheets = checklist.studySheets.split(',').map(s => s.trim());
+            const assignedSheets = checklist.studySheets.split(',').map((s: string) => s.trim());
             const isAssigned = assignedSheets.includes(instructorStudySheetId);
-            
-            console.log(`🔍 Checklist ${checklist.id}: assigned sheets [${assignedSheets.join(', ')}], instructor sheet ID: ${instructorStudySheetId}, match: ${isAssigned}`);
             
             return isAssigned;
           });
-          
-          console.log(`✅ Filtered checklists for instructor's sheet (ID: ${instructorStudySheetId}, Number: ${instructorStudySheetNumber}):`, activeLists.length);
-        } else {
-          console.log("⚠️ No instructor study sheet ID found, showing all active checklists");
         }
 
         setActiveChecklists(activeLists);
         if (activeLists.length > 0 && !selectedChecklist) {
-          setSelectedChecklist(activeLists[0]);
+          const firstChecklist = activeLists[0];
+          setSelectedChecklist(firstChecklist);
+          loadExistingSignatures(firstChecklist);
+          
+          // Cargar automáticamente las evaluaciones del primer checklist
+          await loadEvaluationsForChecklist(parseInt(firstChecklist.id));
         } else if (activeLists.length === 0 && instructorStudySheetId) {
           toast.info(`No hay listas de chequeo asignadas a tu ficha de formación (Ficha ${instructorStudySheetNumber})`);
         }
@@ -181,7 +187,6 @@ export class InstructorChecklistLogic {
         }
       }
     } catch (error) {
-      console.error("Error loading active checklists:", error);
       toast.error("Error al cargar las listas de chequeo activas");
     } finally {
       setLoading(false);
@@ -201,11 +206,7 @@ export class InstructorChecklistLogic {
     extractGeneralObservationsFromEvaluation: (evaluation: Evaluation) => string
   ): Promise<void> => {
     try {
-      console.log("=== LOADING EVALUATIONS FROM DATABASE ===");
-      console.log("Checklist ID:", checklistId, "Type:", typeof checklistId);
-
       const evaluationsResponse = await evaluationService.fetchEvaluationsByChecklist(checklistId);
-      console.log("🔍 Raw evaluations response:", evaluationsResponse);
 
       if (evaluationsResponse && evaluationsResponse.code === "200") {
         if (evaluationsResponse.data && evaluationsResponse.data.length > 0) {
@@ -222,7 +223,11 @@ export class InstructorChecklistLogic {
           setEvaluationRecommendations(firstEvaluation.recommendations || "");
           setEvaluationJudgment(firstEvaluation.valueJudgment || "PENDIENTE");
           
-          console.log("✅ Evaluation loaded successfully");
+          // Asegurar que los datos se persistan en localStorage para futuras cargas
+          if (Object.keys(extractedItemStates).length > 0) {
+            localStorage.setItem(`itemStates_${checklistId}`, JSON.stringify(extractedItemStates));
+          }
+          
           return;
         }
       }
@@ -236,7 +241,6 @@ export class InstructorChecklistLogic {
       setItemStates({});
 
     } catch (error) {
-      console.error("❌ Error loading evaluations:", error);
       setEvaluations([]);
       setSelectedEvaluation(null);
       setEvaluationObservations("");
@@ -269,7 +273,6 @@ export class InstructorChecklistLogic {
       exportService.downloadFileFromBase64(base64Data, fileName, 'application/pdf');
       toast.success("📥 PDF descargado exitosamente");
     } catch (error) {
-      console.error("Error exporting PDF:", error);
       toast.error("Error al exportar a PDF");
     }
   };
@@ -284,7 +287,6 @@ export class InstructorChecklistLogic {
       exportService.downloadFileFromBase64(base64Data, fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       toast.success("📥 Excel descargado exitosamente");
     } catch (error) {
-      console.error("Error exporting Excel:", error);
       toast.error("Error al exportar a Excel");
     }
   };

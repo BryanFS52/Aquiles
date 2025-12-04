@@ -1,158 +1,135 @@
 package com.api.aquilesApi.Business;
 
-import com.api.aquilesApi.Dto.EvaluationsDto;
-
-import com.api.aquilesApi.Entity.Evaluations;
-import com.api.aquilesApi.Service.ChecklistService;
+import com.api.aquilesApi.Dto.EvaluationDto;
+import com.api.aquilesApi.Entity.Evaluation;
+import com.api.aquilesApi.Entity.Checklist;
+import com.api.aquilesApi.Entity.TeamsScrum;
 import com.api.aquilesApi.Service.EvaluationsService;
+import com.api.aquilesApi.Service.ChecklistService;
+import com.api.aquilesApi.Service.TeamScrumService;
 import com.api.aquilesApi.Utilities.CustomException;
-import org.modelmapper.ModelMapper;
+import com.api.aquilesApi.Utilities.Mapper.EvaluationMap;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import java.util.List;
-import java.util.stream.Collectors;
-
 
 
 @Component
 public class EvaluationsBusiness {
-    private EvaluationsService evaluationsService;
-    private ChecklistService checklistService;
-    private ModelMapper modelMapper;
+   private final EvaluationsService evaluationsService;
+   private final ChecklistService checklistService;
+   private final TeamScrumService teamScrumService;
 
-    public EvaluationsBusiness(EvaluationsService evaluationsService, ChecklistService checklistService, ModelMapper modelMapper) {
+    public EvaluationsBusiness(EvaluationsService evaluationsService, 
+                               ChecklistService checklistService,
+                               TeamScrumService teamScrumService) {
         this.evaluationsService = evaluationsService;
         this.checklistService = checklistService;
-        this.modelMapper = modelMapper;
+        this.teamScrumService = teamScrumService;
     }
-
 
     // Validation Object
 
 
     // Get all evaluations (Paginated)
-    public Page<EvaluationsDto> findAll(int page, int size) {
+    public Page<EvaluationDto> findAll(int page, int size) {
         try {
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<Evaluations> evaluationsPage = evaluationsService.findAll(pageRequest);
-            return evaluationsPage.map(evaluation -> modelMapper.map(evaluation, EvaluationsDto.class));
+            Page<Evaluation> evaluationsPage = evaluationsService.findAll(pageRequest);
+            return EvaluationMap.INSTANCE.EntityToDTOs(evaluationsPage);
+        } catch (DataAccessException e) {
+            throw new CustomException("Error retrieving attendances due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            throw new CustomException("Error retrieving evaluations: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException("An unexpected error occurred while retrieving attendances.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     // Get Evaluation by ID
-    public EvaluationsDto findById(Long id) {
+    public EvaluationDto findById(Long id) {
         try {
-            Evaluations evaluation = evaluationsService.getById(id);
-            return modelMapper.map(evaluation, EvaluationsDto.class);
+            Evaluation evaluation = evaluationsService.getById(id);
+            return EvaluationMap.INSTANCE.EntityToDTO(evaluation);
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
-            throw new CustomException("Error retrieving evaluation with ID " + id + ": " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Error Getting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    // Find By Checklist Id - Relación 1:1
-    public List<EvaluationsDto> findByChecklistId(Long checklistId) {
+    // Add new evaluation
+    public EvaluationDto add(EvaluationDto evaluationDto) {
         try {
-            List<Evaluations> evaluations = evaluationsService.findByChecklistId(checklistId);
-            return evaluations.stream()
-                    .map(evaluation -> modelMapper.map(evaluation, EvaluationsDto.class))
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            throw new CustomException("Error retrieving evaluations for checklist ID " + checklistId + ": " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    // Nuevo método para obtener la evaluación única de un checklist (relación 1:1)
-    public EvaluationsDto findEvaluationByChecklistId(Long checklistId) {
-        try {
-            Evaluations evaluation = evaluationsService.findEvaluationByChecklistId(checklistId);
-            return evaluation != null ? modelMapper.map(evaluation, EvaluationsDto.class) : null;
-        } catch (Exception e) {
-            throw new CustomException("Error retrieving evaluation for checklist ID " + checklistId + ": " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    // Verificar si existe evaluación para un checklist
-    public boolean existsByChecklistId(Long checklistId) {
-        try {
-            return evaluationsService.existsByChecklistId(checklistId);
-        } catch (Exception e) {
-            throw new CustomException("Error checking evaluation existence for checklist ID " + checklistId + ": " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    // Add
-    public EvaluationsDto add(EvaluationsDto evaluationsDto) {
-        try {
-            // Crear la entidad Evaluations manualmente para evitar problemas con el mapeo de checklistId
-            Evaluations evaluation = new Evaluations();
-            evaluation.setObservations(evaluationsDto.getObservations());
-            evaluation.setRecommendations(evaluationsDto.getRecommendations());
-            evaluation.setValueJudgment(evaluationsDto.getValueJudgment());
-
-            // Si se proporciona un checklistId, obtener la entidad Checklist del contexto de persistencia
-            if (evaluationsDto.getChecklistId() != null) {
-                try {
-                    // Obtener la entidad Checklist existente para asociarla
-                    evaluation.setChecklist(checklistService.getById(evaluationsDto.getChecklistId()));
-                } catch (Exception e) {
-                    throw new CustomException("Checklist with ID " + evaluationsDto.getChecklistId() + " not found", HttpStatus.BAD_REQUEST);
-                }
-            }
-
-            Evaluations savedEvaluation = evaluationsService.save(evaluation);
-            return modelMapper.map(savedEvaluation, EvaluationsDto.class);
-        } catch (Exception e) {
-            throw new CustomException("Error adding evaluation: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    // Update
-    public void update(Long evaluationId,  EvaluationsDto evaluationsDto) {
-        try {
-            // Obtener la evaluación existente del contexto de persistencia
-            Evaluations existingEvaluation = evaluationsService.getById(evaluationId);
-
-            // Actualizar solo los campos necesarios manualmente para evitar problemas con el mapeo
-            existingEvaluation.setObservations(evaluationsDto.getObservations());
-            existingEvaluation.setRecommendations(evaluationsDto.getRecommendations());
-            existingEvaluation.setValueJudgment(evaluationsDto.getValueJudgment());
-
-            // Si se proporciona un checklistId diferente, actualizar la referencia
-            if (evaluationsDto.getChecklistId() != null) {
-                try {
-                    // Solo actualizar la referencia de checklist si cambió
-                    if (existingEvaluation.getChecklist() == null ||
-                            !existingEvaluation.getChecklist().getId().equals(evaluationsDto.getChecklistId())) {
-                        existingEvaluation.setChecklist(checklistService.getById(evaluationsDto.getChecklistId()));
+            // Verificar si ya existe una evaluación para este checklist y team scrum
+            if (evaluationDto.getChecklistId() != null) {
+                Checklist checklist = checklistService.getById(evaluationDto.getChecklistId());
+                
+                // Si se proporciona teamScrumId, verificar que no exista ya una evaluación para este checklist + team
+                if (evaluationDto.getTeamScrumId() != null) {
+                    Evaluation existingEvaluation = evaluationsService.findByChecklistAndTeam(
+                        evaluationDto.getChecklistId(), 
+                        evaluationDto.getTeamScrumId()
+                    );
+                    if (existingEvaluation != null) {
+                        throw new CustomException("Ya existe una evaluación para este checklist y team scrum. ID de evaluación: " + existingEvaluation.getId(), HttpStatus.CONFLICT);
                     }
-                } catch (Exception e) {
-                    throw new CustomException("Checklist with ID " + evaluationsDto.getChecklistId() + " not found", HttpStatus.BAD_REQUEST);
                 }
+                
+                Evaluation evaluation = new Evaluation();
+                evaluation.setObservations(evaluationDto.getObservations());
+                evaluation.setRecommendations(evaluationDto.getRecommendations());
+                evaluation.setValueJudgment(evaluationDto.getValueJudgment());
+                evaluation.setChecklist(checklist);
+                
+                // Si se proporciona teamScrumId, asignarlo
+                if (evaluationDto.getTeamScrumId() != null) {
+                    TeamsScrum teamsScrum = teamScrumService.getById(evaluationDto.getTeamScrumId());
+                    evaluation.setTeamsScrum(teamsScrum);
+                }
+                
+                Evaluation savedEvaluation = evaluationsService.save(evaluation);
+                return EvaluationMap.INSTANCE.EntityToDTO(savedEvaluation);
+            } else {
+                throw new CustomException("El checklistId es obligatorio para crear una evaluación", HttpStatus.BAD_REQUEST);
             }
-
-            // Guardar la evaluación actualizada
-            evaluationsService.update(existingEvaluation);
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
-            throw new CustomException("Error updating evaluation: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Error creating evaluation: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
+    // Update existing evaluation
+    public void update(Long evaluationId, EvaluationDto evaluationDto) {
+        try {
+            evaluationDto.setId(evaluationId);
+            Evaluation evaluation = evaluationsService.getById( evaluationId);
+            EvaluationMap.INSTANCE.updateEvaluation(evaluationDto, evaluation);
+            evaluationsService.save(evaluation);
+        } catch (Exception e) {
+            throw new CustomException("Error Updating Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Delete evaluation by ID
     public void delete(Long evaluationId) {
         try {
-            Evaluations evaluation = evaluationsService.getById(evaluationId);
+            Evaluation evaluation = evaluationsService.getById(evaluationId);
             evaluationsService.delete(evaluation);
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
-            throw new CustomException("Error deleting evaluation with ID " + evaluationId + ": " + e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Error Deleting Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    // Buscar evaluación por checklist y team scrum
+    public EvaluationDto findByChecklistAndTeam(Long checklistId, Long teamScrumId) {
+        Evaluation evaluation = evaluationsService.findByChecklistAndTeam(checklistId, teamScrumId);
+        if (evaluation == null) {
+            return null;
+        }
+        return EvaluationMap.INSTANCE.EntityToDTO(evaluation);
     }
 }
