@@ -21,7 +21,6 @@ const EvaluatePlanMejoramientoPage = () => {
   const [evaluationId, setEvaluationId] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
 
-  // Estados para los campos de evaluación
   const [pertinence, setPertinence] = useState<boolean>(false)
   const [validity, setValidity] = useState<boolean>(false)
   const [authenticity, setAuthenticity] = useState<boolean>(false)
@@ -55,7 +54,6 @@ const EvaluatePlanMejoramientoPage = () => {
         setIsEditing(true)
       }
     } catch (error) {
-      // No hay evaluación existente, se creará una nueva
       console.log("No existe evaluación previa para este plan")
     }
   }
@@ -81,7 +79,6 @@ const EvaluatePlanMejoramientoPage = () => {
       showLoader && showLoader()
 
       if (isEditing && evaluationId) {
-        // Actualizar evaluación existente
         const { data } = await clientLAN.mutate({
           mutation: UPDATE_IMPROVEMENT_PLAN_EVALUATION,
           variables: { id: Number(evaluationId), input },
@@ -94,7 +91,6 @@ const EvaluatePlanMejoramientoPage = () => {
           toast.error(data?.updateImprovementPlanEvaluation?.message ?? "Error al actualizar evaluación")
         }
       } else {
-        // Crear nueva evaluación
         const { data } = await clientLAN.mutate({
           mutation: ADD_IMPROVEMENT_PLAN_EVALUATION,
           variables: { input },
@@ -114,199 +110,210 @@ const EvaluatePlanMejoramientoPage = () => {
     }
   }
 
+  const EvaluationOption = ({ name, value, onChange, checked }: any) => (
+    <div className="flex items-center justify-center gap-8">
+      <label className="group relative flex cursor-pointer items-center gap-3">
+        <input
+          type="radio"
+          name={name}
+          checked={checked === true}
+          onChange={() => onChange(true)}
+          className="peer sr-only"
+        />
+        <div className="flex h-11 w-20 items-center justify-center rounded-xl border-2 border-slate-200 bg-white transition-all peer-checked:border-emerald-500 peer-checked:bg-gradient-to-r peer-checked:from-emerald-500 peer-checked:to-teal-500 peer-checked:shadow-sm group-hover:border-emerald-300 dark:border-slate-700 dark:bg-slate-800 dark:peer-checked:border-blue-500 dark:peer-checked:from-blue-500 dark:peer-checked:to-blue-600 dark:group-hover:border-blue-400">
+          <span className="text-base font-bold text-slate-600 transition-colors peer-checked:text-white dark:text-slate-300 dark:peer-checked:text-white">
+            SÍ
+          </span>
+        </div>
+      </label>
+      <label className="group relative flex cursor-pointer items-center gap-3">
+        <input
+          type="radio"
+          name={name}
+          checked={checked === false}
+          onChange={() => onChange(false)}
+          className="peer sr-only"
+        />
+        <div className="flex h-11 w-20 items-center justify-center rounded-xl border-2 border-slate-200 bg-white transition-all peer-checked:border-rose-500 peer-checked:bg-gradient-to-r peer-checked:from-rose-500 peer-checked:to-red-500 peer-checked:shadow-sm group-hover:border-rose-300 dark:border-slate-700 dark:bg-slate-800 dark:peer-checked:border-rose-500 dark:peer-checked:from-rose-500 dark:peer-checked:to-rose-600 dark:group-hover:border-rose-400">
+          <span className="text-base font-bold text-slate-600 transition-colors peer-checked:text-white dark:text-slate-300 dark:peer-checked:text-white">
+            NO
+          </span>
+        </div>
+      </label>
+    </div>
+  )
+
   return (
-    <div className="min-h-screen bg-transparent">
-      <div className="mx-auto max-w-4xl px-4 py-6">
+    <div className="min-h-screen">
+      <div className="mx-auto max-w-5xl px-4 py-8">
         <PageTitle onBack={() => router.back()}>
-          {isEditing ? "Editar Evaluación - Plan de Mejoramiento" : "Evaluar Plan de Mejoramiento"}
+          {isEditing ? "Editar Evaluación" : "Nueva Evaluación"}
         </PageTitle>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-          {/* Tabla de Verificación y Valoración de Evidencias */}
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
-            <div className="border-b border-slate-200 bg-slate-50 px-5 py-3 dark:border-slate-700 dark:bg-slate-800/50">
-              <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                Verificación y Valoración de Evidencias
+        <div className="mt-8 space-y-6">
+          {/* Evaluación Completa */}
+          <div className="overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-slate-200/50 dark:border-slate-700/50 dark:bg-slate-800 dark:shadow-slate-900/30">
+            <div className="border-b border-slate-200/60 px-6 py-5 dark:border-slate-700/50">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                Criterios de Evaluación
               </h2>
-              <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">
-                Evalúe cada aspecto del plan de mejoramiento
-              </p>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900/50">
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-slate-700 dark:text-slate-200">
-                      P - Pertinencia
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-slate-700 dark:text-slate-200">
-                      V - Vigencia
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-slate-700 dark:text-slate-200">
-                      A - Autenticidad
-                    </th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-slate-700 dark:text-slate-200">
-                      C - Calidad
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="border-r border-slate-200 px-4 py-6 dark:border-slate-700">
-                      <div className="flex gap-6 justify-center">
-                        <label className="flex cursor-pointer items-center gap-2">
-                          <input
-                            type="radio"
-                            name="pertinence"
-                            checked={pertinence === true}
-                            onChange={() => setPertinence(true)}
-                            className="h-4 w-4 cursor-pointer border-slate-300 text-green-600 focus:ring-2 focus:ring-green-500/20 dark:border-slate-500 dark:bg-slate-800 dark:text-blue-500"
-                          />
-                          <span className="text-sm text-slate-700 dark:text-slate-300">SÍ</span>
-                        </label>
-                        <label className="flex cursor-pointer items-center gap-2">
-                          <input
-                            type="radio"
-                            name="pertinence"
-                            checked={pertinence === false}
-                            onChange={() => setPertinence(false)}
-                            className="h-4 w-4 cursor-pointer border-slate-300 text-red-600 focus:ring-2 focus:ring-red-500/20 dark:border-slate-500 dark:bg-slate-800"
-                          />
-                          <span className="text-sm text-slate-700 dark:text-slate-300">NO</span>
-                        </label>
-                      </div>
-                    </td>
-                    <td className="border-r border-slate-200 px-4 py-6 dark:border-slate-700">
-                      <div className="flex gap-6 justify-center">
-                        <label className="flex cursor-pointer items-center gap-2">
-                          <input
-                            type="radio"
-                            name="validity"
-                            checked={validity === true}
-                            onChange={() => setValidity(true)}
-                            className="h-4 w-4 cursor-pointer border-slate-300 text-green-600 focus:ring-2 focus:ring-green-500/20 dark:border-slate-500 dark:bg-slate-800 dark:text-blue-500"
-                          />
-                          <span className="text-sm text-slate-700 dark:text-slate-300">SÍ</span>
-                        </label>
-                        <label className="flex cursor-pointer items-center gap-2">
-                          <input
-                            type="radio"
-                            name="validity"
-                            checked={validity === false}
-                            onChange={() => setValidity(false)}
-                            className="h-4 w-4 cursor-pointer border-slate-300 text-red-600 focus:ring-2 focus:ring-red-500/20 dark:border-slate-500 dark:bg-slate-800"
-                          />
-                          <span className="text-sm text-slate-700 dark:text-slate-300">NO</span>
-                        </label>
-                      </div>
-                    </td>
-                    <td className="border-r border-slate-200 px-4 py-6 dark:border-slate-700">
-                      <div className="flex gap-6 justify-center">
-                        <label className="flex cursor-pointer items-center gap-2">
-                          <input
-                            type="radio"
-                            name="authenticity"
-                            checked={authenticity === true}
-                            onChange={() => setAuthenticity(true)}
-                            className="h-4 w-4 cursor-pointer border-slate-300 text-green-600 focus:ring-2 focus:ring-green-500/20 dark:border-slate-500 dark:bg-slate-800 dark:text-blue-500"
-                          />
-                          <span className="text-sm text-slate-700 dark:text-slate-300">SÍ</span>
-                        </label>
-                        <label className="flex cursor-pointer items-center gap-2">
-                          <input
-                            type="radio"
-                            name="authenticity"
-                            checked={authenticity === false}
-                            onChange={() => setAuthenticity(false)}
-                            className="h-4 w-4 cursor-pointer border-slate-300 text-red-600 focus:ring-2 focus:ring-red-500/20 dark:border-slate-500 dark:bg-slate-800"
-                          />
-                          <span className="text-sm text-slate-700 dark:text-slate-300">NO</span>
-                        </label>
-                      </div>
-                    </td>
-                    <td className="px-4 py-6">
-                      <div className="flex gap-6 justify-center">
-                        <label className="flex cursor-pointer items-center gap-2">
-                          <input
-                            type="radio"
-                            name="quality"
-                            checked={quality === true}
-                            onChange={() => setQuality(true)}
-                            className="h-4 w-4 cursor-pointer border-slate-300 text-green-600 focus:ring-2 focus:ring-green-500/20 dark:border-slate-500 dark:bg-slate-800 dark:text-blue-500"
-                          />
-                          <span className="text-sm text-slate-700 dark:text-slate-300">SÍ</span>
-                        </label>
-                        <label className="flex cursor-pointer items-center gap-2">
-                          <input
-                            type="radio"
-                            name="quality"
-                            checked={quality === false}
-                            onChange={() => setQuality(false)}
-                            className="h-4 w-4 cursor-pointer border-slate-300 text-red-600 focus:ring-2 focus:ring-red-500/20 dark:border-slate-500 dark:bg-slate-800"
-                          />
-                          <span className="text-sm text-slate-700 dark:text-slate-300">NO</span>
-                        </label>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Juicio de Valor */}
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
-            <div className="border-b border-slate-200 bg-slate-50 px-5 py-3 dark:border-slate-700 dark:bg-slate-800/50">
-              <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Juicio de Valor</h2>
-              <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">
-                Decisión final sobre el plan de mejoramiento
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Evalúe cada criterio según las evidencias presentadas
               </p>
             </div>
 
             <div className="p-6">
-              <div className="flex gap-8 justify-center">
-                <label className="group flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 px-6 py-4 transition-all duration-200 hover:shadow-sm active:scale-[0.98] dark:border-slate-700 dark:hover:border-green-500 has-[:checked]:border-green-500 has-[:checked]:bg-gradient-to-r has-[:checked]:from-green-50 has-[:checked]:to-emerald-50 has-[:checked]:shadow-sm dark:has-[:checked]:border-blue-500 dark:has-[:checked]:bg-blue-900/30">
-                  <input
-                    type="radio"
-                    name="judgment"
-                    checked={judgment === true}
-                    onChange={() => setJudgment(true)}
-                    className="h-5 w-5 cursor-pointer border-slate-300 text-green-600 focus:ring-2 focus:ring-green-500/20 dark:border-slate-500 dark:bg-slate-800 dark:text-blue-500"
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {/* Pertinencia */}
+                <div className="group rounded-xl border border-slate-200/60 p-5 transition-all hover:border-slate-300 hover:shadow-md dark:border-slate-700/50 dark:hover:border-slate-600">
+                  <div className="mb-4">
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                      Pertinencia
+                    </h3>
+                    <p className="mt-0.5 text-xs text-gray-600 dark:text-slate-400">
+                      ¿Es relevante para el objetivo?
+                    </p>
+                  </div>
+                  <EvaluationOption
+                    name="pertinence"
+                    value={pertinence}
+                    onChange={setPertinence}
+                    checked={pertinence}
                   />
-                  <span className="text-base font-semibold text-green-700 dark:text-blue-400">APROBADO</span>
-                </label>
-                <label className="group flex cursor-pointer items-center gap-3 rounded-lg border border-slate-200 px-6 py-4 transition-all duration-200 hover:shadow-sm active:scale-[0.98] dark:border-slate-700 dark:hover:border-red-500 has-[:checked]:border-red-500 has-[:checked]:bg-gradient-to-r has-[:checked]:from-red-50 has-[:checked]:to-red-50 has-[:checked]:shadow-sm dark:has-[:checked]:border-red-500 dark:has-[:checked]:bg-red-900/20">
-                  <input
-                    type="radio"
-                    name="judgment"
-                    checked={judgment === false}
-                    onChange={() => setJudgment(false)}
-                    className="h-5 w-5 cursor-pointer border-slate-300 text-red-600 focus:ring-2 focus:ring-red-500/20 dark:border-slate-500 dark:bg-slate-800"
+                </div>
+
+                {/* Vigencia */}
+                <div className="group rounded-xl border border-slate-200/60 p-5 transition-all hover:border-slate-300 hover:shadow-md dark:border-slate-700/50 dark:hover:border-slate-600">
+                  <div className="mb-4">
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                      Vigencia
+                    </h3>
+                    <p className="mt-0.5 text-xs text-gray-600 dark:text-slate-400">
+                      ¿Está actualizado y vigente?
+                    </p>
+                  </div>
+                  <EvaluationOption
+                    name="validity"
+                    value={validity}
+                    onChange={setValidity}
+                    checked={validity}
                   />
-                  <span className="text-base font-semibold text-red-700 dark:text-red-400">NO APROBADO</span>
-                </label>
+                </div>
+
+                {/* Autenticidad */}
+                <div className="group rounded-xl border border-slate-200/60 p-5 transition-all hover:border-slate-300 hover:shadow-md dark:border-slate-700/50 dark:hover:border-slate-600">
+                  <div className="mb-4">
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                      Autenticidad
+                    </h3>
+                    <p className="mt-0.5 text-xs text-gray-600 dark:text-slate-400">
+                      ¿Es genuino y verificable?
+                    </p>
+                  </div>
+                  <EvaluationOption
+                    name="authenticity"
+                    value={authenticity}
+                    onChange={setAuthenticity}
+                    checked={authenticity}
+                  />
+                </div>
+
+                {/* Calidad */}
+                <div className="group rounded-xl border border-slate-200/60 p-5 transition-all hover:border-slate-300 hover:shadow-md dark:border-slate-700/50 dark:hover:border-slate-600">
+                  <div className="mb-4">
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">
+                      Calidad
+                    </h3>
+                    <p className="mt-0.5 text-xs text-gray-600 dark:text-slate-400">
+                      ¿Cumple con los estándares?
+                    </p>
+                  </div>
+                  <EvaluationOption
+                    name="quality"
+                    value={quality}
+                    onChange={setQuality}
+                    checked={quality}
+                  />
+                </div>
+
+                {/* Juicio Evaluativo */}
+                <div className="group relative rounded-xl border-2 border-emerald-400/60 bg-gradient-to-br from-emerald-50/50 to-teal-50/50 p-4 shadow-lg shadow-emerald-200/40 transition-all hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-300/50 dark:border-blue-400/60 dark:from-blue-900/10 dark:to-blue-900/10 dark:shadow-blue-900/20 dark:hover:border-blue-500">
+                  <div className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/50 dark:from-blue-400 dark:to-blue-600 dark:shadow-blue-500/50">
+                    <svg className="h-4 w-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  </div>
+                  <div className="mb-3 text-center">
+                    <h3 className="text-base font-bold text-gray-900 dark:text-white">
+                      Juicio Evaluativo
+                    </h3>
+                    <p className="mt-0.5 text-xs font-medium text-gray-800 dark:text-white/90">
+                      ¿Aprueba el plan de mejoramiento?
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-stretch justify-center gap-2">
+                    <label className="group/label relative cursor-pointer">
+                      <input
+                        type="radio"
+                        name="judgment"
+                        checked={judgment === true}
+                        onChange={() => setJudgment(true)}
+                        className="peer sr-only"
+                      />
+                      <div className="relative flex min-h-[40px] items-center justify-center gap-2 rounded-lg border-2 border-slate-300 bg-white px-4 py-2 shadow-sm transition-all peer-checked:border-emerald-500 peer-checked:bg-gradient-to-r peer-checked:from-emerald-500 peer-checked:to-teal-500 peer-checked:shadow-md peer-checked:shadow-emerald-500/30 group-hover/label:border-emerald-400 group-hover/label:shadow-md dark:border-slate-600 dark:bg-slate-800 dark:peer-checked:border-blue-500 dark:peer-checked:from-blue-500 dark:peer-checked:to-blue-600 dark:peer-checked:shadow-blue-500/20 dark:group-hover/label:border-blue-400">
+                        <div className="flex items-center justify-center gap-2">
+                          <svg className="h-4 w-4 flex-shrink-0 text-emerald-600 opacity-0 transition-all peer-checked:opacity-100 peer-checked:text-white dark:text-blue-400 dark:peer-checked:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span className="text-base font-extrabold leading-none text-gray-900 transition-colors peer-checked:text-white dark:text-white">
+                            APROBADO
+                          </span>
+                        </div>
+                      </div>
+                    </label>
+                    <label className="group/label relative cursor-pointer">
+                      <input
+                        type="radio"
+                        name="judgment"
+                        checked={judgment === false}
+                        onChange={() => setJudgment(false)}
+                        className="peer sr-only"
+                      />
+                      <div className="relative flex min-h-[40px] items-center justify-center gap-2 rounded-lg border-2 border-slate-300 bg-white px-4 py-2 shadow-sm transition-all peer-checked:border-rose-500 peer-checked:bg-gradient-to-r peer-checked:from-rose-500 peer-checked:to-red-500 peer-checked:shadow-md peer-checked:shadow-rose-500/30 group-hover/label:border-rose-400 group-hover/label:shadow-md dark:border-slate-600 dark:bg-slate-800 dark:peer-checked:from-rose-500 dark:peer-checked:to-rose-600 dark:peer-checked:shadow-rose-500/20 dark:group-hover/label:border-rose-400">
+                        <div className="flex items-center justify-center gap-2">
+                          <svg className="h-4 w-4 flex-shrink-0 text-rose-600 opacity-0 transition-all peer-checked:opacity-100 peer-checked:text-white dark:text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          <span className="text-base font-extrabold leading-none text-gray-900 transition-colors peer-checked:text-white dark:text-white">
+                            REPROBADO
+                          </span>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Botones de acción */}
-          <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
+          <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end">
             <button
               type="button"
               onClick={() => router.back()}
-              className="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all duration-200 hover:bg-slate-50 hover:shadow active:scale-[0.98] dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              className="rounded-xl border-2 border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50 hover:shadow-md active:scale-[0.97] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-750"
             >
               Cancelar
             </button>
             <button
-              type="submit"
-              className="rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:from-green-700 hover:to-emerald-700 hover:shadow-md active:scale-[0.98] dark:from-blue-600 dark:to-blue-700 dark:hover:from-blue-700 dark:hover:to-blue-800"
+              type="button"
+              onClick={handleSubmit}
+              className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-600/30 transition-all hover:from-emerald-700 hover:to-teal-700 hover:shadow-xl hover:shadow-emerald-600/40 active:scale-[0.97] dark:from-blue-600 dark:to-blue-700 dark:shadow-blue-600/30 dark:hover:from-blue-700 dark:hover:to-blue-800 dark:hover:shadow-blue-600/40"
             >
               {isEditing ? "Actualizar Evaluación" : "Guardar Evaluación"}
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   )

@@ -280,56 +280,48 @@ const HistorialPlanesMejoramientoInstructor = () => {
             )
         },
         {
-            key: 'city',
-            header: 'Ciudad',
-            render: (row) => (
-                <div className="flex items-center gap-2">
-                    <FiMapPin className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                    <span className="text-sm text-gray-700 dark:text-white uppercase">
-                        {(row.city || 'NO ESPECIFICADA').toUpperCase()}
-                    </span>
-                </div>
-            )
-        },
-        {
             key: 'state',
             header: 'Estado',
             render: (row) => (
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    row.state 
-                        ? 'bg-green-100 text-green-800 dark:bg-blue-900/30 dark:text-blue-400'
-                        : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                }`}>
-                    <span className={`w-1.5 h-1.5 mr-1.5 rounded-full ${
-                        row.state ? 'bg-green-400 dark:bg-blue-400' : 'bg-red-400'
-                    }`}></span>
-                    {row.state ? 'ACTIVO' : 'INACTIVO'}
-                </span>
+                <div className="flex items-center justify-center">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border transition-all duration-200 ${
+                        row.state 
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'
+                            : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30'
+                    }`}>
+                        <svg className="w-2 h-2" viewBox="0 0 8 8" fill="currentColor">
+                            <circle cx="4" cy="4" r="3" />
+                        </svg>
+                        {row.state ? 'Activo' : 'Inactivo'}
+                    </span>
+                </div>
             )
         },
         {
             key: 'faultType',
             header: 'Tipo de Falta',
             render: (row) => {
-                const getFaultTypeColor = (faultTypeName: string) => {
+                const getFaultTypeStyle = (faultTypeName: string) => {
                     const name = faultTypeName.toLowerCase();
                     if (name.includes('academica') || name.includes('académica')) {
-                        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+                        return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30';
                     } else if (name.includes('disciplinaria')) {
-                        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
+                        return 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/30';
                     }
-                    // Color por defecto
-                    return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+                    return 'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/30';
                 };
 
                 return (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center gap-2">
                         {(row as any).faultType ? (
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getFaultTypeColor((row as any).faultType.name || '')}`}>
-                                {((row as any).faultType?.name ? (row as any).faultType.name.toUpperCase() : 'SIN TIPO DE FALTA')}
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border transition-all duration-200 ${getFaultTypeStyle((row as any).faultType.name || '')}`}>
+                                <svg className="w-2 h-2" viewBox="0 0 8 8" fill="currentColor">
+                                    <circle cx="4" cy="4" r="3" />
+                                </svg>
+                                {((row as any).faultType?.name || 'Sin tipo de falta')}
                             </span>
                         ) : (
-                            <span className="text-sm text-gray-500 dark:text-gray-400 italic">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-gray-50 text-gray-500 border border-gray-200 dark:bg-gray-500/10 dark:text-gray-500 dark:border-gray-500/30">
                                 Sin tipo de falta
                             </span>
                         )}
@@ -346,9 +338,11 @@ const HistorialPlanesMejoramientoInstructor = () => {
                 if (judgment === null || judgment === undefined) {
                     return (
                         <div className="flex items-center justify-center">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400 whitespace-nowrap">
-                                <span className="w-1.5 h-1.5 mr-1.5 rounded-full bg-gray-400"></span>
-                                SIN EVALUAR
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-slate-50 text-slate-600 border border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/30 transition-all duration-200 whitespace-nowrap">
+                                <svg className="w-2 h-2 flex-shrink-0" viewBox="0 0 8 8" fill="currentColor">
+                                    <circle cx="4" cy="4" r="3" />
+                                </svg>
+                                Sin evaluar
                             </span>
                         </div>
                     );
@@ -358,15 +352,19 @@ const HistorialPlanesMejoramientoInstructor = () => {
                 
                 return (
                     <div className="flex items-center justify-center">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border transition-all duration-200 ${
                             isApproved 
-                                ? 'bg-green-100 text-green-800 dark:bg-blue-900/30 dark:text-blue-400'
-                                : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'
+                                : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30'
                         }`}>
-                            <span className={`w-1.5 h-1.5 mr-1.5 rounded-full ${
-                                isApproved ? 'bg-green-400 dark:bg-blue-400' : 'bg-red-400'
-                            }`}></span>
-                            {isApproved ? 'APROBADO' : 'NO APROBADO'}
+                            <svg className="w-2.5 h-2.5" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
+                                {isApproved ? (
+                                    <path d="M2 6L5 9L10 3" strokeLinecap="round" strokeLinejoin="round" />
+                                ) : (
+                                    <path d="M3 3L9 9M9 3L3 9" strokeLinecap="round" strokeLinejoin="round" />
+                                )}
+                            </svg>
+                            {isApproved ? 'Aprobado' : 'Reprobado'}
                         </span>
                     </div>
                 );
