@@ -503,7 +503,18 @@ const FormularioPlanesDeMejoramientoContent =() => {
                 // Si el backend devolvió el id del plan en result.id, redirigir a la página de actividades
                 const planId = (result && (result as any).id) ? (result as any).id : null;
                 if (planId) {
-                    router.push(`/dashboard/ActividadPlanesDeMejoramiento?planId=${planId}`);
+                    // Construir URL con parámetros de ficha para mantener el contexto
+                    let actividadUrl = `/dashboard/ActividadPlanesDeMejoramiento?planId=${planId}`;
+                    
+                    if (studySheetId) {
+                        actividadUrl += `&studySheetId=${studySheetId}`;
+                    }
+                    if (studySheet?.number) {
+                        actividadUrl += `&ficha=${studySheet.number}`;
+                    }
+                    
+                    console.log('🔄 Redirigiendo a actividades con contexto:', actividadUrl);
+                    router.push(actividadUrl);
                 } else {
                     router.back();
                 }

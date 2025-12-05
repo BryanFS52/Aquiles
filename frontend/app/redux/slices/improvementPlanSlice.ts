@@ -74,23 +74,25 @@ const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPla
   };
 };
 
-    type FetchImprovementPlansVars = { page?: number; size?: number; teacherCompetence?: number; id?: number; studySheetId?: number };
+    type FetchImprovementPlansVars = { page?: number; size?: number; teacherCompetence?: number; id?: number; studySheetId?: number; studentId?: number; teacherCompetenceIds?: number[] };
 
 export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], FetchImprovementPlansVars, { rejectValue: { code: string; message: string } }>(
     'improvementPlan/fetchAll',
-    async ({ page, size, teacherCompetence, studySheetId }, { rejectWithValue }) => {
+    async ({ page, size, teacherCompetence, studySheetId, studentId, teacherCompetenceIds }, { rejectWithValue }) => {
         try {
-            // Use federated gateway so Student.person is resolvable
+            // Use clientLAN (federated) para obtener datos de Student.person y TeacherStudySheet.competence
             const { data } = await clientLAN.query<GetAllImprovementPlansQuery, GetAllImprovementPlansQueryVariables>({
                 query: GET_ALL_IMPROVEMENT_PLANS,
-                // Enviar variables incluyendo filtro por ficha si está presente
+                // Enviar variables incluyendo filtros
                 variables: {
                     page,
                     size,
                     teacherCompetence: teacherCompetence as any,
                     studySheetId: studySheetId as any,
+                    studentId: studentId as any,
+                    teacherCompetenceIds: teacherCompetenceIds as any,
                 } as any,
-                fetchPolicy: 'no-cache',
+                fetchPolicy: 'network-only',
             });
             return data.allImprovementPlans;
         } catch (error: any) {
@@ -104,11 +106,11 @@ export const fetchImprovementPlanById = createAsyncThunk<GetImprovementPlanByIdQ
     'improvementPlan/fetchById',
     async ({ id }, { rejectWithValue }) => {
         try {
-            // Use federated gateway so Student.person is resolvable
+            // Use clientLAN (federated) para obtener datos de Student.person y TeacherStudySheet.competence
             const { data } = await clientLAN.query<GetImprovementPlanByIdQuery, GetImprovementPlanByIdQueryVariables>({
                 query: GET_IMPROVEMENT_PLAN_BY_ID,
                 variables: { id },
-                fetchPolicy: 'no-cache',
+                fetchPolicy: 'network-only',
             });
             return data.improvementPlanById;
         } catch (error: any) {
@@ -124,7 +126,7 @@ export const addImprovementPlan = createAsyncThunk<AddImprovementPlanMutation['a
     'improvementPlan/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<AddImprovementPlanMutation, AddImprovementPlanMutationVariables>({
+            const { data } = await client.mutate<AddImprovementPlanMutation, AddImprovementPlanMutationVariables>({
                 mutation: ADD_IMPROVEMENT_PLAN,
                 variables: { input }
             });
@@ -146,7 +148,7 @@ export const updateImprovementPlan = createAsyncThunk<UpdateImprovementPlanMutat
     'improvementPlan/update',
     async ({ id, input }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<UpdateImprovementPlanMutation, UpdateImprovementPlanMutationVariables>({
+            const { data } = await client.mutate<UpdateImprovementPlanMutation, UpdateImprovementPlanMutationVariables>({
                 mutation: UPDATE_IMPROVEMENT_PLAN,
                 variables: { id, input },
             });
@@ -168,7 +170,7 @@ export const deleteImprovementPlan = createAsyncThunk<string, string,
     'improvementPlan/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<DeleteImprovementPlanMutation, DeleteImprovementPlanMutationVariables>({
+            const { data } = await client.mutate<DeleteImprovementPlanMutation, DeleteImprovementPlanMutationVariables>({
                 mutation: DELETE_IMPROVEMENT_PLAN,
                 variables: { id },
             });
@@ -235,13 +237,18 @@ const improvementPlanSlice = createSlice({
                 state.loading = true;
             })
             .addCase(fetchImprovementPlans.fulfilled, (state, action: PayloadAction<any>) => {
+                console.log('✅ fetchImprovementPlans.fulfilled - action.payload:', action.payload);
                 const pagePayload = action.payload ?? {};
                 const dataArray = pagePayload.data ?? [];
+                console.log('✅ dataArray:', dataArray);
+                console.log('✅ dataArray.length:', dataArray.length);
                 state.data = Array.isArray(dataArray)
                     ? dataArray
                         .filter((item: any): item is NonNullable<typeof item> => item !== null)
                         .map(transformGraphQLToImprovementPlanItem)
                     : [];
+                console.log('✅ state.data después de transform:', state.data);
+                console.log('✅ state.data.length:', state.data.length);
                 state.totalItems = pagePayload.totalItems ?? 0;
                 state.totalPages = pagePayload.totalPages ?? 0;
                 state.currentPage = pagePayload.currentPage ?? 0;

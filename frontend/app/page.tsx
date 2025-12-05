@@ -283,7 +283,10 @@ const Login: React.FC = () => {
           throw new Error("Respuesta del servidor incompleta");
         }
 
+        // Guardar datos en localStorage
         localStorage.setItem('userRole', rol);
+        localStorage.setItem('userDocumentType', formData.documentType);
+        localStorage.setItem('userDocument', formData.documentNumber);
 
         // Mostrar mensaje de éxito antes de redirigir
         showAlert('¡Inicio de sesión exitoso! Redirigiendo...', 'success');

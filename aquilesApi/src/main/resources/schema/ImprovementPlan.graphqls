@@ -53,7 +53,7 @@ type ImprovementPlanPageId {
 }
 
 extend type Query {
-    allImprovementPlans(page: Int, size: Int, teacherCompetence: Long, id: Long, studySheetId: Long): ImprovementPlanPage
+    allImprovementPlans(page: Int, size: Int, teacherCompetence: Long, id: Long, studySheetId: Long, studentId: Long, teacherCompetenceIds: [Long]): ImprovementPlanPage
     improvementPlanById(id: Long!): ImprovementPlanPageId
 }
 

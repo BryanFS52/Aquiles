@@ -22,6 +22,8 @@ import {
     GetStudySheetByIdWithAttendancesQueryVariables,
     GetStudySheetsWithCoordinationIdQuery,
     GetStudySheetsWithCoordinationIdQueryVariables,
+    GetStudySheetsByTrainingProjectQuery,
+    GetStudySheetsByTrainingProjectQueryVariables,
     AddStudySheetMutationVariables,
     AddStudySheetMutation
 } from '@graphql/generated';

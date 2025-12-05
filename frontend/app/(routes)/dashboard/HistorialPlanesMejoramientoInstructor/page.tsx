@@ -8,10 +8,10 @@ import type { AppDispatch } from "@redux/store"
 import { useDispatch, useSelector } from "react-redux"
 import {fetchImprovementPlans} from "@slice/improvementPlanSlice";
 import { clientLAN } from "@lib/apollo-client";
-import { GET_STUDY_SHEET_BY_ID, GET_LEARNING_OUTCOMES_BY_COMPETENCE } from "@graphql/olympo/studySheetGraph";
+import { GET_STUDY_SHEET_BY_ID, GET_LEARNING_OUTCOMES_BY_COMPETENCE, GET_TEACHER_COMPETENCES_BY_STUDY_SHEET } from "@graphql/olympo/studySheetGraph";
 import { GET_IMPROVEMENT_PLAN_EVALUATION_BY_PLAN_ID } from "@graphql/improvementPlanEvaluationGraph";
 import { FiMapPin, FiCalendar, FiFileText, FiStar, FiEye, FiPlus, FiArrowLeft, FiCheck } from "react-icons/fi";
-import { ImprovementPlan } from "@graphql/generated";
+import { ImprovementPlan as BaseImprovementPlan } from "@graphql/generated";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@context/UserContext";
@@ -101,7 +101,11 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
     }, [studySheet, fichaData, studySheetIdParam]);
     
     // Usar directamente los datos del backend ya filtrados por ficha
-    const improvementPlans = React.useMemo(() => allImprovementPlans || [], [allImprovementPlans]);
+    const improvementPlans = React.useMemo(() => {
+        console.log('🔍 improvementPlans memo - allImprovementPlans:', allImprovementPlans);
+        console.log('🔍 improvementPlans memo - length:', allImprovementPlans?.length);
+        return allImprovementPlans || [];
+    }, [allImprovementPlans]);
     const fichaNameOrNumber = metaStudySheet?.number ?? studySheet?.number ?? fichaData?.fichaNumber ?? fichaData?.number ?? fichaData?.id ?? '';
     
     // Estado para manejar la página actual (Paginator espera páginas basadas en 1)
@@ -141,43 +145,112 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
         console.log('🔍 DEBUG fichaId cambió:', fichaId);
     }, [fichaId]);
 
+    // Estado para teacherCompetence IDs
+    const [teacherCompetenceIds, setTeacherCompetenceIds] = React.useState<number[] | null>(null);
+    const [loadingCompetences, setLoadingCompetences] = React.useState(false);
+    
+    // Ref para evitar llamadas duplicadas
+    const lastFetchRef = React.useRef<string>('');
+    const isFirstRender = React.useRef(true);
+
+    // useEffect para obtener teacherCompetence IDs cuando hay fichaId
+    useEffect(() => {
+        const fetchTeacherCompetences = async () => {
+            if (!fichaId) {
+                setTeacherCompetenceIds(null);
+                return;
+            }
+            
+            // Evitar llamadas duplicadas
+            if (loadingCompetences) return;
+            
+            setLoadingCompetences(true);
+            try {
+                console.log('🔍 Obteniendo teacherCompetences para fichaId:', fichaId);
+                const { data } = await clientLAN.query({
+                    query: GET_TEACHER_COMPETENCES_BY_STUDY_SHEET,
+                    variables: { id: fichaId },
+                    fetchPolicy: 'cache-first' // Usar caché para evitar llamadas repetidas
+                });
+                
+                const teacherStudySheets = data?.studySheetById?.data?.teacherStudySheets || [];
+                const ids = teacherStudySheets.map((ts: any) => Number(ts.id)).filter((id: number) => !isNaN(id));
+                
+                console.log('✅ TeacherCompetence IDs obtenidos:', ids);
+                setTeacherCompetenceIds(ids.length > 0 ? ids : null);
+            } catch (error) {
+                console.error('❌ Error al obtener teacherCompetences:', error);
+                setTeacherCompetenceIds(null);
+            } finally {
+                setLoadingCompetences(false);
+            }
+        };
+
+        fetchTeacherCompetences();
+    }, [fichaId]); // Removido loadingCompetences de las dependencias
+
     // Ya no necesitamos cargar competencias; filtramos por ficha directamente en backend
     useEffect(() => {
-        if (!fichaId) return;
-        setPage(1); // Reiniciar a la primera página al cambiar de ficha
+        if (fichaId) {
+            setPage(1); // Reiniciar a la primera página al cambiar de ficha
+        }
     }, [fichaId]);
 
-    // useEffect para hacer fetch de datos - ahora filtra por studySheetId directamente (backend)
+    // useEffect para hacer fetch de datos - ahora usa teacherCompetenceIds
     useEffect(() => {
-        console.log('🚀 useEffect ejecutado - fichaId:', fichaId, 'page:', page);
-        if (!fichaId) {
-            console.log('❌ Falta fichaId, no se ejecuta dispatch');
+        // NUNCA cargar sin teacherCompetenceIds - siempre debe haber filtro de ficha
+        if (!teacherCompetenceIds || teacherCompetenceIds.length === 0) {
+            console.log('🚫 No se hace dispatch sin teacherCompetenceIds (sin filtro de ficha)');
+            // Marcar que ya no es el primer render
+            if (isFirstRender.current) {
+                isFirstRender.current = false;
+            }
             return;
         }
-        console.log('✅ Dispatching fetchImprovementPlans con:', { page: page - 1, size: 5, studySheetId: fichaId });
-        dispatch(fetchImprovementPlans({ 
+        
+        // Marcar que ya no es el primer render
+        isFirstRender.current = false;
+        
+        // Preparar variables de consulta CON filtro obligatorio
+        const queryVariables: any = { 
             page: page - 1, // Backend espera páginas basadas en 0
             size: 5,
-            studySheetId: fichaId
-        }));
-    }, [dispatch, page, fichaId]);
+            teacherCompetenceIds: teacherCompetenceIds
+        };
+        
+        // Crear una key única para este fetch
+        const fetchKey = JSON.stringify({ page: queryVariables.page, ids: queryVariables.teacherCompetenceIds });
+        
+        // Evitar llamadas duplicadas
+        if (lastFetchRef.current === fetchKey) {
+            console.log('🚫 Evitando llamada duplicada');
+            return;
+        }
+        
+        console.log('✅ Dispatching fetchImprovementPlans con filtro:', queryVariables);
+        lastFetchRef.current = fetchKey;
+        dispatch(fetchImprovementPlans(queryVariables));
+    }, [page, teacherCompetenceIds, dispatch]);
 
     // Cuando cambian los planes, obtener los nombres/descripciones de los learning outcomes por competencia
     useEffect(() => {
         const fetchOutcomesForCompetences = async () => {
-            try {
-                const plans: any[] = improvementPlans || [];
-                const competenceIds = Array.from(new Set(plans.map(p => p?.teacherCompetence?.competence?.id).filter(Boolean)));
-                if (competenceIds.length === 0) return;
+            // Solo ejecutar si hay planes
+            const plans: any[] = improvementPlans || [];
+            if (plans.length === 0) return;
+            
+            const competenceIds = Array.from(new Set(plans.map(p => p?.teacherCompetence?.competence?.id).filter(Boolean)));
+            if (competenceIds.length === 0) return;
 
+            try {
                 const map: Record<string, { name?: string; description?: string }> = {};
 
                 await Promise.all(competenceIds.map(async (cid) => {
                     try {
                         const { data } = await clientLAN.query({
                             query: GET_LEARNING_OUTCOMES_BY_COMPETENCE,
-                            variables: { idCompetence: Number(cid), page: 0, size: 5 },
-                            fetchPolicy: 'no-cache'
+                            variables: { idCompetence: Number(cid), page: 0, size: 100 },
+                            fetchPolicy: 'cache-first' // Usar caché para evitar llamadas repetidas
                         });
                         const items = data?.allLearningOutcomes?.data || [];
                         items.forEach((it: any) => {
@@ -196,16 +269,24 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
             }
         };
 
-        fetchOutcomesForCompetences();
-    }, [improvementPlans]);
+        // Usar un pequeño delay para evitar llamadas en cascada
+        const timer = setTimeout(() => {
+            fetchOutcomesForCompetences();
+        }, 100);
+        
+        return () => clearTimeout(timer);
+    }, [improvementPlans?.length]); // Solo depender de la longitud, no del array completo
 
     // Cargar evaluaciones para cada plan de mejoramiento
     useEffect(() => {
         const fetchEvaluations = async () => {
-            try {
-                const plans: any[] = improvementPlans || [];
-                if (plans.length === 0) return;
+            const plans: any[] = improvementPlans || [];
+            if (plans.length === 0) {
+                setEvaluationsMap({});
+                return;
+            }
 
+            try {
                 const evaluations: Record<string, boolean | null> = {};
 
                 await Promise.all(plans.map(async (plan) => {
@@ -213,13 +294,18 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
                         const { data } = await clientLAN.query({
                             query: GET_IMPROVEMENT_PLAN_EVALUATION_BY_PLAN_ID,
                             variables: { improvementPlanId: Number(plan.id) },
-                            fetchPolicy: 'no-cache'
+                            fetchPolicy: 'cache-first' // Usar caché para evitar llamadas repetidas
                         });
                         
                         const evaluation = data?.improvementPlanEvaluationByImprovementPlanId?.data;
                         evaluations[plan.id] = evaluation?.judgment ?? null;
-                    } catch (err) {
-                        console.error('Error al obtener evaluación para plan', plan.id, err);
+                    } catch (err: any) {
+                        // Si el error es porque no existe evaluación, no es un error real
+                        const isNotFoundError = err?.message?.includes('not found') || 
+                                              err?.graphQLErrors?.[0]?.message?.includes('not found');
+                        if (!isNotFoundError) {
+                            console.error('Error al obtener evaluación para plan', plan.id, err);
+                        }
                         evaluations[plan.id] = null;
                     }
                 }));
@@ -230,8 +316,13 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
             }
         };
 
-        fetchEvaluations();
-    }, [improvementPlans]);
+        // Usar un pequeño delay para evitar llamadas en cascada
+        const timer = setTimeout(() => {
+            fetchEvaluations();
+        }, 150);
+        
+        return () => clearTimeout(timer);
+    }, [improvementPlans?.length]); // Solo depender de la longitud, no del array completo
 
     const formatDate = (dateString: string) => {
         if (!dateString) return 'No especificada';
@@ -346,11 +437,11 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
                 if (judgment === null || judgment === undefined) {
                     return (
                         <div className="flex items-center justify-center">
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-slate-50 text-slate-600 border border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/30 transition-all duration-200 whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold bg-yellow-50 text-yellow-700 border border-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-400 dark:border-yellow-500/30 transition-all duration-200 whitespace-nowrap">
                                 <svg className="w-2 h-2 flex-shrink-0" viewBox="0 0 8 8" fill="currentColor">
                                     <circle cx="4" cy="4" r="3" />
                                 </svg>
-                                Sin evaluar
+                                Pendiente
                             </span>
                         </div>
                     );
@@ -467,7 +558,14 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
             </div>
         );
     }
-    if (!loading && (!improvementPlans || improvementPlans.length === 0)) {
+    
+    console.log('🎯 Evaluando condición de sin datos:');
+    console.log('  - loading:', loading);
+    console.log('  - improvementPlans:', improvementPlans);
+    console.log('  - improvementPlans.length:', improvementPlans?.length);
+    console.log('  - Array.isArray(improvementPlans):', Array.isArray(improvementPlans));
+    
+    if (!loading && Array.isArray(improvementPlans) && improvementPlans.length === 0) {
         return (
             <div className="mx-auto px-4 py-8 space-y-6">
                 <PageTitle onBack={() => router.back()}>

@@ -5971,6 +5971,11 @@ export type DeleteImprovementPlanFaultTypeMutation = { deleteImprovementPlanFaul
 export type GetAllImprovementPlansQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
+  teacherCompetence?: InputMaybe<Scalars['Long']['input']>;
+  id?: InputMaybe<Scalars['Long']['input']>;
+  studySheetId?: InputMaybe<Scalars['Long']['input']>;
+  studentId?: InputMaybe<Scalars['Long']['input']>;
+  teacherCompetenceIds?: InputMaybe<Array<InputMaybe<Scalars['Long']['input']>> | InputMaybe<Scalars['Long']['input']>>;
 }>;
 
 
@@ -7935,8 +7940,8 @@ export type DeleteImprovementPlanFaultTypeMutationHookResult = ReturnType<typeof
 export type DeleteImprovementPlanFaultTypeMutationResult = Apollo.MutationResult<DeleteImprovementPlanFaultTypeMutation>;
 export type DeleteImprovementPlanFaultTypeMutationOptions = Apollo.BaseMutationOptions<DeleteImprovementPlanFaultTypeMutation, DeleteImprovementPlanFaultTypeMutationVariables>;
 export const GetAllImprovementPlansDocument = gql`
-    query GetAllImprovementPlans($page: Int, $size: Int) {
-  allImprovementPlans(page: $page, size: $size) {
+    query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $id: Long, $studySheetId: Long, $studentId: Long, $teacherCompetenceIds: [Long]) {
+  allImprovementPlans(page: $page, size: $size, teacherCompetence: $teacherCompetence, id: $id, studySheetId: $studySheetId, studentId: $studentId, teacherCompetenceIds: $teacherCompetenceIds) {
     code
     message
     date

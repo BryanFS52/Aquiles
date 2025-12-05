@@ -2,8 +2,8 @@ import { gql } from "@apollo/client";
 
 // Queries and Mutations for ImprovementPlan
 export const GET_ALL_IMPROVEMENT_PLANS = gql`
-query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $id: Long, $studySheetId: Long) {
-  allImprovementPlans(page: $page, size: $size, teacherCompetence: $teacherCompetence, id: $id, studySheetId: $studySheetId) {
+query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $id: Long, $studySheetId: Long, $studentId: Long, $teacherCompetenceIds: [Long]) {
+  allImprovementPlans(page: $page, size: $size, teacherCompetence: $teacherCompetence, id: $id, studySheetId: $studySheetId, studentId: $studentId, teacherCompetenceIds: $teacherCompetenceIds) {
     code
     message
     date
@@ -119,6 +119,54 @@ export const DELETE_IMPROVEMENT_PLAN = gql`
     deleteImprovementPlan(id: $id) {
       code
       message
+    }
+  }
+`;
+
+export const GET_IMPROVEMENT_PLANS_BY_STUDENT = gql`
+  query GetImprovementPlansByStudent($studentId: Long!, $page: Int, $size: Int) {
+    allImprovementPlans(page: $page, size: $size, studentId: $studentId) {
+      code
+      message
+      date
+      totalPages
+      totalItems
+      currentPage
+      data {
+        id
+        actNumber
+        city
+        date
+        startTime
+        endTime
+        place
+        reason
+        state
+        additionalJustification
+        student {
+          id
+          person {
+            name
+            lastname
+            document
+          }
+        }
+        teacherCompetence {
+          id
+          competence {
+            id
+            name
+          }
+        }
+        learningOutcome {
+          id
+        }
+        improvementPlanFile
+        faultType {
+          id
+          name
+        }
+      }
     }
   }
 `;

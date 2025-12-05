@@ -20,11 +20,40 @@ public class ImprovementPlanResolver {
         this.improvementPlanBusiness = improvementPlanBusiness;
     }
 
-    // FindAll ImprovementPlan (GraphQL)
+    // FindAll ImprovementPlan (GraphQL) - Soporta filtros opcionales
     @DgsQuery
-    public Map<String, Object> allImprovementPlans(@InputArgument Integer page, @InputArgument Integer size) {
+    public Map<String, Object> allImprovementPlans(
+            @InputArgument Integer page, 
+            @InputArgument Integer size,
+            @InputArgument Long teacherCompetence,
+            @InputArgument Long id,
+            @InputArgument Long studySheetId,
+            @InputArgument Long studentId,
+            @InputArgument java.util.List<Long> teacherCompetenceIds) {
         try {
-            Page<ImprovementPlanDto> improvementPlanPage = improvementPlanBusiness.findAll(page, size);
+            Page<ImprovementPlanDto> improvementPlanPage;
+            
+            // Filtrar por studentId si está presente (prioridad 1)
+            if (studentId != null) {
+                improvementPlanPage = improvementPlanBusiness.findByStudentId(page, size, studentId);
+            }
+            // Filtrar por teacherCompetenceIds si está presente (prioridad 2 - nueva lógica)
+            else if (teacherCompetenceIds != null && !teacherCompetenceIds.isEmpty()) {
+                improvementPlanPage = improvementPlanBusiness.findByTeacherCompetenceIds(page, size, teacherCompetenceIds);
+            }
+            // Filtrar por studySheetId si está presente (deprecado, pero mantenido por compatibilidad)
+            else if (studySheetId != null) {
+                improvementPlanPage = improvementPlanBusiness.findByStudySheetId(page, size, studySheetId);
+            }
+            // Filtrar por teacherCompetence si está presente
+            else if (teacherCompetence != null) {
+                improvementPlanPage = improvementPlanBusiness.findByFilter(page, size, teacherCompetence);
+            }
+            // Sin filtros, obtener todos
+            else {
+                improvementPlanPage = improvementPlanBusiness.findAll(page, size);
+            }
+            
             return ResponseHttpApi.responseHttpFindAll(
                     improvementPlanPage.getContent(),
                     ResponseHttpApi.CODE_OK,

@@ -35,7 +35,7 @@ public class ImprovementPlanDto implements Serializable {
     private Long teacherCompetence;
     private Long learningOutcome;
 
-    private byte[] improvementPlanFile;
+    private String improvementPlanFile;
 
     // Relations
     private List<ImprovementPlanActivityDto> improvementPlanActivity;

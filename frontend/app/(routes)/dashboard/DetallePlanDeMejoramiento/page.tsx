@@ -200,19 +200,43 @@ export default function DetallePlanPage() {
 
 							<div>
 								<p className="text-xs font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wide mb-2">Motivo / Observaciones</p>
-								<p className="text-lg leading-relaxed text-gray-800 dark:text-white font-medium">{plan?.reason ?? "-"}</p>
-							</div>								{plan?.improvementPlanFile && (
-									<div>
-										<p className="text-xs font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wide mb-2">Archivo adjunto</p>
-										<a className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen dark:from-blue-600 dark:to-blue-700 dark:hover:from-blue-700 dark:hover:to-blue-800 text-white rounded-lg text-sm font-medium transition-colors duration-200" href={plan.improvementPlanFile} target="_blank" rel="noreferrer">
-												<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-													<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-												</svg>
-												Ver archivo
-											</a>
-										</div>
-									)}
+							<p className="text-lg leading-relaxed text-gray-800 dark:text-white font-medium">{plan?.reason ?? "-"}</p>
+						</div>								{plan?.improvementPlanFile && plan.improvementPlanFile.length > 0 && (
+								<div>
+									<p className="text-xs font-semibold text-gray-400 dark:text-slate-500 uppercase tracking-wide mb-2">Archivo adjunto</p>
+									<button
+										onClick={() => {
+											try {
+												// GraphQL devuelve byte[] como Base64 String
+												const base64String = plan.improvementPlanFile as string;
+												const byteCharacters = atob(base64String);
+												const byteNumbers = new Array(byteCharacters.length);
+												for (let i = 0; i < byteCharacters.length; i++) {
+													byteNumbers[i] = byteCharacters.charCodeAt(i);
+												}
+												const byteArray = new Uint8Array(byteNumbers);
+												
+												const blob = new Blob([byteArray], { type: 'application/pdf' });
+												const url = window.URL.createObjectURL(blob);
+												const link = document.createElement('a');
+												link.href = url;
+												link.download = `plan_mejoramiento_${plan.actNumber || plan.id}.pdf`;
+												link.click();
+												window.URL.revokeObjectURL(url);
+											} catch (error) {
+												console.error('Error al descargar:', error);
+											}
+										}}
+										className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen dark:from-blue-600 dark:to-blue-700 dark:hover:from-blue-700 dark:hover:to-blue-800 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+									>
+										<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+										</svg>
+										Descargar archivo
+									</button>
+								</div>
+							)}
 								</div>
 							}
 						/>

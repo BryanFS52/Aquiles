@@ -5,17 +5,14 @@ import com.api.aquilesApi.Entity.ImprovementPlan;
 import com.api.aquilesApi.Service.ImprovementPlanService;
 import com.api.aquilesApi.Utilities.CustomException;
 import com.api.aquilesApi.Utilities.Mapper.ImprovementPlanMap;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.Base64;
 
 @Component
 public class ImprovementPlanBusiness {
@@ -67,6 +64,31 @@ public class ImprovementPlanBusiness {
         }
     }
 
+    // Get improvementPlans by StudentId (Paginated)
+    public Page<ImprovementPlanDto> findByStudentId(int page, int size, Long studentId) {
+        try {
+            PageRequest pageRequest = PageRequest.of(page, size);
+            List<ImprovementPlan> improvementPlans = improvementPlanService.findAllByStudentId(studentId);
+            
+            // Convertir lista a Page manualmente
+            int start = (int) pageRequest.getOffset();
+            int end = Math.min((start + pageRequest.getPageSize()), improvementPlans.size());
+            List<ImprovementPlan> pageContent = improvementPlans.subList(start, end);
+            
+            Page<ImprovementPlan> improvementPlanPage = new org.springframework.data.domain.PageImpl<>(
+                pageContent, pageRequest, improvementPlans.size()
+            );
+
+            System.out.println("Total improvementPlans (by studentId): " + improvementPlanPage.getTotalElements());
+
+            return ImprovementPlanMap.INSTANCE.EntityToDTOs(improvementPlanPage);
+        } catch (DataAccessException e) {
+            throw new CustomException("Error retrieving improvementPlans by studentId due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            throw new CustomException("An unexpected error occurred while retrieving improvementPlans by studentId.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     // Get improvementPlan by Filter
     public Page<ImprovementPlanDto> findByFilter(int page, int size, Long teacherCompetence) {
         try {
@@ -84,18 +106,38 @@ public class ImprovementPlanBusiness {
     }
 
     // Get improvementPlans by StudySheetId (Ficha)
+    // NOTA: Este método está deprecado. El filtrado por ficha ahora se hace
+    // obteniendo los teacherCompetenceIds desde Olympo en el Resolver
+    // y luego usando findByTeacherCompetenceIds
+    @Deprecated
     public Page<ImprovementPlanDto> findByStudySheetId(int page, int size, Long studySheetId) {
         try {
+            // Retornar página vacía - el resolver debe usar findByTeacherCompetenceIds
             PageRequest pageRequest = PageRequest.of(page, size);
-            Page<ImprovementPlan> improvementPlanPage = improvementPlanService.findByStudySheetId(pageRequest, studySheetId);
+            return Page.empty(pageRequest);
+        } catch (Exception e) {
+            throw new CustomException("Method deprecated. Use findByTeacherCompetenceIds instead.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    // Get improvementPlans by list of TeacherCompetence IDs
+    public Page<ImprovementPlanDto> findByTeacherCompetenceIds(int page, int size, List<Long> teacherCompetenceIds) {
+        try {
+            if (teacherCompetenceIds == null || teacherCompetenceIds.isEmpty()) {
+                // Si no hay teacherCompetenceIds, retornar página vacía
+                return Page.empty(PageRequest.of(page, size));
+            }
+            
+            PageRequest pageRequest = PageRequest.of(page, size);
+            Page<ImprovementPlan> improvementPlanPage = improvementPlanService.findByTeacherCompetenceIds(pageRequest, teacherCompetenceIds);
 
-            System.out.println("Total improvementPlans (by studySheetId): " + improvementPlanPage.getTotalElements());
+            System.out.println("Total improvementPlans (by teacherCompetenceIds): " + improvementPlanPage.getTotalElements());
 
             return ImprovementPlanMap.INSTANCE.EntityToDTOs(improvementPlanPage);
         } catch (DataAccessException e) {
-            throw new CustomException("Error retrieving improvementPlans by studySheetId due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException("Error retrieving improvementPlans by teacherCompetenceIds due to data access issues: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            throw new CustomException("An unexpected error occurred while retrieving improvementPlans by studySheetId.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new CustomException("An unexpected error occurred while retrieving improvementPlans by teacherCompetenceIds.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -149,26 +191,11 @@ public class ImprovementPlanBusiness {
                 improvementPlan.setState(true);
             }
 
-            // Initial save
+            // Initial save - SIN generar PDF automáticamente
             ImprovementPlan savedImprovementPlan = improvementPlanService.save(improvementPlan);
-
-            // 2. Generate and attach PDF
-            try {
-                byte[] pdfContent = generatePdf(savedImprovementPlan);
-                if (pdfContent != null && pdfContent.length > 0) {
-                    savedImprovementPlan.setImprovementPlanFile(pdfContent);
-                    // Update with PDF
-                    improvementPlanService.update(savedImprovementPlan);
-                    // Refresh the entity after update
-                    savedImprovementPlan = improvementPlanService.getById(savedImprovementPlan.getId());
-                    System.out.println("PDF generado y guardado exitosamente para el Plan de Mejoramiento ID: " + savedImprovementPlan.getId());
-                } else {
-                    System.err.println("Error: PDF generado está vacío para el Plan de Mejoramiento ID: " + savedImprovementPlan.getId());
-                }
-            } catch (Exception e) {
-                System.err.println("Error al generar el PDF para el Plan de Mejoramiento ID " + savedImprovementPlan.getId() + ": " + e.getMessage());
-                // El plan se guarda aunque falle la generación del PDF
-            }
+            
+            // El archivo será subido posteriormente por el aprendiz
+            // No generamos PDF automáticamente
 
             return ImprovementPlanMap.INSTANCE.EntityToDto(savedImprovementPlan);
         } catch (Exception e) {
@@ -178,6 +205,7 @@ public class ImprovementPlanBusiness {
         }
     }
 
+    /* COMENTADO - Ya no generamos PDF automáticamente, el aprendiz sube su archivo
     private byte[] generatePdf(ImprovementPlan improvementPlan) {
         try {
             // Load the JasperReport template
@@ -213,13 +241,30 @@ public class ImprovementPlanBusiness {
             throw new CustomException("Error al generar el PDF: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    */
 
     // Update existing improvementPlan
     public void update(Long improvementPlanId, ImprovementPlanDto improvementplanDto) {
         try {
             improvementplanDto.setId(improvementPlanId);
             ImprovementPlan improvementPlan = improvementPlanService.getById(improvementPlanId);
+            
+            // Guardar el archivo Base64 antes del mapeo automático
+            String base64File = improvementplanDto.getImprovementPlanFile();
+            
+            // Mapear el resto de campos
             ImprovementPlanMap.INSTANCE.updateImprovementPlan(improvementplanDto, improvementPlan);
+            
+            // Convertir Base64 (String) a byte[] si está presente
+            if (base64File != null && !base64File.isEmpty()) {
+                try {
+                    byte[] fileBytes = Base64.getDecoder().decode(base64File);
+                    improvementPlan.setImprovementPlanFile(fileBytes);
+                } catch (IllegalArgumentException e) {
+                    throw new CustomException("El archivo no está en formato Base64 válido", HttpStatus.BAD_REQUEST);
+                }
+            }
+            
             improvementPlanService.update(improvementPlan);
         } catch (Exception e) {
             throw new CustomException("Error Updating Attendance: " + e.getMessage(), HttpStatus.BAD_REQUEST);

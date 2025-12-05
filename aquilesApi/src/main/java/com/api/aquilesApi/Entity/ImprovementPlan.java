@@ -59,7 +59,7 @@ public class ImprovementPlan implements Serializable {
     @Column (name = "learning_outcome")
     private Long learningOutcome;
 
-    @Column (name = "improvement_plan_file")
+    @Column(name = "improvement_plan_file")
     private byte[] improvementPlanFile;
 
     // Relations

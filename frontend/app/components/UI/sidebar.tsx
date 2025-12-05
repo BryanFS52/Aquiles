@@ -111,6 +111,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ role: initialRole }) => {
     useEffect(() => {
         if (isClientMounted) {
             localStorage.setItem("sidebar-role", role);
+            // Disparar evento personalizado para notificar el cambio de rol
+            window.dispatchEvent(new CustomEvent('roleChanged', { detail: { role } }));
         }
     }, [role, isClientMounted]);
 

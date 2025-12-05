@@ -30,10 +30,31 @@ const AddImprovementPlanActivityPage = () => {
   const [deliveryDate, setDeliveryDate] = useState<string>(new Date().toISOString().split("T")[0])
   const [improvementPlanId, setImprovementPlanId] = useState<string>("")
   const searchParams = useSearchParams()
+  
+  // Capturar parámetros de ficha para preservar el contexto
+  const [studySheetParams, setStudySheetParams] = useState<{
+    studySheetId?: string;
+    ficha?: string;
+    studentIds?: string;
+  }>({});
 
   useEffect(() => {
     const planIdParam = searchParams.get("planId") || searchParams.get("improvementPlanId")
     if (planIdParam) setImprovementPlanId(String(planIdParam))
+    
+    // Capturar parámetros de ficha si existen
+    const studySheetId = searchParams.get("studySheetId")
+    const ficha = searchParams.get("ficha")
+    const studentIds = searchParams.get("studentIds")
+    
+    if (studySheetId || ficha) {
+      setStudySheetParams({
+        studySheetId: studySheetId || undefined,
+        ficha: ficha || undefined,
+        studentIds: studentIds || undefined
+      })
+      console.log('📋 Parámetros de ficha capturados:', { studySheetId, ficha, studentIds })
+    }
   }, [searchParams])
 
   const [deliveryId, setDeliveryId] = useState<string>("")
@@ -41,7 +62,8 @@ const AddImprovementPlanActivityPage = () => {
   const [activitiesCount, setActivitiesCount] = useState<number>(0)
 
   useEffect(() => {
-    dispatch(fetchImprovementPlans({ page: 0, size: 200 }))
+    // NO cargar todos los planes sin filtro - esto causa el flash de datos no filtrados
+    // dispatch(fetchImprovementPlans({ page: 0, size: 200 }))
     dispatch(fetchImprovementPlanActivities({ page: 0, size: 200 }))
     ;(async () => {
       try {
@@ -229,8 +251,26 @@ const AddImprovementPlanActivityPage = () => {
         setActivitiesCount(newCount)
         console.log(`Actividad registrada. Nuevo contador: ${newCount}`)
         
-        // Redirigir siempre al historial después de registrar
-        router.push("/dashboard/HistorialPlanesMejoramientoInstructor")
+        // Redirigir al historial preservando los parámetros de ficha
+        let historialUrl = "/dashboard/HistorialPlanesMejoramientoInstructor"
+        const params = new URLSearchParams()
+        
+        if (studySheetParams.studySheetId) {
+          params.set('studySheetId', studySheetParams.studySheetId)
+        }
+        if (studySheetParams.ficha) {
+          params.set('ficha', studySheetParams.ficha)
+        }
+        if (studySheetParams.studentIds) {
+          params.set('studentIds', studySheetParams.studentIds)
+        }
+        
+        if (params.toString()) {
+          historialUrl += `?${params.toString()}`
+        }
+        
+        console.log('🔄 Redirigiendo a:', historialUrl)
+        router.push(historialUrl)
       } else {
         toast.error(res?.message ?? "Error al registrar actividad")
       }
