@@ -17,7 +17,7 @@ import {
 } from "@redux/slices/cerberos/authSlice";
 import type { User } from "@graphql/generated";
 
-const CERBEROS_URL = process.env.NEXT_PUBLIC_CERBEROS_URL || "http://localhost:3001";
+const CERBEROS_URL = process.env.NEXT_PUBLIC_CERBEROS_URL || "https://cerberos.datasena.com";
 const AQUILES_URL = process.env.NEXT_PUBLIC_AQUILES_URL || "http://localhost:3000";
 
 interface UseAuthReturn {
@@ -28,14 +28,14 @@ interface UseAuthReturn {
   token: string | null;
   error: { code: string | number; message: string } | null;
   loading: boolean;
-  
+
   // Métodos
   login: () => void;
   logout: () => Promise<void>;
   checkAuth: () => Promise<boolean>;
   initializeAuth: () => Promise<void>;
   clearError: () => void;
-  
+
   // Utilidades
   hasRole: (roleName: string) => boolean;
   hasProcess: (processName: string) => boolean;
@@ -44,7 +44,7 @@ interface UseAuthReturn {
 export const useAuth = (): UseAuthReturn => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-  
+
   const { isAuthenticated, user, token, loading, error } = useSelector(
     (state: RootState) => state.auth
   );
@@ -72,7 +72,7 @@ export const useAuth = (): UseAuthReturn => {
       // Primero intentar cargar desde storage
       console.log("🔍 [useAuth] Verificando localStorage...");
       const stored = await dispatch(loadAuthFromStorage()).unwrap();
-      
+
       if (stored) {
         console.log("✅ [useAuth] Sesión encontrada en storage");
         return;
@@ -84,7 +84,7 @@ export const useAuth = (): UseAuthReturn => {
 
       if (token) {
         console.log("🔑 [useAuth] Token encontrado en URL, validando...");
-        
+
         // Guardar inmediatamente en storage como fallback
         const tempAuth = {
           token,
@@ -95,25 +95,25 @@ export const useAuth = (): UseAuthReturn => {
           },
         };
         localStorage.setItem("aquiles_auth", JSON.stringify(tempAuth));
-        
+
         // Intentar validar con backend
         try {
           const result = await dispatch(validateCerberosToken(token)).unwrap();
           console.log("✅ [useAuth] Token validado y guardado");
-          
+
           // Actualizar con datos reales
           localStorage.setItem("aquiles_auth", JSON.stringify(result));
         } catch (validationError) {
           console.warn("⚠️ [useAuth] No se pudo validar con backend, usando token directo");
         }
-        
+
         return;
       }
 
       // Si no hay token, redirigir a login
       console.log("❌ [useAuth] No hay token, redirigiendo a Cerberos");
       throw new Error("No authentication token found");
-      
+
     } catch (error) {
       console.error("❌ [useAuth] Error en initializeAuth:", error);
       throw error;
@@ -125,7 +125,7 @@ export const useAuth = (): UseAuthReturn => {
    */
   const login = useCallback(() => {
     const callbackUrl = `${AQUILES_URL}/auth/callback`;
-    const loginUrl = `${CERBEROS_URL}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
+    const loginUrl = `${CERBEROS_URL}/auth/login?project=Aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
     window.location.href = loginUrl;
   }, []);
 
@@ -135,11 +135,11 @@ export const useAuth = (): UseAuthReturn => {
   const logout = useCallback(async () => {
     try {
       await dispatch(logoutUser()).unwrap();
-      window.location.href = `${CERBEROS_URL}/auth/login`;
+      window.location.href = `${CERBEROS_URL}/auth/login?project=Aquiles`;
     } catch (error) {
       console.error("❌ [useAuth] Error en logout:", error);
       dispatch(clearAuth());
-      window.location.href = `${CERBEROS_URL}/auth/login`;
+      window.location.href = `${CERBEROS_URL}/auth/login?project=Aquiles`;
     }
   }, [dispatch]);
 
@@ -185,14 +185,14 @@ export const useAuth = (): UseAuthReturn => {
     user,
     token,
     error,
-    
+
     // Métodos
     login,
     logout,
     checkAuth,
     initializeAuth,
     clearError,
-    
+
     // Utilidades
     hasRole,
     hasProcess,

@@ -9,7 +9,7 @@ import { verifyTokenInStorage, debugStorageState, isTokenValid } from "@lib/toke
 import { LoaderProvider } from "@context/LoaderContext";
 import Loader from "@components/UI/Loader";
 
-const CERBEROS_URL = process.env.NEXT_PUBLIC_CERBEROS_URL || "http://localhost:3001";
+const CERBEROS_URL = process.env.NEXT_PUBLIC_CERBEROS_URL || "https://cerberos.datasena.com";
 const AQUILES_URL = process.env.NEXT_PUBLIC_AQUILES_URL || "http://localhost:3000";
 
 function HomeContent() {
@@ -26,14 +26,14 @@ function HomeContent() {
 
         if (hasValidToken && isValid) {
           await dispatch(loadAuthFromStorage()).unwrap();
-          
+
           setTimeout(() => {
             router.replace("/dashboard");
           }, 300);
         } else {
           const callbackUrl = `${AQUILES_URL}/auth/callback`;
-          const loginUrl = `${CERBEROS_URL}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
-          
+          const loginUrl = `${CERBEROS_URL}/auth/login?project=Aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
+
           setTimeout(() => {
             window.location.href = loginUrl;
           }, 500);
@@ -42,8 +42,8 @@ function HomeContent() {
         console.error("[Home] Error verificando sesión:", error);
 
         const callbackUrl = `${AQUILES_URL}/auth/callback`;
-        const loginUrl = `${CERBEROS_URL}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
-        
+        const loginUrl = `${CERBEROS_URL}/auth/login?project=Aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
+
         setTimeout(() => {
           window.location.href = loginUrl;
         }, 800);

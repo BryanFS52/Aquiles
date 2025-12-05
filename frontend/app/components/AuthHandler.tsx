@@ -6,7 +6,7 @@ import { AppDispatch, RootState } from "@redux/store";
 import { validateCerberosToken, loadAuthFromStorage } from "@redux/slices/cerberos/authSlice";
 import Loader from "@components/UI/Loader";
 
-const CERBEROS_URL = process.env.NEXT_PUBLIC_CERBEROS_URL || "http://localhost:3001";
+const CERBEROS_URL = process.env.NEXT_PUBLIC_CERBEROS_URL || "https://cerberos.datasena.com";
 const AQUILES_URL = process.env.NEXT_PUBLIC_AQUILES_URL || "http://localhost:3000";
 
 export default function AuthHandler() {
@@ -162,7 +162,7 @@ export default function AuthHandler() {
                                     localStorage.clear();
                                     sessionStorage.clear();
                                     const callbackUrl = `${AQUILES_URL}/auth/callback`;
-                                    const loginUrl = `${CERBEROS_URL}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
+                                    const loginUrl = `${CERBEROS_URL}/auth/login?project=Aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
                                     window.location.href = loginUrl;
                                 }}
                                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
@@ -196,7 +196,7 @@ export default function AuthHandler() {
                         onClick={() => {
                             console.log("🔐 [AuthHandler] Redirigiendo manualmente a Cerberos...");
                             const callbackUrl = `${AQUILES_URL}/auth/callback`;
-                            const loginUrl = `${CERBEROS_URL}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
+                            const loginUrl = `${CERBEROS_URL}/auth/login?project=Aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
                             window.location.href = loginUrl;
                         }}
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

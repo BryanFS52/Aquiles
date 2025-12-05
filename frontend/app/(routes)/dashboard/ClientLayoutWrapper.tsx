@@ -10,7 +10,7 @@ import { RoleType } from '../../types/roles';
 import LayoutContent from './layoutComponent';
 import Loader from '@components/UI/Loader';
 
-const CERBEROS_URL = process.env.NEXT_PUBLIC_CERBEROS_URL || "http://localhost:3001";
+const CERBEROS_URL = process.env.NEXT_PUBLIC_CERBEROS_URL || "https://cerberos.datasena.com";
 const AQUILES_URL = process.env.NEXT_PUBLIC_AQUILES_URL || "http://localhost:3000";
 
 interface ClientLayoutWrapperProps {
@@ -63,7 +63,7 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
                 console.error('❌ [ClientLayoutWrapper] Error cargando auth:', error);
                 // Si falla, redirigir a login
                 const callbackUrl = `${AQUILES_URL}/auth/callback`;
-                const loginUrl = `${CERBEROS_URL}/auth/login?project=aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
+                const loginUrl = `${CERBEROS_URL}/auth/login?project=Aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
                 window.location.href = loginUrl;
             } finally {
                 setIsChecking(false);
