@@ -1,7 +1,6 @@
 package com.api.aquilesApi.Utilities.Mapper;
 
 import com.api.aquilesApi.Dto.ImprovementPlanDto;
-import com.api.aquilesApi.Dto.ImprovementPlanLightDto;
 import com.api.aquilesApi.Entity.ImprovementPlan;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,12 +17,9 @@ public interface ImprovementPlanMap {
 
     @Mapping(source = "improvementPlanFile", target = "improvementPlanFile", qualifiedByName = "bytesToString")
     ImprovementPlanDto EntityToDto(ImprovementPlan improvementPlan);
-    
-    // Método para convertir a DTO light (sin referencias circulares)
-    ImprovementPlanLightDto EntityToLightDto(ImprovementPlan improvementPlan);
 
     @Mapping(source = "improvementPlanFile", target = "improvementPlanFile", qualifiedByName = "stringToBytes")
-    ImprovementPlan DtoToEntity(ImprovementPlanDto improvementPlan);
+    ImprovementPlan DTOToEntity(ImprovementPlanDto improvementPlan);
 
     List<ImprovementPlanDto> EntityToDTOs(List<ImprovementPlan> improvementPlans);
 

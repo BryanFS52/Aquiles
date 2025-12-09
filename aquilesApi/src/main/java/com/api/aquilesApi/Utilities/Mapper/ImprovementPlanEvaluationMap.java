@@ -39,6 +39,20 @@ public interface ImprovementPlanEvaluationMap {
         if (improvementPlan == null) {
             return null;
         }
-        return ImprovementPlanMap.INSTANCE.EntityToLightDto(improvementPlan);
+        return ImprovementPlanLightDto.builder()
+                .id(improvementPlan.getId())
+                .actNumber(improvementPlan.getActNumber())
+                .city(improvementPlan.getCity())
+                .date(improvementPlan.getDate() != null ? improvementPlan.getDate().toString() : null)
+                .startTime(improvementPlan.getStartTime() != null ? improvementPlan.getStartTime().toString() : null)
+                .endTime(improvementPlan.getEndTime() != null ? improvementPlan.getEndTime().toString() : null)
+                .place(improvementPlan.getPlace())
+                .reason(improvementPlan.getReason())
+                .state(improvementPlan.getState())
+                .additionalJustification(improvementPlan.getAdditionalJustification())
+                .studentId(improvementPlan.getStudentId())
+                .teacherCompetence(improvementPlan.getTeacherCompetence())
+                .learningOutcome(improvementPlan.getLearningOutcome())
+                .build();
     }
 }
