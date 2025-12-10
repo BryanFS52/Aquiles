@@ -123,8 +123,11 @@ const HierarchyNode = ({
     isManager = false,
     profiles = [],
     onSelectProfile,
+    onRemoveProfile,
     selectedRole,
-    isAssigning = false
+    isAssigning = false,
+    isRoleAvailableForStudent,
+    assignedProfileData
 }: {
     member: Student
     role: string
@@ -132,8 +135,11 @@ const HierarchyNode = ({
     level?: number
     profiles?: Profile[]
     onSelectProfile?: (studentId: string, profile: Profile) => Promise<void>
+    onRemoveProfile?: (studentId: string) => Promise<void>
     selectedRole?: Profile | null
     isAssigning?: boolean
+    isRoleAvailableForStudent?: (profile: Profile, studentId: string) => boolean
+    assignedProfileData?: Profile | null
 }) => {
     // Generar colores más diversos para los roles
     const generateRoleColors = (roleName: string) => {
@@ -235,16 +241,32 @@ const HierarchyNode = ({
 
                     {/* Rol actual con estilo mejorado */}
                     {(member as any).assignedProfile && (member as any).assignedProfile !== "Sin Rol" && (
-                        <div className="mb-1.5 sm:mb-3 p-1.5 sm:p-2.5 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100/50">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-1 sm:space-x-1.5">
-                                    <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full"></div>
-                                    <span className="text-xs font-medium text-green-700">Rol Asignado</span>
+                        <div className="mb-1.5 sm:mb-3">
+                            <div className="p-1.5 sm:p-2.5 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100/50">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-1 sm:space-x-1.5">
+                                        <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-green-500 rounded-full"></div>
+                                        <span className="text-xs font-medium text-green-700">Rol Asignado</span>
+                                    </div>
+                                    <span className="text-xs font-semibold text-green-800 bg-white/60 px-1 sm:px-2 py-0.5 rounded truncate max-w-20 sm:max-w-none">
+                                        {(member as any).assignedProfile}
+                                    </span>
                                 </div>
-                                <span className="text-xs font-semibold text-green-800 bg-white/60 px-1 sm:px-2 py-0.5 rounded truncate max-w-20 sm:max-w-none">
-                                    {(member as any).assignedProfile}
-                                </span>
                             </div>
+                            {/* Botón para quitar rol (solo roles no únicos) */}
+                            {onRemoveProfile && member.id && assignedProfileData && !assignedProfileData.isUnique && (
+                                <button
+                                    onClick={async (e) => {
+                                        e.stopPropagation();
+                                        await onRemoveProfile(member.id!);
+                                    }}
+                                    className="w-full mt-1.5 py-1 px-2 text-xs font-medium rounded-md transition-all duration-300 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 hover:border-red-300 flex items-center justify-center space-x-1"
+                                    title="Quitar rol (solo roles no únicos)"
+                                >
+                                    <XCircle className="w-3 h-3" />
+                                    <span>Quitar rol</span>
+                                </button>
+                            )}
                         </div>
                     )}
 
@@ -258,11 +280,14 @@ const HierarchyNode = ({
                                     alert('Por favor, selecciona un rol primero.')
                                 }
                             }}
-                            className={`w-full py-1.5 sm:py-2.5 px-2 sm:px-3 text-xs font-medium rounded-lg transition-all duration-300 ${selectedRole && !isAssigning
-                                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-sm hover:shadow-md transform hover:-translate-y-0.5'
-                                : 'bg-gray-100 text-gray-500 cursor-not-allowed'
-                                }`}
-                            disabled={!selectedRole || isAssigning}
+                            className={`w-full py-1.5 sm:py-2.5 px-2 sm:px-3 text-xs font-medium rounded-lg transition-all duration-300 ${
+                                selectedRole && !isAssigning
+                                    ? selectedRole.isUnique && isRoleAvailableForStudent && !isRoleAvailableForStudent(selectedRole, member.id!)
+                                        ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                                        : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-sm hover:shadow-md transform hover:-translate-y-0.5'
+                                    : 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                            }`}
+                            disabled={!selectedRole || isAssigning || (selectedRole && selectedRole.isUnique === true && isRoleAvailableForStudent && !isRoleAvailableForStudent(selectedRole, member.id!))}
                         >
                             <div className="flex items-center justify-center space-x-1 sm:space-x-1.5">
                                 {isAssigning ? (
@@ -273,11 +298,24 @@ const HierarchyNode = ({
                                     </>
                                 ) : selectedRole ? (
                                     <>
-                                        <UserCheck className="w-2 h-2 sm:w-3 sm:h-3" />
-                                        <span className="truncate">
-                                            <span className="hidden sm:inline">Asignar </span>
-                                            {selectedRole.name}
-                                        </span>
+                                        {selectedRole.isUnique && isRoleAvailableForStudent && !isRoleAvailableForStudent(selectedRole, member.id!) ? (
+                                            <>
+                                                <XCircle className="w-2 h-2 sm:w-3 sm:h-3" />
+                                                <span className="truncate text-xs">
+                                                    <span className="hidden sm:inline">Rol único ya asignado</span>
+                                                    <span className="sm:hidden">No disponible</span>
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <UserCheck className="w-2 h-2 sm:w-3 sm:h-3" />
+                                                <span className="truncate">
+                                                    <span className="hidden sm:inline">Asignar </span>
+                                                    {selectedRole.name}
+                                                    {selectedRole.isUnique && <span className="ml-1 text-xs">★</span>}
+                                                </span>
+                                            </>
+                                        )}
                                     </>
                                 ) : (
                                     <>
@@ -331,14 +369,18 @@ const TeamHierarchy = ({
     teamData,
     profiles = [],
     onSelectProfile,
+    onRemoveProfile,
     selectedRole,
-    assigningProfile
+    assigningProfile,
+    isRoleAvailableForStudent
 }: {
     teamData: TeamsScrum
     profiles?: Profile[]
     onSelectProfile?: (studentId: string, profile: Profile) => Promise<void>
+    onRemoveProfile?: (studentId: string) => Promise<void>
     selectedRole?: Profile | null
     assigningProfile?: string | null
+    isRoleAvailableForStudent?: (profile: Profile, studentId: string) => boolean
 }) => {
     // Mapear estudiantes con sus roles asignados desde los datos que llegan
     const studentsWithRole = useMemo(() => {
@@ -359,11 +401,12 @@ const TeamHierarchy = ({
                 if (!student) return null
 
                 const assignedProfileId = membersMap.get(String(student.id))
-                const assignedProfile = profiles.find(p => p.id === assignedProfileId)
+                const assignedProfileData = profiles.find(p => p.id === assignedProfileId)
 
                 return {
                     ...student,
-                    assignedProfile: assignedProfile ? assignedProfile.name : "Sin Rol"
+                    assignedProfile: assignedProfileData ? assignedProfileData.name : "Sin Rol",
+                    assignedProfileData: assignedProfileData || null
                 }
             }).filter(Boolean)
         }
@@ -377,7 +420,8 @@ const TeamHierarchy = ({
 
             return {
                 ...student,
-                assignedProfile: validProfile?.name || "Sin Rol"
+                assignedProfile: validProfile?.name || "Sin Rol",
+                assignedProfileData: validProfile || null
             }
         }).filter(Boolean)
     }, [teamData, profiles])
@@ -427,8 +471,11 @@ const TeamHierarchy = ({
                                         level={2}
                                         profiles={profiles}
                                         onSelectProfile={onSelectProfile}
+                                        onRemoveProfile={onRemoveProfile}
                                         selectedRole={selectedRole}
                                         isAssigning={assigningProfile === student?.id}
+                                        isRoleAvailableForStudent={isRoleAvailableForStudent}
+                                        assignedProfileData={(student as any).assignedProfileData}
                                     />
                                 </div>
                             ) : null
@@ -456,6 +503,7 @@ interface ModalCompositionProps {
     onClose: () => void
     teamData: TeamsScrum | null
     onSelectProfile?: (studentId: string, profile: Profile) => Promise<void>
+    onRemoveProfile?: (studentId: string) => Promise<void>
     profiles: Profile[]
 }
 
@@ -464,10 +512,55 @@ export const ModalComposition = ({
     onClose,
     teamData,
     onSelectProfile,
+    onRemoveProfile,
     profiles
 }: ModalCompositionProps) => {
     const [selectedRole, setSelectedRole] = useState<Profile | null>(null)
     const [assigningProfile, setAssigningProfile] = useState<string | null>(null)
+
+    // Obtener roles únicos ya asignados
+    const assignedUniqueRoles = useMemo(() => {
+        if (!teamData) return new Set<string>();
+        const assigned = new Set<string>();
+        
+        if ((teamData as any).memberIds && Array.isArray((teamData as any).memberIds)) {
+            (teamData as any).memberIds.forEach((m: any) => {
+                if (m.profileId) {
+                    const profile = profiles.find(p => p.id === m.profileId);
+                    if (profile?.isUnique) {
+                        assigned.add(m.profileId);
+                    }
+                }
+            });
+        } else {
+            teamData.students?.forEach(student => {
+                student?.profiles?.forEach(p => {
+                    if (p?.id && p?.isUnique) {
+                        assigned.add(p.id);
+                    }
+                });
+            });
+        }
+        
+        return assigned;
+    }, [teamData, profiles]);
+
+    // Verificar si un rol está disponible para un estudiante
+    const isRoleAvailableForStudent = (profile: Profile, studentId: string) => {
+        if (!profile.isUnique) return true; // Los roles no únicos siempre están disponibles
+        
+        // Verificar si el estudiante ya tiene este rol
+        const memberIds = (teamData as any)?.memberIds;
+        if (memberIds && Array.isArray(memberIds)) {
+            const studentHasRole = memberIds.some((m: any) => 
+                String(m.studentId) === studentId && m.profileId === profile.id
+            );
+            if (studentHasRole) return true; // Puede "re-asignar" su propio rol
+        }
+        
+        // Verificar si otro estudiante tiene este rol único
+        return !assignedUniqueRoles.has(profile.id!);
+    };
 
     const teamStats = useMemo(() => {
         if (!teamData) return { total: 0, withRoles: 0, withoutRoles: 0, uniqueRoles: 0 }
@@ -705,14 +798,18 @@ export const ModalComposition = ({
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
                                 {profiles.map((profile) => {
                                     const profileColors = generateProfileColors(profile.name || '')
+                                    const isUnique = profile.isUnique ?? false;
+                                    const isAssigned = assignedUniqueRoles.has(profile.id!);
+                                    const canSelect = !isUnique || !isAssigned;
+                                    
                                     return (
                                         <div
                                             key={profile.id}
-                                            onClick={() => setSelectedRole(profile)}
-                                            className={`p-2 sm:p-4 rounded-md sm:rounded-xl border-2 cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${selectedRole?.id === profile.id
+                                            onClick={() => canSelect && setSelectedRole(profile)}
+                                            className={`p-2 sm:p-4 rounded-md sm:rounded-xl border-2 transition-all duration-300 ${canSelect ? 'cursor-pointer hover:shadow-lg hover:-translate-y-1' : 'cursor-not-allowed opacity-60'} ${selectedRole?.id === profile.id
                                                 ? `border-solid shadow-xl ring-4 ring-opacity-30 scale-105`
                                                 : 'border-dashed hover:border-solid'
-                                                } ${profileColors.bg} hover:opacity-95 ${selectedRole?.id === profile.id ? `ring-4 ring-offset-2` : ''
+                                                } ${profileColors.bg} ${canSelect ? 'hover:opacity-95' : ''} ${selectedRole?.id === profile.id ? `ring-4 ring-offset-2` : ''
                                                 }`}
                                             style={{
                                                 borderColor: selectedRole?.id === profile.id ? profileColors.dot.replace('bg-', '#') : undefined
@@ -720,13 +817,24 @@ export const ModalComposition = ({
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                                                    <div className={`w-3 h-3 sm:w-5 sm:h-5 rounded-full ${getProfileDotColor(profile.name || '')} shadow-md ring-2 ring-white flex-shrink-0`}></div>
+                                                    <div className={`w-3 h-3 sm:w-5 sm:h-5 rounded-full ${getProfileDotColor(profile.name || '')} shadow-md ring-2 ring-white flex-shrink-0 ${isAssigned && isUnique ? 'opacity-50' : ''}`}></div>
                                                     <div className="flex-1 min-w-0">
-                                                        <h4 className={`font-bold text-xs sm:text-sm ${profileColors.text} truncate tracking-tight`}>{profile.name}</h4>
+                                                        <div className="flex items-center space-x-1">
+                                                            <h4 className={`font-bold text-xs sm:text-sm ${profileColors.text} truncate tracking-tight`}>{profile.name}</h4>
+                                                            {isUnique && (
+                                                                <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0 ${
+                                                                    isAssigned 
+                                                                        ? 'bg-red-100 text-red-700' 
+                                                                        : 'bg-amber-100 text-amber-700'
+                                                                }`}>
+                                                                    {isAssigned ? '✓ Asignado' : 'Único'}
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                         <p className="text-xs text-gray-600 truncate font-medium mt-0.5 hidden sm:block">{profile.description}</p>
                                                     </div>
                                                 </div>
-                                                {selectedRole?.id === profile.id && (
+                                                {selectedRole?.id === profile.id && canSelect && (
                                                     <div className="text-green-600 flex-shrink-0 animate-pulse">
                                                         <div className="p-0.5 sm:p-1 bg-green-100 rounded-full">
                                                             <CheckCircle className="w-3 h-3 sm:w-5 sm:h-5" />
@@ -777,8 +885,10 @@ export const ModalComposition = ({
                                 teamData={teamData}
                                 profiles={profiles}
                                 onSelectProfile={handleProfileAssignment}
+                                onRemoveProfile={onRemoveProfile}
                                 selectedRole={selectedRole}
                                 assigningProfile={assigningProfile}
+                                isRoleAvailableForStudent={isRoleAvailableForStudent}
                             />
                         </div>
                     </div>

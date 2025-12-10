@@ -53,6 +53,7 @@ export interface TeamHandlers {
     onUpdateTeam: (teamId: string, data: TeamInfoData) => Promise<boolean>;
     onDeleteTeam: (teamId: string, teamName: string) => Promise<boolean>;
     onAssignProfile: (studentId: string, profile: Profile) => Promise<void>;
+    onRemoveProfile: (studentId: string) => Promise<void>;
 }
 
 export interface ModalHandlers {
