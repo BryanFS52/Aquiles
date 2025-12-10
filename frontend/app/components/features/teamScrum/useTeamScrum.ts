@@ -201,7 +201,7 @@ export const useTeamScrum = (studySheetId: number) => {
 
                     if (isAlreadyAssigned) {
                         toast.warning(`El rol "${profile.name}" es único y ya está asignado a otro miembro del equipo`, {
-                            position: "top-center",
+                            position: "top-right",
                             autoClose: 4000,
                         });
                         return;
@@ -227,7 +227,7 @@ export const useTeamScrum = (studySheetId: number) => {
                 // Si ya tiene el mismo rol, no hacer nada
                 if (currentProfileId === profile.id) {
                     toast.info(`Este estudiante ya tiene el rol "${profile.name}" asignado`, {
-                        position: "top-center",
+                        position: "top-right",
                         autoClose: 3000,
                     });
                     return;
@@ -238,7 +238,7 @@ export const useTeamScrum = (studySheetId: number) => {
                     toast.info(
                         `Cambiando rol de "${currentProfileName}" a "${profile.name}"...`,
                         {
-                            position: "top-center",
+                            position: "top-right",
                             autoClose: 2000,
                         }
                     );
@@ -261,7 +261,7 @@ export const useTeamScrum = (studySheetId: number) => {
                         res.error?.message ||
                         "Error desconocido al asignar el perfil";
                     toast.error(`Error al asignar perfil: ${message}`, {
-                        position: "top-center",
+                        position: "top-right",
                         autoClose: 5000,
                     });
                     return;
@@ -272,13 +272,13 @@ export const useTeamScrum = (studySheetId: number) => {
                 const roleType = profile.isUnique ? "único" : "compartido";
                 const action = currentProfileId ? "cambiado" : "asignado";
                 toast.success(`Rol ${roleType} "${profile.name}" ${action} exitosamente`, {
-                    position: "top-center",
+                    position: "top-right",
                     autoClose: 3000,
                 });
 
             } catch (error: any) {
                 toast.error(`Error inesperado: ${error?.message || "Error desconocido"}`, {
-                    position: "top-center",
+                    position: "top-right",
                     autoClose: 5000,
                 });
             }
@@ -327,7 +327,7 @@ export const useTeamScrum = (studySheetId: number) => {
                     toast.warning(
                         `No puedes quitar el rol único "${currentProfile.name}". Solo puedes cambiarlo por otro rol.`,
                         {
-                            position: "top-center",
+                            position: "top-right",
                             autoClose: 4000,
                         }
                     );
@@ -338,7 +338,7 @@ export const useTeamScrum = (studySheetId: number) => {
                 toast.info(
                     `Quitando rol "${currentProfile.name}"...`,
                     {
-                        position: "top-center",
+                        position: "top-right",
                         autoClose: 2000,
                     }
                 );
@@ -360,7 +360,7 @@ export const useTeamScrum = (studySheetId: number) => {
                         res.error?.message ||
                         "Error desconocido al quitar el perfil";
                     toast.error(`Error al quitar perfil: ${message}`, {
-                        position: "top-center",
+                        position: "top-right",
                         autoClose: 5000,
                     });
                     return;
@@ -369,13 +369,13 @@ export const useTeamScrum = (studySheetId: number) => {
                 await dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
 
                 toast.success(`Rol "${currentProfile.name}" removido exitosamente`, {
-                    position: "top-center",
+                    position: "top-right",
                     autoClose: 3000,
                 });
 
             } catch (error: any) {
                 toast.error(`Error inesperado: ${error?.message || "Error desconocido"}`, {
-                    position: "top-center",
+                    position: "top-right",
                     autoClose: 5000,
                 });
             }
