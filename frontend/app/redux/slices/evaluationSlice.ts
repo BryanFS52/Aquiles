@@ -1,6 +1,6 @@
-import { clientLAN } from '@lib/apollo-client';
+import { client } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {GET_ALL_EVALUATIONS, GET_EVALUATION_BY_ID, ADD_EVALUATION, UPDATE_EVALUATION, DELETE_EVALUATION, GET_EVALUATIONS_BY_CHECKLIST} from '@graphql/evaluationsGraph';
+import { GET_ALL_EVALUATIONS, GET_EVALUATION_BY_ID, ADD_EVALUATION, UPDATE_EVALUATION, DELETE_EVALUATION, GET_EVALUATIONS_BY_CHECKLIST } from '@graphql/evaluationsGraph';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import {
     Evaluation,
@@ -27,13 +27,13 @@ interface EvaluationInput {
 // Función de utilidad para comparar IDs de forma segura
 function safeIdComparison(id1: any, id2: any): boolean {
     if (id1 == null || id2 == null) return false;
-    
+
     // Comparación por string (más segura)
     const stringMatch = id1.toString() === id2.toString();
-    
+
     // Comparación numérica como respaldo
     const numericMatch = parseInt(id1) === parseInt(id2) && !isNaN(parseInt(id1)) && !isNaN(parseInt(id2));
-    
+
     return stringMatch || numericMatch;
 }
 
@@ -42,23 +42,23 @@ const evaluationService = {
     createCompleteEvaluation: async (checklistId: number, observations: string, recommendations: string, valueJudgment: string) => {
         try {
             const numericChecklistId = parseInt(checklistId.toString());
-            
+
             if (isNaN(numericChecklistId) || numericChecklistId <= 0) {
                 throw new Error(`ID de checklist inválido: ${checklistId}`);
             }
-            
+
             if (!observations || !observations.trim()) {
                 throw new Error('Las observaciones son requeridas');
             }
-            
+
             if (!recommendations || !recommendations.trim()) {
                 throw new Error('Las recomendaciones son requeridas');
             }
-            
+
             if (!valueJudgment || valueJudgment === "PENDIENTE") {
                 throw new Error('El juicio de valor es requerido');
             }
-            
+
             const evaluationInput = {
                 observations: observations.trim(),
                 recommendations: recommendations.trim(),
@@ -66,11 +66,11 @@ const evaluationService = {
                 checklistId: numericChecklistId
             };
 
-            const { data } = await clientLAN.mutate({
+            const { data } = await client.mutate({
                 mutation: ADD_EVALUATION,
                 variables: { input: evaluationInput },
             });
-            
+
             if (data && data.addEvaluation && data.addEvaluation.code === "200") {
                 return data.addEvaluation;
             } else {
@@ -86,11 +86,11 @@ const evaluationService = {
     createEvaluationForChecklist: async (checklistId: number, teamScrumId?: number) => {
         try {
             const numericChecklistId = parseInt(checklistId.toString());
-            
+
             if (isNaN(numericChecklistId) || numericChecklistId <= 0) {
                 throw new Error(`ID de checklist inválido: ${checklistId}`);
             }
-            
+
             const evaluationInput = {
                 observations: "",
                 recommendations: "",
@@ -101,11 +101,11 @@ const evaluationService = {
 
             console.log("🚀 Creando evaluación con datos:", evaluationInput);
 
-            const { data } = await clientLAN.mutate({
+            const { data } = await client.mutate({
                 mutation: ADD_EVALUATION,
                 variables: { input: evaluationInput },
             });
-            
+
             if (data && data.addEvaluation && data.addEvaluation.code === "200") {
                 console.log("✅ Evaluación creada exitosamente:", data.addEvaluation);
                 return data.addEvaluation;
@@ -123,15 +123,15 @@ const evaluationService = {
         try {
             console.log("🔍 Fetching evaluations for checklist:", checklistId);
             console.log("🔍 Using allEvaluations query and filtering");
-            
-            const { data } = await clientLAN.query({
+
+            const { data } = await client.query({
                 query: GET_ALL_EVALUATIONS,
                 variables: { page: 0, size: 100 },
                 fetchPolicy: 'no-cache',
             });
-            
+
             console.log("🔍 Raw GraphQL response:", data);
-            
+
             // Filtrar por checklistId
             if (data.allEvaluations && data.allEvaluations.data) {
                 console.log("🔍 All evaluations before filtering:", data.allEvaluations.data);
@@ -140,15 +140,15 @@ const evaluationService = {
                     console.log(`🔍 Evaluation ${evaluation.id}: checklistId=${evaluation.checklistId}, target=${checklistId}, matches=${matches}`);
                     return matches;
                 });
-                
+
                 console.log("🔍 Filtered evaluations:", filteredEvaluations);
-                
+
                 return {
                     ...data.allEvaluations,
                     data: filteredEvaluations
                 };
             }
-            
+
             console.log("❌ No allEvaluations data found");
             return data.allEvaluations;
         } catch (error) {
@@ -160,7 +160,7 @@ const evaluationService = {
     // Función para obtener una evaluación por ID
     fetchEvaluationById: async (id: number) => {
         try {
-            const { data } = await clientLAN.query({
+            const { data } = await client.query({
                 query: GET_EVALUATION_BY_ID,
                 variables: { id },
                 fetchPolicy: 'no-cache',
@@ -175,7 +175,7 @@ const evaluationService = {
     // Función para actualizar una evaluación
     updateEvaluation: async (id: number, evaluationData: EvaluationInput) => {
         try {
-            const { data } = await clientLAN.mutate({
+            const { data } = await client.mutate({
                 mutation: UPDATE_EVALUATION,
                 variables: { id, input: evaluationData },
             });
@@ -190,7 +190,7 @@ const evaluationService = {
     completeEvaluation: async (evaluationId: number, observations: string, recommendations: string, valueJudgment: string) => {
         try {
             const currentEvaluation = await evaluationService.fetchEvaluationById(evaluationId);
-            
+
             const evaluationData = {
                 observations: observations,
                 recommendations: recommendations,
@@ -223,8 +223,8 @@ export const fetchEvaluationsAllByChecklist = createAsyncThunk<
     GetAllEvaluationsQueryVariables
 >(
     'evaluations/fetchEvaluationsAllByChecklist',
-    async ({page, size}) =>{
-        const { data } = await clientLAN.query<GetAllEvaluationsQuery, GetAllEvaluationsQueryVariables>({
+    async ({ page, size }) => {
+        const { data } = await client.query<GetAllEvaluationsQuery, GetAllEvaluationsQueryVariables>({
             query: GET_ALL_EVALUATIONS,
             variables: { page, size }
         });
@@ -238,7 +238,7 @@ export const fetchAllEvaluationsDebug = createAsyncThunk<
 >(
     'evaluations/fetchAllEvaluationsDebug',
     async ({ page, size }) => {
-        const { data } = await clientLAN.query<GetAllEvaluationsQuery, GetAllEvaluationsQueryVariables>({
+        const { data } = await client.query<GetAllEvaluationsQuery, GetAllEvaluationsQueryVariables>({
             query: GET_ALL_EVALUATIONS,
             variables: { page, size },
             fetchPolicy: 'no-cache',
@@ -254,7 +254,7 @@ export const fetchEvaluationById = createAsyncThunk<
     'evaluations/fetchById',
     async ({ id }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.query<GetEvaluationByIdQuery, GetEvaluationByIdQueryVariables>({
+            const { data } = await client.query<GetEvaluationByIdQuery, GetEvaluationByIdQueryVariables>({
                 query: GET_EVALUATION_BY_ID,
                 variables: { id }
             });
@@ -267,13 +267,13 @@ export const fetchEvaluationById = createAsyncThunk<
 );
 
 
-export const addEvaluation = createAsyncThunk<AddEvaluationMutation['addEvaluation'],AddEvaluationMutationVariables['input'],
-     { rejectValue: { code: string; message: string } }
+export const addEvaluation = createAsyncThunk<AddEvaluationMutation['addEvaluation'], AddEvaluationMutationVariables['input'],
+    { rejectValue: { code: string; message: string } }
 >(
     'evaluations/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<AddEvaluationMutation, AddEvaluationMutationVariables>({
+            const { data } = await client.mutate<AddEvaluationMutation, AddEvaluationMutationVariables>({
                 mutation: ADD_EVALUATION,
                 variables: { input }
             });
@@ -295,7 +295,7 @@ export const updateEvaluation = createAsyncThunk<UpdateEvaluationMutation['updat
     'evaluations/update',
     async ({ id, input }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<UpdateEvaluationMutation, UpdateEvaluationMutationVariables>({
+            const { data } = await client.mutate<UpdateEvaluationMutation, UpdateEvaluationMutationVariables>({
                 mutation: UPDATE_EVALUATION,
                 variables: { id, input },
             });
@@ -312,7 +312,7 @@ export const updateEvaluation = createAsyncThunk<UpdateEvaluationMutation['updat
     }
 );
 
-export const updateEvaluationItemStates = createAsyncThunk<UpdateEvaluationMutation['updateEvaluation'], 
+export const updateEvaluationItemStates = createAsyncThunk<UpdateEvaluationMutation['updateEvaluation'],
     { id: number; itemStates: any; generalObservations?: string; recommendations?: string; valueJudgment?: string },
     { rejectValue: { code: string; message: string } }
 >(
@@ -334,7 +334,7 @@ export const updateEvaluationItemStates = createAsyncThunk<UpdateEvaluationMutat
 
             console.log('Update input:', input);
 
-            const { data } = await clientLAN.mutate<UpdateEvaluationMutation, UpdateEvaluationMutationVariables>({
+            const { data } = await client.mutate<UpdateEvaluationMutation, UpdateEvaluationMutationVariables>({
                 mutation: UPDATE_EVALUATION,
                 variables: { id, input },
             });
@@ -352,7 +352,7 @@ export const updateEvaluationItemStates = createAsyncThunk<UpdateEvaluationMutat
             return rejectWithValue({ code: '500', message: error.message });
         }
     }
-);  
+);
 
 export const deleteEvaluation = createAsyncThunk<string, string,
     { rejectValue: { code: string; message: string } }
@@ -360,7 +360,7 @@ export const deleteEvaluation = createAsyncThunk<string, string,
     'evaluations/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<DeleteEvaluationMutation, DeleteEvaluationMutationVariables>({
+            const { data } = await client.mutate<DeleteEvaluationMutation, DeleteEvaluationMutationVariables>({
                 mutation: DELETE_EVALUATION,
                 variables: { id },
             });
@@ -376,7 +376,7 @@ export const deleteEvaluation = createAsyncThunk<string, string,
             return rejectWithValue({ code: '500', message: error.message });
         }
     }
-);      
+);
 const initialState = createInitialPaginatedState<Evaluation>();
 
 const evaluationSlice = createSlice({
@@ -443,7 +443,7 @@ const evaluationSlice = createSlice({
             .addCase(addEvaluation.fulfilled, (state, action: PayloadAction<AddEvaluationMutation['addEvaluation']>) => {
                 console.log('=== ADD EVALUATION FULFILLED ===');
                 console.log('Response payload:', action.payload);
-                
+
                 if (action.payload) {
                     console.log('Evaluation added successfully:', action.payload);
                     // Note: addEvaluation solo devuelve {code, message, id}, no los datos completos de la evaluación

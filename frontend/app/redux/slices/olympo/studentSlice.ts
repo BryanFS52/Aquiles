@@ -1,4 +1,4 @@
-import { clientLAN } from "@lib/apollo-client";
+import { client } from "@lib/apollo-client";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import { ADD_STUDENT, GET_All_STUDENTS, GET_STUDENT_LIST } from '@graphql/olympo/studentsGraph';
@@ -16,7 +16,7 @@ import {
 export const fetchStudents = createAsyncThunk<GetStudentsQuery['allStudents'], GetStudentsQueryVariables>(
     'student/fetchAll',
     async ({ page, size }) => {
-        const { data } = await clientLAN.query<GetStudentsQuery, GetStudentsQueryVariables>({
+        const { data } = await client.query<GetStudentsQuery, GetStudentsQueryVariables>({
             query: GET_All_STUDENTS,
             variables: { page, size },
             fetchPolicy: 'no-cache',
@@ -28,7 +28,7 @@ export const fetchStudents = createAsyncThunk<GetStudentsQuery['allStudents'], G
 export const fetchStudentList = createAsyncThunk<GetStudentListQuery['allStudentList'], GetStudentListQueryVariables>(
     'student/fetchList',
     async () => {
-        const { data } = await clientLAN.query<GetStudentListQuery, GetStudentListQuery>({
+        const { data } = await client.query<GetStudentListQuery, GetStudentListQuery>({
             query: GET_STUDENT_LIST,
             fetchPolicy: 'no-cache',
         });
@@ -42,7 +42,7 @@ export const addStudent = createAsyncThunk<AddStudentMutation['addStudent'], Add
     'student/addStudent',
     async (Input, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<AddStudentMutation, AddStudentMutationVariables>({
+            const { data } = await client.mutate<AddStudentMutation, AddStudentMutationVariables>({
                 mutation: ADD_STUDENT,
                 variables: { input: Input },
             });
@@ -53,7 +53,7 @@ export const addStudent = createAsyncThunk<AddStudentMutation['addStudent'], Add
             }
             return res;
         } catch (error: any) {
-            return rejectWithValue({ code: '500', message: error.message});
+            return rejectWithValue({ code: '500', message: error.message });
         }
     }
 );

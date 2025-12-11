@@ -11,6 +11,7 @@ import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
 import { BookOpen, ArrowRight } from "lucide-react";
 import PageTitle from "@components/UI/pageTitle";
 import EmptyState from "@components/UI/emptyState";
+import { CompetenceOption } from "@/components/features/InstructorFollowUp/CompetenceSelector/UseCompetence";
 
 
 const JustificacionesInstructorSelectorContent: React.FC = () => {
@@ -80,17 +81,17 @@ const JustificacionesInstructorSelectorContent: React.FC = () => {
     const loadCompetences = async () => {
       showLoader();
       try {
-        const result = await dispatch(fetchStudySheetByTeacher({ 
-          idTeacher: TEMPORAL_INSTRUCTOR_ID, 
-          page: 0, 
-          size: 20 
+        const result = await dispatch(fetchStudySheetByTeacher({
+          idTeacher: TEMPORAL_INSTRUCTOR_ID,
+          page: 0,
+          size: 20
         }));
-        
+
         if (fetchStudySheetByTeacher.fulfilled.match(result)) {
           const studySheets = result.payload?.data || [];
           const filteredSheets = studySheets.filter((sheet: any) => sheet.number.toString() === fichaNumber);
           const allCompetences: CompetenceOption[] = [];
-          
+
           filteredSheets.forEach((sheet: any) => {
             if (sheet.teacherStudySheets) {
               sheet.teacherStudySheets.forEach((tss: any) => {
@@ -102,16 +103,16 @@ const JustificacionesInstructorSelectorContent: React.FC = () => {
                     originalCompetenceId: tss.competence.id,
                     teacherStudySheetId: tss.id
                   };
-                  
+
                   allCompetences.push(competenceOption);
                 }
               });
             }
           });
-        
+
           const competencesArray = allCompetences
             .sort((a, b) => a.name.localeCompare(b.name));
-        
+
           setAvailableCompetences(competencesArray);
           setError(null);
         } else {
@@ -142,7 +143,7 @@ const JustificacionesInstructorSelectorContent: React.FC = () => {
   if (error) {
     return (
       <div className="space-y-6">
-          <PageTitle onBack={() => router.back()}>
+        <PageTitle onBack={() => router.back()}>
           {getPageTitle()}
         </PageTitle>
         <EmptyState message={error} />
@@ -161,7 +162,7 @@ const JustificacionesInstructorSelectorContent: React.FC = () => {
   if (availableCompetences.length === 0) {
     return (
       <div className="space-y-6">
-          <PageTitle onBack={() => router.back()}>
+        <PageTitle onBack={() => router.back()}>
           {getPageTitle()}
         </PageTitle>
         <EmptyState message={`No se encontraron competencias disponibles para la ficha ${fichaNumber}.`} />
@@ -179,10 +180,10 @@ const JustificacionesInstructorSelectorContent: React.FC = () => {
 
   return (
     <div className="space-y-6">
-        <PageTitle onBack={() => router.back()}>
+      <PageTitle onBack={() => router.back()}>
         {getPageTitle()}
       </PageTitle>
-      
+
       <CardGrid
         items={availableCompetences}
         renderCard={renderCompetenceCard}

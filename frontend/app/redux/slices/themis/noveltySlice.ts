@@ -1,5 +1,5 @@
 
-import { clientLAN } from '@lib/apollo-client'
+import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { ADD_NOVELTY } from '@graphql/themis/noveltyGraph'
@@ -240,7 +240,7 @@ export const submitNovelty = createAsyncThunk<
                 teacherId: formData.teacherId,
             };
 
-            const { data } = await clientLAN.mutate<AddNoveltyMutation, AddNoveltyMutationVariables>({
+            const { data } = await client.mutate<AddNoveltyMutation, AddNoveltyMutationVariables>({
                 mutation: ADD_NOVELTY,
                 variables: {
                     input: noveltyData
@@ -325,56 +325,56 @@ const noveltySlice = createSlice({
         }
     },
     extraReducers: (builder) => {
-      builder
-        .addCase(openNoveltyModal.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(openNoveltyModal.fulfilled, (state, action: PayloadAction<StudentAbsenceData>) => {
-            state.loading = false;
-            state.error = null;
-            state.modalOpen = true;
-            state.selectedStudentAbsences = action.payload;
-            state.noveltyTypesLoaded = true;
-            state.formData.studentId = action.payload.studentId;
-            state.formData.teacherId = action.payload.teacherId;
-        })
-        .addCase(openNoveltyModal.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload || { message: 'Error al abrir modal' };
-            state.modalOpen = false;
-        })
+        builder
+            .addCase(openNoveltyModal.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(openNoveltyModal.fulfilled, (state, action: PayloadAction<StudentAbsenceData>) => {
+                state.loading = false;
+                state.error = null;
+                state.modalOpen = true;
+                state.selectedStudentAbsences = action.payload;
+                state.noveltyTypesLoaded = true;
+                state.formData.studentId = action.payload.studentId;
+                state.formData.teacherId = action.payload.teacherId;
+            })
+            .addCase(openNoveltyModal.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || { message: 'Error al abrir modal' };
+                state.modalOpen = false;
+            })
 
-        .addCase(processFile.pending, (state) => {
-            state.loading = true;
-        })
-        .addCase(processFile.fulfilled, (state, action: PayloadAction<string>) => {
-            state.loading = false;
-            state.formData.noveltyFiles = action.payload;
-        })
-        .addCase(processFile.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload || { message: 'Error al procesar archivo' };
-        })
+            .addCase(processFile.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(processFile.fulfilled, (state, action: PayloadAction<string>) => {
+                state.loading = false;
+                state.formData.noveltyFiles = action.payload;
+            })
+            .addCase(processFile.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || { message: 'Error al procesar archivo' };
+            })
 
-        .addCase(submitNovelty.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-            state.submitSuccess = false;
-        })
-        .addCase(submitNovelty.fulfilled, (state, action: PayloadAction<NoveltyResponse>) => {
-            state.loading = false;
-            state.error = null;
-            state.submitSuccess = true;
-            state.lastResponse = action.payload;
-            state.modalOpen = false;
-            state.formData = initialFormData;
-        })
-        .addCase(submitNovelty.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload || { message: 'Error desconocido' };
-            state.submitSuccess = false;
-        });
+            .addCase(submitNovelty.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.submitSuccess = false;
+            })
+            .addCase(submitNovelty.fulfilled, (state, action: PayloadAction<NoveltyResponse>) => {
+                state.loading = false;
+                state.error = null;
+                state.submitSuccess = true;
+                state.lastResponse = action.payload;
+                state.modalOpen = false;
+                state.formData = initialFormData;
+            })
+            .addCase(submitNovelty.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || { message: 'Error desconocido' };
+                state.submitSuccess = false;
+            });
     }
 });
 

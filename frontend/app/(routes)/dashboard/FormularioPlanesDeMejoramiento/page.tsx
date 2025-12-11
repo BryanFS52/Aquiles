@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@redux/store";
 import { fetchFaultTypes } from "@/redux/slices/improvementPlanFaultTypeSlice";
 import { addImprovementPlan, fetchTeacherCompetencesByStudySheet } from "@slice/improvementPlanSlice";
-import { clientLAN } from "@lib/apollo-client";
+import { client } from "@lib/apollo-client";
 import { GET_All_STUDENTS, GET_STUDENT_LIST } from "@graphql/olympo/studentsGraph";
 import { GET_STUDY_SHEET_BY_ID, GET_LEARNING_OUTCOMES_BY_COMPETENCE } from "@graphql/olympo/studySheetGraph";
 import { GET_ALL_IMPROVEMENT_PLANS } from "@graphql/improvementPlanGraph";
@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import { useLoader } from "@context/LoaderContext";
 import ModalLearningOutcome from "@components/Modals/ModalLearningOutcome";
 
-const FormularioPlanesDeMejoramientoContent =() => {
+const FormularioPlanesDeMejoramientoContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const dispatch = useDispatch<AppDispatch>();
@@ -62,7 +62,7 @@ const FormularioPlanesDeMejoramientoContent =() => {
         faultTypeId: '',
         additionalJustification: '',
     });
-    
+
     const [studentHasActivePlan, setStudentHasActivePlan] = useState(false);
     const [checkingActivePlan, setCheckingActivePlan] = useState(false);
 
@@ -117,7 +117,7 @@ const FormularioPlanesDeMejoramientoContent =() => {
         const fetchStudySheet = async () => {
             if (!studySheetId) return;
             try {
-                const { data } = await clientLAN.query({
+                const { data } = await client.query({
                     query: GET_STUDY_SHEET_BY_ID,
                     variables: { id: studySheetId },
                 });
@@ -137,14 +137,14 @@ const FormularioPlanesDeMejoramientoContent =() => {
             setStudentsLoading(true);
             setStudentsError(null);
             try {
-                const { data } = await clientLAN.query({
+                const { data } = await client.query({
                     query: GET_All_STUDENTS,
                     variables: { idStudySheet: studySheetId, page: 0, size: 200 },
                     fetchPolicy: 'no-cache'
                 });
                 const rawStudents = data?.allStudents?.data || [];
                 console.log('Estudiantes cargados:', rawStudents);
-                
+
                 // Normalizar estudiantes
                 const normalizedStudents = rawStudents.map((student: any) => ({
                     id: student.id,
@@ -166,7 +166,7 @@ const FormularioPlanesDeMejoramientoContent =() => {
         const loadInitialData = async () => {
             try {
                 let loadedCompetences: any[] = [];
-                
+
                 if (studySheetId) {
                     console.log('Cargando competencias para studySheetId:', studySheetId);
                     const teacherId = 1; // TODO: reemplazar con user.id si está en contexto
@@ -181,11 +181,11 @@ const FormularioPlanesDeMejoramientoContent =() => {
                         console.warn('No se pudieron cargar competencias:', competenceErr);
                     }
                 }
-                
+
                 setCompetencies(loadedCompetences);
 
                 // Asegurar que se traigan todos los tipos de falta disponibles
-                const faultTypesResult = await dispatch(fetchFaultTypes({ page: 0, size: 100})).unwrap();
+                const faultTypesResult = await dispatch(fetchFaultTypes({ page: 0, size: 100 })).unwrap();
                 console.log('Tipos de falta recibidos:', faultTypesResult);
             } catch (error) {
                 console.error('Error al cargar datos iniciales:', error);
@@ -277,7 +277,7 @@ const FormularioPlanesDeMejoramientoContent =() => {
             setStudentHasActivePlan(false);
             return;
         }
-        
+
         const student = students.find(s => String(s.id) === String(studentId));
         if (student) {
             setFormData(prev => ({
@@ -288,23 +288,23 @@ const FormularioPlanesDeMejoramientoContent =() => {
                 studentEmail: student.person?.email || '',
                 additionalJustification: ''
             }));
-            
+
             // Verificar si el estudiante ya tiene un plan activo
             setCheckingActivePlan(true);
             try {
-                const { data } = await clientLAN.query({
+                const { data } = await client.query({
                     query: GET_ALL_IMPROVEMENT_PLANS,
                     variables: { page: 0, size: 100 },
                     fetchPolicy: 'no-cache'
                 });
-                
+
                 const allPlans = data?.allImprovementPlans?.data || [];
-                const hasActive = allPlans.some((plan: any) => 
+                const hasActive = allPlans.some((plan: any) =>
                     String(plan.student?.id) === String(studentId) && plan.state === true
                 );
-                
+
                 setStudentHasActivePlan(hasActive);
-                
+
                 if (hasActive) {
                     toast.warning(
                         'Este aprendiz ya tiene un plan de mejoramiento activo. Debe proporcionar una justificación para crear otro.',
@@ -320,7 +320,7 @@ const FormularioPlanesDeMejoramientoContent =() => {
             } finally {
                 setCheckingActivePlan(false);
             }
-            
+
             // Registrar hora de inicio y fin al comenzar a diligenciar (si aún no hay)
             setStartAndEndIfEmpty();
             setDateIfEmpty();
@@ -330,7 +330,7 @@ const FormularioPlanesDeMejoramientoContent =() => {
     // Manejar envío del formulario
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!selectedStudent) {
             toast.error('Por favor selecciona un estudiante', {
                 position: "top-right",
@@ -438,7 +438,7 @@ const FormularioPlanesDeMejoramientoContent =() => {
             });
             return;
         }
-        
+
         // Validar justificación adicional si el estudiante ya tiene un plan activo
         if (studentHasActivePlan) {
             if (!formData.additionalJustification || formData.additionalJustification.trim() === '') {
@@ -448,7 +448,7 @@ const FormularioPlanesDeMejoramientoContent =() => {
                 });
                 return;
             }
-            
+
             if (formData.additionalJustification.trim().length < 20) {
                 toast.error('La justificación debe tener al menos 20 caracteres.', {
                     position: "top-right",
@@ -505,14 +505,14 @@ const FormularioPlanesDeMejoramientoContent =() => {
                 if (planId) {
                     // Construir URL con parámetros de ficha para mantener el contexto
                     let actividadUrl = `/dashboard/ActividadPlanesDeMejoramiento?planId=${planId}`;
-                    
+
                     if (studySheetId) {
                         actividadUrl += `&studySheetId=${studySheetId}`;
                     }
                     if (studySheet?.number) {
                         actividadUrl += `&ficha=${studySheet.number}`;
                     }
-                    
+
                     console.log('🔄 Redirigiendo a actividades con contexto:', actividadUrl);
                     router.push(actividadUrl);
                 } else {
@@ -529,9 +529,9 @@ const FormularioPlanesDeMejoramientoContent =() => {
                 networkError: (error as any)?.networkError || null,
                 formData: formData
             });
-            
+
             let errorMessage = 'Error desconocido';
-            
+
             // Manejar errores de GraphQL
             if ((error as any)?.graphQLErrors && (error as any).graphQLErrors.length > 0) {
                 errorMessage = (error as any).graphQLErrors[0].message;
@@ -544,7 +544,7 @@ const FormularioPlanesDeMejoramientoContent =() => {
             else if ((error as any)?.message) {
                 errorMessage = (error as any).message;
             }
-            
+
             // Mostrar error al usuario
             toast.error(`Error al guardar el plan de mejoramiento: ${errorMessage}`, {
                 position: "top-right",
@@ -579,7 +579,7 @@ const FormularioPlanesDeMejoramientoContent =() => {
                                 </div>
 
                                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                         Mejoramiento
+                                    Mejoramiento
                                 </h3>
                             </div>
 
@@ -669,236 +669,236 @@ const FormularioPlanesDeMejoramientoContent =() => {
                         </div>
 
                         {/* Detalles del Plan de Mejoramiento */}
-                            <div className="p-6 space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Competencia */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            <FiBook className="w-4 h-4 inline mr-2" />
-                                            Competencia <span className="text-red-600">*</span>
-                                        </label>
-                                        <select
-                                            value={formData.teacherCompetenceId}
-                                            onChange={(e) => handleCompetenceChange(e.target.value)}
-                                            className="w-full h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
-                                            required
-                                            disabled={!competencies || competencies.length === 0}
-                                        >
-                                            <option value="">
-                                                {!competencies || competencies.length === 0 
-                                                    ? 'No hay competencias disponibles para esta ficha'
-                                                    : 'Seleccionar competencia...'
+                        <div className="p-6 space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Competencia */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <FiBook className="w-4 h-4 inline mr-2" />
+                                        Competencia <span className="text-red-600">*</span>
+                                    </label>
+                                    <select
+                                        value={formData.teacherCompetenceId}
+                                        onChange={(e) => handleCompetenceChange(e.target.value)}
+                                        className="w-full h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
+                                        required
+                                        disabled={!competencies || competencies.length === 0}
+                                    >
+                                        <option value="">
+                                            {!competencies || competencies.length === 0
+                                                ? 'No hay competencias disponibles para esta ficha'
+                                                : 'Seleccionar competencia...'
+                                            }
+                                        </option>
+                                        {competencies?.map((comp: any) => (
+                                            <option key={comp.id} value={comp.id}>
+                                                {comp.competence?.name?.toUpperCase() || comp.name?.toUpperCase() || 'Competencia sin nombre'}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Tipo de Falta */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <FiAlertTriangle className="w-4 h-4 inline mr-2" />
+                                        Tipo de Falta <span className="text-red-600">*</span>
+                                    </label>
+                                    <select
+                                        value={formData.faultTypeId}
+                                        onChange={(e) => handleInputChange('faultTypeId', e.target.value)}
+                                        className="w-full h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
+                                        required
+                                        disabled={faultTypesLoading}
+                                    >
+                                        <option value="">
+                                            {faultTypesLoading ? 'Cargando tipos de fallas...' : 'Seleccionar tipo de falta...'}
+                                        </option>
+                                        {faultTypes?.map((type: any) => (
+                                            <option key={type.id} value={type.id}>
+                                                {type.name.toUpperCase()}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Resultado de Aprendizaje */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <FiBook className="w-4 h-4 inline mr-2" />
+                                        Resultado de Aprendizaje <span className="text-red-600">*</span>
+                                    </label>
+                                    <div className="flex flex-col sm:flex-row gap-2">
+                                        <input
+                                            type="text"
+                                            value={selectedCompetenceLearningOutcomes.find(lo => String(lo.id) === String(formData.learningOutcomeId))?.name || ''}
+                                            className="flex-1 h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed"
+                                            placeholder="Seleccione una competencia primero..."
+                                            disabled
+                                            readOnly
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={async () => {
+                                                if (!formData.teacherCompetenceId) return;
+                                                setLoadingLearningOutcomes(true);
+                                                try {
+                                                    const selectedComp = competencies.find((comp: any) => String(comp.id) === String(formData.teacherCompetenceId));
+                                                    setSelectedCompetenceName(selectedComp?.competence?.name || 'Competencia');
+
+                                                    const { data } = await client.query({
+                                                        query: GET_LEARNING_OUTCOMES_BY_COMPETENCE,
+                                                        variables: { idCompetence: selectedComp?.competence?.id, page: 0, size: 10 }
+                                                    });
+
+                                                    const learningOutcomes = data?.allLearningOutcomes?.data || [];
+                                                    setSelectedCompetenceLearningOutcomes(learningOutcomes);
+                                                    setIsModalLearningOutcomeOpen(true);
+                                                } catch (error) {
+                                                    console.error('Error fetching learning outcomes:', error);
+                                                    toast.error('Error al cargar resultados de aprendizaje');
+                                                } finally {
+                                                    setLoadingLearningOutcomes(false);
                                                 }
-                                            </option>
-                                            {competencies?.map((comp: any) => (
-                                                <option key={comp.id} value={comp.id}>
-                                                    {comp.competence?.name?.toUpperCase() || comp.name?.toUpperCase() || 'Competencia sin nombre'}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    {/* Tipo de Falta */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            <FiAlertTriangle className="w-4 h-4 inline mr-2" />
-                                            Tipo de Falta <span className="text-red-600">*</span>
-                                        </label>
-                                        <select
-                                            value={formData.faultTypeId}
-                                            onChange={(e) => handleInputChange('faultTypeId', e.target.value)}
-                                            className="w-full h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
-                                            required
-                                            disabled={faultTypesLoading}
+                                            }}
+                                            disabled={!formData.teacherCompetenceId || loadingLearningOutcomes}
+                                            className="w-full sm:w-auto h-12 px-4 py-3 bg-primary hover:bg-lightGreen text-white rounded-xl font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            <option value="">
-                                                {faultTypesLoading ? 'Cargando tipos de fallas...' : 'Seleccionar tipo de falta...'}
-                                            </option>
-                                            {faultTypes?.map((type: any) => (
-                                                <option key={type.id} value={type.id}>
-                                                    {type.name.toUpperCase()}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    {/* Resultado de Aprendizaje */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            <FiBook className="w-4 h-4 inline mr-2" />
-                                            Resultado de Aprendizaje <span className="text-red-600">*</span>
-                                        </label>
-                                        <div className="flex flex-col sm:flex-row gap-2">
-                                            <input
-                                                type="text"
-                                                value={selectedCompetenceLearningOutcomes.find(lo => String(lo.id) === String(formData.learningOutcomeId))?.name || ''}
-                                                className="flex-1 h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed"
-                                                placeholder="Seleccione una competencia primero..."
-                                                disabled
-                                                readOnly
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={async () => {
-                                                    if (!formData.teacherCompetenceId) return;
-                                                    setLoadingLearningOutcomes(true);
-                                                    try {
-                                                        const selectedComp = competencies.find((comp: any) => String(comp.id) === String(formData.teacherCompetenceId));
-                                                        setSelectedCompetenceName(selectedComp?.competence?.name || 'Competencia');
-                                                        
-                                                        const { data } = await clientLAN.query({
-                                                            query: GET_LEARNING_OUTCOMES_BY_COMPETENCE,
-                                                            variables: { idCompetence: selectedComp?.competence?.id, page: 0, size: 10 }
-                                                        });
-                                                        
-                                                        const learningOutcomes = data?.allLearningOutcomes?.data || [];
-                                                        setSelectedCompetenceLearningOutcomes(learningOutcomes);
-                                                        setIsModalLearningOutcomeOpen(true);
-                                                    } catch (error) {
-                                                        console.error('Error fetching learning outcomes:', error);
-                                                        toast.error('Error al cargar resultados de aprendizaje');
-                                                    } finally {
-                                                        setLoadingLearningOutcomes(false);
-                                                    }
-                                                }}
-                                                disabled={!formData.teacherCompetenceId || loadingLearningOutcomes}
-                                                className="w-full sm:w-auto h-12 px-4 py-3 bg-primary hover:bg-lightGreen text-white rounded-xl font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                                {loadingLearningOutcomes ? 'Cargando...' : <FiBook className="w-4 h-4" />}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {/* Fecha */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            <FiCalendar className="w-4 h-4 inline mr-2" />
-                                            Fecha
-                                        </label>
-                                            <input
-                                                type="date"
-                                                value={formData.date}
-                                                className="w-full h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed"
-                                                readOnly
-                                                disabled
-                                                aria-readonly
-                                            />
-                                    </div>
-
-                                    {/* Ciudad */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            <FiMapPin className="w-4 h-4 inline mr-2" />
-                                            Ciudad
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={formData.city}
-                                            readOnly
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-100 dark:bg-gray-600 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
-                                            placeholder="Bogotá"
-                                        />
-                                    </div>
-
-                                    {/* Hora de Inicio */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            <FiCalendar className="w-4 h-4 inline mr-2" />
-                                            Hora de Inicio
-                                        </label>
-                                        <input
-                                            type="time"
-                                            value={formData.startTime}
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed"
-                                            readOnly
-                                            disabled
-                                            aria-readonly
-                                        />
-                                    </div>
-
-                                    {/* Hora de Fin */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            <FiCalendar className="w-4 h-4 inline mr-2" />
-                                            Hora de Fin
-                                        </label>
-                                        <input
-                                            type="time"
-                                            value={formData.endTime}
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed"
-                                            readOnly
-                                            disabled
-                                            aria-readonly
-                                        />
-                                    </div>
-
-                                    {/* Lugar */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            <FiMapPin className="w-4 h-4 inline mr-2" />
-                                            Lugar <span className="text-red-600">*</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={formData.place}
-                                            onChange={(e) => handleInputChange('place', e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
-                                            placeholder="Ingrese el lugar..."
-                                            required
-                                        />
+                                            {loadingLearningOutcomes ? 'Cargando...' : <FiBook className="w-4 h-4" />}
+                                        </button>
                                     </div>
                                 </div>
 
-                                {/* Razón */}
+                                {/* Fecha */}
                                 <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            <FiFileText className="w-4 h-4 inline mr-2" />
-                                            Razón del Plan de Mejoramiento <span className="text-red-600">*</span>
-                                        </label>
-                                    <textarea
-                                        value={formData.reason}
-                                        onChange={(e) => handleInputChange('reason', e.target.value)}
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <FiCalendar className="w-4 h-4 inline mr-2" />
+                                        Fecha
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={formData.date}
+                                        className="w-full h-12 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed"
+                                        readOnly
+                                        disabled
+                                        aria-readonly
+                                    />
+                                </div>
+
+                                {/* Ciudad */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <FiMapPin className="w-4 h-4 inline mr-2" />
+                                        Ciudad
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.city}
+                                        readOnly
+                                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-100 dark:bg-gray-600 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
+                                        placeholder="Bogotá"
+                                    />
+                                </div>
+
+                                {/* Hora de Inicio */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <FiCalendar className="w-4 h-4 inline mr-2" />
+                                        Hora de Inicio
+                                    </label>
+                                    <input
+                                        type="time"
+                                        value={formData.startTime}
+                                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed"
+                                        readOnly
+                                        disabled
+                                        aria-readonly
+                                    />
+                                </div>
+
+                                {/* Hora de Fin */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <FiCalendar className="w-4 h-4 inline mr-2" />
+                                        Hora de Fin
+                                    </label>
+                                    <input
+                                        type="time"
+                                        value={formData.endTime}
+                                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-gray-50 dark:bg-gray-600 text-black dark:text-white cursor-not-allowed"
+                                        readOnly
+                                        disabled
+                                        aria-readonly
+                                    />
+                                </div>
+
+                                {/* Lugar */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <FiMapPin className="w-4 h-4 inline mr-2" />
+                                        Lugar <span className="text-red-600">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.place}
+                                        onChange={(e) => handleInputChange('place', e.target.value)}
                                         className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
-                                        rows={4}
-                                        placeholder="Ingrese la razón del plan de mejoramiento..."
+                                        placeholder="Ingrese el lugar..."
                                         required
                                     />
                                 </div>
-                                
-                                {/* Justificación Adicional - Solo si el estudiante ya tiene un plan activo */}
-                                {studentHasActivePlan && (
-                                    <div className="border-2 border-yellow-400 dark:border-yellow-500 rounded-xl p-4 bg-yellow-50 dark:bg-yellow-900/20">
-                                        <div className="flex items-start gap-3 mb-3">
-                                            <FiAlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
-                                            <div className="flex-1">
-                                                <h4 className="text-sm font-semibold text-yellow-800 dark:text-yellow-300 mb-1">
-                                                    Plan de Mejoramiento Activo Detectado
-                                                </h4>
-                                                <p className="text-xs text-yellow-700 dark:text-yellow-400 mb-3">
-                                                    Este aprendiz ya tiene un plan de mejoramiento activo. Para crear un nuevo plan, debe proporcionar una justificación detallada.
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            <FiFileText className="w-4 h-4 inline mr-2" />
-                                            Justificación para Nuevo Plan <span className="text-red-600">*</span>
-                                        </label>
-                                        <textarea
-                                            value={formData.additionalJustification}
-                                            onChange={(e) => handleInputChange('additionalJustification', e.target.value)}
-                                            className="w-full px-4 py-3 border-2 border-yellow-400 dark:border-yellow-500 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
-                                            rows={4}
-                                            placeholder="Explique por qué es necesario crear un nuevo plan de mejoramiento cuando ya existe uno activo (mínimo 20 caracteres)..."
-                                            required
-                                        />
-                                        <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                                            {formData.additionalJustification.length} / 20 caracteres mínimos
-                                        </p>
-                                    </div>
-                                )}
-
-                                {/* Objetivos y conclusiones movidos a Actividades: campos eliminados del formulario de Plan */}
                             </div>
+
+                            {/* Razón */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <FiFileText className="w-4 h-4 inline mr-2" />
+                                    Razón del Plan de Mejoramiento <span className="text-red-600">*</span>
+                                </label>
+                                <textarea
+                                    value={formData.reason}
+                                    onChange={(e) => handleInputChange('reason', e.target.value)}
+                                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary dark:focus:ring-lightGreen focus:border-transparent transition-all duration-200"
+                                    rows={4}
+                                    placeholder="Ingrese la razón del plan de mejoramiento..."
+                                    required
+                                />
+                            </div>
+
+                            {/* Justificación Adicional - Solo si el estudiante ya tiene un plan activo */}
+                            {studentHasActivePlan && (
+                                <div className="border-2 border-yellow-400 dark:border-yellow-500 rounded-xl p-4 bg-yellow-50 dark:bg-yellow-900/20">
+                                    <div className="flex items-start gap-3 mb-3">
+                                        <FiAlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                                        <div className="flex-1">
+                                            <h4 className="text-sm font-semibold text-yellow-800 dark:text-yellow-300 mb-1">
+                                                Plan de Mejoramiento Activo Detectado
+                                            </h4>
+                                            <p className="text-xs text-yellow-700 dark:text-yellow-400 mb-3">
+                                                Este aprendiz ya tiene un plan de mejoramiento activo. Para crear un nuevo plan, debe proporcionar una justificación detallada.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <FiFileText className="w-4 h-4 inline mr-2" />
+                                        Justificación para Nuevo Plan <span className="text-red-600">*</span>
+                                    </label>
+                                    <textarea
+                                        value={formData.additionalJustification}
+                                        onChange={(e) => handleInputChange('additionalJustification', e.target.value)}
+                                        className="w-full px-4 py-3 border-2 border-yellow-400 dark:border-yellow-500 rounded-xl text-sm bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 focus:border-transparent transition-all duration-200"
+                                        rows={4}
+                                        placeholder="Explique por qué es necesario crear un nuevo plan de mejoramiento cuando ya existe uno activo (mínimo 20 caracteres)..."
+                                        required
+                                    />
+                                    <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                                        {formData.additionalJustification.length} / 20 caracteres mínimos
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Objetivos y conclusiones movidos a Actividades: campos eliminados del formulario de Plan */}
+                        </div>
 
                         {/* Botones */}
                         <div className="flex flex-col sm:flex-row justify-end gap-3 p-6 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-600">

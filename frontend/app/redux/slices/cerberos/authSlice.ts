@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { clientLAN } from "@lib/apollo-client";
+import { client } from "@lib/apollo-client";
 import { GET_AUTH_TOKEN, LOGIN, LOGOUT } from "@graphql/cerberos/authGraph";
 import type { User } from "@graphql/generated";
 
@@ -37,7 +37,7 @@ export const validateCerberosToken = createAsyncThunk<
 
     try {
       console.log("📡 [authSlice] Llamando a GET_AUTH_TOKEN mutation...");
-      const { data } = await clientLAN.mutate({
+      const { data } = await client.mutate({
         mutation: GET_AUTH_TOKEN,
         variables: { token },
       });
@@ -98,7 +98,7 @@ export const logoutUser = createAsyncThunk<
   async (_, { getState, rejectWithValue }) => {
     try {
       const { auth } = getState();
-      const { data } = await clientLAN.mutate({
+      const { data } = await client.mutate({
         mutation: LOGOUT,
         variables: {
           idUser: auth.user?.id,

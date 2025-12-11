@@ -1,6 +1,6 @@
 "use client"
 
-import { StudentSummary, setAttendanceSummaryFromStudySheet } from "@redux/slices/attendanceSlice";
+import { StudentSummary } from "@redux/slices/attendanceSlice";
 import { InstructorFollowUpContainerProps } from "./types";
 import { useDispatch, useSelector } from "react-redux";
 import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
@@ -44,15 +44,6 @@ export const InstructorFollowUpContainer: React.FC<InstructorFollowUpContainerPr
         error: noveltyError,
     } = useSelector((state: RootState) => state.novelty);
 
-    useEffect(() => {
-        dispatch(setAttendanceSummaryFromStudySheet([]));
-    }, [competenceQuarterId, fichaNumber, dispatch]);
-
-    useEffect(() => {
-        if (selectedForAttendance) {
-            dispatch(setAttendanceSummaryFromStudySheet(selectedForAttendance));
-        }
-    }, [selectedForAttendance, dispatch]);
 
     const getCompetenceName = () => {
         if (selectedForAttendance?.teacherStudySheets) {

@@ -1,13 +1,14 @@
-import { clientLAN } from '@lib/apollo-client';
+import { client } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { GET_ALL_TRAINING_PROJECTS, 
+import {
+    GET_ALL_TRAINING_PROJECTS,
     GET_TRAINING_PROJECTS_BY_PROGRAM,
-    GET_TRAINING_PROJECT_BY_ID 
+    GET_TRAINING_PROJECT_BY_ID
 } from '@graphql/olympo/trainingProjectGraph';
 import { createInitialPaginatedState } from '@type/slices/common/generic';
-import { 
-    TrainingProject, 
-    GetAllTrainingProjectsQuery, 
+import {
+    TrainingProject,
+    GetAllTrainingProjectsQuery,
     GetAllTrainingProjectsQueryVariables,
     GetTrainingProjectsByProgramQuery,
     GetTrainingProjectsByProgramQueryVariables,
@@ -32,7 +33,7 @@ interface GetTrainingProjectsByProgramServiceParams {
 const trainingProjectService = {
     getAllTrainingProjects: async ({ name, idProgram, page = 0, size = 10 }: GetAllTrainingProjectsServiceParams = {}) => {
         try {
-            const { data } = await clientLAN.query({
+            const { data } = await client.query({
                 query: GET_ALL_TRAINING_PROJECTS,
                 variables: { name, idProgram, page, size },
                 fetchPolicy: 'network-only',
@@ -51,7 +52,7 @@ const trainingProjectService = {
 
     getTrainingProjectsByProgram: async ({ idProgram, page = 0, size = 10 }: GetTrainingProjectsByProgramServiceParams) => {
         try {
-            const { data } = await clientLAN.query({
+            const { data } = await client.query({
                 query: GET_TRAINING_PROJECTS_BY_PROGRAM,
                 variables: { idProgram, page, size },
                 fetchPolicy: 'network-only',
@@ -70,7 +71,7 @@ const trainingProjectService = {
 
     getTrainingProjectById: async (id: number) => {
         try {
-            const { data } = await clientLAN.query({
+            const { data } = await client.query({
                 query: GET_TRAINING_PROJECT_BY_ID,
                 variables: { page: 0, size: 100 },
                 fetchPolicy: 'network-only',
@@ -120,13 +121,13 @@ export const transformGraphQLToTrainingProjectItem = (graphqlData: any): Trainin
 export const fetchAllTrainingProjects = createAsyncThunk<GetAllTrainingProjectsQuery['allTrainingProjects'], GetAllTrainingProjectsQueryVariables>(
     'trainingProject/fetchAll',
     async ({ name, idProgram, page = 0, size = 100 }) => {
-        const { data } = await clientLAN.query<GetAllTrainingProjectsQuery, GetAllTrainingProjectsQueryVariables>({
+        const { data } = await client.query<GetAllTrainingProjectsQuery, GetAllTrainingProjectsQueryVariables>({
             query: GET_ALL_TRAINING_PROJECTS,
-            variables: { 
-                name, 
-                idProgram, 
-                page: page ?? 0, 
-                size: size ?? 100 
+            variables: {
+                name,
+                idProgram,
+                page: page ?? 0,
+                size: size ?? 100
             },
             fetchPolicy: 'no-cache',
         });
@@ -137,12 +138,12 @@ export const fetchAllTrainingProjects = createAsyncThunk<GetAllTrainingProjectsQ
 export const fetchTrainingProjectsByProgram = createAsyncThunk<GetTrainingProjectsByProgramQuery['allTrainingProjects'], GetTrainingProjectsByProgramQueryVariables>(
     'trainingProject/fetchByProgram',
     async ({ idProgram, page = 0, size = 100 }) => {
-        const { data } = await clientLAN.query<GetTrainingProjectsByProgramQuery, GetTrainingProjectsByProgramQueryVariables>({
+        const { data } = await client.query<GetTrainingProjectsByProgramQuery, GetTrainingProjectsByProgramQueryVariables>({
             query: GET_TRAINING_PROJECTS_BY_PROGRAM,
-            variables: { 
-                idProgram, 
-                page: page ?? 0, 
-                size: size ?? 100 
+            variables: {
+                idProgram,
+                page: page ?? 0,
+                size: size ?? 100
             },
             fetchPolicy: 'no-cache',
         });
@@ -153,11 +154,11 @@ export const fetchTrainingProjectsByProgram = createAsyncThunk<GetTrainingProjec
 export const fetchTrainingProjectById = createAsyncThunk<GetTrainingProjectByIdQuery['allTrainingProjects'], { id: number; page?: number; size?: number }>(
     'trainingProject/fetchById',
     async ({ id, page = 0, size = 100 }) => {
-        const { data } = await clientLAN.query<GetTrainingProjectByIdQuery, GetTrainingProjectByIdQueryVariables>({
+        const { data } = await client.query<GetTrainingProjectByIdQuery, GetTrainingProjectByIdQueryVariables>({
             query: GET_TRAINING_PROJECT_BY_ID,
-            variables: { 
-                page: page ?? 0, 
-                size: size ?? 100 
+            variables: {
+                page: page ?? 0,
+                size: size ?? 100
             },
             fetchPolicy: 'no-cache',
         });
@@ -174,7 +175,7 @@ export const fetchTrainingProjectById = createAsyncThunk<GetTrainingProjectByIdQ
                 throw new Error('Training project not found');
             }
         }
-        
+
         return data.allTrainingProjects;
     }
 );

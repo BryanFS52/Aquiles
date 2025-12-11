@@ -1,4 +1,3 @@
-/*
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -20,7 +19,7 @@ import { client } from '../../../lib/apollo-client';
 // Función para mapear programas a iconos basándose en palabras clave
 const getIconForProgram = (name: string): keyof IconMapType => {
   const nameLower = name.toLowerCase();
-  
+
   if (nameLower.includes('software') || nameLower.includes('desarrollo') || nameLower.includes('móviles') || nameLower.includes('aplicaciones')) {
     return 'FaComputer';
   }
@@ -48,7 +47,7 @@ const getIconForProgram = (name: string): keyof IconMapType => {
   if (nameLower.includes('comunitarias') || nameLower.includes('asociativas')) {
     return 'FaPeopleCarry';
   }
-  
+
   // Icono por defecto
   return 'FaPeopleRoof';
 };
@@ -82,9 +81,9 @@ const ProgramasContent: React.FC = () => {
         description: program.description || 'Sin descripción disponible',
         icon: getIconForProgram(program.name)
       }));
-      
+
       setPrograms(mappedPrograms);
-      
+
       // Actualizar información de paginación desde el backend
       setPagination(prev => ({
         ...prev,
@@ -169,14 +168,14 @@ const ProgramasContent: React.FC = () => {
           </div>
         </div>
 
-        {/* Icon Container en la pestañita }
+        {/* Icon Container en la pestañita */}
         <div className="absolute top-0 right-0 w-0 h-0 z-20 flex items-start justify-end pt-5 sm:pt-7 pr-1">
           <div className="absolute top-2 right-2">
             <Icon className="text-2xl sm:text-3xl md:text-4xl drop-shadow-lg text-black/75 dark:text-white transition-colors duration-300" />
           </div>
         </div>
 
-        {/* Decorative Triangle }
+        {/* Decorative Triangle */}
         <div className="absolute top-0 right-0 w-0 h-0 border-l-[90px] sm:border-l-[120px] border-l-transparent border-t-[100px] sm:border-t-[130px] border-t-lime-500/85 dark:border-t-blue-900 opacity-90 transition-colors duration-300"></div>
       </div>
     );
@@ -184,10 +183,10 @@ const ProgramasContent: React.FC = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6 px-2 sm:px-4 lg:px-0">
-      {/* Title }
+      {/* Title */}
       <PageTitle>Programas</PageTitle>
 
-      {/* Search Field }
+      {/* Search Field */}
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center">
         <input
           type="text"
@@ -200,92 +199,92 @@ const ProgramasContent: React.FC = () => {
         />
 
         {/* Results counter */}
-{
-  searchTerm && !loading && (
-    <span className="text-sm text-gray-600 dark:text-gray-400 pt-3">
-      {pagination.totalItems} programa{pagination.totalItems !== 1 ? 's' : ''} encontrado{pagination.totalItems !== 1 ? 's' : ''}
-    </span>
-  )
-}
+        {
+          searchTerm && !loading && (
+            <span className="text-sm text-gray-600 dark:text-gray-400 pt-3">
+              {pagination.totalItems} programa{pagination.totalItems !== 1 ? 's' : ''} encontrado{pagination.totalItems !== 1 ? 's' : ''}
+            </span>
+          )
+        }
       </div >
 
-  {/* Loading state */ }
-{
-  loading && (
-    <div className="col-span-full text-center py-12">
-      <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#01b001] dark:border-blue-500"></div>
-      <p className="text-gray-500 dark:text-gray-400 text-lg mt-4">Cargando programas...</p>
-    </div>
-  )
-}
+      {/* Loading state */}
+      {
+        loading && (
+          <div className="col-span-full text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#01b001] dark:border-blue-500"></div>
+            <p className="text-gray-500 dark:text-gray-400 text-lg mt-4">Cargando programas...</p>
+          </div>
+        )
+      }
 
-{/* Error state */ }
-{
-  error && (
-    <div className="col-span-full text-center py-12">
-      <p className="text-red-500 dark:text-red-400 text-lg">
-        Error al cargar programas: {error.message}
-      </p>
-    </div>
-  )
-}
+      {/* Error state */}
+      {
+        error && (
+          <div className="col-span-full text-center py-12">
+            <p className="text-red-500 dark:text-red-400 text-lg">
+              Error al cargar programas: {error.message}
+            </p>
+          </div>
+        )
+      }
 
-{/* Programs Grid */ }
-{
-  !loading && !error && (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 py-4">
-      {displayedPrograms.length > 0 ? (
-        displayedPrograms.map(renderProgramCard)
-      ) : (
-        <div className="col-span-full text-center py-12">
-          <p className="text-gray-500 dark:text-gray-400 text-lg">
-            No se encontraron programas que coincidan con "{searchTerm}"
-          </p>
-        </div>
-      )}
-    </div>
-  )
-}
+      {/* Programs Grid */}
+      {
+        !loading && !error && (
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 py-4">
+            {displayedPrograms.length > 0 ? (
+              displayedPrograms.map(renderProgramCard)
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400 text-lg">
+                  No se encontraron programas que coincidan con "{searchTerm}"
+                </p>
+              </div>
+            )}
+          </div>
+        )
+      }
 
-{/* Pagination */ }
-{
-  !loading && !error && pagination.totalPages > 1 && (
-    <div className="flex justify-center items-center gap-2 pt-6">
-      <button
-        onClick={() => handlePageChange(Math.max(1, pagination.currentPage - 1))}
-        disabled={pagination.currentPage === 1}
-        className="w-full sm:w-auto px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
-        aria-label="Página anterior"
-      >
-        Anterior
-      </button>
+      {/* Pagination */}
+      {
+        !loading && !error && pagination.totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 pt-6">
+            <button
+              onClick={() => handlePageChange(Math.max(1, pagination.currentPage - 1))}
+              disabled={pagination.currentPage === 1}
+              className="w-full sm:w-auto px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+              aria-label="Página anterior"
+            >
+              Anterior
+            </button>
 
-      <div className="flex flex-wrap gap-1 justify-center">
-        {Array.from({ length: pagination.totalPages }, (_, index) =>
-          renderPaginationButton(index + 1, pagination.currentPage === index + 1)
-        )}
-      </div>
+            <div className="flex flex-wrap gap-1 justify-center">
+              {Array.from({ length: pagination.totalPages }, (_, index) =>
+                renderPaginationButton(index + 1, pagination.currentPage === index + 1)
+              )}
+            </div>
 
-      <button
-        onClick={() => handlePageChange(Math.min(pagination.totalPages, pagination.currentPage + 1))}
-        disabled={pagination.currentPage === pagination.totalPages}
-        className="w-full sm:w-auto px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
-        aria-label="Página siguiente"
-      >
-        Siguiente
-      </button>
-    </div>
-  )
-}
+            <button
+              onClick={() => handlePageChange(Math.min(pagination.totalPages, pagination.currentPage + 1))}
+              disabled={pagination.currentPage === pagination.totalPages}
+              className="w-full sm:w-auto px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-300"
+              aria-label="Página siguiente"
+            >
+              Siguiente
+            </button>
+          </div>
+        )
+      }
 
-{/* Page info */ }
-{
-  !loading && !error && pagination.totalPages > 1 && (
-    <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-      Página {pagination.currentPage} de {pagination.totalPages} ({pagination.totalItems} programas en total)
-    </div>
-  )
-}
+      {/* Page info */}
+      {
+        !loading && !error && pagination.totalPages > 1 && (
+          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+            Página {pagination.currentPage} de {pagination.totalPages} ({pagination.totalItems} programas en total)
+          </div>
+        )
+      }
     </div >
   );
 };
@@ -299,4 +298,3 @@ const Programas: React.FC = () => {
 };
 
 export default Programas;
-*/

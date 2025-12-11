@@ -9,10 +9,9 @@ import { fetchPrograms } from '@slice/olympo/programSlice';
 interface ModalFichasProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: (data: { numero: string; programId: string }) => void;
 }
 
-const ModalFichas: React.FC<ModalFichasProps> = ({ isOpen, onClose, onCreate }) => {
+const ModalFichas: React.FC<ModalFichasProps> = ({ isOpen, onClose }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [fichaData, setFichaData] = useState({ numero: '', programId: '' });
   const [inputError, setInputError] = useState({ numero: false, programId: false });
@@ -35,7 +34,7 @@ const ModalFichas: React.FC<ModalFichasProps> = ({ isOpen, onClose, onCreate }) 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFichaData({ ...fichaData, [name]: value });
-    setInputError({ ...inputError, [name]: false }); 
+    setInputError({ ...inputError, [name]: false });
   };
 
   const handleCreateFicha = () => {
@@ -46,9 +45,6 @@ const ModalFichas: React.FC<ModalFichasProps> = ({ isOpen, onClose, onCreate }) 
 
     setInputError(errors);
 
-    if (!errors.numero && !errors.programId) {
-      onCreate(fichaData); 
-    }
   };
 
   if (!isOpen) return null;
@@ -88,11 +84,10 @@ const ModalFichas: React.FC<ModalFichasProps> = ({ isOpen, onClose, onCreate }) 
               placeholder="Ingresa el número de ficha"
               value={fichaData.numero}
               onChange={handleInputChange}
-              className={`w-full px-4 py-3 rounded-xl border-2 transition-all outline-none ${
-                inputError.numero
-                  ? 'border-red-500 bg-red-50 dark:bg-red-900/20 focus:border-red-600'
-                  : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary dark:focus:border-secondary'
-              }`}
+              className={`w-full px-4 py-3 rounded-xl border-2 transition-all outline-none ${inputError.numero
+                ? 'border-red-500 bg-red-50 dark:bg-red-900/20 focus:border-red-600'
+                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary dark:focus:border-secondary'
+                }`}
             />
             {inputError.numero && (
               <p className="text-red-500 text-sm mt-1 flex items-center">
@@ -119,19 +114,18 @@ const ModalFichas: React.FC<ModalFichasProps> = ({ isOpen, onClose, onCreate }) 
                   name="programId"
                   value={fichaData.programId}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all outline-none appearance-none cursor-pointer ${
-                    inputError.programId
-                      ? 'border-red-500 bg-red-50 dark:bg-red-900/20 focus:border-red-600 text-red-700 dark:text-red-400'
-                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary dark:focus:border-secondary hover:border-gray-400 dark:hover:border-gray-500'
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all outline-none appearance-none cursor-pointer ${inputError.programId
+                    ? 'border-red-500 bg-red-50 dark:bg-red-900/20 focus:border-red-600 text-red-700 dark:text-red-400'
+                    : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-primary dark:focus:border-secondary hover:border-gray-400 dark:hover:border-gray-500'
+                    }`}
                   style={{
                     backgroundImage: 'none',
                   }}
                 >
                   <option value="" className="text-gray-500 dark:text-gray-400 rounded-lg py-2">Selecciona un programa</option>
                   {programs.map((program) => (
-                    <option 
-                      key={program.id} 
+                    <option
+                      key={program.id}
                       value={program.id || ''}
                       className="text-gray-900 dark:text-white bg-white dark:bg-gray-800 py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg my-1"
                     >
@@ -141,17 +135,16 @@ const ModalFichas: React.FC<ModalFichasProps> = ({ isOpen, onClose, onCreate }) 
                 </select>
                 {/* Icono personalizado del select */}
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <svg 
-                    className={`w-5 h-5 transition-colors ${
-                      inputError.programId 
-                        ? 'text-red-500' 
-                        : 'text-gray-400 dark:text-gray-500'
-                    }`}
-                    fill="none" 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth="2" 
-                    viewBox="0 0 24 24" 
+                  <svg
+                    className={`w-5 h-5 transition-colors ${inputError.programId
+                      ? 'text-red-500'
+                      : 'text-gray-400 dark:text-gray-500'
+                      }`}
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
                     <path d="M19 9l-7 7-7-7"></path>

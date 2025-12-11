@@ -5,13 +5,12 @@ import PageTitle from '@components/UI/pageTitle';
 import DataTable from '@components/UI/DataTable';
 import type { DataTableColumn } from '@components/UI/DataTable/types';
 import { useUser } from '@context/UserContext';
-import { clientLAN } from '@lib/apollo-client';
+import { client } from '@lib/apollo-client';
 import { GET_IMPROVEMENT_PLANS_BY_STUDENT } from '@graphql/improvementPlanGraph';
 import { GET_IMPROVEMENT_PLAN_EVALUATION_BY_PLAN_ID } from '@graphql/improvementPlanEvaluationGraph';
 import { FiCalendar, FiEye, FiUpload, FiFile } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { client } from '@lib/apollo-client';
 import { UPDATE_IMPROVEMENT_PLAN } from '@graphql/improvementPlanGraph';
 
 interface ImprovementPlan {
@@ -104,8 +103,8 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
             try {
                 setLoading(true);
                 setError(null);
-                
-                const { data } = await clientLAN.query({
+
+                const { data } = await client.query({
                     query: GET_IMPROVEMENT_PLANS_BY_STUDENT,
                     variables: {
                         page: currentPage - 1,
@@ -128,7 +127,7 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
                             length: plan.improvementPlanFile?.length || 0
                         });
                     });
-                    
+
                     setImprovementPlans(plans);
                     setTotalPages(data.allImprovementPlans.totalPages || 1);
                     console.log(`✅ Se cargaron ${plans.length} planes de mejoramiento`);
@@ -157,10 +156,10 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
 
             try {
                 const evaluations: Record<string, boolean | null> = {};
-                
+
                 for (const plan of improvementPlans) {
                     try {
-                        const { data } = await clientLAN.query({
+                        const { data } = await client.query({
                             query: GET_IMPROVEMENT_PLAN_EVALUATION_BY_PLAN_ID,
                             variables: { improvementPlanId: Number(plan.id) },
                             fetchPolicy: 'network-only'
@@ -194,10 +193,10 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
 
     const formatDate = (dateString?: string) => {
         if (!dateString) return 'No especificada';
-        return new Date(dateString).toLocaleDateString('es-ES', { 
-            day: '2-digit', 
-            month: '2-digit', 
-            year: 'numeric' 
+        return new Date(dateString).toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
         });
     };
 
@@ -207,7 +206,7 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
         input.type = 'file';
         // Solo aceptar documentos (PDF, Word, Excel, etc.)
         input.accept = '.pdf,.doc,.docx,.xls,.xlsx,.txt';
-        
+
         input.onchange = async (e: any) => {
             const file = e.target.files?.[0];
             if (!file) return;
@@ -228,7 +227,7 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
                 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 'text/plain'
             ];
-            
+
             if (!allowedTypes.includes(file.type)) {
                 toast.error('Solo se permiten archivos PDF, Word, Excel o TXT');
                 return;
@@ -236,7 +235,7 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
 
             try {
                 setUploadingPlanId(planId);
-                
+
                 // Convertir archivo a Base64
                 const reader = new FileReader();
                 reader.onload = async () => {
@@ -244,14 +243,14 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
                         // El FileReader devuelve: data:mimeType;base64,BASE64STRING
                         // Solo necesitamos la parte Base64
                         const base64String = (reader.result as string).split(',')[1];
-                        
+
                         console.log('Subiendo archivo:', {
                             name: file.name,
                             type: file.type,
                             size: file.size,
                             base64Length: base64String.length
                         });
-                        
+
                         // Actualizar el plan con el archivo en Base64 (String)
                         const { data } = await client.mutate({
                             mutation: UPDATE_IMPROVEMENT_PLAN,
@@ -266,7 +265,7 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
                         if (data?.updateImprovementPlan?.code === '200') {
                             toast.success('Archivo subido exitosamente');
                             // Recargar los planes para mostrar el archivo actualizado
-                            const { data: updatedData } = await clientLAN.query({
+                            const { data: updatedData } = await client.query({
                                 query: GET_IMPROVEMENT_PLANS_BY_STUDENT,
                                 variables: {
                                     page: currentPage - 1,
@@ -275,7 +274,7 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
                                 },
                                 fetchPolicy: 'network-only'
                             });
-                            
+
                             if (updatedData?.allImprovementPlans?.data) {
                                 setImprovementPlans(updatedData.allImprovementPlans.data);
                             }
@@ -289,12 +288,12 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
                         setUploadingPlanId(null);
                     }
                 };
-                
+
                 reader.onerror = () => {
                     toast.error('Error al leer el archivo');
                     setUploadingPlanId(null);
                 };
-                
+
                 reader.readAsDataURL(file);
             } catch (error: any) {
                 console.error('Error al procesar archivo:', error);
@@ -302,7 +301,7 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
                 setUploadingPlanId(null);
             }
         };
-        
+
         input.click();
     };
 
@@ -346,11 +345,10 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
             header: 'Estado',
             render: (row) => (
                 <div className="flex items-center justify-center">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border transition-all duration-200 ${
-                        row.state 
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'
-                            : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30'
-                    }`}>
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border transition-all duration-200 ${row.state
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'
+                        : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30'
+                        }`}>
                         <svg className="w-2 h-2" viewBox="0 0 8 8" fill="currentColor">
                             <circle cx="4" cy="4" r="3" />
                         </svg>
@@ -391,7 +389,7 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
             header: 'Evaluación',
             render: (row) => {
                 const evaluation = evaluationsMap[row.id];
-                
+
                 // Si no hay evaluación, mostrar "Pendiente"
                 if (evaluation === null || evaluation === undefined) {
                     return (
@@ -408,11 +406,10 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
 
                 return (
                     <div className="flex items-center justify-center">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border transition-all duration-200 ${
-                            evaluation
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'
-                                : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30'
-                        }`}>
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border transition-all duration-200 ${evaluation
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'
+                            : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30'
+                            }`}>
                             <svg className="w-2 h-2" viewBox="0 0 8 8" fill="currentColor">
                                 <circle cx="4" cy="4" r="3" />
                             </svg>
@@ -440,25 +437,25 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
                             onClick={() => {
                                 try {
                                     const base64String = row.improvementPlanFile as string;
-                                    
+
                                     console.log('📥 Descargando archivo, Base64 length:', base64String.length);
-                                    
+
                                     // Limpiar el Base64 si tiene prefijos (data:type;base64,)
                                     let cleanBase64 = base64String;
                                     if (base64String.includes(',')) {
                                         cleanBase64 = base64String.split(',')[1];
                                     }
-                                    
+
                                     // Detectar tipo MIME mirando los magic numbers (primeros bytes del archivo)
                                     const binaryString = atob(cleanBase64.substring(0, Math.min(100, cleanBase64.length)));
                                     const bytes = new Uint8Array(binaryString.length);
                                     for (let i = 0; i < binaryString.length; i++) {
                                         bytes[i] = binaryString.charCodeAt(i);
                                     }
-                                    
+
                                     let mimeType = 'application/octet-stream';
                                     let extension = 'bin';
-                                    
+
                                     // Detectar por "magic numbers" (firmas de archivo)
                                     if (bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46) {
                                         // %PDF - PDF file
@@ -483,18 +480,18 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
                                         mimeType = 'text/plain';
                                         extension = 'txt';
                                     }
-                                    
+
                                     console.log('📄 Tipo detectado:', { mimeType, extension, firstBytes: Array.from(bytes.slice(0, 4)) });
-                                    
+
                                     // Convertir TODO el Base64 a bytes
                                     const fullBinaryString = atob(cleanBase64);
                                     const fullBytes = new Uint8Array(fullBinaryString.length);
                                     for (let i = 0; i < fullBinaryString.length; i++) {
                                         fullBytes[i] = fullBinaryString.charCodeAt(i);
                                     }
-                                    
+
                                     console.log('💾 Archivo completo:', { totalBytes: fullBytes.length, mimeType });
-                                    
+
                                     // Crear blob con el tipo MIME correcto
                                     const blob = new Blob([fullBytes], { type: mimeType });
                                     const url = window.URL.createObjectURL(blob);
@@ -505,7 +502,7 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
                                     link.click();
                                     document.body.removeChild(link);
                                     window.URL.revokeObjectURL(url);
-                                    
+
                                     toast.success('Archivo descargado correctamente');
                                 } catch (error) {
                                     console.error('❌ Error al descargar:', error);
@@ -589,7 +586,7 @@ const PlanesMejoramientoAprendizContent: React.FC = () => {
         <div className="mx-auto px-4 py-8">
             <div className="space-y-6">
                 <PageTitle>Mis Planes De Mejoramiento</PageTitle>
-                
+
                 <DataTable<ImprovementPlan>
                     columns={columns}
                     data={improvementPlans}

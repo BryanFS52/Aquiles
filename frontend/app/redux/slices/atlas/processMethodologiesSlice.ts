@@ -1,15 +1,15 @@
-import { clientLAN } from "@/lib/apollo-client";
+import { client } from "@/lib/apollo-client";
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GET_ALL_METHODOLOGIES_AND_PROFILES } from "@graphql/atlas/processMethodologiesGraph";
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
-import { ProcessMethodology,GetAllProcessMethodologiesAndProfilesQuery, GetAllProcessMethodologiesAndProfilesQueryVariables } from "@/graphql/generated";
+import { ProcessMethodology, GetAllProcessMethodologiesAndProfilesQuery, GetAllProcessMethodologiesAndProfilesQueryVariables } from "@/graphql/generated";
 
-export const fetchAllProcessMethodologiesAndProfiles = createAsyncThunk<GetAllProcessMethodologiesAndProfilesQuery['allProcessMethodology'],GetAllProcessMethodologiesAndProfilesQueryVariables
+export const fetchAllProcessMethodologiesAndProfiles = createAsyncThunk<GetAllProcessMethodologiesAndProfilesQuery['allProcessMethodology'], GetAllProcessMethodologiesAndProfilesQueryVariables
 >(
     'processMethodologies/fetchAll',
     async ({ page, size, search }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.query<GetAllProcessMethodologiesAndProfilesQuery,GetAllProcessMethodologiesAndProfilesQueryVariables>({
+            const { data } = await client.query<GetAllProcessMethodologiesAndProfilesQuery, GetAllProcessMethodologiesAndProfilesQueryVariables>({
                 query: GET_ALL_METHODOLOGIES_AND_PROFILES,
                 variables: { page, size, search },
                 fetchPolicy: 'no-cache',
@@ -38,12 +38,12 @@ const processMethodologiesSlice = createSlice({
             })
             .addCase(fetchAllProcessMethodologiesAndProfiles.fulfilled, (state, action: PayloadAction<any>) => {
                 state.loading = false;
-                
+
                 if (action.payload?.data) {
                     // Filtra nulls y usa los datos directamente
                     state.data = action.payload.data
                         .filter((item: any): item is NonNullable<typeof item> => item !== null) as ProcessMethodology[];
-                    
+
                     state.currentPage = action.payload.currentPage ?? 0;
                     state.totalPages = action.payload.totalPages ?? 0;
                     state.totalItems = action.payload.totalItems ?? 0;

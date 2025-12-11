@@ -9,9 +9,9 @@ import { fetchChecklists } from '@redux/slices/checklistSlice';
 import { fetchStudySheetWithTeamScrum } from '@redux/slices/olympo/studySheetSlice';
 import { fetchTeamScrumById } from '@redux/slices/teamScrumSlice';
 import { addEvaluation, updateEvaluation } from '@redux/slices/evaluationSlice';
-import { 
+import {
   SAVE_OR_UPDATE_CHECKLIST_QUALIFICATION,
-  GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST 
+  GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST
 } from '@graphql/checklistQualificationGraph';
 import { GET_EVALUATION_BY_CHECKLIST_AND_TEAM } from '@graphql/evaluationsGraph';
 import PageTitle from "@components/UI/pageTitle";
@@ -30,12 +30,12 @@ export const InstructorChecklistContainer: React.FC = () => {
   const { data: checklists, loading, error } = useSelector((state: RootState) => state.checklist);
   const { data: studySheets } = useSelector((state: RootState) => state.studySheet);
   const { dataForTeamScrumById: selectedTeamScrum } = useSelector((state: RootState) => state.teamScrum);
-  
+
   // Mutations y queries
   const [saveOrUpdateQualification] = useMutation(SAVE_OR_UPDATE_CHECKLIST_QUALIFICATION);
   const [loadQualifications, { data: qualificationsData }] = useLazyQuery(GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST);
   const [loadEvaluation, { data: evaluationData }] = useLazyQuery(GET_EVALUATION_BY_CHECKLIST_AND_TEAM);
-  
+
   // Estados locales
   const [selectedTrimester, setSelectedTrimester] = useState<string>("");
   const [selectedChecklist, setSelectedChecklist] = useState<Checklist | null>(null);
@@ -64,10 +64,10 @@ export const InstructorChecklistContainer: React.FC = () => {
 
       if (studySheetId) {
         try {
-          const studySheetResponse = await dispatch(fetchStudySheetWithTeamScrum({ 
-            id: parseInt(studySheetId) 
+          const studySheetResponse = await dispatch(fetchStudySheetWithTeamScrum({
+            id: parseInt(studySheetId)
           })).unwrap();
-          
+
           if (studySheetResponse?.data) {
             setSelectedStudySheet(studySheetResponse.data as StudySheet);
           }
@@ -106,10 +106,10 @@ export const InstructorChecklistContainer: React.FC = () => {
 
           if (result.data?.checklistQualificationsByChecklist) {
             const qualifications = result.data.checklistQualificationsByChecklist;
-            
+
             // Mapear las calificaciones a itemStates
             const newItemStates: { [key: number]: { completed: boolean | null, observations: string } } = {};
-            
+
             // Inicializar todos los items
             selectedChecklist.items?.forEach((item: any) => {
               if (item && item.id) {
@@ -148,7 +148,7 @@ export const InstructorChecklistContainer: React.FC = () => {
       setEvaluationObservations(evaluation.observations || "");
       setEvaluationRecommendations(evaluation.recommendations || "");
       setEvaluationJudgment(evaluation.valueJudgment || "");
-      
+
       // ✅ Cargar el estado isFinalized desde la base de datos
       if (evaluation.isFinalized !== undefined && evaluation.isFinalized !== null) {
         setIsFinalSaved(evaluation.isFinalized);
@@ -168,20 +168,20 @@ export const InstructorChecklistContainer: React.FC = () => {
   // Filtrar listas de chequeo por la ficha seleccionada del instructor
   const checklistsForStudySheet = useMemo(() => {
     if (!selectedStudySheet?.id) return checklists;
-    
+
     const filtered = checklists.filter((checklist: Checklist) => {
       // Verificar si la lista tiene fichas asociadas
       if (!checklist.studySheets || checklist.studySheets.length === 0) {
         return false;
       }
-      
+
       // Verificar si la ficha del instructor está en la lista de fichas asociadas
       const studySheetIds = checklist.studySheets.split(',').map(id => id.trim());
       const isMatch = studySheetIds.includes(selectedStudySheet?.id?.toString() || '');
-      
+
       return isMatch;
     });
-    
+
     return filtered;
   }, [checklists, selectedStudySheet]);
 
@@ -191,7 +191,7 @@ export const InstructorChecklistContainer: React.FC = () => {
       .map((checklist: Checklist) => checklist.trimester)
       .filter((trimester: string | null | undefined): trimester is string => Boolean(trimester))
       .filter((trimester: string, index: number, array: string[]) => array.indexOf(trimester) === index);
-    
+
     return trimesters.sort();
   }, [checklistsForStudySheet]);
 
@@ -205,14 +205,26 @@ export const InstructorChecklistContainer: React.FC = () => {
     return checklistsForStudySheet.filter((checklist: Checklist) => checklist.state === true);
   }, [checklistsForStudySheet]);
 
-  // Items paginados
+  // Items paginados - convertir Item[] de GraphQL a SimulatedChecklistItem[]
   const currentItems = useMemo(() => {
     if (!selectedChecklist?.items) return [];
     const startIndex = (currentPage - 1) * itemsPerPage;
     return selectedChecklist.items
       .filter((item): item is NonNullable<typeof item> => item !== null)
-      .slice(startIndex, startIndex + itemsPerPage);
-  }, [selectedChecklist, currentPage, itemsPerPage]);
+      .slice(startIndex, startIndex + itemsPerPage)
+      .map(item => ({
+        id: item.id,
+        code: item.code,
+        indicator: item.indicator,
+        active: item.active,
+        completed: itemStates[item.id]?.completed ?? null,
+        observations: itemStates[item.id]?.observations ?? "",
+        itemType: item.itemType ? {
+          id: item.itemType.id,
+          name: item.itemType.name || ""
+        } : undefined
+      }));
+  }, [selectedChecklist, currentPage, itemsPerPage, itemStates]);
 
   const totalPages = useMemo(() => {
     if (!selectedChecklist?.items) return 0;
@@ -227,15 +239,15 @@ export const InstructorChecklistContainer: React.FC = () => {
       setCurrentPage(1);
       return;
     }
-    
+
     const checklist = checklists.find((c: Checklist) => c.id === checklistId);
     if (checklist) {
       setSelectedChecklist(checklist);
       setCurrentPage(1);
-      
+
       // NO sobrescribir selectedStudySheet ni selectedTeamScrum
       // Estos ya fueron cargados desde localStorage y deben mantenerse
-      
+
       // Cargar evaluación específica para este checklist y team scrum
       if (selectedTeamScrum?.id && checklist.id) {
         loadEvaluation({
@@ -245,23 +257,23 @@ export const InstructorChecklistContainer: React.FC = () => {
           }
         });
       }
-      
+
       // Los itemStates se cargarán automáticamente en el useEffect cuando selectedTeamScrum cambie
     }
   };
 
   const handleItemChange = async (id: number | string, field: string, value: any) => {
     if (isFinalSaved) return;
-    
+
     // Obtener el estado actual del item
     const currentItemState = itemStates[id] || { completed: null, observations: "" };
-    
+
     // Actualizar estado local inmediatamente para mejor UX
     const updatedState = {
       ...currentItemState,
       [field]: value
     };
-    
+
     setItemStates(prev => ({
       ...prev,
       [id]: updatedState
@@ -292,7 +304,7 @@ export const InstructorChecklistContainer: React.FC = () => {
       }
     } catch (error: any) {
       toast.error(`Error al guardar: ${error.message || 'Error desconocido'}`);
-      
+
       // Revertir el cambio en caso de error
       setItemStates(prev => ({
         ...prev,
@@ -381,11 +393,11 @@ export const InstructorChecklistContainer: React.FC = () => {
         isFinalized: true // ✅ Marcar como finalizada en la DB
       };
 
-      await dispatch(updateEvaluation({ 
-        id: parseInt(evaluationId as string), 
-        input: evaluationInput 
+      await dispatch(updateEvaluation({
+        id: parseInt(evaluationId as string),
+        input: evaluationInput
       })).unwrap();
-      
+
       // ✅ Recargar la evaluación desde el servidor para confirmar el cambio
       await loadEvaluation({
         variables: {
@@ -398,7 +410,7 @@ export const InstructorChecklistContainer: React.FC = () => {
       setIsFinalSaved(true);
       setShowPreview(false);
       toast.success("Lista de chequeo guardada definitivamente");
-      
+
     } catch (error: any) {
       toast.error(`❌ Error al guardar: ${error.message || 'Error desconocido'}`);
     }
@@ -411,7 +423,7 @@ export const InstructorChecklistContainer: React.FC = () => {
     localStorage.removeItem('selectedTeamScrumId');
     localStorage.removeItem('selectedStudySheetNumber');
     localStorage.removeItem('selectedTeamScrumName');
-    
+
     // Navegar a la página de selección de fichas
     router.push('/dashboard/InstructorSelection');
   };
@@ -429,8 +441,8 @@ export const InstructorChecklistContainer: React.FC = () => {
 
     const info = {
       fichaNumber: selectedStudySheet.number?.toString() || "No disponible",
-      jornada: selectedStudySheet.journey?.name || "No disponible", 
-      fechas: selectedStudySheet.startLective && selectedStudySheet.endLective 
+      jornada: selectedStudySheet.journey?.name || "No disponible",
+      fechas: selectedStudySheet.startLective && selectedStudySheet.endLective
         ? `${selectedStudySheet.startLective} - ${selectedStudySheet.endLective}`
         : "No disponible",
       programa: selectedStudySheet.trainingProject?.name || "No disponible"
@@ -449,7 +461,7 @@ export const InstructorChecklistContainer: React.FC = () => {
 
     const info = {
       teamName: selectedTeamScrum.teamName || "Sin nombre",
-      projectName: selectedTeamScrum.projectName || selectedChecklist?.trainingProjectName || "Sin proyecto"
+      projectName: selectedTeamScrum.projectName || selectedChecklist?.trainingProjectId || "Sin proyecto"
     };
 
     return info;
@@ -482,7 +494,7 @@ export const InstructorChecklistContainer: React.FC = () => {
 
   const handleCreateEvaluationSubmit = async () => {
     if (!selectedChecklist || !selectedTeamScrum?.id) return;
-    
+
     setIsCreatingEvaluation(true);
     try {
       const evaluationInput = {
@@ -495,10 +507,10 @@ export const InstructorChecklistContainer: React.FC = () => {
       };
 
       await dispatch(addEvaluation(evaluationInput)).unwrap();
-      
+
       setShowCreateEvaluationModal(false);
       toast.success("✅ Evaluación creada exitosamente!");
-      
+
       // Recargar la evaluación para este checklist y team scrum
       loadEvaluation({
         variables: {
@@ -507,7 +519,7 @@ export const InstructorChecklistContainer: React.FC = () => {
         },
         fetchPolicy: 'network-only'
       });
-      
+
     } catch (error: any) {
       toast.error(`❌ Error al crear la evaluación: ${error.message || 'Error desconocido'}`);
     } finally {
@@ -525,7 +537,7 @@ export const InstructorChecklistContainer: React.FC = () => {
 
   const handleCompleteEvaluation = async () => {
     if (!selectedChecklist || !selectedTeamScrum?.id || !evaluationData?.evaluationByChecklistAndTeam?.data) return;
-    
+
     try {
       const evaluation = evaluationData.evaluationByChecklistAndTeam.data;
       const evaluationInput = {
@@ -543,14 +555,14 @@ export const InstructorChecklistContainer: React.FC = () => {
         return;
       }
 
-      await dispatch(updateEvaluation({ 
-        id: parseInt(evaluationId as string), 
-        input: evaluationInput 
+      await dispatch(updateEvaluation({
+        id: parseInt(evaluationId as string),
+        input: evaluationInput
       })).unwrap();
-      
+
       setShowEvaluationForm(false);
       toast.success("Evaluación actualizada exitosamente!");
-      
+
       // Recargar la evaluación actualizada forzando traer datos frescos del servidor
       await loadEvaluation({
         variables: {
@@ -559,7 +571,7 @@ export const InstructorChecklistContainer: React.FC = () => {
         },
         fetchPolicy: 'network-only' // Forzar traer datos del servidor, no del cache
       });
-      
+
     } catch (error: any) {
       toast.error(`❌ Error al actualizar la evaluación: ${error.message || 'Error desconocido'}`);
     }
@@ -576,18 +588,18 @@ export const InstructorChecklistContainer: React.FC = () => {
         onClick={handleBackToStudySheets}
         className="mb-6 flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-[#5cb800] dark:hover:text-[#6bc500] transition-colors duration-200"
       >
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          className="h-5 w-5" 
-          fill="none" 
-          viewBox="0 0 24 24" 
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
           stroke="currentColor"
         >
-          <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            strokeWidth={2} 
-            d="M10 19l-7-7m0 0l7-7m-7 7h18" 
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
           />
         </svg>
         <span className="font-medium">Volver a Fichas</span>
@@ -596,7 +608,7 @@ export const InstructorChecklistContainer: React.FC = () => {
       <PageTitle>Lista de Chequeo - Instructor</PageTitle>
 
       {/* Tarjetas de información */}
-      <InformationCards 
+      <InformationCards
         selectedTeamScrumName={teamScrumInfo.teamName}
         selectedStudySheetNumber={studySheetInfo.fichaNumber}
         selectedChecklist={selectedChecklist}
@@ -623,7 +635,20 @@ export const InstructorChecklistContainer: React.FC = () => {
       {/* Tabla de lista de chequeo */}
       {selectedChecklist && currentItems.length > 0 && (
         <ChecklistTable
-          items={(selectedChecklist.items || []).filter((item): item is NonNullable<typeof item> => item !== null)}
+          items={(selectedChecklist.items || [])
+            .filter((item): item is NonNullable<typeof item> => item !== null)
+            .map(item => ({
+              id: item.id,
+              code: item.code,
+              indicator: item.indicator,
+              active: item.active,
+              completed: itemStates[item.id]?.completed ?? null,
+              observations: itemStates[item.id]?.observations ?? "",
+              itemType: item.itemType ? {
+                id: item.itemType.id,
+                name: item.itemType.name || ""
+              } : undefined
+            }))}
           currentItems={currentItems}
           itemStates={itemStates}
           currentPage={currentPage}

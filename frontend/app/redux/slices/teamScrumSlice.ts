@@ -1,4 +1,4 @@
-import { clientLAN } from '@lib/apollo-client';
+import { client } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GET_TEAMS_SCRUMS, GET_TEAM_SCRUM_BY_ID, GET_TEAM_SCRUM_BY_ID_WITH_STUDENTS, ADD_TEAM_SCRUM, ADD_PROFILE_TO_STUDENT, UPDATE_TEAM_SCRUM, DELETE_TEAM_SCRUM, } from '@graphql/teamsScrumGraph';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
@@ -26,7 +26,7 @@ export const fetchTeamsScrums = createAsyncThunk<GetTeamsScrumsQuery['allTeamsSc
     async ({ page, size }) => {
         try {
 
-            const { data } = await clientLAN.query<GetTeamsScrumsQuery, GetTeamsScrumsQueryVariables>({
+            const { data } = await client.query<GetTeamsScrumsQuery, GetTeamsScrumsQueryVariables>({
                 query: GET_TEAMS_SCRUMS,
                 variables: { page, size },
                 fetchPolicy: 'no-cache',
@@ -45,7 +45,7 @@ export const fetchTeamScrumById = createAsyncThunk<GetTeamScrumByIdQuery['teamSc
     'teamScrum/fetchById',
     async ({ id }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.query<GetTeamScrumByIdQuery, GetTeamScrumByIdQueryVariables>({
+            const { data } = await client.query<GetTeamScrumByIdQuery, GetTeamScrumByIdQueryVariables>({
                 query: GET_TEAM_SCRUM_BY_ID,
                 variables: { id },
             });
@@ -62,7 +62,7 @@ export const fetchTeamScrumByIdWithStudents = createAsyncThunk<GetTeamScrumByIdW
     'teamScrum/fetchByIdWithStudents',
     async ({ id }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.query<GetTeamScrumByIdWithStudentsQuery, GetTeamScrumByIdWithStudentsQueryVariables>({
+            const { data } = await client.query<GetTeamScrumByIdWithStudentsQuery, GetTeamScrumByIdWithStudentsQueryVariables>({
                 query: GET_TEAM_SCRUM_BY_ID_WITH_STUDENTS,
                 variables: { id },
             });
@@ -81,7 +81,7 @@ export const addTeamScrum = createAsyncThunk<AddTeamScrumMutation['addTeamScrum'
     'teamScrum/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<AddTeamScrumMutation, AddTeamScrumMutationVariables>({
+            const { data } = await client.mutate<AddTeamScrumMutation, AddTeamScrumMutationVariables>({
                 mutation: ADD_TEAM_SCRUM,
                 variables: { input }
             });
@@ -103,7 +103,7 @@ export const addProfileToStudent = createAsyncThunk<AddProfileToStudentMutation[
     'teamScrum/addProfileToStudent',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<AddProfileToStudentMutation, AddProfileToStudentMutationVariables>({
+            const { data } = await client.mutate<AddProfileToStudentMutation, AddProfileToStudentMutationVariables>({
                 mutation: ADD_PROFILE_TO_STUDENT,
                 variables: { input }
             });
@@ -125,7 +125,7 @@ export const updateTeamScrum = createAsyncThunk<UpdateTeamScrumMutation['updateT
     'teamScrum/update',
     async ({ id, input }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<UpdateTeamScrumMutation, UpdateTeamScrumMutationVariables>({
+            const { data } = await client.mutate<UpdateTeamScrumMutation, UpdateTeamScrumMutationVariables>({
                 mutation: UPDATE_TEAM_SCRUM,
                 variables: { id, input },
             });
@@ -148,7 +148,7 @@ export const deleteTeamScrum = createAsyncThunk<string, string,
     'teamScrum/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<DeleteTeamScrumMutation, DeleteTeamScrumMutationVariables>({
+            const { data } = await client.mutate<DeleteTeamScrumMutation, DeleteTeamScrumMutationVariables>({
                 mutation: DELETE_TEAM_SCRUM,
                 variables: { id },
             });

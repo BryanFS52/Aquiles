@@ -1,20 +1,20 @@
-import { clientLAN } from '@lib/apollo-client';
+import { client } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { createInitialPaginatedState } from '@type/slices/common/generic'
 import { Coordination } from '@graphql/generated';
 import { GET_COORDINATION_BY_COLABORATOR_ID } from '@graphql/olympo/coordinationGraph';
-import { GetCoordinationByCollaboratorQuery,GetCoordinationByCollaboratorQueryVariables} from '@graphql/generated'
+import { GetCoordinationByCollaboratorQuery, GetCoordinationByCollaboratorQueryVariables } from '@graphql/generated'
 
 export const fetchCoordinationByColaborator = createAsyncThunk<GetCoordinationByCollaboratorQuery['allCoordination'], GetCoordinationByCollaboratorQueryVariables>(
   'coordination/fetchByColaborator',
   async ({ collaboratorId, page, size, state = true }) => {
     try {
-      const { data } = await clientLAN.query<GetCoordinationByCollaboratorQuery, GetCoordinationByCollaboratorQueryVariables>({
+      const { data } = await client.query<GetCoordinationByCollaboratorQuery, GetCoordinationByCollaboratorQueryVariables>({
         query: GET_COORDINATION_BY_COLABORATOR_ID,
         variables: { collaboratorId, page, size, state },
         fetchPolicy: 'no-cache',
       });
-      
+
       return data.allCoordination;
     } catch (error) {
       console.error('Error fetching coordinations:', error);

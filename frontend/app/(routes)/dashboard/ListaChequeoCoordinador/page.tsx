@@ -1,4 +1,3 @@
-/*
 'use client'
 
 import { useState, useEffect } from "react"
@@ -340,8 +339,8 @@ export default function CoordinadorChecklistView() {
                           )}
                         </div>
                         <p className={`text-sm text-gray-600 dark:text-gray-400 leading-relaxed break-words overflow-wrap-anywhere whitespace-pre-wrap transition-all duration-300 ${!expandedCriteria[checklist.id] && checklist.remarks && checklist.remarks.length > 30
-                            ? 'line-clamp-2'
-                            : ''
+                          ? 'line-clamp-2'
+                          : ''
                           }`}>
                           {checklist.remarks || 'Sin observaciones'}
                         </p>
@@ -392,4 +391,3 @@ export default function CoordinadorChecklistView() {
     </>
   )
 }
-*/

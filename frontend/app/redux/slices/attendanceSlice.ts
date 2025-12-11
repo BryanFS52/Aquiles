@@ -1,4 +1,4 @@
-import { clientLAN } from '@lib/apollo-client';
+import { client } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GET_ALL_ATTENDANCES, GET_ATTENDANCES_BY_STUDENT, GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT, ADD_ATTENDANCE, UPDATE_ATTENDANCE, DELETE_ATTENDANCE, GET_ATTENDANCES_WITH_JUSTIFICATIONS_BY_STUDENT } from '@graphql/attendancesGraph';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
@@ -109,11 +109,11 @@ export const processAndSummarizeAttendances = (attendances: Attendance[]): Stude
     return result;
 };
 
-export const fetchAttendances = createAsyncThunk<GetAttendancesQuery['allAttendances'],GetAttendancesQueryVariables
+export const fetchAttendances = createAsyncThunk<GetAttendancesQuery['allAttendances'], GetAttendancesQueryVariables
 >(
     'attendance/fetchAll',
     async ({ page, size }) => {
-        const { data } = await clientLAN.query<GetAttendancesQuery, GetAttendancesQueryVariables>({
+        const { data } = await client.query<GetAttendancesQuery, GetAttendancesQueryVariables>({
             query: GET_ALL_ATTENDANCES,
             variables: { page, size },
             fetchPolicy: 'no-cache',
@@ -122,12 +122,12 @@ export const fetchAttendances = createAsyncThunk<GetAttendancesQuery['allAttenda
     }
 );
 
-export const fetchAttendancesByStudent = createAsyncThunk<Attendance[],AllAttendancesByStudentIdQueryVariables
+export const fetchAttendancesByStudent = createAsyncThunk<Attendance[], AllAttendancesByStudentIdQueryVariables
 >(
     'attendance/fetchByStudent',
     async ({ id, stateId }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.query<AllAttendancesByStudentIdQuery,AllAttendancesByStudentIdQueryVariables
+            const { data } = await client.query<AllAttendancesByStudentIdQuery, AllAttendancesByStudentIdQueryVariables
             >({
                 query: GET_ATTENDANCES_BY_STUDENT,
                 variables: { id, stateId },
@@ -151,7 +151,7 @@ export const fetchAttendancesWithJustificationsByStudentId = createAsyncThunk<Al
     'attendance/fetchWithJustificationsByStudent',
     async ({ id, page, size }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.query<AllAttendancesWithJustificationsByStudentIdQuery, AllAttendancesWithJustificationsByStudentIdQueryVariables>({
+            const { data } = await client.query<AllAttendancesWithJustificationsByStudentIdQuery, AllAttendancesWithJustificationsByStudentIdQueryVariables>({
                 query: GET_ATTENDANCES_WITH_JUSTIFICATIONS_BY_STUDENT,
                 variables: { id, page, size },
                 fetchPolicy: 'no-cache',
@@ -168,7 +168,7 @@ export const fetchAttendanceAndCompetenceByStudent = createAsyncThunk<GetAttenda
     'attendance/fetchWithCompetence',
     async ({ id, page, size }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.query<GetAttendancesAndCompetenceByStudentIdQuery, GetAttendancesAndCompetenceByStudentIdQueryVariables>({
+            const { data } = await client.query<GetAttendancesAndCompetenceByStudentIdQuery, GetAttendancesAndCompetenceByStudentIdQueryVariables>({
                 query: GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT,
                 variables: { id, page, size },
                 fetchPolicy: 'no-cache',
@@ -187,7 +187,7 @@ export const addAttendance = createAsyncThunk<AddAttendanceMutation['addAttendan
     'attendance/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<AddAttendanceMutation, AddAttendanceMutationVariables>({
+            const { data } = await client.mutate<AddAttendanceMutation, AddAttendanceMutationVariables>({
                 mutation: ADD_ATTENDANCE,
                 variables: { input }
             });
@@ -209,7 +209,7 @@ export const updateAttendance = createAsyncThunk<UpdateAttendanceMutation['updat
     'attendance/update',
     async ({ id, input }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<UpdateAttendanceMutation, UpdateAttendanceMutationVariables>({
+            const { data } = await client.mutate<UpdateAttendanceMutation, UpdateAttendanceMutationVariables>({
                 mutation: UPDATE_ATTENDANCE,
                 variables: { id, input },
             });
@@ -232,7 +232,7 @@ export const deleteAttendance = createAsyncThunk<string, string,
     'attendance/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<DeleteAttendanceMutation, DeleteAttendanceMutationVariables>({
+            const { data } = await client.mutate<DeleteAttendanceMutation, DeleteAttendanceMutationVariables>({
                 mutation: DELETE_ATTENDANCE,
                 variables: { id },
             });
@@ -268,27 +268,27 @@ const attendanceSlice = createSlice({
     name: 'attendance',
     initialState,
     reducers: {
-    updateAttendanceSummary: (state) => {
-        state.attendanceSummary = processAndSummarizeAttendances(state.data);
-    },
+        updateAttendanceSummary: (state) => {
+            state.attendanceSummary = processAndSummarizeAttendances(state.data);
+        },
         setAttendanceSummaryFromStudySheet: (state, action: PayloadAction<any>) => {
             const studySheet = action.payload;
             if (!studySheet?.studentStudySheets) {
-            state.attendanceSummary = [];
-            return;
+                state.attendanceSummary = [];
+                return;
             }
 
             // Transformar todas las asistencias de todos los estudiantes a un solo array
             const allAttendances = studySheet.studentStudySheets.flatMap((ss: any) =>
-            (ss.student?.attendances || []).map((a: any) => ({
-                id: a.id || `${ss.student.id}-${a.attendanceDate}`,
-                attendanceDate: a.attendanceDate,
-                attendanceState: a.attendanceState,
-                student: {
-                id: ss.student.id,
-                person: ss.student.person,
-                },
-            }))
+                (ss.student?.attendances || []).map((a: any) => ({
+                    id: a.id || `${ss.student.id}-${a.attendanceDate}`,
+                    attendanceDate: a.attendanceDate,
+                    attendanceState: a.attendanceState,
+                    student: {
+                        id: ss.student.id,
+                        person: ss.student.person,
+                    },
+                }))
             );
 
             state.attendanceSummary = processAndSummarizeAttendances(allAttendances);

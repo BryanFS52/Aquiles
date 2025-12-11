@@ -7,30 +7,22 @@ import PageTitle from "@components/UI/pageTitle"
 import InstructorGrid from "@/components/features/InstructoresCoordinador/InstructorGrid"
 import { Instructor } from "@/components/features/InstructoresCoordinador/InstructorCard"
 import { fetchCoordinationByColaborator } from '@slice/olympo/coordinationSlice';
-import { fetchStudySheetsWithCoordinationId } from '@slice/olympo/studySheetSlice';
 import { TEMPORAL_COORDINATOR_ID } from '@/temporaryCredential';
 
 const InstructoresCoordinadorContainer: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
-    
+
     // Obtener datos de Redux
     const { data: coordinations, loading: loadingCoordinations } = useSelector((state: RootState) => state.coordination);
     const { data: studySheets, loading: loadingSheets } = useSelector((state: RootState) => state.studySheet);
 
     useEffect(() => {
         // Cargar coordinaciones con instructores
-        dispatch(fetchCoordinationByColaborator({ 
+        dispatch(fetchCoordinationByColaborator({
             collaboratorId: TEMPORAL_COORDINATOR_ID,
-            page: 0, 
+            page: 0,
             size: 10,
-            state: true 
-        }));
-
-        // Cargar fichas para obtener relación con instructores
-        dispatch(fetchStudySheetsWithCoordinationId({ 
-            coordinationId: TEMPORAL_COORDINATOR_ID,
-            page: 0, 
-            size: 10
+            state: true
         }));
     }, [dispatch]);
 
@@ -45,10 +37,10 @@ const InstructoresCoordinadorContainer: React.FC = () => {
     const instructors: Instructor[] = teachers.map(teacher => {
         const person = teacher.collaborator?.person;
         const name = `${person?.name || ''} ${person?.lastname || ''}`.trim() || 'Sin nombre';
-        
+
         // Obtener fichas asignadas al instructor a través de teacherStudySheets
         const teacherSheets = studySheets
-            .filter(sheet => 
+            .filter(sheet =>
                 sheet.teacherStudySheets?.some(tss => tss?.teacher?.id === teacher.id)
             );
 
@@ -58,7 +50,7 @@ const InstructoresCoordinadorContainer: React.FC = () => {
             const teacherStudySheet = sheet.teacherStudySheets?.find(tss => tss?.teacher?.id === teacher.id);
             const sheetType = teacherStudySheet?.teacherStudySheetType?.name;
             const competence = teacherStudySheet?.competence?.name;
-            
+
             return {
                 ficha: `${sheet.number || 'N/A'}${sheetType ? ` - ${sheetType}` : ''}${competence ? ` (${competence})` : ''}`
             };
@@ -72,18 +64,18 @@ const InstructoresCoordinadorContainer: React.FC = () => {
             .filter(coord => coord.teachers?.some(t => t?.id === teacher.id))
             .map(coord => coord.trainingCenter?.name)
             .filter(Boolean);
-        
-        const centers = centersList.length > 0 
-            ? centersList.join(', ') 
+
+        const centers = centersList.length > 0
+            ? centersList.join(', ')
             : 'Sin centro asignado';
 
         // Obtener modalidad de las fichas (journey name)
         const journeys = teacherSheets
             .map(sheet => sheet.journey?.name)
             .filter((value, index, self) => value && self.indexOf(value) === index); // Únicos
-        
-        const modalidad = journeys.length > 0 
-            ? journeys.join(', ') 
+
+        const modalidad = journeys.length > 0
+            ? journeys.join(', ')
             : 'No especificada';
 
         return {
@@ -115,7 +107,7 @@ const InstructoresCoordinadorContainer: React.FC = () => {
     return (
         <main className="px-2 sm:px-4 lg:px-0 py-4 sm:py-6">
             <PageTitle>Instructores</PageTitle>
-            
+
             {instructors.length === 0 ? (
                 <div className="text-center py-12">
                     <div className="bg-white dark:bg-shadowBlue rounded-xl p-6 sm:p-12 border border-gray-200 dark:border-gray-700">

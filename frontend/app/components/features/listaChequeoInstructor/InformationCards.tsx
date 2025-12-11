@@ -35,7 +35,7 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <Card 
+      <Card
         header={
           <div className="w-16 h-16 bg-[#5cb800]/10 dark:bg-[#5cb800]/20 rounded-full flex items-center justify-center mx-auto mb-3">
             <div className="w-8 h-8 bg-[#5cb800] dark:bg-[#5cb800] rounded-full flex items-center justify-center">
@@ -47,7 +47,7 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
           <div className="text-center">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Programa de Formación</h3>
             <p className="text-sm text-gray-600 dark:text-gray-300 leading-tight">
-              {studySheetInfo?.programa || selectedChecklist?.trainingProjectName || "No disponible"}
+              {studySheetInfo?.programa || selectedChecklist?.trainingProjectId || "No disponible"}
             </p>
             <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
               <p className="text-xs font-semibold text-[#5cb800] dark:text-[#5cb800]">Trimestre</p>
@@ -58,8 +58,8 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
           </div>
         }
       />
-      
-      <Card 
+
+      <Card
         header={
           <div className="w-16 h-16 bg-[#5cb800]/10 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
             <div className="w-8 h-8 bg-[#538dda] dark:bg-blue-400 rounded-full flex items-center justify-center">
@@ -82,8 +82,8 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
           </div>
         }
       />
-      
-      <Card 
+
+      <Card
         header={
           <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
             <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
@@ -106,8 +106,8 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
           </div>
         }
       />
-      
-      <Card 
+
+      <Card
         header={
           <div className="w-16 h-16 bg-lime-100 dark:bg-lime-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
             <div className="w-8 h-8 bg-lime-500 dark:bg-lime-600 rounded-full flex items-center justify-center">

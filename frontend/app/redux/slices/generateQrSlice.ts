@@ -1,4 +1,4 @@
-import { clientLAN } from '@lib/apollo-client';
+import { client } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { GENERATE_QR_CODE } from '@graphql/generateQrGraph';
 import { RejectedPayload } from '@type/slices/common/generic';
@@ -17,7 +17,7 @@ export const generateQrCode = createAsyncThunk<GenerateQrCodeMutation['generateQ
     'generateQr/generate',
     async (_, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<GenerateQrCodeMutation, GenerateQrCodeMutationVariables>({
+            const { data } = await client.mutate<GenerateQrCodeMutation, GenerateQrCodeMutationVariables>({
                 mutation: GENERATE_QR_CODE,
             });
 

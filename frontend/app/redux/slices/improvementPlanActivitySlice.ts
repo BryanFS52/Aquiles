@@ -1,4 +1,4 @@
-import { clientLAN } from '@lib/apollo-client'
+import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_IMPROVEMENT_PLAN_ACTIVITIES, ADD_IMPROVEMENT_PLAN_ACTIVITY } from '@graphql/improvementPlanActivityGraph'
@@ -6,8 +6,8 @@ import { ImprovementPlanDelivery, ImprovementPlanEvidenceType } from '@graphql/g
 
 export const fetchImprovementPlanActivities = createAsyncThunk<any, { page?: number; size?: number; id?: number }>(
     'improvementPlanActivity/fetchActivities',
-    async ({ page = 0, size = 100, id } ) => {
-        const { data } = await clientLAN.query({
+    async ({ page = 0, size = 100, id }) => {
+        const { data } = await client.query({
             query: GET_ALL_IMPROVEMENT_PLAN_ACTIVITIES,
             variables: { page, size, id },
             fetchPolicy: 'no-cache'
@@ -20,7 +20,7 @@ export const addImprovementPlanActivity = createAsyncThunk<any, any, { rejectVal
     'improvementPlanActivity/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate({
+            const { data } = await client.mutate({
                 mutation: ADD_IMPROVEMENT_PLAN_ACTIVITY,
                 variables: { input }
             });
@@ -86,7 +86,7 @@ const slice = createSlice({
                 const payload = action.payload as RejectedPayload;
                 state.error = payload || { message: action.error.message };
             })
-        ;
+            ;
     }
 });
 

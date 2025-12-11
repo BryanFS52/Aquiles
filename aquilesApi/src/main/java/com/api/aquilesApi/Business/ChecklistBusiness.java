@@ -15,27 +15,27 @@ import org.springframework.stereotype.Component;
 
 /**
  * Business logic para la gestión de Listas de Chequeo
- * 
+ *
  * FLUJO DE VIDA DE UNA LISTA DE CHEQUEO:
  * ========================================
- * 
+ *
  * 1. CREACIÓN (Coordinador):
  *    - Crea la lista de chequeo con items (indicadores técnicos/actitudinales)
  *    - Define: trimestre, componente, proyecto formativo, fichas asociadas
  *    - Campos que PUEDEN ser NULL: remarks, instructorSignature, evaluationCriteria, evaluation
  *    - Estado inicial: state = true (activa)
- * 
+ *
  * 2. VISUALIZACIÓN (Instructor):
  *    - Instructor ve listas activas asignadas a sus fichas (studySheets)
  *    - Puede ver los items a evaluar
  *    - No puede ver campos de calificación porque aún son NULL
- * 
+ *
  * 3. CALIFICACIÓN (Instructor):
  *    - Instructor evalúa cada item (activo: true/false)
  *    - Completa: remarks (observaciones), instructorSignature (firma digital)
  *    - Actualiza: evaluationCriteria (criterios cumplidos)
  *    - Crea relación con Evaluation (1:1)
- * 
+ *
  * 4. CONSULTA (Coordinador/Instructor):
  *    - Ambos pueden ver la lista completa con la calificación
  *    - Histórico se guarda en ChecklistHistory
@@ -78,13 +78,13 @@ public class ChecklistBusiness {
 
     /**
      * Crea una nueva Lista de Chequeo (ROL: COORDINADOR)
-     * 
+     *
      * Campos OBLIGATORIOS al crear:
      * - state (true = activa)
      * - trimester
      * - items (lista de indicadores)
      * - studySheets (fichas asociadas)
-     * 
+     *
      * Campos OPCIONALES (se llenan cuando el instructor califica):
      * - remarks
      * - instructorSignature
@@ -95,10 +95,10 @@ public class ChecklistBusiness {
         try {
             // Validaciones de creación (Coordinador)
             validateChecklistCreation(checklistDto);
-            
+
             Checklist checklist = new Checklist();
             ChecklistMap.INSTANCE.updateChecklist(checklistDto, checklist);
-            
+
             // Establecer relación bidireccional con Items y validar ItemTypes
             if (checklist.getItems() != null) {
                 checklist.getItems().forEach(item -> {
@@ -113,7 +113,7 @@ public class ChecklistBusiness {
                     item.setChecklist(checklist);
                 });
             }
-            
+
             Checklist savedChecklist = checklistService.save(checklist);
             return ChecklistMap.INSTANCE.EntityToDTO(savedChecklist);
         } catch (CustomException e) {
@@ -121,9 +121,9 @@ public class ChecklistBusiness {
         } catch (DataAccessException e) {
             // Detectar error de longitud de campo excedida
             String errorMessage = e.getMessage().toLowerCase();
-            if (errorMessage.contains("demasiado largo") || 
-                errorMessage.contains("too long") ||
-                errorMessage.contains("character varying")) {
+            if (errorMessage.contains("demasiado largo") ||
+                    errorMessage.contains("too long") ||
+                    errorMessage.contains("character varying")) {
                 // Extraer el límite de caracteres del mensaje
                 String limit = "especificado";
                 if (errorMessage.contains("varying(")) {
@@ -136,20 +136,20 @@ public class ChecklistBusiness {
                     }
                 }
                 throw new CustomException(
-                    "Uno de los campos (indicador técnico o actitudinal) excede el límite de " + limit + " caracteres permitidos. " +
-                    "Por favor, reduzca el texto e intente nuevamente.",
-                    HttpStatus.BAD_REQUEST
+                        "Uno de los campos (indicador técnico o actitudinal) excede el límite de " + limit + " caracteres permitidos. " +
+                                "Por favor, reduzca el texto e intente nuevamente.",
+                        HttpStatus.BAD_REQUEST
                 );
             }
             throw new CustomException("Error al crear la Lista de Chequeo: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            throw new CustomException(e.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new CustomException("Error creating checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-        /**
+    /**
      * Actualiza una lista de chequeo existente
-     * 
+     *
      * IMPORTANTE: Solo se actualizan los campos que vienen en el DTO (no-null)
      * Permite dos tipos de actualización:
      * - COORDINADOR: para editar datos generales (trimestre, items, etc)
@@ -159,13 +159,13 @@ public class ChecklistBusiness {
         try {
             checklistDto.setId(checklistId);
             Checklist checklist = checklistService.getById(checklistId);
-            
+
             // ✅ Guardar items actuales antes de mapear
             var currentItems = checklist.getItems();
-            
+
             // Actualizar campos desde el DTO (MapStruct ignora valores null gracias a NullValuePropertyMappingStrategy.IGNORE)
             ChecklistMap.INSTANCE.updateChecklist(checklistDto, checklist);
-            
+
             // ✅ Si el DTO no trae items, restaurar los items originales
             if (checklistDto.getItems() == null || checklistDto.getItems().isEmpty()) {
                 checklist.setItems(currentItems);
@@ -175,21 +175,21 @@ public class ChecklistBusiness {
                     // Validar que el ItemType existe en la base de datos
                     ItemType itemType = itemTypeService.getById(item.getItemType().getId());
                     item.setItemType(itemType);
-                    
+
                     // Establecer la relación bidireccional
                     item.setChecklist(checklist);
                 }
             }
-            
+
             checklistService.save(checklist);
         } catch (CustomException e) {
             throw e;
         } catch (DataAccessException e) {
             // Detectar error de longitud de campo excedida
             String errorMessage = e.getMessage().toLowerCase();
-            if (errorMessage.contains("demasiado largo") || 
-                errorMessage.contains("too long") ||
-                errorMessage.contains("character varying")) {
+            if (errorMessage.contains("demasiado largo") ||
+                    errorMessage.contains("too long") ||
+                    errorMessage.contains("character varying")) {
                 // Extraer el límite de caracteres del mensaje
                 String limit = "especificado";
                 if (errorMessage.contains("varying(")) {
@@ -202,20 +202,20 @@ public class ChecklistBusiness {
                     }
                 }
                 throw new CustomException(
-                    "Uno de los campos (indicador técnico o actitudinal) excede el límite de " + limit + " caracteres permitidos. " +
-                    "Por favor, reduzca el texto e intente nuevamente.",
-                    HttpStatus.BAD_REQUEST
+                        "Uno de los campos (indicador técnico o actitudinal) excede el límite de " + limit + " caracteres permitidos. " +
+                                "Por favor, reduzca el texto e intente nuevamente.",
+                        HttpStatus.BAD_REQUEST
                 );
             }
             // Detectar error de violación de clave foránea
-            if (errorMessage.contains("foreign key") || 
-                errorMessage.contains("llave foránea") || 
-                errorMessage.contains("checklist_qualifications") ||
-                errorMessage.contains("constraint")) {
+            if (errorMessage.contains("foreign key") ||
+                    errorMessage.contains("llave foránea") ||
+                    errorMessage.contains("checklist_qualifications") ||
+                    errorMessage.contains("constraint")) {
                 throw new CustomException(
-                    "No se puede actualizar esta Lista de Chequeo porque ya ha sido evaluada por un instructor. " +
-                    "Los items no pueden ser modificados una vez que existen calificaciones asociadas.",
-                    HttpStatus.CONFLICT
+                        "No se puede actualizar esta Lista de Chequeo porque ya ha sido evaluada por un instructor. " +
+                                "Los items no pueden ser modificados una vez que existen calificaciones asociadas.",
+                        HttpStatus.CONFLICT
                 );
             }
             throw new CustomException("Error al actualizar la Lista de Chequeo: " + e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -234,16 +234,16 @@ public class ChecklistBusiness {
         } catch (DataAccessException e) {
             // Detectar error de violación de clave foránea
             String errorMessage = e.getMessage().toLowerCase();
-            if (errorMessage.contains("foreign key") || 
-                errorMessage.contains("llave foránea") || 
-                errorMessage.contains("checklist_qualifications") ||
-                errorMessage.contains("evaluations") ||
-                errorMessage.contains("constraint") ||
-                errorMessage.contains("referida desde")) {
+            if (errorMessage.contains("foreign key") ||
+                    errorMessage.contains("llave foránea") ||
+                    errorMessage.contains("checklist_qualifications") ||
+                    errorMessage.contains("evaluations") ||
+                    errorMessage.contains("constraint") ||
+                    errorMessage.contains("referida desde")) {
                 throw new CustomException(
-                    "No se puede eliminar esta Lista de Chequeo porque ya ha sido evaluada por un instructor. " +
-                    "Las listas con calificaciones o evaluaciones asociadas no pueden ser eliminadas.",
-                    HttpStatus.CONFLICT
+                        "No se puede eliminar esta Lista de Chequeo porque ya ha sido evaluada por un instructor. " +
+                                "Las listas con calificaciones o evaluaciones asociadas no pueden ser eliminadas.",
+                        HttpStatus.CONFLICT
                 );
             }
             throw new CustomException("Error al eliminar la Lista de Chequeo: " + e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -251,7 +251,7 @@ public class ChecklistBusiness {
             throw new CustomException("Error Deleting Checklist: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-    
+
     /**
      * Validaciones específicas para la creación de una lista de chequeo
      * (Coordinador)
@@ -260,15 +260,15 @@ public class ChecklistBusiness {
         if (dto.getState() == null) {
             throw new CustomException("El estado de la lista de chequeo es obligatorio", HttpStatus.BAD_REQUEST);
         }
-        
+
         if (dto.getTrimester() == null || dto.getTrimester().trim().isEmpty()) {
             throw new CustomException("El trimestre es obligatorio", HttpStatus.BAD_REQUEST);
         }
-        
+
         if (dto.getItems() == null || dto.getItems().isEmpty()) {
             throw new CustomException("Debe agregar al menos un item (indicador) a la lista de chequeo", HttpStatus.BAD_REQUEST);
         }
-        
+
         if (dto.getStudySheets() == null || dto.getStudySheets().trim().isEmpty()) {
             throw new CustomException("Debe asociar al menos una ficha de formación", HttpStatus.BAD_REQUEST);
         }

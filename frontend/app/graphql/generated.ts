@@ -28,6 +28,7 @@ export type Administrative = {
   committees?: Maybe<Array<Maybe<Committee>>>;
   extensionMail?: Maybe<Scalars['String']['output']>;
   extensionPhone?: Maybe<Scalars['String']['output']>;
+  followUps?: Maybe<Array<Maybe<FollowUp>>>;
   id?: Maybe<Scalars['ID']['output']>;
   novelties?: Maybe<Array<Maybe<Novelty>>>;
   state?: Maybe<Scalars['Boolean']['output']>;
@@ -162,33 +163,51 @@ export type ChangeLogPage = {
 };
 
 export type Checklist = {
+  associatedJuries?: Maybe<Array<Maybe<Juries>>>;
   component?: Maybe<Scalars['String']['output']>;
-  dateAssigned?: Maybe<Scalars['String']['output']>;
+  /**  ← Se llena cuando el instructor califica */
   evaluationCriteria?: Maybe<Scalars['Boolean']['output']>;
   evaluations?: Maybe<Evaluation>;
   id: Scalars['ID']['output'];
   instructorSignature?: Maybe<Scalars['String']['output']>;
+  /**  ← Se llena cuando el instructor califica */
   items?: Maybe<Array<Maybe<Item>>>;
+  qualifications?: Maybe<Array<Maybe<ChecklistQualification>>>;
   remarks?: Maybe<Scalars['String']['output']>;
   state?: Maybe<Scalars['Boolean']['output']>;
+  /**  ← Se llena cuando el instructor califica */
   studySheets?: Maybe<Scalars['String']['output']>;
   trainingProjectId?: Maybe<Scalars['Long']['output']>;
+  /**  ← Se llena cuando el instructor califica */
   trimester?: Maybe<Scalars['String']['output']>;
 };
 
+
+export type ChecklistQualificationsArgs = {
+  teamScrumId: Scalars['Long']['input'];
+};
+
+/**
+ * Input para crear checklist (Coordinador)
+ * Campos opcionales: instructorSignature, evaluationCriteria (se llenan al calificar)
+ */
 export type ChecklistDto = {
+  associatedJuries?: InputMaybe<Array<InputMaybe<Scalars['Long']['input']>>>;
   component?: InputMaybe<Scalars['String']['input']>;
-  dateAssigned: Scalars['String']['input'];
-  evaluationCriteria: Scalars['Boolean']['input'];
+  deletedItemIds?: InputMaybe<Array<InputMaybe<Scalars['Long']['input']>>>;
+  /**  ← NULL al crear, se llena al calificar */
+  evaluationCriteria?: InputMaybe<Scalars['Boolean']['input']>;
   evaluationId?: InputMaybe<Scalars['Long']['input']>;
   evaluations?: InputMaybe<Array<InputMaybe<EvaluationDto>>>;
-  instructorSignature: Scalars['String']['input'];
+  instructorSignature?: InputMaybe<Scalars['String']['input']>;
+  /**  ← NULL al crear, se llena al calificar */
   items?: InputMaybe<Array<InputMaybe<ItemDto>>>;
-  remarks: Scalars['String']['input'];
+  remarks?: InputMaybe<Scalars['String']['input']>;
   state: Scalars['Boolean']['input'];
+  /**  ← NULL al crear, se llena al calificar */
   studySheets?: InputMaybe<Scalars['String']['input']>;
   trainingProjectId?: InputMaybe<Scalars['Long']['input']>;
-  trainingProjectName?: InputMaybe<Scalars['String']['input']>;
+  /**  ← Opcional al crear, obligatorio al calificar */
   trimester: Scalars['String']['input'];
 };
 
@@ -234,6 +253,40 @@ export type ChecklistPage = {
 export type ChecklistPageId = {
   code?: Maybe<Scalars['String']['output']>;
   data?: Maybe<Checklist>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+};
+
+export type ChecklistQualification = {
+  checklistId?: Maybe<Scalars['Long']['output']>;
+  id: Scalars['ID']['output'];
+  itemId?: Maybe<Scalars['Long']['output']>;
+  observations?: Maybe<Scalars['String']['output']>;
+  qualificationState?: Maybe<Scalars['Boolean']['output']>;
+  teamScrumId?: Maybe<Scalars['Long']['output']>;
+};
+
+export type ChecklistQualificationDto = {
+  checklistId: Scalars['Long']['input'];
+  itemId: Scalars['Long']['input'];
+  observations?: InputMaybe<Scalars['String']['input']>;
+  qualificationState?: InputMaybe<Scalars['Boolean']['input']>;
+  teamScrumId: Scalars['Long']['input'];
+};
+
+export type ChecklistQualificationPage = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<ChecklistQualification>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ChecklistQualificationPageId = {
+  code?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<ChecklistQualification>;
   date?: Maybe<Scalars['String']['output']>;
   message?: Maybe<Scalars['String']['output']>;
 };
@@ -379,15 +432,23 @@ export type CommitteeInput = {
   teachersIds: Array<Scalars['Long']['input']>;
 };
 
+export type CommitteeListResponse = {
+  code?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<Array<Maybe<Committee>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+};
+
 export type CommitteeNoveltyObservationInput = {
-  observation: Scalars['String']['input'];
+  observation?: InputMaybe<Scalars['String']['input']>;
   studentId: Scalars['Long']['input'];
 };
 
 export type CommitteeNoveltyResponseInput = {
   name: Scalars['String']['input'];
   noveltyId: Scalars['ID']['input'];
-  observation: Scalars['String']['input'];
+  observation?: InputMaybe<Scalars['String']['input']>;
   statusId: Scalars['Long']['input'];
   studentId: Scalars['Long']['input'];
 };
@@ -569,13 +630,6 @@ export type DocumentTypeDto = {
   state?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
-/**
- * extend type Mutation {
- *     addChecklistQualification(input: ChecklistQualificationDto): Response
- *     updateChecklistQualification(id: Long!, input: ChecklistQualificationDto): Response
- *     deleteChecklistQualification(id: Long!): Response
- * }
- */
 export type EmailRequest = {
   email: Scalars['String']['input'];
   htmlContent: Scalars['String']['input'];
@@ -870,6 +924,7 @@ export enum ErrorType {
 export type Evaluation = {
   checklistId?: Maybe<Scalars['Long']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
+  isFinalized?: Maybe<Scalars['Boolean']['output']>;
   observations?: Maybe<Scalars['String']['output']>;
   recommendations?: Maybe<Scalars['String']['output']>;
   teamScrumId?: Maybe<Scalars['Long']['output']>;
@@ -878,6 +933,7 @@ export type Evaluation = {
 
 export type EvaluationDto = {
   checklistId?: InputMaybe<Scalars['Long']['input']>;
+  isFinalized?: InputMaybe<Scalars['Boolean']['input']>;
   observations?: InputMaybe<Scalars['String']['input']>;
   recommendations?: InputMaybe<Scalars['String']['input']>;
   teamScrumId?: InputMaybe<Scalars['Long']['input']>;
@@ -975,6 +1031,7 @@ export type Floor = {
 
 export type FloorDto = {
   environments?: InputMaybe<Array<InputMaybe<EnvironmentDto>>>;
+  headquarter?: InputMaybe<HeadquarterDto>;
   id?: InputMaybe<Scalars['ID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   state?: InputMaybe<Scalars['Boolean']['input']>;
@@ -991,34 +1048,45 @@ export type FloorPage = {
 };
 
 export type FollowUp = {
-  administrative?: Maybe<Administrative>;
   caseDescription?: Maybe<Scalars['String']['output']>;
   committeeEvent?: Maybe<CommitteeEvent>;
+  coordinator?: Maybe<Administrative>;
   creationDate?: Maybe<Scalars['String']['output']>;
   evidenceFiles?: Maybe<Scalars['String']['output']>;
   followUpFlowStatus?: Maybe<FollowUpFlowStatus>;
   followUpStatus?: Maybe<FollowUpStatus>;
   followUpType?: Maybe<FollowUpType>;
   id?: Maybe<Scalars['ID']['output']>;
+  /**  Added for frontend compatibility: improvementPlanFiles as an alias for evidenceFiles */
+  improvementPlanFiles?: Maybe<Scalars['String']['output']>;
   isActive?: Maybe<Scalars['Boolean']['output']>;
+  minute?: Maybe<Minute>;
   student?: Maybe<Student>;
-  studySheetId?: Maybe<Scalars['ID']['output']>;
+  studySheetId?: Maybe<Scalars['Long']['output']>;
   teacher?: Maybe<Teacher>;
 };
 
 export type FollowUpDto = {
   caseDescription?: InputMaybe<Scalars['String']['input']>;
   committeeEvent?: InputMaybe<CommitteeEventDto>;
-  coordinatorId?: InputMaybe<Scalars['ID']['input']>;
+  coordinatorId?: InputMaybe<Scalars['Long']['input']>;
+  creationDate?: InputMaybe<Scalars['String']['input']>;
   evidenceFiles?: InputMaybe<Scalars['String']['input']>;
   followUpFlowStatus?: InputMaybe<FollowUpFlowStatusDto>;
+  followUpFlowStatusId?: InputMaybe<Scalars['Long']['input']>;
   followUpStatus?: InputMaybe<FollowUpStatusDto>;
+  followUpStatusId?: InputMaybe<Scalars['Long']['input']>;
   followUpType?: InputMaybe<FollowUpTypeDto>;
+  /**  Added ID fields to allow clients to send relation IDs directly */
+  followUpTypeId?: InputMaybe<Scalars['Long']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
+  /**  Frontend may send or request improvementPlanFiles; map to entity.evidenceFiles */
+  improvementPlanFiles?: InputMaybe<Scalars['String']['input']>;
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
-  studentId?: InputMaybe<Scalars['ID']['input']>;
-  studySheetId?: InputMaybe<Scalars['ID']['input']>;
-  teacherId?: InputMaybe<Scalars['ID']['input']>;
+  minuteId?: InputMaybe<Scalars['Long']['input']>;
+  studentId?: InputMaybe<Scalars['Long']['input']>;
+  studySheetId?: InputMaybe<Scalars['Long']['input']>;
+  teacherId?: InputMaybe<Scalars['Long']['input']>;
 };
 
 export type FollowUpFlowStatus = {
@@ -1082,6 +1150,12 @@ export type FollowUpType = {
   name?: Maybe<Scalars['String']['output']>;
 };
 
+export type FollowUpTypeCount = {
+  count?: Maybe<Scalars['Int']['output']>;
+  followUpTypeName?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+};
+
 export type FollowUpTypeDto = {
   description?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
@@ -1099,13 +1173,18 @@ export type FollowUpTypePage = {
   totalPages?: Maybe<Scalars['Int']['output']>;
 };
 
+export type FollowUpTypecount = {
+  id?: Maybe<Scalars['ID']['output']>;
+  nameFollowUp?: Maybe<Scalars['String']['output']>;
+};
+
 export type Headquarter = {
   address?: Maybe<Scalars['String']['output']>;
   floors?: Maybe<Array<Maybe<Floor>>>;
   id?: Maybe<Scalars['ID']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   state?: Maybe<Scalars['Boolean']['output']>;
-  trainingCenter?: Maybe<TrainingCenter>;
+  trainingCenters?: Maybe<TrainingCenter>;
 };
 
 export type HeadquarterDto = {
@@ -1114,7 +1193,7 @@ export type HeadquarterDto = {
   id?: InputMaybe<Scalars['ID']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   state?: InputMaybe<Scalars['Boolean']['input']>;
-  trainingCenter?: InputMaybe<TrainingCenterDto>;
+  trainingCenters?: InputMaybe<TrainingCenterDto>;
 };
 
 export type HeadquarterPage = {
@@ -1128,30 +1207,42 @@ export type HeadquarterPage = {
 };
 
 export type ImprovementPlan = {
-  city: Scalars['String']['output'];
-  date: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  reason: Scalars['String']['output'];
-  state: Scalars['Boolean']['output'];
+  actNumber?: Maybe<Scalars['String']['output']>;
+  additionalJustification?: Maybe<Scalars['String']['output']>;
+  city?: Maybe<Scalars['String']['output']>;
+  date?: Maybe<Scalars['String']['output']>;
+  endTime?: Maybe<Scalars['String']['output']>;
+  faultType?: Maybe<ImprovementPlanFaultType>;
+  id?: Maybe<Scalars['ID']['output']>;
+  improvementPlanFile?: Maybe<Scalars['String']['output']>;
+  learningOutcome?: Maybe<LearningOutcome>;
+  place?: Maybe<Scalars['String']['output']>;
+  reason?: Maybe<Scalars['String']['output']>;
+  startTime?: Maybe<Scalars['String']['output']>;
+  state?: Maybe<Scalars['Boolean']['output']>;
   student?: Maybe<Student>;
   teacherCompetence?: Maybe<TeacherStudySheet>;
 };
 
 export type ImprovementPlanActivity = {
+  conclusions?: Maybe<Scalars['String']['output']>;
   deliveryDate?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  evidenceTypes?: Maybe<Array<Maybe<ImprovementPlanEvidenceType>>>;
   id: Scalars['ID']['output'];
   improvementPlan?: Maybe<ImprovementPlan>;
   improvementPlanDelivery?: Maybe<ImprovementPlanDelivery>;
-  learningOutcome?: Maybe<Scalars['Long']['output']>;
+  objectives?: Maybe<Scalars['String']['output']>;
 };
 
 export type ImprovementPlanActivityDto = {
+  conclusions?: InputMaybe<Scalars['String']['input']>;
   deliveryDate?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
+  evidenceTypes?: InputMaybe<Array<InputMaybe<ImprovementPlanEvidenceTypeDto>>>;
   improvementPlan?: InputMaybe<ImprovementPlanDto>;
   improvementPlanDelivery?: InputMaybe<ImprovementPlanDeliveryDto>;
-  learningOutcome?: InputMaybe<Scalars['Long']['input']>;
+  objectives?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ImprovementPlanActivityPage = {
@@ -1199,12 +1290,58 @@ export type ImprovementPlanDeliveryPageId = {
 };
 
 export type ImprovementPlanDto = {
-  city: Scalars['String']['input'];
-  date: Scalars['String']['input'];
-  reason: Scalars['String']['input'];
-  state: Scalars['Boolean']['input'];
-  studentId: Scalars['ID']['input'];
-  teacherCompetence: Scalars['ID']['input'];
+  actNumber?: InputMaybe<Scalars['String']['input']>;
+  additionalJustification?: InputMaybe<Scalars['String']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  date?: InputMaybe<Scalars['String']['input']>;
+  endTime?: InputMaybe<Scalars['String']['input']>;
+  faultType?: InputMaybe<ImprovementPlanFaultTypeDto>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  improvementPlanFile?: InputMaybe<Scalars['String']['input']>;
+  learningOutcome?: InputMaybe<Scalars['ID']['input']>;
+  place?: InputMaybe<Scalars['String']['input']>;
+  reason?: InputMaybe<Scalars['String']['input']>;
+  startTime?: InputMaybe<Scalars['String']['input']>;
+  state?: InputMaybe<Scalars['Boolean']['input']>;
+  studentId?: InputMaybe<Scalars['ID']['input']>;
+  teacherCompetence?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type ImprovementPlanEvaluation = {
+  authenticity?: Maybe<Scalars['Boolean']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  improvementPlan?: Maybe<ImprovementPlan>;
+  judgment?: Maybe<Scalars['Boolean']['output']>;
+  pertinence?: Maybe<Scalars['Boolean']['output']>;
+  quality?: Maybe<Scalars['Boolean']['output']>;
+  validity?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type ImprovementPlanEvaluationDto = {
+  authenticity?: InputMaybe<Scalars['Boolean']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  improvementPlan?: InputMaybe<ImprovementPlanDto>;
+  judgment?: InputMaybe<Scalars['Boolean']['input']>;
+  pertinence?: InputMaybe<Scalars['Boolean']['input']>;
+  quality?: InputMaybe<Scalars['Boolean']['input']>;
+  validity?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type ImprovementPlanEvaluationPage = {
+  code?: Maybe<Scalars['String']['output']>;
+  currentPage?: Maybe<Scalars['Int']['output']>;
+  data?: Maybe<Array<Maybe<ImprovementPlanEvaluation>>>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  totalItems?: Maybe<Scalars['Int']['output']>;
+  totalPages?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ImprovementPlanEvaluationPageId = {
+  code?: Maybe<Scalars['String']['output']>;
+  data?: Maybe<ImprovementPlanEvaluation>;
+  date?: Maybe<Scalars['String']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
 };
 
 export type ImprovementPlanEvidenceType = {
@@ -1213,7 +1350,8 @@ export type ImprovementPlanEvidenceType = {
 };
 
 export type ImprovementPlanEvidenceTypeDto = {
-  name: Scalars['String']['input'];
+  id?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ImprovementPlanEvidenceTypePage = {
@@ -1266,6 +1404,7 @@ export type ImprovementPlanPage = {
   data?: Maybe<Array<Maybe<ImprovementPlan>>>;
   date?: Maybe<Scalars['String']['output']>;
   message?: Maybe<Scalars['String']['output']>;
+  studySheet?: Maybe<StudySheet>;
   totalItems?: Maybe<Scalars['Int']['output']>;
   totalPages?: Maybe<Scalars['Int']['output']>;
 };
@@ -1278,19 +1417,19 @@ export type ImprovementPlanPageId = {
 };
 
 export type Item = {
+  active: Scalars['Boolean']['output'];
   code: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   indicator: Scalars['String']['output'];
   itemType?: Maybe<ItemType>;
-  state: Scalars['Boolean']['output'];
 };
 
 export type ItemDto = {
+  active?: InputMaybe<Scalars['Boolean']['input']>;
   code: Scalars['String']['input'];
   id?: InputMaybe<Scalars['ID']['input']>;
   indicator: Scalars['String']['input'];
-  itemType?: InputMaybe<ItemTypeDto>;
-  state?: InputMaybe<Scalars['Boolean']['input']>;
+  itemTypeId?: InputMaybe<Scalars['Long']['input']>;
 };
 
 export type ItemPageId = {
@@ -1568,6 +1707,7 @@ export type LearningOutcome = {
   competence?: Maybe<Competences>;
   description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
+  improvementPlans?: Maybe<Array<Maybe<ImprovementPlan>>>;
   name?: Maybe<Scalars['String']['output']>;
   state?: Maybe<Scalars['Boolean']['output']>;
 };
@@ -1595,6 +1735,7 @@ export type LoginRequestDto = {
   document: Scalars['Long']['input'];
   idDocumentType: Scalars['Long']['input'];
   password: Scalars['String']['input'];
+  projectName?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type LoginResponseDto = {
@@ -1698,6 +1839,7 @@ export type Mutation = {
   addImprovementPlan?: Maybe<Response>;
   addImprovementPlanActivity?: Maybe<Response>;
   addImprovementPlanDelivery?: Maybe<Response>;
+  addImprovementPlanEvaluation?: Maybe<Response>;
   addImprovementPlanEvidenceType?: Maybe<Response>;
   addImprovementPlanFaultType?: Maybe<Response>;
   addItem?: Maybe<ItemPageId>;
@@ -1760,6 +1902,7 @@ export type Mutation = {
   deleteAttendance?: Maybe<Response>;
   deleteChecklist?: Maybe<Response>;
   deleteChecklistHistory?: Maybe<Response>;
+  deleteChecklistQualification?: Maybe<Response>;
   deleteClassType?: Maybe<Response>;
   deleteCollaborator?: Maybe<Response>;
   deleteCommittee?: Maybe<Response>;
@@ -1783,6 +1926,7 @@ export type Mutation = {
   deleteImprovementPlan?: Maybe<Response>;
   deleteImprovementPlanActivity?: Maybe<Response>;
   deleteImprovementPlanDelivery?: Maybe<Response>;
+  deleteImprovementPlanEvaluation?: Maybe<Response>;
   deleteImprovementPlanEvidenceType?: Maybe<Response>;
   deleteImprovementPlanFaultType?: Maybe<Response>;
   deleteItem?: Maybe<ItemPageId>;
@@ -1836,16 +1980,24 @@ export type Mutation = {
   login?: Maybe<LoginResponseDto>;
   logout?: Maybe<LoginResponseDto>;
   refreshToken?: Maybe<LoginResponseDto>;
+  refreshTrainingProjectName?: Maybe<Response>;
   removePersonFromCommittee?: Maybe<Response>;
   respondNoveltiesFromCommittee?: Maybe<Response>;
+  returnFollowUp?: Maybe<Response>;
   returnNovelty?: Maybe<Response>;
-  /**  Guarda el acta final firmada en la base de datos */
+  /**
+   * Guarda el acta final firmada en la base de datos
+   * IMPORTANTE: El archivo debe ser un PDF en formato Base64
+   * Se acepta con o sin prefijo data URL (data:application/pdf;base64,)
+   */
   saveFinalMinute?: Maybe<Minute>;
+  saveOrUpdateChecklistQualification?: Maybe<Response>;
   sendCommitteeEventCreationEmail: CommitteeEmailResponse;
   sendMultipleHtmlEmail: EmailResponse;
   sendNotification?: Maybe<Scalars['String']['output']>;
   sendNoveltyCreationNotification: EmailResponse;
   sendNoveltyUpdateNotification: EmailResponse;
+  sendPendingFollowUpReminders?: Maybe<Response>;
   sendPendingNoveltyReminders?: Maybe<Response>;
   sendSingleHtmlEmail: EmailResponse;
   updateAdministrative?: Maybe<Response>;
@@ -1869,7 +2021,7 @@ export type Mutation = {
   updateEvaluation?: Maybe<Response>;
   updateExternal?: Maybe<Response>;
   updateFinalReport?: Maybe<Response>;
-  updateFollowUp?: Maybe<FollowUp>;
+  updateFollowUp?: Maybe<Response>;
   updateFollowUpFlowStatus?: Maybe<Response>;
   updateFollowUpStatus?: Maybe<Response>;
   updateFollowUpType?: Maybe<Response>;
@@ -1877,9 +2029,11 @@ export type Mutation = {
   updateImprovementPlan?: Maybe<Response>;
   updateImprovementPlanActivity?: Maybe<Response>;
   updateImprovementPlanDelivery?: Maybe<Response>;
+  updateImprovementPlanEvaluation?: Maybe<Response>;
   updateImprovementPlanEvidenceType?: Maybe<Response>;
   updateImprovementPlanFaultType?: Maybe<Response>;
   updateItem?: Maybe<ItemPageId>;
+  updateItemStatus?: Maybe<Response>;
   updateItemType?: Maybe<Response>;
   updateIteration?: Maybe<StringResponse>;
   updateJourney?: Maybe<Response>;
@@ -2093,6 +2247,11 @@ export type MutationAddImprovementPlanActivityArgs = {
 
 export type MutationAddImprovementPlanDeliveryArgs = {
   input?: InputMaybe<ImprovementPlanDeliveryDto>;
+};
+
+
+export type MutationAddImprovementPlanEvaluationArgs = {
+  input?: InputMaybe<ImprovementPlanEvaluationDto>;
 };
 
 
@@ -2414,6 +2573,11 @@ export type MutationDeleteChecklistHistoryArgs = {
 };
 
 
+export type MutationDeleteChecklistQualificationArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
 export type MutationDeleteClassTypeArgs = {
   id?: InputMaybe<Scalars['Long']['input']>;
 };
@@ -2525,6 +2689,11 @@ export type MutationDeleteImprovementPlanActivityArgs = {
 
 
 export type MutationDeleteImprovementPlanDeliveryArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
+export type MutationDeleteImprovementPlanEvaluationArgs = {
   id: Scalars['Long']['input'];
 };
 
@@ -2786,6 +2955,11 @@ export type MutationRefreshTokenArgs = {
 };
 
 
+export type MutationRefreshTrainingProjectNameArgs = {
+  checklistId: Scalars['Long']['input'];
+};
+
+
 export type MutationRemovePersonFromCommitteeArgs = {
   committeeId: Scalars['Long']['input'];
   personId: Scalars['Long']['input'];
@@ -2799,6 +2973,12 @@ export type MutationRespondNoveltiesFromCommitteeArgs = {
 };
 
 
+export type MutationReturnFollowUpArgs = {
+  id: Scalars['ID']['input'];
+  observation: Scalars['String']['input'];
+};
+
+
 export type MutationReturnNoveltyArgs = {
   id: Scalars['ID']['input'];
   observation: Scalars['String']['input'];
@@ -2808,6 +2988,11 @@ export type MutationReturnNoveltyArgs = {
 export type MutationSaveFinalMinuteArgs = {
   committeeEventId: Scalars['ID']['input'];
   fileContent: Scalars['String']['input'];
+};
+
+
+export type MutationSaveOrUpdateChecklistQualificationArgs = {
+  input?: InputMaybe<ChecklistQualificationDto>;
 };
 
 
@@ -3021,6 +3206,12 @@ export type MutationUpdateImprovementPlanDeliveryArgs = {
 };
 
 
+export type MutationUpdateImprovementPlanEvaluationArgs = {
+  id: Scalars['Long']['input'];
+  input?: InputMaybe<ImprovementPlanEvaluationDto>;
+};
+
+
 export type MutationUpdateImprovementPlanEvidenceTypeArgs = {
   id: Scalars['Long']['input'];
   input?: InputMaybe<ImprovementPlanEvidenceTypeDto>;
@@ -3036,6 +3227,12 @@ export type MutationUpdateImprovementPlanFaultTypeArgs = {
 export type MutationUpdateItemArgs = {
   id: Scalars['Long']['input'];
   item: ItemDto;
+};
+
+
+export type MutationUpdateItemStatusArgs = {
+  active: Scalars['Boolean']['input'];
+  itemId: Scalars['Long']['input'];
 };
 
 
@@ -3716,10 +3913,7 @@ export type ProcessMethodologyById = {
   message?: Maybe<Scalars['String']['output']>;
 };
 
-
-// TODO: This type was duplicated in generated.ts - renamed to avoid conflicts
-// The backend schema should be updated to avoid this duplicate
-export type ProcessMethodologyAssignmentDto = {
+export type ProcessMethodologyDto = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   isUnique?: InputMaybe<Scalars['Boolean']['input']>;
   profileId?: InputMaybe<Scalars['String']['input']>;
@@ -3955,6 +4149,7 @@ export type Query = {
   allChangeLogs?: Maybe<ChangeLogPage>;
   allChangeLogsList?: Maybe<ChangeLogPage>;
   allChecklistHistory?: Maybe<ChecklistHistoryPage>;
+  allChecklistQualifications?: Maybe<ChecklistQualificationPage>;
   allChecklists?: Maybe<ChecklistPage>;
   allClassType?: Maybe<ClassTypePage>;
   allClassTypeList?: Maybe<ClassTypePage>;
@@ -3990,6 +4185,7 @@ export type Query = {
   allHeadquartersList?: Maybe<HeadquarterPage>;
   allImprovementPlanActivities?: Maybe<ImprovementPlanActivityPage>;
   allImprovementPlanDeliveries?: Maybe<ImprovementPlanDeliveryPage>;
+  allImprovementPlanEvaluations?: Maybe<ImprovementPlanEvaluationPage>;
   allImprovementPlanEvidenceTypes?: Maybe<ImprovementPlanEvidenceTypePage>;
   allImprovementPlanFaultTypes?: Maybe<ImprovementPlanFaultTypePage>;
   allImprovementPlans?: Maybe<ImprovementPlanPage>;
@@ -4008,6 +4204,7 @@ export type Query = {
   allLearningActivities?: Maybe<LearningActivityPage>;
   allLearningActivitiesList?: Maybe<LearningActivityPage>;
   allLearningOutcomes?: Maybe<LearningOutcomePage>;
+  allLearningOutcomesByCompetence?: Maybe<LearningOutcomePage>;
   allLearningOutcomesList?: Maybe<LearningOutcomePage>;
   allMacroRegions?: Maybe<PageResponseMacroRegionDto>;
   allMacroRegionsList?: Maybe<PageResponseMacroRegionDto>;
@@ -4087,18 +4284,26 @@ export type Query = {
   checklistById?: Maybe<ChecklistPageId>;
   checklistHistoryById?: Maybe<ChecklistHistoryPageId>;
   checklistHistoryId?: Maybe<Array<Maybe<ChecklistHistory>>>;
+  checklistQualificationById?: Maybe<ChecklistQualificationPageId>;
+  checklistQualificationsByChecklist?: Maybe<Array<Maybe<ChecklistQualification>>>;
   committeeById?: Maybe<Committee>;
   committeeEventById?: Maybe<CommitteeEvent>;
-  committeesByStudentId?: Maybe<Array<Maybe<Committee>>>;
+  committeesByStudentId?: Maybe<CommitteeListResponse>;
   evaluationByChecklist?: Maybe<EvaluationPageId>;
+  evaluationByChecklistAndTeam?: Maybe<EvaluationPageId>;
   evaluationById?: Maybe<EvaluationPageId>;
   evaluationExistsForChecklist?: Maybe<EvaluationPageId>;
   evaluationsByChecklist?: Maybe<EvaluationPage>;
+  exportChecklistToExcel?: Maybe<Scalars['String']['output']>;
+  exportChecklistToPdf?: Maybe<Scalars['String']['output']>;
   finalReportById?: Maybe<FinalReportPageId>;
   followUpById?: Maybe<FollowUp>;
   followUpFlowStatusById?: Maybe<FollowUpFlowStatus>;
   followUpStatusById?: Maybe<FollowUpStatus>;
   followUpTypeById?: Maybe<FollowUpType>;
+  followUpsByCoordinator?: Maybe<FollowUpPage>;
+  followUpsByStudent?: Maybe<FollowUpPage>;
+  followUpsByTeacher?: Maybe<FollowUpPage>;
   generateFinalReport?: Maybe<FinalReportPageId>;
   /**  Genera el acta en formato DOCX y la retorna en Base64 (no se guarda en BD) */
   generateMinuteDocx?: Maybe<Scalars['String']['output']>;
@@ -4109,6 +4314,8 @@ export type Query = {
   improvementPlanActivityById?: Maybe<ImprovementPlanActivityPageId>;
   improvementPlanById?: Maybe<ImprovementPlanPageId>;
   improvementPlanDeliveryById?: Maybe<ImprovementPlanDeliveryPageId>;
+  improvementPlanEvaluationById?: Maybe<ImprovementPlanEvaluationPageId>;
+  improvementPlanEvaluationByImprovementPlanId?: Maybe<ImprovementPlanEvaluationPageId>;
   improvementPlanEvidenceTypeById?: Maybe<ImprovementPlanEvidenceTypePageId>;
   improvementPlanFaultTypeById?: Maybe<ImprovementPlanFaultTypePageId>;
   itemById?: Maybe<ItemPageId>;
@@ -4118,9 +4325,13 @@ export type Query = {
   justificationByStudentId?: Maybe<JustificationPage>;
   justificationStatusById?: Maybe<JustificationStatusPageId>;
   justificationTypeById?: Maybe<JustificationTypePageId>;
+  /**  Obtiene el acta guardada para un evento de comité específico */
+  minuteByCommitteeEventId?: Maybe<Minute>;
   minuteById?: Maybe<Minute>;
   /**  Obtiene un archivo de acta temporal en Base64 por nombre de archivo */
   minuteFileBase64?: Maybe<Scalars['String']['output']>;
+  /**  Obtiene el contenido Base64 del acta asociada a un evento (lee BD o genera on-demand) */
+  minuteFileBase64ByEventId?: Maybe<Scalars['String']['output']>;
   noveltyById?: Maybe<Novelty>;
   noveltyStatusById?: Maybe<NoveltyStatus>;
   personById?: Maybe<PersonById>;
@@ -4184,6 +4395,12 @@ export type QueryAllChangeLogsArgs = {
 
 
 export type QueryAllChecklistHistoryArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAllChecklistQualificationsArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -4353,12 +4570,19 @@ export type QueryAllHeadquartersArgs = {
 
 
 export type QueryAllImprovementPlanActivitiesArgs = {
+  id?: InputMaybe<Scalars['Long']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
 export type QueryAllImprovementPlanDeliveriesArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAllImprovementPlanEvaluationsArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -4377,8 +4601,13 @@ export type QueryAllImprovementPlanFaultTypesArgs = {
 
 
 export type QueryAllImprovementPlansArgs = {
+  id?: InputMaybe<Scalars['Long']['input']>;
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
+  studentId?: InputMaybe<Scalars['Long']['input']>;
+  studySheetId?: InputMaybe<Scalars['Long']['input']>;
+  teacherCompetence?: InputMaybe<Scalars['Long']['input']>;
+  teacherCompetenceIds?: InputMaybe<Array<InputMaybe<Scalars['Long']['input']>>>;
 };
 
 
@@ -4455,6 +4684,13 @@ export type QueryAllLearningOutcomesArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
   state?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type QueryAllLearningOutcomesByCompetenceArgs = {
+  competenceId?: InputMaybe<Scalars['Long']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -4795,6 +5031,17 @@ export type QueryChecklistHistoryIdArgs = {
 };
 
 
+export type QueryChecklistQualificationByIdArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
+export type QueryChecklistQualificationsByChecklistArgs = {
+  checklistId: Scalars['Long']['input'];
+  teamScrumId: Scalars['Long']['input'];
+};
+
+
 export type QueryCommitteeByIdArgs = {
   id: Scalars['ID']['input'];
 };
@@ -4815,6 +5062,12 @@ export type QueryEvaluationByChecklistArgs = {
 };
 
 
+export type QueryEvaluationByChecklistAndTeamArgs = {
+  checklistId: Scalars['Long']['input'];
+  teamScrumId: Scalars['Long']['input'];
+};
+
+
 export type QueryEvaluationByIdArgs = {
   id: Scalars['Long']['input'];
 };
@@ -4827,6 +5080,16 @@ export type QueryEvaluationExistsForChecklistArgs = {
 
 export type QueryEvaluationsByChecklistArgs = {
   checklistId: Scalars['Long']['input'];
+};
+
+
+export type QueryExportChecklistToExcelArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
+export type QueryExportChecklistToPdfArgs = {
+  id: Scalars['Long']['input'];
 };
 
 
@@ -4852,6 +5115,27 @@ export type QueryFollowUpStatusByIdArgs = {
 
 export type QueryFollowUpTypeByIdArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryFollowUpsByCoordinatorArgs = {
+  coordinatorId: Scalars['ID']['input'];
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryFollowUpsByStudentArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  studentId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryFollowUpsByTeacherArgs = {
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  teacherId: Scalars['ID']['input'];
 };
 
 
@@ -4894,6 +5178,16 @@ export type QueryImprovementPlanByIdArgs = {
 
 export type QueryImprovementPlanDeliveryByIdArgs = {
   id: Scalars['Long']['input'];
+};
+
+
+export type QueryImprovementPlanEvaluationByIdArgs = {
+  id: Scalars['Long']['input'];
+};
+
+
+export type QueryImprovementPlanEvaluationByImprovementPlanIdArgs = {
+  improvementPlanId: Scalars['Long']['input'];
 };
 
 
@@ -4944,6 +5238,11 @@ export type QueryJustificationTypeByIdArgs = {
 };
 
 
+export type QueryMinuteByCommitteeEventIdArgs = {
+  committeeEventId: Scalars['ID']['input'];
+};
+
+
 export type QueryMinuteByIdArgs = {
   id: Scalars['ID']['input'];
 };
@@ -4951,6 +5250,11 @@ export type QueryMinuteByIdArgs = {
 
 export type QueryMinuteFileBase64Args = {
   filename: Scalars['String']['input'];
+};
+
+
+export type QueryMinuteFileBase64ByEventIdArgs = {
+  committeeEventId: Scalars['ID']['input'];
 };
 
 
@@ -5008,8 +5312,8 @@ export type QueryWorkItemStateByIdArgs = {
 export type Region = {
   description?: Maybe<Scalars['String']['output']>;
   id?: Maybe<Scalars['ID']['output']>;
-  latitude?: Maybe<Scalars['Int']['output']>;
-  longitude?: Maybe<Scalars['Int']['output']>;
+  latitude?: Maybe<Scalars['Float']['output']>;
+  longitude?: Maybe<Scalars['Float']['output']>;
   macroRegion?: Maybe<MacroRegion>;
   name?: Maybe<Scalars['String']['output']>;
   state?: Maybe<Scalars['Boolean']['output']>;
@@ -5018,8 +5322,8 @@ export type Region = {
 export type RegionDto = {
   description?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
-  latitude?: InputMaybe<Scalars['Int']['input']>;
-  longitude?: InputMaybe<Scalars['Int']['input']>;
+  latitude?: InputMaybe<Scalars['Float']['input']>;
+  longitude?: InputMaybe<Scalars['Float']['input']>;
   macroRegion?: InputMaybe<MacroRegionDto>;
   name?: InputMaybe<Scalars['String']['input']>;
   state?: InputMaybe<Scalars['Boolean']['input']>;
@@ -5128,6 +5432,7 @@ export type StringResponse = {
 export type Student = {
   attendances?: Maybe<Array<Maybe<Attendance>>>;
   committees?: Maybe<Array<Maybe<Committee>>>;
+  followUps?: Maybe<Array<Maybe<FollowUp>>>;
   id?: Maybe<Scalars['ID']['output']>;
   improvementPlans?: Maybe<Array<Maybe<ImprovementPlan>>>;
   novelties?: Maybe<Array<Maybe<Novelty>>>;
@@ -5274,6 +5579,7 @@ export type Teacher = {
   collaborator?: Maybe<Collaborator>;
   committees?: Maybe<Array<Maybe<Committee>>>;
   coordinations?: Maybe<Array<Maybe<Coordination>>>;
+  followUps?: Maybe<Array<Maybe<FollowUp>>>;
   id?: Maybe<Scalars['ID']['output']>;
   novelties?: Maybe<Array<Maybe<Novelty>>>;
   state?: Maybe<Scalars['Boolean']['output']>;
@@ -5827,7 +6133,7 @@ export type GetAuthTokenMutationVariables = Exact<{
 }>;
 
 
-export type GetAuthTokenMutation = { getAuthToken?: { code?: string | null, message?: string | null, token?: string | null, user?: { id?: string | null, roles?: Array<{ name?: string | null } | null> | null, person?: { name?: string | null, photo?: string | null, lastname?: string | null } | null, processDetails?: Array<{ process?: { functionName?: string | null } | null } | null> | null } | null } | null };
+export type GetAuthTokenMutation = { getAuthToken?: { code?: string | null, message?: string | null, token?: string | null, user?: { id?: string | null, roles?: Array<{ name?: string | null } | null> | null, person?: { document?: string | null, name?: string | null, photo?: string | null, lastname?: string | null } | null, processDetails?: Array<{ process?: { functionName?: string | null } | null } | null> | null } | null } | null };
 
 export type UpdatePasswordMutationVariables = Exact<{
   input: UpdatePasswordInputDto;
@@ -5835,6 +6141,103 @@ export type UpdatePasswordMutationVariables = Exact<{
 
 
 export type UpdatePasswordMutation = { updatePassword?: { code?: string | null, message?: string | null } | null };
+
+export type GetAllChecklistsQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetAllChecklistsQuery = { allChecklists?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: string | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean, itemType?: { id: string, name?: string | null } | null } | null> | null } | null> | null } | null };
+
+export type GetChecklistByIdQueryVariables = Exact<{
+  id: Scalars['Long']['input'];
+}>;
+
+
+export type GetChecklistByIdQuery = { checklistById?: { code?: string | null, date?: string | null, message?: string | null, data?: { id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: string | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean, itemType?: { id: string, name?: string | null } | null } | null> | null, evaluations?: { id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null, associatedJuries?: Array<{ id: string } | null> | null } | null } | null };
+
+export type GetAllChecklistsCoordinatorQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetAllChecklistsCoordinatorQuery = { allChecklists?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: string | null, trainingProjectId?: any | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean, itemType?: { id: string, name?: string | null } | null } | null> | null } | null> | null } | null };
+
+export type GetChecklistByIdCoordinatorQueryVariables = Exact<{
+  id: Scalars['Long']['input'];
+}>;
+
+
+export type GetChecklistByIdCoordinatorQuery = { checklistById?: { code?: string | null, date?: string | null, message?: string | null, data?: { id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: string | null, trainingProjectId?: any | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean, itemType?: { id: string, name?: string | null } | null } | null> | null, evaluations?: { id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null, associatedJuries?: Array<{ id: string } | null> | null } | null } | null };
+
+export type GetAllChecklistsInstructorQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetAllChecklistsInstructorQuery = { allChecklists?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: string | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean, itemType?: { id: string, name?: string | null } | null } | null> | null, evaluations?: { id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null } | null> | null } | null };
+
+export type GetChecklistByIdInstructorQueryVariables = Exact<{
+  id: Scalars['Long']['input'];
+}>;
+
+
+export type GetChecklistByIdInstructorQuery = { checklistById?: { code?: string | null, date?: string | null, message?: string | null, data?: { id: string, state?: boolean | null, remarks?: string | null, instructorSignature?: string | null, evaluationCriteria?: boolean | null, trimester?: string | null, component?: string | null, studySheets?: string | null, items?: Array<{ id: string, code: string, indicator: string, active: boolean, itemType?: { id: string, name?: string | null } | null } | null> | null, evaluations?: { id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null, associatedJuries?: Array<{ id: string } | null> | null } | null } | null };
+
+export type AddChecklistMutationVariables = Exact<{
+  input: ChecklistDto;
+}>;
+
+
+export type AddChecklistMutation = { addChecklist?: { code?: string | null, message?: string | null, id?: any | null } | null };
+
+export type UpdateChecklistMutationVariables = Exact<{
+  id: Scalars['Long']['input'];
+  input: ChecklistDto;
+}>;
+
+
+export type UpdateChecklistMutation = { updateChecklist?: { code?: string | null, message?: string | null, id?: any | null } | null };
+
+export type DeleteChecklistMutationVariables = Exact<{
+  id: Scalars['Long']['input'];
+}>;
+
+
+export type DeleteChecklistMutation = { deleteChecklist?: { code?: string | null, message?: string | null, id?: any | null } | null };
+
+export type UpdateItemStatusMutationVariables = Exact<{
+  itemId: Scalars['Long']['input'];
+  active: Scalars['Boolean']['input'];
+}>;
+
+
+export type UpdateItemStatusMutation = { updateItemStatus?: { code?: string | null, message?: string | null } | null };
+
+export type SaveOrUpdateChecklistQualificationMutationVariables = Exact<{
+  input: ChecklistQualificationDto;
+}>;
+
+
+export type SaveOrUpdateChecklistQualificationMutation = { saveOrUpdateChecklistQualification?: { code?: string | null, message?: string | null, id?: any | null } | null };
+
+export type GetChecklistQualificationsByChecklistQueryVariables = Exact<{
+  checklistId: Scalars['Long']['input'];
+  teamScrumId: Scalars['Long']['input'];
+}>;
+
+
+export type GetChecklistQualificationsByChecklistQuery = { checklistQualificationsByChecklist?: Array<{ id: string, qualificationState?: boolean | null, observations?: string | null, itemId?: any | null, teamScrumId?: any | null, checklistId?: any | null } | null> | null };
+
+export type DeleteChecklistQualificationMutationVariables = Exact<{
+  id: Scalars['Long']['input'];
+}>;
+
+
+export type DeleteChecklistQualificationMutation = { deleteChecklistQualification?: { code?: string | null, message?: string | null, id?: any | null } | null };
 
 export type SendNotificationMutationVariables = Exact<{
   emailRequest: EmailRequest;
@@ -5849,14 +6252,14 @@ export type GetAllEvaluationsQueryVariables = Exact<{
 }>;
 
 
-export type GetAllEvaluationsQuery = { allEvaluations?: { code?: string | null, message?: string | null, date?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null> | null } | null };
+export type GetAllEvaluationsQuery = { allEvaluations?: { code?: string | null, message?: string | null, date?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null, isFinalized?: boolean | null } | null> | null } | null };
 
 export type GetEvaluationByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
 
 
-export type GetEvaluationByIdQuery = { evaluationById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null } | null };
+export type GetEvaluationByIdQuery = { evaluationById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null, isFinalized?: boolean | null } | null } | null };
 
 export type AddEvaluationMutationVariables = Exact<{
   input: EvaluationDto;
@@ -5885,7 +6288,15 @@ export type GetEvaluationsByChecklistQueryVariables = Exact<{
 }>;
 
 
-export type GetEvaluationsByChecklistQuery = { evaluationsByChecklist?: { code?: string | null, message?: string | null, date?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null } | null> | null } | null };
+export type GetEvaluationsByChecklistQuery = { evaluationsByChecklist?: { code?: string | null, message?: string | null, date?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null, teamScrumId?: any | null, isFinalized?: boolean | null } | null> | null } | null };
+
+export type GetEvaluationByChecklistAndTeamQueryVariables = Exact<{
+  checklistId: Scalars['Long']['input'];
+  teamScrumId: Scalars['Long']['input'];
+}>;
+
+
+export type GetEvaluationByChecklistAndTeamQuery = { evaluationByChecklistAndTeam?: { code?: string | null, message?: string | null, date?: string | null, data?: { id?: string | null, observations?: string | null, recommendations?: string | null, valueJudgment?: string | null, checklistId?: any | null, teamScrumId?: any | null, isFinalized?: boolean | null } | null } | null };
 
 export type GetAllFinalReportsQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -5928,6 +6339,97 @@ export type GenerateQrCodeMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GenerateQrCodeMutation = { generateQRCode?: { sessionId?: string | null, qrCodeBase64?: string | null, qrUrl?: string | null } | null };
+
+export type AllImprovementPlanActivitiesQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+  id?: InputMaybe<Scalars['Long']['input']>;
+}>;
+
+
+export type AllImprovementPlanActivitiesQuery = { allImprovementPlanActivities?: { data?: Array<{ id: string, description?: string | null, objectives?: string | null, conclusions?: string | null, deliveryDate?: string | null, evidenceTypes?: Array<{ id: string, name: string } | null> | null, improvementPlanDelivery?: { id: string, deliveryFormat?: string | null } | null, improvementPlan?: { id?: string | null } | null } | null> | null } | null };
+
+export type AddImprovementPlanActivityMutationVariables = Exact<{
+  input?: InputMaybe<ImprovementPlanActivityDto>;
+}>;
+
+
+export type AddImprovementPlanActivityMutation = { addImprovementPlanActivity?: { code?: string | null, message?: string | null } | null };
+
+export type AllImprovementPlanEvidenceTypesQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type AllImprovementPlanEvidenceTypesQuery = { allImprovementPlanEvidenceTypes?: { data?: Array<{ id: string, name: string } | null> | null } | null };
+
+export type AllImprovementPlanDeliveriesQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type AllImprovementPlanDeliveriesQuery = { allImprovementPlanDeliveries?: { data?: Array<{ id: string, deliveryFormat?: string | null } | null> | null } | null };
+
+export type UpdateImprovementPlanActivityMutationVariables = Exact<{
+  id: Scalars['Long']['input'];
+  input?: InputMaybe<ImprovementPlanActivityDto>;
+}>;
+
+
+export type UpdateImprovementPlanActivityMutation = { updateImprovementPlanActivity?: { code?: string | null, message?: string | null } | null };
+
+export type DeleteImprovementPlanActivityMutationVariables = Exact<{
+  id: Scalars['Long']['input'];
+}>;
+
+
+export type DeleteImprovementPlanActivityMutation = { deleteImprovementPlanActivity?: { code?: string | null, message?: string | null } | null };
+
+export type AllImprovementPlanEvaluationsQueryVariables = Exact<{
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type AllImprovementPlanEvaluationsQuery = { allImprovementPlanEvaluations?: { code?: string | null, message?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id?: string | null, pertinence?: boolean | null, validity?: boolean | null, authenticity?: boolean | null, quality?: boolean | null, judgment?: boolean | null } | null> | null } | null };
+
+export type ImprovementPlanEvaluationByIdQueryVariables = Exact<{
+  id: Scalars['Long']['input'];
+}>;
+
+
+export type ImprovementPlanEvaluationByIdQuery = { improvementPlanEvaluationById?: { code?: string | null, message?: string | null, data?: { id?: string | null, pertinence?: boolean | null, validity?: boolean | null, authenticity?: boolean | null, quality?: boolean | null, judgment?: boolean | null } | null } | null };
+
+export type ImprovementPlanEvaluationByImprovementPlanIdQueryVariables = Exact<{
+  improvementPlanId: Scalars['Long']['input'];
+}>;
+
+
+export type ImprovementPlanEvaluationByImprovementPlanIdQuery = { improvementPlanEvaluationByImprovementPlanId?: { code?: string | null, message?: string | null, data?: { id?: string | null, pertinence?: boolean | null, validity?: boolean | null, authenticity?: boolean | null, quality?: boolean | null, judgment?: boolean | null } | null } | null };
+
+export type AddImprovementPlanEvaluationMutationVariables = Exact<{
+  input?: InputMaybe<ImprovementPlanEvaluationDto>;
+}>;
+
+
+export type AddImprovementPlanEvaluationMutation = { addImprovementPlanEvaluation?: { code?: string | null, message?: string | null } | null };
+
+export type UpdateImprovementPlanEvaluationMutationVariables = Exact<{
+  id: Scalars['Long']['input'];
+  input?: InputMaybe<ImprovementPlanEvaluationDto>;
+}>;
+
+
+export type UpdateImprovementPlanEvaluationMutation = { updateImprovementPlanEvaluation?: { code?: string | null, message?: string | null } | null };
+
+export type DeleteImprovementPlanEvaluationMutationVariables = Exact<{
+  id: Scalars['Long']['input'];
+}>;
+
+
+export type DeleteImprovementPlanEvaluationMutation = { deleteImprovementPlanEvaluation?: { code?: string | null, message?: string | null } | null };
 
 export type GetAllImprovementPlanFaultTypesQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -5977,21 +6479,21 @@ export type GetAllImprovementPlansQueryVariables = Exact<{
 }>;
 
 
-export type GetAllImprovementPlansQuery = { allImprovementPlans?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, city: string, date: string, reason: string, state: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
+export type GetAllImprovementPlansQuery = { allImprovementPlans?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id?: string | null, actNumber?: string | null, city?: string | null, date?: string | null, startTime?: string | null, endTime?: string | null, place?: string | null, reason?: string | null, state?: boolean | null, additionalJustification?: string | null, improvementPlanFile?: string | null, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null, learningOutcome?: { id?: string | null } | null, faultType?: { id?: string | null, name?: string | null } | null } | null> | null } | null };
 
 export type GetImprovementPlanByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
 
 
-export type GetImprovementPlanByIdQuery = { improvementPlanById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id: string, city: string, date: string, reason: string, state: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null } | null };
+export type GetImprovementPlanByIdQuery = { improvementPlanById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id?: string | null, actNumber?: string | null, city?: string | null, date?: string | null, startTime?: string | null, endTime?: string | null, place?: string | null, reason?: string | null, state?: boolean | null, additionalJustification?: string | null, improvementPlanFile?: string | null, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null, learningOutcome?: { id?: string | null } | null, faultType?: { id?: string | null, name?: string | null } | null } | null } | null };
 
 export type AddImprovementPlanMutationVariables = Exact<{
   input: ImprovementPlanDto;
 }>;
 
 
-export type AddImprovementPlanMutation = { addImprovementPlan?: { code?: string | null, message?: string | null } | null };
+export type AddImprovementPlanMutation = { addImprovementPlan?: { id?: any | null, code?: string | null, message?: string | null } | null };
 
 export type UpdateImprovementPlanMutationVariables = Exact<{
   id: Scalars['Long']['input'];
@@ -6007,6 +6509,24 @@ export type DeleteImprovementPlanMutationVariables = Exact<{
 
 
 export type DeleteImprovementPlanMutation = { deleteImprovementPlan?: { code?: string | null, message?: string | null } | null };
+
+export type GetImprovementPlansByStudentQueryVariables = Exact<{
+  studentId: Scalars['Long']['input'];
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetImprovementPlansByStudentQuery = { allImprovementPlans?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id?: string | null, actNumber?: string | null, city?: string | null, date?: string | null, startTime?: string | null, endTime?: string | null, place?: string | null, reason?: string | null, state?: boolean | null, additionalJustification?: string | null, improvementPlanFile?: string | null, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null, learningOutcome?: { id?: string | null } | null, faultType?: { id?: string | null, name?: string | null } | null } | null> | null } | null };
+
+export type CheckStudentHasActivePlanQueryVariables = Exact<{
+  studentId: Scalars['ID']['input'];
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type CheckStudentHasActivePlanQuery = { allImprovementPlans?: { data?: Array<{ id?: string | null, state?: boolean | null, student?: { id?: string | null } | null } | null> | null } | null };
 
 export type GetAllJustificationStatusQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -6187,7 +6707,7 @@ export type GetStudySheetsQueryVariables = Exact<{
 }>;
 
 
-export type GetStudySheetsQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, numberStudents?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, offer?: { name?: string | null } | null, journey?: { name?: string | null } | null, quarter?: Array<{ name?: { extension?: string | null, number?: number | null } | null } | null> | null, trainingProject?: { name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
+export type GetStudySheetsQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, numberStudents?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, offer?: { name?: string | null } | null, journey?: { name?: string | null } | null, quarter?: Array<{ name?: { extension?: string | null, number?: number | null } | null } | null> | null, trainingProject?: { id?: string | null, name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
 
 export type GetStudySheetsByTrainingProjectQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
@@ -6202,7 +6722,7 @@ export type GetStudySheetWithTeamScrumByIdQueryVariables = Exact<{
 }>;
 
 
-export type GetStudySheetWithTeamScrumByIdQuery = { studySheetById?: { data?: { id?: string | null, number?: number | null, teamsScrum?: Array<{ id?: string | null, teamName?: string | null, projectName?: string | null, processMethodology?: { id?: string | null, name?: string | null } | null, students?: Array<{ id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null, email?: string | null } | null, profiles?: Array<{ name?: string | null, description?: string | null, isActive?: boolean | null, isUnique?: boolean | null } | null> | null } | null> | null } | null> | null } | null } | null };
+export type GetStudySheetWithTeamScrumByIdQuery = { studySheetById?: { data?: { id?: string | null, number?: number | null, startLective?: string | null, endLective?: string | null, journey?: { id?: string | null, name?: string | null } | null, trainingProject?: { id?: string | null, name?: string | null, program?: { id?: string | null, name?: string | null } | null } | null, teamsScrum?: Array<{ id?: string | null, teamName?: string | null, projectName?: string | null, processMethodology?: { id?: string | null, name?: string | null } | null, students?: Array<{ id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null, email?: string | null } | null, profiles?: Array<{ name?: string | null, description?: string | null, isActive?: boolean | null, isUnique?: boolean | null } | null> | null } | null> | null } | null> | null } | null } | null };
 
 export type GetStudySheetByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
@@ -6218,7 +6738,7 @@ export type StudySheetByTeacherQueryVariables = Exact<{
 }>;
 
 
-export type StudySheetByTeacherQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, journey?: { name?: string | null } | null, trainingProject?: { name?: string | null, program?: { name?: string | null } | null } | null, teacherStudySheets?: Array<{ id?: string | null, competence?: { id?: string | null, name?: string | null, learningOutcome?: Array<{ name?: string | null, description?: string | null } | null> | null } | null } | null> | null, studentStudySheets?: Array<{ student?: { id?: string | null, person?: { document?: string | null, name?: string | null, lastname?: string | null, phone?: string | null, email?: string | null, bloodType?: string | null, dateBirth?: string | null } | null } | null, studentStudySheetState?: { name?: string | null } | null } | null> | null } | null> | null } | null };
+export type StudySheetByTeacherQuery = { allStudySheets?: { date?: string | null, code?: string | null, message?: string | null, currentPage?: number | null, totalPages?: number | null, totalItems?: number | null, data?: Array<{ id?: string | null, number?: number | null, startLective?: string | null, endLective?: string | null, state?: boolean | null, journey?: { name?: string | null } | null, trainingProject?: { name?: string | null, program?: { name?: string | null } | null } | null, teacherStudySheets?: Array<{ id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null> | null, studentStudySheets?: Array<{ student?: { id?: string | null, person?: { document?: string | null, name?: string | null, lastname?: string | null, phone?: string | null, email?: string | null, bloodType?: string | null, dateBirth?: string | null } | null } | null, studentStudySheetState?: { name?: string | null } | null } | null> | null } | null> | null } | null };
 
 export type GetStudySheetWithStudentsQueryVariables = Exact<{
   id: Scalars['Long']['input'];
@@ -6234,6 +6754,15 @@ export type GetTeacherCompetenceByStudySheetsQueryVariables = Exact<{
 
 
 export type GetTeacherCompetenceByStudySheetsQuery = { studySheetById?: { code?: string | null, message?: string | null, data?: { id?: string | null, teacherStudySheets?: Array<{ id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null> | null } | null } | null };
+
+export type GetLearningOutcomesByCompetenceQueryVariables = Exact<{
+  idCompetence?: InputMaybe<Scalars['Long']['input']>;
+  page?: InputMaybe<Scalars['Int']['input']>;
+  size?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetLearningOutcomesByCompetenceQuery = { allLearningOutcomes?: { code?: string | null, message?: string | null, data?: Array<{ id?: string | null, name?: string | null, description?: string | null, code?: number | null } | null> | null } | null };
 
 export type StudySheetByTeacherIdWithTeamScrumQueryVariables = Exact<{
   idTeacher?: InputMaybe<Scalars['Long']['input']>;
@@ -7331,6 +7860,7 @@ export const GetAuthTokenDocument = gql`
         name
       }
       person {
+        document
         name
         photo
         lastname
@@ -7404,6 +7934,689 @@ export function useUpdatePasswordMutation(baseOptions?: Apollo.MutationHookOptio
 export type UpdatePasswordMutationHookResult = ReturnType<typeof useUpdatePasswordMutation>;
 export type UpdatePasswordMutationResult = Apollo.MutationResult<UpdatePasswordMutation>;
 export type UpdatePasswordMutationOptions = Apollo.BaseMutationOptions<UpdatePasswordMutation, UpdatePasswordMutationVariables>;
+export const GetAllChecklistsDocument = gql`
+    query GetAllChecklists($page: Int, $size: Int) {
+  allChecklists(page: $page, size: $size) {
+    date
+    code
+    message
+    currentPage
+    totalPages
+    totalItems
+    data {
+      id
+      state
+      remarks
+      instructorSignature
+      evaluationCriteria
+      trimester
+      component
+      studySheets
+      items {
+        id
+        code
+        indicator
+        active
+        itemType {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAllChecklistsQuery__
+ *
+ * To run a query within a React component, call `useGetAllChecklistsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllChecklistsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllChecklistsQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useGetAllChecklistsQuery(baseOptions?: Apollo.QueryHookOptions<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>(GetAllChecklistsDocument, options);
+}
+export function useGetAllChecklistsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>(GetAllChecklistsDocument, options);
+}
+export function useGetAllChecklistsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>(GetAllChecklistsDocument, options);
+}
+export type GetAllChecklistsQueryHookResult = ReturnType<typeof useGetAllChecklistsQuery>;
+export type GetAllChecklistsLazyQueryHookResult = ReturnType<typeof useGetAllChecklistsLazyQuery>;
+export type GetAllChecklistsSuspenseQueryHookResult = ReturnType<typeof useGetAllChecklistsSuspenseQuery>;
+export type GetAllChecklistsQueryResult = Apollo.QueryResult<GetAllChecklistsQuery, GetAllChecklistsQueryVariables>;
+export const GetChecklistByIdDocument = gql`
+    query GetChecklistById($id: Long!) {
+  checklistById(id: $id) {
+    code
+    date
+    message
+    data {
+      id
+      state
+      remarks
+      instructorSignature
+      evaluationCriteria
+      trimester
+      component
+      studySheets
+      items {
+        id
+        code
+        indicator
+        active
+        itemType {
+          id
+          name
+        }
+      }
+      evaluations {
+        id
+        observations
+        recommendations
+        valueJudgment
+        checklistId
+      }
+      associatedJuries {
+        id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetChecklistByIdQuery__
+ *
+ * To run a query within a React component, call `useGetChecklistByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetChecklistByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetChecklistByIdQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetChecklistByIdQuery(baseOptions: Apollo.QueryHookOptions<GetChecklistByIdQuery, GetChecklistByIdQueryVariables> & ({ variables: GetChecklistByIdQueryVariables; skip?: boolean; } | { skip: boolean; })) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>(GetChecklistByIdDocument, options);
+}
+export function useGetChecklistByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>(GetChecklistByIdDocument, options);
+}
+export function useGetChecklistByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>(GetChecklistByIdDocument, options);
+}
+export type GetChecklistByIdQueryHookResult = ReturnType<typeof useGetChecklistByIdQuery>;
+export type GetChecklistByIdLazyQueryHookResult = ReturnType<typeof useGetChecklistByIdLazyQuery>;
+export type GetChecklistByIdSuspenseQueryHookResult = ReturnType<typeof useGetChecklistByIdSuspenseQuery>;
+export type GetChecklistByIdQueryResult = Apollo.QueryResult<GetChecklistByIdQuery, GetChecklistByIdQueryVariables>;
+export const GetAllChecklistsCoordinatorDocument = gql`
+    query GetAllChecklistsCoordinator($page: Int, $size: Int) {
+  allChecklists(page: $page, size: $size) {
+    date
+    code
+    message
+    currentPage
+    totalPages
+    totalItems
+    data {
+      id
+      state
+      remarks
+      instructorSignature
+      evaluationCriteria
+      trimester
+      component
+      studySheets
+      trainingProjectId
+      items {
+        id
+        code
+        indicator
+        active
+        itemType {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAllChecklistsCoordinatorQuery__
+ *
+ * To run a query within a React component, call `useGetAllChecklistsCoordinatorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllChecklistsCoordinatorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllChecklistsCoordinatorQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useGetAllChecklistsCoordinatorQuery(baseOptions?: Apollo.QueryHookOptions<GetAllChecklistsCoordinatorQuery, GetAllChecklistsCoordinatorQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetAllChecklistsCoordinatorQuery, GetAllChecklistsCoordinatorQueryVariables>(GetAllChecklistsCoordinatorDocument, options);
+}
+export function useGetAllChecklistsCoordinatorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllChecklistsCoordinatorQuery, GetAllChecklistsCoordinatorQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetAllChecklistsCoordinatorQuery, GetAllChecklistsCoordinatorQueryVariables>(GetAllChecklistsCoordinatorDocument, options);
+}
+export function useGetAllChecklistsCoordinatorSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllChecklistsCoordinatorQuery, GetAllChecklistsCoordinatorQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<GetAllChecklistsCoordinatorQuery, GetAllChecklistsCoordinatorQueryVariables>(GetAllChecklistsCoordinatorDocument, options);
+}
+export type GetAllChecklistsCoordinatorQueryHookResult = ReturnType<typeof useGetAllChecklistsCoordinatorQuery>;
+export type GetAllChecklistsCoordinatorLazyQueryHookResult = ReturnType<typeof useGetAllChecklistsCoordinatorLazyQuery>;
+export type GetAllChecklistsCoordinatorSuspenseQueryHookResult = ReturnType<typeof useGetAllChecklistsCoordinatorSuspenseQuery>;
+export type GetAllChecklistsCoordinatorQueryResult = Apollo.QueryResult<GetAllChecklistsCoordinatorQuery, GetAllChecklistsCoordinatorQueryVariables>;
+export const GetChecklistByIdCoordinatorDocument = gql`
+    query GetChecklistByIdCoordinator($id: Long!) {
+  checklistById(id: $id) {
+    code
+    date
+    message
+    data {
+      id
+      state
+      remarks
+      instructorSignature
+      evaluationCriteria
+      trimester
+      component
+      studySheets
+      trainingProjectId
+      items {
+        id
+        code
+        indicator
+        active
+        itemType {
+          id
+          name
+        }
+      }
+      evaluations {
+        id
+        observations
+        recommendations
+        valueJudgment
+        checklistId
+      }
+      associatedJuries {
+        id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetChecklistByIdCoordinatorQuery__
+ *
+ * To run a query within a React component, call `useGetChecklistByIdCoordinatorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetChecklistByIdCoordinatorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetChecklistByIdCoordinatorQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetChecklistByIdCoordinatorQuery(baseOptions: Apollo.QueryHookOptions<GetChecklistByIdCoordinatorQuery, GetChecklistByIdCoordinatorQueryVariables> & ({ variables: GetChecklistByIdCoordinatorQueryVariables; skip?: boolean; } | { skip: boolean; })) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetChecklistByIdCoordinatorQuery, GetChecklistByIdCoordinatorQueryVariables>(GetChecklistByIdCoordinatorDocument, options);
+}
+export function useGetChecklistByIdCoordinatorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetChecklistByIdCoordinatorQuery, GetChecklistByIdCoordinatorQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetChecklistByIdCoordinatorQuery, GetChecklistByIdCoordinatorQueryVariables>(GetChecklistByIdCoordinatorDocument, options);
+}
+export function useGetChecklistByIdCoordinatorSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetChecklistByIdCoordinatorQuery, GetChecklistByIdCoordinatorQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<GetChecklistByIdCoordinatorQuery, GetChecklistByIdCoordinatorQueryVariables>(GetChecklistByIdCoordinatorDocument, options);
+}
+export type GetChecklistByIdCoordinatorQueryHookResult = ReturnType<typeof useGetChecklistByIdCoordinatorQuery>;
+export type GetChecklistByIdCoordinatorLazyQueryHookResult = ReturnType<typeof useGetChecklistByIdCoordinatorLazyQuery>;
+export type GetChecklistByIdCoordinatorSuspenseQueryHookResult = ReturnType<typeof useGetChecklistByIdCoordinatorSuspenseQuery>;
+export type GetChecklistByIdCoordinatorQueryResult = Apollo.QueryResult<GetChecklistByIdCoordinatorQuery, GetChecklistByIdCoordinatorQueryVariables>;
+export const GetAllChecklistsInstructorDocument = gql`
+    query GetAllChecklistsInstructor($page: Int, $size: Int) {
+  allChecklists(page: $page, size: $size) {
+    date
+    code
+    message
+    currentPage
+    totalPages
+    totalItems
+    data {
+      id
+      state
+      remarks
+      instructorSignature
+      evaluationCriteria
+      trimester
+      component
+      studySheets
+      items {
+        id
+        code
+        indicator
+        active
+        itemType {
+          id
+          name
+        }
+      }
+      evaluations {
+        id
+        observations
+        recommendations
+        valueJudgment
+        checklistId
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAllChecklistsInstructorQuery__
+ *
+ * To run a query within a React component, call `useGetAllChecklistsInstructorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllChecklistsInstructorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllChecklistsInstructorQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useGetAllChecklistsInstructorQuery(baseOptions?: Apollo.QueryHookOptions<GetAllChecklistsInstructorQuery, GetAllChecklistsInstructorQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetAllChecklistsInstructorQuery, GetAllChecklistsInstructorQueryVariables>(GetAllChecklistsInstructorDocument, options);
+}
+export function useGetAllChecklistsInstructorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllChecklistsInstructorQuery, GetAllChecklistsInstructorQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetAllChecklistsInstructorQuery, GetAllChecklistsInstructorQueryVariables>(GetAllChecklistsInstructorDocument, options);
+}
+export function useGetAllChecklistsInstructorSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllChecklistsInstructorQuery, GetAllChecklistsInstructorQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<GetAllChecklistsInstructorQuery, GetAllChecklistsInstructorQueryVariables>(GetAllChecklistsInstructorDocument, options);
+}
+export type GetAllChecklistsInstructorQueryHookResult = ReturnType<typeof useGetAllChecklistsInstructorQuery>;
+export type GetAllChecklistsInstructorLazyQueryHookResult = ReturnType<typeof useGetAllChecklistsInstructorLazyQuery>;
+export type GetAllChecklistsInstructorSuspenseQueryHookResult = ReturnType<typeof useGetAllChecklistsInstructorSuspenseQuery>;
+export type GetAllChecklistsInstructorQueryResult = Apollo.QueryResult<GetAllChecklistsInstructorQuery, GetAllChecklistsInstructorQueryVariables>;
+export const GetChecklistByIdInstructorDocument = gql`
+    query GetChecklistByIdInstructor($id: Long!) {
+  checklistById(id: $id) {
+    code
+    date
+    message
+    data {
+      id
+      state
+      remarks
+      instructorSignature
+      evaluationCriteria
+      trimester
+      component
+      studySheets
+      items {
+        id
+        code
+        indicator
+        active
+        itemType {
+          id
+          name
+        }
+      }
+      evaluations {
+        id
+        observations
+        recommendations
+        valueJudgment
+        checklistId
+      }
+      associatedJuries {
+        id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetChecklistByIdInstructorQuery__
+ *
+ * To run a query within a React component, call `useGetChecklistByIdInstructorQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetChecklistByIdInstructorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetChecklistByIdInstructorQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetChecklistByIdInstructorQuery(baseOptions: Apollo.QueryHookOptions<GetChecklistByIdInstructorQuery, GetChecklistByIdInstructorQueryVariables> & ({ variables: GetChecklistByIdInstructorQueryVariables; skip?: boolean; } | { skip: boolean; })) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetChecklistByIdInstructorQuery, GetChecklistByIdInstructorQueryVariables>(GetChecklistByIdInstructorDocument, options);
+}
+export function useGetChecklistByIdInstructorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetChecklistByIdInstructorQuery, GetChecklistByIdInstructorQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetChecklistByIdInstructorQuery, GetChecklistByIdInstructorQueryVariables>(GetChecklistByIdInstructorDocument, options);
+}
+export function useGetChecklistByIdInstructorSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetChecklistByIdInstructorQuery, GetChecklistByIdInstructorQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<GetChecklistByIdInstructorQuery, GetChecklistByIdInstructorQueryVariables>(GetChecklistByIdInstructorDocument, options);
+}
+export type GetChecklistByIdInstructorQueryHookResult = ReturnType<typeof useGetChecklistByIdInstructorQuery>;
+export type GetChecklistByIdInstructorLazyQueryHookResult = ReturnType<typeof useGetChecklistByIdInstructorLazyQuery>;
+export type GetChecklistByIdInstructorSuspenseQueryHookResult = ReturnType<typeof useGetChecklistByIdInstructorSuspenseQuery>;
+export type GetChecklistByIdInstructorQueryResult = Apollo.QueryResult<GetChecklistByIdInstructorQuery, GetChecklistByIdInstructorQueryVariables>;
+export const AddChecklistDocument = gql`
+    mutation AddChecklist($input: ChecklistDto!) {
+  addChecklist(input: $input) {
+    code
+    message
+    id
+  }
+}
+    `;
+export type AddChecklistMutationFn = Apollo.MutationFunction<AddChecklistMutation, AddChecklistMutationVariables>;
+
+/**
+ * __useAddChecklistMutation__
+ *
+ * To run a mutation, you first call `useAddChecklistMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddChecklistMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addChecklistMutation, { data, loading, error }] = useAddChecklistMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAddChecklistMutation(baseOptions?: Apollo.MutationHookOptions<AddChecklistMutation, AddChecklistMutationVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<AddChecklistMutation, AddChecklistMutationVariables>(AddChecklistDocument, options);
+}
+export type AddChecklistMutationHookResult = ReturnType<typeof useAddChecklistMutation>;
+export type AddChecklistMutationResult = Apollo.MutationResult<AddChecklistMutation>;
+export type AddChecklistMutationOptions = Apollo.BaseMutationOptions<AddChecklistMutation, AddChecklistMutationVariables>;
+export const UpdateChecklistDocument = gql`
+    mutation UpdateChecklist($id: Long!, $input: ChecklistDto!) {
+  updateChecklist(id: $id, input: $input) {
+    code
+    message
+    id
+  }
+}
+    `;
+export type UpdateChecklistMutationFn = Apollo.MutationFunction<UpdateChecklistMutation, UpdateChecklistMutationVariables>;
+
+/**
+ * __useUpdateChecklistMutation__
+ *
+ * To run a mutation, you first call `useUpdateChecklistMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateChecklistMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateChecklistMutation, { data, loading, error }] = useUpdateChecklistMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateChecklistMutation(baseOptions?: Apollo.MutationHookOptions<UpdateChecklistMutation, UpdateChecklistMutationVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<UpdateChecklistMutation, UpdateChecklistMutationVariables>(UpdateChecklistDocument, options);
+}
+export type UpdateChecklistMutationHookResult = ReturnType<typeof useUpdateChecklistMutation>;
+export type UpdateChecklistMutationResult = Apollo.MutationResult<UpdateChecklistMutation>;
+export type UpdateChecklistMutationOptions = Apollo.BaseMutationOptions<UpdateChecklistMutation, UpdateChecklistMutationVariables>;
+export const DeleteChecklistDocument = gql`
+    mutation DeleteChecklist($id: Long!) {
+  deleteChecklist(id: $id) {
+    code
+    message
+    id
+  }
+}
+    `;
+export type DeleteChecklistMutationFn = Apollo.MutationFunction<DeleteChecklistMutation, DeleteChecklistMutationVariables>;
+
+/**
+ * __useDeleteChecklistMutation__
+ *
+ * To run a mutation, you first call `useDeleteChecklistMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteChecklistMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteChecklistMutation, { data, loading, error }] = useDeleteChecklistMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteChecklistMutation(baseOptions?: Apollo.MutationHookOptions<DeleteChecklistMutation, DeleteChecklistMutationVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<DeleteChecklistMutation, DeleteChecklistMutationVariables>(DeleteChecklistDocument, options);
+}
+export type DeleteChecklistMutationHookResult = ReturnType<typeof useDeleteChecklistMutation>;
+export type DeleteChecklistMutationResult = Apollo.MutationResult<DeleteChecklistMutation>;
+export type DeleteChecklistMutationOptions = Apollo.BaseMutationOptions<DeleteChecklistMutation, DeleteChecklistMutationVariables>;
+export const UpdateItemStatusDocument = gql`
+    mutation UpdateItemStatus($itemId: Long!, $active: Boolean!) {
+  updateItemStatus(itemId: $itemId, active: $active) {
+    code
+    message
+  }
+}
+    `;
+export type UpdateItemStatusMutationFn = Apollo.MutationFunction<UpdateItemStatusMutation, UpdateItemStatusMutationVariables>;
+
+/**
+ * __useUpdateItemStatusMutation__
+ *
+ * To run a mutation, you first call `useUpdateItemStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateItemStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateItemStatusMutation, { data, loading, error }] = useUpdateItemStatusMutation({
+ *   variables: {
+ *      itemId: // value for 'itemId'
+ *      active: // value for 'active'
+ *   },
+ * });
+ */
+export function useUpdateItemStatusMutation(baseOptions?: Apollo.MutationHookOptions<UpdateItemStatusMutation, UpdateItemStatusMutationVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<UpdateItemStatusMutation, UpdateItemStatusMutationVariables>(UpdateItemStatusDocument, options);
+}
+export type UpdateItemStatusMutationHookResult = ReturnType<typeof useUpdateItemStatusMutation>;
+export type UpdateItemStatusMutationResult = Apollo.MutationResult<UpdateItemStatusMutation>;
+export type UpdateItemStatusMutationOptions = Apollo.BaseMutationOptions<UpdateItemStatusMutation, UpdateItemStatusMutationVariables>;
+export const SaveOrUpdateChecklistQualificationDocument = gql`
+    mutation SaveOrUpdateChecklistQualification($input: ChecklistQualificationDto!) {
+  saveOrUpdateChecklistQualification(input: $input) {
+    code
+    message
+    id
+  }
+}
+    `;
+export type SaveOrUpdateChecklistQualificationMutationFn = Apollo.MutationFunction<SaveOrUpdateChecklistQualificationMutation, SaveOrUpdateChecklistQualificationMutationVariables>;
+
+/**
+ * __useSaveOrUpdateChecklistQualificationMutation__
+ *
+ * To run a mutation, you first call `useSaveOrUpdateChecklistQualificationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveOrUpdateChecklistQualificationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [saveOrUpdateChecklistQualificationMutation, { data, loading, error }] = useSaveOrUpdateChecklistQualificationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useSaveOrUpdateChecklistQualificationMutation(baseOptions?: Apollo.MutationHookOptions<SaveOrUpdateChecklistQualificationMutation, SaveOrUpdateChecklistQualificationMutationVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<SaveOrUpdateChecklistQualificationMutation, SaveOrUpdateChecklistQualificationMutationVariables>(SaveOrUpdateChecklistQualificationDocument, options);
+}
+export type SaveOrUpdateChecklistQualificationMutationHookResult = ReturnType<typeof useSaveOrUpdateChecklistQualificationMutation>;
+export type SaveOrUpdateChecklistQualificationMutationResult = Apollo.MutationResult<SaveOrUpdateChecklistQualificationMutation>;
+export type SaveOrUpdateChecklistQualificationMutationOptions = Apollo.BaseMutationOptions<SaveOrUpdateChecklistQualificationMutation, SaveOrUpdateChecklistQualificationMutationVariables>;
+export const GetChecklistQualificationsByChecklistDocument = gql`
+    query GetChecklistQualificationsByChecklist($checklistId: Long!, $teamScrumId: Long!) {
+  checklistQualificationsByChecklist(
+    checklistId: $checklistId
+    teamScrumId: $teamScrumId
+  ) {
+    id
+    qualificationState
+    observations
+    itemId
+    teamScrumId
+    checklistId
+  }
+}
+    `;
+
+/**
+ * __useGetChecklistQualificationsByChecklistQuery__
+ *
+ * To run a query within a React component, call `useGetChecklistQualificationsByChecklistQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetChecklistQualificationsByChecklistQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetChecklistQualificationsByChecklistQuery({
+ *   variables: {
+ *      checklistId: // value for 'checklistId'
+ *      teamScrumId: // value for 'teamScrumId'
+ *   },
+ * });
+ */
+export function useGetChecklistQualificationsByChecklistQuery(baseOptions: Apollo.QueryHookOptions<GetChecklistQualificationsByChecklistQuery, GetChecklistQualificationsByChecklistQueryVariables> & ({ variables: GetChecklistQualificationsByChecklistQueryVariables; skip?: boolean; } | { skip: boolean; })) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetChecklistQualificationsByChecklistQuery, GetChecklistQualificationsByChecklistQueryVariables>(GetChecklistQualificationsByChecklistDocument, options);
+}
+export function useGetChecklistQualificationsByChecklistLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetChecklistQualificationsByChecklistQuery, GetChecklistQualificationsByChecklistQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetChecklistQualificationsByChecklistQuery, GetChecklistQualificationsByChecklistQueryVariables>(GetChecklistQualificationsByChecklistDocument, options);
+}
+export function useGetChecklistQualificationsByChecklistSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetChecklistQualificationsByChecklistQuery, GetChecklistQualificationsByChecklistQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<GetChecklistQualificationsByChecklistQuery, GetChecklistQualificationsByChecklistQueryVariables>(GetChecklistQualificationsByChecklistDocument, options);
+}
+export type GetChecklistQualificationsByChecklistQueryHookResult = ReturnType<typeof useGetChecklistQualificationsByChecklistQuery>;
+export type GetChecklistQualificationsByChecklistLazyQueryHookResult = ReturnType<typeof useGetChecklistQualificationsByChecklistLazyQuery>;
+export type GetChecklistQualificationsByChecklistSuspenseQueryHookResult = ReturnType<typeof useGetChecklistQualificationsByChecklistSuspenseQuery>;
+export type GetChecklistQualificationsByChecklistQueryResult = Apollo.QueryResult<GetChecklistQualificationsByChecklistQuery, GetChecklistQualificationsByChecklistQueryVariables>;
+export const DeleteChecklistQualificationDocument = gql`
+    mutation DeleteChecklistQualification($id: Long!) {
+  deleteChecklistQualification(id: $id) {
+    code
+    message
+    id
+  }
+}
+    `;
+export type DeleteChecklistQualificationMutationFn = Apollo.MutationFunction<DeleteChecklistQualificationMutation, DeleteChecklistQualificationMutationVariables>;
+
+/**
+ * __useDeleteChecklistQualificationMutation__
+ *
+ * To run a mutation, you first call `useDeleteChecklistQualificationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteChecklistQualificationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteChecklistQualificationMutation, { data, loading, error }] = useDeleteChecklistQualificationMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteChecklistQualificationMutation(baseOptions?: Apollo.MutationHookOptions<DeleteChecklistQualificationMutation, DeleteChecklistQualificationMutationVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<DeleteChecklistQualificationMutation, DeleteChecklistQualificationMutationVariables>(DeleteChecklistQualificationDocument, options);
+}
+export type DeleteChecklistQualificationMutationHookResult = ReturnType<typeof useDeleteChecklistQualificationMutation>;
+export type DeleteChecklistQualificationMutationResult = Apollo.MutationResult<DeleteChecklistQualificationMutation>;
+export type DeleteChecklistQualificationMutationOptions = Apollo.BaseMutationOptions<DeleteChecklistQualificationMutation, DeleteChecklistQualificationMutationVariables>;
 export const SendNotificationDocument = gql`
     mutation SendNotification($emailRequest: EmailRequest!) {
   sendNotification(emailRequest: $emailRequest)
@@ -7450,6 +8663,7 @@ export const GetAllEvaluationsDocument = gql`
       recommendations
       valueJudgment
       checklistId
+      isFinalized
     }
   }
 }
@@ -7500,6 +8714,7 @@ export const GetEvaluationByIdDocument = gql`
       recommendations
       valueJudgment
       checklistId
+      isFinalized
     }
   }
 }
@@ -7658,6 +8873,8 @@ export const GetEvaluationsByChecklistDocument = gql`
       recommendations
       valueJudgment
       checklistId
+      teamScrumId
+      isFinalized
     }
   }
 }
@@ -7695,6 +8912,61 @@ export type GetEvaluationsByChecklistQueryHookResult = ReturnType<typeof useGetE
 export type GetEvaluationsByChecklistLazyQueryHookResult = ReturnType<typeof useGetEvaluationsByChecklistLazyQuery>;
 export type GetEvaluationsByChecklistSuspenseQueryHookResult = ReturnType<typeof useGetEvaluationsByChecklistSuspenseQuery>;
 export type GetEvaluationsByChecklistQueryResult = Apollo.QueryResult<GetEvaluationsByChecklistQuery, GetEvaluationsByChecklistQueryVariables>;
+export const GetEvaluationByChecklistAndTeamDocument = gql`
+    query GetEvaluationByChecklistAndTeam($checklistId: Long!, $teamScrumId: Long!) {
+  evaluationByChecklistAndTeam(
+    checklistId: $checklistId
+    teamScrumId: $teamScrumId
+  ) {
+    code
+    message
+    date
+    data {
+      id
+      observations
+      recommendations
+      valueJudgment
+      checklistId
+      teamScrumId
+      isFinalized
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetEvaluationByChecklistAndTeamQuery__
+ *
+ * To run a query within a React component, call `useGetEvaluationByChecklistAndTeamQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetEvaluationByChecklistAndTeamQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetEvaluationByChecklistAndTeamQuery({
+ *   variables: {
+ *      checklistId: // value for 'checklistId'
+ *      teamScrumId: // value for 'teamScrumId'
+ *   },
+ * });
+ */
+export function useGetEvaluationByChecklistAndTeamQuery(baseOptions: Apollo.QueryHookOptions<GetEvaluationByChecklistAndTeamQuery, GetEvaluationByChecklistAndTeamQueryVariables> & ({ variables: GetEvaluationByChecklistAndTeamQueryVariables; skip?: boolean; } | { skip: boolean; })) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetEvaluationByChecklistAndTeamQuery, GetEvaluationByChecklistAndTeamQueryVariables>(GetEvaluationByChecklistAndTeamDocument, options);
+}
+export function useGetEvaluationByChecklistAndTeamLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetEvaluationByChecklistAndTeamQuery, GetEvaluationByChecklistAndTeamQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetEvaluationByChecklistAndTeamQuery, GetEvaluationByChecklistAndTeamQueryVariables>(GetEvaluationByChecklistAndTeamDocument, options);
+}
+export function useGetEvaluationByChecklistAndTeamSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetEvaluationByChecklistAndTeamQuery, GetEvaluationByChecklistAndTeamQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<GetEvaluationByChecklistAndTeamQuery, GetEvaluationByChecklistAndTeamQueryVariables>(GetEvaluationByChecklistAndTeamDocument, options);
+}
+export type GetEvaluationByChecklistAndTeamQueryHookResult = ReturnType<typeof useGetEvaluationByChecklistAndTeamQuery>;
+export type GetEvaluationByChecklistAndTeamLazyQueryHookResult = ReturnType<typeof useGetEvaluationByChecklistAndTeamLazyQuery>;
+export type GetEvaluationByChecklistAndTeamSuspenseQueryHookResult = ReturnType<typeof useGetEvaluationByChecklistAndTeamSuspenseQuery>;
+export type GetEvaluationByChecklistAndTeamQueryResult = Apollo.QueryResult<GetEvaluationByChecklistAndTeamQuery, GetEvaluationByChecklistAndTeamQueryVariables>;
 export const GetAllFinalReportsDocument = gql`
     query GetAllFinalReports($page: Int, $size: Int) {
   allFinalReports(page: $page, size: $size) {
@@ -7979,6 +9251,512 @@ export function useGenerateQrCodeMutation(baseOptions?: Apollo.MutationHookOptio
 export type GenerateQrCodeMutationHookResult = ReturnType<typeof useGenerateQrCodeMutation>;
 export type GenerateQrCodeMutationResult = Apollo.MutationResult<GenerateQrCodeMutation>;
 export type GenerateQrCodeMutationOptions = Apollo.BaseMutationOptions<GenerateQrCodeMutation, GenerateQrCodeMutationVariables>;
+export const AllImprovementPlanActivitiesDocument = gql`
+    query AllImprovementPlanActivities($page: Int, $size: Int, $id: Long) {
+  allImprovementPlanActivities(page: $page, size: $size, id: $id) {
+    data {
+      id
+      description
+      objectives
+      conclusions
+      deliveryDate
+      evidenceTypes {
+        id
+        name
+      }
+      improvementPlanDelivery {
+        id
+        deliveryFormat
+      }
+      improvementPlan {
+        id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useAllImprovementPlanActivitiesQuery__
+ *
+ * To run a query within a React component, call `useAllImprovementPlanActivitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllImprovementPlanActivitiesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAllImprovementPlanActivitiesQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useAllImprovementPlanActivitiesQuery(baseOptions?: Apollo.QueryHookOptions<AllImprovementPlanActivitiesQuery, AllImprovementPlanActivitiesQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<AllImprovementPlanActivitiesQuery, AllImprovementPlanActivitiesQueryVariables>(AllImprovementPlanActivitiesDocument, options);
+}
+export function useAllImprovementPlanActivitiesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AllImprovementPlanActivitiesQuery, AllImprovementPlanActivitiesQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<AllImprovementPlanActivitiesQuery, AllImprovementPlanActivitiesQueryVariables>(AllImprovementPlanActivitiesDocument, options);
+}
+export function useAllImprovementPlanActivitiesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AllImprovementPlanActivitiesQuery, AllImprovementPlanActivitiesQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<AllImprovementPlanActivitiesQuery, AllImprovementPlanActivitiesQueryVariables>(AllImprovementPlanActivitiesDocument, options);
+}
+export type AllImprovementPlanActivitiesQueryHookResult = ReturnType<typeof useAllImprovementPlanActivitiesQuery>;
+export type AllImprovementPlanActivitiesLazyQueryHookResult = ReturnType<typeof useAllImprovementPlanActivitiesLazyQuery>;
+export type AllImprovementPlanActivitiesSuspenseQueryHookResult = ReturnType<typeof useAllImprovementPlanActivitiesSuspenseQuery>;
+export type AllImprovementPlanActivitiesQueryResult = Apollo.QueryResult<AllImprovementPlanActivitiesQuery, AllImprovementPlanActivitiesQueryVariables>;
+export const AddImprovementPlanActivityDocument = gql`
+    mutation addImprovementPlanActivity($input: ImprovementPlanActivityDto) {
+  addImprovementPlanActivity(input: $input) {
+    code
+    message
+  }
+}
+    `;
+export type AddImprovementPlanActivityMutationFn = Apollo.MutationFunction<AddImprovementPlanActivityMutation, AddImprovementPlanActivityMutationVariables>;
+
+/**
+ * __useAddImprovementPlanActivityMutation__
+ *
+ * To run a mutation, you first call `useAddImprovementPlanActivityMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddImprovementPlanActivityMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addImprovementPlanActivityMutation, { data, loading, error }] = useAddImprovementPlanActivityMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAddImprovementPlanActivityMutation(baseOptions?: Apollo.MutationHookOptions<AddImprovementPlanActivityMutation, AddImprovementPlanActivityMutationVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<AddImprovementPlanActivityMutation, AddImprovementPlanActivityMutationVariables>(AddImprovementPlanActivityDocument, options);
+}
+export type AddImprovementPlanActivityMutationHookResult = ReturnType<typeof useAddImprovementPlanActivityMutation>;
+export type AddImprovementPlanActivityMutationResult = Apollo.MutationResult<AddImprovementPlanActivityMutation>;
+export type AddImprovementPlanActivityMutationOptions = Apollo.BaseMutationOptions<AddImprovementPlanActivityMutation, AddImprovementPlanActivityMutationVariables>;
+export const AllImprovementPlanEvidenceTypesDocument = gql`
+    query AllImprovementPlanEvidenceTypes($page: Int, $size: Int) {
+  allImprovementPlanEvidenceTypes(page: $page, size: $size) {
+    data {
+      id
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useAllImprovementPlanEvidenceTypesQuery__
+ *
+ * To run a query within a React component, call `useAllImprovementPlanEvidenceTypesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllImprovementPlanEvidenceTypesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAllImprovementPlanEvidenceTypesQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useAllImprovementPlanEvidenceTypesQuery(baseOptions?: Apollo.QueryHookOptions<AllImprovementPlanEvidenceTypesQuery, AllImprovementPlanEvidenceTypesQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<AllImprovementPlanEvidenceTypesQuery, AllImprovementPlanEvidenceTypesQueryVariables>(AllImprovementPlanEvidenceTypesDocument, options);
+}
+export function useAllImprovementPlanEvidenceTypesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AllImprovementPlanEvidenceTypesQuery, AllImprovementPlanEvidenceTypesQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<AllImprovementPlanEvidenceTypesQuery, AllImprovementPlanEvidenceTypesQueryVariables>(AllImprovementPlanEvidenceTypesDocument, options);
+}
+export function useAllImprovementPlanEvidenceTypesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AllImprovementPlanEvidenceTypesQuery, AllImprovementPlanEvidenceTypesQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<AllImprovementPlanEvidenceTypesQuery, AllImprovementPlanEvidenceTypesQueryVariables>(AllImprovementPlanEvidenceTypesDocument, options);
+}
+export type AllImprovementPlanEvidenceTypesQueryHookResult = ReturnType<typeof useAllImprovementPlanEvidenceTypesQuery>;
+export type AllImprovementPlanEvidenceTypesLazyQueryHookResult = ReturnType<typeof useAllImprovementPlanEvidenceTypesLazyQuery>;
+export type AllImprovementPlanEvidenceTypesSuspenseQueryHookResult = ReturnType<typeof useAllImprovementPlanEvidenceTypesSuspenseQuery>;
+export type AllImprovementPlanEvidenceTypesQueryResult = Apollo.QueryResult<AllImprovementPlanEvidenceTypesQuery, AllImprovementPlanEvidenceTypesQueryVariables>;
+export const AllImprovementPlanDeliveriesDocument = gql`
+    query AllImprovementPlanDeliveries($page: Int, $size: Int) {
+  allImprovementPlanDeliveries(page: $page, size: $size) {
+    data {
+      id
+      deliveryFormat
+    }
+  }
+}
+    `;
+
+/**
+ * __useAllImprovementPlanDeliveriesQuery__
+ *
+ * To run a query within a React component, call `useAllImprovementPlanDeliveriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllImprovementPlanDeliveriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAllImprovementPlanDeliveriesQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useAllImprovementPlanDeliveriesQuery(baseOptions?: Apollo.QueryHookOptions<AllImprovementPlanDeliveriesQuery, AllImprovementPlanDeliveriesQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<AllImprovementPlanDeliveriesQuery, AllImprovementPlanDeliveriesQueryVariables>(AllImprovementPlanDeliveriesDocument, options);
+}
+export function useAllImprovementPlanDeliveriesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AllImprovementPlanDeliveriesQuery, AllImprovementPlanDeliveriesQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<AllImprovementPlanDeliveriesQuery, AllImprovementPlanDeliveriesQueryVariables>(AllImprovementPlanDeliveriesDocument, options);
+}
+export function useAllImprovementPlanDeliveriesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AllImprovementPlanDeliveriesQuery, AllImprovementPlanDeliveriesQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<AllImprovementPlanDeliveriesQuery, AllImprovementPlanDeliveriesQueryVariables>(AllImprovementPlanDeliveriesDocument, options);
+}
+export type AllImprovementPlanDeliveriesQueryHookResult = ReturnType<typeof useAllImprovementPlanDeliveriesQuery>;
+export type AllImprovementPlanDeliveriesLazyQueryHookResult = ReturnType<typeof useAllImprovementPlanDeliveriesLazyQuery>;
+export type AllImprovementPlanDeliveriesSuspenseQueryHookResult = ReturnType<typeof useAllImprovementPlanDeliveriesSuspenseQuery>;
+export type AllImprovementPlanDeliveriesQueryResult = Apollo.QueryResult<AllImprovementPlanDeliveriesQuery, AllImprovementPlanDeliveriesQueryVariables>;
+export const UpdateImprovementPlanActivityDocument = gql`
+    mutation updateImprovementPlanActivity($id: Long!, $input: ImprovementPlanActivityDto) {
+  updateImprovementPlanActivity(id: $id, input: $input) {
+    code
+    message
+  }
+}
+    `;
+export type UpdateImprovementPlanActivityMutationFn = Apollo.MutationFunction<UpdateImprovementPlanActivityMutation, UpdateImprovementPlanActivityMutationVariables>;
+
+/**
+ * __useUpdateImprovementPlanActivityMutation__
+ *
+ * To run a mutation, you first call `useUpdateImprovementPlanActivityMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateImprovementPlanActivityMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateImprovementPlanActivityMutation, { data, loading, error }] = useUpdateImprovementPlanActivityMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateImprovementPlanActivityMutation(baseOptions?: Apollo.MutationHookOptions<UpdateImprovementPlanActivityMutation, UpdateImprovementPlanActivityMutationVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<UpdateImprovementPlanActivityMutation, UpdateImprovementPlanActivityMutationVariables>(UpdateImprovementPlanActivityDocument, options);
+}
+export type UpdateImprovementPlanActivityMutationHookResult = ReturnType<typeof useUpdateImprovementPlanActivityMutation>;
+export type UpdateImprovementPlanActivityMutationResult = Apollo.MutationResult<UpdateImprovementPlanActivityMutation>;
+export type UpdateImprovementPlanActivityMutationOptions = Apollo.BaseMutationOptions<UpdateImprovementPlanActivityMutation, UpdateImprovementPlanActivityMutationVariables>;
+export const DeleteImprovementPlanActivityDocument = gql`
+    mutation deleteImprovementPlanActivity($id: Long!) {
+  deleteImprovementPlanActivity(id: $id) {
+    code
+    message
+  }
+}
+    `;
+export type DeleteImprovementPlanActivityMutationFn = Apollo.MutationFunction<DeleteImprovementPlanActivityMutation, DeleteImprovementPlanActivityMutationVariables>;
+
+/**
+ * __useDeleteImprovementPlanActivityMutation__
+ *
+ * To run a mutation, you first call `useDeleteImprovementPlanActivityMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteImprovementPlanActivityMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteImprovementPlanActivityMutation, { data, loading, error }] = useDeleteImprovementPlanActivityMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteImprovementPlanActivityMutation(baseOptions?: Apollo.MutationHookOptions<DeleteImprovementPlanActivityMutation, DeleteImprovementPlanActivityMutationVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<DeleteImprovementPlanActivityMutation, DeleteImprovementPlanActivityMutationVariables>(DeleteImprovementPlanActivityDocument, options);
+}
+export type DeleteImprovementPlanActivityMutationHookResult = ReturnType<typeof useDeleteImprovementPlanActivityMutation>;
+export type DeleteImprovementPlanActivityMutationResult = Apollo.MutationResult<DeleteImprovementPlanActivityMutation>;
+export type DeleteImprovementPlanActivityMutationOptions = Apollo.BaseMutationOptions<DeleteImprovementPlanActivityMutation, DeleteImprovementPlanActivityMutationVariables>;
+export const AllImprovementPlanEvaluationsDocument = gql`
+    query AllImprovementPlanEvaluations($page: Int, $size: Int) {
+  allImprovementPlanEvaluations(page: $page, size: $size) {
+    data {
+      id
+      pertinence
+      validity
+      authenticity
+      quality
+      judgment
+    }
+    code
+    message
+    totalPages
+    totalItems
+    currentPage
+  }
+}
+    `;
+
+/**
+ * __useAllImprovementPlanEvaluationsQuery__
+ *
+ * To run a query within a React component, call `useAllImprovementPlanEvaluationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllImprovementPlanEvaluationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAllImprovementPlanEvaluationsQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useAllImprovementPlanEvaluationsQuery(baseOptions?: Apollo.QueryHookOptions<AllImprovementPlanEvaluationsQuery, AllImprovementPlanEvaluationsQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<AllImprovementPlanEvaluationsQuery, AllImprovementPlanEvaluationsQueryVariables>(AllImprovementPlanEvaluationsDocument, options);
+}
+export function useAllImprovementPlanEvaluationsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AllImprovementPlanEvaluationsQuery, AllImprovementPlanEvaluationsQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<AllImprovementPlanEvaluationsQuery, AllImprovementPlanEvaluationsQueryVariables>(AllImprovementPlanEvaluationsDocument, options);
+}
+export function useAllImprovementPlanEvaluationsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AllImprovementPlanEvaluationsQuery, AllImprovementPlanEvaluationsQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<AllImprovementPlanEvaluationsQuery, AllImprovementPlanEvaluationsQueryVariables>(AllImprovementPlanEvaluationsDocument, options);
+}
+export type AllImprovementPlanEvaluationsQueryHookResult = ReturnType<typeof useAllImprovementPlanEvaluationsQuery>;
+export type AllImprovementPlanEvaluationsLazyQueryHookResult = ReturnType<typeof useAllImprovementPlanEvaluationsLazyQuery>;
+export type AllImprovementPlanEvaluationsSuspenseQueryHookResult = ReturnType<typeof useAllImprovementPlanEvaluationsSuspenseQuery>;
+export type AllImprovementPlanEvaluationsQueryResult = Apollo.QueryResult<AllImprovementPlanEvaluationsQuery, AllImprovementPlanEvaluationsQueryVariables>;
+export const ImprovementPlanEvaluationByIdDocument = gql`
+    query ImprovementPlanEvaluationById($id: Long!) {
+  improvementPlanEvaluationById(id: $id) {
+    data {
+      id
+      pertinence
+      validity
+      authenticity
+      quality
+      judgment
+    }
+    code
+    message
+  }
+}
+    `;
+
+/**
+ * __useImprovementPlanEvaluationByIdQuery__
+ *
+ * To run a query within a React component, call `useImprovementPlanEvaluationByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useImprovementPlanEvaluationByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useImprovementPlanEvaluationByIdQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useImprovementPlanEvaluationByIdQuery(baseOptions: Apollo.QueryHookOptions<ImprovementPlanEvaluationByIdQuery, ImprovementPlanEvaluationByIdQueryVariables> & ({ variables: ImprovementPlanEvaluationByIdQueryVariables; skip?: boolean; } | { skip: boolean; })) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<ImprovementPlanEvaluationByIdQuery, ImprovementPlanEvaluationByIdQueryVariables>(ImprovementPlanEvaluationByIdDocument, options);
+}
+export function useImprovementPlanEvaluationByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ImprovementPlanEvaluationByIdQuery, ImprovementPlanEvaluationByIdQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<ImprovementPlanEvaluationByIdQuery, ImprovementPlanEvaluationByIdQueryVariables>(ImprovementPlanEvaluationByIdDocument, options);
+}
+export function useImprovementPlanEvaluationByIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ImprovementPlanEvaluationByIdQuery, ImprovementPlanEvaluationByIdQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<ImprovementPlanEvaluationByIdQuery, ImprovementPlanEvaluationByIdQueryVariables>(ImprovementPlanEvaluationByIdDocument, options);
+}
+export type ImprovementPlanEvaluationByIdQueryHookResult = ReturnType<typeof useImprovementPlanEvaluationByIdQuery>;
+export type ImprovementPlanEvaluationByIdLazyQueryHookResult = ReturnType<typeof useImprovementPlanEvaluationByIdLazyQuery>;
+export type ImprovementPlanEvaluationByIdSuspenseQueryHookResult = ReturnType<typeof useImprovementPlanEvaluationByIdSuspenseQuery>;
+export type ImprovementPlanEvaluationByIdQueryResult = Apollo.QueryResult<ImprovementPlanEvaluationByIdQuery, ImprovementPlanEvaluationByIdQueryVariables>;
+export const ImprovementPlanEvaluationByImprovementPlanIdDocument = gql`
+    query ImprovementPlanEvaluationByImprovementPlanId($improvementPlanId: Long!) {
+  improvementPlanEvaluationByImprovementPlanId(
+    improvementPlanId: $improvementPlanId
+  ) {
+    data {
+      id
+      pertinence
+      validity
+      authenticity
+      quality
+      judgment
+    }
+    code
+    message
+  }
+}
+    `;
+
+/**
+ * __useImprovementPlanEvaluationByImprovementPlanIdQuery__
+ *
+ * To run a query within a React component, call `useImprovementPlanEvaluationByImprovementPlanIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useImprovementPlanEvaluationByImprovementPlanIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useImprovementPlanEvaluationByImprovementPlanIdQuery({
+ *   variables: {
+ *      improvementPlanId: // value for 'improvementPlanId'
+ *   },
+ * });
+ */
+export function useImprovementPlanEvaluationByImprovementPlanIdQuery(baseOptions: Apollo.QueryHookOptions<ImprovementPlanEvaluationByImprovementPlanIdQuery, ImprovementPlanEvaluationByImprovementPlanIdQueryVariables> & ({ variables: ImprovementPlanEvaluationByImprovementPlanIdQueryVariables; skip?: boolean; } | { skip: boolean; })) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<ImprovementPlanEvaluationByImprovementPlanIdQuery, ImprovementPlanEvaluationByImprovementPlanIdQueryVariables>(ImprovementPlanEvaluationByImprovementPlanIdDocument, options);
+}
+export function useImprovementPlanEvaluationByImprovementPlanIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ImprovementPlanEvaluationByImprovementPlanIdQuery, ImprovementPlanEvaluationByImprovementPlanIdQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<ImprovementPlanEvaluationByImprovementPlanIdQuery, ImprovementPlanEvaluationByImprovementPlanIdQueryVariables>(ImprovementPlanEvaluationByImprovementPlanIdDocument, options);
+}
+export function useImprovementPlanEvaluationByImprovementPlanIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<ImprovementPlanEvaluationByImprovementPlanIdQuery, ImprovementPlanEvaluationByImprovementPlanIdQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<ImprovementPlanEvaluationByImprovementPlanIdQuery, ImprovementPlanEvaluationByImprovementPlanIdQueryVariables>(ImprovementPlanEvaluationByImprovementPlanIdDocument, options);
+}
+export type ImprovementPlanEvaluationByImprovementPlanIdQueryHookResult = ReturnType<typeof useImprovementPlanEvaluationByImprovementPlanIdQuery>;
+export type ImprovementPlanEvaluationByImprovementPlanIdLazyQueryHookResult = ReturnType<typeof useImprovementPlanEvaluationByImprovementPlanIdLazyQuery>;
+export type ImprovementPlanEvaluationByImprovementPlanIdSuspenseQueryHookResult = ReturnType<typeof useImprovementPlanEvaluationByImprovementPlanIdSuspenseQuery>;
+export type ImprovementPlanEvaluationByImprovementPlanIdQueryResult = Apollo.QueryResult<ImprovementPlanEvaluationByImprovementPlanIdQuery, ImprovementPlanEvaluationByImprovementPlanIdQueryVariables>;
+export const AddImprovementPlanEvaluationDocument = gql`
+    mutation AddImprovementPlanEvaluation($input: ImprovementPlanEvaluationDto) {
+  addImprovementPlanEvaluation(input: $input) {
+    code
+    message
+  }
+}
+    `;
+export type AddImprovementPlanEvaluationMutationFn = Apollo.MutationFunction<AddImprovementPlanEvaluationMutation, AddImprovementPlanEvaluationMutationVariables>;
+
+/**
+ * __useAddImprovementPlanEvaluationMutation__
+ *
+ * To run a mutation, you first call `useAddImprovementPlanEvaluationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddImprovementPlanEvaluationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addImprovementPlanEvaluationMutation, { data, loading, error }] = useAddImprovementPlanEvaluationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAddImprovementPlanEvaluationMutation(baseOptions?: Apollo.MutationHookOptions<AddImprovementPlanEvaluationMutation, AddImprovementPlanEvaluationMutationVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<AddImprovementPlanEvaluationMutation, AddImprovementPlanEvaluationMutationVariables>(AddImprovementPlanEvaluationDocument, options);
+}
+export type AddImprovementPlanEvaluationMutationHookResult = ReturnType<typeof useAddImprovementPlanEvaluationMutation>;
+export type AddImprovementPlanEvaluationMutationResult = Apollo.MutationResult<AddImprovementPlanEvaluationMutation>;
+export type AddImprovementPlanEvaluationMutationOptions = Apollo.BaseMutationOptions<AddImprovementPlanEvaluationMutation, AddImprovementPlanEvaluationMutationVariables>;
+export const UpdateImprovementPlanEvaluationDocument = gql`
+    mutation UpdateImprovementPlanEvaluation($id: Long!, $input: ImprovementPlanEvaluationDto) {
+  updateImprovementPlanEvaluation(id: $id, input: $input) {
+    code
+    message
+  }
+}
+    `;
+export type UpdateImprovementPlanEvaluationMutationFn = Apollo.MutationFunction<UpdateImprovementPlanEvaluationMutation, UpdateImprovementPlanEvaluationMutationVariables>;
+
+/**
+ * __useUpdateImprovementPlanEvaluationMutation__
+ *
+ * To run a mutation, you first call `useUpdateImprovementPlanEvaluationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateImprovementPlanEvaluationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateImprovementPlanEvaluationMutation, { data, loading, error }] = useUpdateImprovementPlanEvaluationMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateImprovementPlanEvaluationMutation(baseOptions?: Apollo.MutationHookOptions<UpdateImprovementPlanEvaluationMutation, UpdateImprovementPlanEvaluationMutationVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<UpdateImprovementPlanEvaluationMutation, UpdateImprovementPlanEvaluationMutationVariables>(UpdateImprovementPlanEvaluationDocument, options);
+}
+export type UpdateImprovementPlanEvaluationMutationHookResult = ReturnType<typeof useUpdateImprovementPlanEvaluationMutation>;
+export type UpdateImprovementPlanEvaluationMutationResult = Apollo.MutationResult<UpdateImprovementPlanEvaluationMutation>;
+export type UpdateImprovementPlanEvaluationMutationOptions = Apollo.BaseMutationOptions<UpdateImprovementPlanEvaluationMutation, UpdateImprovementPlanEvaluationMutationVariables>;
+export const DeleteImprovementPlanEvaluationDocument = gql`
+    mutation DeleteImprovementPlanEvaluation($id: Long!) {
+  deleteImprovementPlanEvaluation(id: $id) {
+    code
+    message
+  }
+}
+    `;
+export type DeleteImprovementPlanEvaluationMutationFn = Apollo.MutationFunction<DeleteImprovementPlanEvaluationMutation, DeleteImprovementPlanEvaluationMutationVariables>;
+
+/**
+ * __useDeleteImprovementPlanEvaluationMutation__
+ *
+ * To run a mutation, you first call `useDeleteImprovementPlanEvaluationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteImprovementPlanEvaluationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteImprovementPlanEvaluationMutation, { data, loading, error }] = useDeleteImprovementPlanEvaluationMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteImprovementPlanEvaluationMutation(baseOptions?: Apollo.MutationHookOptions<DeleteImprovementPlanEvaluationMutation, DeleteImprovementPlanEvaluationMutationVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<DeleteImprovementPlanEvaluationMutation, DeleteImprovementPlanEvaluationMutationVariables>(DeleteImprovementPlanEvaluationDocument, options);
+}
+export type DeleteImprovementPlanEvaluationMutationHookResult = ReturnType<typeof useDeleteImprovementPlanEvaluationMutation>;
+export type DeleteImprovementPlanEvaluationMutationResult = Apollo.MutationResult<DeleteImprovementPlanEvaluationMutation>;
+export type DeleteImprovementPlanEvaluationMutationOptions = Apollo.BaseMutationOptions<DeleteImprovementPlanEvaluationMutation, DeleteImprovementPlanEvaluationMutationVariables>;
 export const GetAllImprovementPlanFaultTypesDocument = gql`
     query GetAllImprovementPlanFaultTypes($page: Int, $size: Int) {
   allImprovementPlanFaultTypes(page: $page, size: $size) {
@@ -8181,7 +9959,15 @@ export type DeleteImprovementPlanFaultTypeMutationResult = Apollo.MutationResult
 export type DeleteImprovementPlanFaultTypeMutationOptions = Apollo.BaseMutationOptions<DeleteImprovementPlanFaultTypeMutation, DeleteImprovementPlanFaultTypeMutationVariables>;
 export const GetAllImprovementPlansDocument = gql`
     query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $id: Long, $studySheetId: Long, $studentId: Long, $teacherCompetenceIds: [Long]) {
-  allImprovementPlans(page: $page, size: $size, teacherCompetence: $teacherCompetence, id: $id, studySheetId: $studySheetId, studentId: $studentId, teacherCompetenceIds: $teacherCompetenceIds) {
+  allImprovementPlans(
+    page: $page
+    size: $size
+    teacherCompetence: $teacherCompetence
+    id: $id
+    studySheetId: $studySheetId
+    studentId: $studentId
+    teacherCompetenceIds: $teacherCompetenceIds
+  ) {
     code
     message
     date
@@ -8190,10 +9976,15 @@ export const GetAllImprovementPlansDocument = gql`
     currentPage
     data {
       id
+      actNumber
       city
       date
+      startTime
+      endTime
+      place
       reason
       state
+      additionalJustification
       student {
         id
         person {
@@ -8208,6 +9999,14 @@ export const GetAllImprovementPlansDocument = gql`
           id
           name
         }
+      }
+      learningOutcome {
+        id
+      }
+      improvementPlanFile
+      faultType {
+        id
+        name
       }
     }
   }
@@ -8228,6 +10027,11 @@ export const GetAllImprovementPlansDocument = gql`
  *   variables: {
  *      page: // value for 'page'
  *      size: // value for 'size'
+ *      teacherCompetence: // value for 'teacherCompetence'
+ *      id: // value for 'id'
+ *      studySheetId: // value for 'studySheetId'
+ *      studentId: // value for 'studentId'
+ *      teacherCompetenceIds: // value for 'teacherCompetenceIds'
  *   },
  * });
  */
@@ -8255,10 +10059,15 @@ export const GetImprovementPlanByIdDocument = gql`
     date
     data {
       id
+      actNumber
       city
       date
+      startTime
+      endTime
+      place
       reason
       state
+      additionalJustification
       student {
         id
         person {
@@ -8273,6 +10082,14 @@ export const GetImprovementPlanByIdDocument = gql`
           id
           name
         }
+      }
+      learningOutcome {
+        id
+      }
+      improvementPlanFile
+      faultType {
+        id
+        name
       }
     }
   }
@@ -8314,6 +10131,7 @@ export type GetImprovementPlanByIdQueryResult = Apollo.QueryResult<GetImprovemen
 export const AddImprovementPlanDocument = gql`
     mutation AddImprovementPlan($input: ImprovementPlanDto!) {
   addImprovementPlan(input: $input) {
+    id
     code
     message
   }
@@ -8414,6 +10232,136 @@ export function useDeleteImprovementPlanMutation(baseOptions?: Apollo.MutationHo
 export type DeleteImprovementPlanMutationHookResult = ReturnType<typeof useDeleteImprovementPlanMutation>;
 export type DeleteImprovementPlanMutationResult = Apollo.MutationResult<DeleteImprovementPlanMutation>;
 export type DeleteImprovementPlanMutationOptions = Apollo.BaseMutationOptions<DeleteImprovementPlanMutation, DeleteImprovementPlanMutationVariables>;
+export const GetImprovementPlansByStudentDocument = gql`
+    query GetImprovementPlansByStudent($studentId: Long!, $page: Int, $size: Int) {
+  allImprovementPlans(page: $page, size: $size, studentId: $studentId) {
+    code
+    message
+    date
+    totalPages
+    totalItems
+    currentPage
+    data {
+      id
+      actNumber
+      city
+      date
+      startTime
+      endTime
+      place
+      reason
+      state
+      additionalJustification
+      student {
+        id
+        person {
+          name
+          lastname
+          document
+        }
+      }
+      teacherCompetence {
+        id
+        competence {
+          id
+          name
+        }
+      }
+      learningOutcome {
+        id
+      }
+      improvementPlanFile
+      faultType {
+        id
+        name
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetImprovementPlansByStudentQuery__
+ *
+ * To run a query within a React component, call `useGetImprovementPlansByStudentQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetImprovementPlansByStudentQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetImprovementPlansByStudentQuery({
+ *   variables: {
+ *      studentId: // value for 'studentId'
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useGetImprovementPlansByStudentQuery(baseOptions: Apollo.QueryHookOptions<GetImprovementPlansByStudentQuery, GetImprovementPlansByStudentQueryVariables> & ({ variables: GetImprovementPlansByStudentQueryVariables; skip?: boolean; } | { skip: boolean; })) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetImprovementPlansByStudentQuery, GetImprovementPlansByStudentQueryVariables>(GetImprovementPlansByStudentDocument, options);
+}
+export function useGetImprovementPlansByStudentLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetImprovementPlansByStudentQuery, GetImprovementPlansByStudentQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetImprovementPlansByStudentQuery, GetImprovementPlansByStudentQueryVariables>(GetImprovementPlansByStudentDocument, options);
+}
+export function useGetImprovementPlansByStudentSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetImprovementPlansByStudentQuery, GetImprovementPlansByStudentQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<GetImprovementPlansByStudentQuery, GetImprovementPlansByStudentQueryVariables>(GetImprovementPlansByStudentDocument, options);
+}
+export type GetImprovementPlansByStudentQueryHookResult = ReturnType<typeof useGetImprovementPlansByStudentQuery>;
+export type GetImprovementPlansByStudentLazyQueryHookResult = ReturnType<typeof useGetImprovementPlansByStudentLazyQuery>;
+export type GetImprovementPlansByStudentSuspenseQueryHookResult = ReturnType<typeof useGetImprovementPlansByStudentSuspenseQuery>;
+export type GetImprovementPlansByStudentQueryResult = Apollo.QueryResult<GetImprovementPlansByStudentQuery, GetImprovementPlansByStudentQueryVariables>;
+export const CheckStudentHasActivePlanDocument = gql`
+    query CheckStudentHasActivePlan($studentId: ID!, $page: Int, $size: Int) {
+  allImprovementPlans(page: $page, size: $size) {
+    data {
+      id
+      state
+      student {
+        id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useCheckStudentHasActivePlanQuery__
+ *
+ * To run a query within a React component, call `useCheckStudentHasActivePlanQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCheckStudentHasActivePlanQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCheckStudentHasActivePlanQuery({
+ *   variables: {
+ *      studentId: // value for 'studentId'
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useCheckStudentHasActivePlanQuery(baseOptions: Apollo.QueryHookOptions<CheckStudentHasActivePlanQuery, CheckStudentHasActivePlanQueryVariables> & ({ variables: CheckStudentHasActivePlanQueryVariables; skip?: boolean; } | { skip: boolean; })) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<CheckStudentHasActivePlanQuery, CheckStudentHasActivePlanQueryVariables>(CheckStudentHasActivePlanDocument, options);
+}
+export function useCheckStudentHasActivePlanLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CheckStudentHasActivePlanQuery, CheckStudentHasActivePlanQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<CheckStudentHasActivePlanQuery, CheckStudentHasActivePlanQueryVariables>(CheckStudentHasActivePlanDocument, options);
+}
+export function useCheckStudentHasActivePlanSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<CheckStudentHasActivePlanQuery, CheckStudentHasActivePlanQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<CheckStudentHasActivePlanQuery, CheckStudentHasActivePlanQueryVariables>(CheckStudentHasActivePlanDocument, options);
+}
+export type CheckStudentHasActivePlanQueryHookResult = ReturnType<typeof useCheckStudentHasActivePlanQuery>;
+export type CheckStudentHasActivePlanLazyQueryHookResult = ReturnType<typeof useCheckStudentHasActivePlanLazyQuery>;
+export type CheckStudentHasActivePlanSuspenseQueryHookResult = ReturnType<typeof useCheckStudentHasActivePlanSuspenseQuery>;
+export type CheckStudentHasActivePlanQueryResult = Apollo.QueryResult<CheckStudentHasActivePlanQuery, CheckStudentHasActivePlanQueryVariables>;
 export const GetAllJustificationStatusDocument = gql`
     query GetAllJustificationStatus($page: Int, $size: Int) {
   allJustificationsStatus(page: $page, size: $size) {
@@ -9479,6 +11427,7 @@ export const GetStudySheetsDocument = gql`
         }
       }
       trainingProject {
+        id
         name
         program {
           id
@@ -9608,6 +11557,20 @@ export const GetStudySheetWithTeamScrumByIdDocument = gql`
     data {
       id
       number
+      startLective
+      endLective
+      journey {
+        id
+        name
+      }
+      trainingProject {
+        id
+        name
+        program {
+          id
+          name
+        }
+      }
       teamsScrum {
         id
         teamName
@@ -9780,10 +11743,6 @@ export const StudySheetByTeacherDocument = gql`
         competence {
           id
           name
-          learningOutcome {
-            name
-            description
-          }
         }
       }
       studentStudySheets {
@@ -9964,6 +11923,55 @@ export type GetTeacherCompetenceByStudySheetsQueryHookResult = ReturnType<typeof
 export type GetTeacherCompetenceByStudySheetsLazyQueryHookResult = ReturnType<typeof useGetTeacherCompetenceByStudySheetsLazyQuery>;
 export type GetTeacherCompetenceByStudySheetsSuspenseQueryHookResult = ReturnType<typeof useGetTeacherCompetenceByStudySheetsSuspenseQuery>;
 export type GetTeacherCompetenceByStudySheetsQueryResult = Apollo.QueryResult<GetTeacherCompetenceByStudySheetsQuery, GetTeacherCompetenceByStudySheetsQueryVariables>;
+export const GetLearningOutcomesByCompetenceDocument = gql`
+    query GetLearningOutcomesByCompetence($idCompetence: Long, $page: Int, $size: Int) {
+  allLearningOutcomes(idCompetence: $idCompetence, page: $page, size: $size) {
+    code
+    message
+    data {
+      id
+      name
+      description
+      code
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetLearningOutcomesByCompetenceQuery__
+ *
+ * To run a query within a React component, call `useGetLearningOutcomesByCompetenceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetLearningOutcomesByCompetenceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetLearningOutcomesByCompetenceQuery({
+ *   variables: {
+ *      idCompetence: // value for 'idCompetence'
+ *      page: // value for 'page'
+ *      size: // value for 'size'
+ *   },
+ * });
+ */
+export function useGetLearningOutcomesByCompetenceQuery(baseOptions?: Apollo.QueryHookOptions<GetLearningOutcomesByCompetenceQuery, GetLearningOutcomesByCompetenceQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<GetLearningOutcomesByCompetenceQuery, GetLearningOutcomesByCompetenceQueryVariables>(GetLearningOutcomesByCompetenceDocument, options);
+}
+export function useGetLearningOutcomesByCompetenceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetLearningOutcomesByCompetenceQuery, GetLearningOutcomesByCompetenceQueryVariables>) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<GetLearningOutcomesByCompetenceQuery, GetLearningOutcomesByCompetenceQueryVariables>(GetLearningOutcomesByCompetenceDocument, options);
+}
+export function useGetLearningOutcomesByCompetenceSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetLearningOutcomesByCompetenceQuery, GetLearningOutcomesByCompetenceQueryVariables>) {
+  const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+  return Apollo.useSuspenseQuery<GetLearningOutcomesByCompetenceQuery, GetLearningOutcomesByCompetenceQueryVariables>(GetLearningOutcomesByCompetenceDocument, options);
+}
+export type GetLearningOutcomesByCompetenceQueryHookResult = ReturnType<typeof useGetLearningOutcomesByCompetenceQuery>;
+export type GetLearningOutcomesByCompetenceLazyQueryHookResult = ReturnType<typeof useGetLearningOutcomesByCompetenceLazyQuery>;
+export type GetLearningOutcomesByCompetenceSuspenseQueryHookResult = ReturnType<typeof useGetLearningOutcomesByCompetenceSuspenseQuery>;
+export type GetLearningOutcomesByCompetenceQueryResult = Apollo.QueryResult<GetLearningOutcomesByCompetenceQuery, GetLearningOutcomesByCompetenceQueryVariables>;
 export const StudySheetByTeacherIdWithTeamScrumDocument = gql`
     query studySheetByTeacherIdWithTeamScrum($idTeacher: Long, $page: Int, $size: Int) {
   allStudySheets(page: $page, size: $size, idTeacher: $idTeacher) {

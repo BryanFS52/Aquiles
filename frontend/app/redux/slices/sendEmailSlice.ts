@@ -1,4 +1,4 @@
-import { clientLAN } from '@lib/apollo-client';
+import { client } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { SEND_EMAIL_NOTIFICATION } from '@graphql/emailGraph';
 import { RejectedPayload } from '@type/slices/common/generic';
@@ -24,7 +24,7 @@ export const sendEmailNotification = createAsyncThunk<
     'email/sendNotification',
     async (variables, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate({
+            const { data } = await client.mutate({
                 mutation: SEND_EMAIL_NOTIFICATION,
                 variables,
             });

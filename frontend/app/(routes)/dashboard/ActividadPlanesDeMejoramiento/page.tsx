@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import PageTitle from "@components/UI/pageTitle"
-import { clientLAN } from "@lib/apollo-client"
+import { client } from "@lib/apollo-client"
 import {
   GET_ALL_IMPROVEMENT_PLAN_EVIDENCE_TYPES,
   GET_ALL_IMPROVEMENT_PLAN_DELIVERIES,
@@ -30,7 +30,7 @@ const AddImprovementPlanActivityPage = () => {
   const [deliveryDate, setDeliveryDate] = useState<string>(new Date().toISOString().split("T")[0])
   const [improvementPlanId, setImprovementPlanId] = useState<string>("")
   const searchParams = useSearchParams()
-  
+
   // Capturar parámetros de ficha para preservar el contexto
   const [studySheetParams, setStudySheetParams] = useState<{
     studySheetId?: string;
@@ -41,12 +41,12 @@ const AddImprovementPlanActivityPage = () => {
   useEffect(() => {
     const planIdParam = searchParams.get("planId") || searchParams.get("improvementPlanId")
     if (planIdParam) setImprovementPlanId(String(planIdParam))
-    
+
     // Capturar parámetros de ficha si existen
     const studySheetId = searchParams.get("studySheetId")
     const ficha = searchParams.get("ficha")
     const studentIds = searchParams.get("studentIds")
-    
+
     if (studySheetId || ficha) {
       setStudySheetParams({
         studySheetId: studySheetId || undefined,
@@ -65,33 +65,33 @@ const AddImprovementPlanActivityPage = () => {
     // NO cargar todos los planes sin filtro - esto causa el flash de datos no filtrados
     // dispatch(fetchImprovementPlans({ page: 0, size: 200 }))
     dispatch(fetchImprovementPlanActivities({ page: 0, size: 200 }))
-    ;(async () => {
-      try {
-        const { data } = await clientLAN.query({
-          query: GET_ALL_IMPROVEMENT_PLAN_EVIDENCE_TYPES,
-          variables: { page: 0, size: 200 },
-          fetchPolicy: "no-cache",
-        })
-        const items = data?.allImprovementPlanEvidenceTypes?.data || []
-        if (items && items.length > 0) setGlobalEvidenceTypes(items.map((it: any) => ({ id: it.id, name: it.name })))
-      } catch (err) {
-        // ignore
-      }
-    })()
-    ;(async () => {
-      try {
-        const { data } = await clientLAN.query({
-          query: GET_ALL_IMPROVEMENT_PLAN_DELIVERIES,
-          variables: { page: 0, size: 200 },
-          fetchPolicy: "no-cache",
-        })
-        const items = data?.allImprovementPlanDeliveries?.data || []
-        if (items && items.length > 0)
-          setGlobalDeliveries(items.map((it: any) => ({ id: it.id, deliveryFormat: it.deliveryFormat })))
-      } catch (err) {
-        // ignore
-      }
-    })()
+      ; (async () => {
+        try {
+          const { data } = await client.query({
+            query: GET_ALL_IMPROVEMENT_PLAN_EVIDENCE_TYPES,
+            variables: { page: 0, size: 200 },
+            fetchPolicy: "no-cache",
+          })
+          const items = data?.allImprovementPlanEvidenceTypes?.data || []
+          if (items && items.length > 0) setGlobalEvidenceTypes(items.map((it: any) => ({ id: it.id, name: it.name })))
+        } catch (err) {
+          // ignore
+        }
+      })()
+      ; (async () => {
+        try {
+          const { data } = await client.query({
+            query: GET_ALL_IMPROVEMENT_PLAN_DELIVERIES,
+            variables: { page: 0, size: 200 },
+            fetchPolicy: "no-cache",
+          })
+          const items = data?.allImprovementPlanDeliveries?.data || []
+          if (items && items.length > 0)
+            setGlobalDeliveries(items.map((it: any) => ({ id: it.id, deliveryFormat: it.deliveryFormat })))
+        } catch (err) {
+          // ignore
+        }
+      })()
   }, [dispatch])
 
   useEffect(() => {
@@ -110,24 +110,24 @@ const AddImprovementPlanActivityPage = () => {
       try {
         const planIdNumber = Number(improvementPlanId)
         console.log(`🔍 Buscando actividades para el plan ID: ${planIdNumber}`)
-        
-        const { data } = await clientLAN.query({
+
+        const { data } = await client.query({
           query: GET_ALL_IMPROVEMENT_PLAN_ACTIVITIES,
           variables: { page: 0, size: 200, id: planIdNumber },
           fetchPolicy: "no-cache",
         })
-        
+
         const allItems = data?.allImprovementPlanActivities?.data || []
         console.log(`📦 Total de actividades recibidas del backend:`, allItems.length)
         console.log(`📋 Actividades completas:`, allItems)
-        
+
         // Filtrar manualmente las actividades que pertenecen a este plan específico
         const filteredItems = allItems.filter((activity: any) => {
           const activityPlanId = activity?.improvementPlan?.id
           console.log(`  - Actividad ${activity.id}: Plan ID = ${activityPlanId}`)
           return Number(activityPlanId) === planIdNumber
         })
-        
+
         const count = filteredItems.length
         console.log(`✅ Actividades filtradas para el plan ${planIdNumber}: ${count}`)
         setActivitiesCount(count)
@@ -250,11 +250,11 @@ const AddImprovementPlanActivityPage = () => {
         const newCount = activitiesCount + 1
         setActivitiesCount(newCount)
         console.log(`Actividad registrada. Nuevo contador: ${newCount}`)
-        
+
         // Redirigir al historial preservando los parámetros de ficha
         let historialUrl = "/dashboard/HistorialPlanesMejoramientoInstructor"
         const params = new URLSearchParams()
-        
+
         if (studySheetParams.studySheetId) {
           params.set('studySheetId', studySheetParams.studySheetId)
         }
@@ -264,11 +264,11 @@ const AddImprovementPlanActivityPage = () => {
         if (studySheetParams.studentIds) {
           params.set('studentIds', studySheetParams.studentIds)
         }
-        
+
         if (params.toString()) {
           historialUrl += `?${params.toString()}`
         }
-        
+
         console.log('🔄 Redirigiendo a:', historialUrl)
         router.push(historialUrl)
       } else {
@@ -405,11 +405,10 @@ const AddImprovementPlanActivityPage = () => {
                     {displayDeliveries?.map((d: any) => (
                       <label
                         key={d.id}
-                        className={`group relative flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 transition-all duration-200 hover:shadow-sm active:scale-[0.98] ${
-                          deliveryId === String(d.id)
+                        className={`group relative flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 transition-all duration-200 hover:shadow-sm active:scale-[0.98] ${deliveryId === String(d.id)
                             ? "border-green-500 bg-gradient-to-r from-green-50 to-emerald-50 shadow-sm dark:border-blue-500 dark:bg-blue-900/30"
                             : "border-slate-200 bg-white hover:border-green-300 hover:bg-green-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:border-blue-400 dark:hover:bg-blue-900/20"
-                        }`}
+                          }`}
                       >
                         <input
                           type="radio"
@@ -419,11 +418,10 @@ const AddImprovementPlanActivityPage = () => {
                           className="h-4 w-4 shrink-0 cursor-pointer border-slate-300 text-green-600 shadow-sm transition-all duration-200 focus:ring-2 focus:ring-green-500/20 group-hover:scale-110 dark:border-slate-500 dark:bg-slate-800 dark:text-blue-500"
                         />
                         <span
-                          className={`text-sm transition-colors duration-200 ${
-                            deliveryId === String(d.id)
+                          className={`text-sm transition-colors duration-200 ${deliveryId === String(d.id)
                               ? "font-medium text-green-700 dark:text-blue-400"
                               : "text-slate-700 group-hover:text-green-700 dark:text-slate-300 dark:group-hover:text-blue-400"
-                          }`}
+                            }`}
                         >
                           {d.deliveryFormat}
                         </span>

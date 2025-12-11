@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@redux/store";
-import { fetchStudySheetsWithCoordinationId, addStudySheet } from "@slice/olympo/studySheetSlice";
 import { TEMPORAL_COORDINATOR_ID } from "@/temporaryCredential";
 import { MdAddCircle } from "react-icons/md";
 import { FaArrowRight } from "react-icons/fa";
@@ -20,55 +19,9 @@ const CrearFichasContainer: React.FC = () => {
     (state: RootState) => state.studySheet
   );
 
-  // 🔹 Cargar las fichas al montar el componente
-  useEffect(() => {
-    dispatch(
-      fetchStudySheetsWithCoordinationId({
-        coordinationId: TEMPORAL_COORDINATOR_ID,
-        page: 0,
-        size: 10,
-      })
-    );
-  }, [dispatch]);
-
   // 🔹 Manejo de modal
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
-
-  // 🔹 Crear nueva ficha
-  const handleCreateFicha = async (newFicha: any) => {
-    try {
-      // ✅ Transformamos correctamente el input
-      const formattedFicha = {
-        number: newFicha.number, // antes era "numero"
-        trainingProjectId: newFicha.trainingProjectId, // antes era "programId"
-        startLective: newFicha.startLective,
-        endLective: newFicha.endLective,
-        offerId: newFicha.offerId,
-        journeyId: newFicha.journeyId,
-        studySheetStateId: newFicha.studySheetStateId,
-        numberStudents: newFicha.numberStudents,
-      };
-
-      await dispatch(addStudySheet(formattedFicha)).unwrap();
-
-      toast.success("✅ ¡Ficha creada con éxito!");
-
-      // 🔄 Recargar lista
-      dispatch(
-        fetchStudySheetsWithCoordinationId({
-          coordinationId: TEMPORAL_COORDINATOR_ID,
-          page: 0,
-          size: 10,
-        })
-      );
-
-      handleCloseModal();
-    } catch (err: any) {
-      console.error("Error al crear ficha:", err);
-      toast.error(err?.message || "❌ Error al crear la ficha.");
-    }
-  };
 
   return (
     <div className="p-6 space-y-8">
@@ -78,7 +31,6 @@ const CrearFichasContainer: React.FC = () => {
       <ModalFichas
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        onCreate={handleCreateFicha}
       />
 
       {/* Botón para abrir modal */}

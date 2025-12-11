@@ -6,7 +6,7 @@ import { fetchChecklists } from '@redux/slices/checklistSlice';
 import { fetchTeamScrumByIdWithStudents } from '@redux/slices/teamScrumSlice';
 import { GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST } from '@graphql/checklistQualificationGraph';
 import { GET_EVALUATION_BY_CHECKLIST_AND_TEAM } from '@graphql/evaluationsGraph';
-import { clientLAN } from '@lib/apollo-client';
+import { client } from '@lib/apollo-client';
 import PageTitle from "@components/UI/pageTitle";
 import { Calendar, Users, User, Eye, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -43,11 +43,11 @@ interface EvaluatedChecklistData {
 
 export default function AprendizChecklistView() {
   const dispatch = useDispatch<AppDispatch>();
-  
+
   // Redux state
   const { data: checklists, loading: loadingChecklists } = useSelector((state: RootState) => state.checklist);
   const { dataForTeamScrumById } = useSelector((state: RootState) => state.teamScrum);
-  
+
   // State management
   const [selectedTrimester, setSelectedTrimester] = useState<string>("todos");
   const [selectedComponent, setSelectedComponent] = useState<string>("todos");
@@ -57,16 +57,16 @@ export default function AprendizChecklistView() {
   const [selectedChecklistForPreview, setSelectedChecklistForPreview] = useState<EvaluatedChecklistData | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [loading, setLoading] = useState(true);
-  
+
   // Estados para manejar expansión de texto
   const [expandedObservations, setExpandedObservations] = useState<{ [key: string]: boolean }>({});
   const [expandedRecommendations, setExpandedRecommendations] = useState<boolean>(false);
   const [expandedEvaluationObs, setExpandedEvaluationObs] = useState<boolean>(false);
   const [expandedCardDescriptions, setExpandedCardDescriptions] = useState<{ [key: string]: boolean }>({});
-  
+
   const itemsPerPage = 5;
   const teamScrumId = "1"; // ID del team scrum del aprendiz (igual que en TeamScrumAprendizContainer)
-  
+
   // Obtener el team scrum del aprendiz - REPLICANDO EXACTAMENTE TeamScrumAprendizContainer
   const studentTeamScrum = useMemo(() => {
     return dataForTeamScrumById;
@@ -111,7 +111,7 @@ export default function AprendizChecklistView() {
 
           try {
             // Cargar calificaciones de los items
-            const qualificationsResult = await clientLAN.query({
+            const qualificationsResult = await client.query({
               query: GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST,
               variables: {
                 checklistId: parseInt(checklist.id as string),
@@ -137,7 +137,7 @@ export default function AprendizChecklistView() {
             });
 
             // Cargar evaluación general
-            const evaluationResult = await clientLAN.query({
+            const evaluationResult = await client.query({
               query: GET_EVALUATION_BY_CHECKLIST_AND_TEAM,
               variables: {
                 checklistId: parseInt(checklist.id as string),
@@ -191,13 +191,13 @@ export default function AprendizChecklistView() {
   }, [studentTeamScrum, checklists, dispatch]);
 
   // Obtener trimestres y componentes únicos
-  const availableTrimesters = useMemo(() => 
+  const availableTrimesters = useMemo(() =>
     Array.from(new Set(evaluatedChecklists.map(item => item.trimester)))
-  , [evaluatedChecklists]);
+    , [evaluatedChecklists]);
 
-  const availableComponents = useMemo(() => 
+  const availableComponents = useMemo(() =>
     Array.from(new Set(evaluatedChecklists.map(item => item.component)))
-  , [evaluatedChecklists]);
+    , [evaluatedChecklists]);
 
   // Filtrar listas de chequeo
   useEffect(() => {
@@ -346,9 +346,9 @@ export default function AprendizChecklistView() {
   // Información del estudiante desde el team scrum
   const studentInfo = useMemo(() => {
     if (!studentTeamScrum?.studySheet) return null;
-    
+
     const studySheet = studentTeamScrum.studySheet;
-    
+
     return {
       centroFormacion: "Centro de Servicios Financieros",
       programa: studySheet.trainingProject?.program?.name || "Análisis y Desarrollo de Software",
@@ -505,7 +505,7 @@ export default function AprendizChecklistView() {
               No hay listas de chequeo evaluadas
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              {evaluatedChecklists.length === 0 
+              {evaluatedChecklists.length === 0
                 ? "Aún no se han realizado evaluaciones para tu equipo"
                 : "No se encontraron evaluaciones para los filtros seleccionados"}
             </p>
@@ -528,11 +528,10 @@ export default function AprendizChecklistView() {
                         <div className="text-sm text-white/80 min-w-0 flex-1">
                           {checklist.component.length > 50 ? (
                             <div className="w-full min-w-0">
-                              <div 
-                                className={`break-all overflow-wrap-anywhere text-wrap ${
-                                  expandedCardDescriptions[checklist.checklistId] ? 'whitespace-pre-wrap' : 'truncate'
-                                }`}
-                                style={{ 
+                              <div
+                                className={`break-all overflow-wrap-anywhere text-wrap ${expandedCardDescriptions[checklist.checklistId] ? 'whitespace-pre-wrap' : 'truncate'
+                                  }`}
+                                style={{
                                   wordBreak: 'break-all',
                                   overflowWrap: 'anywhere',
                                   maxWidth: '100%',
@@ -541,8 +540,8 @@ export default function AprendizChecklistView() {
                                   hyphens: 'auto'
                                 }}
                               >
-                                {expandedCardDescriptions[checklist.checklistId] 
-                                  ? checklist.component 
+                                {expandedCardDescriptions[checklist.checklistId]
+                                  ? checklist.component
                                   : truncateText(checklist.component, 50)
                                 }
                               </div>
@@ -643,11 +642,10 @@ export default function AprendizChecklistView() {
                 <button
                   onClick={goToPreviousPage}
                   disabled={currentPage === 1}
-                  className={`px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg transition-all duration-300 ${
-                    currentPage === 1
+                  className={`px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg transition-all duration-300 ${currentPage === 1
                       ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800 text-gray-400'
                       : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
-                  }`}
+                    }`}
                 >
                   Anterior
                 </button>
@@ -657,11 +655,10 @@ export default function AprendizChecklistView() {
                 <button
                   onClick={goToNextPage}
                   disabled={currentPage === totalPages}
-                  className={`px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg transition-all duration-300 ${
-                    currentPage === totalPages
+                  className={`px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg transition-all duration-300 ${currentPage === totalPages
                       ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800 text-gray-400'
                       : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
-                  }`}
+                    }`}
                 >
                   Siguiente
                 </button>
@@ -698,17 +695,17 @@ export default function AprendizChecklistView() {
             </div>
 
             {/* Contenido scrolleable */}
-            <div 
-              className="flex-1 overflow-y-auto overflow-x-hidden" 
-              style={{ 
-                wordWrap: 'break-word', 
+            <div
+              className="flex-1 overflow-y-auto overflow-x-hidden"
+              style={{
+                wordWrap: 'break-word',
                 overflowWrap: 'anywhere',
                 maxWidth: '100%'
               }}
             >
-              <div 
-                className="p-8 space-y-8 max-w-full" 
-                style={{ 
+              <div
+                className="p-8 space-y-8 max-w-full"
+                style={{
                   wordBreak: 'break-all',
                   overflowWrap: 'anywhere',
                   maxWidth: '100%',
@@ -763,34 +760,31 @@ export default function AprendizChecklistView() {
                         <div className="p-6">
                           <div className="space-y-6">
                             {previewData.items.map((item, index) => (
-                              <div 
-                                key={item.id} 
-                                className={`p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-lg ${
-                                  item.completed === true 
-                                    ? 'border-[#5cb800]/60 bg-[#5cb800]/10 dark:border-[#5cb800]/40 dark:bg-[#5cb800]/20' 
-                                    : item.completed === false 
+                              <div
+                                key={item.id}
+                                className={`p-6 rounded-2xl border-2 transition-all duration-300 hover:shadow-lg ${item.completed === true
+                                    ? 'border-[#5cb800]/60 bg-[#5cb800]/10 dark:border-[#5cb800]/40 dark:bg-[#5cb800]/20'
+                                    : item.completed === false
                                       ? 'border-red-500/60 bg-red-50/50 dark:border-red-500/40 dark:bg-red-900/20'
                                       : 'border-gray-300/60 bg-gray-50 dark:border-gray-600/40 dark:bg-gray-800/40'
-                                }`}
+                                  }`}
                               >
                                 <div className="flex items-start justify-between mb-4">
                                   <div className="flex items-center gap-3">
-                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white shadow-lg ${
-                                      item.completed === true 
-                                        ? 'bg-gradient-to-br from-[#5cb800] to-[#8fd400]' 
-                                        : item.completed === false 
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white shadow-lg ${item.completed === true
+                                        ? 'bg-gradient-to-br from-[#5cb800] to-[#8fd400]'
+                                        : item.completed === false
                                           ? 'bg-gradient-to-br from-red-500 to-red-600'
                                           : 'bg-gradient-to-br from-gray-400 to-gray-500'
-                                    }`}>
+                                      }`}>
                                       {index + 1}
                                     </div>
-                                    <span className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${
-                                      item.completed === true 
-                                        ? 'bg-gradient-to-r from-[#5cb800] to-[#8fd400] text-white' 
-                                        : item.completed === false 
+                                    <span className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm ${item.completed === true
+                                        ? 'bg-gradient-to-r from-[#5cb800] to-[#8fd400] text-white'
+                                        : item.completed === false
                                           ? 'bg-gradient-to-r from-red-500 to-red-600 text-white'
                                           : 'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
-                                    }`}>
+                                      }`}>
                                       {item.completed === true ? 'CUMPLE' : item.completed === false ? 'NO CUMPLE' : 'SIN EVALUAR'}
                                     </span>
                                   </div>
@@ -809,11 +803,10 @@ export default function AprendizChecklistView() {
                                     <div className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed min-w-0 w-full">
                                       {item.observations.length > 150 ? (
                                         <div className="w-full">
-                                          <div 
-                                            className={`w-full min-w-0 ${
-                                              expandedObservations[item.id] ? 'whitespace-pre-wrap break-all' : 'break-all'
-                                            }`}
-                                            style={{ 
+                                          <div
+                                            className={`w-full min-w-0 ${expandedObservations[item.id] ? 'whitespace-pre-wrap break-all' : 'break-all'
+                                              }`}
+                                            style={{
                                               wordBreak: 'break-all',
                                               overflowWrap: 'anywhere',
                                               maxWidth: '100%',
@@ -822,8 +815,8 @@ export default function AprendizChecklistView() {
                                               hyphens: 'auto'
                                             }}
                                           >
-                                            {expandedObservations[item.id] 
-                                              ? item.observations 
+                                            {expandedObservations[item.id]
+                                              ? item.observations
                                               : truncateText(item.observations, 150)
                                             }
                                           </div>
@@ -879,11 +872,10 @@ export default function AprendizChecklistView() {
                                 <div className="bg-gradient-to-br from-gray-50 to-white dark:from-[#5cb800]/5 dark:to-[#8fd400]/5 p-4 rounded-2xl border border-gray-200/60 dark:border-[#5cb800]/20 min-h-[120px]">
                                   {previewData.evaluation.observations && previewData.evaluation.observations.length > 200 ? (
                                     <div className="w-full min-w-0">
-                                      <div 
-                                        className={`text-gray-700 dark:text-gray-300 text-sm leading-relaxed w-full min-w-0 ${
-                                          expandedEvaluationObs ? 'whitespace-pre-wrap break-all' : 'break-all'
-                                        }`}
-                                        style={{ 
+                                      <div
+                                        className={`text-gray-700 dark:text-gray-300 text-sm leading-relaxed w-full min-w-0 ${expandedEvaluationObs ? 'whitespace-pre-wrap break-all' : 'break-all'
+                                          }`}
+                                        style={{
                                           wordBreak: 'break-all',
                                           overflowWrap: 'anywhere',
                                           maxWidth: '100%',
@@ -892,8 +884,8 @@ export default function AprendizChecklistView() {
                                           hyphens: 'auto'
                                         }}
                                       >
-                                        {expandedEvaluationObs 
-                                          ? previewData.evaluation.observations 
+                                        {expandedEvaluationObs
+                                          ? previewData.evaluation.observations
                                           : truncateText(previewData.evaluation.observations, 200)
                                         }
                                       </div>
@@ -933,11 +925,10 @@ export default function AprendizChecklistView() {
                                 <div className="bg-gradient-to-br from-gray-50 to-white dark:from-[#5cb800]/5 dark:to-[#8fd400]/5 p-4 rounded-2xl border border-gray-200/60 dark:border-[#5cb800]/20 min-h-[120px]">
                                   {previewData.evaluation.recommendations && previewData.evaluation.recommendations.length > 200 ? (
                                     <div className="w-full min-w-0">
-                                      <div 
-                                        className={`text-gray-700 dark:text-gray-300 text-sm leading-relaxed w-full min-w-0 ${
-                                          expandedRecommendations ? 'whitespace-pre-wrap break-all' : 'break-all'
-                                        }`}
-                                        style={{ 
+                                      <div
+                                        className={`text-gray-700 dark:text-gray-300 text-sm leading-relaxed w-full min-w-0 ${expandedRecommendations ? 'whitespace-pre-wrap break-all' : 'break-all'
+                                          }`}
+                                        style={{
                                           wordBreak: 'break-all',
                                           overflowWrap: 'anywhere',
                                           maxWidth: '100%',
@@ -946,8 +937,8 @@ export default function AprendizChecklistView() {
                                           hyphens: 'auto'
                                         }}
                                       >
-                                        {expandedRecommendations 
-                                          ? previewData.evaluation.recommendations 
+                                        {expandedRecommendations
+                                          ? previewData.evaluation.recommendations
                                           : truncateText(previewData.evaluation.recommendations, 200)
                                         }
                                       </div>

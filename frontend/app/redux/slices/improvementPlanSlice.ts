@@ -1,4 +1,4 @@
-import { client, clientLAN } from '@lib/apollo-client'
+import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic'
 import { GET_ALL_IMPROVEMENT_PLANS, GET_IMPROVEMENT_PLAN_BY_ID, ADD_IMPROVEMENT_PLAN, UPDATE_IMPROVEMENT_PLAN, DELETE_IMPROVEMENT_PLAN } from '@graphql/improvementPlanGraph'
@@ -28,60 +28,60 @@ export interface TeacherCompetence {
 
 // Función para transformar datos de GraphQL a ImprovementPlan
 const transformGraphQLToImprovementPlanItem = (graphqlData: any): ImprovementPlan => {
-  return {
-    id: graphqlData.id,
-    actNumber: graphqlData.actNumber,
-    city: graphqlData.city,
-    date: graphqlData.date,
-    startTime: graphqlData.startTime,
-    endTime: graphqlData.endTime,
-    place: graphqlData.place,
-    reason: graphqlData.reason,
-    state: graphqlData.state,
-    student: graphqlData.student
-      ? {
-          id: graphqlData.student.id,
-          person: {
-            id: graphqlData.student.person?.id,
-            name: graphqlData.student.person?.name,
-            lastname: graphqlData.student.person?.lastname,
-            document: graphqlData.student.person?.document,
-          },
-        }
-      : null,
-    teacherCompetence: graphqlData.teacherCompetence
-      ? {
-          id: graphqlData.teacherCompetence.id,
-          competence: {
-            id: graphqlData.teacherCompetence.competence?.id,
-            name: graphqlData.teacherCompetence.competence?.name,
-          },
-        }
-      : null,
-    learningOutcome: graphqlData.learningOutcome
+    return {
+        id: graphqlData.id,
+        actNumber: graphqlData.actNumber,
+        city: graphqlData.city,
+        date: graphqlData.date,
+        startTime: graphqlData.startTime,
+        endTime: graphqlData.endTime,
+        place: graphqlData.place,
+        reason: graphqlData.reason,
+        state: graphqlData.state,
+        student: graphqlData.student
             ? {
-                    id: graphqlData.learningOutcome.id,
-                    name: graphqlData.learningOutcome.name,
-                }
+                id: graphqlData.student.id,
+                person: {
+                    id: graphqlData.student.person?.id,
+                    name: graphqlData.student.person?.name,
+                    lastname: graphqlData.student.person?.lastname,
+                    document: graphqlData.student.person?.document,
+                },
+            }
             : null,
-    improvementPlanFile: graphqlData.improvementPlanFile,
-    faultType: graphqlData.faultType
-      ? {
-          id: graphqlData.faultType.id,
-          name: graphqlData.faultType.name,
-        }
-      : undefined,
-  };
+        teacherCompetence: graphqlData.teacherCompetence
+            ? {
+                id: graphqlData.teacherCompetence.id,
+                competence: {
+                    id: graphqlData.teacherCompetence.competence?.id,
+                    name: graphqlData.teacherCompetence.competence?.name,
+                },
+            }
+            : null,
+        learningOutcome: graphqlData.learningOutcome
+            ? {
+                id: graphqlData.learningOutcome.id,
+                name: graphqlData.learningOutcome.name,
+            }
+            : null,
+        improvementPlanFile: graphqlData.improvementPlanFile,
+        faultType: graphqlData.faultType
+            ? {
+                id: graphqlData.faultType.id,
+                name: graphqlData.faultType.name,
+            }
+            : undefined,
+    };
 };
 
-    type FetchImprovementPlansVars = { page?: number; size?: number; teacherCompetence?: number; id?: number; studySheetId?: number; studentId?: number; teacherCompetenceIds?: number[] };
+type FetchImprovementPlansVars = { page?: number; size?: number; teacherCompetence?: number; id?: number; studySheetId?: number; studentId?: number; teacherCompetenceIds?: number[] };
 
 export const fetchImprovementPlans = createAsyncThunk<GetAllImprovementPlansQuery['allImprovementPlans'], FetchImprovementPlansVars, { rejectValue: { code: string; message: string } }>(
     'improvementPlan/fetchAll',
     async ({ page, size, teacherCompetence, studySheetId, studentId, teacherCompetenceIds }, { rejectWithValue }) => {
         try {
-            // Use clientLAN (federated) para obtener datos de Student.person y TeacherStudySheet.competence
-            const { data } = await clientLAN.query<GetAllImprovementPlansQuery, GetAllImprovementPlansQueryVariables>({
+            // Use client (federated) para obtener datos de Student.person y TeacherStudySheet.competence
+            const { data } = await client.query<GetAllImprovementPlansQuery, GetAllImprovementPlansQueryVariables>({
                 query: GET_ALL_IMPROVEMENT_PLANS,
                 // Enviar variables incluyendo filtros
                 variables: {
@@ -106,8 +106,8 @@ export const fetchImprovementPlanById = createAsyncThunk<GetImprovementPlanByIdQ
     'improvementPlan/fetchById',
     async ({ id }, { rejectWithValue }) => {
         try {
-            // Use clientLAN (federated) para obtener datos de Student.person y TeacherStudySheet.competence
-            const { data } = await clientLAN.query<GetImprovementPlanByIdQuery, GetImprovementPlanByIdQueryVariables>({
+            // Use client (federated) para obtener datos de Student.person y TeacherStudySheet.competence
+            const { data } = await client.query<GetImprovementPlanByIdQuery, GetImprovementPlanByIdQueryVariables>({
                 query: GET_IMPROVEMENT_PLAN_BY_ID,
                 variables: { id },
                 fetchPolicy: 'network-only',
@@ -192,16 +192,16 @@ export const fetchTeacherCompetencesByStudySheet = createAsyncThunk<TeacherCompe
     'improvementPlan/fetchTeacherCompetencesByStudySheet',
     async ({ studySheetId, teacherId }) => {
         console.log('Solicitando competencias con:', { studySheetId, teacherId });
-        
+
         try {
-            const { data } = await clientLAN.query({
+            const { data } = await client.query({
                 query: GET_TEACHER_COMPETENCES_BY_STUDY_SHEET,
                 variables: { id: parseInt(studySheetId), teacherId: parseInt(teacherId) },
                 fetchPolicy: 'no-cache',
             });
-            
+
             console.log('Respuesta completa de GET_TEACHER_COMPETENCES_BY_STUDY_SHEET:', data);
-            
+
             const result = data.studySheetById?.data?.teacherStudySheets?.map((item: any) => ({
                 id: item.id,
                 competence: {
@@ -210,7 +210,7 @@ export const fetchTeacherCompetencesByStudySheet = createAsyncThunk<TeacherCompe
                     learningOutcome: item.competence.learningOutcome || []
                 },
             })) || [];
-            
+
             console.log('Competencias procesadas:', result);
             return result;
         } catch (error) {

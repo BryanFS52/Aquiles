@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@redux/store";
@@ -8,7 +8,7 @@ import Loader from "@components/UI/Loader";
 
 const AQUILES_URL = process.env.NEXT_PUBLIC_AQUILES_URL || "http://localhost:3000";
 
-export default function CerberosCallback() {
+function CerberosCallbackContent() {
   const searchParams = useSearchParams();
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
@@ -101,5 +101,20 @@ export default function CerberosCallback() {
         <p className="mt-4 text-gray-600">Procesando autenticación...</p>
       </div>
     </div>
+  );
+}
+
+export default function CerberosCallback() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Loader />
+          <p className="mt-4 text-gray-600">Cargando...</p>
+        </div>
+      </div>
+    }>
+      <CerberosCallbackContent />
+    </Suspense>
   );
 }

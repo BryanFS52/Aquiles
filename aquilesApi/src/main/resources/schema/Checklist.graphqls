@@ -7,8 +7,6 @@ type Checklist {
     instructorSignature: String  # ← Se llena cuando el instructor califica
     evaluationCriteria: Boolean  # ← Se llena cuando el instructor califica
     studySheets: String
-    trimester: String
-    component: String
     trainingProjectId: Long
     evaluations: Evaluation  # ← Se llena cuando el instructor califica
     items: [Item]
@@ -54,10 +52,15 @@ input ChecklistDto {
 extend type Query {
     allChecklists(page: Int, size: Int): ChecklistPage
     checklistById(id: Long!): ChecklistPageId
+    exportChecklistToPdf(id: Long!): String
+    exportChecklistToExcel(id: Long!): String
+
 }
 
 extend type Mutation {
     addChecklist(input: ChecklistDto): Response
     updateChecklist(id: Long!, input: ChecklistDto): Response
     deleteChecklist(id: Long!): Response
+    updateItemStatus(itemId: Long!, active: Boolean!): Response
+    refreshTrainingProjectName(checklistId: Long!): Response
 }

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import PageTitle from "@components/UI/pageTitle"
-import { clientLAN } from "@lib/apollo-client"
+import { client } from "@lib/apollo-client"
 import {
   GET_IMPROVEMENT_PLAN_EVALUATION_BY_PLAN_ID,
   ADD_IMPROVEMENT_PLAN_EVALUATION,
@@ -37,7 +37,7 @@ const EvaluatePlanMejoramientoPage = () => {
 
   const loadExistingEvaluation = async (planId: string) => {
     try {
-      const { data } = await clientLAN.query({
+      const { data } = await client.query({
         query: GET_IMPROVEMENT_PLAN_EVALUATION_BY_PLAN_ID,
         variables: { improvementPlanId: Number(planId) },
         fetchPolicy: "no-cache",
@@ -79,7 +79,7 @@ const EvaluatePlanMejoramientoPage = () => {
       showLoader && showLoader()
 
       if (isEditing && evaluationId) {
-        const { data } = await clientLAN.mutate({
+        const { data } = await client.mutate({
           mutation: UPDATE_IMPROVEMENT_PLAN_EVALUATION,
           variables: { id: Number(evaluationId), input },
         })
@@ -91,7 +91,7 @@ const EvaluatePlanMejoramientoPage = () => {
           toast.error(data?.updateImprovementPlanEvaluation?.message ?? "Error al actualizar evaluación")
         }
       } else {
-        const { data } = await clientLAN.mutate({
+        const { data } = await client.mutate({
           mutation: ADD_IMPROVEMENT_PLAN_EVALUATION,
           variables: { input },
         })

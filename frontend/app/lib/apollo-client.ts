@@ -6,7 +6,7 @@ const GRAPHQL_URI = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/gr
 console.log("🔗 Apollo Client URI:", GRAPHQL_URI);
 
 // Cliente Lan por medio de la direccion IP
-const clientLAN = new ApolloClient({
+const client = new ApolloClient({
     link: new HttpLink({
         uri: GRAPHQL_URI,
         fetchOptions: {
@@ -27,4 +27,4 @@ const clientLAN = new ApolloClient({
     },
 });
 
-export { client, clientLAN };
+export { client };

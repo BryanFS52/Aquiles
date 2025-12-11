@@ -15,6 +15,7 @@ import com.api.aquilesApi.Utilities.Exception.NotFoundException;
 import com.netflix.graphql.dgs.*;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
 import java.util.Map;
 
 @DgsComponent

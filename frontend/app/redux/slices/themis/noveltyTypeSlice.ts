@@ -1,5 +1,5 @@
 
-import { clientLAN } from '@lib/apollo-client'
+import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { createInitialPaginatedState, RejectedPayload, GenericPaginatedState } from '@type/slices/common/generic'
 import { GET_NOVELTYTYPE_LIST } from '@graphql/themis/noveltyTypeGraph'
@@ -49,7 +49,7 @@ export const fetchNoveltyTypes = createAsyncThunk<
     async ({ page = 0, size = 100 }, { rejectWithValue }) => {
         try {
 
-            const { data } = await clientLAN.query<GetNoveltyTypesQuery, GetNoveltyTypesQueryVariables>({
+            const { data } = await client.query<GetNoveltyTypesQuery, GetNoveltyTypesQueryVariables>({
                 query: GET_NOVELTYTYPE_LIST,
                 variables: { page, size },
                 fetchPolicy: 'cache-first'

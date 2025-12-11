@@ -90,7 +90,7 @@ public class ChecklistQualificationBusiness {
                 qualification.setQualificationState(dto.getQualificationState());
                 qualification.setObservations(dto.getObservations());
                 
-                Item item = itemService.findById(dto.getItemId());
+                Item item = itemService.getById(dto.getItemId());
                 TeamsScrum teamScrum = teamScrumService.getById(dto.getTeamScrumId());
                 Checklist checklist = checklistService.getById(dto.getChecklistId());
                 

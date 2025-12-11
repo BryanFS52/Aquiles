@@ -23,7 +23,7 @@ export default function ChecklistItems({ items, onItemUpdate }: ChecklistItemsPr
 
   const handleToggleItem = async (itemId: string, currentStatus: boolean) => {
     setLoadingItems(prev => new Set(prev).add(itemId))
-    
+
     try {
       const { data } = await updateItemStatus({
         variables: {
@@ -66,11 +66,10 @@ export default function ChecklistItems({ items, onItemUpdate }: ChecklistItemsPr
         {items.map((item) => (
           <div
             key={item.id}
-            className={`p-4 border rounded-lg transition-all duration-200 ${
-              item.active 
-                ? 'border-blue-200 bg-blue-50' 
+            className={`p-4 border rounded-lg transition-all duration-200 ${item.active
+                ? 'border-blue-200 bg-blue-50'
                 : 'border-gray-200 bg-gray-50'
-            }`}
+              }`}
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -78,17 +77,15 @@ export default function ChecklistItems({ items, onItemUpdate }: ChecklistItemsPr
                   <span className="text-xs font-medium text-gray-500 bg-gray-200 px-2 py-1 rounded">
                     {item.code}
                   </span>
-                  <span className={`text-xs font-medium px-2 py-1 rounded ${
-                    item.active 
-                      ? 'text-blue-700 bg-blue-200' 
+                  <span className={`text-xs font-medium px-2 py-1 rounded ${item.active
+                      ? 'text-blue-700 bg-blue-200'
                       : 'text-gray-700 bg-gray-200'
-                  }`}>
+                    }`}>
                     {item.active ? 'Activo' : 'Inactivo'}
                   </span>
                 </div>
-                <p className={`text-sm ${
-                  item.active ? 'text-gray-800' : 'text-gray-500'
-                }`}>
+                <p className={`text-sm ${item.active ? 'text-gray-800' : 'text-gray-500'
+                  }`}>
                   {item.indicator}
                 </p>
               </div>
@@ -96,16 +93,14 @@ export default function ChecklistItems({ items, onItemUpdate }: ChecklistItemsPr
                 <button
                   onClick={() => handleToggleItem(item.id, item.active)}
                   disabled={loadingItems.has(item.id)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                    item.active
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${item.active
                       ? 'bg-blue-600 focus:ring-blue-500'
                       : 'bg-gray-200 focus:ring-gray-500'
-                  } ${loadingItems.has(item.id) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    } ${loadingItems.has(item.id) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      item.active ? 'translate-x-6' : 'translate-x-1'
-                    }`}
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${item.active ? 'translate-x-6' : 'translate-x-1'
+                      }`}
                   />
                 </button>
               </div>

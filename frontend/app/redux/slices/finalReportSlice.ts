@@ -1,4 +1,4 @@
-import { clientLAN } from '@lib/apollo-client';
+import { client } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
 import { GET_ALL_FINAL_REPORTS, GET_FINAL_REPORT_BY_ID, ADD_FINAL_REPORT, UPDATE_FINAL_REPORT, DELETE_FINAL_REPORT } from '@graphql/finalReportGraph';
@@ -20,8 +20,8 @@ import {
 export const fetchFinalReport = createAsyncThunk<GetAllFinalReportsQuery['allFinalReports'], GetAllFinalReportsQueryVariables
 >(
     'finalReport/fetchAll',
-    async ({page, size}) => {
-        const { data } = await clientLAN.query<GetAllFinalReportsQuery, GetAllFinalReportsQueryVariables>({
+    async ({ page, size }) => {
+        const { data } = await client.query<GetAllFinalReportsQuery, GetAllFinalReportsQueryVariables>({
             query: GET_ALL_FINAL_REPORTS,
             variables: { page, size },
             fetchPolicy: 'no-cache',
@@ -34,10 +34,10 @@ export const fetchFinalReportById = createAsyncThunk<GetFinalReportByIdQuery['fi
     { rejectValue: { code: string; message: string } }
 >(
     'finalReport/fetchById',
-    async ({ id }, {rejectWithValue}) => {
+    async ({ id }, { rejectWithValue }) => {
         try {
 
-            const { data } = await clientLAN.query<GetFinalReportByIdQuery, GetFinalReportByIdQueryVariables>({
+            const { data } = await client.query<GetFinalReportByIdQuery, GetFinalReportByIdQueryVariables>({
                 query: GET_FINAL_REPORT_BY_ID,
                 variables: { id },
                 fetchPolicy: 'no-cache',
@@ -45,7 +45,7 @@ export const fetchFinalReportById = createAsyncThunk<GetFinalReportByIdQuery['fi
             return data.finalReportById;
         } catch (error: any) {
             console.error("Error fetching final report by ID:", error);
-            return rejectWithValue({code: '500', message: "Error fetching final report by ID"});
+            return rejectWithValue({ code: '500', message: "Error fetching final report by ID" });
         }
     }
 );
@@ -56,7 +56,7 @@ export const addFinalReport = createAsyncThunk<AddFinalReportMutation['addFinalR
     'finalReport/add',
     async (input, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<AddFinalReportMutation, AddFinalReportMutationVariables>({
+            const { data } = await client.mutate<AddFinalReportMutation, AddFinalReportMutationVariables>({
                 mutation: ADD_FINAL_REPORT,
                 variables: { input },
             });
@@ -68,7 +68,7 @@ export const addFinalReport = createAsyncThunk<AddFinalReportMutation['addFinalR
             return res;
         } catch (error: any) {
             console.error("Error adding final report:", error);
-            return rejectWithValue({ code: '500', message: error.message});
+            return rejectWithValue({ code: '500', message: error.message });
         }
     }
 );
@@ -77,9 +77,9 @@ export const updateFinalReport = createAsyncThunk<UpdateFinalReportMutation['upd
     { rejectValue: { code: string; message: string } }
 >(
     'finalReport/update',
-     async ({ id, input }, { rejectWithValue }) => {
+    async ({ id, input }, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<UpdateFinalReportMutation, UpdateFinalReportMutationVariables>({
+            const { data } = await client.mutate<UpdateFinalReportMutation, UpdateFinalReportMutationVariables>({
                 mutation: UPDATE_FINAL_REPORT,
                 variables: { id, input },
             });
@@ -91,7 +91,7 @@ export const updateFinalReport = createAsyncThunk<UpdateFinalReportMutation['upd
             return res;
         } catch (error: any) {
             console.error("Error updating final report:", error);
-            return rejectWithValue({ code: '500', message: error.message});
+            return rejectWithValue({ code: '500', message: error.message });
         }
     }
 );
@@ -100,7 +100,7 @@ export const deleteFinalReport = createAsyncThunk<string | number, DeleteFinalRe
     'finalReport/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await clientLAN.mutate<DeleteFinalReportMutation, DeleteFinalReportMutationVariables>({
+            const { data } = await client.mutate<DeleteFinalReportMutation, DeleteFinalReportMutationVariables>({
                 mutation: DELETE_FINAL_REPORT,
                 variables: { id },
             });

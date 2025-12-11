@@ -6,7 +6,6 @@ import { AppDispatch, RootState } from '@/redux/store';
 import { useRouter } from 'next/navigation';
 import { FaUsers } from "react-icons/fa";
 import { toast } from 'react-toastify';
-import { fetchStudySheetsWithCoordinationId } from '@slice/olympo/studySheetSlice';
 import { fetchCoordinationByColaborator } from '@slice/olympo/coordinationSlice';
 import { TEMPORAL_COORDINATOR_ID } from '@/temporaryCredential';
 import PageTitle from '@/components/UI/pageTitle';
@@ -27,20 +26,6 @@ const InstructorTechnicalAssignContainer: React.FC = () => {
     .flatMap(coord => coord.teachers || [])
     .filter((teacher): teacher is NonNullable<typeof teacher> => teacher !== null && teacher !== undefined);
 
-  useEffect(() => {
-    // Cargar fichas y coordinaciones
-    dispatch(fetchStudySheetsWithCoordinationId({ 
-      coordinationId: TEMPORAL_COORDINATOR_ID,
-      page: 0, 
-      size: 10
-    }));
-    dispatch(fetchCoordinationByColaborator({ 
-      collaboratorId: TEMPORAL_COORDINATOR_ID, 
-      page: 0, 
-      size: 10, 
-      state: true 
-    }));
-  }, [dispatch]);
 
   const handleAssignInstructor = (sheetId: string, teacherId: string) => {
     if (!teacherId) {
@@ -49,7 +34,7 @@ const InstructorTechnicalAssignContainer: React.FC = () => {
     }
 
     const teacher = teachers.find(t => t.id === teacherId);
-    
+
     if (!teacher) {
       toast.error("Instructor no encontrado");
       return;

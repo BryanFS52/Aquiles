@@ -9,6 +9,7 @@ import PageTitle from "@components/UI/pageTitle";
 import EmptyState from "@components/UI/emptyState";
 import StatsGrid from "./StatsGrid";
 import StudentsList from "./StudentsList";
+import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
 
 const ApprenticeContainer: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,7 +22,7 @@ const ApprenticeContainer: React.FC = () => {
   useEffect(() => {
     // Limpiar estado anterior antes de cargar nueva ficha
     dispatch(clearStudySheetState());
-    dispatch(fetchStudySheetWithStudents({ id: TEMPORAL_APRENDIZ_ID }));
+    dispatch(fetchStudySheetWithStudents({ id: TEMPORAL_INSTRUCTOR_ID }));
   }, [dispatch]);
 
   useEffect(() => {

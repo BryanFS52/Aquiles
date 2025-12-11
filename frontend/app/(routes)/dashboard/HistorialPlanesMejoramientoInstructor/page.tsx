@@ -6,8 +6,8 @@ import DataTable from "@components/UI/DataTable";
 import type { DataTableColumn } from "@components/UI/DataTable/types";
 import type { AppDispatch } from "@redux/store"
 import { useDispatch, useSelector } from "react-redux"
-import {fetchImprovementPlans} from "@slice/improvementPlanSlice";
-import { clientLAN } from "@lib/apollo-client";
+import { fetchImprovementPlans } from "@slice/improvementPlanSlice";
+import { client } from "@lib/apollo-client";
 import { GET_STUDY_SHEET_BY_ID, GET_LEARNING_OUTCOMES_BY_COMPETENCE, GET_TEACHER_COMPETENCES_BY_STUDY_SHEET } from "@graphql/olympo/studySheetGraph";
 import { GET_IMPROVEMENT_PLAN_EVALUATION_BY_PLAN_ID } from "@graphql/improvementPlanEvaluationGraph";
 import { FiMapPin, FiCalendar, FiFileText, FiStar, FiEye, FiPlus, FiArrowLeft, FiCheck } from "react-icons/fi";
@@ -18,10 +18,10 @@ import { useUser } from "@context/UserContext";
 
 // Extender el tipo para incluir faultType que puede venir del backend
 interface ImprovementPlan extends BaseImprovementPlan {
-  faultType?: {
-    id: string;
-    name: string;
-  } | null;
+    faultType?: {
+        id: string;
+        name: string;
+    } | null;
 }
 
 const HistorialPlanesMejoramientoInstructorContent = () => {
@@ -29,12 +29,12 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { user } = useUser();
-    const { 
-        data: allImprovementPlans, 
-        loading, 
-        error, 
-        totalPages, 
-        totalItems, 
+    const {
+        data: allImprovementPlans,
+        loading,
+        error,
+        totalPages,
+        totalItems,
         currentPage,
         metaStudySheet
     } = useSelector((state: any) => {
@@ -48,9 +48,9 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
     const fichaDataString = searchParams.get('fichaData'); // mantener por compatibilidad
     const fichaNumber = searchParams.get('ficha');
     const studentIds = searchParams.get('studentIds');
-    
+
     const [studySheet, setStudySheet] = React.useState<any>(null);
-    
+
     const fichaData = React.useMemo(() => {
         if (fichaDataString) {
             // Si viene como JSON en fichaData (compatibilidad)
@@ -70,13 +70,13 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
         }
         return null;
     }, [fichaDataString, fichaNumber, studentIds]);
-    
+
     // Fetch studySheet si viene studySheetId
     useEffect(() => {
         const fetchStudySheet = async () => {
             if (studySheetIdParam) {
                 try {
-                    const { data } = await clientLAN.query({
+                    const { data } = await client.query({
                         query: GET_STUDY_SHEET_BY_ID,
                         variables: { id: parseInt(studySheetIdParam, 10) },
                     });
@@ -89,7 +89,7 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
         };
         fetchStudySheet();
     }, [studySheetIdParam]);
-    
+
     // Memorizar el ID de la ficha para evitar renders innecesarios
     // Usar tanto id como fichaNumber según lo que esté disponible
     const fichaId = React.useMemo(() => {
@@ -99,7 +99,7 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
         console.log('fichaId calculado:', finalId, 'desde studySheet:', studySheet, 'fichaData:', fichaData, 'studySheetIdParam:', studySheetIdParam);
         return finalId;
     }, [studySheet, fichaData, studySheetIdParam]);
-    
+
     // Usar directamente los datos del backend ya filtrados por ficha
     const improvementPlans = React.useMemo(() => {
         console.log('🔍 improvementPlans memo - allImprovementPlans:', allImprovementPlans);
@@ -107,7 +107,7 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
         return allImprovementPlans || [];
     }, [allImprovementPlans]);
     const fichaNameOrNumber = metaStudySheet?.number ?? studySheet?.number ?? fichaData?.fichaNumber ?? fichaData?.number ?? fichaData?.id ?? '';
-    
+
     // Estado para manejar la página actual (Paginator espera páginas basadas en 1)
     const [page, setPage] = React.useState(1);
     // const [selectedTeacherCompetenceId, setSelectedTeacherCompetenceId] = React.useState<number | null>(null);
@@ -117,11 +117,11 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
     const [learningOutcomeMap, setLearningOutcomeMap] = React.useState<Record<string, { name?: string; description?: string }>>({});
     // Mapa de evaluaciones: planId -> judgment
     const [evaluationsMap, setEvaluationsMap] = React.useState<Record<string, boolean | null>>({});
-    
+
     // Función para manejar cambio de página
     const handlePageChange = React.useCallback((newPage: number) => {
         if (loading || newPage === page) return; // Evitar llamadas duplicadas
-        
+
         setPage(newPage);
         // No necesitamos dispatch aquí porque el useEffect se encargará cuando page cambie
     }, [loading, page]);
@@ -148,7 +148,7 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
     // Estado para teacherCompetence IDs
     const [teacherCompetenceIds, setTeacherCompetenceIds] = React.useState<number[] | null>(null);
     const [loadingCompetences, setLoadingCompetences] = React.useState(false);
-    
+
     // Ref para evitar llamadas duplicadas
     const lastFetchRef = React.useRef<string>('');
     const isFirstRender = React.useRef(true);
@@ -160,22 +160,22 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
                 setTeacherCompetenceIds(null);
                 return;
             }
-            
+
             // Evitar llamadas duplicadas
             if (loadingCompetences) return;
-            
+
             setLoadingCompetences(true);
             try {
                 console.log('🔍 Obteniendo teacherCompetences para fichaId:', fichaId);
-                const { data } = await clientLAN.query({
+                const { data } = await client.query({
                     query: GET_TEACHER_COMPETENCES_BY_STUDY_SHEET,
                     variables: { id: fichaId },
                     fetchPolicy: 'cache-first' // Usar caché para evitar llamadas repetidas
                 });
-                
+
                 const teacherStudySheets = data?.studySheetById?.data?.teacherStudySheets || [];
                 const ids = teacherStudySheets.map((ts: any) => Number(ts.id)).filter((id: number) => !isNaN(id));
-                
+
                 console.log('✅ TeacherCompetence IDs obtenidos:', ids);
                 setTeacherCompetenceIds(ids.length > 0 ? ids : null);
             } catch (error) {
@@ -207,26 +207,26 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
             }
             return;
         }
-        
+
         // Marcar que ya no es el primer render
         isFirstRender.current = false;
-        
+
         // Preparar variables de consulta CON filtro obligatorio
-        const queryVariables: any = { 
+        const queryVariables: any = {
             page: page - 1, // Backend espera páginas basadas en 0
             size: 5,
             teacherCompetenceIds: teacherCompetenceIds
         };
-        
+
         // Crear una key única para este fetch
         const fetchKey = JSON.stringify({ page: queryVariables.page, ids: queryVariables.teacherCompetenceIds });
-        
+
         // Evitar llamadas duplicadas
         if (lastFetchRef.current === fetchKey) {
             console.log('🚫 Evitando llamada duplicada');
             return;
         }
-        
+
         console.log('✅ Dispatching fetchImprovementPlans con filtro:', queryVariables);
         lastFetchRef.current = fetchKey;
         dispatch(fetchImprovementPlans(queryVariables));
@@ -238,7 +238,7 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
             // Solo ejecutar si hay planes
             const plans: any[] = improvementPlans || [];
             if (plans.length === 0) return;
-            
+
             const competenceIds = Array.from(new Set(plans.map(p => p?.teacherCompetence?.competence?.id).filter(Boolean)));
             if (competenceIds.length === 0) return;
 
@@ -247,7 +247,7 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
 
                 await Promise.all(competenceIds.map(async (cid) => {
                     try {
-                        const { data } = await clientLAN.query({
+                        const { data } = await client.query({
                             query: GET_LEARNING_OUTCOMES_BY_COMPETENCE,
                             variables: { idCompetence: Number(cid), page: 0, size: 100 },
                             fetchPolicy: 'cache-first' // Usar caché para evitar llamadas repetidas
@@ -273,7 +273,7 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
         const timer = setTimeout(() => {
             fetchOutcomesForCompetences();
         }, 100);
-        
+
         return () => clearTimeout(timer);
     }, [improvementPlans?.length]); // Solo depender de la longitud, no del array completo
 
@@ -291,18 +291,18 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
 
                 await Promise.all(plans.map(async (plan) => {
                     try {
-                        const { data } = await clientLAN.query({
+                        const { data } = await client.query({
                             query: GET_IMPROVEMENT_PLAN_EVALUATION_BY_PLAN_ID,
                             variables: { improvementPlanId: Number(plan.id) },
                             fetchPolicy: 'cache-first' // Usar caché para evitar llamadas repetidas
                         });
-                        
+
                         const evaluation = data?.improvementPlanEvaluationByImprovementPlanId?.data;
                         evaluations[plan.id] = evaluation?.judgment ?? null;
                     } catch (err: any) {
                         // Si el error es porque no existe evaluación, no es un error real
-                        const isNotFoundError = err?.message?.includes('not found') || 
-                                              err?.graphQLErrors?.[0]?.message?.includes('not found');
+                        const isNotFoundError = err?.message?.includes('not found') ||
+                            err?.graphQLErrors?.[0]?.message?.includes('not found');
                         if (!isNotFoundError) {
                             console.error('Error al obtener evaluación para plan', plan.id, err);
                         }
@@ -320,7 +320,7 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
         const timer = setTimeout(() => {
             fetchEvaluations();
         }, 150);
-        
+
         return () => clearTimeout(timer);
     }, [improvementPlans?.length]); // Solo depender de la longitud, no del array completo
 
@@ -345,8 +345,8 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
                     </div>
                     <div>
                         <p className="font-medium text-gray-900 dark:text-white text-sm uppercase">
-                            {row.student?.person ? 
-                                `${row.student.person.name} ${row.student.person.lastname}`.toUpperCase() : 
+                            {row.student?.person ?
+                                `${row.student.person.name} ${row.student.person.lastname}`.toUpperCase() :
                                 'ESTUDIANTE NO DISPONIBLE'
                             }
                         </p>
@@ -365,7 +365,7 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
                 </div>
             )
         },
-        
+
         {
             key: 'date',
             header: 'Fecha',
@@ -383,11 +383,10 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
             header: 'Estado',
             render: (row) => (
                 <div className="flex items-center justify-center">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border transition-all duration-200 ${
-                        row.state 
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'
-                            : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30'
-                    }`}>
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border transition-all duration-200 ${row.state
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'
+                        : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30'
+                        }`}>
                         <svg className="w-2 h-2" viewBox="0 0 8 8" fill="currentColor">
                             <circle cx="4" cy="4" r="3" />
                         </svg>
@@ -432,8 +431,8 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
             key: 'evaluation',
             header: 'Evaluación',
             render: (row) => {
-                const judgment = evaluationsMap[row.id];
-                
+                const judgment = evaluationsMap[row.id ?? ''];
+
                 if (judgment === null || judgment === undefined) {
                     return (
                         <div className="flex items-center justify-center">
@@ -446,16 +445,15 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
                         </div>
                     );
                 }
-                
+
                 const isApproved = judgment === true;
-                
+
                 return (
                     <div className="flex items-center justify-center">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border transition-all duration-200 ${
-                            isApproved 
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'
-                                : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30'
-                        }`}>
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold border transition-all duration-200 ${isApproved
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'
+                            : 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30'
+                            }`}>
                             <svg className="w-2.5 h-2.5" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
                                 {isApproved ? (
                                     <path d="M2 6L5 9L10 3" strokeLinecap="round" strokeLinejoin="round" />
@@ -469,7 +467,7 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
                 );
             }
         },
-        
+
         {
             key: 'actions',
             header: 'Acciones',
@@ -489,7 +487,7 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
                         <FiPlus className="w-4 h-4 mr-2" /> ACTIVIDAD
                     </button>
 
-                    {evaluationsMap[row.id] === null || evaluationsMap[row.id] === undefined ? (
+                    {evaluationsMap[row.id ?? ''] === null || evaluationsMap[row.id ?? ''] === undefined ? (
                         <button
                             onClick={() => router.push(`./EvaluarPlanMejoramiento?planId=${row.id}`)}
                             className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-lightGreen to-primary hover:from-primary hover:to-lightGreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:bg-gradient-to-r dark:from-blue-600 dark:to-blue-700 dark:hover:from-blue-700 dark:hover:to-blue-800 dark:focus:ring-blue-500 transition-colors duration-200"
@@ -511,30 +509,30 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
     ];
 
     // Función de filtro personalizada
-        const filterFunction = (row: ImprovementPlan, filter: string): boolean => {
-            const searchTerm = filter.toLowerCase().trim();
-            if (!searchTerm) return true;
+    const filterFunction = (row: ImprovementPlan, filter: string): boolean => {
+        const searchTerm = filter.toLowerCase().trim();
+        if (!searchTerm) return true;
         const normalizeText = (text: string) => text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            const normalizedSearch = normalizeText(searchTerm);
-            
-            return (
-                // Búsqueda en datos del estudiante
-                (row.student?.person?.name ? normalizeText(row.student.person.name).includes(normalizedSearch) : false) ||
-                (row.student?.person?.lastname ? normalizeText(row.student.person.lastname).includes(normalizedSearch) : false) ||
-                (row.student?.person?.document ? row.student.person.document.includes(searchTerm) : false) ||
-                // Búsqueda en ciudad
-                (row.city ? normalizeText(row.city).includes(normalizedSearch) : false) ||
-                // Búsqueda en tipo de falta
-                ((row as any).faultType?.name ? normalizeText((row as any).faultType.name).includes(normalizedSearch) : false) ||
-                // Búsqueda por palabras clave específicas de tipo de falta
-                ((row as any).faultType?.name ? (
-                    (normalizeText((row as any).faultType.name).includes('academica') && normalizedSearch.includes('academica')) ||
-                    (normalizeText((row as any).faultType.name).includes('disciplinaria') && normalizedSearch.includes('disciplinaria'))
-                ) : false) ||
-                // (Removed objectives search - objectives now live in activities)
-                false
-            );
-        }
+        const normalizedSearch = normalizeText(searchTerm);
+
+        return (
+            // Búsqueda en datos del estudiante
+            (row.student?.person?.name ? normalizeText(row.student.person.name).includes(normalizedSearch) : false) ||
+            (row.student?.person?.lastname ? normalizeText(row.student.person.lastname).includes(normalizedSearch) : false) ||
+            (row.student?.person?.document ? row.student.person.document.includes(searchTerm) : false) ||
+            // Búsqueda en ciudad
+            (row.city ? normalizeText(row.city).includes(normalizedSearch) : false) ||
+            // Búsqueda en tipo de falta
+            ((row as any).faultType?.name ? normalizeText((row as any).faultType.name).includes(normalizedSearch) : false) ||
+            // Búsqueda por palabras clave específicas de tipo de falta
+            ((row as any).faultType?.name ? (
+                (normalizeText((row as any).faultType.name).includes('academica') && normalizedSearch.includes('academica')) ||
+                (normalizeText((row as any).faultType.name).includes('disciplinaria') && normalizedSearch.includes('disciplinaria'))
+            ) : false) ||
+            // (Removed objectives search - objectives now live in activities)
+            false
+        );
+    }
 
     if (loading) {
         return (
@@ -558,13 +556,13 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
             </div>
         );
     }
-    
+
     console.log('🎯 Evaluando condición de sin datos:');
     console.log('  - loading:', loading);
     console.log('  - improvementPlans:', improvementPlans);
     console.log('  - improvementPlans.length:', improvementPlans?.length);
     console.log('  - Array.isArray(improvementPlans):', Array.isArray(improvementPlans));
-    
+
     if (!loading && Array.isArray(improvementPlans) && improvementPlans.length === 0) {
         return (
             <div className="mx-auto px-4 py-8 space-y-6">
@@ -599,18 +597,18 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
             </div>
         );
     }
-    
-    
+
+
     return (
         <div className="mx-auto px-4 py-8">
             <div className="space-y-6">
                 <div>
-                    <PageTitle  onBack={() => router.back()}>
+                    <PageTitle onBack={() => router.back()}>
                         {fichaNameOrNumber ? `Historial - Ficha N° ${fichaNameOrNumber}` : 'Historial De Planes De Mejoramiento'}
                     </PageTitle>
                     {/* Toolbar removed: assign actions are now per-row in the table to avoid duplicate 'ASIGNAR' buttons */}
                 </div>
-                
+
 
                 <DataTable<ImprovementPlan>
                     columns={columns}
@@ -626,9 +624,9 @@ const HistorialPlanesMejoramientoInstructorContent = () => {
                     onExternalPageChange={handlePageChange}
                     externalTotalPages={totalPages}
                 />
-                
+
                 {/* Paginación: usar la que provee `DataTable` internamente. */}
-                
+
 
             </div>
         </div>

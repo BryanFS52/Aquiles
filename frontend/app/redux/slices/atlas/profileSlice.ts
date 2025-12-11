@@ -1,13 +1,13 @@
-import { clientLAN } from '@lib/apollo-client';
+import { client } from '@lib/apollo-client';
 import { GET_ALL_PROFILES, GET_PROFILE_BY_ID } from '@graphql/atlas/profilesGraph';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createInitialPaginatedState, RejectedPayload } from '@type/slices/common/generic';
-import { Profile, GetAllProfilesQuery, GetAllProfilesQueryVariables, GetProfileByIdQuery,GetProfileByIdQueryVariables} from '@graphql/generated'
+import { Profile, GetAllProfilesQuery, GetAllProfilesQueryVariables, GetProfileByIdQuery, GetProfileByIdQueryVariables } from '@graphql/generated'
 
 export const fetchProfiles = createAsyncThunk<GetAllProfilesQuery['allProfiles'], GetAllProfilesQueryVariables>(
     'profile/fetchAll',
     async ({ page, size }) => {
-        const { data } = await clientLAN.query<GetAllProfilesQuery, GetAllProfilesQueryVariables>({
+        const { data } = await client.query<GetAllProfilesQuery, GetAllProfilesQueryVariables>({
             query: GET_ALL_PROFILES,
             variables: { page, size },
             fetchPolicy: 'no-cache',
@@ -19,7 +19,7 @@ export const fetchProfiles = createAsyncThunk<GetAllProfilesQuery['allProfiles']
 export const fetchProfileById = createAsyncThunk<GetProfileByIdQuery['ProfileById'], GetProfileByIdQueryVariables>(
     'profile/fetchById',
     async ({ id }) => {
-        const { data } = await clientLAN.query<GetProfileByIdQuery, GetProfileByIdQueryVariables>({
+        const { data } = await client.query<GetProfileByIdQuery, GetProfileByIdQueryVariables>({
             query: GET_PROFILE_BY_ID,
             variables: { id },
         });

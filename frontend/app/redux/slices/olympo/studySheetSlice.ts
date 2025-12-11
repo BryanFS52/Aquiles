@@ -1,4 +1,4 @@
-import { clientLAN } from '@lib/apollo-client'
+import { client } from '@lib/apollo-client'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { GET_STUDY_SHEETS, GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID, GET_STUDY_SHEET_BY_ID, GET_STUDY_SHEET_BY_TEACHER, GET_STUDY_SHEET_WITH_STUDENTS, GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM, GET_STUDY_SHEET_BY_ID_WITH_ATTENDANCES, GET_STUDY_SHEETS_BY_TRAINING_PROJECT, ADD_STUDY_SHEET, GET_STUDY_SHEETS_WITH_COORDINATION_ID } from '@graphql/olympo/studySheetGraph'
 import { createInitialPaginatedState } from '@type/slices/common/generic';
@@ -31,11 +31,11 @@ import {
 export const fetchStudySheets = createAsyncThunk<GetStudySheetsQuery['allStudySheets'], GetStudySheetsQueryVariables>(
     'studySheet/fetchAll',
     async ({ page = 0, size = 100 }) => {
-        const { data } = await clientLAN.query<GetStudySheetsQuery, GetStudySheetsQueryVariables>({
+        const { data } = await client.query<GetStudySheetsQuery, GetStudySheetsQueryVariables>({
             query: GET_STUDY_SHEETS,
-            variables: { 
-                page: page ?? 0, 
-                size: size ?? 100 
+            variables: {
+                page: page ?? 0,
+                size: size ?? 100
             },
             fetchPolicy: 'no-cache',
         });
@@ -47,7 +47,7 @@ export const fetchStudySheets = createAsyncThunk<GetStudySheetsQuery['allStudySh
 export const fetchStudySheetWithTeamScrum = createAsyncThunk<GetStudySheetWithTeamScrumByIdQuery['studySheetById'], GetStudySheetWithTeamScrumByIdQueryVariables>(
     'studySheet/fetchTeamScrum',
     async ({ id }) => {
-        const { data } = await clientLAN.query<GetStudySheetWithTeamScrumByIdQuery, GetStudySheetWithTeamScrumByIdQueryVariables>({
+        const { data } = await client.query<GetStudySheetWithTeamScrumByIdQuery, GetStudySheetWithTeamScrumByIdQueryVariables>({
             query: GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID,
             variables: { id },
             fetchPolicy: 'no-cache',
@@ -59,7 +59,7 @@ export const fetchStudySheetWithTeamScrum = createAsyncThunk<GetStudySheetWithTe
 export const fetchStudySheetById = createAsyncThunk<GetStudySheetByIdQuery['studySheetById'], GetStudySheetByIdQueryVariables>(
     'studySheet/fetchById',
     async ({ id }) => {
-        const { data } = await clientLAN.query<GetStudySheetByIdQuery, GetStudySheetByIdQueryVariables>({
+        const { data } = await client.query<GetStudySheetByIdQuery, GetStudySheetByIdQueryVariables>({
             query: GET_STUDY_SHEET_BY_ID,
             variables: { id },
             fetchPolicy: 'no-cache',
@@ -71,12 +71,12 @@ export const fetchStudySheetById = createAsyncThunk<GetStudySheetByIdQuery['stud
 export const fetchStudySheetByTeacher = createAsyncThunk<StudySheetByTeacherQuery['allStudySheets'], StudySheetByTeacherQueryVariables>(
     'studySheet/fetchByTeacher',
     async ({ idTeacher, page = 0, size = 100 }) => {
-        const { data } = await clientLAN.query<StudySheetByTeacherQuery, StudySheetByTeacherQueryVariables>({
+        const { data } = await client.query<StudySheetByTeacherQuery, StudySheetByTeacherQueryVariables>({
             query: GET_STUDY_SHEET_BY_TEACHER,
-            variables: { 
-                idTeacher, 
-                page: page ?? 0, 
-                size: size ?? 100 
+            variables: {
+                idTeacher,
+                page: page ?? 0,
+                size: size ?? 100
             },
             fetchPolicy: 'no-cache',
         })
@@ -87,7 +87,7 @@ export const fetchStudySheetByTeacher = createAsyncThunk<StudySheetByTeacherQuer
 export const fetchStudySheetWithStudents = createAsyncThunk<GetStudySheetWithStudentsQuery['studySheetById'], GetStudySheetWithStudentsQueryVariables>(
     'studySheet/fetchStudents',
     async ({ id }) => {
-        const { data } = await clientLAN.query<GetStudySheetWithStudentsQuery, GetStudySheetWithStudentsQueryVariables>({
+        const { data } = await client.query<GetStudySheetWithStudentsQuery, GetStudySheetWithStudentsQueryVariables>({
             query: GET_STUDY_SHEET_WITH_STUDENTS,
             variables: { id },
             fetchPolicy: 'no-cache',
@@ -99,12 +99,12 @@ export const fetchStudySheetWithStudents = createAsyncThunk<GetStudySheetWithStu
 export const fetchStudySheetByTeacherIdWithTeamScrum = createAsyncThunk<StudySheetByTeacherIdWithTeamScrumQuery['allStudySheets'], StudySheetByTeacherIdWithTeamScrumQueryVariables>(
     'studySheet/fetchByTeacherIdWithTeamScrum',
     async ({ idTeacher, page = 0, size = 100 }) => {
-        const { data } = await clientLAN.query<StudySheetByTeacherIdWithTeamScrumQuery, StudySheetByTeacherIdWithTeamScrumQueryVariables>({
+        const { data } = await client.query<StudySheetByTeacherIdWithTeamScrumQuery, StudySheetByTeacherIdWithTeamScrumQueryVariables>({
             query: GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM,
-            variables: { 
-                idTeacher, 
-                page: page ?? 0, 
-                size: size ?? 100 
+            variables: {
+                idTeacher,
+                page: page ?? 0,
+                size: size ?? 100
             },
             fetchPolicy: 'no-cache',
         });
@@ -115,7 +115,7 @@ export const fetchStudySheetByTeacherIdWithTeamScrum = createAsyncThunk<StudyShe
 export const fetchStudySheetByIdWithAttendances = createAsyncThunk<GetStudySheetByIdWithAttendancesQuery['studySheetById'], GetStudySheetByIdWithAttendancesQueryVariables>(
     'studySheet/fetchByIdWithAttendances',
     async ({ id, competenceId }) => {
-        const { data } = await clientLAN.query<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>({
+        const { data } = await client.query<GetStudySheetByIdWithAttendancesQuery, GetStudySheetByIdWithAttendancesQueryVariables>({
             query: GET_STUDY_SHEET_BY_ID_WITH_ATTENDANCES,
             variables: { id, competenceId },
             fetchPolicy: 'no-cache',
@@ -127,20 +127,20 @@ export const fetchStudySheetByIdWithAttendances = createAsyncThunk<GetStudySheet
 export const fetchStudySheetsByTrainingProject = createAsyncThunk<GetStudySheetsByTrainingProjectQuery['allStudySheets'], GetStudySheetsByTrainingProjectQueryVariables & { idTrainingProject: number }>(
     'studySheet/fetchByTrainingProject',
     async ({ idTrainingProject, page = 0, size = 100 }) => {
-        const { data } = await clientLAN.query<GetStudySheetsByTrainingProjectQuery, GetStudySheetsByTrainingProjectQueryVariables>({
+        const { data } = await client.query<GetStudySheetsByTrainingProjectQuery, GetStudySheetsByTrainingProjectQueryVariables>({
             query: GET_STUDY_SHEETS_BY_TRAINING_PROJECT,
             variables: { page, size },
             fetchPolicy: 'no-cache',
         });
-        
+
         // Filtrar las fichas por proyecto formativo en el frontend ya que no hay parámetro específico en el backend
         if (data?.allStudySheets?.data) {
-            const filteredData = data.allStudySheets.data.filter((studySheet: any) => 
+            const filteredData = data.allStudySheets.data.filter((studySheet: any) =>
                 studySheet?.trainingProject?.id?.toString() === idTrainingProject.toString()
             );
-            
+
             const actualSize = size ?? 100;
-            
+
             return {
                 ...data.allStudySheets,
                 data: filteredData,
@@ -149,7 +149,7 @@ export const fetchStudySheetsByTrainingProject = createAsyncThunk<GetStudySheets
                 currentPage: page ?? 0
             };
         }
-        
+
         return data.allStudySheets;
     }
 );
@@ -408,7 +408,7 @@ export const { clearStudySheetState, clearAttendanceSelection } = studySheetSlic
 export const studySheetService = {
     getStudySheetsByTrainingProject: async ({ idTrainingProject, page = 0, size = 100 }: { idTrainingProject: number; page?: number; size?: number }) => {
         try {
-            const { data } = await clientLAN.query({
+            const { data } = await client.query({
                 query: GET_STUDY_SHEETS_BY_TRAINING_PROJECT,
                 variables: { page, size },
                 fetchPolicy: 'network-only',
@@ -416,7 +416,7 @@ export const studySheetService = {
 
             if (data?.allStudySheets?.code === '200' || data?.allStudySheets?.code === 200) {
                 // Filtrar las fichas por proyecto formativo
-                const filteredData = data.allStudySheets.data?.filter((studySheet: any) => 
+                const filteredData = data.allStudySheets.data?.filter((studySheet: any) =>
                     studySheet?.trainingProject?.id?.toString() === idTrainingProject.toString()
                 ) || [];
 

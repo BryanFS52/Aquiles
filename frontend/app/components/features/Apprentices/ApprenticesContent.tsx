@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Apprentice } from '@type/slices/aprendices'
+import { Apprentice } from '@/components/features/Apprentices/aprendices'
 import { toast } from 'react-toastify'
 import PageTitle from '@components/UI/pageTitle'
 import ApprenticeForm from './ApprenticeForm'

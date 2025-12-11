@@ -1,4 +1,4 @@
-import { clientLAN } from '@lib/apollo-client';
+import { client } from '@lib/apollo-client';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { GET_PROGRAMS } from '@graphql/olympo/programGraph';
 import { createInitialPaginatedState } from '@type/slices/common/generic';
@@ -7,7 +7,7 @@ import { Program, GetProgramsQuery, GetProgramsQueryVariables } from '@graphql/g
 export const fetchPrograms = createAsyncThunk<GetProgramsQuery['allPrograms'], GetProgramsQueryVariables>(
     'program/fetchAll',
     async ({ page, size }) => {
-        const { data } = await clientLAN.query<GetProgramsQuery, GetProgramsQueryVariables>({
+        const { data } = await client.query<GetProgramsQuery, GetProgramsQueryVariables>({
             query: GET_PROGRAMS,
             variables: { page, size },
             fetchPolicy: 'no-cache',

@@ -51,7 +51,6 @@ const store = configureStore({
         coordination: coordinationReducer,
         faultType: faultTypeReducer,
         finalReport: finalReportReducer,
-        trainingProject: trainingProjectReducer,
     }
 });
 
