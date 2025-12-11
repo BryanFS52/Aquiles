@@ -1131,7 +1131,6 @@ export type ImprovementPlan = {
   city: Scalars['String']['output'];
   date: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  qualification: Scalars['Boolean']['output'];
   reason: Scalars['String']['output'];
   state: Scalars['Boolean']['output'];
   student?: Maybe<Student>;
@@ -1202,7 +1201,6 @@ export type ImprovementPlanDeliveryPageId = {
 export type ImprovementPlanDto = {
   city: Scalars['String']['input'];
   date: Scalars['String']['input'];
-  qualification: Scalars['Boolean']['input'];
   reason: Scalars['String']['input'];
   state: Scalars['Boolean']['input'];
   studentId: Scalars['ID']['input'];
@@ -3719,7 +3717,9 @@ export type ProcessMethodologyById = {
 };
 
 
-export type ProcessMethodologyDto = {
+// TODO: This type was duplicated in generated.ts - renamed to avoid conflicts
+// The backend schema should be updated to avoid this duplicate
+export type ProcessMethodologyAssignmentDto = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   isUnique?: InputMaybe<Scalars['Boolean']['input']>;
   profileId?: InputMaybe<Scalars['String']['input']>;
@@ -5969,17 +5969,22 @@ export type DeleteImprovementPlanFaultTypeMutation = { deleteImprovementPlanFaul
 export type GetAllImprovementPlansQueryVariables = Exact<{
   page?: InputMaybe<Scalars['Int']['input']>;
   size?: InputMaybe<Scalars['Int']['input']>;
+  teacherCompetence?: InputMaybe<Scalars['Long']['input']>;
+  id?: InputMaybe<Scalars['Long']['input']>;
+  studySheetId?: InputMaybe<Scalars['Long']['input']>;
+  studentId?: InputMaybe<Scalars['Long']['input']>;
+  teacherCompetenceIds?: InputMaybe<Array<InputMaybe<Scalars['Long']['input']>> | InputMaybe<Scalars['Long']['input']>>;
 }>;
 
 
-export type GetAllImprovementPlansQuery = { allImprovementPlans?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, city: string, date: string, reason: string, state: boolean, qualification: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
+export type GetAllImprovementPlansQuery = { allImprovementPlans?: { code?: string | null, message?: string | null, date?: string | null, totalPages?: number | null, totalItems?: number | null, currentPage?: number | null, data?: Array<{ id: string, city: string, date: string, reason: string, state: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null> | null } | null };
 
 export type GetImprovementPlanByIdQueryVariables = Exact<{
   id: Scalars['Long']['input'];
 }>;
 
 
-export type GetImprovementPlanByIdQuery = { improvementPlanById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id: string, city: string, date: string, reason: string, state: boolean, qualification: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null } | null };
+export type GetImprovementPlanByIdQuery = { improvementPlanById?: { code?: string | null, message?: string | null, date?: string | null, data?: { id: string, city: string, date: string, reason: string, state: boolean, student?: { id?: string | null, person?: { name?: string | null, lastname?: string | null, document?: string | null } | null } | null, teacherCompetence?: { id?: string | null, competence?: { id?: string | null, name?: string | null } | null } | null } | null } | null };
 
 export type AddImprovementPlanMutationVariables = Exact<{
   input: ImprovementPlanDto;
@@ -8175,8 +8180,8 @@ export type DeleteImprovementPlanFaultTypeMutationHookResult = ReturnType<typeof
 export type DeleteImprovementPlanFaultTypeMutationResult = Apollo.MutationResult<DeleteImprovementPlanFaultTypeMutation>;
 export type DeleteImprovementPlanFaultTypeMutationOptions = Apollo.BaseMutationOptions<DeleteImprovementPlanFaultTypeMutation, DeleteImprovementPlanFaultTypeMutationVariables>;
 export const GetAllImprovementPlansDocument = gql`
-    query GetAllImprovementPlans($page: Int, $size: Int) {
-  allImprovementPlans(page: $page, size: $size) {
+    query GetAllImprovementPlans($page: Int, $size: Int, $teacherCompetence: Long, $id: Long, $studySheetId: Long, $studentId: Long, $teacherCompetenceIds: [Long]) {
+  allImprovementPlans(page: $page, size: $size, teacherCompetence: $teacherCompetence, id: $id, studySheetId: $studySheetId, studentId: $studentId, teacherCompetenceIds: $teacherCompetenceIds) {
     code
     message
     date
@@ -8189,7 +8194,6 @@ export const GetAllImprovementPlansDocument = gql`
       date
       reason
       state
-      qualification
       student {
         id
         person {
@@ -8255,7 +8259,6 @@ export const GetImprovementPlanByIdDocument = gql`
       date
       reason
       state
-      qualification
       student {
         id
         person {

@@ -106,6 +106,7 @@ export const TeamScrumContainer: React.FC<TeamScrumContainerProps> = ({ studyShe
                 onClose={modalHandlers.onCloseHistory}
                 teamData={selectedTeamForHistory}
                 onSelectProfile={teamHandlers.onAssignProfile}
+                onRemoveProfile={teamHandlers.onRemoveProfile}
                 profiles={scrumProfiles}
             />
 

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.2 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="ImprovementPlan" pageWidth="595" pageHeight="842" columnWidth="555"
+              leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+
+    <parameter name="city" class="java.lang.String"/>
+    <parameter name="date" class="java.lang.String"/>
+    <parameter name="reason" class="java.lang.String"/>
+    <parameter name="studentId" class="java.lang.String"/>
+    <parameter name="competence" class="java.lang.String"/>
+
+    <field name="city" class="java.lang.String"/>
+    <field name="date" class="java.time.LocalDate"/>
+    <field name="reason" class="java.lang.String"/>
+    <field name="studentId" class="java.lang.Long"/>
+    <field name="teacherCompetence" class="java.lang.Long"/>
+
+    <title>
+        <band height="79" splitType="Stretch">
+            <staticText>
+                <reportElement x="0" y="0" width="555" height="30"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="16" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Plan de Mejoramiento]]></text>
+            </staticText>
+        </band>
+    </title>
+
+    <detail>
+        <band height="400" splitType="Stretch">
+            <textField>
+                <reportElement x="150" y="20" width="405" height="20"/>
+                <textElement verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$P{city}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="20" width="150" height="20"/>
+                <textElement verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Ciudad:]]></text>
+            </staticText>
+
+            <textField>
+                <reportElement x="150" y="50" width="405" height="20"/>
+                <textElement verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$P{date}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="50" width="150" height="20"/>
+                <textElement verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Fecha:]]></text>
+            </staticText>
+
+            <textField>
+                <reportElement x="150" y="80" width="405" height="20"/>
+                <textElement verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$P{studentId}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="80" width="150" height="20"/>
+                <textElement verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[ID del Estudiante:]]></text>
+            </staticText>
+
+            <textField>
+                <reportElement x="150" y="110" width="405" height="20"/>
+                <textElement verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$P{competence}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement x="0" y="110" width="150" height="20"/>
+                <textElement verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Competencia:]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="0" y="150" width="555" height="30"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="12" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Motivo del Plan de Mejoramiento:]]></text>
+            </staticText>
+            <textField>
+                <reportElement x="0" y="180" width="555" height="100"/>
+                <textElement textAlignment="Justified"/>
+                <textFieldExpression><![CDATA[$P{reason}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <pageFooter>
+        <band height="54" splitType="Stretch">
+            <textField>
+                <reportElement x="180" y="24" width="100" height="30"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+            <textField evaluationTime="Report">
+                <reportElement x="280" y="24" width="100" height="30"/>
+                <textElement textAlignment="Left"/>
+                <textFieldExpression><![CDATA[" of " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+</jasperReport>
+

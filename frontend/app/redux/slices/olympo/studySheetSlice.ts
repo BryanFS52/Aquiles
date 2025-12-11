@@ -22,16 +22,21 @@ import {
     GetStudySheetByIdWithAttendancesQueryVariables,
     GetStudySheetsWithCoordinationIdQuery,
     GetStudySheetsWithCoordinationIdQueryVariables,
+    GetStudySheetsByTrainingProjectQuery,
+    GetStudySheetsByTrainingProjectQueryVariables,
     AddStudySheetMutationVariables,
     AddStudySheetMutation
 } from '@graphql/generated';
 
 export const fetchStudySheets = createAsyncThunk<GetStudySheetsQuery['allStudySheets'], GetStudySheetsQueryVariables>(
     'studySheet/fetchAll',
-    async ({ page, size }) => {
+    async ({ page = 0, size = 100 }) => {
         const { data } = await clientLAN.query<GetStudySheetsQuery, GetStudySheetsQueryVariables>({
             query: GET_STUDY_SHEETS,
-            variables: { page, size },
+            variables: { 
+                page: page ?? 0, 
+                size: size ?? 100 
+            },
             fetchPolicy: 'no-cache',
         });
         return data.allStudySheets;
@@ -65,10 +70,14 @@ export const fetchStudySheetById = createAsyncThunk<GetStudySheetByIdQuery['stud
 
 export const fetchStudySheetByTeacher = createAsyncThunk<StudySheetByTeacherQuery['allStudySheets'], StudySheetByTeacherQueryVariables>(
     'studySheet/fetchByTeacher',
-    async ({ idTeacher, page, size }) => {
+    async ({ idTeacher, page = 0, size = 100 }) => {
         const { data } = await clientLAN.query<StudySheetByTeacherQuery, StudySheetByTeacherQueryVariables>({
             query: GET_STUDY_SHEET_BY_TEACHER,
-            variables: { idTeacher, page, size },
+            variables: { 
+                idTeacher, 
+                page: page ?? 0, 
+                size: size ?? 100 
+            },
             fetchPolicy: 'no-cache',
         })
         return data.allStudySheets;
@@ -89,10 +98,14 @@ export const fetchStudySheetWithStudents = createAsyncThunk<GetStudySheetWithStu
 
 export const fetchStudySheetByTeacherIdWithTeamScrum = createAsyncThunk<StudySheetByTeacherIdWithTeamScrumQuery['allStudySheets'], StudySheetByTeacherIdWithTeamScrumQueryVariables>(
     'studySheet/fetchByTeacherIdWithTeamScrum',
-    async ({ idTeacher, page, size }) => {
+    async ({ idTeacher, page = 0, size = 100 }) => {
         const { data } = await clientLAN.query<StudySheetByTeacherIdWithTeamScrumQuery, StudySheetByTeacherIdWithTeamScrumQueryVariables>({
             query: GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM,
-            variables: { idTeacher, page, size },
+            variables: { 
+                idTeacher, 
+                page: page ?? 0, 
+                size: size ?? 100 
+            },
             fetchPolicy: 'no-cache',
         });
         return data.allStudySheets;
@@ -111,43 +124,36 @@ export const fetchStudySheetByIdWithAttendances = createAsyncThunk<GetStudySheet
     }
 );
 
-export const fetchStudySheetsWithCoordinationId = createAsyncThunk<GetStudySheetsWithCoordinationIdQuery['getStudySheetsWithCoordinationId'], GetStudySheetsWithCoordinationIdQueryVariables>(
-    'studySheet/fetchWithCoordinationId',
-    async ({ coordinationId, page, size }) => {
-        try {
-            const { data } = await clientLAN.query<GetStudySheetsWithCoordinationIdQuery, GetStudySheetsWithCoordinationIdQueryVariables>({
-                query: GET_STUDY_SHEETS_WITH_COORDINATION_ID,
-                variables: { coordinationId, page, size },
-                fetchPolicy: 'no-cache',
-            });
-            return data.getStudySheetsWithCoordinationId;
-        } catch (error) {
-            console.error("Error fetching study sheets with coordination ID:", error);
-            throw error;
+export const fetchStudySheetsByTrainingProject = createAsyncThunk<GetStudySheetsByTrainingProjectQuery['allStudySheets'], GetStudySheetsByTrainingProjectQueryVariables & { idTrainingProject: number }>(
+    'studySheet/fetchByTrainingProject',
+    async ({ idTrainingProject, page = 0, size = 100 }) => {
+        const { data } = await clientLAN.query<GetStudySheetsByTrainingProjectQuery, GetStudySheetsByTrainingProjectQueryVariables>({
+            query: GET_STUDY_SHEETS_BY_TRAINING_PROJECT,
+            variables: { page, size },
+            fetchPolicy: 'no-cache',
+        });
+        
+        // Filtrar las fichas por proyecto formativo en el frontend ya que no hay parámetro específico en el backend
+        if (data?.allStudySheets?.data) {
+            const filteredData = data.allStudySheets.data.filter((studySheet: any) => 
+                studySheet?.trainingProject?.id?.toString() === idTrainingProject.toString()
+            );
+            
+            const actualSize = size ?? 100;
+            
+            return {
+                ...data.allStudySheets,
+                data: filteredData,
+                totalItems: filteredData.length,
+                totalPages: Math.ceil(filteredData.length / actualSize),
+                currentPage: page ?? 0
+            };
         }
-    }   
-);
-
-export const addStudySheet = createAsyncThunk<AddStudySheetMutation['addStudySheet'], AddStudySheetMutationVariables['input'],
-    { rejectValue: { code: string; message: string } }
->(
-    'studySheet/add',
-    async (input, { rejectWithValue }) => {
-        try {
-            const { data } = await clientLAN.mutate<AddStudySheetMutation, AddStudySheetMutationVariables>({
-                mutation: ADD_STUDY_SHEET,
-                variables: { input },
-            });
-            const res = data?.addStudySheet;
-            if (!res || res.code !== '200') {
-                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
-            }
-            return res;
-        } catch (error: any) {
-            return rejectWithValue({ code: '500', message: error.message });
-        }
+        
+        return data.allStudySheets;
     }
 );
+
 
 interface ExtendedStudySheetState extends ReturnType<typeof createInitialPaginatedState < StudySheet >> {
     dataForStudents: Record<string, Student[]>,
@@ -364,18 +370,21 @@ const studySheetSlice = createSlice({
                 state.loadingAttendanceSheet = false;
                 state.selectedForAttendance = null;
             });
-            // Fetch StudySheets with CoordinationId
-            builder
-            .addCase(fetchStudySheetsWithCoordinationId.pending, (state) => {
+
+        // Fetch StudySheets by Training Project
+        builder
+            .addCase(fetchStudySheetsByTrainingProject.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchStudySheetsWithCoordinationId.fulfilled, (state, action) => {
+            .addCase(fetchStudySheetsByTrainingProject.fulfilled, (state, action) => {
                 const payload = action.payload;
                 if (payload?.data) {
+                    // Filtra nulls y usa los datos directamente
                     state.data = payload.data
-                        .filter((item: any): item is NonNullable<typeof item> => item !== null) as StudySheet[];
-                        state.totalItems = payload.totalItems ?? 0;
+                        .filter((item): item is NonNullable<typeof item> => item !== null) as StudySheet[];
+
+                    state.totalItems = payload.totalItems ?? 0;
                     state.totalPages = payload.totalPages ?? 0;
                     state.currentPage = payload.currentPage ?? 0;
                 } else {
@@ -386,28 +395,43 @@ const studySheetSlice = createSlice({
                 }
                 state.loading = false;
             })
-            .addCase(fetchStudySheetsWithCoordinationId.rejected, (state, action) => {
-                state.error = action.error.message ?? 'Error fetching study sheets with coordination id';
+            .addCase(fetchStudySheetsByTrainingProject.rejected, (state, action) => {
+                state.error = action.error.message ?? 'Error fetching study sheets by training project';
                 state.loading = false;
             });
-            // Add StudySheet
-            builder
-                .addCase(addStudySheet.pending, (state) => {
-                    state.loading = true;
-                    state.error = null;
-                })
-                .addCase(addStudySheet.fulfilled, (state, action) => {
-                    state.loading = false;
-                    // Opcionalmente podrías agregar la nueva ficha al estado
-                    // pero es mejor recargar la lista completa
-                })
-                .addCase(addStudySheet.rejected, (state, action) => {
-                    state.error = action.error.message ?? 'Error adding study sheet';
-                    state.loading = false;
-                });
     }
 });
 
 export const { clearStudySheetState, clearAttendanceSelection } = studySheetSlice.actions;
+
+// Service methods for compatibility with existing components
+export const studySheetService = {
+    getStudySheetsByTrainingProject: async ({ idTrainingProject, page = 0, size = 100 }: { idTrainingProject: number; page?: number; size?: number }) => {
+        try {
+            const { data } = await clientLAN.query({
+                query: GET_STUDY_SHEETS_BY_TRAINING_PROJECT,
+                variables: { page, size },
+                fetchPolicy: 'network-only',
+            });
+
+            if (data?.allStudySheets?.code === '200' || data?.allStudySheets?.code === 200) {
+                // Filtrar las fichas por proyecto formativo
+                const filteredData = data.allStudySheets.data?.filter((studySheet: any) => 
+                    studySheet?.trainingProject?.id?.toString() === idTrainingProject.toString()
+                ) || [];
+
+                return {
+                    ...data.allStudySheets,
+                    data: filteredData
+                };
+            } else {
+                throw new Error(data?.allStudySheets?.message || 'Error fetching study sheets by training project');
+            }
+        } catch (error) {
+            console.error('Error fetching study sheets by training project:', error);
+            throw error;
+        }
+    }
+};
 
 export default studySheetSlice.reducer;

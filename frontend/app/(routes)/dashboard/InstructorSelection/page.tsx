@@ -18,6 +18,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { clientLAN } from "@lib/apollo-client";
 import { GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM } from "@graphql/olympo/studySheetGraph";
+import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
 
 interface StudySheet {
   id: string;
@@ -81,11 +82,8 @@ export default function InstructorSelection() {
   }, []);
 
   // Cargar fichas asignadas al instructor
-  // Mal
   useEffect(() => {
     const loadStudySheets = async () => {
-      if (!user?.id) return;
-
       showLoader();
       try {
         setError(null);
@@ -93,9 +91,9 @@ export default function InstructorSelection() {
         const { data } = await clientLAN.query({
           query: GET_STUDY_SHEET_BY_TEACHER_ID_WITH_TEAM_SCRUM,
           variables: { 
-            idTeacher: user.id,
+            idTeacher: TEMPORAL_INSTRUCTOR_ID,
             page: 0, 
-            size: 50 
+            size: 100 
           },
           fetchPolicy: 'no-cache'
         });
@@ -112,7 +110,7 @@ export default function InstructorSelection() {
     };
 
     loadStudySheets();
-  }, [user?.id]);
+  }, []);
 
   const handleStudySheetSelection = (studySheet: StudySheet) => {
     setSelectedStudySheet(studySheet);

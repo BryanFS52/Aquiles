@@ -2,7 +2,7 @@ type Item {
     id: ID!
     code: String!
     indicator: String!
-    state: Boolean!
+    active: Boolean!
     itemType: ItemType
 }
 
@@ -17,8 +17,8 @@ input ItemDto {
     id: ID
     code: String!
     indicator: String!
-    state: Boolean
-    itemType: ItemTypeDto
+    active: Boolean
+    itemTypeId: Long
 }
 
 extend type Query {

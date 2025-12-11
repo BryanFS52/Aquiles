@@ -27,6 +27,7 @@ export const GET_STUDY_SHEETS = gql`
                     }
                 }
                 trainingProject {
+                    id
                     name
                     program {
                         id
@@ -88,6 +89,20 @@ export const GET_STUDY_SHEET_WITH_TEAM_SCRUM_BY_ID = gql`
     data {
       id
       number
+      startLective
+      endLective
+      journey {
+        id
+        name
+      }
+      trainingProject {
+        id
+        name
+        program {
+          id
+          name
+        }
+      }
       teamsScrum {
         id
         teamName
@@ -196,10 +211,6 @@ export const GET_STUDY_SHEET_BY_TEACHER = gql`
           competence {
             id
             name
-            learningOutcome {
-              name
-              description            
-            }
           }
         }
         studentStudySheets {
@@ -271,12 +282,27 @@ query GetTeacherCompetenceByStudySheets($id: Long, $teacherId : Long) {
     data {
       id
       teacherStudySheets {
-        id
-        competence {
           id
-          name
+          competence {
+            id
+            name
+          }
         }
-      }
+    }
+  }
+}
+`;
+
+export const GET_LEARNING_OUTCOMES_BY_COMPETENCE = gql`
+query GetLearningOutcomesByCompetence($idCompetence: Long, $page: Int, $size: Int) {
+  allLearningOutcomes(idCompetence: $idCompetence, page: $page, size: $size) {
+    code
+    message
+    data {
+      id
+      name
+      description
+      code
     }
   }
 }

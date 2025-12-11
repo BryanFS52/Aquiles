@@ -1,274 +1,520 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, AlertTriangle, Phone } from "lucide-react";
-import { toast } from "react-toastify";
+import { useEffect, useState, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useMutation, useLazyQuery } from "@apollo/client";
+import { useRouter } from 'next/navigation';
+import { AppDispatch, RootState } from '@redux/store';
+import { fetchChecklists } from '@redux/slices/checklistSlice';
+import { fetchStudySheetWithTeamScrum } from '@redux/slices/olympo/studySheetSlice';
+import { fetchTeamScrumById } from '@redux/slices/teamScrumSlice';
+import { addEvaluation, updateEvaluation } from '@redux/slices/evaluationSlice';
+import { 
+  SAVE_OR_UPDATE_CHECKLIST_QUALIFICATION,
+  GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST 
+} from '@graphql/checklistQualificationGraph';
+import { GET_EVALUATION_BY_CHECKLIST_AND_TEAM } from '@graphql/evaluationsGraph';
 import PageTitle from "@components/UI/pageTitle";
-import EmptyState from "@components/UI/emptyState";
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '@/redux/store';
-import {
-  Checklist,
-  Evaluation,
-  SimulatedChecklistItem,
-} from "@/types/checklist";
-import { checkListService } from '@redux/slices/checklistSlice';
-import { evaluationService } from '@redux/slices/evaluationSlice';
-
-// Import logic classes
-import { InstructorChecklistLogic } from './InstructorChecklistLogic';
-import { InstructorChecklistHandlers } from './InstructorChecklistHandlers';
-
-// Import componentized parts
 import { InformationCards } from './InformationCards';
 import { ChecklistControls } from './ChecklistControls';
 import { ChecklistTable } from './ChecklistTable';
 import { EvaluationSection } from './EvaluationSection';
-import { SignatureUpload } from './SignatureUpload';
-import { PreviewModal } from './PreviewModal';
 import { CreateEvaluationModal } from './CreateEvaluationModal';
+import { PreviewModal } from './PreviewModal';
+import { Checklist, StudySheet, TeamsScrum } from '@graphql/generated';
+import { toast } from 'react-toastify';
 
 export const InstructorChecklistContainer: React.FC = () => {
-  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  const { data: checklists, loading, error } = useSelector((state: RootState) => state.checklist);
+  const { data: studySheets } = useSelector((state: RootState) => state.studySheet);
+  const { dataForTeamScrumById: selectedTeamScrum } = useSelector((state: RootState) => state.teamScrum);
   
-  // Redux selectors
-  const evaluationState = useSelector((state: RootState) => state.evaluation);
-  const checklistState = useSelector((state: RootState) => state.checklist);
-  const reduxError = evaluationState.error || checklistState.error;
+  // Mutations y queries
+  const [saveOrUpdateQualification] = useMutation(SAVE_OR_UPDATE_CHECKLIST_QUALIFICATION);
+  const [loadQualifications, { data: qualificationsData }] = useLazyQuery(GET_CHECKLIST_QUALIFICATIONS_BY_CHECKLIST);
+  const [loadEvaluation, { data: evaluationData }] = useLazyQuery(GET_EVALUATION_BY_CHECKLIST_AND_TEAM);
   
-  // Estados principales
-  const [activeChecklists, setActiveChecklists] = useState<Checklist[]>([]);
+  // Estados locales
+  const [selectedTrimester, setSelectedTrimester] = useState<string>("");
   const [selectedChecklist, setSelectedChecklist] = useState<Checklist | null>(null);
-  const [selectedTrimester, setSelectedTrimester] = useState<string>("todos");
-  const [isClientMounted, setIsClientMounted] = useState(false);
-  
-  // Estados para el team scrum seleccionado
-  const [selectedTeamScrumId, setSelectedTeamScrumId] = useState<string | null>(null);
-  const [selectedTeamScrumName, setSelectedTeamScrumName] = useState<string>("");
-  const [selectedStudySheetNumber, setSelectedStudySheetNumber] = useState<string>("");
-  const [selectedStudySheetId, setSelectedStudySheetId] = useState<string>("");
-  
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [firmaAnterior, setFirmaAnterior] = useState<string | null>(null);
-  const [firmaNuevo, setFirmaNuevo] = useState<string | null>(null);
-  const [evaluations, setEvaluations] = useState<Evaluation[]>([]);
-  const [selectedEvaluation, setSelectedEvaluation] = useState<Evaluation | null>(null);
-  const [evaluationObservations, setEvaluationObservations] = useState<string>("");
-  const [evaluationRecommendations, setEvaluationRecommendations] = useState<string>("");
-  const [evaluationJudgment, setEvaluationJudgment] = useState<string>("PENDIENTE");
-  const [loading, setLoading] = useState<boolean>(true);
-  const [itemStates, setItemStates] = useState<{ [key: number]: { completed: boolean | null, observations: string } }>({});
-  const [isSavingItems, setIsSavingItems] = useState<boolean>(false);
-  const [pendingChanges, setPendingChanges] = useState<boolean>(false);
-
-  // Estados para modales
-  const [showCreateEvaluationModal, setShowCreateEvaluationModal] = useState(false);
-  const [isCreatingEvaluation, setIsCreatingEvaluation] = useState(false);
-  const [showEvaluationForm, setShowEvaluationForm] = useState(false);
+  const [selectedStudySheet, setSelectedStudySheet] = useState<StudySheet | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [isFinalSaved, setIsFinalSaved] = useState(false);
-  
-  // Refs
-  const signatureUpdateRef = useRef<{ type: string; inProgress: boolean }>({ type: '', inProgress: false });
-  const saveItemsDebounceRef = useRef<NodeJS.Timeout | null>(null);
-  const selectedChecklistRef = useRef<Checklist | null>(selectedChecklist);
+  const [itemStates, setItemStates] = useState<{ [key: string | number]: { completed: boolean | null, observations: string } }>({});
 
-  // Update ref when selectedChecklist changes
+  // Estados para la evaluación
+  const [showEvaluationForm, setShowEvaluationForm] = useState(false);
+  const [showCreateEvaluationModal, setShowCreateEvaluationModal] = useState(false);
+  const [evaluationObservations, setEvaluationObservations] = useState("");
+  const [evaluationRecommendations, setEvaluationRecommendations] = useState("");
+  const [evaluationJudgment, setEvaluationJudgment] = useState("");
+  const [evaluationCriteria, setEvaluationCriteria] = useState<boolean | null>(null);
+  const [isCreatingEvaluation, setIsCreatingEvaluation] = useState(false);
+
+  const itemsPerPage = 5;
+
+  // Cargar datos del localStorage cuando el componente se monta
   useEffect(() => {
-    selectedChecklistRef.current = selectedChecklist;
-  }, [selectedChecklist]);
+    const loadFromLocalStorage = async () => {
+      const studySheetId = localStorage.getItem('selectedStudySheetId');
+      const teamScrumId = localStorage.getItem('selectedTeamScrumId');
 
-  const itemsPerPage = 3;
+      if (studySheetId) {
+        try {
+          const studySheetResponse = await dispatch(fetchStudySheetWithTeamScrum({ 
+            id: parseInt(studySheetId) 
+          })).unwrap();
+          
+          if (studySheetResponse?.data) {
+            setSelectedStudySheet(studySheetResponse.data as StudySheet);
+          }
+        } catch (error) {
+          toast.error("Error al cargar la ficha seleccionada");
+        }
+      }
 
-  // Wrapper functions que usan las clases lógicas
-  const loadExistingSignatures = (checklist: Checklist): void => {
-    InstructorChecklistLogic.loadExistingSignatures(
-      checklist,
-      setFirmaAnterior,
-      setFirmaNuevo
-    );
-  };
+      if (teamScrumId) {
+        try {
+          await dispatch(fetchTeamScrumById({ id: teamScrumId }));
+        } catch (error) {
+          toast.error("Error al cargar el Team Scrum seleccionado");
+        }
+      }
+    };
 
-  const extractItemStatesFromEvaluation = (evaluation: Evaluation) => {
-    return InstructorChecklistLogic.extractItemStatesFromEvaluation(evaluation);
-  };
+    loadFromLocalStorage();
+  }, [dispatch]);
 
-  const extractGeneralObservationsFromEvaluation = (evaluation: Evaluation) => {
-    return InstructorChecklistLogic.extractGeneralObservationsFromEvaluation(evaluation);
-  };
+  useEffect(() => {
+    dispatch(fetchChecklists({ page: 0, size: 50 }));
+  }, [dispatch]);
 
-  const loadActiveChecklists = useCallback(async (): Promise<void> => {
-    await InstructorChecklistLogic.loadActiveChecklists(
-      selectedChecklistRef.current,
-      setLoading,
-      setActiveChecklists,
-      setSelectedChecklist,
-      loadExistingSignatures,
-      loadEvaluationsForChecklist
-    );
-  }, []);
+  // Cargar calificaciones cuando se selecciona un checklist y teamScrum
+  useEffect(() => {
+    const loadChecklistQualifications = async () => {
+      if (selectedChecklist && selectedTeamScrum) {
+        try {
+          const result = await loadQualifications({
+            variables: {
+              checklistId: parseInt(selectedChecklist.id as string),
+              teamScrumId: parseInt(selectedTeamScrum.id as string)
+            }
+          });
 
-  const loadEvaluationsForChecklist = useCallback(async (checklistId: number): Promise<void> => {
-    await InstructorChecklistLogic.loadEvaluationsForChecklist(
-      checklistId,
-      setEvaluations,
-      setSelectedEvaluation,
-      setEvaluationObservations,
-      setEvaluationRecommendations,
-      setEvaluationJudgment,
-      setItemStates,
-      extractItemStatesFromEvaluation,
-      extractGeneralObservationsFromEvaluation
-    );
-  }, []);
+          if (result.data?.checklistQualificationsByChecklist) {
+            const qualifications = result.data.checklistQualificationsByChecklist;
+            
+            // Mapear las calificaciones a itemStates
+            const newItemStates: { [key: number]: { completed: boolean | null, observations: string } } = {};
+            
+            // Inicializar todos los items
+            selectedChecklist.items?.forEach((item: any) => {
+              if (item && item.id) {
+                newItemStates[item.id] = {
+                  completed: null,
+                  observations: ""
+                };
+              }
+            });
 
-  // Obtener items del checklist seleccionado
-  const items = useMemo((): SimulatedChecklistItem[] => {
-    if (!selectedChecklist || !selectedChecklist.items) {
-      // Simulamos items para el checklist seleccionado si no hay items reales
-      return [
-        { id: 1, indicator: "El software evidencia autenticación y manejo dinámico de roles.", completed: null, observations: "" },
-        { id: 2, indicator: "Aplica en el sistema procedimientos almacenados y/o funciones.", completed: null, observations: "" },
-        { id: 3, indicator: "Implementa servicios REST siguiendo estándares.", completed: null, observations: "" },
-        { id: 4, indicator: "La aplicación implementa patrones de diseño.", completed: null, observations: "" },
-        { id: 5, indicator: "Se evidencia el uso de principios SOLID.", completed: null, observations: "" },
-        { id: 6, indicator: "Describe la creación de usuarios y privilegios a nivel de base de datos.", completed: null, observations: "" }
-      ];
+            // Sobrescribir con las calificaciones existentes
+            qualifications.forEach((qual: any) => {
+              if (qual.itemId) {
+                newItemStates[qual.itemId] = {
+                  completed: qual.qualificationState,
+                  observations: qual.observations || ""
+                };
+              }
+            });
+
+            setItemStates(newItemStates);
+          }
+        } catch (error) {
+          // Error al cargar calificaciones
+        }
+      }
+    };
+
+    loadChecklistQualifications();
+  }, [selectedChecklist, selectedTeamScrum, loadQualifications]);
+
+  // Efecto para actualizar los campos de evaluación cuando llegue la data del backend
+  useEffect(() => {
+    if (evaluationData?.evaluationByChecklistAndTeam?.data) {
+      const evaluation = evaluationData.evaluationByChecklistAndTeam.data;
+      setEvaluationObservations(evaluation.observations || "");
+      setEvaluationRecommendations(evaluation.recommendations || "");
+      setEvaluationJudgment(evaluation.valueJudgment || "");
+      
+      // ✅ Cargar el estado isFinalized desde la base de datos
+      if (evaluation.isFinalized !== undefined && evaluation.isFinalized !== null) {
+        setIsFinalSaved(evaluation.isFinalized);
+      } else {
+        setIsFinalSaved(false);
+      }
+    } else {
+      // Limpiar campos si no hay evaluación
+      setEvaluationObservations("");
+      setEvaluationRecommendations("");
+      setEvaluationJudgment("");
+      setEvaluationCriteria(null);
+      setIsFinalSaved(false);
     }
+  }, [evaluationData]);
 
-    // Mapear los items reales del checklist a nuestro formato
-    return selectedChecklist.items.map((item, index) => {
-      const itemId = parseInt(item.id || (index + 1).toString());
+  // Filtrar listas de chequeo por la ficha seleccionada del instructor
+  const checklistsForStudySheet = useMemo(() => {
+    if (!selectedStudySheet?.id) return checklists;
+    
+    const filtered = checklists.filter((checklist: Checklist) => {
+      // Verificar si la lista tiene fichas asociadas
+      if (!checklist.studySheets || checklist.studySheets.length === 0) {
+        return false;
+      }
       
-      // Obtener el estado desde itemStates (datos de BD) o valores por defecto
-      const itemState = itemStates[itemId];
+      // Verificar si la ficha del instructor está en la lista de fichas asociadas
+      const studySheetIds = checklist.studySheets.split(',').map(id => id.trim());
+      const isMatch = studySheetIds.includes(selectedStudySheet?.id?.toString() || '');
       
-      return {
-        id: itemId,
-        indicator: item.indicator,
-        completed: itemState ? itemState.completed : null, // Usar datos de BD si existen
-        observations: itemState ? itemState.observations : "" // Usar observaciones de BD si existen
-      };
+      return isMatch;
     });
-  }, [selectedChecklist, itemStates]);
+    
+    return filtered;
+  }, [checklists, selectedStudySheet]);
 
-  // Filtrar checklists por trimestre
+  // Obtener trimestres únicos dinámicamente de las listas asignadas a esta ficha
+  const availableTrimester = useMemo(() => {
+    const trimesters = checklistsForStudySheet
+      .map((checklist: Checklist) => checklist.trimester)
+      .filter((trimester: string | null | undefined): trimester is string => Boolean(trimester))
+      .filter((trimester: string, index: number, array: string[]) => array.indexOf(trimester) === index);
+    
+    return trimesters.sort();
+  }, [checklistsForStudySheet]);
+
+  // Listas filtradas por trimestre (solo las de esta ficha)
   const filteredChecklists = useMemo(() => {
-    if (selectedTrimester === "todos") {
-      return activeChecklists;
+    if (!selectedTrimester) return checklistsForStudySheet;
+    return checklistsForStudySheet.filter((checklist: Checklist) => checklist.trimester === selectedTrimester);
+  }, [checklistsForStudySheet, selectedTrimester]);
+
+  const activeChecklists = useMemo(() => {
+    return checklistsForStudySheet.filter((checklist: Checklist) => checklist.state === true);
+  }, [checklistsForStudySheet]);
+
+  // Items paginados
+  const currentItems = useMemo(() => {
+    if (!selectedChecklist?.items) return [];
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return selectedChecklist.items
+      .filter((item): item is NonNullable<typeof item> => item !== null)
+      .slice(startIndex, startIndex + itemsPerPage);
+  }, [selectedChecklist, currentPage, itemsPerPage]);
+
+  const totalPages = useMemo(() => {
+    if (!selectedChecklist?.items) return 0;
+    return Math.ceil(selectedChecklist.items.length / itemsPerPage);
+  }, [selectedChecklist, itemsPerPage]);
+
+  // Funciones de manejo
+  const handleChecklistChange = async (checklistId: string) => {
+    if (!checklistId) {
+      setSelectedChecklist(null);
+      setItemStates({});
+      setCurrentPage(1);
+      return;
     }
-    return activeChecklists.filter((checklist: Checklist) => {
-      // Convertir ambos valores a string para comparación consistente
-      const checklistTrimester = checklist.trimester?.toString();
-      const selectedTrimesterStr = selectedTrimester.toString();
-      console.log(`Filtering: checklist ${checklist.id} trimester=${checklistTrimester}, selected=${selectedTrimesterStr}`);
-      return checklistTrimester === selectedTrimesterStr;
-    });
-  }, [activeChecklists, selectedTrimester]);
-
-  const totalPages = Math.ceil(items.length / itemsPerPage);
-  const currentItems = items.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-  // Handler functions usando las clases lógicas
-  const handleTrimesterChange = (value: string): void => {
-    InstructorChecklistHandlers.handleTrimesterChange(
-      value,
-      setSelectedTrimester,
-      setCurrentPage
-    );
+    
+    const checklist = checklists.find((c: Checklist) => c.id === checklistId);
+    if (checklist) {
+      setSelectedChecklist(checklist);
+      setCurrentPage(1);
+      
+      // NO sobrescribir selectedStudySheet ni selectedTeamScrum
+      // Estos ya fueron cargados desde localStorage y deben mantenerse
+      
+      // Cargar evaluación específica para este checklist y team scrum
+      if (selectedTeamScrum?.id && checklist.id) {
+        loadEvaluation({
+          variables: {
+            checklistId: checklist.id,
+            teamScrumId: selectedTeamScrum.id
+          }
+        });
+      }
+      
+      // Los itemStates se cargarán automáticamente en el useEffect cuando selectedTeamScrum cambie
+    }
   };
 
-  const handleChecklistChange = async (checklistId: string): Promise<void> => {
-    await InstructorChecklistHandlers.handleChecklistChange(
-      checklistId,
-      activeChecklists,
-      setCurrentPage,
-      setItemStates,
-      setSelectedChecklist,
-      setFirmaAnterior,
-      setFirmaNuevo,
-      setEvaluations,
-      setSelectedEvaluation,
-      setEvaluationObservations,
-      setEvaluationRecommendations,
-      setEvaluationJudgment,
-      setIsFinalSaved,
-      loadExistingSignatures,
-      loadEvaluationsForChecklist
-    );
+  const handleItemChange = async (id: number | string, field: string, value: any) => {
+    if (isFinalSaved) return;
+    
+    // Obtener el estado actual del item
+    const currentItemState = itemStates[id] || { completed: null, observations: "" };
+    
+    // Actualizar estado local inmediatamente para mejor UX
+    const updatedState = {
+      ...currentItemState,
+      [field]: value
+    };
+    
+    setItemStates(prev => ({
+      ...prev,
+      [id]: updatedState
+    }));
+
+    // Validar que tengamos los datos necesarios
+    if (!selectedChecklist || !selectedTeamScrum) {
+      toast.error("Error: No se ha seleccionado un checklist o team scrum");
+      return;
+    }
+
+    // Guardar en la base de datos
+    try {
+      const qualificationInput = {
+        itemId: parseInt(id.toString()),
+        teamScrumId: parseInt(selectedTeamScrum.id as string),
+        checklistId: parseInt(selectedChecklist.id as string),
+        qualificationState: updatedState.completed,
+        observations: updatedState.observations || ""
+      };
+
+      const result = await saveOrUpdateQualification({
+        variables: { input: qualificationInput }
+      });
+
+      if (result.data?.saveOrUpdateChecklistQualification?.code === "200") {
+        // Guardado exitoso - podemos mostrar un indicador sutil
+      }
+    } catch (error: any) {
+      toast.error(`Error al guardar: ${error.message || 'Error desconocido'}`);
+      
+      // Revertir el cambio en caso de error
+      setItemStates(prev => ({
+        ...prev,
+        [id]: currentItemState
+      }));
+    }
   };
 
-  const handleItemChange = (id: number, field: string, value: any): void => {
-    InstructorChecklistHandlers.handleItemChange(
-      id,
-      field,
-      value,
-      itemStates,
-      setItemStates,
-      isFinalSaved,
-      selectedChecklist,
-      setPendingChanges,
-      saveItemsDebounceRef,
-      selectedEvaluation,
-      handleAutoSaveItems
-    );
-  };
-
-  const handleAutoSaveItems = async (currentItemStates: any): Promise<void> => {
-    await InstructorChecklistHandlers.handleAutoSaveItems(
-      currentItemStates,
-      selectedEvaluation,
-      selectedChecklist,
-      evaluationObservations,
-      evaluationRecommendations,
-      evaluationJudgment,
-      setIsSavingItems,
-      setPendingChanges
-    );
-  };
-
-  const handlePageChange = (page: number): void => {
+  const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  const handleSaveChecklist = async (): Promise<void> => {
+  const handleSaveChecklist = async () => {
+    if (!selectedChecklist) return;
     setShowPreview(true);
   };
 
-  const handleEnableModification = (): void => {
+  const handleEnableModification = () => {
     setIsFinalSaved(false);
-    if (selectedChecklist) {
-      localStorage.removeItem(`isFinalSaved_${selectedChecklist.id}`);
+  };
+
+  const handleExportPDF = async () => {
+    if (!selectedChecklist) return;
+    // TODO: Implementar exportación PDF
+  };
+
+  const handleExportExcel = async () => {
+    if (!selectedChecklist) return;
+    // TODO: Implementar exportación Excel
+  };
+
+  const generatePreviewData = () => {
+    if (!selectedChecklist) return null;
+
+    const items = selectedChecklist.items?.map((item: any) => {
+      if (!item) return null;
+      return {
+        ...item,
+        completed: itemStates[item.id]?.completed ?? (item as any).completed,
+        observations: itemStates[item.id]?.observations ?? (item as any).observations
+      };
+    }).filter(Boolean) || [];
+
+    // Verificar si hay datos de evaluación (usar evaluationData en lugar de checklist.evaluations)
+    const evaluation = evaluationData?.evaluationByChecklistAndTeam?.data;
+    const hasEvaluation = !!evaluation;
+
+    return {
+      checklist: selectedChecklist,
+      items,
+      evaluation: hasEvaluation ? {
+        observations: evaluation.observations || "",
+        recommendations: evaluation.recommendations || "",
+        judgment: evaluation.valueJudgment || "PENDIENTE"
+      } : {
+        observations: "",
+        recommendations: "",
+        judgment: "PENDIENTE"
+      },
+      hasEvaluationData: hasEvaluation
+    };
+  };
+
+  const handleFinalSave = async () => {
+    if (!selectedChecklist || !selectedTeamScrum?.id || !evaluationData?.evaluationByChecklistAndTeam?.data) {
+      toast.error("❌ Debe existir una evaluación antes de guardar definitivamente");
+      return;
     }
-    toast.info("📝 Modo de edición habilitado.");
-  };
 
-  const handleExportPDF = async (): Promise<void> => {
-    if (selectedChecklist) {
-      await InstructorChecklistLogic.exportToPDF(selectedChecklist);
+    try {
+      const evaluation = evaluationData.evaluationByChecklistAndTeam.data;
+      const evaluationId = evaluation.id;
+
+      if (!evaluationId) {
+        toast.error("❌ No se encontró el ID de la evaluación");
+        return;
+      }
+
+      // ✅ Actualizar la evaluación con isFinalized: true en la base de datos
+      const evaluationInput = {
+        observations: evaluationObservations.trim(),
+        recommendations: evaluationRecommendations.trim(),
+        valueJudgment: evaluationJudgment,
+        checklistId: parseInt(selectedChecklist.id as string),
+        teamScrumId: parseInt(selectedTeamScrum.id as string),
+        isFinalized: true // ✅ Marcar como finalizada en la DB
+      };
+
+      await dispatch(updateEvaluation({ 
+        id: parseInt(evaluationId as string), 
+        input: evaluationInput 
+      })).unwrap();
+      
+      // ✅ Recargar la evaluación desde el servidor para confirmar el cambio
+      await loadEvaluation({
+        variables: {
+          checklistId: parseInt(selectedChecklist.id as string),
+          teamScrumId: parseInt(selectedTeamScrum.id as string)
+        },
+        fetchPolicy: 'network-only' // Forzar datos frescos del servidor
+      });
+
+      setIsFinalSaved(true);
+      setShowPreview(false);
+      toast.success("Lista de chequeo guardada definitivamente");
+      
+    } catch (error: any) {
+      toast.error(`❌ Error al guardar: ${error.message || 'Error desconocido'}`);
     }
   };
 
-  const handleExportExcel = async (): Promise<void> => {
-    if (selectedChecklist) {
-      await InstructorChecklistLogic.exportToExcel(selectedChecklist);
+  // Función para volver a la selección de fichas
+  const handleBackToStudySheets = () => {
+    // Limpiar localStorage
+    localStorage.removeItem('selectedStudySheetId');
+    localStorage.removeItem('selectedTeamScrumId');
+    localStorage.removeItem('selectedStudySheetNumber');
+    localStorage.removeItem('selectedTeamScrumName');
+    
+    // Navegar a la página de selección de fichas
+    router.push('/dashboard/InstructorSelection');
+  };
+
+  // Datos dinámicos basados en la selección actual
+  const getStudySheetInfo = () => {
+    if (!selectedStudySheet) {
+      return {
+        fichaNumber: "No disponible",
+        jornada: "No disponible",
+        fechas: "No disponible",
+        programa: "No disponible"
+      };
+    }
+
+    const info = {
+      fichaNumber: selectedStudySheet.number?.toString() || "No disponible",
+      jornada: selectedStudySheet.journey?.name || "No disponible", 
+      fechas: selectedStudySheet.startLective && selectedStudySheet.endLective 
+        ? `${selectedStudySheet.startLective} - ${selectedStudySheet.endLective}`
+        : "No disponible",
+      programa: selectedStudySheet.trainingProject?.name || "No disponible"
+    };
+
+    return info;
+  };
+
+  const getTeamScrumInfo = () => {
+    if (!selectedTeamScrum) {
+      return {
+        teamName: "No seleccionado",
+        projectName: "No disponible"
+      };
+    }
+
+    const info = {
+      teamName: selectedTeamScrum.teamName || "Sin nombre",
+      projectName: selectedTeamScrum.projectName || selectedChecklist?.trainingProjectName || "Sin proyecto"
+    };
+
+    return info;
+  };
+
+  const studySheetInfo = getStudySheetInfo();
+  const teamScrumInfo = getTeamScrumInfo();
+
+  // Funciones para manejo de evaluación
+  const handleEvaluationFieldChange = (field: string, value: string | boolean) => {
+    switch (field) {
+      case 'observations':
+        setEvaluationObservations(value as string);
+        break;
+      case 'recommendations':
+        setEvaluationRecommendations(value as string);
+        break;
+      case 'judgment':
+        setEvaluationJudgment(value as string);
+        break;
+      case 'criteria':
+        setEvaluationCriteria(value as boolean);
+        break;
     }
   };
 
-  const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-    setFile: React.Dispatch<React.SetStateAction<string | null>>
-  ): Promise<void> => {
-    await InstructorChecklistHandlers.handleFileUpload(
-      event,
-      setFile,
-      isFinalSaved
-    );
+  const handleCreateEvaluation = () => {
+    setShowCreateEvaluationModal(true);
   };
 
-  // Evaluation handlers
+  const handleCreateEvaluationSubmit = async () => {
+    if (!selectedChecklist || !selectedTeamScrum?.id) return;
+    
+    setIsCreatingEvaluation(true);
+    try {
+      const evaluationInput = {
+        observations: evaluationObservations.trim(),
+        recommendations: evaluationRecommendations.trim(),
+        valueJudgment: evaluationJudgment,
+        checklistId: parseInt(selectedChecklist.id as string),
+        teamScrumId: parseInt(selectedTeamScrum.id as string),
+        isFinalized: false // ✅ Nueva evaluación siempre empieza sin finalizar
+      };
+
+      await dispatch(addEvaluation(evaluationInput)).unwrap();
+      
+      setShowCreateEvaluationModal(false);
+      toast.success("✅ Evaluación creada exitosamente!");
+      
+      // Recargar la evaluación para este checklist y team scrum
+      loadEvaluation({
+        variables: {
+          checklistId: parseInt(selectedChecklist.id as string),
+          teamScrumId: parseInt(selectedTeamScrum.id as string)
+        },
+        fetchPolicy: 'network-only'
+      });
+      
+    } catch (error: any) {
+      toast.error(`❌ Error al crear la evaluación: ${error.message || 'Error desconocido'}`);
+    } finally {
+      setIsCreatingEvaluation(false);
+    }
+  };
+
   const handleUpdateEvaluationClick = () => {
     setShowEvaluationForm(true);
   };
@@ -277,403 +523,226 @@ export const InstructorChecklistContainer: React.FC = () => {
     setShowEvaluationForm(false);
   };
 
-  const handleCompleteEvaluation = async (): Promise<void> => {
-    await InstructorChecklistHandlers.handleCompleteEvaluation(
-      selectedEvaluation,
-      selectedChecklist,
-      evaluationObservations,
-      evaluationRecommendations,
-      evaluationJudgment,
-      itemStates,
-      setSelectedEvaluation,
-      setEvaluations,
-      setShowEvaluationForm,
-      setPendingChanges
-    );
-  };
-
-  const handleCreateEvaluationFromModal = async () => {
-    await InstructorChecklistHandlers.handleCreateEvaluationFromModal(
-      selectedChecklist,
-      evaluationObservations,
-      evaluationRecommendations,
-      evaluationJudgment,
-      itemStates,
-      selectedTeamScrumId,
-      setIsCreatingEvaluation,
-      setSelectedEvaluation,
-      setEvaluations,
-      setShowCreateEvaluationModal,
-      setPendingChanges
-    );
-  };
-
-  const handleEvaluationFieldChange = (field: string, value: string) => {
-    InstructorChecklistHandlers.handleEvaluationFieldChange(
-      field,
-      value,
-      setEvaluationObservations,
-      setEvaluationRecommendations,
-      setEvaluationJudgment,
-      isFinalSaved,
-      selectedChecklist,
-      evaluationObservations,
-      evaluationRecommendations,
-      evaluationJudgment,
-      setPendingChanges
-    );
-  };
-
-  const handleOpenCreateEvaluationModal = () => {
-    setShowCreateEvaluationModal(true);
-  };
-
-  const handleCloseCreateEvaluationModal = () => {
-    setShowCreateEvaluationModal(false);
-  };
-
-  // Preview handlers
-  const generatePreviewData = () => {
-    if (!selectedChecklist) return null;
-
-    const updatedItems = items.map(item => {
-      const itemState = itemStates[item.id] || { completed: item.completed, observations: item.observations };
-      return {
-        ...item,
-        completed: itemState.completed,
-        observations: itemState.observations
-      };
-    });
-
-    return {
-      checklist: selectedChecklist,
-      items: updatedItems,
-      evaluation: {
-        observations: evaluationObservations,
-        recommendations: evaluationRecommendations,
-        judgment: evaluationJudgment
-      },
-      hasEvaluationData: evaluationObservations.trim() || evaluationRecommendations.trim() || (evaluationJudgment && evaluationJudgment !== "PENDIENTE")
-    };
-  };
-
-  const handleBackToEdit = (): void => {
-    setShowPreview(false);
-  };
-
-  const handleFinalSave = async (): Promise<void> => {
+  const handleCompleteEvaluation = async () => {
+    if (!selectedChecklist || !selectedTeamScrum?.id || !evaluationData?.evaluationByChecklistAndTeam?.data) return;
+    
     try {
-      toast.info("💾 Guardando lista de chequeo definitivamente...");
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setIsFinalSaved(true);
-      setShowPreview(false);
+      const evaluation = evaluationData.evaluationByChecklistAndTeam.data;
+      const evaluationInput = {
+        observations: evaluationObservations.trim(),
+        recommendations: evaluationRecommendations.trim(),
+        valueJudgment: evaluationJudgment,
+        checklistId: parseInt(selectedChecklist.id as string),
+        teamScrumId: parseInt(selectedTeamScrum.id as string),
+        isFinalized: false // ✅ Mantener false al actualizar (solo "Guardar Definitivamente" lo pone en true)
+      };
 
-      if (selectedChecklist) {
-        localStorage.setItem(`isFinalSaved_${selectedChecklist.id}`, 'true');
-        localStorage.removeItem(`evaluationData_${selectedChecklist.id}`);
-        localStorage.removeItem(`itemStates_${selectedChecklist.id}`);
+      const evaluationId = evaluation.id;
+      if (!evaluationId) {
+        toast.error("❌ No se encontró el ID de la evaluación");
+        return;
       }
 
-      toast.success("✅ Lista de chequeo guardada definitivamente!");
-    } catch (error) {
-      console.error("Error saving checklist:", error);
-      toast.error("❌ Error al guardar la lista de chequeo definitivamente");
+      await dispatch(updateEvaluation({ 
+        id: parseInt(evaluationId as string), 
+        input: evaluationInput 
+      })).unwrap();
+      
+      setShowEvaluationForm(false);
+      toast.success("Evaluación actualizada exitosamente!");
+      
+      // Recargar la evaluación actualizada forzando traer datos frescos del servidor
+      await loadEvaluation({
+        variables: {
+          checklistId: parseInt(selectedChecklist.id as string),
+          teamScrumId: parseInt(selectedTeamScrum.id as string)
+        },
+        fetchPolicy: 'network-only' // Forzar traer datos del servidor, no del cache
+      });
+      
+    } catch (error: any) {
+      toast.error(`❌ Error al actualizar la evaluación: ${error.message || 'Error desconocido'}`);
     }
   };
 
-  const handleBackToSelection = () => {
-    localStorage.removeItem('selectedChecklistId');
-    if (selectedChecklist) {
-      localStorage.removeItem(`itemStates_${selectedChecklist.id}`);
-      localStorage.removeItem(`evaluationData_${selectedChecklist.id}`);
-    }
-    toast.info("Regresando a la selección de TeamScrum...");
-    router.push('/dashboard/InstructorSelection');
+  const extractGeneralObservationsFromEvaluation = (evaluation: any) => {
+    return evaluation?.observations || "";
   };
-
-  // Simplified useEffects - you would implement the full logic here
-  useEffect(() => {
-    setIsClientMounted(true);
-    const savedTrimester = localStorage.getItem('selectedTrimester');
-    if (savedTrimester) {
-      setSelectedTrimester(savedTrimester);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isClientMounted) return;
-    
-    const teamScrumId = localStorage.getItem('selectedTeamScrumId');
-    const teamScrumName = localStorage.getItem('selectedTeamScrumName');
-    const studySheetNumber = localStorage.getItem('selectedStudySheetNumber');
-    const studySheetId = localStorage.getItem('selectedStudySheetId');
-    
-    if (teamScrumId && teamScrumName) {
-      setSelectedTeamScrumId(teamScrumId);
-      setSelectedTeamScrumName(teamScrumName);
-      setSelectedStudySheetNumber(studySheetNumber || "");
-      setSelectedStudySheetId(studySheetId || "");
-    } else {
-      console.log('❌ No hay team scrum seleccionado, redirigiendo a selección');
-      window.location.href = '/dashboard/InstructorSelection';
-    }
-  }, [isClientMounted]);
-
-  // Cargar listas de chequeo activas después de que se establezca la información del instructor
-  useEffect(() => {
-    if (isClientMounted && selectedStudySheetId && selectedTeamScrumId) {
-      console.log('🔄 Loading checklists for instructor sheet:', { id: selectedStudySheetId, number: selectedStudySheetNumber });
-      loadActiveChecklists();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isClientMounted, selectedStudySheetId, selectedTeamScrumId]);
-
-  // Mostrar loader durante la hidratación del cliente
-  if (!isClientMounted) {
-    return (
-      <div className="w-full min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="animate-spin w-8 h-8 border-4 border-[#5cb800] dark:border-blue-500 border-t-transparent rounded-full"></div>
-          <p className="text-gray-600 dark:text-gray-400">Cargando aplicación...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="w-full min-h-screen">
-      {/* Estilos CSS para el diseño hexagonal */}
-      <style jsx>{`
-        /* Estilos para los hexágonos y diseño */
-        .hexagon-container {
-          width: 250px;
-          height: 250px;
-          position: relative;
-        }
-        
-        .hexagon {
-          width: 100%;
-          height: 100%;
-          position: relative;
-          border-radius: 20px;
-          transform: rotate(45deg);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .hexagon:hover {
-          transform: rotate(45deg) scale(1.05);
-        }
-        
-        .hexagon-inner {
-          width: calc(100% - 8px);
-          height: calc(100% - 8px);
-          position: absolute;
-          top: 4px;
-          left: 4px;
-          border-radius: 16px;
-          transform: rotate(-45deg);
-          transition: all 0.3s ease;
-        }
-        
-        .hexagon-inner:hover {
-          transform: rotate(-45deg) scale(0.98);
-        }
-        
-        /* Animación de flotación para los hexágonos */
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(45deg); }
-          50% { transform: translateY(-10px) rotate(45deg); }
-        }
-        
-        .hexagon-container:hover .hexagon {
-          animation: float 2s ease-in-out infinite;
-        }
-        
-        /* Estilos para inputs hexagonales */
-        .hexagon-input:focus {
-          transform: scale(1.02);
-          box-shadow: 0 10px 30px rgba(1, 176, 1, 0.3);
-        }
-        
-        /* Estilos para botones hexagonales */
-        .hexagon-button:hover:not(:disabled) {
-          box-shadow: 0 15px 40px rgba(1, 176, 1, 0.4);
-        }
-        
-        .hexagon-export:hover:not(:disabled) {
-          box-shadow: 0 15px 40px rgba(1, 176, 1, 0.3);
-        }
-        
-        /* Estilos para manejo de texto largo en evaluaciones */
-        .evaluation-text {
-          word-wrap: break-word;
-          word-break: break-word;
-          overflow-wrap: break-word;
-          white-space: pre-wrap;
-          hyphens: auto;
-          -webkit-hyphens: auto;
-          -moz-hyphens: auto;
-          -ms-hyphens: auto;
-          max-width: 100%;
-          overflow-x: hidden;
-        }
-        
-        /* Soporte para navegadores más antiguos */
-        .evaluation-text {
-          -ms-word-break: break-all;
-          word-break: break-all;
-          word-break: break-word;
-          -webkit-hyphens: auto;
-          -moz-hyphens: auto;
-          hyphens: auto;
-        }
-      `}</style>
-
-      {/* Contenido principal con diseño tipo panal */}
-      <div className="p-6 space-y-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <PageTitle>Lista de Chequeo - Vista del Instructor</PageTitle>
-            
-            {/* Indicador de guardado automático */}
-            {isSavingItems ? (
-              <div className="flex items-center space-x-2 px-3 py-1 bg-[#5cb800]/10 dark:bg-blue-900/30 rounded-full border border-[#5cb800]/30 dark:border-blue-600">
-                <div className="animate-spin w-4 h-4 border-2 border-[#5cb800] dark:border-blue-500 border-t-transparent rounded-full"></div>
-                <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                  Guardando cambios...
-                </span>
-              </div>
-            ) : pendingChanges ? (
-              <div className="flex items-center space-x-2 px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 rounded-full border border-yellow-300 dark:border-yellow-600">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-                <span className="text-sm text-yellow-700 dark:text-yellow-300 font-medium">
-                  Cambios pendientes
-                </span>
-              </div>
-            ) : selectedEvaluation && Object.keys(itemStates).length > 0 ? (
-              <div className="flex items-center space-x-2 px-3 py-1 bg-[#5cb800]/10 dark:bg-blue-900/30 rounded-full border border-[#5cb800]/30 dark:border-blue-600">
-                <div className="w-2 h-2 bg-[#5cb800] dark:bg-blue-500 rounded-full"></div>
-                <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">
-                  Cambios guardados
-                </span>
-              </div>
-            ) : null}
-          </div>
-          
-          {/* Botón para volver a la selección de TeamScrum */}
-          <button
-            onClick={handleBackToSelection}
-            className="flex items-center space-x-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            <span className="font-medium">Cambiar Team Scrum</span>
-          </button>
-        </div>
-
-        {/* Cards de información específica */}
-        <InformationCards
-          selectedTeamScrumName={selectedTeamScrumName}
-          selectedStudySheetNumber={selectedStudySheetNumber}
-          selectedChecklist={selectedChecklist}
-        />
-
-        {/* Controles de filtros y acciones */}
-        <ChecklistControls
-          selectedTrimester={selectedTrimester}
-          filteredChecklists={filteredChecklists}
-          selectedChecklist={selectedChecklist}
-          activeChecklists={activeChecklists}
-          isFinalSaved={isFinalSaved}
-          onTrimesterChange={handleTrimesterChange}
-          onChecklistChange={handleChecklistChange}
-          onSaveChecklist={handleSaveChecklist}
-          onEnableModification={handleEnableModification}
-          onExportPDF={handleExportPDF}
-          onExportExcel={handleExportExcel}
-        />
-
-        {/* Estados de carga y vacío */}
-        {loading ? (
-          <EmptyState 
-            message="Cargando listas de chequeo activas..."
+    <div className="p-8 dark:bg-[#00111f] min-h-screen text-gray-900 dark:text-white">
+      {/* Botón Volver a Fichas */}
+      <button
+        onClick={handleBackToStudySheets}
+        className="mb-6 flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-[#5cb800] dark:hover:text-[#6bc500] transition-colors duration-200"
+      >
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          className="h-5 w-5" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor"
+        >
+          <path 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            strokeWidth={2} 
+            d="M10 19l-7-7m0 0l7-7m-7 7h18" 
           />
-        ) : filteredChecklists.length === 0 ? (
-          <EmptyState 
-            message={selectedTrimester === "todos" 
-              ? "No hay listas de chequeo activas disponibles. Las listas de chequeo deben ser activadas desde la vista del coordinador" 
-              : `No hay listas de chequeo activas para el trimestre ${selectedTrimester}. Las listas de chequeo deben ser activadas desde la vista del coordinador`}
-          />
-        ) : !selectedChecklist ? (
-          <EmptyState 
-            message="Selecciona una lista de chequeo para comenzar la evaluación"
-          />
-        ) : (
-          <>
-            {/* DataTable con diseño moderno */}
-            <ChecklistTable
-              items={items}
-              currentItems={currentItems}
-              itemStates={itemStates}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              isFinalSaved={isFinalSaved}
-              onItemChange={handleItemChange}
-              onPageChange={handlePageChange}
-            />
+        </svg>
+        <span className="font-medium">Volver a Fichas</span>
+      </button>
 
-            {/* Sección de Evaluación */}
-            <EvaluationSection
-              selectedChecklist={selectedChecklist}
-              selectedEvaluation={selectedEvaluation}
-              showEvaluationForm={showEvaluationForm}
-              evaluationObservations={evaluationObservations}
-              evaluationRecommendations={evaluationRecommendations}
-              evaluationJudgment={evaluationJudgment}
-              isFinalSaved={isFinalSaved}
-              onUpdateClick={handleUpdateEvaluationClick}
-              onCancelUpdate={handleCancelUpdate}
-              onCompleteEvaluation={handleCompleteEvaluation}
-              onCreateEvaluation={handleOpenCreateEvaluationModal}
-              onFieldChange={handleEvaluationFieldChange}
-              extractGeneralObservationsFromEvaluation={extractGeneralObservationsFromEvaluation}
-            />
+      <PageTitle>Lista de Chequeo - Instructor</PageTitle>
 
-            {/* Sección de Firmas */}
-            <SignatureUpload
-              firmaAnterior={firmaAnterior}
-              firmaNuevo={firmaNuevo}
-              isFinalSaved={isFinalSaved}
-              onFileUpload={handleFileUpload}
-              setFirmaAnterior={setFirmaAnterior}
-              setFirmaNuevo={setFirmaNuevo}
-            />
-          </>
-        )}
-      </div>
-
-      {/* Modal de Vista Previa */}
-      <PreviewModal
-        showPreview={showPreview}
+      {/* Tarjetas de información */}
+      <InformationCards 
+        selectedTeamScrumName={teamScrumInfo.teamName}
+        selectedStudySheetNumber={studySheetInfo.fichaNumber}
         selectedChecklist={selectedChecklist}
-        generatePreviewData={generatePreviewData}
-        onBackToEdit={handleBackToEdit}
-        onFinalSave={handleFinalSave}
+        studySheetInfo={studySheetInfo}
+        teamScrumInfo={teamScrumInfo}
       />
 
-      {/* Modal para crear evaluación */}
+      {/* Controles de filtros y acciones */}
+      <ChecklistControls
+        selectedTrimester={selectedTrimester}
+        filteredChecklists={filteredChecklists}
+        selectedChecklist={selectedChecklist}
+        activeChecklists={activeChecklists}
+        availableTrimester={availableTrimester}
+        isFinalSaved={isFinalSaved}
+        onTrimesterChange={setSelectedTrimester}
+        onChecklistChange={handleChecklistChange}
+        onSaveChecklist={handleSaveChecklist}
+        onEnableModification={handleEnableModification}
+        onExportPDF={handleExportPDF}
+        onExportExcel={handleExportExcel}
+      />
+
+      {/* Tabla de lista de chequeo */}
+      {selectedChecklist && currentItems.length > 0 && (
+        <ChecklistTable
+          items={(selectedChecklist.items || []).filter((item): item is NonNullable<typeof item> => item !== null)}
+          currentItems={currentItems}
+          itemStates={itemStates}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          isFinalSaved={isFinalSaved}
+          onItemChange={handleItemChange}
+          onPageChange={handlePageChange}
+        />
+      )}
+
+      {/* Sección de Evaluación */}
+      {selectedChecklist && currentItems.length > 0 && (
+        <EvaluationSection
+          selectedChecklist={selectedChecklist}
+          selectedEvaluation={evaluationData?.evaluationByChecklistAndTeam?.data || null}
+          showEvaluationForm={showEvaluationForm}
+          evaluationObservations={evaluationObservations}
+          evaluationRecommendations={evaluationRecommendations}
+          evaluationJudgment={evaluationJudgment}
+          evaluationCriteria={evaluationCriteria}
+          isFinalSaved={isFinalSaved}
+          onUpdateClick={handleUpdateEvaluationClick}
+          onCancelUpdate={handleCancelUpdate}
+          onCompleteEvaluation={handleCompleteEvaluation}
+          onCreateEvaluation={handleCreateEvaluation}
+          onFieldChange={handleEvaluationFieldChange}
+          extractGeneralObservationsFromEvaluation={extractGeneralObservationsFromEvaluation}
+        />
+      )}
+
+      {/* Modal de Crear Evaluación */}
       <CreateEvaluationModal
         showModal={showCreateEvaluationModal}
         selectedChecklist={selectedChecklist}
         evaluationObservations={evaluationObservations}
         evaluationRecommendations={evaluationRecommendations}
         evaluationJudgment={evaluationJudgment}
+        evaluationCriteria={evaluationCriteria}
         isFinalSaved={isFinalSaved}
         isCreating={isCreatingEvaluation}
-        onClose={handleCloseCreateEvaluationModal}
-        onCreate={handleCreateEvaluationFromModal}
+        onClose={() => setShowCreateEvaluationModal(false)}
+        onCreate={handleCreateEvaluationSubmit}
         onFieldChange={handleEvaluationFieldChange}
+      />
+
+      {/* Estado de carga */}
+      {loading && (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5cb800] dark:border-shadowBlue"></div>
+        </div>
+      )}
+
+      {/* Estado de error */}
+      {error && (
+        <div className="bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg mb-6">
+          <p className="font-medium">Error al cargar las listas de chequeo:</p>
+          <p className="text-sm">{typeof error === 'string' ? error : 'Error desconocido'}</p>
+        </div>
+      )}
+
+      {/* Estado vacío cuando no hay checklists */}
+      {!loading && !error && checklists.length === 0 && (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">📋</span>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            No hay listas de chequeo disponibles
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Las listas de chequeo creadas por el coordinador aparecerán aquí.
+          </p>
+        </div>
+      )}
+
+      {/* Estado cuando hay listas pero ninguna está asignada a esta ficha */}
+      {!loading && !error && checklists.length > 0 && checklistsForStudySheet.length === 0 && selectedStudySheet && (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">📋</span>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            No hay listas de chequeo asignadas a tu ficha
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            La ficha {selectedStudySheet.number || selectedStudySheet.id} no tiene listas de chequeo asignadas.
+          </p>
+          <p className="text-gray-500 dark:text-gray-500 text-sm mt-2">
+            Contacta al coordinador para que asigne listas de chequeo a esta ficha.
+          </p>
+        </div>
+      )}
+
+      {/* Estado cuando se selecciona una lista pero no tiene items */}
+      {selectedChecklist && (!selectedChecklist.items || selectedChecklist.items.length === 0) && (
+        <div className="text-center py-12">
+          <div className="w-16 h-16 bg-yellow-200 dark:bg-yellow-700 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">⚠️</span>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            Lista de chequeo sin items
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Esta lista de chequeo no tiene items para evaluar.
+          </p>
+        </div>
+      )}
+
+      {/* Modal de vista previa */}
+      <PreviewModal
+        showPreview={showPreview}
+        selectedChecklist={selectedChecklist}
+        generatePreviewData={generatePreviewData}
+        onBackToEdit={() => setShowPreview(false)}
+        onFinalSave={handleFinalSave}
       />
     </div>
   );
 };
+
+
+

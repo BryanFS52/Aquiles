@@ -23,11 +23,9 @@ public class ItemDto {
     @Size(max = 100, message = "El indicador no puede exceder los 100 caracteres")
     private String indicator;
 
-    @NotBlank(message = "El tipo de ítem es obligatorio")
-    private Boolean state = true;
+    private Boolean active = true;
 
-    // Relations
-    private ItemType itemType;
-
-    private Checklist checklist;
+    private Long itemTypeId;
+    
+    private ItemTypeDto itemType;
 }

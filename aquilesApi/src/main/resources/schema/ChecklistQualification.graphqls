@@ -1,38 +1,44 @@
-#type ChecklistQualification {
-#    id: ID!
-#    qualificationState: Boolean
-#    observations: String
-#}
-#
-#type ChecklistQualificationPage {
-#    code: String
-#    data: [Checklist]
-#    date: String
-#    totalPages: Int
-#    totalItems: Int
-#    currentPage: Int
-#    message: String
-#}
-#
-#type ChecklistQualificationPageId {
-#    data: Checklist
-#    date: String
-#    code: String
-#    message: String
-#}
-#
-#input ChecklistQualificationDto{
-#    qualificationState: Boolean
-#    observations: String
-#}
-#
-#extend type Query {
-#    allChecklistQualifications(page: Int, size: Int): ChecklistQualificationPage
-#    checklistQualificationById(id: Long!): ChecklistQualificationPageId
-#}
-#
-#extend type Mutation {
-#    addChecklistQualification(input: ChecklistQualificationDto): Response
-#    updateChecklistQualification(id: Long!, input: ChecklistQualificationDto): Response
-#    deleteChecklistQualification(id: Long!): Response
-#}
+type ChecklistQualification {
+    id: ID!
+    qualificationState: Boolean
+    observations: String
+    itemId: Long
+    teamScrumId: Long
+    checklistId: Long
+}
+
+type ChecklistQualificationPage {
+    code: String
+    data: [ChecklistQualification]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type ChecklistQualificationPageId {
+    data: ChecklistQualification
+    date: String
+    code: String
+    message: String
+}
+
+input ChecklistQualificationDto{
+    qualificationState: Boolean
+    observations: String
+    itemId: Long!
+    teamScrumId: Long!
+    checklistId: Long!
+}
+
+extend type Query {
+    allChecklistQualifications(page: Int, size: Int): ChecklistQualificationPage
+    checklistQualificationById(id: Long!): ChecklistQualificationPageId
+    checklistQualificationsByChecklist(checklistId: Long!, teamScrumId: Long!): [ChecklistQualification]
+}
+
+extend type Mutation {
+    saveOrUpdateChecklistQualification(input: ChecklistQualificationDto): Response
+    deleteChecklistQualification(id: Long!): Response
+}

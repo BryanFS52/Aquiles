@@ -6,6 +6,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Animación para desplegables */
+@keyframes slide-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.2s ease-out;
+}
+
 
 .arrow-button {
   @apply p-2 bg-gray-200 rounded hover:bg-gray-300 transition-colors;

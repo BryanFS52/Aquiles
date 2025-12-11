@@ -1,33 +1,33 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { StudentSummary, setAttendanceSummaryFromStudySheet } from "@redux/slices/attendanceSlice";
+import { InstructorFollowUpContainerProps } from "./types";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import {AttendanceTable} from "@components/features/InstructorFollowUp/attendanceTable";
+import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
+import { AppDispatch, RootState } from "@redux/store";
+import { useEffect, useState } from "react";
+import { openNoveltyModal } from "@redux/slices/themis/noveltySlice";
+import { PiStudentFill } from "react-icons/pi";
+import { MdWarning } from "react-icons/md";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify"
 import PageTitle from "@components/UI/pageTitle";
 import NoveltyModal from "@components/Modals/noveltyModal";
 import StatCard from "@/components/features/AprendicesList/StatCard";
-import { StudentSummary, setAttendanceSummaryFromStudySheet } from "@redux/slices/attendanceSlice";
-import { openNoveltyModal } from "@redux/slices/themis/noveltySlice";
-import { AppDispatch, RootState } from "@redux/store";
-import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
-import { useRouter } from "next/navigation";
-import { InstructorFollowUpContainerProps } from "./types";
-import { PiStudentFill } from "react-icons/pi";
-import { MdWarning } from "react-icons/md";
+import AttendanceTable from "@/components/features/InstructorFollowUp/attendanceTable";
 
 const getAuthenticatedInstructorId = (): number => {
     return TEMPORAL_INSTRUCTOR_ID;
 };
 
 export const InstructorFollowUpContainer: React.FC<InstructorFollowUpContainerProps> = ({
-  competenceQuarterId,
-  fichaNumber,
+    competenceQuarterId,
+    fichaNumber,
 }) => {
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
     const [isTransitioning, setIsTransitioning] = useState(false);
-    
+
     const {
         data: studySheets,
         selectedForAttendance,
@@ -57,7 +57,7 @@ export const InstructorFollowUpContainer: React.FC<InstructorFollowUpContainerPr
     const getCompetenceName = () => {
         if (selectedForAttendance?.teacherStudySheets) {
             const targetTeacherStudySheet = selectedForAttendance.teacherStudySheets.find(
-            (tss: any) => parseInt(tss.id) === parseInt(competenceQuarterId.toString())
+                (tss: any) => parseInt(tss.id) === parseInt(competenceQuarterId.toString())
             );
             return targetTeacherStudySheet?.competence?.name || `Competencia ${competenceQuarterId}`;
         }
@@ -99,7 +99,7 @@ export const InstructorFollowUpContainer: React.FC<InstructorFollowUpContainerPr
             if (error.code === "INSUFFICIENT_ABSENCES") {
                 toast.warn(
                     error.message ||
-                        "El estudiante no tienen suficientes ausencias e injustificadas para reportar deserción"
+                    "El estudiante no tienen suficientes ausencias e injustificadas para reportar deserción"
                 );
             } else {
                 toast.error(error.message || "Error al abrir modal de novedad");
@@ -107,7 +107,7 @@ export const InstructorFollowUpContainer: React.FC<InstructorFollowUpContainerPr
         }
     };
 
-    const handleCloseNoveltyModal = () => {};
+    const handleCloseNoveltyModal = () => { };
 
     return (
         <div className="space-y-4 sm:space-y-6 p-2 sm:p-4 md:p-6 lg:p-8">

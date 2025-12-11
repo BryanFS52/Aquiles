@@ -6,7 +6,8 @@ import lombok.*;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,21 +24,33 @@ public class ImprovementPlanActivity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, columnDefinition = "text")
     private String description;
+
+    @Column(name = "objectives", columnDefinition = "text")
+    private String objectives;
+
+    @Column(name = "conclusions", columnDefinition = "text")
+    private String conclusions;
 
     @Column(name = "delivery_date", nullable = false)
     private LocalDate deliveryDate;
-
-    @Column(name = "learning_outcome", nullable = true)
-    private Long learningOutcome;
 
     // 1. Relation (M-1) with ImprovementPlan
     @ManyToOne
     @JoinColumn(name = "improvement_plan_id", nullable = false)
     private ImprovementPlan improvementPlan;
 
-    // 2. Relation (M-1) with ImprovementPlanDelivery
+    // 2. Relation (M-M) with improvementPlanEvidenceMap
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "improvement_plan_evidence_map",
+            joinColumns = @JoinColumn(name = "improvement_plan_id"),
+            inverseJoinColumns = @JoinColumn(name = "evidence_type_id")
+    )
+    private List<ImprovementPlanEvidenceType> evidenceTypes;
+
+    // 3. Relation (M-1) with ImprovementPlanDelivery
     @ManyToOne
     @JoinColumn(name = "delivery_id", nullable = false)
     private ImprovementPlanDelivery improvementPlanDelivery;

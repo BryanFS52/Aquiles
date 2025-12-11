@@ -184,13 +184,74 @@ export const useTeamScrum = (studySheetId: number) => {
                     return;
                 }
 
+                // Validar si el rol es único y ya está asignado a OTRO estudiante
+                if (profile.isUnique) {
+                    const isAlreadyAssigned = selectedTeamForHistory.students?.some(
+                        student => {
+                            if (student?.id === studentId) return false; // Ignorar el estudiante actual
+                            const memberIds = (selectedTeamForHistory as any).memberIds;
+                            if (memberIds && Array.isArray(memberIds)) {
+                                return memberIds.some((m: any) => 
+                                    m.studentId !== parseInt(studentId) && m.profileId === profile.id
+                                );
+                            }
+                            return student?.profiles?.some(p => p?.id === profile.id);
+                        }
+                    );
+
+                    if (isAlreadyAssigned) {
+                        toast.warning(`El rol "${profile.name}" es único y ya está asignado a otro miembro del equipo`, {
+                            position: "top-right",
+                            autoClose: 4000,
+                        });
+                        return;
+                    }
+                }
+
+                // Verificar si el estudiante ya tiene un rol asignado
+                const memberIds = (selectedTeamForHistory as any).memberIds;
+                let currentProfileId: string | null = null;
+                let currentProfileName: string | null = null;
+
+                if (memberIds && Array.isArray(memberIds)) {
+                    const currentMember = memberIds.find((m: any) => 
+                        String(m.studentId) === studentId
+                    );
+                    if (currentMember?.profileId) {
+                        currentProfileId = currentMember.profileId;
+                        const currentProfile = scrumProfiles.find(p => p.id === currentProfileId);
+                        currentProfileName = currentProfile?.name || null;
+                    }
+                }
+
+                // Si ya tiene el mismo rol, no hacer nada
+                if (currentProfileId === profile.id) {
+                    toast.info(`Este estudiante ya tiene el rol "${profile.name}" asignado`, {
+                        position: "top-right",
+                        autoClose: 3000,
+                    });
+                    return;
+                }
+
+                // Mostrar mensaje informativo si está cambiando de rol
+                if (currentProfileId) {
+                    toast.info(
+                        `Cambiando rol de "${currentProfileName}" a "${profile.name}"...`,
+                        {
+                            position: "top-right",
+                            autoClose: 2000,
+                        }
+                    );
+                }
+
+                // Asignar o actualizar el rol (el backend ahora maneja ambos casos)
                 const res = await dispatch(addProfileToStudent([
                     {
                         teamScrumId: selectedTeamForHistory.id,
                         studentId: parseInt(studentId),
                         profileId: String(profile.id),
                         isActive: true,
-                        isUnique: false
+                        isUnique: profile.isUnique ?? false
                     } as any
                 ]));
 
@@ -199,19 +260,124 @@ export const useTeamScrum = (studySheetId: number) => {
                         res.payload?.message ||
                         res.error?.message ||
                         "Error desconocido al asignar el perfil";
-                    toast.error(`Error al asignar perfil: ${message}`);
+                    toast.error(`Error al asignar perfil: ${message}`, {
+                        position: "top-right",
+                        autoClose: 5000,
+                    });
                     return;
                 }
 
                 await dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
 
-                toast.success(`Rol "${profile.name}" asignado exitosamente al estudiante`, {
+                const roleType = profile.isUnique ? "único" : "compartido";
+                const action = currentProfileId ? "cambiado" : "asignado";
+                toast.success(`Rol ${roleType} "${profile.name}" ${action} exitosamente`, {
                     position: "top-right",
                     autoClose: 3000,
                 });
 
             } catch (error: any) {
-                toast.error(`Error inesperado: ${error?.message || "Error desconocido"}`);
+                toast.error(`Error inesperado: ${error?.message || "Error desconocido"}`, {
+                    position: "top-right",
+                    autoClose: 5000,
+                });
+            }
+        },
+
+        onRemoveProfile: async (studentId: string) => {
+            try {
+                if (!selectedTeamForHistory?.id) {
+                    toast.error("Error: No se ha seleccionado un equipo válido");
+                    return;
+                }
+
+                // Verificar el rol actual del estudiante desde memberIds o profiles
+                const memberIds = (selectedTeamForHistory as any).memberIds;
+                let currentProfile: Profile | null = null;
+                let currentProfileId: string | null = null;
+
+                if (memberIds && Array.isArray(memberIds)) {
+                    const currentMember = memberIds.find((m: any) => 
+                        String(m.studentId) === String(studentId)
+                    );
+                    if (currentMember?.profileId) {
+                        currentProfileId = currentMember.profileId;
+                        currentProfile = scrumProfiles.find(p => p.id === currentProfileId) || null;
+                    }
+                }
+
+                // Si no se encontró en memberIds, buscar en los profiles del estudiante
+                if (!currentProfile) {
+                    const student = selectedTeamForHistory.students?.find(s => String(s?.id) === String(studentId));
+                    if (student?.profiles && student.profiles.length > 0) {
+                        const validProfile = student.profiles.find(p => p?.name && p.name !== null);
+                        if (validProfile) {
+                            currentProfile = validProfile as Profile;
+                        }
+                    }
+                }
+
+                if (!currentProfile || !currentProfile.name) {
+                    toast.info("Este estudiante no tiene un rol asignado");
+                    return;
+                }
+
+                // No permitir quitar roles únicos si están asignados
+                if (currentProfile.isUnique) {
+                    toast.warning(
+                        `No puedes quitar el rol único "${currentProfile.name}". Solo puedes cambiarlo por otro rol.`,
+                        {
+                            position: "top-right",
+                            autoClose: 4000,
+                        }
+                    );
+                    return;
+                }
+
+                // Mostrar toast de confirmación
+                toast.info(
+                    `Quitando rol "${currentProfile.name}"...`,
+                    {
+                        position: "top-right",
+                        autoClose: 2000,
+                    }
+                );
+
+                // Asignar un rol vacío/null para remover
+                const res = await dispatch(addProfileToStudent([
+                    {
+                        teamScrumId: selectedTeamForHistory.id,
+                        studentId: parseInt(studentId),
+                        profileId: "",
+                        isActive: false,
+                        isUnique: false
+                    } as any
+                ]));
+
+                if (addProfileToStudent.rejected.match(res)) {
+                    const message =
+                        res.payload?.message ||
+                        res.error?.message ||
+                        "Error desconocido al quitar el perfil";
+                    toast.error(`Error al quitar perfil: ${message}`, {
+                        position: "top-right",
+                        autoClose: 5000,
+                    });
+                    return;
+                }
+
+                await dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
+
+                toast.success(`Rol "${currentProfile.name}" removido exitosamente`, {
+                    position: "top-right",
+                    autoClose: 3000,
+                });
+
+            } catch (error: any) {
+                toast.error(`Error inesperado: ${error?.message || "Error desconocido"}`, {
+                    position: "top-right",
+                    autoClose: 5000,
+                });
             }
         }
     };

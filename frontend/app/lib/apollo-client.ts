@@ -27,4 +27,4 @@ const clientLAN = new ApolloClient({
     },
 });
 
-export { clientLAN };
+export { client, clientLAN };

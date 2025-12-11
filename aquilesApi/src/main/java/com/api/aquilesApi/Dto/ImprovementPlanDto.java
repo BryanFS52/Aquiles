@@ -1,43 +1,44 @@
 package com.api.aquilesApi.Dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import java.io.Serializable;
 import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ImprovementPlanDto {
+@Getter
+@Setter
+@Builder
+public class ImprovementPlanDto implements Serializable {
+
     private Long id;
 
-    // @NotBlank(message = "La ciudad es obligatoria")
-    // @Size(max = 55, message = "La ciudad no puede exceder los 55 caracteres")
+    private String actNumber;
     private String city;
-
-    // @NotNull(message = "La fecha es obligatoria")
     private String date;
-
-    // @NotBlank(message = "El motivo es obligatorio")
-    // @Size(max = 255, message = "El motivo no puede exceder los 255 caracteres")
+    private String startTime;
+    private String endTime;
+    private String place;
     private String reason;
-
-    // @NotNull(message = "El estado es obligatorio")
     private Boolean state;
+    private String additionalJustification;
 
-    // @NotNull(message = "La calificación es obligatoria")
-    private Boolean qualification;
-
-    // @NotNull(message = "El estudiante es obligatorio")
+    // Reference IDs
     private Long studentId;
-
-    // @NotNull(message = "La competencia del instructor es obligatoria")
     private Long teacherCompetence;
+    private Long learningOutcome;
 
+    private String improvementPlanFile;
 
     // Relations
     private List<ImprovementPlanActivityDto> improvementPlanActivity;
     private ImprovementPlanFaultTypeDto faultType;
-    private ImprovementPlanEvidenceMapDto improvementPlanEvidenceMapDto;
+    private ImprovementPlanEvaluationDto improvementPlanEvaluation;
 }

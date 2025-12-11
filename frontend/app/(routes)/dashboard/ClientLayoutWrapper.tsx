@@ -98,6 +98,19 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
 
     const logoutUser = () => {
         setUser(null);
+
+        // Limpiar localStorage
+        try {
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userRole');
+            localStorage.removeItem('userDocument');
+            localStorage.removeItem('userDocumentType');
+            localStorage.removeItem('sidebar-role');
+        } catch (error) {
+            console.error('Error al limpiar datos del usuario en localStorage:', error);
+        }
     };
 
     const userContextValue: UserContextType = {

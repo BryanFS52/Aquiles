@@ -101,3 +101,5 @@ export const AttendanceTable: React.FC<
     </motion.div>
   );
 }
+
+export default AttendanceTable;

@@ -41,66 +41,59 @@ export const fetchFaultTypeById = createAsyncThunk<GetImprovementPlanFaultTypeBy
     }
 );
 
-export const addFaultType = createAsyncThunk<AddImprovementPlanFaultTypeMutation['addImprovementPlanFaultType'],AddImprovementPlanFaultTypeMutationVariables['input'],
-    { rejectValue: { code: string; message: string } }
+// export const addFaultType = createAsyncThunk<any, any, {}>(); // Comentado por ahora - se implementará cuando sea necesario
+
+// Helper to normalize GraphQL items to the local ImprovementPlanFaultType shape
+const transformGraphQLToFaultTypeItem = (item: any): ImprovementPlanFaultType => {
+    // Map known fields and spread the rest to preserve additional properties
+    return {
+        id: item.id,
+        // Accept both backend variants: prefer `name` if present, fall back to `faulType`
+            name: item.name ?? item.faulType ?? '',
+        description: item.description ?? '',
+        ...item,
+    } as ImprovementPlanFaultType;
+};
+
+export const addFaultType = createAsyncThunk<
+    AddImprovementPlanFaultTypeMutation['addImprovementPlanFaultType'],
+    AddImprovementPlanFaultTypeMutationVariables
 >(
     'faultType/add',
-    async (input, { rejectWithValue }) => {
-        try {
-            const { data } = await clientLAN.mutate<AddImprovementPlanFaultTypeMutation, AddImprovementPlanFaultTypeMutationVariables>({
-                mutation: ADD_FAULT_TYPE,
-                variables: { input },
-            });
-            const res = data?.addImprovementPlanFaultType;
-            if (!res || res.code !== '200') {
-                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
-            }
-            return res;
-        } catch (error: any) {
-            return rejectWithValue({ code: error?.code ?? '500', message: error?.message ?? 'Unknown error' });
-        }
+    async (variables) => {
+        const { data } = await clientLAN.mutate<AddImprovementPlanFaultTypeMutation, AddImprovementPlanFaultTypeMutationVariables>({
+            mutation: ADD_FAULT_TYPE,
+            variables,
+        });
+        return data?.addImprovementPlanFaultType as AddImprovementPlanFaultTypeMutation['addImprovementPlanFaultType'];
     }
 );
 
-export const updateFaultType = createAsyncThunk<UpdateImprovementPlanFaultTypeMutation['updateImprovementPlanFaultType'],UpdateImprovementPlanFaultTypeMutationVariables,
-    { rejectValue: { code: string; message: string } }
+export const updateFaultType = createAsyncThunk<
+    UpdateImprovementPlanFaultTypeMutation['updateImprovementPlanFaultType'],
+    UpdateImprovementPlanFaultTypeMutationVariables
 >(
     'faultType/update',
-    async ({ id, input }, { rejectWithValue }) => {
-        try {
-            const { data } = await clientLAN.mutate<UpdateImprovementPlanFaultTypeMutation, UpdateImprovementPlanFaultTypeMutationVariables>({
-                mutation: UPDATE_FAULT_TYPE,
-                variables: { id, input },
-            });
-            const res = data?.updateImprovementPlanFaultType;
-            if (!res || res.code !== '200') {
-                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
-            }
-            return res;
-        } catch (error: any) {
-            return rejectWithValue({ code: error?.code ?? '500', message: error?.message ?? 'Unknown error' });
-        }
+    async (variables) => {
+        const { data } = await clientLAN.mutate<UpdateImprovementPlanFaultTypeMutation, UpdateImprovementPlanFaultTypeMutationVariables>({
+            mutation: UPDATE_FAULT_TYPE,
+            variables,
+        });
+        return data?.updateImprovementPlanFaultType as UpdateImprovementPlanFaultTypeMutation['updateImprovementPlanFaultType'];
     }
 );
 
-export const deleteFaultType = createAsyncThunk<string, string,
-    { rejectValue: { code: string; message: string } }
+export const deleteFaultType = createAsyncThunk<
+    DeleteImprovementPlanFaultTypeMutation['deleteImprovementPlanFaultType'],
+    DeleteImprovementPlanFaultTypeMutationVariables
 >(
     'faultType/delete',
-    async (id, { rejectWithValue }) => {
-        try {
-            const { data } = await clientLAN.mutate<DeleteImprovementPlanFaultTypeMutation, DeleteImprovementPlanFaultTypeMutationVariables>({
-                mutation: DELETE_FAULT_TYPE,
-                variables: { id },
-            });
-            const res = data?.deleteImprovementPlanFaultType;
-            if (!res || res.code !== '200') {
-                return rejectWithValue({ code: res?.code ?? '500', message: res?.message ?? 'Unknown error' });
-            }
-            return id;
-        } catch (error: any) {
-            return rejectWithValue({ code: error?.code ?? '500', message: error?.message ?? 'Unknown error' });
-        }
+    async (variables) => {
+        const { data } = await clientLAN.mutate<DeleteImprovementPlanFaultTypeMutation, DeleteImprovementPlanFaultTypeMutationVariables>({
+            mutation: DELETE_FAULT_TYPE,
+            variables,
+        });
+        return data?.deleteImprovementPlanFaultType as DeleteImprovementPlanFaultTypeMutation['deleteImprovementPlanFaultType'];
     }
 );
 
@@ -117,13 +110,23 @@ const faultTypeSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchFaultTypes.fulfilled, (state, action: PayloadAction<GetAllImprovementPlanFaultTypesQuery['allImprovementPlanFaultTypes']>) => {
-                const payload = action.payload;
-                if (payload?.data) {
-                    state.data = payload.data.filter((item): item is NonNullable<typeof item> => item !== null) as ImprovementPlanFaultType[];
-                    state.totalItems = payload.totalItems ?? 0;
-                    state.totalPages = payload.totalPages ?? 0;
-                    state.currentPage = payload.currentPage ?? 0;
+            .addCase(fetchFaultTypes.fulfilled, (state, action: PayloadAction<any>) => {
+                if (action.payload?.data) {
+                    // Filtrar items null y transformar
+                    const mappedItems = action.payload.data
+                        .filter((item: any): item is NonNullable<typeof item> => item !== null)
+                        .map(transformGraphQLToFaultTypeItem);
+                    
+                    // Eliminar duplicados basados en ID
+                    const uniqueItems = Array.from(
+                        new Map(mappedItems.map((item: ImprovementPlanFaultType) => [item.id, item])).values()
+                    ) as ImprovementPlanFaultType[];
+                    
+                    console.log('Tipos de falta después de eliminar duplicados:', uniqueItems);
+                    state.data = uniqueItems;
+                    state.totalItems = action.payload.totalItems ?? 0;
+                    state.totalPages = action.payload.totalPages ?? 0;
+                    state.currentPage = action.payload.currentPage ?? 0;
                 }
                 state.loading = false;
             })
@@ -139,7 +142,10 @@ const faultTypeSlice = createSlice({
             .addCase(fetchFaultTypeById.fulfilled, (state, action: PayloadAction<GetImprovementPlanFaultTypeByIdQuery['improvementPlanFaultTypeById']>) => {
                 const payload = action.payload;
                 if (payload?.data) {
-                    state.data = [payload.data].filter((item): item is NonNullable<typeof item> => item !== null) as ImprovementPlanFaultType[];
+                    // Normalize the single item using the same transformer
+                    const item = payload.data;
+                    const mapped = transformGraphQLToFaultTypeItem(item);
+                    state.data = [mapped];
                 }
                 state.loading = false;
             })
@@ -168,17 +174,20 @@ const faultTypeSlice = createSlice({
                 state.error = { code, message };
             })
             // deleteFaultType
-            .addCase(deleteFaultType.fulfilled, (state, action: PayloadAction<string>) => {
-                if (action.payload) {
-                    state.data = state.data.filter((faultType: ImprovementPlanFaultType) => faultType.id !== action.payload);
-                }
-                state.error = null;
-            })
-            .addCase(deleteFaultType.rejected, (state, action) => {
-                const payload = action.payload as RejectedPayload;
-                const { code, message } = payload || {};
-                state.error = { code, message };
-            });
+                        .addCase(deleteFaultType.fulfilled, (state, action) => {
+                            // action.payload is the mutation result (likely an object with an `id`), so read id safely
+                            const payload = action.payload as DeleteImprovementPlanFaultTypeMutation['deleteImprovementPlanFaultType'] | null | undefined;
+                            const id = payload?.id as string | undefined;
+                            if (id) {
+                                state.data = state.data.filter((faultType: ImprovementPlanFaultType) => faultType.id !== id);
+                            }
+                            state.error = null;
+                        })
+                        .addCase(deleteFaultType.rejected, (state, action) => {
+                            const payload = action.payload as RejectedPayload;
+                            const { code, message } = payload || {};
+                            state.error = { code, message };
+                        });
     }
 });
 

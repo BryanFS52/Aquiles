@@ -26,6 +26,6 @@ public class    ImprovementPlanEvidenceType implements Serializable {
     // Relations
     // 1. Relation (M-M) with improvementPlan
     @ManyToMany(mappedBy = "evidenceTypes")
-    private List<ImprovementPlan> improvementPlans = new ArrayList<>();
+    private List<ImprovementPlanActivity> improvementPlanActivities = new ArrayList<>();
 
 }

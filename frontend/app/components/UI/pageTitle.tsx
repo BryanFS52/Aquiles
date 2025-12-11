@@ -49,7 +49,13 @@ const PageTitle: React.FC<PageTitleProps> = ({ children, backUrl, onBack }) => {
                 ) : (
                     <div className="w-1 sm:w-1.5 h-10 sm:h-12 md:h-14 bg-gradient-to-b from-primary via-lightGreen to-primary dark:from-secondary dark:via-lightGreen dark:to-secondary rounded-full shadow-md flex-shrink-0"></div>
                 )}
-                <h1 className="text-black dark:text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl font-inter font-semibold min-w-0">
+                <h1
+                    className={`text-black dark:text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl font-inter font-semibold min-w-0 ${
+                        showBackButton ? 'cursor-pointer' : ''
+                    }`}
+                    onClick={showBackButton ? handleBackClick : undefined}
+                    role={showBackButton ? 'button' : undefined}
+                >
                     {children}
                 </h1>
             </div>

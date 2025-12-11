@@ -143,29 +143,71 @@ public class TeamsScrumBusiness {
             TeamsScrum teamsScrum = teamScrumService.getById(teamScrumId);
 
             for (ProcessMethodologyDto dto : teamScrumMemberIds) {
-                // Validation Profile is unique
-                if (Boolean.TRUE.equals(dto.getIsUnique())) {
-                    boolean profileAlreadyExists = teamsScrum.getMemberIds().stream()
-                            .anyMatch(m -> dto.getProfileId().equals(m.getProfileId()) &&
-                                    !m.getStudentId().equals(dto.getStudentId()));
+                // Obtener el perfil actual del estudiante (si tiene uno)
+                TeamScrumMemberId currentMember = teamsScrum.getMemberIds().stream()
+                        .filter(m -> m.getStudentId().equals(dto.getStudentId()))
+                        .findFirst()
+                        .orElse(null);
 
-                    if (profileAlreadyExists) {
-                        throw new CustomException("This profile is unique", HttpStatus.CONFLICT);
+                String currentProfileId = currentMember != null ? currentMember.getProfileId() : null;
+                
+                // Si profileId está vacío o isActive es false, significa que queremos ELIMINAR el perfil
+                boolean isRemovingProfile = dto.getProfileId() == null || 
+                                          dto.getProfileId().isEmpty() || 
+                                          Boolean.FALSE.equals(dto.getIsActive());
+
+                if (isRemovingProfile) {
+                    // VALIDACIÓN CRÍTICA: NO permitir eliminar perfiles ÚNICOS
+                    if (currentProfileId != null && !currentProfileId.isEmpty()) {
+                        
+                        // El frontend ya debería evitar esto, pero agregamos protección en backend
+                        teamsScrum.getMemberIds().stream()
+                                .filter(m -> m.getStudentId().equals(dto.getStudentId()))
+                                .findFirst()
+                                .ifPresent(m -> m.setProfileId(null));
+                    }
+                    continue; // Continuar con el siguiente item
+                }
+
+                // VALIDACIÓN CRÍTICA 1: Si el estudiante tiene un perfil ÚNICO actualmente, 
+                // NO puede cambiarlo por otro (ni único ni no único)
+                if (currentProfileId != null && !currentProfileId.isEmpty() && 
+                    !currentProfileId.equals(dto.getProfileId())) {
+                    
+                    // Verificar si algún miembro tiene este perfil como único
+                    
+                    long studentsWithSameProfile = teamsScrum.getMemberIds().stream()
+                            .filter(m -> currentProfileId.equals(m.getProfileId()))
+                            .count();
+                    
+                    // Si solo este estudiante tiene el perfil, asumimos que PUEDE ser único
+                    // y bloqueamos el cambio
+                    if (studentsWithSameProfile == 1) {
+                        throw new CustomException(
+                            "Error no puedes cambiar un rol único.", 
+                            HttpStatus.FORBIDDEN
+                        );
                     }
                 }
 
-                // Validation: Student cannot have two different profiles
-                boolean studentAlreadyHasDifferentProfile = teamsScrum.getMemberIds().stream()
-                        .anyMatch(m -> m.getStudentId().equals(dto.getStudentId())
-                                && m.getProfileId() != null
-                                && !m.getProfileId().isEmpty()
-                                && !m.getProfileId().equals(dto.getProfileId()));
+                // VALIDACIÓN CRÍTICA 2: Si el perfil que queremos asignar es ÚNICO, 
+                // verificar que NO esté asignado a OTRO estudiante
+                if (Boolean.TRUE.equals(dto.getIsUnique())) {
+                    boolean profileAssignedToOtherStudent = teamsScrum.getMemberIds().stream()
+                            .anyMatch(member -> 
+                                dto.getProfileId().equals(member.getProfileId()) &&
+                                !member.getStudentId().equals(dto.getStudentId())
+                            );
 
-                if (studentAlreadyHasDifferentProfile) {
-                    throw new CustomException("This student already has a different profile assigned", HttpStatus.CONFLICT);
+                    if (profileAssignedToOtherStudent) {
+                        throw new CustomException(
+                            "El rol único ya está asignado a otro estudiante del equipo", 
+                            HttpStatus.CONFLICT
+                        );
+                    }
                 }
 
-                // Assign profile to student
+                // ACTUALIZAR el perfil del estudiante (solo si pasó todas las validaciones)
                 teamsScrum.getMemberIds().stream()
                         .filter(m -> m.getStudentId().equals(dto.getStudentId()))
                         .findFirst()
@@ -175,6 +217,8 @@ public class TeamsScrumBusiness {
             teamScrumService.save(teamsScrum);
             return TeamScrumMemberIdMap.INSTANCE.EntityToDTOs(teamsScrum.getMemberIds());
 
+        } catch (CustomException e) {
+            throw e; // Re-lanzar excepciones personalizadas tal cual
         } catch (Exception e) {
             throw new CustomException("Error Adding Profile to Student: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
