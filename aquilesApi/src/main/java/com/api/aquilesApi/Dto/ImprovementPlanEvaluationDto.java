@@ -1,5 +1,6 @@
 package com.api.aquilesApi.Dto;
 
+import com.api.aquilesApi.Dto.Light.ImprovementPlanLightDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

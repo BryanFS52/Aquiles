@@ -1,4 +1,4 @@
-package com.api.aquilesApi.Dto;
+package com.api.aquilesApi.Dto.Light;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

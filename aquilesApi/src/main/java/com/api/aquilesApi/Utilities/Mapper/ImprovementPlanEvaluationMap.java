@@ -1,7 +1,7 @@
 package com.api.aquilesApi.Utilities.Mapper;
 
 import com.api.aquilesApi.Dto.ImprovementPlanEvaluationDto;
-import com.api.aquilesApi.Dto.ImprovementPlanLightDto;
+import com.api.aquilesApi.Dto.Light.ImprovementPlanLightDto;
 import com.api.aquilesApi.Entity.ImprovementPlan;
 import com.api.aquilesApi.Entity.ImprovementPlanEvaluation;
 import org.mapstruct.Mapper;
