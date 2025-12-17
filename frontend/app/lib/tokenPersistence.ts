@@ -21,7 +21,7 @@ export interface AuthData {
 }
 
 /**
- * Guardar token en localStorage de Aquiles
+ * Guardar token SOLO en sessionStorage y cookies (NO localStorage por seguridad)
  */
 export const saveTokenToAquiles = (token: string, source: string = "manual"): boolean => {
   try {
@@ -42,14 +42,14 @@ export const saveTokenToAquiles = (token: string, source: string = "manual"): bo
       source,
     };
 
-    // Guardar objeto completo
-    localStorage.setItem("aquiles_auth", JSON.stringify(authData));
+    // Guardar en sessionStorage
+    sessionStorage.setItem("aquiles_auth", JSON.stringify(authData));
+    sessionStorage.setItem("aquiles_token", token);
+    sessionStorage.setItem("aquiles_auth_timestamp", Date.now().toString());
 
-    // Guardar token como string también (backup)
-    localStorage.setItem("aquiles_token", token);
-
-    // Guardar timestamp
-    localStorage.setItem("aquiles_auth_timestamp", Date.now().toString());
+    // Guardar en cookies de Aquiles
+    const cookieValue = btoa(JSON.stringify(authData));
+    document.cookie = `aquiles_session=${cookieValue}; path=/; max-age=86400; SameSite=Lax`;
 
     console.log("✅ [TokenPersistence] Token guardado exitosamente");
     console.log(`✅ [TokenPersistence] Fuente: ${source}`);
@@ -63,28 +63,55 @@ export const saveTokenToAquiles = (token: string, source: string = "manual"): bo
 };
 
 /**
- * Obtener token de localStorage
+ * Obtener token desde cookies de Aquiles
+ */
+const getTokenFromCookies = (): string | null => {
+  try {
+    const cookieMatch = document.cookie.match(/aquiles_session=([^;]+)/);
+    if (cookieMatch && cookieMatch[1]) {
+      const decoded = atob(cookieMatch[1]);
+      const authData = JSON.parse(decoded);
+      if (authData.token) {
+        console.log("✅ [TokenPersistence] Token obtenido de cookies Aquiles");
+        return authData.token;
+      }
+    }
+  } catch (error) {
+    console.error("❌ [TokenPersistence] Error leyendo cookies:", error);
+  }
+  return null;
+};
+
+/**
+ * Obtener token de sessionStorage > cookies (NO localStorage por seguridad)
  */
 export const getTokenFromStorage = (): string | null => {
   try {
-    // Intentar obtener del objeto completo primero
-    const authData = localStorage.getItem("aquiles_auth");
-    if (authData) {
-      const parsed = JSON.parse(authData);
+    // PRIORIDAD 1: sessionStorage
+    const sessionAuth = sessionStorage.getItem("aquiles_auth");
+    if (sessionAuth) {
+      const parsed = JSON.parse(sessionAuth);
       if (parsed.token) {
-        console.log("✅ [TokenPersistence] Token obtenido de aquiles_auth");
+        console.log("✅ [TokenPersistence] Token obtenido de sessionStorage");
         return parsed.token;
       }
     }
 
-    // Fallback: obtener el token como string
-    const token = localStorage.getItem("aquiles_token");
-    if (token) {
-      console.log("✅ [TokenPersistence] Token obtenido de aquiles_token");
-      return token;
+    const sessionToken = sessionStorage.getItem("aquiles_token");
+    if (sessionToken) {
+      console.log("✅ [TokenPersistence] Token obtenido de sessionStorage (token string)");
+      return sessionToken;
     }
 
-    console.warn("⚠️ [TokenPersistence] No hay token en storage");
+    // PRIORIDAD 2: Cookies de Aquiles
+    const cookieToken = getTokenFromCookies();
+    if (cookieToken) {
+      // Si encontramos token en cookies, sincronizar a sessionStorage
+      sessionStorage.setItem("aquiles_token", cookieToken);
+      return cookieToken;
+    }
+
+    console.warn("⚠️ [TokenPersistence] No hay token en sessionStorage ni cookies");
     return null;
   } catch (error) {
     console.error("❌ [TokenPersistence] Error obteniendo token:", error);
@@ -93,22 +120,23 @@ export const getTokenFromStorage = (): string | null => {
 };
 
 /**
- * Verificar que el token está en localStorage
+ * Verificar que el token está en sessionStorage o cookies (NO localStorage)
  */
 export const verifyTokenInStorage = (): boolean => {
   try {
     const token = getTokenFromStorage();
-    const hasAuth = !!localStorage.getItem("aquiles_auth");
-    const hasToken = !!localStorage.getItem("aquiles_token");
+    const hasSessionAuth = !!sessionStorage.getItem("aquiles_auth");
+    const hasSessionToken = !!sessionStorage.getItem("aquiles_token");
+    const hasCookie = !!document.cookie.match(/aquiles_session=([^;]+)/);
 
-    const isValid = token !== null && (hasAuth || hasToken);
+    const isValid = token !== null && (hasSessionAuth || hasSessionToken || hasCookie);
 
     console.log("🔍 [TokenPersistence] Verificación de storage:", {
       tokenExists: !!token,
-      aquiles_auth: hasAuth,
-      aquiles_token: hasToken,
+      sessionStorage: hasSessionAuth || hasSessionToken,
+      cookies: hasCookie,
       valid: isValid,
-      timestamp: localStorage.getItem("aquiles_auth_timestamp"),
+      timestamp: sessionStorage.getItem("aquiles_auth_timestamp"),
     });
 
     return isValid;
@@ -119,15 +147,20 @@ export const verifyTokenInStorage = (): boolean => {
 };
 
 /**
- * Limpiar token de localStorage
+ * Limpiar token de sessionStorage y cookies (NO localStorage)
  */
 export const clearTokenFromStorage = (): void => {
   try {
-    console.log("🗑️ [TokenPersistence] Limpiando tokens de storage...");
-    localStorage.removeItem("aquiles_auth");
-    localStorage.removeItem("aquiles_token");
-    localStorage.removeItem("aquiles_auth_timestamp");
+    console.log("🗑️ [TokenPersistence] Limpiando tokens de sessionStorage y cookies...");
+    
+    // Limpiar sessionStorage
     sessionStorage.removeItem("aquiles_auth");
+    sessionStorage.removeItem("aquiles_token");
+    sessionStorage.removeItem("aquiles_auth_timestamp");
+    
+    // Limpiar cookies de Aquiles
+    document.cookie = "aquiles_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    
     console.log("✅ [TokenPersistence] Tokens limpiados");
   } catch (error) {
     console.error("❌ [TokenPersistence] Error limpiando tokens:", error);
@@ -135,14 +168,32 @@ export const clearTokenFromStorage = (): void => {
 };
 
 /**
- * Obtener auth data completa
+ * Obtener auth data completa desde sessionStorage > cookies (NO localStorage)
  */
 export const getAuthDataFromStorage = (): AuthData | null => {
   try {
-    const authData = localStorage.getItem("aquiles_auth");
-    if (authData) {
-      return JSON.parse(authData);
+    // PRIORIDAD 1: sessionStorage
+    const sessionAuth = sessionStorage.getItem("aquiles_auth");
+    if (sessionAuth) {
+      console.log("✅ [TokenPersistence] Auth data obtenida de sessionStorage");
+      return JSON.parse(sessionAuth);
     }
+
+    // PRIORIDAD 2: Cookies de Aquiles
+    const cookieMatch = document.cookie.match(/aquiles_session=([^;]+)/);
+    if (cookieMatch && cookieMatch[1]) {
+      try {
+        const decoded = atob(cookieMatch[1]);
+        const authData = JSON.parse(decoded);
+        console.log("✅ [TokenPersistence] Auth data obtenida de cookies Aquiles");
+        // Sincronizar a sessionStorage
+        sessionStorage.setItem("aquiles_auth", JSON.stringify(authData));
+        return authData;
+      } catch (e) {
+        console.error("❌ [TokenPersistence] Error decodificando cookie:", e);
+      }
+    }
+
     return null;
   } catch (error) {
     console.error("❌ [TokenPersistence] Error obteniendo auth data:", error);
@@ -167,11 +218,11 @@ export const isTokenValid = (): boolean => {
 };
 
 /**
- * Verificar edad del token
+ * Verificar edad del token (SOLO sessionStorage)
  */
 export const getTokenAge = (): number | null => {
   try {
-    const timestamp = localStorage.getItem("aquiles_auth_timestamp");
+    const timestamp = sessionStorage.getItem("aquiles_auth_timestamp");
     if (!timestamp) return null;
 
     const age = Date.now() - parseInt(timestamp);
@@ -184,23 +235,23 @@ export const getTokenAge = (): number | null => {
 };
 
 /**
- * Debug: mostrar estado completo de storage
+ * Debug: mostrar estado completo de storage (SOLO sessionStorage y cookies)
  */
 export const debugStorageState = (): void => {
   console.log("🔍 [TokenPersistence] ═══════════════════════════════════════");
   console.log("🔍 [TokenPersistence] DEBUG - Estado de Storage");
   console.log("🔍 [TokenPersistence] ═══════════════════════════════════════");
 
-  // localStorage
-  console.log("📦 localStorage items:", {
-    aquiles_auth: localStorage.getItem("aquiles_auth") ? "✅" : "❌",
-    aquiles_token: localStorage.getItem("aquiles_token") ? "✅" : "❌",
-    aquiles_auth_timestamp: localStorage.getItem("aquiles_auth_timestamp") ? "✅" : "❌",
-  });
-
   // sessionStorage
   console.log("📦 sessionStorage items:", {
     aquiles_auth: sessionStorage.getItem("aquiles_auth") ? "✅" : "❌",
+    aquiles_token: sessionStorage.getItem("aquiles_token") ? "✅" : "❌",
+    aquiles_auth_timestamp: sessionStorage.getItem("aquiles_auth_timestamp") ? "✅" : "❌",
+  });
+
+  // Cookies
+  console.log("🍪 Cookies:", {
+    aquiles_session: document.cookie.match(/aquiles_session=([^;]+)/) ? "✅" : "❌",
   });
 
   // Token válido

@@ -13,7 +13,7 @@ Crea un archivo `.env` en la raíz del proyecto `frontend/` con las siguientes v
 NEXT_PUBLIC_API_URL=http://localhost:4000/graphql
 
 # URL del servidor SSO Cerberos (autenticación)
-NEXT_PUBLIC_CERBEROS_URL=http://10.12.16.59:3000
+NEXT_PUBLIC_CERBEROS_URL=https://cerberos.datasena.com/
 
 # URL de este proyecto Aquiles (para callbacks)     
 NEXT_PUBLIC_AQUILES_URL=http://localhost:3000
@@ -27,7 +27,7 @@ cp .env.example .env
 ### Flujo de Autenticación
 
 1. El usuario accede a Aquiles (`localhost:3000`)
-2. Si no está autenticado, se redirige a Cerberos (`10.12.16.59:3000`)
+2. Si no está autenticado, se redirige a Cerberos (`https://cerberos.datasena.com`)
 3. Después del login exitoso, Cerberos redirige de vuelta con un token
 4. Aquiles valida el token y crea la sesión del usuario
 

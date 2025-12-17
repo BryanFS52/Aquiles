@@ -34,14 +34,27 @@ function CerberosCallbackContent() {
   const validateTokenWithRedux = async (token: string) => {
     console.log("🚀 [Callback Page] Iniciando validación del token...");
 
+    // IMPORTANTE: Guardar el token en sessionStorage ANTES de hacer la petición GraphQL
+    console.log("💾 [Callback Page] Guardando token en sessionStorage ANTES de validar...");
+    sessionStorage.setItem("aquiles_token", token);
+    sessionStorage.setItem("aquiles_auth_timestamp", Date.now().toString());
+    
+    const tempAuth = {
+      token,
+      timestamp: Date.now(),
+      user: null,
+      source: "cerberos_callback"
+    };
+    sessionStorage.setItem("aquiles_auth", JSON.stringify(tempAuth));
+
     try {
       console.log("📡 [Callback Page] Llamando a validateCerberosToken...");
       const result = await dispatch(validateCerberosToken(token)).unwrap();
       console.log("✅ [Callback Page] Token validado exitosamente:", result);
 
       // Verificar que se guardó
-      const stored = localStorage.getItem("aquiles_auth");
-      console.log("💾 [Callback Page] localStorage después de validación:", stored ? "✅ EXISTE" : "❌ VACÍO");
+      const stored = sessionStorage.getItem("aquiles_auth");
+      console.log("💾 [Callback Page] sessionStorage después de validación:", stored ? "✅ EXISTE" : "❌ VACÍO");
       if (stored) {
         console.log("📦 [Callback Page] Contenido guardado:", JSON.parse(stored));
       }
@@ -50,7 +63,7 @@ function CerberosCallbackContent() {
       console.log("🔄 [Callback Page] Redirigiendo a dashboard (client-side navigation)...");
       setTimeout(() => {
         // Verificar una última vez antes de redirigir
-        const finalCheck = localStorage.getItem("aquiles_auth");
+        const finalCheck = sessionStorage.getItem("aquiles_auth");
         console.log("🔍 [Callback Page] Verificación final antes de redirect:", finalCheck ? "✅ OK" : "❌ PERDIDO");
 
         router.push("/dashboard");
@@ -72,13 +85,13 @@ function CerberosCallbackContent() {
         },
       };
 
-      console.log("💾 [Callback Page] Guardando en localStorage/sessionStorage...");
-      localStorage.setItem("aquiles_auth", JSON.stringify(tempAuthData));
+      console.log("💾 [Callback Page] Guardando en sessionStorage (fallback)...");
       sessionStorage.setItem("aquiles_auth", JSON.stringify(tempAuthData));
+      sessionStorage.setItem("aquiles_token", token);
 
       // Verificar
-      const verified = localStorage.getItem("aquiles_auth");
-      console.log("🔍 [Callback Page] Verificación localStorage:", verified ? "✅ GUARDADO" : "❌ ERROR");
+      const verified = sessionStorage.getItem("aquiles_auth");
+      console.log("🔍 [Callback Page] Verificación sessionStorage:", verified ? "✅ GUARDADO" : "❌ ERROR");
       if (verified) {
         console.log("📦 [Callback Page] Datos guardados:", JSON.parse(verified));
       }

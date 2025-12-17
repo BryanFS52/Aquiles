@@ -60,21 +60,18 @@ export const validateCerberosToken = createAsyncThunk<
 
       console.log("💾 [authSlice] Datos a guardar:", authData);
 
-      // Guardar en múltiples lugares para asegurar persistencia
-      console.log("💾 [authSlice] Guardando en localStorage...");
-      localStorage.setItem("aquiles_auth", JSON.stringify(authData));
-
+      // Guardar SOLO en sessionStorage y cookies (NO localStorage por seguridad)
       console.log("💾 [authSlice] Guardando en sessionStorage...");
       sessionStorage.setItem("aquiles_auth", JSON.stringify(authData));
 
-      // También guardar en cookies como backup
+      // Guardar en cookies de Aquiles
       console.log("💾 [authSlice] Guardando en cookies...");
       const cookieValue = btoa(JSON.stringify(authData)); // Base64 encode
-      document.cookie = `olympo_session=${cookieValue}; path=/; max-age=86400`; // 24 horas
+      document.cookie = `aquiles_session=${cookieValue}; path=/; max-age=86400; SameSite=Lax`; // 24 horas
 
       // Verificar que se guardó correctamente
-      const verification = localStorage.getItem("aquiles_auth");
-      console.log("🔍 [authSlice] Verificación localStorage:", verification ? "✅ GUARDADO" : "❌ NO GUARDADO");
+      const verification = sessionStorage.getItem("aquiles_auth");
+      console.log("🔍 [authSlice] Verificación sessionStorage:", verification ? "✅ GUARDADO" : "❌ NO GUARDADO");
 
       console.log("✅ [authSlice] validateCerberosToken completado exitosamente");
       return authData;
@@ -147,6 +144,7 @@ export const loadAuthFromStorage = createAsyncThunk<
 
       // 2. Si no está en localStorage, buscar en sessionStorage
       if (!storedAuth) {
+        // Buscar SOLO en sessionStorage y cookies (NO localStorage por seguridad)
         console.log("📦 [authSlice] Buscando en sessionStorage...");
         const sessionData = sessionStorage.getItem("aquiles_auth");
         if (sessionData) {
@@ -158,10 +156,10 @@ export const loadAuthFromStorage = createAsyncThunk<
         }
       }
 
-      // 3. Si no está en ninguno, buscar en cookies
+      // Si no está en sessionStorage, buscar en cookies
       if (!storedAuth) {
         console.log("📦 [authSlice] Buscando en cookies...");
-        const cookieMatch = document.cookie.match(/olympo_session=([^;]+)/);
+        const cookieMatch = document.cookie.match(/aquiles_session=([^;]+)/);
         if (cookieMatch) {
           try {
             const decoded = atob(cookieMatch[1]); // Base64 decode
@@ -181,10 +179,10 @@ export const loadAuthFromStorage = createAsyncThunk<
         const parsed: AuthData = JSON.parse(storedAuth);
         console.log("📦 [authSlice] Datos parseados:", parsed);
 
-        // Restaurar en localStorage si se encontró en otro lugar
-        if (source !== "localStorage") {
-          console.log("💾 [authSlice] Restaurando en localStorage desde", source);
-          localStorage.setItem("aquiles_auth", JSON.stringify(parsed));
+        // Restaurar en sessionStorage si se encontró en cookies
+        if (source === "cookie") {
+          console.log("💾 [authSlice] Restaurando en sessionStorage desde cookies");
+          sessionStorage.setItem("aquiles_auth", JSON.stringify(parsed));
         }
 
         return parsed;
@@ -194,10 +192,9 @@ export const loadAuthFromStorage = createAsyncThunk<
       return null;
     } catch (error) {
       console.error("❌ [authSlice] Error en loadAuthFromStorage:", error);
-      // Limpiar todos los storages en caso de error
-      localStorage.removeItem("aquiles_auth");
+      // Limpiar storages en caso de error (SOLO sessionStorage y cookies)
       sessionStorage.removeItem("aquiles_auth");
-      document.cookie = "olympo_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "aquiles_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       return rejectWithValue({
         code: 500,
         message: "Error loading authentication data",
@@ -233,10 +230,9 @@ const authSlice = createSlice({
       state.cerberosUser = null;
       state.error = null;
 
-      // Limpiar todos los storages
-      localStorage.removeItem("aquiles_auth");
+      // Limpiar SOLO sessionStorage y cookies (NO localStorage)
       sessionStorage.removeItem("aquiles_auth");
-      document.cookie = "olympo_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "aquiles_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     },
   },
   extraReducers: (builder) => {
