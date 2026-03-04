@@ -1,0 +1,8 @@
+# Node
+node_modules/
+# IDE
+.vscode/
+.idea/
+# Logs
+*.log
+aquilesApi/src/main/resources/application.yml

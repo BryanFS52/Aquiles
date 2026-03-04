@@ -1,0 +1,1 @@
+export { ActasInstructorContainer } from './ActasInstructorContainer';

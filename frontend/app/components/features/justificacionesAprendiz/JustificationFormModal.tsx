@@ -1,0 +1,77 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+import { FaRegListAlt } from 'react-icons/fa';
+import { JustificationFormProps } from './types';
+import JustificationFormComponent from '@/components/features/JustificacionesInstructor/justificationForm';
+
+interface JustificationFormModalProps extends JustificationFormProps {
+    formRef?: React.RefObject<HTMLDivElement>;
+}
+
+export const JustificationFormModal: React.FC<JustificationFormModalProps> = ({
+    form,
+    justificationTypesData,
+    loadingJustificationTypes,
+    loadingJustification,
+    onSave,
+    onCancel,
+    onInputChange,
+    onTextInputChange,
+    onNumericInputChange,
+    onFileChange,
+    onUpdateJustificationTypeId,
+    fileRef,
+    fileInputRefPrev,
+    formRef,
+}) => {
+    return (
+        <motion.div
+            ref={formRef}
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -30, scale: 0.95 }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+            className="bg-white rounded-xl shadow-2xl p-3 sm:p-4 md:p-6 border border-gray-100 dark:border-gray-800 dark:bg-[#002033]"
+        >
+            <div className="flex items-start sm:items-center justify-between gap-3">
+                <div className="flex items-start sm:items-center flex-1 min-w-0">
+                    <div className="bg-gradient-to-r dark:from-secondary dark:to-blue-900 from-primary to-lime-500 p-2 sm:p-3 rounded-full shadow-lg flex-shrink-0">
+                        <FaRegListAlt className="text-xl sm:text-2xl text-white" />
+                    </div>
+                    <div className="ml-3 sm:ml-4 min-w-0">
+                        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200 truncate">
+                            Formulario de Justificación
+                        </h2>
+                        <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm truncate">
+                            Completa los datos para justificar tu ausencia
+                        </p>
+                    </div>
+                </div>
+                <button
+                    onClick={onCancel}
+                    className="text-gray-400 dark:hover:text-gray-100 hover:text-gray-600 text-xl sm:text-2xl transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 p-1.5 sm:p-2 rounded-full flex-shrink-0"
+                >
+                    ×
+                </button>
+            </div>
+
+            <div className="mt-4 sm:mt-6">
+                <JustificationFormComponent
+                    form={form}
+                    justificationTypesData={justificationTypesData}
+                    loadingJustificationTypes={loadingJustificationTypes}
+                    loadingJustification={loadingJustification}
+                    handleSave={onSave}
+                    handleCancel={onCancel}
+                    handleInputChange={onInputChange}
+                    handleTextInputChange={onTextInputChange}
+                    handleNumericInputChange={onNumericInputChange}
+                    handleFileChange={onFileChange}
+                    updateJustificationTypeId={onUpdateJustificationTypeId}
+                    fileRef={fileRef}
+                    fileInputRefPrev={fileInputRefPrev}
+                />
+            </div>
+        </motion.div>
+    );
+};

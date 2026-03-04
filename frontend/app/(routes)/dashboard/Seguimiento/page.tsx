@@ -1,0 +1,57 @@
+"use client";
+
+import { useEffect, useState, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "@redux/store";
+import { clearAttendanceSelection, fetchStudySheetByTeacher } from "@slice/olympo/studySheetSlice";
+import { useLoader } from "@context/LoaderContext";
+import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
+import PageTitle from "@components/UI/pageTitle";
+import {
+  StudySheetGrid
+} from "@components/features/seguimiento";
+
+const StudySheetsPage: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { showLoader, hideLoader } = useLoader();
+
+  const { data, loading: studySheetLoading, error } = useSelector((state: any) => state.studySheet);
+  const fichas = data || [];
+
+  // Inicialización de datos
+  useEffect(() => {
+    dispatch(clearAttendanceSelection());
+    dispatch(fetchStudySheetByTeacher({
+      idTeacher: TEMPORAL_INSTRUCTOR_ID,
+      page: 0,
+      size: 50
+    }));
+  }, [dispatch]);
+
+  // Manejo del loader global
+  useEffect(() => {
+    if (studySheetLoading) {
+      showLoader();
+    } else {
+      hideLoader();
+    }
+  }, [studySheetLoading, showLoader, hideLoader]);
+
+  return (
+    <div className="w-full px-2 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6">
+      <div className="max-w-[1600px] mx-auto">
+        <PageTitle>Seguimiento de Fichas</PageTitle>
+
+        {/* Grid de fichas */}
+        <StudySheetGrid
+          studySheets={fichas}
+          loading={studySheetLoading}
+          error={error}
+          getHref={(sheet) => `/dashboard/InstructorFollowUp?ficha=${sheet.number}`}
+        />
+      </div>
+    </div>
+  );
+}
+
+export default StudySheetsPage;

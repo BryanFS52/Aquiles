@@ -1,3 +1,24 @@
 {
-  "extends": "next/core-web-vitals"
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "next",
+    "next/core-web-vitals",
+    "eslint:recommended"
+  ],
+  "plugins": [],
+  "ignorePatterns": [
+    "app/graphql/generated.ts",
+    "**/generated.ts",
+    "**/generated/**/*"
+  ],
+  "rules": {
+    "no-unused-vars": "off",
+    "no-undef": "off",
+    "react/no-unescaped-entities": "off",
+    "no-empty-pattern": "off"
+  }
 }

@@ -1,0 +1,33 @@
+type Item {
+    id: ID!
+    code: String!
+    indicator: String!
+    active: Boolean!
+    itemType: ItemType
+}
+
+type ItemPageId {
+    data: Checklist
+    date: String
+    code: String
+    message: String
+}
+
+input ItemDto {
+    id: ID
+    code: String!
+    indicator: String!
+    active: Boolean
+    itemTypeId: Long
+}
+
+extend type Query {
+    allItems(page: Int, size: Int): ItemPageId
+    itemById(id: Long!): ItemPageId
+}
+
+extend type Mutation {
+    addItem(item: ItemDto!): ItemPageId
+    updateItem(id: Long!, item: ItemDto!): ItemPageId
+    deleteItem(id: Long!): ItemPageId
+}

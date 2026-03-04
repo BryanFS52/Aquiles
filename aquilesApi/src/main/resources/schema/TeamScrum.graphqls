@@ -1,0 +1,91 @@
+type StudySheet @key(fields: "id") @extends {
+    id : ID @external
+    teamsScrum : [TeamsScrum]
+}
+
+type ProcessMethodology {
+    id : ID
+}
+
+type TeamsScrum @key(fields: "id") {
+    id: ID
+    teamName: String
+    projectName: String
+    problem: String
+    objectives: String
+    description: String
+    projectJustification: String
+    checklist: Checklist
+    studySheet : StudySheet
+    students : [Student]
+    processMethodology: ProcessMethodology
+}
+
+type TeamsScrumPage {
+    code: String
+    data: [TeamsScrum]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type TeamsScrumPageId {
+    data: TeamsScrum
+    date: String
+    code: String
+    message: String
+}
+
+input TeamScrumMemberId {
+    id : Long
+    studentId : Long
+    profileId : String
+}
+
+type TeamScrumMemberIdResponse {
+    id : Long
+    studentId : Long
+    profileId : String
+}
+
+input ProcessMethodologyDto{
+    teamScrumId : Long
+    studentId : Long
+    profileId : String
+    isActive : Boolean
+    isUnique : Boolean
+}
+
+input TeamsScrumDto {
+    id : ID
+    teamName: String
+    projectName: String
+    problem: String
+    objectives: String
+    description: String
+    projectJustification: String
+    checklist: ChecklistDto
+    studySheetId: Long
+    memberIds: [TeamScrumMemberId]
+    processMethodologyId: String
+}
+
+type addProfileToStudentResponse {
+    id: [TeamScrumMemberIdResponse]
+    code: String
+    message: String
+}
+
+extend type Query {
+    allTeamsScrums(page: Int, size: Int): TeamsScrumPage
+    teamScrumById(id: Long!): TeamsScrumPageId
+}
+
+extend type Mutation {
+    addTeamScrum(input: TeamsScrumDto!): Response
+    addProfileToStudent(input : [ProcessMethodologyDto] ) : addProfileToStudentResponse
+    updateTeamScrum(id: Long!, input: TeamsScrumDto): Response
+    deleteTeamScrum(id: Long!): Response
+}

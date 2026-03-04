@@ -1,0 +1,8 @@
+
+export const TEMPORAL_COORDINATOR_ID = 3;
+
+export const TEMPORAL_COLLABORATOR_ID = 7;
+
+export const TEMPORAL_INSTRUCTOR_ID = 1;
+
+export const TEMPORAL_APRENDIZ_ID = 1;

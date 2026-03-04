@@ -1,0 +1,205 @@
+import { gql } from "@apollo/client";
+
+// Queries and Mutations for Attendances
+export const GET_ALL_ATTENDANCES = gql`
+  query GetAttendances($page: Int, $size: Int) {
+    allAttendances(page: $page, size: $size) {
+      date
+      code
+      message
+      data {
+        id
+        attendanceDate
+        attendanceState {
+          id
+          status
+        }
+        student {
+          id
+          person {
+            name
+            lastname
+            document
+          }
+        }
+      }
+      currentPage
+      totalPages
+      totalItems
+    }
+  }
+`;
+
+export const GET_ATTENDANCES_BY_STUDENT = gql`
+  query allAttendancesByStudentId($id: Long, $stateId: Long) {
+    allAttendancesByStudentId(id: $id, stateId: $stateId) {
+      data {
+        id
+        attendanceDate
+        student {
+          id
+          person {
+            name
+            lastname
+            document
+          }
+        }
+        attendanceState {
+          id
+          status
+        }
+      }
+    }
+  }
+`;
+
+export const GET_ATTENDANCES_WITH_JUSTIFICATIONS_BY_STUDENT = gql`
+  query allAttendancesWithJustificationsByStudentId($id: Long, $stateId: Long, $page: Int, $size: Int) {
+    allAttendancesByStudentId(id: $id, stateId: $stateId, page: $page, size: $size) {
+      data {
+        id
+        attendanceDate
+        student {
+          id
+          person {
+            name
+            lastname
+            document
+          }
+        }
+        attendanceState {
+          id
+          status
+        }
+        justification {
+          justificationStatus {
+            id
+            name
+          }
+        }
+        competenceQuarter{
+          competence{
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_ATTENDANCES_AND_COMPETENCE_BY_STUDENT = gql`
+  query GetAttendancesAndCompetenceByStudentId($id: Long, $page: Int, $size: Int) {
+    allAttendancesByStudentId(id: $id, page: $page, size: $size) {
+      data {
+        id
+        attendanceDate
+        attendanceState{
+            status
+        }
+        competenceQuarter{
+                id
+                competence {
+                    name
+                }
+            }
+      }
+    }
+  }
+`;
+
+export const GET_ATTENDANCES_AND_JUSTIFICATIONS_BY_STUDENT = gql`
+  query GetAttendancesAndJustificationsByStudent($id: Long!) {
+    allAttendancesByStudentId(id: $id) {
+      data {
+        id
+        justification {
+          id
+          description
+          justificationFile
+          absenceDate
+          justificationType {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_ATTENDANCES_BY_COMPETENCE_QUARTER_AND_JUSTIFICATIONS = gql`
+  query GetAttendancesByCompetenceQuarterAndJustifications($competenceQuarterId: Long!, $page: Int, $size: Int) {
+    allAttendanceByCompetenceQuarterIdWithJustifications(competenceQuarterId: $competenceQuarterId, page: $page, size: $size) {
+      data {
+        id
+        justification {
+          id
+          description
+          absenceDate
+          justificationDate
+          justificationFile
+          justificationType {
+            id
+            name
+          }
+          justificationStatus {
+            id
+            name
+          }
+        }
+        student {
+          person {
+            name
+            lastname
+            document
+          }
+          studentStudySheets {
+            studySheet {
+              number
+              teacherStudySheets{
+                competence{
+                  name
+                    learningOutcome{
+                        code
+                        id
+                        name
+                    }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const ADD_ATTENDANCE = gql`
+  mutation AddAttendance($input: AttendanceDto!) {
+    addAttendance(input: $input) {
+      code
+      message
+      id
+    }
+  }
+`;
+
+export const UPDATE_ATTENDANCE = gql`
+  mutation UpdateAttendance($id: Long!, $input: AttendanceDto!) {
+    updateAttendance(id: $id, input: $input) {
+      code
+      message
+      id
+    }
+  }
+`;
+
+export const DELETE_ATTENDANCE = gql`
+  mutation DeleteAttendance($id: Long!) {
+    deleteAttendance(id: $id) {
+      code
+      message
+      id
+    }
+  }
+`;

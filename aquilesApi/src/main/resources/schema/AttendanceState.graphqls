@@ -1,0 +1,37 @@
+type AttendanceState {
+    id: ID
+    status: String
+}
+
+type AttendanceStatePage {
+    code: String
+    data: [AttendanceState]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type AttendanceStatePageId {
+    data: AttendanceState
+    date: String
+    code: String
+    message: String
+}
+
+input AttendanceStateDto {
+    id: ID
+    status: String
+}
+
+extend type Query {
+    allStateAttendances(page: Int, size: Int): AttendanceStatePage
+    stateAttendanceById(id: Long!): AttendanceStatePageId
+}
+
+extend type Mutation {
+    addStateAttendance(input: AttendanceStateDto!): Response
+    updateStateAttendance(id: Long!, input: AttendanceStateDto!): Response
+    deleteStateAttendance(id: Long!): Response
+}

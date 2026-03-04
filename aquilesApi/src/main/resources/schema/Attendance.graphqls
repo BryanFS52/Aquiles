@@ -1,0 +1,46 @@
+type Attendance @key(fields: "id") {
+    id: ID!
+    attendanceDate: String
+    attendanceState: AttendanceState
+    student: Student
+    competenceQuarter : TeacherStudySheet
+    justification: Justification
+}
+
+type AttendancePage {
+    data: [Attendance]
+    code: String
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type AttendancePageId {
+    data: Attendance
+    date: String
+    code: String
+    message: String
+}
+
+input AttendanceDto {
+    id: ID
+    attendanceDate: String
+    attendanceState: AttendanceStateDto
+    competenceQuarter: Long
+    studentId: Long
+}
+
+extend type Query {
+    allAttendances(page: Int, size: Int): AttendancePage
+    attendanceById(id: Long!): AttendancePageId
+    allAttendanceByCompetenceQuarterIdWithJustifications(competenceQuarterId: Long, page: Int, size: Int): AttendancePage
+    allAttendancesByStudentId(id: Long, stateId: Long, page: Int, size: Int): AttendancePage
+}
+
+extend type Mutation {
+    addAttendance(input: AttendanceDto): Response
+    updateAttendance(id: Long!, input: AttendanceDto): Response
+    deleteAttendance(id: Long!): Response
+}

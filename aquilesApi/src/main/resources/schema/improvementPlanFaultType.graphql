@@ -1,0 +1,37 @@
+type ImprovementPlanFaultType {
+    id: ID
+    name: String
+}
+
+type ImprovementPlanFaultTypePage {
+    code: String
+    data: [ImprovementPlanFaultType]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+input ImprovementPlanFaultTypeDto {
+    id: ID
+    name: String
+}
+
+type ImprovementPlanFaultTypePageId {
+    data: ImprovementPlanFaultType
+    date: String
+    code: String
+    message: String
+}
+
+extend type Query {
+    allImprovementPlanFaultTypes(page: Int, size: Int): ImprovementPlanFaultTypePage
+    improvementPlanFaultTypeById(id: Long!): ImprovementPlanFaultTypePageId
+}
+
+extend type Mutation {
+    addImprovementPlanFaultType(input: ImprovementPlanFaultTypeDto): Response
+    updateImprovementPlanFaultType(id: Long!, input: ImprovementPlanFaultTypeDto): Response
+    deleteImprovementPlanFaultType(id: Long!): Response
+}

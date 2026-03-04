@@ -1,0 +1,64 @@
+type ImprovementPlan {
+    id: ID
+    actNumber: String
+    city: String
+    date: String
+    startTime: String
+    endTime: String
+    place: String
+    reason: String
+    state: Boolean
+    additionalJustification: String
+    student: Student
+    teacherCompetence: TeacherStudySheet
+    learningOutcome: LearningOutcome
+    improvementPlanFile: String
+    faultType: ImprovementPlanFaultType
+}
+
+input ImprovementPlanDto {
+    id: ID
+    actNumber: String
+    city: String
+    date: String
+    startTime: String
+    endTime: String
+    place: String
+    reason: String
+    state: Boolean
+    additionalJustification: String
+    studentId: ID
+    teacherCompetence: ID
+    learningOutcome: ID
+    improvementPlanFile: String
+    faultType: ImprovementPlanFaultTypeDto
+}
+
+type ImprovementPlanPage {
+    code: String
+    data: [ImprovementPlan]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+    studySheet: StudySheet
+}
+
+type ImprovementPlanPageId {
+    data: ImprovementPlan
+    date: String
+    code: String
+    message: String
+}
+
+extend type Query {
+    allImprovementPlans(page: Int, size: Int, teacherCompetence: Long, id: Long, studySheetId: Long, studentId: Long, teacherCompetenceIds: [Long]): ImprovementPlanPage
+    improvementPlanById(id: Long!): ImprovementPlanPageId
+}
+
+extend type Mutation {
+    addImprovementPlan(input: ImprovementPlanDto): Response
+    updateImprovementPlan(id: Long!, input: ImprovementPlanDto): Response
+    deleteImprovementPlan(id: Long!): Response
+}

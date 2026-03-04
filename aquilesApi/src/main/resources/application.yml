@@ -1,0 +1,62 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: aquilesApi
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/DB_Aquiles
+    username: postgres
+    password: fabrica2024*
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:  
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ejem50010@gmail.com
+    password: hkgv tkui uafl gkii
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+
+  scheduling:
+    enabled: true
+
+  firebase:
+    config:
+      file: config/firebase-config.json
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  graphql:
+    path: aquiles/graphql
+    graphiql:
+      enabled: true
+      path: /graphiql
+    cors:
+      allowed-origin-patterns: "*"
+      allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+      allow-credentials: true
+      max-age: 3600
+
+frontend:
+  url: https://collect-techno-surf-foo.trycloudflare.com

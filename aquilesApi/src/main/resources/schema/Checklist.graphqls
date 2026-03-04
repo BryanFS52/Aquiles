@@ -1,0 +1,66 @@
+type Checklist {
+    id: ID!
+    state: Boolean
+    remarks: String  # ← Se llena cuando el instructor califica
+    trimester: String
+    component: String
+    instructorSignature: String  # ← Se llena cuando el instructor califica
+    evaluationCriteria: Boolean  # ← Se llena cuando el instructor califica
+    studySheets: String
+    trainingProjectId: Long
+    evaluations: Evaluation  # ← Se llena cuando el instructor califica
+    items: [Item]
+    associatedJuries: [Juries]
+    qualifications(teamScrumId: Long!): [ChecklistQualification]  # ← Nueva query para obtener calificaciones por team
+}
+
+type ChecklistPage {
+    code: String
+    data: [Checklist]
+    date: String
+    totalPages: Int
+    totalItems: Int
+    currentPage: Int
+    message: String
+}
+
+type ChecklistPageId {
+    data: Checklist
+    date: String
+    code: String
+    message: String
+}
+
+# Input para crear checklist (Coordinador)
+# Campos opcionales: instructorSignature, evaluationCriteria (se llenan al calificar)
+input ChecklistDto {
+    state: Boolean!
+    remarks: String  # ← Opcional al crear, obligatorio al calificar
+    trimester: String!
+    component: String
+    instructorSignature: String  # ← NULL al crear, se llena al calificar
+    evaluationCriteria: Boolean  # ← NULL al crear, se llena al calificar
+    studySheets: String
+    trainingProjectId: Long
+    evaluationId: Long
+    evaluations: [EvaluationDto]  # ← NULL al crear, se llena al calificar
+    items: [ItemDto]
+    associatedJuries: [Long]
+    deletedItemIds: [Long]  # ← Campo para IDs de items a eliminar
+}
+
+extend type Query {
+    allChecklists(page: Int, size: Int): ChecklistPage
+    checklistById(id: Long!): ChecklistPageId
+    exportChecklistToPdf(id: Long!): String
+    exportChecklistToExcel(id: Long!): String
+
+}
+
+extend type Mutation {
+    addChecklist(input: ChecklistDto): Response
+    updateChecklist(id: Long!, input: ChecklistDto): Response
+    deleteChecklist(id: Long!): Response
+    updateItemStatus(itemId: Long!, active: Boolean!): Response
+    refreshTrainingProjectName(checklistId: Long!): Response
+}

@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -10,17 +11,44 @@ const config: Config = {
     extend: {
       fontFamily: {
         'kiwi-marumaru': ['Kiwi Maru', 'serif'],
+        'inter': ['Inter', 'sans-serif'],
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
-      // Agregar color personalizado
       colors: {
-        'custom-blue': '#00324D',
-        'custom-blues': '#39A900',
-        'sena-red': '#dc2626'
+        'primary': {
+          DEFAULT: '#398F0F',
+          light: '#84CC16',
+        },
+        'secondary': {
+          DEFAULT: '#00304D',
+          light: '#39A900',
+        },
+        'darkBlue': '#005386',
+        'shadowBlue': '#00304d',
+        'lightGray': '#E4E4E5',
+        'darkGray': '#5e5c5c',
+        'lightGreen': '#39A900',
+        'darkGreen': '#007832',
+        'darkBackground': '#001829',
+        'white': '#ffffff',
+        'grayText': '#9ca3af',
+        'black': '#000000',
+        // Colores específicos para modo oscuro con el color correcto #00304d
+        'dark': {
+          'sidebar': '#00304d',        // Color principal más oscuro
+          'sidebarGradient': '#001829', // Para degradados
+          'main': '#001829',           // Fondo principal muy oscuro
+          'card': '#1e293b',           // Tarjetas en azul grisáceo
+          'cardHover': '#334155',      // Hover de tarjetas
+          'text': '#ffffff',           // Texto principal blanco
+          'textSecondary': '#94a3b8',  // Texto secundario gris claro
+          'border': '#334155',         // Bordes sutiles
+          'accent': '#0ea5e9',         // Azul de acento para elementos activos
+          'accentHover': '#0284c7',    // Hover del acento
+        }
       },
       keyframes: {
         showContent: {
@@ -30,13 +58,70 @@ const config: Config = {
             opacity: "1",
           },
         },
+        'spin-slow': {
+          to: { transform: 'rotate(360deg)' }
+        },
+        'spin-reverse': {
+          to: { transform: 'rotate(-360deg)' }
+        },
+        'pulse-gentle': {
+          '0%, 100%': {
+            opacity: '0.9',
+            transform: 'scale(1)',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
+          },
+          '50%': {
+            opacity: '1',
+            transform: 'scale(1.02)',
+            boxShadow: '0 15px 35px -5px rgba(0, 0, 0, 0.15)'
+          }
+        },
+        'float-gentle': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' }
+        },
+        'glow-pulse': {
+          '0%, 100%': { boxShadow: '0 0 5px rgba(57, 143, 15, 0.2)' },
+          '50%': { boxShadow: '0 0 20px rgba(57, 143, 15, 0.4), 0 0 30px rgba(57, 143, 15, 0.2)' }
+        },
+        'bounce-soft': {
+          '0%, 20%, 53%, 80%, 100%': { transform: 'translate3d(0, 0, 0)' },
+          '40%, 43%': { transform: 'translate3d(0, -5px, 0)' },
+          '70%': { transform: 'translate3d(0, -3px, 0)' },
+          '90%': { transform: 'translate3d(0, -1px, 0)' }
+        },
+        'fade-in-up': {
+          from: {
+            opacity: '0',
+            transform: 'translate3d(0, 30px, 0)'
+          },
+          to: {
+            opacity: '1',
+            transform: 'translate3d(0, 0, 0)'
+          }
+        }
       },
       animation: {
-        "show-Content": "showContent 0.5s 0.7s ease-in-out 1 forwards ",
+        "show-Content": "showContent 0.5s 0.7s ease-in-out 1 forwards",
+        'spin-slow': 'spin-slow 8s linear infinite',
+        'spin-reverse': 'spin-reverse 6s linear infinite',
+        'pulse-gentle': 'pulse-gentle 3s ease-in-out infinite',
+        'float-gentle': 'float-gentle 4s ease-in-out infinite',
+        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
+        'bounce-soft': 'bounce-soft 2s ease-in-out infinite',
+        'fade-in-up': 'fade-in-up 0.6s ease-out'
       },
+      screens: {
+        'xs': '360px',
+        'sm': '640px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        '2xl': '1536px'
+      }
     },
   },
-  plugins: [require("tailwind-animation-delay")],
+  plugins: [],
 };
 
 export default config;

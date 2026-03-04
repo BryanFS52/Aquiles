@@ -1,0 +1,671 @@
+/* Animaciones espectaculares para el Dashboard de Aquiles - SOLO PARA DASHBOARD */
+
+/* Animaciones del logo principal - SOLO DASHBOARD */
+@keyframes dashboard-breathe {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes dashboard-pulse-ring-outer {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(0.95);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes dashboard-spin-elegant {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes dashboard-spin-reverse-elegant {
+    to {
+        transform: rotate(-360deg);
+    }
+}
+
+@keyframes dashboard-logo-glow {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 20px rgba(57, 143, 15, 0.3),
+            0 0 40px rgba(57, 143, 15, 0.1),
+            inset 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+    50% {
+        box-shadow:
+            0 0 30px rgba(57, 143, 15, 0.5),
+            0 0 60px rgba(57, 143, 15, 0.2),
+            inset 0 0 30px rgba(255, 255, 255, 0.2);
+    }
+}
+
+@keyframes dashboard-logo-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.9;
+    }
+
+    50% {
+        transform: scale(1.02);
+        opacity: 1;
+    }
+}
+
+@keyframes dashboard-shimmer-cross {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+
+    50% {
+        transform: translateX(0%) rotate(45deg);
+    }
+
+    100% {
+        transform: translateX(100%) rotate(45deg);
+    }
+}
+
+/* Animaciones de órbitas - SOLO DASHBOARD */
+@keyframes dashboard-orbit-1 {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes dashboard-orbit-2 {
+    to {
+        transform: rotate(-300deg);
+    }
+}
+
+@keyframes dashboard-orbit-3 {
+    to {
+        transform: rotate(420deg);
+    }
+}
+
+@keyframes dashboard-orbit-4 {
+    to {
+        transform: rotate(-450deg);
+    }
+}
+
+/* Animaciones de partículas flotantes - SOLO DASHBOARD */
+@keyframes dashboard-float-1 {
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.4;
+    }
+
+    33% {
+        transform: translateY(-20px) rotate(120deg);
+        opacity: 0.7;
+    }
+
+    66% {
+        transform: translateY(10px) rotate(240deg);
+        opacity: 0.5;
+    }
+}
+
+@keyframes dashboard-float-2 {
+
+    0%,
+    100% {
+        transform: translateX(0px) translateY(0px);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: translateX(15px) translateY(-25px);
+        opacity: 0.8;
+    }
+}
+
+@keyframes dashboard-float-3 {
+
+    0%,
+    100% {
+        transform: translateY(0px) scale(1);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: translateY(-15px) scale(1.1);
+        opacity: 0.9;
+    }
+}
+
+@keyframes dashboard-float-4 {
+
+    0%,
+    100% {
+        transform: translateX(0px) translateY(0px) rotate(0deg);
+        opacity: 0.4;
+    }
+
+    25% {
+        transform: translateX(-10px) translateY(-20px) rotate(90deg);
+        opacity: 0.7;
+    }
+
+    75% {
+        transform: translateX(10px) translateY(-10px) rotate(270deg);
+        opacity: 0.6;
+    }
+}
+
+@keyframes dashboard-float-5 {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: translateY(-30px);
+        opacity: 1;
+    }
+}
+
+@keyframes dashboard-float-6 {
+
+    0%,
+    100% {
+        transform: translateX(0px) translateY(0px) rotate(45deg);
+        opacity: 0.3;
+    }
+
+    33% {
+        transform: translateX(20px) translateY(-15px) rotate(135deg);
+        opacity: 0.8;
+    }
+
+    66% {
+        transform: translateX(-15px) translateY(-25px) rotate(225deg);
+        opacity: 0.6;
+    }
+}
+
+/* Animaciones de texto - SOLO DASHBOARD */
+@keyframes dashboard-text-shimmer {
+    0% {
+        background-position: -200% center;
+    }
+
+    100% {
+        background-position: 200% center;
+    }
+}
+
+@keyframes dashboard-bounce-name {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-5px);
+    }
+
+    60% {
+        transform: translateY(-3px);
+    }
+}
+
+@keyframes dashboard-fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes dashboard-fade-in-delayed {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    40% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes dashboard-bounce-gentle {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+@keyframes dashboard-pulse-dot {
+
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+/* Clases de utilidad SOLO para elementos del dashboard */
+.animate-breathe {
+    animation: dashboard-breathe 4s ease-in-out infinite;
+}
+
+.animate-pulse-ring-outer {
+    animation: dashboard-pulse-ring-outer 3s ease-in-out infinite;
+}
+
+.animate-spin-elegant {
+    animation: dashboard-spin-elegant 10s linear infinite;
+}
+
+.animate-spin-reverse-elegant {
+    animation: dashboard-spin-reverse-elegant 15s linear infinite;
+}
+
+.animate-logo-glow {
+    animation: dashboard-logo-glow 3s ease-in-out infinite;
+}
+
+.animate-logo-pulse {
+    animation: dashboard-logo-pulse 2s ease-in-out infinite;
+}
+
+.animate-shimmer-cross {
+    animation: dashboard-shimmer-cross 3s ease-in-out infinite;
+}
+
+.animate-orbit-1 {
+    animation: dashboard-orbit-1 20s linear infinite;
+}
+
+.animate-orbit-2 {
+    animation: dashboard-orbit-2 25s linear infinite;
+}
+
+.animate-orbit-3 {
+    animation: dashboard-orbit-3 18s linear infinite;
+}
+
+.animate-orbit-4 {
+    animation: dashboard-orbit-4 22s linear infinite;
+}
+
+.animate-float-1 {
+    animation: dashboard-float-1 6s ease-in-out infinite;
+}
+
+.animate-float-2 {
+    animation: dashboard-float-2 8s ease-in-out infinite 1s;
+}
+
+.animate-float-3 {
+    animation: dashboard-float-3 7s ease-in-out infinite 2s;
+}
+
+.animate-float-4 {
+    animation: dashboard-float-4 9s ease-in-out infinite 0.5s;
+}
+
+.animate-float-5 {
+    animation: dashboard-float-5 5s ease-in-out infinite 3s;
+}
+
+.animate-float-6 {
+    animation: dashboard-float-6 10s ease-in-out infinite 1.5s;
+}
+
+.animate-text-shimmer {
+    background: linear-gradient(90deg,
+            #1f2937,
+            #374151,
+            #4b5563,
+            #374151,
+            #1f2937);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: dashboard-text-shimmer 3s linear infinite;
+}
+
+.dark .animate-text-shimmer {
+    background: linear-gradient(90deg,
+            #f9fafb,
+            #e5e7eb,
+            #d1d5db,
+            #e5e7eb,
+            #f9fafb);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.animate-bounce-name {
+    animation: dashboard-bounce-name 2s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+    animation: dashboard-fade-in-up 1s ease-out;
+}
+
+.animate-fade-in-delayed {
+    animation: dashboard-fade-in-delayed 2s ease-out;
+}
+
+.animate-bounce-gentle {
+    animation: dashboard-bounce-gentle 3s ease-in-out infinite;
+}
+
+.animate-pulse-dot {
+    animation: dashboard-pulse-dot 2s ease-in-out infinite;
+}
+
+/* Delays para animaciones escalonadas */
+.animation-delay-100 {
+    animation-delay: 0.1s;
+}
+
+.animation-delay-200 {
+    animation-delay: 0.2s;
+}
+
+.animation-delay-300 {
+    animation-delay: 0.3s;
+}
+
+.animation-delay-400 {
+    animation-delay: 0.4s;
+}
+
+.animation-delay-500 {
+    animation-delay: 0.5s;
+}
+
+.animation-delay-600 {
+    animation-delay: 0.6s;
+}
+
+.animation-delay-700 {
+    animation-delay: 0.7s;
+}
+
+.animation-delay-800 {
+    animation-delay: 0.8s;
+}
+
+.animation-delay-900 {
+    animation-delay: 0.9s;
+}
+
+.animation-delay-1000 {
+    animation-delay: 1s;
+}
+
+.animation-delay-1200 {
+    animation-delay: 1.2s;
+}
+
+.animation-delay-1500 {
+    animation-delay: 1.5s;
+}
+
+.animation-delay-2000 {
+    animation-delay: 2s;
+}
+
+/* Efectos hover mejorados */
+.hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+
+    .animate-breathe,
+    .animate-pulse-ring-outer,
+    .animate-spin-elegant,
+    .animate-spin-reverse-elegant,
+    .animate-logo-glow,
+    .animate-logo-pulse,
+    .animate-shimmer-cross,
+    .animate-orbit-1,
+    .animate-orbit-2,
+    .animate-orbit-3,
+    .animate-orbit-4,
+    .animate-float-1,
+    .animate-float-2,
+    .animate-float-3,
+    .animate-float-4,
+    .animate-float-5,
+    .animate-float-6,
+    .animate-text-shimmer,
+    .animate-bounce-name,
+    .animate-bounce-gentle,
+    .animate-pulse-dot {
+        animation: none;
+    }
+}
+
+/* Responsive mejoras */
+@media (max-width: 640px) {
+    .animate-breathe {
+        animation-duration: 6s;
+    }
+}
+
+/* ===== NUEVAS ANIMACIONES PARA WELCOME HERO ===== */
+
+/* Animaciones de partículas flotantes */
+@keyframes float-1 {
+    0%, 100% { transform: translateY(0px) rotate(45deg); }
+    50% { transform: translateY(-20px) rotate(45deg); }
+}
+
+@keyframes float-2 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+}
+
+@keyframes float-3 {
+    0%, 100% { transform: translateY(0px) rotate(45deg); }
+    50% { transform: translateY(-25px) rotate(45deg); }
+}
+
+@keyframes float-4 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-18px); }
+}
+
+@keyframes float-5 {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+}
+
+@keyframes float-6 {
+    0%, 100% { transform: translateY(0px) rotate(45deg); }
+    50% { transform: translateY(-22px) rotate(45deg); }
+}
+
+/* Animaciones de órbitas para partículas del logo */
+@keyframes orbit-1 {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes orbit-2 {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(-360deg); }
+}
+
+@keyframes orbit-3 {
+    from { transform: rotate(90deg); }
+    to { transform: rotate(450deg); }
+}
+
+@keyframes orbit-4 {
+    from { transform: rotate(180deg); }
+    to { transform: rotate(-180deg); }
+}
+
+/* Animación de respiración para el logo */
+@keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+}
+
+/* Animación de brillo del logo */
+@keyframes logo-glow {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(57, 143, 15, 0.3), 0 0 40px rgba(57, 143, 15, 0.1);
+    }
+    50% { 
+        box-shadow: 0 0 30px rgba(57, 143, 15, 0.5), 0 0 60px rgba(57, 143, 15, 0.2);
+    }
+}
+
+/* Animación de pulso del logo */
+@keyframes logo-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.02); opacity: 0.95; }
+}
+
+/* Efecto shimmer cruzado */
+@keyframes shimmer-cross {
+    0% { transform: translateX(-100%) translateY(-100%); }
+    100% { transform: translateX(100%) translateY(100%); }
+}
+
+/* Animación de texto brillante */
+@keyframes text-shimmer {
+    0%, 100% { 
+        background-position: -200% center;
+        background-image: linear-gradient(90deg, #1f2937, #398F0F, #1f2937);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    50% { 
+        background-position: 200% center;
+    }
+}
+
+/* Animación de rebote suave para el nombre */
+@keyframes bounce-name {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Animación de aparición con retraso */
+@keyframes fade-in-up {
+    from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+@keyframes fade-in-delayed {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Animación suave de rebote */
+@keyframes bounce-gentle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+/* Animación de pulso para puntos decorativos */
+@keyframes pulse-dot {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Clases de animación */
+.animate-float-1 { animation: float-1 3s ease-in-out infinite; }
+.animate-float-2 { animation: float-2 4s ease-in-out infinite; }
+.animate-float-3 { animation: float-3 3.5s ease-in-out infinite; }
+.animate-float-4 { animation: float-4 4.5s ease-in-out infinite; }
+.animate-float-5 { animation: float-5 2.8s ease-in-out infinite; }
+.animate-float-6 { animation: float-6 3.2s ease-in-out infinite; }
+
+.animate-orbit-1 { animation: orbit-1 20s linear infinite; }
+.animate-orbit-2 { animation: orbit-2 25s linear infinite; }
+.animate-orbit-3 { animation: orbit-3 18s linear infinite; }
+.animate-orbit-4 { animation: orbit-4 22s linear infinite; }
+
+.animate-breathe { animation: breathe 4s ease-in-out infinite; }
+.animate-logo-glow { animation: logo-glow 3s ease-in-out infinite; }
+.animate-logo-pulse { animation: logo-pulse 2s ease-in-out infinite; }
+.animate-shimmer-cross { animation: shimmer-cross 3s ease-in-out infinite; }
+.animate-text-shimmer { animation: text-shimmer 4s ease-in-out infinite; }
+.animate-bounce-name { animation: bounce-name 2s ease-in-out infinite; }
+.animate-fade-in-up { animation: fade-in-up 1s ease-out forwards; }
+.animate-fade-in-delayed { animation: fade-in-delayed 1.5s ease-out 0.5s forwards; opacity: 0; }
+.animate-bounce-gentle { animation: bounce-gentle 3s ease-in-out infinite; }
+.animate-pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+/* Delays para efectos escalonados */
+.animation-delay-300 { animation-delay: 0.3s; }
+.animation-delay-600 { animation-delay: 0.6s; }
+.animation-delay-900 { animation-delay: 0.9s; }
+.animation-delay-1200 { animation-delay: 1.2s; }
