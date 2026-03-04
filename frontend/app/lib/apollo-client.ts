@@ -3,7 +3,7 @@ import { setContext } from '@apollo/client/link/context';
 import { getTokenFromStorage } from './tokenPersistence';
 
 // Obtener URL del backend desde variables de entorno o usar default
-const GRAPHQL_URI = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/graphql";
+const GRAPHQL_URI = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/graphql";
 
 console.log("🔗 Apollo Client URI:", GRAPHQL_URI);
 

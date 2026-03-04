@@ -1,6 +1,6 @@
 /**
  * 🪝 CUSTOM HOOK: useAuth
- * 
+ *
  * Hook personalizado para facilitar el uso de autenticación en toda la aplicación.
  * Proporciona métodos y estados simplificados para trabajar con el auth slice.
  */

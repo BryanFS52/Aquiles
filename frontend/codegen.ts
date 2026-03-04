@@ -2,7 +2,7 @@ import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
     documents: ['app/graphql/**/*.{ts,tsx,js,jsx}'],
-    schema: 'http://localhost:4000/graphql',
+    schema: 'http://localhost:8080/graphql', // Asegúrate de que esta URL apunte a tu backend GraphQL
     generates: {
         'app/graphql/generated.ts': {
             plugins: [

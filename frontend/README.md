@@ -15,7 +15,7 @@ NEXT_PUBLIC_API_URL=http://localhost:4000/graphql
 # URL del servidor SSO Cerberos (autenticación)
 NEXT_PUBLIC_CERBEROS_URL=https://cerberos.datasena.com/
 
-# URL de este proyecto Aquiles (para callbacks)     
+# URL de este proyecto Aquiles (para callbacks)
 NEXT_PUBLIC_AQUILES_URL=http://localhost:3000
 ```
 
