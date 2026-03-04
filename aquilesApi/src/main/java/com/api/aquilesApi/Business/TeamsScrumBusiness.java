@@ -218,7 +218,7 @@ public class TeamsScrumBusiness {
             return TeamScrumMemberIdMap.INSTANCE.EntityToDTOs(teamsScrum.getMemberIds());
 
         } catch (CustomException e) {
-            throw e; // Re-lanzar excepciones personalizadas tal cual
+            throw e; // lanzar excepciones personalizadas tal cual
         } catch (Exception e) {
             throw new CustomException("Error Adding Profile to Student: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }

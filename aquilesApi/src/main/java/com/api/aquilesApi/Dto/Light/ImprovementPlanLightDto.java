@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 /**
  * DTO "light" de ImprovementPlan sin referencias circulares
- * Se usa para evitar bucles infinitos cuando se incluye en otros DTOs
+ * Se usa para evitar bucles infinitos cuando se incluye en otros DTOS
  */
 @Data
 @AllArgsConstructor

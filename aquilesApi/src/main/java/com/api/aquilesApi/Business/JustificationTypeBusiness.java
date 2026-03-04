@@ -25,7 +25,6 @@ public class JustificationTypeBusiness {
 
     }
 
-
     // Get all justificationTypes (Paginated)
     public Page<JustificationTypeDto> findAll(int page, int size) {
         try {
