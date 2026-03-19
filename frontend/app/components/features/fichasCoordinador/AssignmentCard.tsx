@@ -24,7 +24,7 @@ export const AssignmentCardComponent: React.FC<AssignmentCardComponentProps> = (
                 {/* Info de la card */}
                 <div className="space-y-4 flex-1">
                     <div>
-                        <h3 className="text-2xl font-bold text-primary dark:text-secondary mb-3">
+                        <h3 className="text-2xl font-bold text-primary dark:text-white mb-3">
                             {card.title}
                         </h3>
                         <p className="text-base text-grayText dark:text-white leading-relaxed">

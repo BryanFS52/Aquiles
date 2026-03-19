@@ -21,12 +21,12 @@ export const CreateEvaluationModal: React.FC<CreateEvaluationModalProps> = ({
     <Modal
       isOpen={showModal}
       onClose={onClose}
-      title="Crear Evaluación"
+      title="Crear evaluación"
       size="xxl"
     >
       {/* Información del checklist con diseño moderno */}
       <Card
-        header={<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Lista de Chequeo: {selectedChecklist?.trimester ? `Trimestre ${selectedChecklist.trimester}` : 'Sin trimestre'}</h3>}
+        header={<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Lista de chequeo: {selectedChecklist?.trimester ? `Trimestre ${selectedChecklist.trimester}` : 'Sin trimestre'}</h3>}
         body={<p className="text-gray-700 dark:text-gray-300 text-sm">Complete los siguientes campos para crear la evaluación de esta lista de chequeo.</p>}
         className="mb-6"
       />
@@ -81,7 +81,7 @@ export const CreateEvaluationModal: React.FC<CreateEvaluationModalProps> = ({
       <div className="mb-6">
         <label className="block text-lg font-semibold text-darkBlue dark:text-white mb-4">
           <span className="flex items-center gap-2">
-            Juicio de Valor: <span className="text-red-500">*</span>
+            Juicio de valor: <span className="text-red-500">*</span>
           </span>
         </label>
         <select
@@ -92,13 +92,13 @@ export const CreateEvaluationModal: React.FC<CreateEvaluationModalProps> = ({
         >
           <option value="">Seleccione un juicio de valor</option>
           <option value="APROBADO">Aprobado</option>
-          <option value="NO APROBADO">No Aprobado</option>
+          <option value="NO APROBADO">No aprobado</option>
         </select>
       </div>
 
       {/* Indicador de progreso con diseño moderno */}
       <Card
-        header={<h4 className="font-semibold text-gray-900 dark:text-gray-100">Progreso de Evaluación</h4>}
+        header={<h4 className="font-semibold text-gray-900 dark:text-gray-100">Progreso de evaluación</h4>}
         body={
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30">
@@ -113,7 +113,7 @@ export const CreateEvaluationModal: React.FC<CreateEvaluationModalProps> = ({
             </div>
             <div className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30">
               <div className={`w-4 h-4 rounded-full ${evaluationJudgment && evaluationJudgment !== '' ? 'bg-green-500' : 'bg-gray-300'} transition-colors duration-300`}></div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Juicio de Valor</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Juicio de valor</span>
               {evaluationJudgment && evaluationJudgment !== '' && <span className="text-green-500">✓</span>}
             </div>
           </div>
@@ -149,7 +149,7 @@ export const CreateEvaluationModal: React.FC<CreateEvaluationModalProps> = ({
           ) : (
             <>
               <Save className="w-5 h-5" />
-              <span>Crear Evaluación</span>
+              <span>Crear evaluación</span>
             </>
           )}
         </button>

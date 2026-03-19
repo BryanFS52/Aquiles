@@ -321,7 +321,7 @@ export class InstructorChecklistHandlers {
       }
 
       const newEvaluationResult = await evaluationService.createEvaluationForChecklist(
-        parseInt(selectedChecklist.id), 
+        parseInt(selectedChecklist.id),
         teamScrumIdNumber
       );
 

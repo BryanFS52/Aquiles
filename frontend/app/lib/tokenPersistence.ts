@@ -25,7 +25,7 @@ export interface AuthData {
  */
 export const saveTokenToAquiles = (token: string, source: string = "manual"): boolean => {
   try {
-    console.log(`📝 [TokenPersistence] Guardando token de ${source}...`);
+    console.log(`[TokenPersistence] Guardando token de ${source}...`);
 
     const authData: AuthData = {
       token,
@@ -51,13 +51,13 @@ export const saveTokenToAquiles = (token: string, source: string = "manual"): bo
     const cookieValue = btoa(JSON.stringify(authData));
     document.cookie = `aquiles_session=${cookieValue}; path=/; max-age=86400; SameSite=Lax`;
 
-    console.log("✅ [TokenPersistence] Token guardado exitosamente");
-    console.log(`✅ [TokenPersistence] Fuente: ${source}`);
-    console.log(`✅ [TokenPersistence] Timestamp: ${Date.now()}`);
+    console.log("[TokenPersistence] Token guardado exitosamente");
+    console.log(`[TokenPersistence] Fuente: ${source}`);
+    console.log(`[TokenPersistence] Timestamp: ${Date.now()}`);
 
     return verifyTokenInStorage();
   } catch (error) {
-    console.error("❌ [TokenPersistence] Error guardando token:", error);
+    console.error("[TokenPersistence] Error guardando token:", error);
     return false;
   }
 };

@@ -18,6 +18,9 @@ const Modal: React.FC<ModalProps> = ({
     size = "md",
     children,
     className = "",
+    headerClassName = "",
+    showHeaderAccent = true,
+    showCloseButton = true,
 }) => {
     // Detectar modo oscuro usando la clase 'dark' en el documento
     const [isDarkMode, setIsDarkMode] = React.useState(false);
@@ -63,7 +66,7 @@ const Modal: React.FC<ModalProps> = ({
     let modalSize = sizeMap[size] || "max-w-lg";
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center h-full p-4 transition-all duration-300 ease-out bg-black/60 backdrop-blur-xs">
+        <div className="fixed inset-0 z-[9998] flex items-center justify-center h-full p-4 transition-all duration-300 ease-out">
             <div
                 className={`w-full transform rounded-3xl shadow-2xl transition-all duration-500 ease-out ${isDarkMode
                     ? "border border-slate-700/50 bg-gradient-to-br from-slate-800 via-slate-800 to-slate-900 text-slate-100"
@@ -72,16 +75,18 @@ const Modal: React.FC<ModalProps> = ({
             >
                 {/* Header premium */}
                 <div
-                    className={`flex items-center justify-between p-6 pb-4 ${title ? "border-opacity-20 border-b" : ""} ${isDarkMode ? "border-slate-700/50" : "border-gray-200/60"}`}
+                    className={`flex items-center justify-between p-6 pb-4 ${title ? "border-opacity-20 border-b" : ""} ${isDarkMode ? "border-slate-700/50" : "border-gray-200/60"} ${headerClassName}`}
                 >
                     {title && (
                         <div className="flex items-center space-x-3">
-                            <div
-                                className={`h-8 w-1 rounded-full ${isDarkMode
-                                    ? "bg-gradient-to-b from-[#00304D] to-[#005386]"
-                                    : "bg-gradient-to-b from-lime-500 to-lime-600"
-                                    } `}
-                            />
+                            {showHeaderAccent && (
+                                <div
+                                    className={`h-8 w-1 rounded-full ${isDarkMode
+                                        ? "bg-gradient-to-b from-[#00304D] to-[#005386]"
+                                        : "bg-gradient-to-b from-lime-500 to-lime-600"
+                                        } `}
+                                />
+                            )}
                             <h2
                                 className={`text-xl font-bold tracking-tight ${isDarkMode ? "text-slate-100 drop-shadow-sm" : "text-gray-900"
                                     } `}
@@ -91,28 +96,30 @@ const Modal: React.FC<ModalProps> = ({
                         </div>
                     )}
 
-                    <button
-                        onClick={onClose}
-                        className={`group relative rounded-xl p-2.5 ml-2 sm:ml-4 transition-all duration-200 ${isDarkMode
-                            ? "hover:bg-slate-700/70 hover:shadow-lg hover:shadow-slate-900/20 active:bg-slate-600/80"
-                            : "hover:bg-gray-100/80 hover:shadow-lg hover:shadow-gray-900/10 active:bg-gray-200/60"
-                            } hover:ring-opacity-20 transform ring-0 hover:scale-105 hover:ring-2 active:scale-95 ${isDarkMode ? "hover:ring-blue-400" : "hover:ring-lime-500"} `}
-                        aria-label="Cerrar modal"
-                    >
-                        <X
-                            className={`h-6 w-6 transition-all duration-200 ${isDarkMode
-                                ? "text-slate-400 group-hover:text-slate-200"
-                                : "text-gray-500 group-hover:text-gray-700"
-                                } group-hover:rotate-90`}
-                        />
-                        {/* Efecto de hover sutil */}
-                        <div
-                            className={`absolute inset-0 rounded-xl opacity-0 transition-opacity duration-200 group-hover:opacity-100 ${isDarkMode
-                                ? "bg-gradient-to-r from-blue-500/10 to-purple-500/10"
-                                : "bg-gradient-to-r from-lime-500/5 to-lime-500/5"
-                                } `}
-                        />
-                    </button>
+                    {showCloseButton && (
+                        <button
+                            onClick={onClose}
+                            className={`group relative rounded-xl p-2.5 ml-2 sm:ml-4 transition-all duration-200 ${isDarkMode
+                                ? "hover:bg-slate-700/70 hover:shadow-lg hover:shadow-slate-900/20 active:bg-slate-600/80"
+                                : "hover:bg-gray-100/80 hover:shadow-lg hover:shadow-gray-900/10 active:bg-gray-200/60"
+                                } hover:ring-opacity-20 transform ring-0 hover:scale-105 hover:ring-2 active:scale-95 ${isDarkMode ? "hover:ring-blue-400" : "hover:ring-lime-500"} `}
+                            aria-label="Cerrar modal"
+                        >
+                            <X
+                                className={`h-6 w-6 transition-all duration-200 ${isDarkMode
+                                    ? "text-slate-400 group-hover:text-slate-200"
+                                    : "text-gray-500 group-hover:text-gray-700"
+                                    } group-hover:rotate-90`}
+                            />
+                            {/* Efecto de hover sutil */}
+                            <div
+                                className={`absolute inset-0 rounded-xl opacity-0 transition-opacity duration-200 group-hover:opacity-100 ${isDarkMode
+                                    ? "bg-gradient-to-r from-blue-500/10 to-purple-500/10"
+                                    : "bg-gradient-to-r from-lime-500/5 to-lime-500/5"
+                                    } `}
+                            />
+                        </button>
+                    )}
                 </div>
 
                 {/* Contenido con mejor spacing y efectos */}

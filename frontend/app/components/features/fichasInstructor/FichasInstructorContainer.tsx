@@ -13,32 +13,260 @@ import PageTitle from '@components/UI/pageTitle';
 import EmptyState from '@components/UI/emptyState';
 import { TEMPORAL_INSTRUCTOR_ID } from '@/temporaryCredential';
 
+const MOCK_FICHAS: StudySheetWithCompetence[] = [
+    {
+        id: '101',
+        number: 2876543,
+        startLective: '2026-01-15',
+        endLective: '2026-07-10',
+        state: true,
+        competenceId: 12,
+        journey: { name: 'Mañana' },
+        trainingProject: {
+            program: { name: 'Análisis y Desarrollo de Software' }
+        },
+        studentStudySheets: [
+            {
+                student: {
+                    id: 'st-1',
+                    person: {
+                        name: 'Laura',
+                        lastname: 'Gómez',
+                        email: 'laura.gomez@sena.edu.co',
+                        document: '1000123456'
+                    }
+                },
+                studentStudySheetState: { name: 'En formacion' }
+            },
+            {
+                student: {
+                    id: 'st-2',
+                    person: {
+                        name: 'Carlos',
+                        lastname: 'Martínez',
+                        email: 'carlos.martinez@sena.edu.co',
+                        document: '1000654321'
+                    }
+                },
+                studentStudySheetState: { name: 'En formacion' }
+            },
+            {
+                student: {
+                    id: 'st-3',
+                    person: {
+                        name: 'Andrés',
+                        lastname: 'Ruiz',
+                        email: 'andres.ruiz@sena.edu.co',
+                        document: '1099001122'
+                    }
+                },
+                studentStudySheetState: { name: 'Condicionado' }
+            },
+            {
+                student: {
+                    id: 'st-4',
+                    person: {
+                        name: 'María',
+                        lastname: 'López',
+                        email: 'maria.lopez@sena.edu.co',
+                        document: '1000987654'
+                    }
+                },
+                studentStudySheetState: { name: 'En formacion' }
+            }
+        ]
+    },
+    {
+        id: '102',
+        number: 2876999,
+        startLective: '2026-02-01',
+        endLective: '2026-08-30',
+        state: true,
+        competenceId: 18,
+        journey: { name: 'Tarde' },
+        trainingProject: {
+            program: { name: 'Desarrollo Multimedia y Web' }
+        },
+        studentStudySheets: [
+            {
+                student: {
+                    id: 'st-5',
+                    person: {
+                        name: 'Andrés',
+                        lastname: 'Ruiz',
+                        email: 'andres.ruiz@sena.edu.co',
+                        document: '1099001122'
+                    }
+                },
+                studentStudySheetState: { name: 'Condicionado' }
+            },
+            {
+                student: {
+                    id: 'st-6',
+                    person: {
+                        name: 'Sofía',
+                        lastname: 'García',
+                        email: 'sofia.garcia@sena.edu.co',
+                        document: '1000876543'
+                    }
+                },
+                studentStudySheetState: { name: 'En formacion' }
+            },
+            {
+                student: {
+                    id: 'st-7',
+                    person: {
+                        name: 'Diego',
+                        lastname: 'Fernández',
+                        email: 'diego.fernandez@sena.edu.co',
+                        document: '1000765432'
+                    }
+                },
+                studentStudySheetState: { name: 'En formacion' }
+            }
+        ]
+    },
+    {
+        id: '103',
+        number: 2876555,
+        startLective: '2026-03-01',
+        endLective: '2026-09-30',
+        state: false,
+        competenceId: 20,
+        journey: { name: 'Noche' },
+        trainingProject: {
+            program: { name: 'Redes de Computadores' }
+        },
+        studentStudySheets: [
+            {
+                student: {
+                    id: 'st-4',
+                    person: {
+                        name: 'María',
+                        lastname: 'López',
+                        email: 'maria.lopez@sena.edu.co',
+                        document: '1000987654'
+                    }
+                },
+                studentStudySheetState: { name: 'En formacion' }
+            },
+            {
+                student: {
+                    id: 'st-8',
+                    person: {
+                        name: 'Valentina',
+                        lastname: 'Sánchez',
+                        email: 'valentina.sanchez@sena.edu.co',
+                        document: '1000654321'
+                    }
+                },
+                studentStudySheetState: { name: 'En formacion' }
+            }
+        ]
+    },
+    {
+        id: '104',
+        number: 2876566,
+        startLective: '2026-04-01',
+        endLective: '2026-10-31',
+        state: true,
+        competenceId: 25,
+        journey: { name: 'Mañana' },
+        trainingProject: {
+            program: { name: 'Seguridad Informática' }
+        },
+        studentStudySheets: [
+            {
+                student: {
+                    id: 'st-5',
+                    person: {
+                        name: 'Sofía',
+                        lastname: 'García',
+                        email: 'sofia.garcia@sena.edu.co',
+                        document: '1000876543'
+                    }
+                },
+                studentStudySheetState: { name: 'En formacion' }
+            },
+            {
+                student: {
+                    id: 'st-9',
+                    person: {
+                        name: 'Miguel',
+                        lastname: 'Torres',
+                        email: 'miguel.torres@sena.edu.co',
+                        document: '1000543210'
+                    }
+                },
+                studentStudySheetState: { name: 'En formacion' }
+            }
+        ]
+    },
+    {
+        id: '105',
+        number: 2876577,
+        startLective: '2026-05-01',
+        endLective: '2026-11-30',
+        state: false,
+        competenceId: 30,
+        journey: { name: 'Tarde' },
+        trainingProject: {
+            program: { name: 'Inteligencia Artificial' }
+        },
+        studentStudySheets: [
+            {
+                student: {
+                    id: 'st-6',
+                    person: {
+                        name: 'Diego',
+                        lastname: 'Fernández',
+                        email: 'diego.fernandez@sena.edu.co',
+                        document: '1000765432'
+                    }
+                },
+                studentStudySheetState: { name: 'En formacion' }
+            }
+        ]
+    }
+];
+
 export const FichasInstructorContainer: React.FC = () => {
     const [selectedFicha, setSelectedFicha] = useState<StudySheetWithCompetence | null>(null);
     const [isModalOpen, setModalOpen] = useState(false);
-    const [isTransitioning, setIsTransitioning] = useState(false);
 
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
     const { showLoader, hideLoader } = useLoader();
 
-    const { data, loading, loadingAttendanceSheet } = useSelector((state: any) => state.studySheet);
-    const fichas: StudySheetWithCompetence[] = data || [];
+    const { data, loading } = useSelector((state: any) => state.studySheet);
+
+    // =====================
+    // MODO MOCK (ACTIVO)
+    // =====================
+    const fichas: StudySheetWithCompetence[] = MOCK_FICHAS;
+
+    // =====================
+    // MODO BACKEND (DESCOMENTAR CUANDO LO NECESITES)
+    // =====================
+    // const fichas: StudySheetWithCompetence[] = data || [];
 
     useEffect(() => {
-        const loadData = async () => {
-            showLoader();
-            try {
-                dispatch(clearAttendanceSelection());
-                await dispatch(fetchStudySheetByTeacher({ idTeacher: TEMPORAL_INSTRUCTOR_ID, page: 0, size: 5 })).unwrap();
-            } catch (error) {
-                console.error('Error al cargar fichas:', error);
-            } finally {
-                hideLoader();
-            }
-        };
-        
-        loadData();
+        // MODO MOCK (ACTIVO)
+        dispatch(clearAttendanceSelection());
+
+        // MODO BACKEND (DESCOMENTAR CUANDO LO NECESITES)
+        // const loadData = async () => {
+        //     showLoader();
+        //     try {
+        //         dispatch(clearAttendanceSelection());
+        //         await dispatch(fetchStudySheetByTeacher({ idTeacher: TEMPORAL_INSTRUCTOR_ID, page: 0, size: 5 })).unwrap();
+        //     } catch (error) {
+        //         console.error('Error al cargar fichas:', error);
+        //     } finally {
+        //         hideLoader();
+        //     }
+        // };
+        // loadData();
     }, [dispatch]);
     
     const handleViewApprentices = (ficha: StudySheetWithCompetence) => {
@@ -65,19 +293,20 @@ export const FichasInstructorContainer: React.FC = () => {
                 urlParams.set('competenceId', competenceId.toString());
             }
             
-            // Primero cargar los datos
-            await dispatch(fetchStudySheetByIdWithAttendances({
-                id: parseInt(studySheet.id),
-                competenceId
-            })).unwrap();
+            // MODO MOCK (ACTIVO)
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            // MODO BACKEND (DESCOMENTAR CUANDO LO NECESITES)
+            // await dispatch(fetchStudySheetByIdWithAttendances({
+            //     id: parseInt(studySheet.id),
+            //     competenceId
+            // })).unwrap();
             
-            // Después navegar
             router.push(`/dashboard/asistencia?${urlParams.toString()}`);
             
         } catch (error) {
             console.error('Error al cargar la ficha:', error);
         } finally {
-            // Delay mínimo para transición suave
             setTimeout(() => {
                 hideLoader();
             }, 300);

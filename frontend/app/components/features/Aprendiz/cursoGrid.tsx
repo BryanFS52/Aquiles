@@ -5,8 +5,8 @@ const CursoGrid = () => {
     return (
         <div className="flex w-full xl:w-96 h-52 rounded-lg overflow-hidden shadow-lg bg-zinc-200 relative p-4">
             <div className="z-50 space-y-2">
-                <span className="font-inter text-lg">Nombre del Curso:</span>
-                <p className="font-inter text-black-700 text-sm">Gestión Empresarial</p>
+                <span className="font-inter text-lg">Nombre del curso:</span>
+                <p className="font-inter text-black-700 text-sm">Gestión empresarial</p>
                 <span className="font-inter text-lg">Modalidad:</span>
                 <p className="font-inter text-black-700 text-sm">Presencial</p>
             </div>

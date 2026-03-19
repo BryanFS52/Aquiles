@@ -6,16 +6,18 @@ interface ProgramsGridProps {
   programs: Program[];
   loading: boolean;
   searchTerm: string;
+  onProgramClick?: (program: Program) => void;
 }
 
-export const ProgramsGrid: React.FC<ProgramsGridProps> = ({ 
-  programs, 
-  loading, 
-  searchTerm 
+export const ProgramsGrid: React.FC<ProgramsGridProps> = ({
+  programs,
+  loading,
+  searchTerm,
+  onProgramClick
 }) => {
   if (loading) {
     return (
-      <p className="text-center text-gray-600 dark:text-gray-400">Cargando programas...</p>
+      <p className="text-center text-gray-600 dark:text-gray-400">Cargando programas.</p>
     );
   }
 
@@ -32,7 +34,11 @@ export const ProgramsGrid: React.FC<ProgramsGridProps> = ({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
       {programs.map((program) => (
-        <ProgramCard key={program.id} program={program} />
+        <ProgramCard
+          key={program.id}
+          program={program}
+          onClick={onProgramClick}
+        />
       ))}
     </div>
   );

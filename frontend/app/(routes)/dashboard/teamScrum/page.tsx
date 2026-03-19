@@ -9,6 +9,50 @@ import { useLoader } from "@context/LoaderContext";
 import PageTitle from "@components/UI/pageTitle";
 import EmptyState from "@components/UI/emptyState";
 import Link from "next/link";
+import { TEMPORAL_INSTRUCTOR_ID } from "@/temporaryCredential";
+import { USE_TEAM_SCRUM_MOCK } from "@components/features/teamScrum/mockData";
+
+// [MOCK-TEMP START]
+// TODO BACKEND: borrar este bloque cuando conectes backend real para listado de fichas Team Scrum.
+const MOCK_STUDY_SHEETS: StudySheet[] = [
+  {
+    id: "1",
+    number: 2876541,
+    state: true,
+    numberStudents: 25,
+    startLective: "2026-01-15",
+    endLective: "2026-12-15",
+    journey: { name: "Diurna" },
+    offer: { name: "Presencial" },
+    quarter: [{ name: { extension: "TRI", number: 2 } }],
+    trainingProject: { program: { name: "Análisis y Desarrollo de Software" } },
+  } as StudySheet,
+  {
+    id: "2",
+    number: 2876542,
+    state: true,
+    numberStudents: 28,
+    startLective: "2026-02-01",
+    endLective: "2026-12-20",
+    journey: { name: "Mixta" },
+    offer: { name: "Virtual" },
+    quarter: [{ name: { extension: "TRI", number: 1 } }],
+    trainingProject: { program: { name: "Diseño e Integración de Multimedia" } },
+  } as StudySheet,
+  {
+    id: "3",
+    number: 2876543,
+    state: true,
+    numberStudents: 22,
+    startLective: "2026-01-20",
+    endLective: "2026-11-30",
+    journey: { name: "Nocturna" },
+    offer: { name: "Presencial" },
+    quarter: [{ name: { extension: "TRI", number: 3 } }],
+    trainingProject: { program: { name: "Gestión de Redes de Datos" } },
+  } as StudySheet,
+];
+// [MOCK-TEMP END]
 
 const StudySheetsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -16,8 +60,18 @@ const StudySheetsPage: React.FC = () => {
   const { showLoader, hideLoader } = useLoader();
 
   useEffect(() => {
-    dispatch(fetchStudySheetByTeacherIdWithTeamScrum({ idTeacher: 1, page: 0, size: 5 }));
+    // [BACKEND ORIGINAL - REFERENCIA]
+    // dispatch(fetchStudySheetByTeacherIdWithTeamScrum({ idTeacher: 1, page: 0, size: 5 }));
+
+    // [MOCK-TEMP] Mientras USE_TEAM_SCRUM_MOCK esté en true, no consume backend.
+    if (USE_TEAM_SCRUM_MOCK) return;
+    dispatch(fetchStudySheetByTeacherIdWithTeamScrum({ idTeacher: TEMPORAL_INSTRUCTOR_ID, page: 0, size: 5 }));
   }, [dispatch]);
+
+  // [MOCK-TEMP] Fuente de datos temporal para evitar 404 mientras no hay backend estable.
+  const displayedStudySheets: StudySheet[] = USE_TEAM_SCRUM_MOCK
+    ? MOCK_STUDY_SHEETS
+    : ((studySheets as StudySheet[]) ?? []);
 
   useEffect(() => {
     if (studySheetLoading) {
@@ -38,7 +92,7 @@ const StudySheetsPage: React.FC = () => {
     });
   };
 
-  if (error) {
+  if (!USE_TEAM_SCRUM_MOCK && error) {
     return (
       <EmptyState
         message={
@@ -50,7 +104,7 @@ const StudySheetsPage: React.FC = () => {
     );
   }
 
-  if (!studySheetLoading && (!studySheets || studySheets.length === 0)) {
+  if (!studySheetLoading && displayedStudySheets.length === 0) {
     return (
       <EmptyState message="No se encontraron fichas disponibles." />
     );
@@ -58,9 +112,9 @@ const StudySheetsPage: React.FC = () => {
 
   return (
     <div className="w-full px-2 sm:px-4 lg:px-8">
-      <PageTitle>Teams Scrum</PageTitle>
+      <PageTitle>Teams scrum</PageTitle>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-        {(studySheets as StudySheet[]).map((sheet) => (
+        {displayedStudySheets.map((sheet) => (
           <Link
             key={sheet.id}
             href={`/dashboard/teamScrum/${sheet.id}`}
@@ -122,7 +176,7 @@ const StudySheetsPage: React.FC = () => {
                     <div className="bg-blue-50 dark:bg-shadowBlue/20 rounded-lg p-3 space-y-2">
                       <div className="flex items-center space-x-2 mb-2">
                         <div className="w-2 h-2 bg-blue-500 dark:bg-lightGreen rounded-full"></div>
-                        <span className="text-xs sm:text-sm font-medium text-blue-600 dark:text-lightGreen">Período Lectivo</span>
+                        <span className="text-xs sm:text-sm font-medium text-blue-600 dark:text-lightGreen">Período lectivo</span>
                       </div>
                       <div className="space-y-1 sm:space-y-2">
                         <div className="flex items-center space-x-2">

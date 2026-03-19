@@ -13,6 +13,31 @@ import PageTitle from "@components/UI/pageTitle";
 import EmptyState from "@components/UI/emptyState";
 import { CompetenceOption } from "@/components/features/InstructorFollowUp/CompetenceSelector/UseCompetence";
 
+const MOCK_COMPETENCES_BY_FICHA: Record<string, CompetenceOption[]> = {
+  '2876543': [
+    {
+      id: '12',
+      name: 'Desarrollo Frontend',
+      studySheetNumber: 2876543,
+      teacherStudySheetId: 'tss-101'
+    },
+    {
+      id: '13',
+      name: 'Desarrollo Backend',
+      studySheetNumber: 2876543,
+      teacherStudySheetId: 'tss-102'
+    }
+  ],
+  '2876999': [
+    {
+      id: '18',
+      name: 'Diseño UX/UI',
+      studySheetNumber: 2876999,
+      teacherStudySheetId: 'tss-201'
+    }
+  ]
+};
+
 
 const JustificacionesInstructorSelectorContent: React.FC = () => {
   const [availableCompetences, setAvailableCompetences] = useState<CompetenceOption[]>([]);
@@ -30,9 +55,9 @@ const JustificacionesInstructorSelectorContent: React.FC = () => {
 
   const getPageTitle = () => {
     if (fichaNumber) {
-      return `Competencias de la Ficha ${fichaNumber}`;
+      return `Competencias de la ficha ${fichaNumber}`;
     }
-    return "Seleccionar Competencia para Justificaciones";
+    return "Seleccionar competencia para justificaciones";
   };
 
   const renderCompetenceCard = (competence: CompetenceOption) => (
@@ -79,50 +104,60 @@ const JustificacionesInstructorSelectorContent: React.FC = () => {
 
   useEffect(() => {
     const loadCompetences = async () => {
-      showLoader();
+      // MODO MOCK (ACTIVO)
+      const mockedCompetences = fichaNumber ? (MOCK_COMPETENCES_BY_FICHA[fichaNumber] || []) : [];
+      setAvailableCompetences(mockedCompetences);
+      setError(null);
+
+      // MODO BACKEND (DESCOMENTAR CUANDO LO NECESITES)
+      // showLoader();
       try {
-        const result = await dispatch(fetchStudySheetByTeacher({
-          idTeacher: TEMPORAL_INSTRUCTOR_ID,
-          page: 0,
-          size: 20
-        }));
+        // const result = await dispatch(fetchStudySheetByTeacher({
+        //   idTeacher: TEMPORAL_INSTRUCTOR_ID,
+        //   page: 0,
+        //   size: 20
+        // }));
 
-        if (fetchStudySheetByTeacher.fulfilled.match(result)) {
-          const studySheets = result.payload?.data || [];
-          const filteredSheets = studySheets.filter((sheet: any) => sheet.number.toString() === fichaNumber);
-          const allCompetences: CompetenceOption[] = [];
+        // if (fetchStudySheetByTeacher.fulfilled.match(result)) {
+        //   const studySheets = result.payload?.data || [];
+        //   const filteredSheets = studySheets.filter((sheet: any) => sheet.number.toString() === fichaNumber);
+        //   const allCompetences: CompetenceOption[] = [];
 
-          filteredSheets.forEach((sheet: any) => {
-            if (sheet.teacherStudySheets) {
-              sheet.teacherStudySheets.forEach((tss: any) => {
-                if (tss.competence && tss.competence.id && tss.competence.name) {
-                  const competenceOption = {
-                    id: tss.competence.id,
-                    name: tss.competence.name,
-                    studySheetNumber: sheet.number,
-                    originalCompetenceId: tss.competence.id,
-                    teacherStudySheetId: tss.id
-                  };
+        //   filteredSheets.forEach((sheet: any) => {
+        //     if (sheet.teacherStudySheets) {
+        //       sheet.teacherStudySheets.forEach((tss: any) => {
+        //         if (tss.competence && tss.competence.id && tss.competence.name) {
+        //           const competenceOption = {
+        //             id: tss.competence.id,
+        //             name: tss.competence.name,
+        //             studySheetNumber: sheet.number,
+        //             originalCompetenceId: tss.competence.id,
+        //             teacherStudySheetId: tss.id
+        //           };
 
-                  allCompetences.push(competenceOption);
-                }
-              });
-            }
-          });
+        //           allCompetences.push(competenceOption);
+        //         }
+        //       });
+        //     }
+        //   });
 
-          const competencesArray = allCompetences
-            .sort((a, b) => a.name.localeCompare(b.name));
+        //   const competencesArray = allCompetences
+        //     .sort((a, b) => a.name.localeCompare(b.name));
 
-          setAvailableCompetences(competencesArray);
-          setError(null);
-        } else {
-          setError("Error al cargar las competencias disponibles");
-        }
+        //   setAvailableCompetences(competencesArray);
+        //   setError(null);
+        // } else {
+        //   setError("Error al cargar las competencias disponibles");
+        // }
       } catch (error) {
         console.error('Error loading competences:', error);
         setError("Error al cargar las competencias disponibles");
       } finally {
+        // MODO MOCK (ACTIVO)
         hideLoader();
+
+        // MODO BACKEND (DESCOMENTAR CUANDO LO NECESITES)
+        // hideLoader();
       }
     };
 
@@ -152,7 +187,7 @@ const JustificacionesInstructorSelectorContent: React.FC = () => {
             onClick={() => router.back()}
             className="px-4 py-2 bg-primary dark:bg-secondary text-white rounded-md hover:bg-primary/90 dark:hover:bg-secondary/90 transition-colors duration-200"
           >
-            Volver a Fichas Instructor
+            Volver a fichas instructor
           </button>
         </div>
       </div>
@@ -171,7 +206,7 @@ const JustificacionesInstructorSelectorContent: React.FC = () => {
             onClick={() => router.back()}
             className="px-4 py-2 bg-primary dark:bg-secondary text-white rounded-md hover:bg-primary/90 dark:hover:bg-secondary/90 transition-colors duration-200"
           >
-            Volver a Fichas Instructor
+            Volver a fichas instructor
           </button>
         </div>
       </div>
@@ -189,7 +224,7 @@ const JustificacionesInstructorSelectorContent: React.FC = () => {
         renderCard={renderCompetenceCard}
         pageSize={9}
         columns={3}
-        filterPlaceholder="Buscar por nombre de competencia..."
+        filterPlaceholder="Buscar por nombre de competencia"
         filterFunction={filterCompetences}
         className="mt-6"
       />
@@ -202,7 +237,7 @@ const JustificacionesInstructorSelector = () => {
     <Suspense fallback={<div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto mb-4"></div>
-        <p className="text-gray-600 dark:text-gray-400">Cargando justificaciones...</p>
+        <p className="text-gray-600 dark:text-gray-400">Cargando justificaciones</p>
       </div>
     </div>}>
       <JustificacionesInstructorSelectorContent />

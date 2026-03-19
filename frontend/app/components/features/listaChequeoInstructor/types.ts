@@ -1,10 +1,10 @@
 // Types for Lista Chequeo Instructor module
-import { 
-  Checklist, 
-  Evaluation, 
-  SimulatedChecklistItem, 
-  InstructorChecklistState, 
-  ValueJudgment 
+import {
+  Checklist,
+  Evaluation,
+  SimulatedChecklistItem,
+  InstructorChecklistState,
+  ValueJudgment
 } from "@type/checklist";
 
 // Base component props interfaces

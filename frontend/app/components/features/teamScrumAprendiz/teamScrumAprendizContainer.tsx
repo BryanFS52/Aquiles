@@ -46,7 +46,7 @@ const TeamScrumAprendizContainer: React.FC = () => {
     useEffect(() => {
         if (error && !loading) {
             const errorMessage = typeof error === 'string' ? error : error.message || 'Error desconocido';
-            toast.error(`Error al cargar el Team Scrum: ${errorMessage}`, {
+            toast.error(`Error al cargar el team Scrum: ${errorMessage}`, {
                 autoClose: 5000,
                 position: "top-right"
             });
@@ -126,7 +126,7 @@ const TeamScrumAprendizContainer: React.FC = () => {
                 input: updatePayload
             })).unwrap();
 
-            toast.success("¡Información del Team Scrum actualizada exitosamente!", {
+            toast.success("¡Información del team scrum actualizada exitosamente!", {
                 autoClose: 4000,
                 position: "top-right"
             });
@@ -150,10 +150,10 @@ const TeamScrumAprendizContainer: React.FC = () => {
     };
 
     const projectSections = [
-        { field: "problem", label: "Problemática", placeholder: "¿Cuál es la problemática de su Proyecto?", value: formData.problem },
-        { field: "objectives", label: "Objetivo", placeholder: "¿Cuál es el objetivo de su Proyecto?", value: formData.objectives },
+        { field: "problem", label: "Problemática", placeholder: "¿Cuál es la problemática de su proyecto?", value: formData.problem },
+        { field: "objectives", label: "Objetivo", placeholder: "¿Cuál es el objetivo de su proyecto?", value: formData.objectives },
         { field: "description", label: "Descripción", placeholder: "Describa el Proyecto", value: formData.description },
-        { field: "projectJustification", label: "Justificación", placeholder: "Justifique el Proyecto", value: formData.projectJustification },
+        { field: "projectJustification", label: "Justificación", placeholder: "Justifique el proyecto", value: formData.projectJustification },
     ];
 
     if (loading && !dataForTeamScrumById) {
@@ -188,7 +188,7 @@ const TeamScrumAprendizContainer: React.FC = () => {
 
     return (
         <div className="w-full px-2 sm:px-4 lg:px-0">
-            <PageTitle>Mi Team Scrum</PageTitle>
+            <PageTitle>Mi team scrum</PageTitle>
 
             <TeamHeader
                 teamName={formData.teamName}

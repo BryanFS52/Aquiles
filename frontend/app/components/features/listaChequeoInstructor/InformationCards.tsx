@@ -45,7 +45,7 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
         }
         body={
           <div className="text-center">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Programa de Formación</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Programa de formación</h3>
             <p className="text-sm text-gray-600 dark:text-gray-300 leading-tight">
               {studySheetInfo?.programa || selectedChecklist?.trainingProjectId || "No disponible"}
             </p>
@@ -69,7 +69,7 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
         }
         body={
           <div className="text-center">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Datos de Formación</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Datos de formación</h3>
             <p className="text-sm text-gray-600 dark:text-gray-300">
               <span className="font-semibold text-gray-900 dark:text-white">Jornada:</span> {studySheetInfo?.jornada || "No disponible"}
             </p>
@@ -93,7 +93,7 @@ export const InformationCards: React.FC<InformationCardsPropsExtended> = ({
         }
         body={
           <div className="text-center">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Team Scrum</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Team scrum</h3>
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
               {teamScrumInfo?.teamName || selectedTeamScrumName || "No seleccionado"}
             </p>

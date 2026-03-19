@@ -48,6 +48,12 @@ interface ApiResponse<T = any> {
     message?: string;
 }
 
+interface SectionCardProps {
+    title: string;
+    description: string;
+    children: React.ReactNode;
+}
+
 // Componente reutilizable para campos
 const ProfileField: React.FC<ProfileFieldProps> = ({
     label,
@@ -134,6 +140,18 @@ const Alert: React.FC<AlertProps> = ({ type, message, onClose }) => {
     );
 };
 
+const SectionCard: React.FC<SectionCardProps> = ({ title, description, children }) => (
+    <section className="rounded-2xl border border-gray-200/80 bg-white/90 p-5 shadow-sm backdrop-blur-sm transition-all duration-300 dark:border-gray-700 dark:bg-gray-800/80 sm:p-6">
+        <div className="mb-5 flex items-start justify-between gap-4 border-b border-gray-200 pb-3 dark:border-gray-700">
+            <div>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 sm:text-lg">{title}</h3>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">{description}</p>
+            </div>
+        </div>
+        {children}
+    </section>
+);
+
 const PerfilContainer: React.FC = () => {
     const [profileData, setProfileData] = useState<ProfileData>({
         nombres: '',
@@ -157,7 +175,8 @@ const PerfilContainer: React.FC = () => {
         programa: ''
     });
     
-    const [profileImage, setProfileImage] = useState<string>("https://img.freepik.com/foto-gratis/joven-bella-mujer-pie-sobre-pared-blanca_114579-90514.jpg");
+    const [profileImage, setProfileImage] = useState<string>('');
+    const [originalProfileImage, setOriginalProfileImage] = useState<string>('');
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isLoadingData, setIsLoadingData] = useState<boolean>(true);
@@ -165,6 +184,18 @@ const PerfilContainer: React.FC = () => {
     const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const [hasChanges, setHasChanges] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const fullName = `${profileData.nombres} ${profileData.apellidos}`.trim() || 'Usuario';
+    const profileCompletion = [
+        profileData.nombres,
+        profileData.apellidos,
+        profileData.correo,
+        profileData.documento,
+        profileData.telefono,
+        profileData.centro,
+        profileData.programa,
+        profileData.fechaNacimiento,
+    ].filter((value) => value?.trim()).length;
+    const completionPercentage = Math.round((profileCompletion / 8) * 100);
 
     const showAlert = useCallback((message: string, type: 'success' | 'error' = 'error') => {
         setAlert({ message, type });
@@ -179,7 +210,9 @@ const PerfilContainer: React.FC = () => {
                 const data = response.data.data;
                 setProfileData(data);
                 setOriginalData(data);
-                if (data.foto) setProfileImage(data.foto);
+                const savedProfileImage = data.foto || '';
+                setProfileImage(savedProfileImage);
+                setOriginalProfileImage(savedProfileImage);
             }
         } catch (error) {
             console.error('Error cargando perfil:', error);
@@ -195,8 +228,9 @@ const PerfilContainer: React.FC = () => {
 
     useEffect(() => {
         const hasDataChanged = JSON.stringify(profileData) !== JSON.stringify(originalData);
-        setHasChanges(hasDataChanged);
-    }, [profileData, originalData]);
+        const hasImageChanged = profileImage !== originalProfileImage;
+        setHasChanges(hasDataChanged || hasImageChanged);
+    }, [profileData, originalData, profileImage, originalProfileImage]);
 
     const validateForm = (): boolean => {
         const newErrors: ValidationErrors = {};
@@ -252,7 +286,6 @@ const PerfilContainer: React.FC = () => {
             reader.onload = (e) => {
                 if (e.target?.result) {
                     setProfileImage(e.target.result as string);
-                    setHasChanges(true);
                 }
             };
             reader.readAsDataURL(file);
@@ -266,9 +299,13 @@ const PerfilContainer: React.FC = () => {
 
     const handleCancel = () => {
         setProfileData(originalData);
+        setProfileImage(originalProfileImage);
         setIsEditing(false);
         setErrors({});
         setHasChanges(false);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
 
     const handleSave = async () => {
@@ -281,11 +318,12 @@ const PerfilContainer: React.FC = () => {
         try {
             const response = await axios.put<ApiResponse>('/api/profile', {
                 ...profileData,
-                foto: profileImage !== "https://img.freepik.com/foto-gratis/joven-bella-mujer-pie-sobre-pared-blanca_114579-90514.jpg" ? profileImage : null
+                foto: profileImage || null
             });
 
             if (response.data?.success) {
                 setOriginalData(profileData);
+                setOriginalProfileImage(profileImage);
                 setIsEditing(false);
                 setHasChanges(false);
                 showAlert('Perfil actualizado exitosamente', 'success');
@@ -334,103 +372,148 @@ const PerfilContainer: React.FC = () => {
                 />
             )}
 
-            {/* Header con botones de acción */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">Información del Perfil</h1>
-                <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
-                    {!isEditing ? (
-                        <button
-                            onClick={handleEdit}
-                            className="flex-1 sm:flex-none flex items-center justify-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors duration-200 dark:text-blue-400 dark:bg-blue-900/20 dark:border-blue-700 dark:hover:bg-blue-900/30"
-                        >
-                            <HiPencil className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                            Editar
-                        </button>
-                    ) : (
-                        <>
-                            <button
-                                onClick={handleCancel}
-                                disabled={isLoading}
-                                className="flex-1 sm:flex-none flex items-center justify-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors duration-200 disabled:opacity-50 dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600"
-                            >
-                                <HiX className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleSave}
-                                disabled={isLoading || !hasChanges}
-                                className="flex-1 sm:flex-none flex items-center justify-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {isLoading ? (
-                                    <>
-                                        <svg className="animate-spin -ml-1 mr-2 h-3 w-3 sm:h-4 sm:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Guardando...
-                                    </>
+            <div className="overflow-hidden rounded-3xl border border-gray-300/50 bg-gradient-to-br from-white via-white to-gray-50 shadow-lg dark:border-gray-600/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+                <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:p-8">
+                    <div className="flex flex-col gap-5 md:flex-row md:items-center">
+                        <div className="relative mx-auto md:mx-0">
+                            <div className="relative group">
+                                {profileImage ? (
+                                    <Image
+                                        src={profileImage}
+                                        alt="Foto de perfil"
+                                        width={200}
+                                        height={200}
+                                        className="h-28 w-28 rounded-full border-4 border-white object-cover shadow-xl dark:border-gray-800 sm:h-36 sm:w-36 lg:h-40 lg:w-40"
+                                    />
                                 ) : (
-                                    <>
-                                        <HiCheck className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-                                        Guardar
-                                    </>
+                                    <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-[#eef9e8] to-[#dff1d1] shadow-xl dark:border-gray-800 dark:from-gray-800 dark:to-gray-700 sm:h-36 sm:w-36 lg:h-40 lg:w-40">
+                                        <HiUser className="h-12 w-12 text-[#5cb800] dark:text-[#8fd400] sm:h-16 sm:w-16" />
+                                    </div>
                                 )}
-                            </button>
-                        </>
-                    )}
+                                {isEditing && (
+                                    <button
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="absolute inset-0 flex items-center justify-center rounded-full bg-black/45 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                                    >
+                                        <HiCamera className="h-6 w-6 text-white sm:h-8 sm:w-8" />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="min-w-0 flex-1 text-center md:text-left">
+                            <h1 className="mt-3 text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">
+                                {fullName}
+                            </h1>
+                            <p className="mt-2 max-w-2xl text-sm text-gray-600 dark:text-gray-300 sm:text-base">
+                                Administra tu información personal, académica y de contacto desde un solo lugar.
+                            </p>
+
+                            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                                <div className="rounded-2xl border border-white/70 bg-white/80 p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800/80">
+                                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Correo</p>
+                                    <p className="mt-1 truncate text-sm font-semibold text-gray-900 dark:text-white">{profileData.correo || 'Sin registrar'}</p>
+                                </div>
+                                <div className="rounded-2xl border border-white/70 bg-white/80 p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800/80">
+                                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Documento</p>
+                                    <p className="mt-1 truncate text-sm font-semibold text-gray-900 dark:text-white">{profileData.documento || 'Sin registrar'}</p>
+                                </div>
+                                <div className="rounded-2xl border border-white/70 bg-white/80 p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800/80">
+                                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Perfil completo</p>
+                                    <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">{completionPercentage}%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col items-stretch gap-3 lg:min-w-[240px]">
+                        <div className="rounded-2xl border border-white/70 bg-white/85 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800/85">
+                            <div className="flex items-center justify-between gap-3">
+                                <div>
+                                    <p className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Estado del perfil</p>
+                                    <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
+                                        {hasChanges ? 'Con cambios pendientes' : 'Actualizado'}
+                                    </p>
+                                </div>
+                                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${hasChanges ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'}`}>
+                                    {hasChanges ? 'Pendiente' : 'OK'}
+                                </span>
+                            </div>
+                            <div className="mt-4">
+                                <div className="mb-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                    <span>Completitud</span>
+                                    <span>{completionPercentage}%</span>
+                                </div>
+                                <div className="h-2.5 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                                    <div
+                                        className="h-full rounded-full bg-gradient-to-r from-[#5cb800] to-[#8fd400] transition-all duration-300"
+                                        style={{ width: `${completionPercentage}%` }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
+                            {!isEditing ? (
+                                <button
+                                    onClick={handleEdit}
+                                    className="flex-1 sm:flex-none flex items-center justify-center rounded-xl border border-[#5cb800]/20 bg-white px-4 py-2.5 text-sm font-medium text-[#2d6a00] shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#f3ffe8] dark:border-[#8fd400]/20 dark:bg-gray-800 dark:text-[#b7f56b] dark:hover:bg-gray-700"
+                                >
+                                    <HiPencil className="mr-2 h-4 w-4" />
+                                    Editar perfil
+                                </button>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={handleCancel}
+                                        disabled={isLoading}
+                                        className="flex-1 sm:flex-none flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 shadow-sm transition-all duration-200 hover:bg-gray-100 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                                    >
+                                        <HiX className="mr-2 h-4 w-4" />
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={handleSave}
+                                        disabled={isLoading || !hasChanges}
+                                        className="flex-1 sm:flex-none flex items-center justify-center rounded-xl border border-[#5cb800] bg-gradient-to-r from-[#5cb800] to-[#78ca1c] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        {isLoading ? (
+                                            <>
+                                                <svg className="-ml-1 mr-2 h-4 w-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                                Guardando
+                                            </>
+                                        ) : (
+                                            <>
+                                                <HiCheck className="mr-2 h-4 w-4" />
+                                                Guardar cambios
+                                            </>
+                                        )}
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="flex flex-col xl:flex-row items-start space-y-6 sm:space-y-8 xl:space-y-0 xl:space-x-8 lg:space-x-12">
-                {/* Sección de foto */}
-                <div className="flex flex-col items-center space-y-3 sm:space-y-4 w-full xl:w-auto mx-auto xl:mx-0">
-                    <div className="relative group">
-                        <Image
-                            src={profileImage}
-                            alt="Foto de perfil"
-                            width={200}
-                            height={200}
-                            className="rounded-full object-cover border-4 border-gray-200 dark:border-gray-600 shadow-lg w-32 h-32 sm:w-48 sm:h-48 md:w-52 md:h-52 lg:w-56 lg:h-56"
-                        />
-                        {isEditing && (
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                            >
-                                <HiCamera className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-                            </button>
-                        )}
-                    </div>
-                    {isEditing && (
-                        <div className="text-center">
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium dark:text-blue-400 dark:hover:text-blue-300"
-                            >
-                                Cambiar foto
-                            </button>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                JPG, PNG o GIF (máx. 5MB)
-                            </p>
-                        </div>
-                    )}
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="hidden"
-                    />
-                </div>
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+            />
 
-                {/* Formulario */}
-                <div className="flex-1 space-y-6 sm:space-y-8 w-full min-w-0">
-                    {/* Datos Personales */}
-                    <div>
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 pb-2 border-b border-gray-200 dark:border-gray-600">
-                            Datos Personales
-                        </h3>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
+                <div className="space-y-6">
+                    <SectionCard
+                        title="Datos personales"
+                        description="Mantén actualizada tu información principal y de contacto."
+                    >
+                        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
                             <ProfileField
                                 label="Nombres"
                                 name="nombres"
@@ -480,7 +563,7 @@ const PerfilContainer: React.FC = () => {
                                 value={profileData.documento}
                                 onChange={handleInputChange}
                                 placeholder="Número de documento"
-                                disabled={true} // El documento nunca debe ser editable
+                                disabled={true}
                             />
                             <ProfileField
                                 label="Fecha de Nacimiento"
@@ -491,14 +574,13 @@ const PerfilContainer: React.FC = () => {
                                 disabled={!isEditing}
                             />
                         </div>
-                    </div>
+                    </SectionCard>
 
-                    {/* Información Académica */}
-                    <div>
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 sm:mb-6 pb-2 border-b border-gray-200 dark:border-gray-600">
-                            Información Académica
-                        </h3>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                    <SectionCard
+                        title="Información académica"
+                        description="Visualiza los datos institucionales asociados a tu cuenta."
+                    >
+                        <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
                             <ProfileField
                                 label="Centro de Formación"
                                 name="centro"
@@ -517,15 +599,56 @@ const PerfilContainer: React.FC = () => {
                                 disabled={!isEditing}
                             />
                         </div>
-                    </div>
+                    </SectionCard>
+                </div>
+
+                <div className="space-y-6">
+                    <section className="rounded-2xl border border-gray-200/80 bg-white/90 p-5 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/80 sm:p-6">
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 sm:text-lg">Resumen del perfil</h3>
+                        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
+                            Vista rápida de tus datos más importantes.
+                        </p>
+
+                        <div className="mt-5 space-y-3">
+                            <div className="rounded-2xl bg-gray-50 p-4 dark:bg-gray-900/60">
+                                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Nombre completo</p>
+                                <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">{fullName}</p>
+                            </div>
+                            <div className="rounded-2xl bg-gray-50 p-4 dark:bg-gray-900/60">
+                                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Centro</p>
+                                <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">{profileData.centro || 'Sin registrar'}</p>
+                            </div>
+                            <div className="rounded-2xl bg-gray-50 p-4 dark:bg-gray-900/60">
+                                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Programa</p>
+                                <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">{profileData.programa || 'Sin registrar'}</p>
+                            </div>
+                            <div className="rounded-2xl bg-gray-50 p-4 dark:bg-gray-900/60">
+                                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Teléfono</p>
+                                <p className="mt-1 text-sm font-semibold text-gray-900 dark:text-white">{profileData.telefono || 'Sin registrar'}</p>
+                            </div>
+                        </div>
+
+                        {isEditing && (
+                            <div className="mt-5 rounded-2xl border border-dashed border-[#5cb800]/35 bg-[#f7fff0] p-4 text-center dark:border-[#8fd400]/25 dark:bg-[#8fd400]/5">
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="inline-flex items-center justify-center rounded-xl bg-[#5cb800] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#4da000]"
+                                >
+                                    <HiCamera className="mr-2 h-4 w-4" />
+                                    Actualizar foto
+                                </button>
+                                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">JPG, PNG o GIF de máximo 5MB.</p>
+                            </div>
+                        )}
+                    </section>
                 </div>
             </div>
 
             {/* Información adicional */}
             {hasChanges && isEditing && (
-                <div className="p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg dark:bg-yellow-900/20 dark:border-yellow-700">
+                <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-4 shadow-sm dark:border-yellow-700 dark:bg-yellow-900/20">
                     <p className="text-xs sm:text-sm text-yellow-800 dark:text-yellow-300">
-                        Tienes cambios sin guardar. No olvides hacer clic en &quot;Guardar Cambios&quot; para confirmar las modificaciones.
+                        Tienes cambios sin guardar. No olvides hacer clic en &quot;Guardar cambios&quot; para confirmar las modificaciones.
                     </p>
                 </div>
             )}

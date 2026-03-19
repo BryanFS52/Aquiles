@@ -30,7 +30,7 @@ export const TeamScrumEmptyState: React.FC<TeamScrumEmptyStateProps> = ({
                 </div>
 
                 <h3 className="text-xl font-semibold text-darkGray dark:text-white mb-3">
-                    No hay equipos de Scrum disponibles
+                    No hay equipos de scrum disponibles
                 </h3>
 
                 <p className="text-grayText dark:text-white mb-8 leading-relaxed">
@@ -52,7 +52,7 @@ export const TeamScrumEmptyState: React.FC<TeamScrumEmptyStateProps> = ({
                         }}
                         className="px-6 py-3 text-white bg-gradient-to-r from-primary to-lightGreen hover:from-primary/90 hover:to-lightGreen/90 dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90 rounded-lg font-medium transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50"
                     >
-                        Crear Primer Equipo
+                        Crear primer equipo
                     </button>
                 </div>
             </div>

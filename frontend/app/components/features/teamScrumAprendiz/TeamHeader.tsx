@@ -31,7 +31,7 @@ const TeamHeader: React.FC<TeamHeaderProps> = ({ teamName, projectName, studyShe
 
                 <div className="flex-1 text-center lg:text-left">
                     <div className="bg-lightGray/50 dark:bg-darkBlue/50 border border-lightGray dark:border-darkGray rounded-xl p-3 text-2xl font-bold text-black dark:text-white placeholder-grayText w-full lg:w-auto cursor-not-allowed select-none">
-                        {teamName || "Nombre del Team"}
+                        {teamName || "Nombre del team"}
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
                         <div className="flex items-center justify-center gap-3 bg-gradient-to-r from-white to-gray-50 dark:from-darkBlue/70 dark:to-shadowBlue/70 rounded-xl p-4 border border-lightGray/30 dark:border-darkGray/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group">

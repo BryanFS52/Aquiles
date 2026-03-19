@@ -38,7 +38,7 @@ export interface JustificationsHistoricalProps {
 
 // justifications instructor container props
 export interface JustificacionesInstructorContainerProps {
-  competenceQuarterId: number;
-  fichaNumber?: string | null;
-  learningOutcomeId?: string | null;
+competenceQuarterId: number;
+fichaNumber?: string | null;
+learningOutcomeId?: string | null;
 }

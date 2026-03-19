@@ -293,7 +293,7 @@ const HierarchyNode = ({
                                 {isAssigning ? (
                                     <>
                                         <div className="animate-spin rounded-full h-2 w-2 sm:h-3 sm:w-3 border-b border-white"></div>
-                                        <span className="hidden sm:inline">Asignando...</span>
+                                        <span className="hidden sm:inline">Asignando</span>
                                         <span className="sm:hidden">...</span>
                                     </>
                                 ) : selectedRole ? (
@@ -439,7 +439,7 @@ const TeamHierarchy = ({
                             </div>
                             <div className="min-w-0 flex-1">
                                 <h3 className="text-xs sm:text-base font-semibold text-gray-900 truncate">
-                                    Miembros del Equipo
+                                    Miembros del equipo
                                 </h3>
                                 <p className="text-xs text-gray-600 hidden sm:block">
                                     {studentsWithRole.length} personas • Gestiona roles
@@ -626,7 +626,7 @@ export const ModalComposition = ({
                         <GitBranch className="w-4 h-4 sm:w-6 sm:h-6 text-white drop-shadow-sm" />
                     </div>
                     <div className="min-w-0 flex-1">
-                        <span className="text-base sm:text-xl font-bold text-gray-900 tracking-tight block truncate">Organigrama del Equipo</span>
+                        <span className="text-base sm:text-xl font-bold text-gray-900 dark:from-secundary tracking-tight block truncate">Organigrama del equipo</span>
                         <p className="text-gray-600 text-xs sm:text-sm mt-0.5 sm:mt-1 font-medium hidden sm:block">Estructura jerárquica y organización</p>
                     </div>
                 </div>
@@ -660,7 +660,7 @@ export const ModalComposition = ({
                             <div className="relative">
                                 <div className="text-xs sm:text-sm text-gray-500 font-medium mb-1 flex items-center justify-center space-x-1">
                                     <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                                    <span className="hidden sm:inline">Con Roles</span>
+                                    <span className="hidden sm:inline">Con roles</span>
                                     <span className="sm:hidden">Roles</span>
                                 </div>
                                 <div className="text-lg sm:text-2xl font-bold text-green-600 transition-transform duration-200 group-hover:scale-110">{teamStats.withRoles}</div>
@@ -674,7 +674,7 @@ export const ModalComposition = ({
                             <div className="relative">
                                 <div className="text-xs sm:text-sm text-gray-500 font-medium mb-1 flex items-center justify-center space-x-1">
                                     <XCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                                    <span className="hidden sm:inline">Sin Roles</span>
+                                    <span className="hidden sm:inline">Sin roles</span>
                                     <span className="sm:hidden">Sin</span>
                                 </div>
                                 <div className="text-lg sm:text-2xl font-bold text-red-600 transition-transform duration-200 group-hover:scale-110">{teamStats.withoutRoles}</div>
@@ -719,8 +719,8 @@ export const ModalComposition = ({
                                     <div className="min-w-0 flex-1">
                                         <span className="text-sm sm:text-base font-semibold text-gray-700 flex items-center space-x-1 sm:space-x-2 truncate">
                                             <Settings className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                                            <span className="truncate">Roles Disponibles</span>
-                                            <span className="hidden sm:inline">para Asignar</span>
+                                            <span className="truncate">Roles disponibles</span>
+                                            <span className="hidden sm:inline">para asignar</span>
                                         </span>
                                         <p className="text-xs text-gray-500 mt-0.5 sm:mt-1 hidden sm:block">Selecciona y asigna roles a los miembros</p>
                                     </div>
@@ -788,8 +788,8 @@ export const ModalComposition = ({
                                 <div className="min-w-0 flex-1">
                                     <h3 className="text-sm sm:text-lg font-bold text-gray-800 tracking-tight flex items-center space-x-1 sm:space-x-2 truncate">
                                         <BarChart3 className="w-3 h-3 sm:w-5 sm:h-5 flex-shrink-0" />
-                                        <span className="truncate">Roles Disponibles</span>
-                                        <span className="hidden sm:inline">para Asignar</span>
+                                        <span className="truncate">Roles disponibles</span>
+                                        <span className="hidden sm:inline">para asignar</span>
                                     </h3>
                                     <p className="text-xs sm:text-sm text-gray-600 font-medium hidden sm:block">Selecciona un rol y asígnalo a un miembro</p>
                                 </div>
@@ -823,8 +823,8 @@ export const ModalComposition = ({
                                                             <h4 className={`font-bold text-xs sm:text-sm ${profileColors.text} truncate tracking-tight`}>{profile.name}</h4>
                                                             {isUnique && (
                                                                 <span className={`text-xs px-1.5 py-0.5 rounded-full font-semibold flex-shrink-0 ${
-                                                                    isAssigned 
-                                                                        ? 'bg-red-100 text-red-700' 
+                                                                    isAssigned
+                                                                        ? 'bg-red-100 text-red-700'
                                                                         : 'bg-amber-100 text-amber-700'
                                                                 }`}>
                                                                     {isAssigned ? '✓ Asignado' : 'Único'}

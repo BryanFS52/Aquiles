@@ -28,7 +28,7 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
           <div className="w-10 h-10 bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue rounded-xl flex items-center justify-center">
             <Filter className="w-5 h-5 text-white" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Controles de Lista de Chequeo</h3>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Controles de lista de chequeo</h3>
         </div>
       }
       body={
@@ -39,14 +39,14 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
             <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 <span className="w-2 h-2 bg-[#5cb800] dark:bg-shadowBlue rounded-full"></span>
-                Trimestre (del Coordinador)
+                Trimestre (del coordinador)
               </label>
               <select
                 value={selectedTrimester}
                 onChange={(e) => onTrimesterChange(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200 focus:ring-2 focus:ring-[#5cb800] dark:focus:ring-shadowBlue focus:border-[#5cb800] dark:focus:border-shadowBlue hover:border-[#5cb800] dark:hover:border-shadowBlue"
               >
-                <option value="">Todos los Trimestres</option>
+                <option value="">Todos los trimestres</option>
                 {availableTrimester.map((trimester) => (
                   <option key={trimester} value={trimester}>
                     {trimester}
@@ -64,19 +64,19 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
             <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                 <span className="w-2 h-2 bg-[#538dda] dark:bg-blue-400 rounded-full"></span>
-                Lista de Chequeo
+                Lista de chequeo
               </label>
               <select
                 value={selectedChecklist?.id || ''}
                 onChange={(e) => onChecklistChange(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200 focus:ring-2 focus:ring-[#538dda] dark:focus:ring-blue-400 focus:border-[#538dda] dark:focus:border-blue-400 hover:border-[#538dda] dark:hover:border-blue-400"
               >
-                <option value="">Seleccionar Lista de Chequeo</option>
+                <option value="">Seleccionar lista de chequeo</option>
                 {filteredChecklists.map((checklist) => {
-                  const displayText = checklist.component || checklist.remarks || `Lista de Chequeo ${checklist.id}`;
+                  const displayText = checklist.component || checklist.remarks || `Lista de chequeo ${checklist.id}`;
                   // Limitar a 100 caracteres con puntos suspensivos si es más largo
-                  const truncatedText = displayText.length > 100 
-                    ? displayText.substring(0, 100) + '...' 
+                  const truncatedText = displayText.length > 100
+                    ? displayText.substring(0, 100) + '...'
                     : displayText;
                   return (
                     <option key={checklist.id} value={checklist.id}>
@@ -96,7 +96,7 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
               className="flex items-center gap-2 bg-gradient-to-r from-[#5cb800] to-[#6bc500] hover:from-[#4da600] hover:to-[#5cb800] disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
             >
               <FileText className="w-4 h-4" />
-              Vista Previa y Guardar
+              Vista previa y guardar
             </button>
             
             <button
@@ -123,7 +123,7 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
                 className="flex items-center gap-2 bg-gradient-to-r from-[#5cb800] to-[#6bc500] hover:from-[#4da600] hover:to-[#5cb800] text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <Edit3 className="w-4 h-4" />
-                Habilitar Modificación
+                Habilitar modificación
               </button>
             )}
           </div>
@@ -160,7 +160,7 @@ export const ChecklistControls: React.FC<ChecklistControlsPropsExtended> = ({
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-[#5cb800] dark:text-[#6bc500] uppercase tracking-wide mb-1">
-                    Criterios de Evaluación
+                    Criterios de evaluación
                   </p>
                   <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed break-words overflow-wrap-anywhere whitespace-pre-wrap">
                     {selectedChecklist.component || selectedChecklist.remarks}

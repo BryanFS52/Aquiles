@@ -29,7 +29,7 @@ export const mapStudentToApprentice = (student: Student): Apprentice => {
     id: student.id ?? undefined,
     name: student.person?.name ?? '',
     lastName: student.person?.lastname ?? '',
-    documentType: typeof student.person?.documentType === 'object' 
+    documentType: typeof student.person?.documentType === 'object'
       ? student.person?.documentType?.name ?? ''
       : student.person?.documentType ?? '',
     documentNumber: student.person?.document ?? '',

@@ -24,7 +24,7 @@ export const ChecklistTable: React.FC<ChecklistTableProps> = ({
         return (
           <div className="flex justify-center">
             <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold border ${
-              isTechnical 
+              isTechnical
                 ? 'bg-lime-50 dark:bg-lime-900/20 text-lime-700 dark:text-lime-300 border-lime-200 dark:border-lime-700'
                 : 'bg-lime-50 dark:bg-lime-900/20 text-lime-700 dark:text-lime-300 border-lime-200 dark:border-lime-700'
             }`}>
@@ -66,8 +66,8 @@ export const ChecklistTable: React.FC<ChecklistTableProps> = ({
                 }`}
               />
               <span className={`text-base font-medium ${
-                itemState.completed === true 
-                  ? 'text-blue-700 dark:text-blue-400' 
+                itemState.completed === true
+                  ? 'text-blue-700 dark:text-blue-400'
                   : 'text-gray-600 dark:text-gray-400'
               }`}>
                 Sí
@@ -88,8 +88,8 @@ export const ChecklistTable: React.FC<ChecklistTableProps> = ({
                 }`}
               />
               <span className={`text-base font-medium ${
-                itemState.completed === false 
-                  ? 'text-red-700 dark:text-red-400' 
+                itemState.completed === false
+                  ? 'text-red-700 dark:text-red-400'
                   : 'text-gray-600 dark:text-gray-400'
               }`}>
                 No
@@ -131,7 +131,7 @@ export const ChecklistTable: React.FC<ChecklistTableProps> = ({
         filterPlaceholder="Buscar en lista de chequeo..."
         className="border-0 shadow-xl"
         paginator={() => null} // Deshabilitar paginación interna del DataTable
-        filterFunction={(item, filter) => 
+        filterFunction={(item, filter) =>
           item.indicator?.toLowerCase().includes(filter.toLowerCase()) ||
           (itemStates[item.id]?.observations || '').toLowerCase().includes(filter.toLowerCase())
         }

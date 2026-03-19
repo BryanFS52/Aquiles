@@ -15,7 +15,7 @@ export const SignatureUpload: React.FC<SignatureUploadProps> = ({
     <div className="mt-12 relative">
       <div className="text-center mb-8">
         <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Firmas Digitales
+          Firmas digitales
         </h3>
         <p className="text-sm text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
           Sube las firmas digitales de los instructores. Las firmas se guardarán automáticamente en la base de datos al subirlas.
@@ -27,26 +27,26 @@ export const SignatureUpload: React.FC<SignatureUploadProps> = ({
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
           <div className="text-center mb-6">
             <h4 className="text-xl font-bold text-gray-900 dark:text-white">
-              Instructor Técnico Anterior
+              Instructor técnico anterior
             </h4>
           </div>
           
           <label className={`flex flex-col items-center p-8 border-2 border-dashed rounded-lg w-full transition-all duration-300 group ${
-            isFinalSaved 
-              ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 cursor-not-allowed opacity-60' 
+            isFinalSaved
+              ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 cursor-not-allowed opacity-60'
               : 'border-gray-300 dark:border-gray-600 cursor-pointer hover:border-[#5cb800] dark:hover:border-shadowBlue hover:bg-gray-50 dark:hover:bg-gray-700/30'
           }`}>
             <UploadCloud className={`w-16 h-16 transition-colors duration-300 mb-4 ${
-              isFinalSaved 
-                ? 'text-gray-300 dark:text-gray-600' 
+              isFinalSaved
+                ? 'text-gray-300 dark:text-gray-600'
                 : 'text-gray-400 group-hover:text-[#5cb800] dark:group-hover:text-shadowBlue'
             }`} />
             <span className={`font-medium text-lg text-center transition-colors duration-300 mb-2 ${
-              isFinalSaved 
-                ? 'text-gray-400 dark:text-gray-500' 
+              isFinalSaved
+                ? 'text-gray-400 dark:text-gray-500'
                 : 'text-gray-700 dark:text-gray-300 group-hover:text-[#5cb800] dark:group-hover:text-shadowBlue'
             }`}>
-              {isFinalSaved ? 'Lista Guardada Definitivamente' : 'Subir Firma Digital'}
+              {isFinalSaved ? 'Lista guardada definitivamente' : 'Subir firma digital'}
             </span>
             <span className="text-sm text-gray-500 dark:text-gray-400">
               {isFinalSaved ? 'Firmas bloqueadas' : 'Formatos: JPG, PNG, GIF'}
@@ -87,26 +87,26 @@ export const SignatureUpload: React.FC<SignatureUploadProps> = ({
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
           <div className="text-center mb-6">
             <h4 className="text-xl font-bold text-gray-900 dark:text-white">
-              Instructor Técnico Nuevo
+              Instructor técnico nuevo
             </h4>
           </div>
           
           <label className={`flex flex-col items-center p-8 border-2 border-dashed rounded-lg w-full transition-all duration-300 group ${
-            isFinalSaved 
-              ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 cursor-not-allowed opacity-60' 
+            isFinalSaved
+              ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 cursor-not-allowed opacity-60'
               : 'border-gray-300 dark:border-gray-600 cursor-pointer hover:border-[#5cb800] dark:hover:border-shadowBlue hover:bg-gray-50 dark:hover:bg-gray-700/30'
           }`}>
             <UploadCloud className={`w-16 h-16 transition-colors duration-300 mb-4 ${
-              isFinalSaved 
-                ? 'text-gray-300 dark:text-gray-600' 
+              isFinalSaved
+                ? 'text-gray-300 dark:text-gray-600'
                 : 'text-gray-400 group-hover:text-[#5cb800] dark:group-hover:text-shadowBlue'
             }`} />
             <span className={`font-medium text-lg text-center transition-colors duration-300 mb-2 ${
-              isFinalSaved 
-                ? 'text-gray-400 dark:text-gray-500' 
+              isFinalSaved
+                ? 'text-gray-400 dark:text-gray-500'
                 : 'text-gray-700 dark:text-gray-300 group-hover:text-[#5cb800] dark:group-hover:text-shadowBlue'
             }`}>
-              {isFinalSaved ? 'Lista Guardada Definitivamente' : 'Subir Firma Digital'}
+              {isFinalSaved ? 'Lista guardada definitivamente' : 'Subir firma digital'}
             </span>
             <span className="text-sm text-gray-500 dark:text-gray-400">
               {isFinalSaved ? 'Firmas bloqueadas' : 'Formatos: JPG, PNG, GIF'}

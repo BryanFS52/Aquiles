@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { MdInfo, MdDescription, MdFlag, MdReportProblem, MdFormatAlignJustify } from "react-icons/md";
-import { FaSave, FaTimes } from "react-icons/fa";
 import { TeamsScrum } from "@graphql/generated";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -128,7 +127,7 @@ const ModalTeamInformation: React.FC<ModalTeamInformationProps> = ({
 
         if (!team) return;
         if (!team.id) {
-            console.error("Team ID is missing");
+            console.error("Falta el ID del equipo");
             return;
         }
 
@@ -142,7 +141,7 @@ const ModalTeamInformation: React.FC<ModalTeamInformationProps> = ({
                 onClose();
             }
         } catch (error) {
-            console.error("Error saving team information:", error);
+            console.error("Error al guardar la información del equipo:", error);
         } finally {
             setLoading(false);
         }
@@ -160,14 +159,17 @@ const ModalTeamInformation: React.FC<ModalTeamInformationProps> = ({
         <Modal
             isOpen={isOpen}
             onClose={handleClose}
+            showHeaderAccent={false}
+            showCloseButton={false}
+            headerClassName="!bg-gradient-to-r !from-[#5cb800] !to-[#8fd400] dark:!from-secondary dark:!to-darkBlue !border-transparent rounded-t-3xl"
             title={
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-lime-600 to-green-600 dark:from-shadowBlue dark:to-darkBlue rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-white/20 dark:bg-white/15 rounded-full flex items-center justify-center border border-white/30">
                         <MdInfo className="text-xl text-white" />
                     </div>
                     <div>
-                        <span className="text-lg font-bold">Información del Equipo</span>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{team.teamName}</p>
+                        <span className="text-lg font-bold text-white">Información del equipo</span>
+                        <p className="text-sm text-white/85">{team.teamName}</p>
                     </div>
                 </div>
             }
@@ -178,8 +180,8 @@ const ModalTeamInformation: React.FC<ModalTeamInformationProps> = ({
                         {/* Description */}
                         <div>
                             <label className="flex items-center gap-2 text-sm font-semibold text-darkGray dark:text-lightGray mb-2">
-                                <MdDescription className="text-lime-600 dark:text-lime-400" />
-                                Descripción del Proyecto
+                                <MdDescription className="text-gray dark:text-white" />
+                                Descripción del proyecto
                             </label>
                             <textarea
                                 value={formData.description}
@@ -188,7 +190,7 @@ const ModalTeamInformation: React.FC<ModalTeamInformationProps> = ({
                                     ? "border-red-500 focus:ring-red-500"
                                     : "border-lightGray dark:border-gray-600"
                                     }`}
-                                placeholder="Describe detalladamente el proyecto del equipo..."
+                                placeholder="Describe detalladamente el proyecto del equipo"
                                 rows={4}
                             />
                             {errors.description && (
@@ -199,8 +201,8 @@ const ModalTeamInformation: React.FC<ModalTeamInformationProps> = ({
                         {/* Objectives */}
                         <div>
                             <label className="flex items-center gap-2 text-sm font-semibold text-darkGray dark:text-lightGray mb-2">
-                                <MdFlag className="text-lime-600 dark:text-lime-400" />
-                                Objetivos del Proyecto
+                                <MdFlag className="text-gray dark:text-white" />
+                                Objetivos del proyecto
                             </label>
                             <textarea
                                 value={formData.objectives}
@@ -220,8 +222,8 @@ const ModalTeamInformation: React.FC<ModalTeamInformationProps> = ({
                         {/* Problem */}
                         <div>
                             <label className="flex items-center gap-2 text-sm font-semibold text-darkGray dark:text-lightGray mb-2">
-                                <MdReportProblem className="text-lime-600 dark:text-lime-400" />
-                                Problema a Resolver
+                                <MdReportProblem className="text-gray dark:text-white" />
+                                Problema a resolver
                             </label>
                             <textarea
                                 value={formData.problem}
@@ -230,7 +232,7 @@ const ModalTeamInformation: React.FC<ModalTeamInformationProps> = ({
                                     ? "border-red-500 focus:ring-red-500"
                                     : "border-lightGray dark:border-gray-600"
                                     }`}
-                                placeholder="Describe el problema específico que el proyecto busca solucionar..."
+                                placeholder="Describe el problema específico que el proyecto busca solucionar"
                                 rows={4}
                             />
                             {errors.problem && (
@@ -241,8 +243,8 @@ const ModalTeamInformation: React.FC<ModalTeamInformationProps> = ({
                         {/* Project Justification */}
                         <div>
                             <label className="flex items-center gap-2 text-sm font-semibold text-darkGray dark:text-lightGray mb-2">
-                                <MdFormatAlignJustify className="text-lime-600 dark:text-lime-400" />
-                                Justificación del Proyecto
+                                <MdFormatAlignJustify className="text-gray dark:text-white" />
+                                Justificación del proyecto
                             </label>
                             <textarea
                                 value={formData.projectJustification}
@@ -251,7 +253,7 @@ const ModalTeamInformation: React.FC<ModalTeamInformationProps> = ({
                                     ? "border-red-500 focus:ring-red-500"
                                     : "border-lightGray dark:border-gray-600"
                                     }`}
-                                placeholder="Explica por qué es importante desarrollar este proyecto..."
+                                placeholder="Explica por qué es importante desarrollar este proyecto"
                                 rows={4}
                             />
                             {errors.projectJustification && (
@@ -266,23 +268,21 @@ const ModalTeamInformation: React.FC<ModalTeamInformationProps> = ({
                                 onClick={handleClose}
                                 className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300"
                             >
-                                <FaTimes className="text-sm" />
                                 Cancelar
                             </button>
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="flex items-center gap-2 px-6 py-3 text-white bg-gradient-to-r from-lime-600 to-green-600 hover:from-lime-700 hover:to-green-700 dark:from-shadowBlue dark:to-darkBlue dark:hover:from-darkBlue dark:hover:to-shadowBlue rounded-xl hover:-translate-y-0.5 transition-all duration-300 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                                className="flex items-center gap-2 px-6 py-3 text-white bg-gradient-to-r from-[#5cb800] to-[#8fd400] hover:from-lime-700 hover:to-green-700 dark:from-shadowBlue dark:to-darkBlue dark:hover:from-darkBlue dark:hover:to-shadowBlue rounded-xl hover:-translate-y-0.5 transition-all duration-300 transform disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                             >
                                 {loading ? (
                                     <>
                                         <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                                        Guardando...
+                                        Guardando
                                     </>
                                 ) : (
                                     <>
-                                        <FaSave className="text-sm" />
-                                        Guardar Información
+                                        Guardar información
                                     </>
                                 )}
                             </button>

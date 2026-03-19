@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useLoader } from '@context/LoaderContext';
-import { MdAddCircle, MdGroup } from 'react-icons/md';
+import { MdGroup } from 'react-icons/md';
 import { TeamCard } from './TeamCard';
 import { TeamDeleteConfirmation } from './TeamDeleteConfirmation';
 import { ModalComposition } from '@/components/features/teamScrum/modalComposition';
@@ -56,7 +56,7 @@ export const TeamScrumContainer: React.FC<TeamScrumContainerProps> = ({ studyShe
         return (
             <div className="p-6">
                 <PageTitle>
-                    Teams Scrum de la Ficha {studySheet ? `N° ${studySheet.number}` : ""}
+                    Teams scrum de la ficha {studySheet ? `N° ${studySheet.number}` : ""}
                 </PageTitle>
 
                 <div className="bg-white dark:bg-shadowBlue rounded-xl p-12 text-center border border-lightGray dark:border-grayText">
@@ -64,7 +64,7 @@ export const TeamScrumContainer: React.FC<TeamScrumContainerProps> = ({ studyShe
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                     </div>
                     <h3 className="text-xl font-semibold text-darkGray dark:text-white mb-2">
-                        Cargando información de la ficha...
+                        Cargando información de la ficha
                     </h3>
                     <p className="text-grayText dark:text-white">
                         Por favor espera mientras obtenemos los datos.
@@ -78,7 +78,7 @@ export const TeamScrumContainer: React.FC<TeamScrumContainerProps> = ({ studyShe
     return (
         <div className="p-6">
             <PageTitle onBack={() => router.back()}>
-                Teams Scrum de la Ficha {studySheet ? `N° ${studySheet.number}` : ""}
+                Teams scrum de la ficha {studySheet ? `N° ${studySheet.number}` : ""}
             </PageTitle>
 
             {/* Modales */}
@@ -112,19 +112,18 @@ export const TeamScrumContainer: React.FC<TeamScrumContainerProps> = ({ studyShe
 
             <div className="mt-8">
                 {/* Botón para crear nuevo equipo */}
-                <div className="mb-6">
+                <div className="mb-6 flex justify-end">
                     <button
                         onClick={modalHandlers.onOpenModal}
-                        className="px-6 py-3 text-white bg-gradient-to-r from-primary to-lightGreen hover:from-primary/90 hover:to-lightGreen/90 dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90 rounded-lg font-medium transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50 inline-flex items-center gap-2"
+                        className="px-6 py-3 text-white bg-gradient-to-r from-[#5cb800] to-[#8fd400] hover:from-[#5cb800]/90 hover:to-[#8fd400]/90 dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90 rounded-lg font-medium transition-all duration-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#5cb800]/50 inline-flex items-center"
                     >
-                        <MdAddCircle className="w-5 h-5" />
-                        Crear Nuevo Equipo
+                        Crear nuevo equipo
                     </button>
                 </div>
 
                 {teams.length === 0 ? (
                     <EmptyState
-                        message="No hay Teams Scrum disponibles para esta ficha"
+                        message="No hay teams scrum disponibles para esta ficha"
                         icon="/img/LogoAquilesWhite.png"
                     />
                 ) : (

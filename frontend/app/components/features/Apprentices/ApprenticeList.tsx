@@ -19,7 +19,7 @@ const ApprenticeList = ({ apprentices }: ApprenticeListProps) => {
 
   return (
     <div className="bg-white dark:bg-shadowBlue p-4 sm:p-6 rounded-xl shadow-md border border-lightGray dark:border-grayText">
-      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-primary dark:text-secondary">Lista de Aprendices</h2>
+      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-primary dark:text-secondary">Lista de aprendices</h2>
       
       <input
         type="text"

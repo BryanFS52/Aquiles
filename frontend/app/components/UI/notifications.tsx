@@ -59,11 +59,11 @@ export const Notifications: React.FC<NotificationsProps> & { unreadCount: number
   };
 
   return (
-    <div className="fixed top-16 right-2 sm:absolute sm:right-0 sm:top-full mt-2 w-[calc(100vw-1rem)] max-w-72 sm:w-96 sm:max-w-none bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-      <div className="flex justify-between items-center p-3 sm:p-4 border-b border-gray-100">
-        <span className="text-[#00324d] font-inter font-bold text-sm sm:text-base">Notifications</span>
+    <div className="w-[calc(100vw-1rem)] max-w-72 sm:w-96 sm:max-w-none bg-white dark:bg-shadowBlue border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-[9999]">
+      <div className="flex justify-between items-center p-3 sm:p-4 border-b border-gray-100 dark:border-gray-600">
+        <span className="text-[#00324d] dark:text-white font-inter font-bold text-sm sm:text-base">Notifications</span>
         <button
-          className="text-[#00324d] hover:text-[#40b003] text-xs sm:text-sm font-inter transition-colors duration-200 px-2 py-1 rounded hover:bg-gray-50"
+          className="text-[#00324d] dark:text-gray-300 hover:text-[#40b003] dark:hover:text-lightGreen text-xs sm:text-sm font-inter transition-colors duration-200 px-2 py-1 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
           onClick={markAllAsRead}
         >
           <span className="hidden sm:inline">Marcar todo como leído</span>
@@ -75,14 +75,14 @@ export const Notifications: React.FC<NotificationsProps> & { unreadCount: number
           <li
             key={`${notification.id}-${index}`}
             className={`flex items-start p-2 sm:p-3 rounded-lg cursor-pointer transition-colors duration-200 mb-2 last:mb-0 ${notification.unread
-              ? 'bg-blue-50 hover:bg-blue-100'
-              : 'hover:bg-gray-50'
+              ? 'bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-800/40'
+              : 'hover:bg-gray-50 dark:hover:bg-gray-700'
               }`}
             onClick={() => handleNotificationClick(notification.id)}
           >
-            <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden flex items-center justify-center bg-[#e6f2ff] flex-shrink-0">
+            <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden flex items-center justify-center bg-[#e6f2ff] dark:bg-blue-900/40 flex-shrink-0">
               {notification.isSystem ? (
-                <BellRing className="w-4 h-4 sm:w-6 sm:h-6 text-[#00324d]" />
+                <BellRing className="w-4 h-4 sm:w-6 sm:h-6 text-[#00324d] dark:text-blue-300" />
               ) : (
                 <Image
                   src={notification.avatar || ''}
@@ -96,18 +96,18 @@ export const Notifications: React.FC<NotificationsProps> & { unreadCount: number
                 />
               )}
               {notification.unread && (
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#40b003] rounded-full border-2 border-white"></div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#40b003] rounded-full border-2 border-white dark:border-shadowBlue"></div>
               )}
             </div>
             <div className="ml-3 sm:ml-4 flex-1 min-w-0">
-              <p className="text-[#00324d] text-sm sm:text-base leading-relaxed">
-                <strong className="hover:text-[#40b003] transition-colors duration-200">{notification.user}</strong>{' '}
+              <p className="text-[#00324d] dark:text-gray-200 text-sm sm:text-base leading-relaxed">
+                <strong className="hover:text-[#40b003] dark:hover:text-lightGreen transition-colors duration-200">{notification.user}</strong>{' '}
                 <span className="break-words">{notification.action}</span>{' '}
                 {notification.content && (
-                  <strong className="text-[#40b003] break-words">{notification.content}</strong>
+                  <strong className="text-[#40b003] dark:text-lightGreen break-words">{notification.content}</strong>
                 )}
               </p>
-              <p className="text-gray-500 text-xs sm:text-sm mt-1">{notification.time}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mt-1">{notification.time}</p>
             </div>
           </li>
         ))}
