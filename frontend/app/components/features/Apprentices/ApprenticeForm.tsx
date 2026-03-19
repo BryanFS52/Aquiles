@@ -6,6 +6,10 @@ import { addStudent, fetchStudentList } from '@slice/olympo/studentSlice'
 import { NewApprentice, Apprentice } from '@/components/features/Apprentices/aprendices'
 import { toast } from 'react-toastify'
 
+// ===== Toggle rápido =====
+const USE_SERVICE = false // Modo local (sin servicio)
+// const USE_SERVICE = true // Modo servicio (backend)
+
 interface ApprenticeFormProps {
   onApprenticeCreated?: (newApprentice: Apprentice) => void
 }
@@ -33,6 +37,36 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
     setIsSubmitting(true)
 
     try {
+      // ===== MODO LOCAL =====
+      // Este bloque NO borra la lógica del servicio.
+      // Solo corta aquí cuando USE_SERVICE = false.
+      if (!USE_SERVICE) {
+        const createdApprentice: Apprentice = {
+          id: String(Date.now()),
+          ...newApprentice,
+        }
+
+        if (onApprenticeCreated) {
+          onApprenticeCreated(createdApprentice)
+        }
+        
+        toast.success('Aprendiz creado correctamente.')
+
+        setNewApprentice({
+          name: '',
+          lastName: '',
+          documentType: '',
+          documentNumber: '',
+          program: '',
+          email: '',
+          teamNumber: '',
+        })
+
+        return
+      }
+
+      // ===== MODO SERVICIO =====
+      // Se ejecuta cuando USE_SERVICE = true.
       const result = await dispatch(addStudent(newApprentice as any)).unwrap()
 
       if (result && result.code === '200') {
@@ -71,7 +105,7 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
 
   return (
     <div className="bg-white dark:bg-shadowBlue p-4 sm:p-6 rounded-xl shadow-md border border-lightGray dark:border-grayText">
-      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-primary dark:text-secondary">Crear Nuevo Aprendiz</h2>
+      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-primary dark:text-secondary">Crear nuevo aprendiz</h2>
       <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div className="space-y-1.5 sm:space-y-2">
@@ -100,7 +134,7 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div className="space-y-1.5 sm:space-y-2">
-            <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="documentType">Tipo de Documento</label>
+            <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="documentType">Tipo de documento</label>
             <select
               className="input px-3 sm:px-4 py-2 border border-lightGray dark:border-grayText rounded-lg w-full text-sm sm:text-base bg-white dark:bg-shadowBlue text-grayText dark:text-white focus:border-primary dark:focus:border-secondary focus:ring-2 focus:ring-primary/20 dark:focus:ring-secondary/20 transition-all"
               id='documentType'
@@ -110,13 +144,13 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
               required
             >
               <option value="">Seleccionar</option>
-              <option value="CC">Cédula de Ciudadanía</option>
-              <option value="TI">Tarjeta de Identidad</option>
-              <option value="CE">Cédula de Extranjería</option>
+              <option value="CC">Cédula de ciudadanía</option>
+              <option value="TI">Tarjeta de identidad</option>
+              <option value="CE">Cédula de extranjería</option>
             </select>
           </div>
           <div className="space-y-1.5 sm:space-y-2">
-            <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="documentNumber">Número de Documento</label>
+            <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="documentNumber">Número de documento</label>
             <input
               className="input px-3 sm:px-4 py-2 border border-lightGray dark:border-grayText rounded-lg w-full text-sm sm:text-base bg-white dark:bg-shadowBlue text-grayText dark:text-white focus:border-primary dark:focus:border-secondary focus:ring-2 focus:ring-primary/20 dark:focus:ring-secondary/20 transition-all"
               id="documentNumber"
@@ -141,7 +175,7 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
         </div>
 
         <div className="space-y-1.5 sm:space-y-2">
-          <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="email">Correo Institucional</label>
+          <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="email">Correo institucional</label>
           <input
             className="input px-3 sm:px-4 py-2 border border-lightGray dark:border-grayText rounded-lg w-full text-sm sm:text-base bg-white dark:bg-shadowBlue text-grayText dark:text-white focus:border-primary dark:focus:border-secondary focus:ring-2 focus:ring-primary/20 dark:focus:ring-secondary/20 transition-all"
             type="email"
@@ -154,7 +188,7 @@ const ApprenticeForm = ({ onApprenticeCreated }: ApprenticeFormProps) => {
         </div>
 
         <div className="space-y-1.5 sm:space-y-2">
-          <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="teamNumber">Número del Team</label>
+          <label className="block text-xs sm:text-sm font-medium text-grayText dark:text-white" htmlFor="teamNumber">Número del team</label>
           <input
             className="input px-3 sm:px-4 py-2 border border-lightGray dark:border-grayText rounded-lg w-full text-sm sm:text-base bg-white dark:bg-shadowBlue text-grayText dark:text-white focus:border-primary dark:focus:border-secondary focus:ring-2 focus:ring-primary/20 dark:focus:ring-secondary/20 transition-all"
             id="teamNumber"

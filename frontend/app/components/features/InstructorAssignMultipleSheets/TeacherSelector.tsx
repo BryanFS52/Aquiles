@@ -10,9 +10,9 @@ interface TeacherSelectorProps {
     onSelect: (teacherId: number | null) => void;
 }
 
-export const TeacherSelector: React.FC<TeacherSelectorProps> = ({ 
-    teachers, 
-    selectedTeacherId, 
+export const TeacherSelector: React.FC<TeacherSelectorProps> = ({
+    teachers,
+    selectedTeacherId,
     onSelect
 }) => {
     return (
@@ -36,24 +36,24 @@ export const TeacherSelector: React.FC<TeacherSelectorProps> = ({
                         }}
                         className={`w-full p-4 rounded-xl border-2 transition-all duration-200 text-left ${
                             isSelected
-                                ? 'border-primary bg-primary/10 shadow-md'
-                                : 'border-gray-200 hover:border-primary/50 hover:bg-gray-50'
+                                ? 'border-primary bg-primary/10 dark:bg-primary/20 shadow-md'
+                                : 'border-gray-200 dark:border-gray-600 hover:border-primary/50 hover:bg-gray-50 dark:hover:bg-gray-700'
                         }`}
                     >
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
                                 <div className={`p-2 rounded-lg ${
-                                    isSelected ? 'bg-primary text-white' : 'bg-gray-100 text-darkGray'
+                                    isSelected ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-gray-700 text-darkGray dark:text-gray-300'
                                 }`}>
                                     <FaUser className="text-lg" />
                                 </div>
                                 <div>
                                     <p className={`font-semibold ${
-                                        isSelected ? 'text-primary' : 'text-secondary'
+                                        isSelected ? 'text-primary' : 'text-secondary dark:text-white'
                                     }`}>
                                         {fullName}
                                     </p>
-                                    <p className="text-sm text-darkGray flex items-center space-x-1">
+                                    <p className="text-sm text-darkGray dark:text-gray-400 flex items-center space-x-1">
                                         <FaIdCard className="text-xs" />
                                         <span>{personDocument}</span>
                                     </p>

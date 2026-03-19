@@ -21,7 +21,7 @@ const TeamMembers: React.FC<TeamMembersProps> = ({ students }) => {
                 </div>
                 <div>
                     <h3 className="text-2xl font-bold text-black dark:text-white">
-                        Miembros del Team
+                        Miembros del team
                     </h3>
                     <p className="text-sm text-grayText dark:text-gray-400">
                         Integrantes activos del equipo

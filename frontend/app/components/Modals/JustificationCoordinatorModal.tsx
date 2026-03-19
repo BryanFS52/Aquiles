@@ -20,6 +20,7 @@ interface JustificationCoordinatorModalProps {
   isOpen: boolean;
   onClose: () => void;
   fichaData: FichaData;
+  statusFilter?: "all" | "Aprobada" | "Pendiente" | "Rechazada";
 }
 
 // Datos quemados de justificaciones
@@ -292,12 +293,215 @@ const justificationsData: Record<string, any[]> = {
       motivo: "Daño en tubería del hogar, adjunta factura del plomero",
     },
   ],
+  "5": [
+    {
+      id: "j27",
+      aprendiz: "Camilo Andrés Vega",
+      documento: "4041424344",
+      fechaAusencia: "2025-10-15",
+      fechaJustificacion: "2025-10-16",
+      tipo: "Cita Médica",
+      estado: "Aprobada",
+      motivo: "Consulta cardiológica programada con especialista",
+    },
+    {
+      id: "j28",
+      aprendiz: "María José Quintero",
+      documento: "4546474849",
+      fechaAusencia: "2025-10-12",
+      fechaJustificacion: "2025-10-13",
+      tipo: "Enfermedad",
+      estado: "Pendiente",
+      motivo: "Síntomas virales, esperando resultado de exámenes",
+    },
+    {
+      id: "j29",
+      aprendiz: "Nicolás Herrera Ruiz",
+      documento: "5051525354",
+      fechaAusencia: "2025-10-08",
+      fechaJustificacion: "2025-10-10",
+      tipo: "Asunto Personal",
+      estado: "Rechazada",
+      motivo: "Justificación tardía y sin documentación de soporte",
+    },
+    {
+      id: "j30",
+      aprendiz: "Paola Andrea Jiménez",
+      documento: "5556575859",
+      fechaAusencia: "2025-10-05",
+      fechaJustificacion: "2025-10-06",
+      tipo: "Calamidad Doméstica",
+      estado: "Aprobada",
+      motivo: "Robo en la vivienda, diligencias con la policía",
+    },
+  ],
+  "6": [
+    {
+      id: "j31",
+      aprendiz: "Roberto Carlos Medina",
+      documento: "6061626364",
+      fechaAusencia: "2025-10-20",
+      fechaJustificacion: "2025-10-21",
+      tipo: "Problemas de Transporte",
+      estado: "Aprobada",
+      motivo: "Accidente de tránsito que bloqueó la vía principal",
+    },
+    {
+      id: "j32",
+      aprendiz: "Diana Lorena Sánchez",
+      documento: "6566676869",
+      fechaAusencia: "2025-10-18",
+      fechaJustificacion: "2025-10-19",
+      tipo: "Cita Médica",
+      estado: "Pendiente",
+      motivo: "Control dermatológico por condición crónica",
+    },
+    {
+      id: "j33",
+      aprendiz: "Fernando Javier Ospina",
+      documento: "7071727374",
+      fechaAusencia: "2025-10-14",
+      fechaJustificacion: "2025-10-15",
+      tipo: "Asunto Familiar",
+      estado: "Aprobada",
+      motivo: "Funeral de familiar cercano, adjunta esquela",
+    },
+  ],
+  "7": [
+    {
+      id: "j34",
+      aprendiz: "Andrea Carolina Paz",
+      documento: "7576777879",
+      fechaAusencia: "2025-10-22",
+      fechaJustificacion: "2025-10-23",
+      tipo: "Enfermedad",
+      estado: "Aprobada",
+      motivo: "Infección estomacal aguda, incapacidad médica",
+    },
+    {
+      id: "j35",
+      aprendiz: "Manuel Eduardo Restrepo",
+      documento: "8081828384",
+      fechaAusencia: "2025-10-17",
+      fechaJustificacion: "2025-10-18",
+      tipo: "Asunto Personal",
+      estado: "Pendiente",
+      motivo: "Diligencias bancarias urgentes por fraude",
+    },
+    {
+      id: "j36",
+      aprendiz: "Claudia Patricia Álvarez",
+      documento: "8586878889",
+      fechaAusencia: "2025-10-11",
+      fechaJustificacion: "2025-10-12",
+      tipo: "Cita Médica",
+      estado: "Rechazada",
+      motivo: "Cita médica no prioritaria que pudo reagendarse",
+    },
+  ],
+  "8": [
+    {
+      id: "j37",
+      aprendiz: "Jorge Luis Vargas",
+      documento: "9091929394",
+      fechaAusencia: "2025-10-19",
+      fechaJustificacion: "2025-10-20",
+      tipo: "Problemas de Transporte",
+      estado: "Aprobada",
+      motivo: "Paro de transportadores en la región",
+    },
+    {
+      id: "j38",
+      aprendiz: "Liliana Marcela Torres",
+      documento: "9596979899",
+      fechaAusencia: "2025-10-13",
+      fechaJustificacion: "2025-10-14",
+      tipo: "Calamidad Doméstica",
+      estado: "Pendiente",
+      motivo: "Incendio en el sector, evacuación preventiva",
+    },
+  ],
+  "9": [
+    {
+      id: "j39",
+      aprendiz: "Andrés Mauricio León",
+      documento: "1001011121",
+      fechaAusencia: "2025-10-16",
+      fechaJustificacion: "2025-10-17",
+      tipo: "Asunto Familiar",
+      estado: "Aprobada",
+      motivo: "Nacimiento de hijo, acompañamiento en hospital",
+    },
+    {
+      id: "j40",
+      aprendiz: "Patricia Elena Rosales",
+      documento: "1314151617",
+      fechaAusencia: "2025-10-09",
+      fechaJustificacion: "2025-10-10",
+      tipo: "Enfermedad",
+      estado: "Pendiente",
+      motivo: "Dolor de cabeza intenso, esperando cita neurológica",
+    },
+    {
+      id: "j41",
+      aprendiz: "Carlos Alberto Duarte",
+      documento: "1819202122",
+      fechaAusencia: "2025-10-04",
+      fechaJustificacion: "2025-10-05",
+      tipo: "Cita Médica",
+      estado: "Rechazada",
+      motivo: "Cita de control que pudo programarse en horario libre",
+    },
+  ],
+  "10": [
+    {
+      id: "j42",
+      aprendiz: "Gloria Esperanza Muñoz",
+      documento: "2324252627",
+      fechaAusencia: "2025-10-21",
+      fechaJustificacion: "2025-10-22",
+      tipo: "Problemas de Transporte",
+      estado: "Aprobada",
+      motivo: "Daño en puente vehicular, vía cerrada por reparaciones",
+    },
+    {
+      id: "j43",
+      aprendiz: "Héctor Fabián Cárdenas",
+      documento: "2829303132",
+      fechaAusencia: "2025-10-14",
+      fechaJustificacion: "2025-10-15",
+      tipo: "Asunto Personal",
+      estado: "Pendiente",
+      motivo: "Trámites legales por divorcio, cita con abogado",
+    },
+    {
+      id: "j44",
+      aprendiz: "Sandra Milena Gaitán",
+      documento: "3334353637",
+      fechaAusencia: "2025-10-07",
+      fechaJustificacion: "2025-10-08",
+      tipo: "Calamidad Doméstica",
+      estado: "Aprobada",
+      motivo: "Daño eléctrico en la vivienda, gestión con empresa de energía",
+    },
+    {
+      id: "j45",
+      aprendiz: "Oscar Reinaldo Bermúdez",
+      documento: "3839404142",
+      fechaAusencia: "2025-10-01",
+      fechaJustificacion: "2025-10-02",
+      tipo: "Enfermedad",
+      estado: "Aprobada",
+      motivo: "Intoxicación alimentaria, certificado médico adjunto",
+    },
+  ],
 };
 
 const JustificationCoordinatorModal: React.FC<JustificationCoordinatorModalProps> = ({
   isOpen,
   onClose,
   fichaData,
+  statusFilter = "all",
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -305,11 +509,16 @@ const JustificationCoordinatorModal: React.FC<JustificationCoordinatorModalProps
 
   const allJustifications = justificationsData[fichaData.id] || [];
   
+  // Filtrar justificaciones por estado
+  const filteredJustifications = statusFilter === "all"
+    ? allJustifications
+    : allJustifications.filter(j => j.estado === statusFilter);
+  
   // Calcular paginación
-  const totalPages = Math.ceil(allJustifications.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredJustifications.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentJustifications = allJustifications.slice(startIndex, endIndex);
+  const currentJustifications = filteredJustifications.slice(startIndex, endIndex);
 
   // Detectar modo oscuro
   useEffect(() => {
@@ -328,10 +537,10 @@ const JustificationCoordinatorModal: React.FC<JustificationCoordinatorModalProps
     return () => observer.disconnect();
   }, []);
 
-  // Resetear página al cambiar de ficha
+  // Resetear página al cambiar de ficha o filtro
   useEffect(() => {
     setCurrentPage(1);
-  }, [fichaData.id]);
+  }, [fichaData.id, statusFilter]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -393,9 +602,16 @@ const JustificationCoordinatorModal: React.FC<JustificationCoordinatorModalProps
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-                Justificaciones Enviadas
+                {statusFilter === "all"
+                  ? "Justificaciones enviadas"
+                  : `Justificaciones ${statusFilter}s`}
               </h3>
-              <span className="font-bold text-blue-500">{allJustifications.length}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-blue-500">{filteredJustifications.length}</span>
+                {statusFilter !== "all" && (
+                  <span className="text-sm text-gray-500 dark:text-gray-400">de {allJustifications.length} total</span>
+                )}
+              </div>
             </div>
             <JustificationList justifications={currentJustifications} />
           </div>

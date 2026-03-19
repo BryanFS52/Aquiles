@@ -80,7 +80,7 @@ export const InstructorChecklistContainer: React.FC = () => {
         try {
           await dispatch(fetchTeamScrumById({ id: teamScrumId }));
         } catch (error) {
-          toast.error("Error al cargar el Team Scrum seleccionado");
+          toast.error("Error al cargar el team scrum seleccionado");
         }
       }
     };
@@ -602,10 +602,10 @@ export const InstructorChecklistContainer: React.FC = () => {
             d="M10 19l-7-7m0 0l7-7m-7 7h18"
           />
         </svg>
-        <span className="font-medium">Volver a Fichas</span>
+        <span className="font-medium">Volver a fichas</span>
       </button>
 
-      <PageTitle>Lista de Chequeo - Instructor</PageTitle>
+      <PageTitle>Lista de chequeo - instructor</PageTitle>
 
       {/* Tarjetas de información */}
       <InformationCards

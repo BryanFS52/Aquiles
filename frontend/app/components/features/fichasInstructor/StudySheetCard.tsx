@@ -18,7 +18,7 @@ export const StudySheetCard: React.FC<StudySheetCardProps> = ({
             {/* Sección de Aprendices */}
             <div className="flex flex-col items-center">
                 <div
-                    className="bg-gradient-to-r from-primary to-lime-500 dark:from-shadowBlue dark:to-darkBlue rounded-2xl h-20 w-20 flex items-center justify-center border-4 border-black/50 dark:border-white shadow-lg hover:scale-105 cursor-pointer transition"
+                    className="bg-gradient-to-r from-primary to-lime-500 dark:from-shadowBlue dark:to-darkBlue rounded-2xl h-20 w-20 flex items-center justify-center border-4 border-black/10 dark:border-white/30 shadow-lg hover:scale-105 cursor-pointer transition"
                     onClick={() => onViewApprentices(studySheet)}
                     role="button"
                     tabIndex={0}
@@ -35,11 +35,11 @@ export const StudySheetCard: React.FC<StudySheetCardProps> = ({
 
             {/* Información de la Ficha */}
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 text-center md:text-left">
-                <FichaInfo label="Número de Ficha" value={studySheet.number?.toString()} />
+                <FichaInfo label="Número de ficha" value={studySheet.number?.toString()} />
                 <FichaInfo label="Jornada" value={studySheet.journey?.name} />
                 <FichaInfo label="Programa" value={studySheet.trainingProject?.program?.name} />
-                <FichaInfo label="Inicio Etapa Lectiva" value={studySheet.startLective} />
-                <FichaInfo label="Fin Etapa Lectiva" value={studySheet.endLective} />
+                <FichaInfo label="Inicio etapa lectiva" value={studySheet.startLective} />
+                <FichaInfo label="Fin etapa lectiva" value={studySheet.endLective} />
                 <FichaInfo label="Estado" value={studySheet.state ? 'Activo' : 'Inactivo'} />
             </div>
 
@@ -85,7 +85,7 @@ export const StudySheetCard: React.FC<StudySheetCardProps> = ({
                         )}
                     </svg>
                     <span className="relative">
-                        {loading ? 'Procesando...' : 'Ver Justificaciones'}
+                        {loading ? 'Procesando' : 'Ver justificaciones'}
                     </span>
                     <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </button>
@@ -107,7 +107,7 @@ export const StudySheetCard: React.FC<StudySheetCardProps> = ({
                         )}
                     </svg>
                     <span className="relative">
-                        {loading ? 'Procesando...' : 'Seguimiento'}
+                        {loading ? 'Procesando' : 'Seguimiento'}
                     </span>
                     <div className="absolute inset-0 bg-white/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </button>

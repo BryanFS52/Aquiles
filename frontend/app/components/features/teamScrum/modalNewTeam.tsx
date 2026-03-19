@@ -8,6 +8,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { useMemo } from "react";
 import Modal from "@components/UI/Modal";
+import { getMockStudentsByStudySheet, USE_TEAM_SCRUM_MOCK } from "./mockData";
+import { toast } from "react-toastify";
+
+// [MOCK-TEMP]
+// Este modal mantiene la lógica original y agrega fuente de estudiantes mock temporal.
 interface StudentOption {
   value: string;
   label: string;
@@ -59,7 +64,18 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
   const rawStudents = useSelector((state: RootState) => state.studySheet.dataForStudents);
 
   const studentsForThisSheet = useMemo(
-    () => (rawStudents?.[String(studySheetId)] ?? []) as any[],
+    () => {
+      // [BACKEND ORIGINAL - REFERENCIA]
+      // return (rawStudents?.[String(studySheetId)] ?? []) as any[];
+
+      // [MOCK-TEMP START]
+      if (USE_TEAM_SCRUM_MOCK) {
+        return getMockStudentsByStudySheet(studySheetId).map((student) => ({ student }));
+      }
+
+      return (rawStudents?.[String(studySheetId)] ?? []) as any[];
+      // [MOCK-TEMP END]
+    },
     [rawStudents, studySheetId]
   );
 
@@ -79,25 +95,36 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
 
   // Traer estudiantes al montar el modal
   useEffect(() => {
-    if (studySheetId) {
+    // [BACKEND ORIGINAL]
+    // if (studySheetId) {
+    //   dispatch(fetchStudySheetWithStudents({ id: studySheetId }));
+    // }
+
+    // [MOCK-TEMP] Evita llamada al backend en modo mock.
+    if (!USE_TEAM_SCRUM_MOCK && studySheetId) {
       dispatch(fetchStudySheetWithStudents({ id: studySheetId }));
     }
   }, [dispatch, studySheetId]);
 
-  // Estilos para Select
+  // Estilos para Select con soporte para modo oscuro
   const selectStyles = {
-    control: (provided: any, state: any) => ({
-      ...provided,
-      borderColor: errors.members ? '#ef4444' : state.isFocused ? '#3b82f6' : '#d1d5db',
-      borderWidth: '2px',
-      boxShadow: state.isFocused ? '0 0 0 2px #3b82f650, 0 0 0 4px #3b82f620' : 'none',
-      '&:hover': {
-        borderColor: state.isFocused ? '#3b82f6' : '#9ca3af'
-      },
-      minHeight: '44px',
-      borderRadius: '6px',
-      margin: '2px' // Agregar margen para evitar que se corte el ring
-    }),
+    control: (provided: any, state: any) => {
+      const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+      return {
+        ...provided,
+        borderColor: state.isFocused ? '#3b82f6' : isDark ? '#374151' : '#d1d5db',
+        borderWidth: '2px',
+        boxShadow: state.isFocused ? '0 0 0 2px #3b82f650, 0 0 0 4px #3b82f620' : 'none',
+        backgroundColor: isDark ? '#1a2332' : '#ffffff',
+        color: isDark ? '#ffffff' : '#111827',
+        '&:hover': {
+          borderColor: state.isFocused ? '#3b82f6' : isDark ? '#4b5563' : '#9ca3af'
+        },
+        minHeight: '44px',
+        borderRadius: '6px',
+        margin: '2px'
+      };
+    },
     multiValue: (provided: any) => ({
       ...provided,
       backgroundColor: '#dbeafe',
@@ -123,21 +150,40 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
       color: '#9ca3af',
       fontSize: '14px'
     }),
-    option: (provided: any, state: any) => ({
+    option: (provided: any, state: any) => {
+      const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+      return {
+        ...provided,
+        backgroundColor: state.isSelected
+          ? '#3b82f6'
+          : state.isFocused
+            ? isDark ? '#374151' : '#dbeafe'
+            : isDark ? '#1a2332' : '#ffffff',
+        color: state.isSelected ? 'white' : isDark ? '#e5e7eb' : '#374151',
+        ':active': {
+          backgroundColor: '#3b82f6'
+        }
+      };
+    },
+    menuPortal: (provided: any) => {
+      const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+      return {
+        ...provided,
+        zIndex: 9999,
+        backgroundColor: isDark ? '#1a2332' : '#ffffff'
+      };
+    },
+    menu: (provided: any) => {
+      const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark');
+      return {
+        ...provided,
+        backgroundColor: isDark ? '#1a2332' : '#ffffff',
+        border: `1px solid ${isDark ? '#374151' : '#d1d5db'}`
+      };
+    },
+    indicatorSeparator: (provided: any) => ({
       ...provided,
-      backgroundColor: state.isSelected
-        ? '#3b82f6'
-        : state.isFocused
-          ? '#dbeafe'
-          : 'white',
-      color: state.isSelected ? 'white' : '#374151',
-      ':active': {
-        backgroundColor: '#3b82f6'
-      }
-    }),
-    menuPortal: (provided: any) => ({
-      ...provided,
-      zIndex: 9999
+      display: 'none'
     })
   };
 
@@ -157,7 +203,7 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
-    if (!teamData.teamName?.trim()) newErrors.teamName = "El nombre del Team Scrum es obligatorio";
+    if (!teamData.teamName?.trim()) newErrors.teamName = "El nombre del team scrum es obligatorio";
     else if (teamData.teamName.trim().length < 3) newErrors.teamName = "Debe tener al menos 3 caracteres";
 
     if (!teamData.projectName?.trim()) newErrors.projectName = "El nombre del proyecto es obligatorio";
@@ -165,10 +211,9 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
 
     if (!teamData.processMethodologyId) newErrors.processMethodologyId = "Debe seleccionar un marco de trabajo";
 
-    if (!teamData.memberIds || teamData.memberIds.length === 0)
-      newErrors.members = "Debe seleccionar al menos un miembro";
-    else if (teamData.memberIds.length > 4)
-      newErrors.members = "No puede seleccionar más de 4 miembros";
+    if (!teamData.memberIds || teamData.memberIds.length === 0) {
+      toast.warning("Debe seleccionar al menos un miembro");
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -181,18 +226,20 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
     }));
   };
 
-
   const handleMembersChange = (
     selectedOptions: MultiValue<StudentOption>,
   ): void => {
+    if (selectedOptions.length > 4) {
+      const maxMembersMessage = "No puede seleccionar más de 4 integrantes en el scrum";
+      toast.warning(maxMembersMessage);
+      return;
+    }
+
     const memberIds: TeamScrumMemberId[] = selectedOptions.map(option => ({
       studentId: parseInt(option.id, 10)
     }));
-    if (memberIds.length > 4) return;
+
     setTeamData(prev => ({ ...prev, memberIds }));
-    if (errors.members) {
-      setErrors(prev => ({ ...prev, members: null }));
-    }
   };
 
   const handleCreateTeam = async (): Promise<void> => {
@@ -236,8 +283,11 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={handleCloseModal}
-      title="Nuevo Team Scrum"
+      title={<span className="text-white">Nuevo team scrum</span>}
       size="md"
+      showHeaderAccent={false}
+      showCloseButton={false}
+      headerClassName="bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-secondary dark:to-darkBlue rounded-t-3xl border-b-0 relative overflow-hidden"
       className="max-h-[90vh] overflow-hidden"
     >
       <div className="max-h-[60vh] overflow-y-auto px-2 py-2">
@@ -245,8 +295,8 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
 
           {/* Marcos de trabajo */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Marco de trabajo *
+            <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
+              Marco de trabajo
             </label>
             <select
               name="processMethodologyId"
@@ -254,10 +304,10 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
               required
               value={teamData.processMethodologyId || ''}
               onChange={(e) => handleInputChange('processMethodologyId', e.target.value)}
-              className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors disabled:opacity-50 ${errors.processMethodologyId ? 'border-red-500' : 'border-gray-300'}`}
+              className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 dark:bg-darkBackground dark:text-white dark:border-dark-border/60 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-1 dark:focus:ring-offset-darkBackground transition-colors disabled:opacity-50 ${errors.processMethodologyId ? 'border-red-500 dark:border-red-500' : 'border-gray-300'}`}
               disabled={isSubmitting}
             >
-              <option value="" disabled>Selecciona un marco de trabajo...</option>
+              <option value="" disabled>Selecciona un marco de trabajo</option>
               {processMethodologies.map((methodology) => (
                 <option key={methodology.id ?? crypto.randomUUID()} value={methodology.id ?? ""}>
                   {methodology.name}
@@ -271,8 +321,8 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
           </div>
           {/* Nombre del Team Scrum */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Nombre del Team *
+            <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
+              Nombre del team
             </label>
             <input
               type="text"
@@ -280,8 +330,8 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
               placeholder="Ej: Team Alpha, Desarrolladores Frontend..."
               value={teamData.teamName || ''}
               onChange={(e) => handleInputChange('teamName', e.target.value)}
-              className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors ${errors.teamName
-                ? 'border-red-500 focus:ring-red-500'
+              className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 dark:bg-darkBackground dark:text-white dark:border-dark-border/60 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-1 dark:focus:ring-offset-darkBackground transition-colors ${errors.teamName
+                ? 'border-red-500 dark:border-red-500 focus:ring-red-500 dark:focus:ring-red-400'
                 : 'border-gray-300'
                 }`}
               disabled={isSubmitting}
@@ -293,17 +343,17 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
 
           {/* Nombre del Proyecto */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Nombre del Proyecto *
+            <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
+              Nombre del proyecto
             </label>
             <input
               type="text"
               required
-              placeholder="Ej: Sistema de Gestión, App Mobile..."
+              placeholder="Ej: Sistema de gestión, app mobile"
               value={teamData.projectName || ''}
               onChange={(e) => handleInputChange('projectName', e.target.value)}
-              className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors ${errors.projectName
-                ? 'border-red-500 focus:ring-red-500'
+              className={`w-full px-3 py-2 border-2 rounded-md text-gray-900 dark:bg-darkBackground dark:text-white dark:border-dark-border/60 dark:placeholder-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-1 dark:focus:ring-offset-darkBackground transition-colors ${errors.projectName
+                ? 'border-red-500 dark:border-red-500 focus:ring-red-500 dark:focus:ring-red-400'
                 : 'border-gray-300'
                 }`}
               disabled={isSubmitting}
@@ -315,10 +365,10 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
 
           {/* Miembros del Team */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Miembros del Team *
-              <span className="text-gray-500 font-normal text-xs">
-                ({teamData.memberIds?.length || 0}/4)
+            <label className="block text-sm font-semibold text-gray-700 dark:text-white mb-2">
+              Miembros del team
+              <span className="text-gray-500 dark:text-gray-400 font-normal text-xs">
+                ({teamData.memberIds?.length || 0} de 4)
               </span>
             </label>
             <Select
@@ -327,11 +377,10 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
               value={selectedMembers}
               onChange={handleMembersChange}
               styles={selectStyles}
-              placeholder="Buscar y seleccionar miembros..."
-              isOptionDisabled={() => (teamData.memberIds?.length || 0) >= 4}
+              placeholder="Buscar y seleccionar miembros"
               noOptionsMessage={() =>
                 currentLoading
-                  ? "Cargando estudiantes..."
+                  ? "Cargando estudiantes"
                   : studentOptions.length === 0
                     ? "No hay estudiantes disponibles"
                     : "No se encontraron estudiantes"
@@ -346,33 +395,23 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
               menuPortalTarget={typeof window !== "undefined" ? document.body : undefined}
               menuPosition="fixed"
             />
-
-            {errors.members && (
-              <p className="text-red-500 text-xs mt-1">{errors.members}</p>
-            )}
-            <p className="text-gray-500 text-xs mt-1">
-              {studentOptions.length === 0 && !currentLoading
-                ? "No hay estudiantes disponibles para asignar"
-                : "Selecciona entre 1 y 4 miembros para el equipo"}
-            </p>
-
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="pt-4 border-t border-gray-200 flex justify-end space-x-3">
+      <div className="pt-4 border-t border-gray-200 dark:border-dark-border flex justify-end space-x-3">
         <button
           onClick={handleCloseModal}
           disabled={isSubmitting}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50"
+          className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-white bg-white dark:bg-darkBackground/60 border border-gray-300 dark:border-dark-border/60 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-darkBackground focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors disabled:opacity-50"
         >
           Cancelar
         </button>
         <button
           onClick={handleCreateTeam}
           disabled={isSubmitting || currentLoading}
-          className="px-4 py-2 text-sm font-medium rounded-md text-white bg-gradient-to-r from-primary to-lightGreen hover:from-primary/90 hover:to-lightGreen/90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+          className="px-4 py-2 text-sm font-medium rounded-md text-white bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-darkBackground focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
         >
           {isSubmitting ? (
             <>
@@ -380,10 +419,10 @@ const ModalNewTeam: React.FC<ModalNewTeamProps> = ({
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
-              Creando...
+              Creando
             </>
           ) : (
-            'Crear Equipo'
+            'Crear equipo'
           )}
         </button>
       </div>

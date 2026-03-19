@@ -193,7 +193,7 @@ function DataTable<T extends object>({
                                 paginatedData.map((row, idx) => (
                                     <tr
                                         key={idx}
-                                        className={`transition-all duration-200 hover:scale-[1.01] hover:transform ${getRowClasses(isDarkMode)} ${typeof onRowClick === "function" ? "cursor-pointer" : ""}`}
+                                        className={`transition-colors duration-200 ${getRowClasses(isDarkMode)} ${typeof onRowClick === "function" ? "cursor-pointer" : ""}`}
                                         onClick={
                                             typeof onRowClick === "function"
                                                 ? () => onRowClick(row)

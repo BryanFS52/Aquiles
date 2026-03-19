@@ -1,3 +1,5 @@
+//Notificaciones de ejemplo para mostrar en la aplicación
+
 export const notificationsData = [
     {
         id: 1,

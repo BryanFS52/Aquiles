@@ -38,19 +38,19 @@ export const AssignmentCard: React.FC<AssignmentCardProps> = ({ assignment, onVi
     };
 
     return (
-        <div className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 hover:scale-[1.01]">
+        <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 hover:scale-[1.01]">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                 
                 {/* Info principal */}
                 <div className="flex-1">
                     <div className="flex items-start space-x-4">
-                        <div className="bg-primary/10 p-3 rounded-xl flex-shrink-0">
-                            <FaUserCheck className="text-primary text-xl" />
+                        <div className="bg-primary/10 dark:bg-primary/20 p-3 rounded-xl flex-shrink-0">
+                            <FaUserCheck className="text-primary dark:text-primary-light text-xl" />
                         </div>
                         <div className="flex-1">
-                            <h3 className="text-xl font-bold text-secondary mb-1">{assignment.instructor}</h3>
-                            <p className="text-darkGray mb-2">{assignment.program}</p>
-                            <div className="flex items-center space-x-4 text-sm text-darkGray">
+                            <h3 className="text-xl font-bold text-secondary dark:text-white mb-1">{assignment.instructor}</h3>
+                            <p className="text-darkGray dark:text-gray-300 mb-2">{assignment.program}</p>
+                            <div className="flex items-center space-x-4 text-sm text-darkGray dark:text-gray-400">
                                 <span>Asignado: {assignment.assignedDate}</span>
                                 <span className="flex items-center space-x-1">
                                     <FaLayerGroup className="w-3 h-3" />
@@ -68,7 +68,7 @@ export const AssignmentCard: React.FC<AssignmentCardProps> = ({ assignment, onVi
                         {/* Fichas asignadas */}
                         <div className="flex flex-wrap gap-2">
                             {assignment.sheets.map((sheet, idx) => (
-                                <span key={idx} className="bg-primary/10 text-primary px-3 py-1 rounded-lg text-sm font-medium border border-primary/20">
+                                <span key={idx} className="bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light px-3 py-1 rounded-lg text-sm font-medium border border-primary/20 dark:border-primary/30">
                                     {sheet}
                                 </span>
                             ))}
@@ -82,21 +82,21 @@ export const AssignmentCard: React.FC<AssignmentCardProps> = ({ assignment, onVi
                             </span>
                             
                             <div className="flex space-x-2">
-                                <button 
+                                <button
                                     onClick={() => onView(assignment.id)}
-                                    className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                                    className="p-2 text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors"
                                 >
                                     <FaEye className="w-4 h-4" />
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => onEdit(assignment.id)}
-                                    className="p-2 text-lightGreen hover:bg-lightGreen/10 rounded-lg transition-colors"
+                                    className="p-2 text-lightGreen hover:bg-lightGreen/10 dark:hover:bg-lightGreen/20 rounded-lg transition-colors"
                                 >
                                     <FaEdit className="w-4 h-4" />
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => onDelete(assignment.id)}
-                                    className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/20 rounded-lg transition-colors"
                                 >
                                     <FaTrash className="w-4 h-4" />
                                 </button>

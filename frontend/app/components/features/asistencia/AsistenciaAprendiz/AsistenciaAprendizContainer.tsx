@@ -131,7 +131,7 @@ const AsistenciaAprendizContainer: React.FC = () => {
   return (
     <div className="w-full min-h-screen">
       <div className="p-0 sm:p-0 md:p-0 xl:p-0 h-full flex flex-col justify-start">
-        <PageTitle>Mi Asistencia</PageTitle>
+        <PageTitle>Mi asistencia</PageTitle>
 
         <AsistenciaAprendizCalendar
           events={getFilteredEvents()}

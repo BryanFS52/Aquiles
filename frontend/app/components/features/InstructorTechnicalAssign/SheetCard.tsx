@@ -42,7 +42,7 @@ const SheetCard: React.FC<SheetCardProps> = ({
             </div>
             <div className="min-w-0 flex-1">
               <h3 className="text-lg sm:text-xl font-bold truncate">Ficha {sheet.number}</h3>
-              <p className="text-sm sm:text-base text-white/90 truncate">Programa de Formación</p>
+              <p className="text-sm sm:text-base text-white/90 truncate">Programa de formación</p>
             </div>
           </div>
           <div className="text-left sm:text-right w-full sm:w-auto">
@@ -61,7 +61,7 @@ const SheetCard: React.FC<SheetCardProps> = ({
           <div className="flex items-start sm:items-center space-x-3">
             <FaCalendarAlt className="text-primary dark:text-secondary flex-shrink-0 mt-1 sm:mt-0" />
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm font-medium text-darkGray dark:text-gray-300">Número de Estudiantes</p>
+              <p className="text-xs sm:text-sm font-medium text-darkGray dark:text-gray-300">Número de estudiantes</p>
               <p className="font-semibold text-secondary dark:text-white text-sm sm:text-base">
                 {sheet.numberStudents || 0}
               </p>
@@ -72,19 +72,57 @@ const SheetCard: React.FC<SheetCardProps> = ({
             <FaGraduationCap className="text-primary dark:text-secondary flex-shrink-0 mt-1 sm:mt-0" />
             <div className="min-w-0 flex-1">
               <p className="text-xs sm:text-sm font-medium text-darkGray dark:text-gray-300">Programa</p>
-              <p className="font-semibold text-secondary dark:text-white truncate text-sm sm:text-base" title={sheet.trainingProject?.program?.name || 'N/A'}>
-                {sheet.trainingProject?.program?.name || 'N/A'}
+              <p className="font-semibold text-secondary dark:text-white truncate text-sm sm:text-base" title={
+                // 🔄 PARA DATOS MOCK (DESARROLLO) - ACTIVO
+                (sheet as any).offer?.program?.name ||
+                // ⬇️ PARA DATOS REALES - DESCOMENTAR cuando uses API real ⬇️
+                // sheet.trainingProject?.program?.name ||
+                'N/A'
+              }>
+                {/* 🔄 PARA DATOS MOCK (DESARROLLO) - ACTIVO */}
+                {(sheet as any).offer?.program?.name ||
+                 /* ⬇️ PARA DATOS REALES - DESCOMENTAR cuando uses API real ⬇️ */
+                 /* sheet.trainingProject?.program?.name || */
+                'N/A'}
               </p>
             </div>
           </div>
         </div>
+
+        {/* 
+        🔄 ===== GUÍA RÁPIDA: CAMBIAR DE DATOS MOCK A DATOS REALES =====
+        
+        📋 ACTUALMENTE ACTIVO: DATOS MOCK
+        ✅ Líneas activas: (sheet as any).offer?.program?.name
+        💤 Líneas comentadas: sheet.trainingProject?.program?.name
+        
+        🔄 PARA CAMBIAR A DATOS REALES:
+        
+        1️⃣ EN ESTE ARCHIVO (SheetCard.tsx):
+          - COMENTAR: (sheet as any).offer?.program?.name ||
+          - DESCOMENTAR: sheet.trainingProject?.program?.name ||
+        
+        2️⃣ EN InstructorTechnicalAssignContainer.tsx:
+          ELIMINAR/COMENTAR la sección completa:
+          - offer: { id: "X", program: { ... } }  ← ESTA ESTRUCTURA NO EXISTE EN API REAL
+          
+          MANTENER únicamente:
+          - trainingProject: { id: "X", title: "..." }  ← ESTA SÍ EXISTE EN API REAL
+        
+        3️⃣ RESULTADO:
+          - ✅ Sin errores TypeScript
+          - ✅ Programas aparecerán desde trainingProject.program.name (API real)
+          - ✅ Estructura compatible con GraphQL generado automáticamente
+        
+        💡 TIP: La API real tiene program dentro de trainingProject, NO dentro de offer
+        */}
 
         {/* Instructor actual */}
         <div className="bg-gray-50 dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4">
           <div className="flex items-start sm:items-center space-x-3">
             <FaUserTie className={`text-lg sm:text-xl flex-shrink-0 mt-1 sm:mt-0 ${teacherName ? 'text-primary dark:text-secondary' : 'text-gray-400 dark:text-gray-500'}`} />
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm font-medium text-darkGray dark:text-gray-300">Instructor Técnico</p>
+              <p className="text-xs sm:text-sm font-medium text-darkGray dark:text-gray-300">Instructor técnico</p>
               <p className={`font-semibold text-sm sm:text-base truncate ${teacherName ? 'text-secondary dark:text-white' : 'text-gray-400 dark:text-gray-500'}`}>
                 {teacherName || "Sin asignar"}
               </p>
@@ -95,7 +133,7 @@ const SheetCard: React.FC<SheetCardProps> = ({
         {/* Asignación de instructor */}
         <div className="space-y-3 sm:space-y-4">
           <label className="block text-xs sm:text-sm font-bold text-secondary dark:text-white">
-            {teacherName ? 'Reasignar Instructor:' : 'Asignar Instructor:'}
+            {teacherName ? 'Reasignar Instructor:' : 'Asignar instructor:'}
           </label>
 
           <div className="relative">
@@ -104,7 +142,7 @@ const SheetCard: React.FC<SheetCardProps> = ({
               value={selectedInstructor}
               onChange={(e) => onSelectInstructor(e.target.value)}
             >
-              <option value="">Seleccionar Instructor</option>
+              <option value="">Seleccionar instructor</option>
               {teachers.map((teacher) => (
                 <option key={teacher.id} value={teacher.id!}>
                   {`${teacher.collaborator?.person?.name || ''} ${teacher.collaborator?.person?.lastname || ''}`.trim()}

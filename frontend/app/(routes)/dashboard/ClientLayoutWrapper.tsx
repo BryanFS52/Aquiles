@@ -47,20 +47,26 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
 
     const [user, setUser] = useState<User | null>(null);
 
+    // ========================================
+    // 🚫 VERIFICACIÓN DE AUTH DESHABILITADA TEMPORALMENTE
+    // ========================================
+    // Descomenta el bloque de abajo para habilitar la verificación de autenticación
+    
+    /*
     // Cargar autenticación al montar
     useEffect(() => {
         const loadAuth = async () => {
-            console.log('🔍 [ClientLayoutWrapper] Iniciando carga de autenticación...');
+            console.log('[ClientLayoutWrapper] Iniciando carga de autenticación...');
             try {
                 const result = await dispatch(loadAuthFromStorage()).unwrap();
-                console.log('✅ [ClientLayoutWrapper] Auth cargada:', result ? 'Sí' : 'No');
+                console.log('[ClientLayoutWrapper] Auth cargada:', result ? 'Sí' : 'No');
 
                 if (!result) {
-                    console.warn('⚠️ [ClientLayoutWrapper] No hay datos de auth, redirigiendo...');
+                    console.warn('[ClientLayoutWrapper] No hay datos de auth, redirigiendo...');
                     throw new Error('No authentication data');
                 }
             } catch (error) {
-                console.error('❌ [ClientLayoutWrapper] Error cargando auth:', error);
+                console.error('[ClientLayoutWrapper] Error cargando auth:', error);
                 // Si falla, redirigir a login
                 const callbackUrl = `${AQUILES_URL}/auth/callback`;
                 const loginUrl = `${CERBEROS_URL}/auth/login?project=Aquiles&redirectUri=${encodeURIComponent(callbackUrl)}`;
@@ -72,19 +78,40 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
 
         // Timeout de seguridad para evitar carga infinita
         const timeoutId = setTimeout(() => {
-            console.warn('⏰ [ClientLayoutWrapper] Timeout de 10s alcanzado, desbloqueando...');
+            console.warn('[ClientLayoutWrapper] Timeout de 10s alcanzado, desbloqueando...');
             setIsChecking(false);
         }, 10000);
 
         loadAuth().finally(() => clearTimeout(timeoutId));
     }, [dispatch]);
+    */
+
+    // ========================================
+    // USUARIO TEMPORAL PARA BYPASS DE AUTH
+    // ========================================
+    useEffect(() => {
+        // Crear un usuario temporal para pruebas sin autenticación
+        const tempUser = {
+            id: 999,
+            person: {
+                name: 'Usuario',
+                lastname: 'Temporal',
+                email: 'temp@example.com'
+            },
+            roles: [{ name: 'instructor' }] // Cambia por: 'instructor' o 'coordinador' si necesitas otro rol
+        };
+        
+        console.log('[ClientLayoutWrapper] Usando usuario temporal para bypass');
+        setUser(mapCerberosUserToContextUser(tempUser));
+        setIsChecking(false);
+    }, []);
 
     // Actualizar usuario cuando authUser cambie
     useEffect(() => {
-        console.log('👤 [ClientLayoutWrapper] authUser cambió:', authUser ? 'Presente' : 'Ausente');
+        console.log('[ClientLayoutWrapper] authUser cambió:', authUser ? 'Presente' : 'Ausente');
         if (authUser) {
             const mappedUser = mapCerberosUserToContextUser(authUser);
-            console.log('✅ [ClientLayoutWrapper] Usuario mapeado:', mappedUser);
+            console.log('[ClientLayoutWrapper] Usuario mapeado:', mappedUser);
             setUser(mappedUser);
         }
     }, [authUser]);
@@ -136,6 +163,12 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
         );
     }
 
+    // ========================================
+    // VALIDACIÓN DE USUARIO DESHABILITADA TEMPORALMENTE
+    // ========================================
+    // Descomenta el bloque de abajo para habilitar la validación de usuario
+    
+    /*
     // Si no hay usuario, mostrar error
     if (!user || !isAuthenticated) {
         return (
@@ -147,6 +180,7 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
             </div>
         );
     }
+    */
 
     return (
         <UserContext.Provider value={userContextValue}>

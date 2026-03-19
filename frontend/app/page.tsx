@@ -19,6 +19,12 @@ function HomeContent() {
   const [isChecking, setIsChecking] = useState<boolean>(true);
 
   useEffect(() => {
+    // ========================================
+    // 🚫 AUTENTICACIÓN DESHABILITADA TEMPORALMENTE
+    // ========================================
+    // Descomenta el bloque de abajo para habilitar el login nuevamente
+    
+    /*
     const checkAuth = async () => {
       try {
         const hasValidToken = verifyTokenInStorage();
@@ -53,6 +59,17 @@ function HomeContent() {
     };
 
     checkAuth();
+    */
+
+    // ========================================
+    // 🎯 ACCESO DIRECTO AL DASHBOARD (TEMPORAL)
+    // ========================================
+    // Esta línea permite ir directamente al dashboard sin login
+    setTimeout(() => {
+      router.replace("/dashboard");
+      setIsChecking(false);
+    }, 300);
+    
   }, [dispatch, router]);
 
   if (isChecking || loading) {
@@ -61,7 +78,7 @@ function HomeContent() {
         <div className="text-center">
           <Loader />
           <p className="mt-4 text-gray-600">Verificando autenticación...</p>
-          <p className="mt-2 text-gray-500 text-sm">Conectando con Cerberos...</p>
+          <p className="mt-2 text-gray-500 text-sm">Conectando con cerberos...</p>
         </div>
       </div>
     );

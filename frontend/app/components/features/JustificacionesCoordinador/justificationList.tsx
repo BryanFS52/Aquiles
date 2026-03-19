@@ -10,7 +10,7 @@ interface Justification {
   fechaAusencia: string;
   fechaJustificacion: string;
   tipo: string;
-  estado: "Pendiente" | "Aprobada" | "Rechazada";
+  estado: "Aprobada" | "Pendiente" | "Rechazada";
   motivo: string;
 }
 
@@ -23,10 +23,10 @@ const JustificationList: React.FC<JustificationListProps> = ({ justifications })
     switch (estado) {
       case "Aprobada":
         return <FaCheckCircle className="text-green-500 text-xl" />;
-      case "Rechazada":
-        return <FaTimesCircle className="text-red-500 text-xl" />;
       case "Pendiente":
         return <FaClock className="text-yellow-500/90 text-xl" />;
+      case "Rechazada":
+        return <FaTimesCircle className="text-red-500 text-xl" />;
       default:
         return null;
     }
@@ -36,10 +36,10 @@ const JustificationList: React.FC<JustificationListProps> = ({ justifications })
     switch (estado) {
       case "Aprobada":
         return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400";
-      case "Rechazada":
-        return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
       case "Pendiente":
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400";
+      case "Rechazada":
+        return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400";
     }
@@ -93,7 +93,7 @@ const JustificationList: React.FC<JustificationListProps> = ({ justifications })
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    Fecha de Ausencia
+                    Fecha de ausencia
                   </p>
                   <p className="text-sm font-medium text-gray-800 dark:text-white">
                     {formatDate(justification.fechaAusencia)}
@@ -101,7 +101,7 @@ const JustificationList: React.FC<JustificationListProps> = ({ justifications })
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    Fecha de Justificación
+                    Fecha de justificación
                   </p>
                   <p className="text-sm font-medium text-gray-800 dark:text-white">
                     {formatDate(justification.fechaJustificacion)}
@@ -111,7 +111,7 @@ const JustificationList: React.FC<JustificationListProps> = ({ justifications })
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <div className="mb-3">
                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    Tipo de Justificación
+                    Tipo de justificación
                     </p>
                     <p className="text-sm font-medium text-gray-800 dark:text-white">
                     {justification.tipo}

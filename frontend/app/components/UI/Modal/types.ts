@@ -10,4 +10,7 @@ export interface ModalProps {
     size?: ModalSize;
     children: ReactNode;
     className?: string;
+    headerClassName?: string;
+    showHeaderAccent?: boolean;
+    showCloseButton?: boolean;
 }

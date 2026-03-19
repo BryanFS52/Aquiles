@@ -184,7 +184,7 @@ export const AprendicesListContainer: React.FC = () => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Cargando estudiantes...</p>
+          <p className="text-gray-600 dark:text-gray-400">Cargando estudiantes</p>
         </div>
       </div>
     );
@@ -193,7 +193,7 @@ export const AprendicesListContainer: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageTitle>
-        Lista de Asistencia
+        Lista de asistencia
       </PageTitle>
 
       {/* Estadísticas con Cards */}
@@ -229,7 +229,7 @@ export const AprendicesListContainer: React.FC = () => {
               columns={tableColumns}
               data={students}
               pageSize={10}
-              filterPlaceholder="Buscar aprendices..."
+              filterPlaceholder="Buscar aprendices"
               filterFunction={(student, filter) =>
                 student.fullName.toLowerCase().includes(filter.toLowerCase()) ||
                 student.documentNumber.includes(filter)
@@ -242,7 +242,7 @@ export const AprendicesListContainer: React.FC = () => {
                 onClick={handleSaveAttendance}
                 className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
-                Guardar Asistencia
+                Guardar asistencia
               </button>
             </div>
           </div>

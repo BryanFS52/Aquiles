@@ -1,5 +1,10 @@
 'use client'
 
+/**
+ * IMPORTANTE: ESTE ARCHIVO CONTIENE DATOS QUEMADOS PARA PRUEBAS DE DISEÑO
+ * Los datos quemados están marcados claramente con comentarios para facilitar su eliminación.
+ */
+
 import React, { useEffect, useState } from 'react';
 import PageTitle from '@components/UI/pageTitle';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,9 +15,249 @@ import { Card, CardGrid } from '@components/UI/Card';
 import DataTable from '@components/UI/DataTable';
 import Loader from '@components/UI/Loader';
 import EmptyState from '@components/UI/emptyState';
-import { Users,Building2, Check, X, Grid3X3, List, User, UserCheck } from 'lucide-react';
+import { Users,Building2, Grid3X3, List, User, UserCheck } from 'lucide-react';
 import { useLoader } from '@/context/LoaderContext';
 import { TEMPORAL_COLLABORATOR_ID } from '@/temporaryCredential';
+
+// ============ DATOS QUEMADOS - ELIMINAR CUANDO YA NO SE NECESITEN ============
+const DUMMY_COORDINATIONS: Coordination[] = [
+    {
+        id: "1",
+        name: "Coordinación Software",
+        state: true,
+        trainingCenter: {
+            name: "Centro de servicios financieros"
+        },
+        teachers: [
+            {
+                id: "t1",
+                state: true,
+                collaborator: {
+                    person: {
+                        name: "Juan",
+                        lastname: "Pérez",
+                        document: "12345678"
+                    }
+                }
+            },
+            {
+                id: "t2",
+                state: false,
+                collaborator: {
+                    person: {
+                        name: "Lucia",
+                        lastname: "Fernandez",
+                        document: "99887766"
+                    }
+                }
+            }
+        ]
+    },
+    {
+        id: "2",
+        name: "Coordinación de formacion integral",
+        state: false,
+        trainingCenter: {
+            name: "Centro de servicios financieros"
+        },
+        teachers: [
+            {
+                id: "t3",
+                state: true,
+                collaborator: {
+                    person: {
+                        name: "Maria",
+                        lastname: "López",
+                        document: "87654321"
+                    }
+                }
+            },
+            {
+                id: "t4",
+                state: true,
+                collaborator: {
+                    person: {
+                        name: "Carlos",
+                        lastname: "Ramirez",
+                        document: "11223344"
+                    }
+                }
+            }
+        ]
+    },
+    {
+    id: "3",
+        name: "Coordinación administracion educativa",
+        state: true,
+        trainingCenter: {
+            name: "Centro de servicios financieros"
+        },
+        teachers: [
+            {
+                id: "t5",
+                state: true,
+                collaborator: {
+                    person: {
+                        name: "Andres",
+                        lastname: "Gomez",
+                        document: "5468752"
+                    }
+                }
+            },
+            {
+                id: "t6",
+                state: false,
+                collaborator: {
+                    person: {
+                        name: "Sofia",
+                        lastname: "Martinez",
+                        document: "66778899"
+                    }
+                }
+            },
+            {
+                id: "t7",
+                state: true,
+                collaborator: {
+                    person: {
+                        name: "Diego",
+                        lastname: "Sanchez",
+                        document: "44556677"
+                    }
+                }
+            }
+        ]
+    },
+    {
+        id: "4",
+        name: "Coordinación de gestion administrativa",
+        state: false,
+        trainingCenter: {
+            name: "Centro de servicios financieros"
+        },
+        teachers: [
+            {
+                id: "t8",
+                state: true,
+                collaborator: {
+                    person: {
+                        name: "Laura",
+                        lastname: "Diaz",
+                        document: "33445566"
+                    }
+                }
+            },
+            {
+                id: "t9",
+                state: false,
+                collaborator: {
+                    person: {
+                        name: "Jorge",
+                        lastname: "Vargas",
+                        document: "22334455"
+                    }
+                }
+            }
+        ]
+    },
+    {
+        id: "5",
+        name: "Coordinación de gestion administrativa",
+        state: false,
+        trainingCenter: {
+            name: "Centro de servicios financieros"
+        },
+        teachers: [
+            {
+                id: "t8",
+                state: true,
+                collaborator: {
+                    person: {
+                        name: "Laura",
+                        lastname: "Diaz",
+                        document: "33445566"
+                    }
+                }
+            },
+            {
+                id: "t9",
+                state: false,
+                collaborator: {
+                    person: {
+                        name: "Jorge",
+                        lastname: "Vargas",
+                        document: "22334455"
+                    }
+                }
+            }
+        ]
+    },
+    {
+        id: "6",
+        name: "Coordinación de gestion administrativa",
+        state: false,
+        trainingCenter: {
+            name: "Centro de servicios financieros"
+        },
+        teachers: [
+            {
+                id: "t8",
+                state: true,
+                collaborator: {
+                    person: {
+                        name: "Laura",
+                        lastname: "Diaz",
+                        document: "33445566"
+                    }
+                }
+            },
+            {
+                id: "t9",
+                state: false,
+                collaborator: {
+                    person: {
+                        name: "Jorge",
+                        lastname: "Vargas",
+                        document: "22334455"
+                    }
+                }
+            }
+        ]
+    },
+    {
+        id: "7",
+        name: "Coordinación de gestion administrativa",
+        state: false,
+        trainingCenter: {
+            name: "Centro de servicios financieros"
+        },
+        teachers: [
+            {
+                id: "t8",
+                state: true,
+                collaborator: {
+                    person: {
+                        name: "Laura",
+                        lastname: "Diaz",
+                        document: "33445566"
+                    }
+                }
+            },
+            {
+                id: "t9",
+                state: false,
+                collaborator: {
+                    person: {
+                        name: "Jorge",
+                        lastname: "Vargas",
+                        document: "22334455"
+                    }
+                }
+            }
+        ]
+    }
+];
+// ========================================================================
 
 type ViewMode = 'cards' | 'table';
 
@@ -26,6 +271,12 @@ const CoordinacionesContainer: React.FC = () => {
     const { data: coordinaciones, loading, error } = useSelector(
         (state: RootState) => state.coordination
     );
+
+    // ============ USAR SIEMPRE DATOS DUMMY MIENTRAS NO HAY BACKEND ============
+    // Cambiar por la línea de abajo cuando tengas el backend funcionando:
+    // const coordinacionesData = coordinaciones && coordinaciones.length > 0 ? coordinaciones : DUMMY_COORDINATIONS;
+    const coordinacionesData = DUMMY_COORDINATIONS; // Forzar datos dummy siempre
+    // ==========================================================================
 
     // Detectar modo oscuro
     useEffect(() => {
@@ -52,6 +303,9 @@ const CoordinacionesContainer: React.FC = () => {
         return () => observer.disconnect();
     }, []);
 
+    // ⚠️ COMENTADO TEMPORALMENTE: Llamada al backend que causa error 404
+    // Descomenta esto cuando el backend tenga GraphQL funcionando
+    /*
     useEffect(() => {
         const loadCoordinations = async () => {
             showLoader();
@@ -66,6 +320,7 @@ const CoordinacionesContainer: React.FC = () => {
         
         loadCoordinations();
     }, [dispatch]);
+    */
 
     // Función para alternar la expansión de una card
     const toggleExpanded = (coordinationId: string | number) => {
@@ -97,12 +352,10 @@ const CoordinacionesContainer: React.FC = () => {
                     <div className="flex items-center gap-2 self-start sm:self-auto">
                         {coordination.state ? (
                             <span className="flex items-center gap-1 px-2 py-1 bg-lightGreen/10 dark:bg-blue-900/20 text-lightGreen dark:text-blue-300 rounded-full text-xs sm:text-sm">
-                                <Check size={12} className="sm:w-3.5 sm:h-3.5" />
                                 Activa
                             </span>
                         ) : (
                             <span className="flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-full text-xs sm:text-sm">
-                                <X size={12} className="sm:w-3.5 sm:h-3.5" />
                                 Inactiva
                             </span>
                         )}
@@ -115,7 +368,7 @@ const CoordinacionesContainer: React.FC = () => {
                     <div className="flex items-start gap-2 sm:gap-3">
                         <Building2 className="text-secondary dark:text-white mt-1 flex-shrink-0" size={16} />
                         <div className="min-w-0 flex-1">
-                            <p className="text-xs sm:text-sm font-medium text-darkGray dark:text-gray-300">Centro de Formación</p>
+                            <p className="text-xs sm:text-sm font-medium text-darkGray dark:text-gray-300">Centro de formación</p>
                             <p className="text-sm sm:text-base text-darkBlue dark:text-white font-medium capitalize truncate">
                                 {coordination.trainingCenter?.name || 'No asignado'}
                             </p>
@@ -151,7 +404,7 @@ const CoordinacionesContainer: React.FC = () => {
                                                     </p>
                                                 </div>
                                             </div>
-                                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${teacher.state ? 'bg-lightGreen dark:bg-blue-400' : 'bg-grayText dark:bg-gray-500'}`} />
+                                            <span className={`w-2 h-2 rounded-full flex-shrink-0 ${teacher.state ? 'bg-lightGreen dark:bg-lime-400' : 'bg-red-500 dark:bg-red-400'}`} />
                                         </div>
                                     ) : null
                                 )}
@@ -188,25 +441,25 @@ const CoordinacionesContainer: React.FC = () => {
         {
             key: 'trainingCenter' as keyof Coordination,
             header: 'Centro',
-            className: 'min-w-[180px] hidden sm:table-cell',
+            className: 'min-w-[180px] hidden sm:table-cell text-center',
             render: (coordination: Coordination) => (
-                <div className="text-darkBlue dark:text-white capitalize">
-                    <div className="truncate">{coordination.trainingCenter?.name || 'No asignado'}</div>
+                <div className="flex justify-center text-darkBlue dark:text-white capitalize">
+                    <div className="truncate text-center">{coordination.trainingCenter?.name || 'No asignado'}</div>
                 </div>
             ),
         },
         {
             key: 'teachers' as keyof Coordination,
             header: 'Instructores',
-            className: 'min-w-[120px]',
+            className: 'min-w-[120px] text-center',
             render: (coordination: Coordination) => {
                 const activeTeachers = coordination.teachers?.filter(t => t && t.state).length || 0;
                 const totalTeachers = coordination.teachers?.length || 0;
                 return (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-center gap-2">
                         <Users className="text-secondary dark:text-white flex-shrink-0" size={14} />
                         <span className="text-sm">
-                            <span className="font-medium text-lightGreen dark:text-blue-300">{activeTeachers}</span>
+                            <span className="font-medium text-lightGreen dark:text-lightGreen">{activeTeachers}</span>
                             <span className="text-grayText dark:text-gray-400">/{totalTeachers}</span>
                         </span>
                     </div>
@@ -216,18 +469,18 @@ const CoordinacionesContainer: React.FC = () => {
         {
             key: 'state' as keyof Coordination,
             header: 'Estado',
-            className: 'min-w-[100px]',
+            className: 'min-w-[100px] text-center',
             render: (coordination: Coordination) => (
-                <span
-                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${coordination.state
-                        ? 'bg-lightGreen/10 dark:bg-blue-900/20 text-lightGreen dark:text-blue-300'
-                        : 'bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400'
-                        }`}
-                >
-                    {coordination.state ? <Check size={12} /> : <X size={12} />}
-                    <span className="hidden sm:inline">{coordination.state ? 'Activa' : 'Inactiva'}</span>
-                    <span className="sm:hidden">{coordination.state ? 'OK' : 'X'}</span>
-                </span>
+                <div className="flex justify-center">
+                    <span
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${coordination.state
+                            ? 'bg-lightGreen/10 dark:bg-blue-900/20 text-lightGreen dark:text-blue-300'
+                            : 'bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400'
+                            }`}
+                    >
+                        <span>{coordination.state ? 'Activa' : 'Inactiva'}</span>
+                    </span>
+                </div>
             ),
         },
     ];
@@ -250,6 +503,8 @@ const CoordinacionesContainer: React.FC = () => {
         );
     };
 
+    // ⚠️ COMENTADO TEMPORALMENTE: Manejo de loading y error del backend
+    /*
     if (loading) {
         return <Loader />;
     }
@@ -266,8 +521,12 @@ const CoordinacionesContainer: React.FC = () => {
             </div>
         );
     }
+    */
 
-    if (!coordinaciones || coordinaciones.length === 0) {
+    // 🔄 CAMBIO TEMPORAL: Siempre mostrar datos porque no dependen del backend ahora
+    // if (!coordinacionesData || coordinacionesData.length === 0) {
+    // Comentado porque siempre tenemos datos dummy
+    /*
         return (
             <div className="space-y-4 md:space-y-6 px-2 sm:px-4 lg:px-0">
                 <PageTitle>Mis Coordinaciones</PageTitle>
@@ -278,11 +537,12 @@ const CoordinacionesContainer: React.FC = () => {
             </div>
         );
     }
+    */
 
     return (
         <div className="space-y-4 md:space-y-6 px-2 sm:px-4 lg:px-0">
             <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-                <PageTitle>Mis Coordinaciones</PageTitle>
+                <PageTitle>Mis coordinaciones</PageTitle>
 
                 {/* Selector de vista */}
                 <div className="flex items-center gap-1 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 p-1 w-full sm:w-auto">
@@ -311,8 +571,9 @@ const CoordinacionesContainer: React.FC = () => {
 
             {/* Renderizado condicional basado en el modo de vista */}
             {viewMode === 'cards' ? (
+                // 🔄 CAMBIO TEMPORAL: coordinacionesData era "coordinaciones" - REVERTIR DESPUÉS */
                 <CardGrid
-                    items={coordinaciones}
+                    items={coordinacionesData}
                     renderCard={renderCoordinationCard}
                     pageSize={6}
                     columns={1} // 1 columna en móvil, se ajusta automáticamente en el CardGrid
@@ -324,9 +585,10 @@ const CoordinacionesContainer: React.FC = () => {
             ) : (
                 <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden shadow-sm">
                     <div className="overflow-x-auto">
+                        {/* 🔄 CAMBIO TEMPORAL: coordinacionesData era "coordinaciones" - REVERTIR DESPUÉS */}
                         <DataTable
                             columns={tableColumns}
-                            data={coordinaciones}
+                            data={coordinacionesData}
                             isDarkMode={isDarkMode}
                             pageSize={10}
                             filterPlaceholder="Buscar coordinaciones..."

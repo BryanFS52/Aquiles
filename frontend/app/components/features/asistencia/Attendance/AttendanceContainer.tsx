@@ -15,6 +15,189 @@ import EmptyState from "@components/UI/emptyState";
 import AttendanceSheet from './AttendanceSheet';
 import AttendanceStats from './AttendanceStats';
 
+const MOCK_ATTENDANCE_STUDY_SHEET: any = {
+    id: '101',
+    number: 2876543,
+    numberStudents: 2,
+    trainingProject: {
+        program: {
+            name: 'Análisis y Desarrollo de Software'
+        }
+    },
+    teacherStudySheets: [
+        {
+            id: 'tss-101',
+            competence: {
+                id: '12',
+                name: 'Desarrollo web'
+            }
+        },
+        {
+            id: 'tss-102',
+            competence: {
+                id: '13',
+                name: 'PHP'
+            }
+        },
+        {
+            id: 'tss-103',
+            competence: {
+                id: '14',
+                name: 'Industrias 4.0'
+            }
+        },
+        {
+            id: 'tss-104',
+            competence: {
+                id: '15',
+                name: 'Testing'
+            }
+        },
+        {
+            id: 'tss-105',
+            competence: {
+                id: '16',
+                name: 'Desarrollo móvil'
+            }
+        },
+        {
+            id: 'tss-106',
+            competence: {
+                id: '17',
+                name: 'Tics'
+            }
+        }
+    ],
+    studentStudySheets: [
+        {
+            id: 'sss-1',
+            state: 'Activo',
+            studentStudySheetState: { name: 'En formacion' },
+            student: {
+                person: {
+                    document: '1000123456',
+                    name: 'Laura',
+                    lastname: 'Gómez'
+                },
+                attendances: [
+                    { attendanceDate: '2026-03-02', attendanceState: { status: 'Presente' } },
+                    { attendanceDate: '2026-03-03', attendanceState: { status: 'Ausente' } },
+                    { attendanceDate: '2026-03-04', attendanceState: { status: 'Retardo' } },
+                    { attendanceDate: '2026-03-05', attendanceState: { status: 'Justificado' } }
+                ]
+            }
+        },
+        {
+            id: 'sss-2',
+            state: 'Activo',
+            studentStudySheetState: { name: 'En formacion' },
+            student: {
+                person: {
+                    document: '1000654321',
+                    name: 'Carlos',
+                    lastname: 'Martínez'
+                },
+                attendances: [
+                    { attendanceDate: '2026-03-02', attendanceState: { status: 'Presente' } },
+                    { attendanceDate: '2026-03-03', attendanceState: { status: 'Presente' } },
+                    { attendanceDate: '2026-03-04', attendanceState: { status: 'Presente' } },
+                    { attendanceDate: '2026-03-05', attendanceState: { status: 'Retardo' } }
+                ]
+            }
+        },
+        {
+            id: 'sss-3',
+            state: 'Inactivo',
+            studentStudySheetState: { name: 'Retirado' },
+            student: {
+                person: {
+                    document: '1000987654',
+                    name: 'Ana',
+                    lastname: 'López'
+                },
+                attendances: [
+                    { attendanceDate: '2026-03-02', attendanceState: { status: 'Ausente' } },
+                    { attendanceDate: '2026-03-03', attendanceState: { status: 'Ausente' } },
+                    { attendanceDate: '2026-03-04', attendanceState: { status: 'Ausente' } },
+                    { attendanceDate: '2026-03-05', attendanceState: { status: 'Ausente' } }
+                ]
+            }
+        },
+        {
+            id: 'sss-4',
+            state: 'Activo',
+            studentStudySheetState: { name: 'En formacion' },
+            student: {
+                person: {
+                    document: '1000234567',
+                    name: 'Miguel',
+                    lastname: 'Sánchez'
+                },
+                attendances: [
+                    { attendanceDate: '2026-03-02', attendanceState: { status: 'Justificado' } },
+                    { attendanceDate: '2026-03-03', attendanceState: { status: 'Justificado' } },
+                    { attendanceDate: '2026-03-04', attendanceState: { status: 'Justificado' } },
+                    { attendanceDate: '2026-03-05', attendanceState: { status: 'Justificado' } }
+                ]
+            }
+        },
+        {
+            id: 'sss-5',
+            state: 'Activo',
+            studentStudySheetState: { name: 'En formacion' },
+            student: {
+                person: {
+                    document: '1000543210',
+                    name: 'Sofía',
+                    lastname: 'Díaz'
+                },
+                attendances: [
+                    { attendanceDate: '2026-03-02', attendanceState: { status: 'Presente' } },
+                    { attendanceDate: '2026-03-03', attendanceState: { status: 'Presente' } },
+                    { attendanceDate: '2026-03-04', attendanceState: { status: 'Justificado' } },
+                    { attendanceDate: '2026-03-05', attendanceState: { status: 'Ausente' } }
+                ]
+            }
+        },
+        {
+            id: 'sss-6',
+            state: 'Inactivo',
+            studentStudySheetState: { name: 'Retirado' },
+            student: {
+                person: {
+                    document: '1000765432',
+                    name: 'Laura',
+                    lastname: 'García'
+                },
+                attendances: [
+                    { attendanceDate: '2026-03-02', attendanceState: { status: 'Ausente' } },
+                    { attendanceDate: '2026-03-03', attendanceState: { status: 'Ausente' } },
+                    { attendanceDate: '2026-03-04', attendanceState: { status: 'Ausente' } },
+                    { attendanceDate: '2026-03-05', attendanceState: { status: 'Ausente' } }
+                ]
+            }
+        },
+        {
+            id: 'sss-7',
+            state: 'Activo',
+            studentStudySheetState: { name: 'En formacion' },
+            student: {
+                person: {
+                    document: '1000876543',
+                    name: 'David',
+                    lastname: 'Fernández'
+                },
+                attendances: [
+                    { attendanceDate: '2026-03-02', attendanceState: { status: 'Presente' } },
+                    { attendanceDate: '2026-03-03', attendanceState: { status: 'Presente' } },
+                    { attendanceDate: '2026-03-04', attendanceState: { status: 'Presente' } },
+                    { attendanceDate: '2026-03-05', attendanceState: { status: 'Presente' } }
+                ]
+            }
+        }
+    ]
+};
+
 const AttendanceContainer: React.FC = () => {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
@@ -30,8 +213,15 @@ const AttendanceContainer: React.FC = () => {
         (state: RootState) => state.studySheet
     );
 
-    // Usar la ficha seleccionada para asistencia si está disponible, de lo contrario usar la primera del array
-    const studySheet = selectedForAttendance || (studySheets.length > 0 ? studySheets[0] : undefined);
+    // =====================
+    // MODO MOCK (ACTIVO)
+    // =====================
+    const studySheet = MOCK_ATTENDANCE_STUDY_SHEET;
+
+    // =====================
+    // MODO BACKEND (DESCOMENTAR CUANDO LO NECESITES)
+    // =====================
+    // const studySheet = selectedForAttendance || (studySheets.length > 0 ? studySheets[0] : undefined);
 
     const handleNavigate = (competenceId: string) => {
         setIsTransitioning(true);
@@ -43,25 +233,32 @@ const AttendanceContainer: React.FC = () => {
         router.push(`/dashboard/asistenciaManual?${urlParams.toString()}`);
     };
 
-    // Efecto para cargar la ficha desde la URL si no está disponible en Redux (State)
     useEffect(() => {
-        if (studySheetIdFromUrl && !selectedForAttendance) {
-            const studySheetId = parseInt(studySheetIdFromUrl);
-            const competenceId = competenceIdFromUrl ? parseInt(competenceIdFromUrl) : undefined;
+        // MODO MOCK (ACTIVO)
+        // No carga backend.
 
-            dispatch(fetchStudySheetByIdWithAttendances({
-                id: studySheetId,
-                competenceId
-            }));
-        }
+        // MODO BACKEND (DESCOMENTAR CUANDO LO NECESITES)
+        // if (studySheetIdFromUrl && !selectedForAttendance) {
+        //     const studySheetId = parseInt(studySheetIdFromUrl);
+        //     const competenceId = competenceIdFromUrl ? parseInt(competenceIdFromUrl) : undefined;
+        //
+        //     dispatch(fetchStudySheetByIdWithAttendances({
+        //         id: studySheetId,
+        //         competenceId
+        //     }));
+        // }
     }, [studySheetIdFromUrl, competenceIdFromUrl, selectedForAttendance, dispatch]);
 
     useEffect(() => {
-        if (loadingAttendanceSheet) {
-            showLoader();
-        } else if (studySheet || error) {
-            hideLoader();
-        }
+        // MODO MOCK (ACTIVO)
+        hideLoader();
+
+        // MODO BACKEND (DESCOMENTAR CUANDO LO NECESITES)
+        // if (loadingAttendanceSheet) {
+        //     showLoader();
+        // } else if (studySheet || error) {
+        //     hideLoader();
+        // }
     }, [loadingAttendanceSheet, studySheet, error, showLoader, hideLoader]);
 
     if (error) {
@@ -70,10 +267,13 @@ const AttendanceContainer: React.FC = () => {
         );
     }
 
-    // Loader de carga
-    if (loadingAttendanceSheet || loading) {
-        return <Loader />;
-    }
+    // MODO MOCK (ACTIVO)
+    // Mantener vista cargada con datos de prueba.
+
+    // MODO BACKEND (DESCOMENTAR CUANDO LO NECESITES)
+    // if (loadingAttendanceSheet || loading) {
+    //     return <Loader />;
+    // }
 
     // Estado vacío si no hay datos
     if (!studySheet) {
@@ -87,24 +287,24 @@ const AttendanceContainer: React.FC = () => {
             {/* Sección de información del curso y estadísticas */}
             <div className="flex flex-col space-y-3 sm:space-y-4 xl:flex-row xl:space-y-0 xl:space-x-4 lg:space-x-6">
                 {/* Nombre del curso */}
-                <AttendanceSheet 
-                    studySheetData={studySheet} 
-                    onNavigate={handleNavigate} 
+                <AttendanceSheet
+                    studySheetData={studySheet}
+                    onNavigate={handleNavigate}
                 />
                 {/* Estadísticas de estudiantes */}
-                <AttendanceStats 
-                    studySheetData={studySheet} 
-                    onNavigate={handleNavigate} 
-                />                
+                <AttendanceStats
+                    studySheetData={studySheet}
+                    onNavigate={handleNavigate}
+                />
             </div>
             {/* Tabla de asistencia */}
-            <TableAttendance 
-                studySheetData={studySheet} 
-                onNavigate={handleNavigate} 
+            <TableAttendance
+                studySheetData={studySheet}
+                onNavigate={handleNavigate}
             />
             {/* Sección inferior con número de ficha y leyenda */}
-            <AttendanceFooter 
-                studySheet={studySheet} 
+            <AttendanceFooter
+                studySheet={studySheet}
             />
         </div>
     );

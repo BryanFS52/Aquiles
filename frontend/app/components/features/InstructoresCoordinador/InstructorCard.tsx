@@ -49,28 +49,28 @@ const InstructorCard: React.FC<InstructorCardProps> = ({ instructor }) => {
 
                     {/* Información del instructor */}
                     <div className="flex-1 min-w-0">
-                        <h3 className="text-base sm:text-lg font-bold text-primary dark:text-secondary mb-1 truncate">
+                        <h3 className="text-base sm:text-lg font-bold text-primary dark:text-white mb-1 truncate">
                             {instructor.name}
                         </h3>
                         
                         <div className="space-y-1.5 sm:space-y-2">
-                            <div className="flex items-center gap-2 text-xs sm:text-sm text-grayText dark:text-white">
-                                <FontAwesomeIcon icon={faUserTie} className="text-primary dark:text-secondary flex-shrink-0" />
+                            <div className="flex items-center gap-2 text-xs sm:text-sm text-grayText dark:text-gray-200">
+                                <FontAwesomeIcon icon={faUserTie} className="text-primary dark:text-white flex-shrink-0" />
                                 <span className="truncate">{instructor.specialty}</span>
                             </div>
                             
-                            <div className="flex items-center gap-2 text-xs sm:text-sm text-grayText dark:text-white">
-                                <FontAwesomeIcon icon={faBuilding} className="text-primary dark:text-secondary flex-shrink-0" />
+                            <div className="flex items-center gap-2 text-xs sm:text-sm text-grayText dark:text-gray-200">
+                                <FontAwesomeIcon icon={faBuilding} className="text-primary dark:text-white flex-shrink-0" />
                                 <span className="truncate">{instructor.centers}</span>
                             </div>
                             
-                            <div className="flex items-center gap-2 text-xs sm:text-sm text-grayText dark:text-white">
-                                <FontAwesomeIcon icon={faClock} className="text-primary dark:text-secondary flex-shrink-0" />
+                            <div className="flex items-center gap-2 text-xs sm:text-sm text-grayText dark:text-gray-200">
+                                <FontAwesomeIcon icon={faClock} className="text-primary dark:text-white flex-shrink-0" />
                                 <span className="truncate">{instructor.modalidad}</span>
                             </div>
                             
-                            <div className="flex items-center gap-2 text-xs sm:text-sm text-grayText dark:text-white">
-                                <FontAwesomeIcon icon={faBriefcase} className="text-primary dark:text-secondary flex-shrink-0" />
+                            <div className="flex items-center gap-2 text-xs sm:text-sm text-grayText dark:text-gray-200">
+                                <FontAwesomeIcon icon={faBriefcase} className="text-primary dark:text-white flex-shrink-0" />
                                 <span className="truncate">{instructor.contractTime}</span>
                             </div>
                         </div>
@@ -99,21 +99,21 @@ const InstructorCard: React.FC<InstructorCardProps> = ({ instructor }) => {
             {showModal && (
                 <Modal onClose={() => setShowModal(false)}>
                     <div className="space-y-3">
-                        <h4 className="text-lg sm:text-xl font-bold text-primary dark:text-secondary mb-4">
-                            Información del Instructor
+                        <h4 className="text-lg sm:text-xl font-bold text-primary dark:text-white mb-4">
+                            Información del instructor
                         </h4>
                         <div className="space-y-2">
                             <p className="text-sm sm:text-base text-grayText dark:text-white">
-                                <strong className="text-primary dark:text-secondary">Contrato:</strong> {instructor.contractTime}
+                                <strong className="text-primary dark:text-white">Contrato:</strong> {instructor.contractTime}
                             </p>
                             <p className="text-sm sm:text-base text-grayText dark:text-white">
-                                <strong className="text-primary dark:text-secondary">Modalidad:</strong> {instructor.modalidad}
+                                <strong className="text-primary dark:text-white">Modalidad:</strong> {instructor.modalidad}
                             </p>
                             <p className="text-sm sm:text-base text-grayText dark:text-white">
-                                <strong className="text-primary dark:text-secondary">Especialidad:</strong> {instructor.specialty}
+                                <strong className="text-primary dark:text-white">Especialidad:</strong> {instructor.specialty}
                             </p>
                             <p className="text-sm sm:text-base text-grayText dark:text-white">
-                                <strong className="text-primary dark:text-secondary">Centros:</strong> {instructor.centers}
+                                <strong className="text-primary dark:text-white">Centros:</strong> {instructor.centers}
                             </p>
                         </div>
                     </div>
@@ -121,8 +121,8 @@ const InstructorCard: React.FC<InstructorCardProps> = ({ instructor }) => {
             )}
             {showModalFichas && (
                 <Modal onClose={() => setShowModalFichas(false)}>
-                    <h4 className="text-lg sm:text-xl font-bold text-primary dark:text-secondary mb-4">
-                        Fichas Asignadas
+                    <h4 className="text-lg sm:text-xl font-bold text-primary dark:text-white mb-4">
+                        Fichas asignadas
                     </h4>
                     {instructor.fichas.length === 0 ? (
                         <div className="text-center py-6">
@@ -132,11 +132,11 @@ const InstructorCard: React.FC<InstructorCardProps> = ({ instructor }) => {
                     ) : (
                         <div className="space-y-2 max-h-96 overflow-y-auto">
                             {instructor.fichas.map((f, i) => (
-                                <div 
-                                    key={i} 
+                                <div
+                                    key={i}
                                     className="flex items-center gap-3 p-3 bg-lightGray/30 dark:bg-grayText/10 rounded-lg hover:bg-lightGray/50 dark:hover:bg-grayText/20 transition-colors"
                                 >
-                                    <FontAwesomeIcon icon={faUserGroup} className="text-primary dark:text-secondary flex-shrink-0" />
+                                    <FontAwesomeIcon icon={faUserGroup} className="text-primary dark:text-white flex-shrink-0" />
                                     <span className="text-xs sm:text-sm text-grayText dark:text-white flex-1">
                                         {f.ficha}
                                     </span>

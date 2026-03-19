@@ -25,7 +25,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue px-6 py-4">
           <h3 className="text-2xl font-bold text-white text-center">
-            Evaluación de Lista de Chequeo
+            Evaluación de lista de chequeo
           </h3>
         </div>
         
@@ -39,7 +39,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                   {/* Estado de la evaluación */}
                   <div className="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-800 dark:to-blue-900/50 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
                     <p className="text-blue-800 dark:text-blue-200 text-center font-medium">
-                      <strong>Actualizar Evaluación:</strong> Modifique los campos que desee cambiar
+                      <strong>Actualizar evaluación:</strong> Modifique los campos que desee cambiar
                     </p>
                   </div>
 
@@ -101,7 +101,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                         >
                           <option value="">Seleccionar...</option>
                           <option value="APROBADO">Aprobado</option>
-                          <option value="NO APROBADO">No Aprobado</option>
+                          <option value="NO APROBADO">No aprobado</option>
                         </select>
                       </div>
 
@@ -139,7 +139,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                   <div className="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-800 dark:to-blue-900/50 px-6 py-4 border-b border-gray-200 dark:border-gray-600">
                     <p className="text-blue-800 dark:text-blue-200 text-center font-medium flex items-center justify-center gap-2">
                       <span className="text-2xl"></span>
-                      <strong>Evaluación Completada</strong>
+                      <strong>Evaluación completada</strong>
                     </p>
                   </div>
 
@@ -216,7 +216,7 @@ export const EvaluationSection: React.FC<EvaluationSectionProps> = ({
                 {/* Contenido de la tabla */}
                 <div className="px-6 py-8 text-center">
                   <div className="space-y-6">
-                   
+                  
                     <h4 className="text-2xl font-bold text-gray-900 dark:text-white">
                       Esta lista no tiene evaluación
                     </h4>

@@ -7,6 +7,17 @@ import { fetchStudySheetWithTeamScrum, clearStudySheetState } from '@slice/olymp
 import { addTeamScrum, deleteTeamScrum, updateTeamScrum, addProfileToStudent } from '@slice/teamScrumSlice';
 import { fetchAllProcessMethodologiesAndProfiles } from '@slice/atlas/processMethodologiesSlice';
 import { toast } from 'react-toastify';
+import {
+    buildMockTeamFromInput,
+    createInitialMockTeams,
+    getMockStudentsByStudySheet,
+    MOCK_PROCESS_METHODOLOGIES,
+    USE_TEAM_SCRUM_MOCK,
+} from './mockData';
+
+// [MOCK-TEMP]
+// Este hook conserva la lógica de backend y agrega una ruta temporal mock.
+// Para volver 100% backend, cambia USE_TEAM_SCRUM_MOCK=false y elimina bloques marcados MOCK-TEMP.
 import type {
     TeamsScrum,
     Profile,
@@ -20,8 +31,8 @@ export const useTeamScrum = (studySheetId: number) => {
     const dispatch = useDispatch<AppDispatch>();
 
     // Redux state
-    const { data, loading: studySheetLoading } = useSelector((state: RootState) => state.studySheet);
-    const { data: processMethodologies } = useSelector((state: RootState) => state.processMethodologies);
+    const { data, loading: studySheetLoadingFromRedux } = useSelector((state: RootState) => state.studySheet);
+    const { data: processMethodologiesFromRedux } = useSelector((state: RootState) => state.processMethodologies);
 
     // Local state
     const [scrumProfiles, setScrumProfiles] = useState<Profile[]>([]);
@@ -29,6 +40,7 @@ export const useTeamScrum = (studySheetId: number) => {
     const [isInitialLoad, setIsInitialLoad] = useState(true);
     const [teamToDelete, setTeamToDelete] = useState<TeamsScrum | null>(null);
     const [selectedTeamForInfo, setSelectedTeamForInfo] = useState<TeamsScrum | null>(null);
+    const [mockTeams, setMockTeams] = useState<TeamsScrum[]>([]);
 
     // Modal states
     const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -37,23 +49,64 @@ export const useTeamScrum = (studySheetId: number) => {
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState<boolean>(false);
 
     // Computed values
-    const studySheet = data?.[0] ?? null;
+    const processMethodologies = USE_TEAM_SCRUM_MOCK
+        ? MOCK_PROCESS_METHODOLOGIES
+        : processMethodologiesFromRedux;
+    const studySheetLoading = USE_TEAM_SCRUM_MOCK ? false : studySheetLoadingFromRedux;
+
+    const studySheet = useMemo(() => {
+        if (USE_TEAM_SCRUM_MOCK) {
+            return {
+                id: String(studySheetId),
+                number: studySheetId,
+                teamsScrum: mockTeams,
+            } as any;
+        }
+
+        return data?.[0] ?? null;
+    }, [data, mockTeams, studySheetId]);
+
     const teams: TeamsScrum[] = useMemo(() => {
         const teamsArray = (studySheet?.teamsScrum as TeamsScrum[]) ?? [];
         return teamsArray;
     }, [studySheet?.teamsScrum]);
 
+    const updateMockTeamById = (teamId: string, updater: (team: TeamsScrum) => TeamsScrum): void => {
+        setMockTeams((prev) => prev.map((team) => (String(team.id) === teamId ? updater(team) : team)));
+
+        setSelectedTeamForHistory((prev) => {
+            if (!prev || String(prev.id) !== teamId) return prev;
+            return updater(prev);
+        });
+
+        setSelectedTeamForInfo((prev) => {
+            if (!prev || String(prev.id) !== teamId) return prev;
+            return updater(prev);
+        });
+    };
+
     // Effects
     useEffect(() => {
-        if (studySheetId) {
-            setIsInitialLoad(true);
-            dispatch(clearStudySheetState());
-            dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
-            dispatch(fetchAllProcessMethodologiesAndProfiles({ page: 0, size: 10, search: "" }));
+        if (!studySheetId) return;
+
+        setIsInitialLoad(true);
+
+        // [MOCK-TEMP START] Inicialización local sin backend.
+        if (USE_TEAM_SCRUM_MOCK) {
+            setMockTeams(createInitialMockTeams(studySheetId));
+            setIsInitialLoad(false);
+            return;
         }
+        // [MOCK-TEMP END]
+
+        // [BACKEND ORIGINAL]
+        dispatch(clearStudySheetState());
+        dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
+        dispatch(fetchAllProcessMethodologiesAndProfiles({ page: 0, size: 10, search: "" }));
     }, [dispatch, studySheetId]);
 
     useEffect(() => {
+        if (USE_TEAM_SCRUM_MOCK) return;
         if (isInitialLoad && !studySheetLoading) {
             setIsInitialLoad(false);
         }
@@ -90,10 +143,20 @@ export const useTeamScrum = (studySheetId: number) => {
                 }
 
                 if (input.memberIds.length > 4) {
-                    toast.warning("Un equipo Scrum no puede tener más de 4 miembros");
+                    toast.warning("Un equipo scrum no puede tener más de 4 miembros");
                     return false;
                 }
 
+                // [MOCK-TEMP START] Alta local de Team Scrum.
+                if (USE_TEAM_SCRUM_MOCK) {
+                    const newMockTeam = buildMockTeamFromInput(input, studySheetId);
+                    setMockTeams((prev) => [...prev, newMockTeam]);
+                    toast.success("Team scrum registrado exitosamente (mock)");
+                    return true;
+                }
+                // [MOCK-TEMP END]
+
+                // [BACKEND ORIGINAL]
                 const res = await dispatch(addTeamScrum(input));
 
                 if (addTeamScrum.rejected.match(res)) {
@@ -116,6 +179,42 @@ export const useTeamScrum = (studySheetId: number) => {
 
         onUpdateTeam: async (teamId: string, data: TeamInfoData) => {
             try {
+                // [MOCK-TEMP START] Edición local de Team Scrum.
+                if (USE_TEAM_SCRUM_MOCK) {
+                    updateMockTeamById(String(teamId), (team) => {
+                        const availableStudents = getMockStudentsByStudySheet(studySheetId);
+                        const updatedStudents = data.memberIds.map((member) => {
+                            const baseStudent = availableStudents.find(
+                                (student) => Number(student.id) === Number(member.studentId)
+                            );
+                            const profile = MOCK_PROCESS_METHODOLOGIES
+                                .flatMap((methodology) => methodology.profiles ?? [])
+                                .find((p) => p?.id === member.profileId);
+
+                            return {
+                                ...(baseStudent ?? { id: String(member.studentId), person: { name: "", lastname: "" } }),
+                                profiles: profile ? [profile] : [],
+                            } as any;
+                        });
+
+                        return {
+                            ...team,
+                            projectName: data.projectName,
+                            teamName: data.teamName,
+                            description: data.description,
+                            objectives: data.objectives,
+                            problem: data.problem,
+                            projectJustification: data.projectJustification,
+                            students: updatedStudents,
+                        };
+                    });
+
+                    toast.success("Información del team scrum actualizada exitosamente (mock)");
+                    return true;
+                }
+                // [MOCK-TEMP END]
+
+                // [BACKEND ORIGINAL]
                 const res = await dispatch(updateTeamScrum({
                     id: teamId,
                     input: {
@@ -152,6 +251,15 @@ export const useTeamScrum = (studySheetId: number) => {
 
         onDeleteTeam: async (teamId: string, teamName: string) => {
             try {
+                // [MOCK-TEMP START] Eliminación local de Team Scrum.
+                if (USE_TEAM_SCRUM_MOCK) {
+                    setMockTeams((prev) => prev.filter((team) => String(team.id) !== String(teamId)));
+                    toast.success(`Team scrum "${teamName}" eliminado correctamente (mock)`);
+                    return true;
+                }
+                // [MOCK-TEMP END]
+
+                // [BACKEND ORIGINAL]
                 const res = await dispatch(deleteTeamScrum(teamId));
 
                 if (deleteTeamScrum.rejected.match(res)) {
@@ -164,7 +272,7 @@ export const useTeamScrum = (studySheetId: number) => {
                 }
 
                 await dispatch(fetchStudySheetWithTeamScrum({ id: studySheetId }));
-                toast.success(`Team Scrum "${teamName}" eliminado correctamente`);
+                toast.success(`Team scrum "${teamName}" eliminado correctamente`);
                 return true;
             } catch (e: any) {
                 toast.error(`Excepción no controlada al eliminar la tarea: ${e?.message || "Error desconocido"}`);
@@ -184,6 +292,33 @@ export const useTeamScrum = (studySheetId: number) => {
                     return;
                 }
 
+                // [MOCK-TEMP START] Asignación local de rol.
+                if (USE_TEAM_SCRUM_MOCK) {
+                    const currentTeamId = String(selectedTeamForHistory.id);
+                    const isAlreadyAssigned = selectedTeamForHistory.students?.some((student) => {
+                        if (String(student?.id) === String(studentId)) return false;
+                        return student?.profiles?.some((assigned) => assigned?.id === profile.id);
+                    });
+
+                    if (profile.isUnique && isAlreadyAssigned) {
+                        toast.warning(`El rol "${profile.name}" es único y ya está asignado a otro miembro del equipo`);
+                        return;
+                    }
+
+                    updateMockTeamById(currentTeamId, (team) => ({
+                        ...team,
+                        students: (team.students ?? []).map((student) =>
+                            String(student?.id) === String(studentId)
+                                ? ({ ...student, profiles: [profile] } as any)
+                                : student
+                        ),
+                    }));
+
+                    toast.success(`Rol "${profile.name}" asignado exitosamente (mock)`);
+                    return;
+                }
+                // [MOCK-TEMP END]
+
                 // Validar si el rol es único y ya está asignado a OTRO estudiante
                 if (profile.isUnique) {
                     const isAlreadyAssigned = selectedTeamForHistory.students?.some(
@@ -191,7 +326,7 @@ export const useTeamScrum = (studySheetId: number) => {
                             if (student?.id === studentId) return false; // Ignorar el estudiante actual
                             const memberIds = (selectedTeamForHistory as any).memberIds;
                             if (memberIds && Array.isArray(memberIds)) {
-                                return memberIds.some((m: any) => 
+                                return memberIds.some((m: any) =>
                                     m.studentId !== parseInt(studentId) && m.profileId === profile.id
                                 );
                             }
@@ -214,7 +349,7 @@ export const useTeamScrum = (studySheetId: number) => {
                 let currentProfileName: string | null = null;
 
                 if (memberIds && Array.isArray(memberIds)) {
-                    const currentMember = memberIds.find((m: any) => 
+                    const currentMember = memberIds.find((m: any) =>
                         String(m.studentId) === studentId
                     );
                     if (currentMember?.profileId) {
@@ -291,13 +426,43 @@ export const useTeamScrum = (studySheetId: number) => {
                     return;
                 }
 
+                // [MOCK-TEMP START] Remoción local de rol.
+                if (USE_TEAM_SCRUM_MOCK) {
+                    const teamId = String(selectedTeamForHistory.id);
+                    const student = selectedTeamForHistory.students?.find((s) => String(s?.id) === String(studentId));
+                    const currentProfile = student?.profiles?.[0] ?? null;
+
+                    if (!currentProfile) {
+                        toast.info("Este estudiante no tiene un rol asignado");
+                        return;
+                    }
+
+                    if (currentProfile.isUnique) {
+                        toast.warning(`No puedes quitar el rol único "${currentProfile.name}". Solo puedes cambiarlo por otro rol.`);
+                        return;
+                    }
+
+                    updateMockTeamById(teamId, (team) => ({
+                        ...team,
+                        students: (team.students ?? []).map((item) =>
+                            String(item?.id) === String(studentId)
+                                ? ({ ...item, profiles: [] } as any)
+                                : item
+                        ),
+                    }));
+
+                    toast.success(`Rol "${currentProfile.name}" removido exitosamente (mock)`);
+                    return;
+                }
+                // [MOCK-TEMP END]
+
                 // Verificar el rol actual del estudiante desde memberIds o profiles
                 const memberIds = (selectedTeamForHistory as any).memberIds;
                 let currentProfile: Profile | null = null;
                 let currentProfileId: string | null = null;
 
                 if (memberIds && Array.isArray(memberIds)) {
-                    const currentMember = memberIds.find((m: any) => 
+                    const currentMember = memberIds.find((m: any) =>
                         String(m.studentId) === String(studentId)
                     );
                     if (currentMember?.profileId) {

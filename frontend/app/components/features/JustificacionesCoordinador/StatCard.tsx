@@ -63,9 +63,9 @@ const StatCard: React.FC<StatCardProps> = ({
         {/* Patrón decorativo de fondo */}
         <div className="absolute bottom-0 right-0 w-20 h-20 opacity-10">
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="2" className={textColor} />
-            <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="2" className={textColor} />
-            <circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" strokeWidth="2" className={textColor} />
+            <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="2" className={`${textColor}`} />
+            <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="2" className={`${textColor}`} />
+            <circle cx="50" cy="50" r="20" fill="none" stroke="currentColor" strokeWidth="2" className={`${textColor}`} />
           </svg>
         </div>
       </div>

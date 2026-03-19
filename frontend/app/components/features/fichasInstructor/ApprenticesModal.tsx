@@ -19,7 +19,7 @@ export const ApprenticesModal: React.FC<ApprenticesModalProps> = ({
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title="Lista de Aprendices"
+            title="Lista de aprendices"
             size="xl"
         >
             {students && students.length > 0 ? (
@@ -46,7 +46,7 @@ export const ApprenticesModal: React.FC<ApprenticesModalProps> = ({
                                             {displayName.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="min-w-0">
-                                            <p className="font-medium text-gray-900 dark:text-white text-sm sm:text-base truncate">
+                                            <p className="font-medium text-gray-800 dark:text-white text-sm sm:text-base truncate">
                                                 {displayName}
                                             </p>
                                             {person?.email && (
@@ -64,7 +64,7 @@ export const ApprenticesModal: React.FC<ApprenticesModalProps> = ({
 
                                     <div className="flex items-center mt-2 sm:mt-0 sm:ml-2 sm:flex-row">
                                         <span className={`px-2 py-1 text-[10px] sm:text-xs font-medium rounded-full whitespace-nowrap ${studentState === 'En formacion'
-                                            ? 'bg-green-100 text-green-800 dark:bg-shadowBlue/20 dark:text-blue-300'
+                                            ? 'bg-green-600 text-white dark:bg-green-600 dark:text-white'
                                             : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
                                             }`}>
                                             {studentState}

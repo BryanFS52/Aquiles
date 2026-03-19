@@ -56,16 +56,16 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
         
         // Solo mostrar log detallado en la primera llamada de cada estudiante
         if (isFirstCall && attendances && attendances.length > 0) {
-            console.log('🔍 Available attendance dates for student:', attendances.map(a => ({
+            console.log('Fechas de asistencia disponibles para el estudiante:', attendances.map(a => ({
                 date: a.attendanceDate,
                 status: a.attendanceState?.status,
                 fullObject: a
             })));
-            console.log('🔍 Looking for dates like:', targetDate);
+            console.log('Buscando fechas como:', targetDate);
         }
         
         if (!attendances) return null;
-        const result = attendances.find((attendance: any) => 
+        const result = attendances.find((attendance: any) =>
             attendance.attendanceDate === targetDate
         );
         return result;
@@ -84,7 +84,7 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
         
         // Verificar algunos casos específicos según tu calendario
         const dayNames = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-        console.log(`🔍 Fecha ${dateStr} cae en: ${dayNames[ourDay]} (índice ${ourDay}) - JS day: ${jsDay}`);
+        console.log(`Fecha ${dateStr} cae en: ${dayNames[ourDay]} (índice ${ourDay}) - JS day: ${jsDay}`);
         
         return ourDay;
     };
@@ -150,7 +150,7 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
             sortedWeeks.push(new Array(7).fill(''));
         }
         
-        console.log('🔍 Created weeks from data (correctly indexed by day):', sortedWeeks);
+        console.log('Semanas creadas a partir de datos (indexados correctamente por día):', sortedWeeks);
         return sortedWeeks.slice(0, 4);
     };
 
@@ -160,7 +160,7 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
     // Función para generar las fechas de la semana actual basada en el trimestre
     const generateWeekDates = (weekOffset: number = 0) => {
         const dates = weeklyDates[weekOffset] || new Array(7).fill('');
-        console.log(`🔍 Generated week ${weekOffset + 1} dates:`, dates);
+        console.log(`Fechas generadas para la semana ${weekOffset + 1}:`, dates);
         return dates;
     };
 
@@ -222,7 +222,7 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                             onClick={handleAttendanceClick}
                             className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl shadow bg-gradient-to-r from-lime-400 to-lime-600 dark:from-shadowBlue dark:to-darkBlue text-black dark:text-white hover:bg-lightGreen dark:hover:bg-shadowBlue transition border hover:border-lightGreen dark:hover:border-shadowBlue whitespace-nowrap"
                         >
-                            <span className="hidden xs:inline">Toma de</span> Asistencia <BsQrCode className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="hidden xs:inline">Toma de </span>asistencia <BsQrCode className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
 
                         <button
@@ -234,7 +234,7 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                                 }`}
                             title={!selectedCompetence ? 'Debe seleccionar una competencia primero' : ''}
                         >
-                            <span className="hidden xs:inline">Asistencia</span> Manual <FaClipboardList className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="hidden xs:inline">Asistencia</span> manual <FaClipboardList className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
 
                         {/* Selector de Competencia */}
@@ -243,7 +243,7 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                             onChange={(e) => setSelectedCompetence(e.target.value)}
                             className="h-9 sm:h-10 px-3 pr-8 text-xs sm:text-sm rounded-xl border border-lightGray dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-lightGreen dark:focus:ring-shadowBlue focus:border-lightGreen dark:focus:border-shadowBlue shadow-sm bg-white dark:bg-gray-700 text-black dark:text-white min-w-[200px] sm:min-w-[250px]"
                         >
-                            <option value="">Seleccione competencia...</option>
+                            <option value="">Seleccione competencia</option>
                             {competences.map((competence) => (
                                 <option key={competence.id} value={competence.id}>
                                     {competence.name}
@@ -311,7 +311,7 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                             <thead className="bg-gradient-to-r from-lime-400 to-lime-600 dark:from-shadowBlue dark:to-darkBlue text-black dark:text-white">
                                 <tr>
                                     <th className="w-32 sm:w-40 px-1 sm:px-2 py-2 sm:py-3 text-xs font-medium uppercase tracking-wider border border-white dark:border-gray-600 text-left">
-                                        <div className="truncate">Número Documento</div>
+                                        <div className="truncate">Número documento</div>
                                     </th>
                                     <th className="w-40 sm:w-48 px-1 sm:px-2 py-2 sm:py-3 text-xs font-medium uppercase tracking-wider border border-white dark:border-gray-600 text-center">
                                         <div className="truncate">Nombres y Apellidos</div>
@@ -359,15 +359,15 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                                                         
                                                         // Solo mostrar log una vez por estudiante (primer día)
                                                         if (dayIndex === 0 && weekIndex === 0) {
-                                                            console.log('🔍 Student attendances for', studentStudySheet.student?.person?.name, ':', studentAttendances);
+                                                            console.log('Asistencias de estudiante para:', studentStudySheet.student?.person?.name, ':', studentAttendances);
                                                         }
                                                         
                                                         const attendance = getAttendanceByDate(
-                                                            studentAttendances, 
+                                                            studentAttendances,
                                                             date,
                                                             dayIndex === 0 && weekIndex === 0 // isFirstCall
                                                         );
-                                                        const attendanceIcon = attendance 
+                                                        const attendanceIcon = attendance
                                                             ? getAttendanceIcon(attendance.attendanceState?.status)
                                                             : null;
 
@@ -396,7 +396,7 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
 
                 {/* Leyenda de iconos */}
                 <div className="bg-white border border-lightGray rounded-xl shadow-sm p-4">
-                    <h3 className="text-sm font-semibold text-darkGray mb-3">Leyenda de Asistencia:</h3>
+                    <h3 className="text-sm font-semibold text-darkGray mb-3">Leyenda de asistencia:</h3>
                     <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
                         <div className="flex items-center gap-2">
                             <FaCheck className="text-green-500" />
