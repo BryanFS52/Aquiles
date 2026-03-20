@@ -30,7 +30,7 @@ const AttendanceStats: React.FC<AttendanceStatsProps> = ({ studySheetData, onNav
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
                                     <BsPersonCircle className="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                                    <span className="text-sm text-gray-600 dark:text-gray-300">Número de Estudiantes</span>
+                                    <span className="text-sm text-gray-600 dark:text-gray-300">Número de estudiantes</span>
                                 </div>
                                 <span className="text-base font-semibold text-black dark:text-white">
                                     {studySheetData?.numberStudents || 0}
@@ -41,7 +41,7 @@ const AttendanceStats: React.FC<AttendanceStatsProps> = ({ studySheetData, onNav
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
                                     <BsPersonCircle className="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                                    <span className="text-sm text-gray-600 dark:text-gray-300">Aprendices Activos</span>
+                                    <span className="text-sm text-gray-600 dark:text-gray-300">Aprendices activos</span>
                                 </div>
                                 <span className="text-base font-semibold text-black dark:text-white">
                                     {activeStudents || 0}
@@ -52,7 +52,7 @@ const AttendanceStats: React.FC<AttendanceStatsProps> = ({ studySheetData, onNav
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
                                     <BsPersonCircle className="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
-                                    <span className="text-sm text-gray-600 dark:text-gray-300">Aprendices Retirados</span>
+                                    <span className="text-sm text-gray-600 dark:text-gray-300">Aprendices retirados</span>
                                 </div>
                                 <span className="text-base font-semibold text-black dark:text-white">
                                     {withdrawnStudents}
@@ -69,7 +69,7 @@ const AttendanceStats: React.FC<AttendanceStatsProps> = ({ studySheetData, onNav
                                     {studySheetData?.numberStudents || 0}
                                 </span>
                                 <span className="text-xs lg:text-sm text-gray-600 dark:text-gray-300 hidden lg:block">
-                                    Número de Estudiantes
+                                    Número de estudiantes
                                 </span>
                                 <span className="text-xs text-gray-600 dark:text-gray-300 lg:hidden">
                                     Total
@@ -86,7 +86,7 @@ const AttendanceStats: React.FC<AttendanceStatsProps> = ({ studySheetData, onNav
                                     {activeStudents || 0}
                                 </span>
                                 <span className="text-xs lg:text-sm text-gray-600 dark:text-gray-300 hidden lg:block">
-                                    Aprendices Activos
+                                    Aprendices activos
                                 </span>
                                 <span className="text-xs text-gray-600 dark:text-gray-300 lg:hidden">
                                     Activos
@@ -103,7 +103,7 @@ const AttendanceStats: React.FC<AttendanceStatsProps> = ({ studySheetData, onNav
                                     {withdrawnStudents}
                                 </span>
                                 <span className="text-xs lg:text-sm text-gray-600 dark:text-gray-300 hidden lg:block">
-                                    Aprendices Retirados
+                                    Aprendices retirados
                                 </span>
                                 <span className="text-xs text-gray-600 dark:text-gray-300 lg:hidden">
                                     Retirados

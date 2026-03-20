@@ -46,7 +46,7 @@ const FormularioQr: React.FC = () => {
         if (studentId) {
             setIsScanning(false);
             setDocumentNumber(studentId);
-            console.log('🎯 Datos obtenidos de la URL:', {
+            console.log('Datos obtenidos de la URL:', {
                 studentId,
                 email: email ? decodeURIComponent(email) : null,
                 competenceQuarterId,
@@ -79,7 +79,7 @@ const FormularioQr: React.FC = () => {
                 competenceQuarter: competenceQuarterId ? parseInt(competenceQuarterId) : 1
             };
 
-            console.log('📝 Registrando asistencia con datos:', {
+            console.log('Registrando asistencia con datos:', {
                 studentId: studentIdToUse,
                 competenceQuarterId: competenceQuarterId,
                 sessionId: sessionId,
@@ -210,7 +210,7 @@ const FormularioQr: React.FC = () => {
 
                         {/* Título */}
                         <h1 className="text-2xl font-bold text-secondary mb-2">
-                            ¡Asistencia Registrada!
+                            ¡Asistencia registrada!
                         </h1>
                         <p className="text-darkGray mb-6">
                             Tu asistencia ha sido registrada exitosamente
@@ -262,7 +262,7 @@ const FormularioQr: React.FC = () => {
                         {/* Footer */}
                         <div className="flex items-center justify-center text-sm text-grayText">
                             <IoTimeOutline className="mr-2" />
-                            Esta ventana se cerrará automáticamente...
+                            Esta ventana se cerrará automáticamente
                         </div>
                     </div>
                 </div>
@@ -318,7 +318,7 @@ const FormularioQr: React.FC = () => {
                                     <BsQrCodeScan className="text-white text-xl" />
                                 </div>
                                 <div>
-                                    <h1 className="text-xl font-bold text-white">Registro de Asistencia</h1>
+                                    <h1 className="text-xl font-bold text-white">Registro de asistencia</h1>
                                     <p className="text-lightGray text-sm">{dayName}, {formattedDate}</p>
                                 </div>
                             </div>
@@ -346,7 +346,7 @@ const FormularioQr: React.FC = () => {
                                 {studentId ? 'Confirma tu Asistencia' : 'Registra tu Asistencia'}
                             </h2>
                             <p className="text-darkGray text-sm">
-                                {studentId 
+                                {studentId
                                     ? 'Tu información ha sido pre-cargada desde el email' 
                                     : 'Escanea tu QR personal o ingresa tu documento manualmente'
                                 }

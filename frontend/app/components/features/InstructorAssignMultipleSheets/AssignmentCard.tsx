@@ -23,9 +23,9 @@ interface AssignmentCardProps {
 export const AssignmentCard: React.FC<AssignmentCardProps> = ({ assignment, onView, onEdit, onDelete }) => {
     const getStatusColor = (status: string) => {
         switch(status) {
-            case 'Activo': return 'bg-green-100 text-green-800 border-green-200';
-            case 'Pendiente': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-            default: return 'bg-gray-100 text-gray-800 border-gray-200';
+            case 'Activo': return 'bg-primary text-white border-green-100 dark:border-green-700';
+            case 'Pendiente': return 'bg-yellow-500 text-white border-yellow-200 dark:border-yellow-700';
+            default: return 'bg-gray-500 text-white border-gray-200 dark:border-gray-700';
         }
     };
 

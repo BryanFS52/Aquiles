@@ -45,7 +45,7 @@ const JustificationFormComponent: React.FC<Props> = ({
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div className="flex flex-col space-y-2">
                         <label className="text-sm font-medium text-black dark:text-lightGray">
-                            Número de Documento *
+                            Número de documento
                         </label>
                         <input
                             disabled
@@ -62,7 +62,7 @@ const JustificationFormComponent: React.FC<Props> = ({
                     </div>
                     <div className="flex flex-col space-y-2">
                         <label className="text-sm font-medium text-black dark:text-lightGray">
-                            Nombre Aprendiz *
+                            Nombre aprendiz
                         </label>
                         <input
                             disabled
@@ -79,7 +79,7 @@ const JustificationFormComponent: React.FC<Props> = ({
 
                 <div className="flex flex-col space-y-2">
                     <label className="text-sm font-medium text-black dark:text-lightGray">
-                        Descripción *
+                        Descripción
                     </label>
                     <textarea
                         name="descripcion"
@@ -96,7 +96,7 @@ const JustificationFormComponent: React.FC<Props> = ({
                         htmlFor="justificationTypeSelect"
                         className="text-sm font-medium text-black dark:text-lightGray"
                     >
-                        Tipo De Novedad *
+                        Tipo de novedad
                     </label>
                     <select
                         id="justificationTypeSelect"
@@ -109,7 +109,7 @@ const JustificationFormComponent: React.FC<Props> = ({
                         required
                     >
                         <option value="" disabled hidden>
-                            {loadingJustificationTypes ? "Cargando tipos..." : "Seleccione el tipo"}
+                            {loadingJustificationTypes ? "Cargando tipos" : "Seleccione el tipo"}
                         </option>
                         {justificationTypesData?.map(({ id, name }: JustificationType) => (
                             <option key={id} value={id}>
@@ -128,7 +128,7 @@ const JustificationFormComponent: React.FC<Props> = ({
                         onClick={() => fileInputRefPrev.current?.click()}
                         className="bg-black dark:bg-lightGreen text-white h-11 rounded-lg hover:bg-lightGreen dark:hover:bg-darkGreen transition-colors font-medium"
                     >
-                        {fileRef.current?.name || "📎 Subir Archivo"}
+                        {fileRef.current?.name || "Subir Archivo"}
                     </button>
                     <input
                         type="file"
@@ -158,7 +158,7 @@ const JustificationFormComponent: React.FC<Props> = ({
                         className="px-6 py-3 bg-black dark:bg-lightGreen text-white rounded-lg hover:bg-lightGreen dark:hover:bg-darkGreen transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                         disabled={form.isSubmitting || loadingJustification}
                     >
-                        {form.isSubmitting || loadingJustification ? "Enviando..." : "Enviar Justificación"}
+                        {form.isSubmitting || loadingJustification ? "Enviando" : "Enviar justificación"}
                     </button>
                 </div>
             </form>

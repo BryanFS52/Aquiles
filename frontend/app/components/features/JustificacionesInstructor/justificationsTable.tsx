@@ -130,7 +130,7 @@ const JustificationTable: React.FC<JustificationTableProps> = ({
   // }
 
   if (!hasAnyData) {
-    const message = isInstructorView 
+    const message = isInstructorView
       ? "No se encontraron justificaciones para esta ficha. Selecciona una ficha desde el panel del instructor."
       : "No hay justificaciones disponibles en este momento.";
     return <EmptyState message={message} />;
@@ -152,7 +152,7 @@ const JustificationTable: React.FC<JustificationTableProps> = ({
             <th className="px-6 py-4 font-medium">Aprendiz</th>
             <th className="px-6 py-4 font-medium">Fecha de ausencia</th>
             <th className="px-6 py-4 font-medium">Fecha de justificacion</th>
-            <th className="px-6 py-4 font-medium">Archivo Adjunto</th>
+            <th className="px-6 py-4 font-medium">Archivo adjunto</th>
             <th className="px-6 py-4 font-medium">Estado del proceso</th>
             <th className="px-6 py-4 font-medium">Acciones</th>
           </tr>
@@ -206,7 +206,7 @@ const JustificationTable: React.FC<JustificationTableProps> = ({
                     title="Cambiar estado de la justificación"
                     className="px-3 py-2 text-xs font-medium bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200 min-w-[120px]"
                   >
-                    <option value="">Seleccionar estado...</option>
+                    <option value="">Seleccionar estado</option>
                     {getActiveStatuses(justificationStatuses)
                       .filter(status => status.name !== "En proceso")
                       .map((status) => (
@@ -217,7 +217,7 @@ const JustificationTable: React.FC<JustificationTableProps> = ({
                   </select>
                   {loadingStatuses && (
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      Cargando...
+                      Cargando
                     </span>
                   )}
                 <button

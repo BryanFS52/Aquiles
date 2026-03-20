@@ -27,9 +27,9 @@ const InfoCard: React.FC<InfoCardProps> = ({ ficha, onClick, viewMode = "grid" }
       <div className="group bg-white dark:bg-shadowBlue rounded-lg p-4 hover:shadow-md transition-all duration-200 border border-gray-200 dark:border-white hover:border-blue-300 dark:hover:border-blue-500">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4 flex-1">
-            <div 
+            <div
               onClick={() => onClick()}
-              className="cursor-pointer bg-gradient-to-r from-primary to-lightGreen dark:from-shadowBlue dark:to-darkBlue text-white px-4 py-2 rounded-lg text-sm font-bold hover:shadow-lg transition-all"
+              className="cursor-pointer bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-shadowBlue dark:to-darkBlue text-white px-4 py-2 rounded-lg text-sm font-bold hover:shadow-lg transition-all"
             >
               Ficha N° {ficha.numeroFicha}
             </div>

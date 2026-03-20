@@ -21,7 +21,7 @@ const MOCK_ATTENDANCE_STUDY_SHEET: any = {
     numberStudents: 2,
     trainingProject: {
         program: {
-            name: 'Análisis y Desarrollo de Software'
+            name: 'Análisis y desarrollo de software'
         }
     },
     teacherStudySheets: [

@@ -9,7 +9,7 @@ const FILTER_LABELS: Record<string, string> = {
   aprendiz: "Aprendiz",
   fecha: "Fecha de Justificación",
   justificationStatus: "Estado del proceso",
-  absenceDate: "Fecha de Ausencia"
+  absenceDate: "Fecha de ausencia"
 } as const;
 
 const FILTER_STATUS: Record<string, string> = {
@@ -74,7 +74,7 @@ export const SingleFilterMode = ({
               type={NUMBER_FILTER_TYPES.includes(selectedFiltro as any) ? "number" : "text"}
               placeholder={
                 !selectedFiltro || selectedFiltro === "todo"
-                  ? "Buscar en todos los campos..."
+                  ? "Buscar en todos los campos "
                   : `Buscar por ${FILTER_LABELS[selectedFiltro]}`
               }
               value={searchTerm}

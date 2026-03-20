@@ -34,7 +34,7 @@ const SheetCard: React.FC<SheetCardProps> = ({
   return (
     <div className="bg-white dark:bg-shadowBlue rounded-xl sm:rounded-2xl shadow-lg border border-lightGray dark:border-grayText overflow-hidden hover:shadow-xl transition-all duration-300">
       {/* Header de la ficha */}
-      <div className="bg-gradient-to-r from-primary to-lightGreen dark:from-secondary dark:to-blue-900 p-4 sm:p-6 text-white">
+      <div className="bg-gradient-to-r from-[#5cb800] to-[#8fd400] dark:from-secondary dark:to-blue-900 p-4 sm:p-6 text-white">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
             <div className="bg-white/20 p-2 sm:p-3 rounded-lg sm:rounded-xl flex-shrink-0">
@@ -59,7 +59,7 @@ const SheetCard: React.FC<SheetCardProps> = ({
         {/* Información básica */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div className="flex items-start sm:items-center space-x-3">
-            <FaCalendarAlt className="text-primary dark:text-secondary flex-shrink-0 mt-1 sm:mt-0" />
+            <FaCalendarAlt className="text-gray dark:text-secondary flex-shrink-0 mt-1 sm:mt-0" />
             <div className="min-w-0 flex-1">
               <p className="text-xs sm:text-sm font-medium text-darkGray dark:text-gray-300">Número de estudiantes</p>
               <p className="font-semibold text-secondary dark:text-white text-sm sm:text-base">
@@ -69,13 +69,13 @@ const SheetCard: React.FC<SheetCardProps> = ({
           </div>
 
           <div className="flex items-start sm:items-center space-x-3">
-            <FaGraduationCap className="text-primary dark:text-secondary flex-shrink-0 mt-1 sm:mt-0" />
+            <FaGraduationCap className="text-gray dark:text-secondary flex-shrink-0 mt-1 sm:mt-0" />
             <div className="min-w-0 flex-1">
               <p className="text-xs sm:text-sm font-medium text-darkGray dark:text-gray-300">Programa</p>
               <p className="font-semibold text-secondary dark:text-white truncate text-sm sm:text-base" title={
-                // 🔄 PARA DATOS MOCK (DESARROLLO) - ACTIVO
+                // PARA DATOS MOCK (DESARROLLO) - ACTIVO
                 (sheet as any).offer?.program?.name ||
-                // ⬇️ PARA DATOS REALES - DESCOMENTAR cuando uses API real ⬇️
+                // PARA DATOS REALES - DESCOMENTAR cuando uses API real ⬇️
                 // sheet.trainingProject?.program?.name ||
                 'N/A'
               }>
@@ -89,8 +89,8 @@ const SheetCard: React.FC<SheetCardProps> = ({
           </div>
         </div>
 
-        {/* 
-        🔄 ===== GUÍA RÁPIDA: CAMBIAR DE DATOS MOCK A DATOS REALES =====
+        {/*
+        ===== GUÍA RÁPIDA: CAMBIAR DE DATOS MOCK A DATOS REALES =====
         
         📋 ACTUALMENTE ACTIVO: DATOS MOCK
         ✅ Líneas activas: (sheet as any).offer?.program?.name

@@ -34,9 +34,9 @@ const FILTER_LABELS: Record<string, string> = {
   todo: "Todo",
   documento: "Documento",
   aprendiz: "Aprendiz",
-  fecha: "Fecha de Justificación",
+  fecha: "Fecha de justificación",
   justificationStatus: "Estado del proceso",
-  absenceDate: "Fecha de Ausencia"
+  absenceDate: "Fecha de ausencia"
 } as const;
 
 const FILTER_STATUS: Record<string, string> = {
@@ -69,8 +69,8 @@ const JustificationFilters: React.FC<Props> = ({
     [filterOptions.multiFilters]
   );
 
-  const hasActiveFilters = useMemo(() => 
-    filterOptions.enableMultiFilter 
+  const hasActiveFilters = useMemo(() =>
+    filterOptions.enableMultiFilter
       ? activeMultiFilters.length > 0
       : Boolean(filterOptions.selectedFiltro || filterOptions.searchTerm),
     [filterOptions.enableMultiFilter, activeMultiFilters.length, filterOptions.selectedFiltro, filterOptions.searchTerm]
@@ -162,7 +162,7 @@ const JustificationFilters: React.FC<Props> = ({
               className="px-6 py-2 bg-[#01b001] dark:bg-shadowBlue text-white rounded-lg hover:bg-green-600 dark:hover:bg-darkBlue transition-colors duration-300 disabled:opacity-50"
               disabled={loading}
             >
-              {loading ? "Cargando..." : "Recargar Justificaciones"}
+              {loading ? "Cargando" : "Recargar justificaciones"}
             </button>
             <LearningSelect />
           </div>

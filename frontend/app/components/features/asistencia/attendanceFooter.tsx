@@ -34,18 +34,6 @@ const AttendanceFooter: React.FC<AttendanceFooterProps> = ({ studySheet }) => {
                     </span>
                 </div>
             </div>
-
-            {/* Leyenda de símbolos */}
-            <div className="flex-1">
-                <div className="rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 p-4">
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                        <LegendItem label="Asistencia" icon={FaCheck} color="text-green-500" />
-                        <LegendItem label="Retardo" icon={TbLetterR} color="text-yellow-500" />
-                        <LegendItem label="Inasistencia" icon={TbLetterX} color="text-red-500" />
-                        <LegendItem label="Justificación" icon={TbLetterJ} color="text-blue-500" />
-                    </div>
-                </div>
-            </div>
         </div>
     );
 };

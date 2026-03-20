@@ -40,7 +40,7 @@ export const JustificationFormModal: React.FC<JustificationFormModalProps> = ({
                     </div>
                     <div className="ml-4">
                         <h2 className="text-2xl font-bold text-gray-800 dark:text-dark-text">
-                            Formulario de Justificación
+                            Formulario de justificación
                         </h2>
                         <p className="text-gray-600 dark:text-dark-textSecondary text-sm">
                             Completa los datos para justificar tu ausencia
