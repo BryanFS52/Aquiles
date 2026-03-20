@@ -125,6 +125,17 @@ const DUMMY_COORDINATIONS: Coordination[] = [
                         document: "44556677"
                     }
                 }
+            },
+            {
+                id: "t10",
+                state: true,
+                collaborator: {
+                    person: {
+                        name: "Ana",
+                        lastname: "Garcia",
+                        document: "99887766"
+                    }
+                }
             }
         ]
     },
@@ -351,11 +362,11 @@ const CoordinacionesContainer: React.FC = () => {
                     </h3>
                     <div className="flex items-center gap-2 self-start sm:self-auto">
                         {coordination.state ? (
-                            <span className="flex items-center gap-1 px-2 py-1 bg-lightGreen/10 dark:bg-blue-900/20 text-lightGreen dark:text-blue-300 rounded-full text-xs sm:text-sm">
+                            <span className="flex items-center gap-1 px-2 py-1 bg-lightGreen dark:bg-lightGreen text-white dark:text-white rounded-full text-xs sm:text-sm">
                                 Activa
                             </span>
                         ) : (
-                            <span className="flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-full text-xs sm:text-sm">
+                            <span className="flex items-center gap-1 px-2 py-1 bg-red-600 dark:bg-red text-white dark:text-white rounded-full text-xs sm:text-sm">
                                 Inactiva
                             </span>
                         )}
@@ -408,12 +419,12 @@ const CoordinacionesContainer: React.FC = () => {
                                         </div>
                                     ) : null
                                 )}
-                                {(coordination.teachers?.length || 0) > 3 && (
+                                {(coordination.teachers?.length || 0) > 2 && (
                                     <button
                                         onClick={() => toggleExpanded(coordination.id!)}
                                         className="w-full text-xs text-primary dark:text-blue-300 hover:text-primary/80 dark:hover:text-blue-400 text-center py-1.5 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-medium"
                                     >
-                                        {isExpanded ? 'Ver menos' : `+${(coordination.teachers?.length || 0) - 3} instructores más`}
+                                        {isExpanded ? 'Ver menos' : `+${(coordination.teachers?.length || 0) - 2} instructores más`}
                                     </button>
                                 )}
                             </div>
@@ -433,7 +444,7 @@ const CoordinacionesContainer: React.FC = () => {
             header: 'Coordinación',
             className: 'min-w-[200px]',
             render: (coordination: Coordination) => (
-                <div className="font-medium text-primary dark:text-blue-300 capitalize">
+                <div className="font-medium text-gray dark:text-white capitalize">
                     <div className="truncate">{coordination.name}</div>
                 </div>
             ),
@@ -443,7 +454,7 @@ const CoordinacionesContainer: React.FC = () => {
             header: 'Centro',
             className: 'min-w-[180px] hidden sm:table-cell text-center',
             render: (coordination: Coordination) => (
-                <div className="flex justify-center text-darkBlue dark:text-white capitalize">
+                <div className="flex justify-center text-gray dark:text-white capitalize">
                     <div className="truncate text-center">{coordination.trainingCenter?.name || 'No asignado'}</div>
                 </div>
             ),
@@ -457,9 +468,9 @@ const CoordinacionesContainer: React.FC = () => {
                 const totalTeachers = coordination.teachers?.length || 0;
                 return (
                     <div className="flex items-center justify-center gap-2">
-                        <Users className="text-secondary dark:text-white flex-shrink-0" size={14} />
+                        <Users className="text-gray dark:text-white flex-shrink-0" size={14} />
                         <span className="text-sm">
-                            <span className="font-medium text-lightGreen dark:text-lightGreen">{activeTeachers}</span>
+                            <span className="font-medium text-gray dark:text-white">{activeTeachers}</span>
                             <span className="text-grayText dark:text-gray-400">/{totalTeachers}</span>
                         </span>
                     </div>
@@ -474,8 +485,8 @@ const CoordinacionesContainer: React.FC = () => {
                 <div className="flex justify-center">
                     <span
                         className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${coordination.state
-                            ? 'bg-lightGreen/10 dark:bg-blue-900/20 text-lightGreen dark:text-blue-300'
-                            : 'bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400'
+                            ? 'bg-lightGreen dark:bg-lightGreen text-white dark:text-white'
+                            : 'bg-red-600 dark:bg-red-600 text-white dark:text-white'
                             }`}
                     >
                         <span>{coordination.state ? 'Activa' : 'Inactiva'}</span>
@@ -503,7 +514,7 @@ const CoordinacionesContainer: React.FC = () => {
         );
     };
 
-    // ⚠️ COMENTADO TEMPORALMENTE: Manejo de loading y error del backend
+    // COMENTADO TEMPORALMENTE: Manejo de loading y error del backend
     /*
     if (loading) {
         return <Loader />;
@@ -523,7 +534,7 @@ const CoordinacionesContainer: React.FC = () => {
     }
     */
 
-    // 🔄 CAMBIO TEMPORAL: Siempre mostrar datos porque no dependen del backend ahora
+    // CAMBIO TEMPORAL: Siempre mostrar datos porque no dependen del backend ahora
     // if (!coordinacionesData || coordinacionesData.length === 0) {
     // Comentado porque siempre tenemos datos dummy
     /*
@@ -549,7 +560,7 @@ const CoordinacionesContainer: React.FC = () => {
                     <button
                         onClick={() => setViewMode('cards')}
                         className={`flex items-center justify-center gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all flex-1 sm:flex-none ${viewMode === 'cards'
-                            ? 'bg-primary dark:bg-shadowBlue text-white shadow-sm'
+                            ? 'bg-gradient-to-r from-primary to-lightGreen dark:from-secondary dark:to-blue-900 text-white shadow-sm'
                             : 'text-darkGray dark:text-gray-300 hover:text-primary dark:hover:text-shadowBlue hover:bg-gray-50 dark:hover:bg-gray-700'
                             }`}
                     >
@@ -559,7 +570,7 @@ const CoordinacionesContainer: React.FC = () => {
                     <button
                         onClick={() => setViewMode('table')}
                         className={`flex items-center justify-center gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-all flex-1 sm:flex-none ${viewMode === 'table'
-                            ? 'bg-primary dark:bg-shadowBlue text-white shadow-sm'
+                            ? 'bg-gradient-to-r from-primary to-lightGreen dark:from-secondary dark:to-blue-900 text-white shadow-sm'
                             : 'text-darkGray dark:text-gray-300 hover:text-primary dark:hover:text-shadowBlue hover:bg-gray-50 dark:hover:bg-gray-700'
                             }`}
                     >
@@ -571,13 +582,13 @@ const CoordinacionesContainer: React.FC = () => {
 
             {/* Renderizado condicional basado en el modo de vista */}
             {viewMode === 'cards' ? (
-                // 🔄 CAMBIO TEMPORAL: coordinacionesData era "coordinaciones" - REVERTIR DESPUÉS */
+                // CAMBIO TEMPORAL: coordinacionesData era "coordinaciones" - REVERTIR DESPUÉS */
                 <CardGrid
                     items={coordinacionesData}
                     renderCard={renderCoordinationCard}
                     pageSize={6}
                     columns={1} // 1 columna en móvil, se ajusta automáticamente en el CardGrid
-                    filterPlaceholder="Buscar coordinaciones..."
+                    filterPlaceholder="Buscar coordinaciones"
                     filterFunction={filterFunction}
                     isDarkMode={isDarkMode}
                     className="min-h-[400px]"
@@ -585,13 +596,13 @@ const CoordinacionesContainer: React.FC = () => {
             ) : (
                 <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden shadow-sm">
                     <div className="overflow-x-auto">
-                        {/* 🔄 CAMBIO TEMPORAL: coordinacionesData era "coordinaciones" - REVERTIR DESPUÉS */}
+                        {/* CAMBIO TEMPORAL: coordinacionesData era "coordinaciones" - REVERTIR DESPUÉS */}
                         <DataTable
                             columns={tableColumns}
                             data={coordinacionesData}
                             isDarkMode={isDarkMode}
                             pageSize={10}
-                            filterPlaceholder="Buscar coordinaciones..."
+                            filterPlaceholder="Buscar coordinaciones"
                             filterFunction={filterFunction}
                             className="min-h-[400px] min-w-[600px]"
                         />

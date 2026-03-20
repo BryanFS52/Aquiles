@@ -9,7 +9,7 @@ function DataTable<T extends object>({
     data,
     isDarkMode = false,
     pageSize = 5,
-    filterPlaceholder = "Buscar...",
+    filterPlaceholder = "Buscar",
     filterFunction,
     className = "",
     onAddClick,
@@ -108,8 +108,8 @@ function DataTable<T extends object>({
 
     // Clases para las filas individuales
     const getRowClasses = (isDark: boolean) => isDark
-        ? "border-grayText/30 hover:bg-darkBlue/30 bg-shadowBlue"
-        : "border-gray-100 hover:bg-blue-50/50 bg-white";
+        ? "border-grayText/30 hover:bg-darkBlue/30"
+        : "border-gray-100 hover:bg-blue-50/50";
 
     const handlePageChange = (newPage: number) => {
         if (newPage < 1 || newPage > totalPages) return;
@@ -156,7 +156,7 @@ function DataTable<T extends object>({
             {/* Tabla */}
             <div className="overflow-hidden rounded-b-2xl sm:rounded-b-3xl">
                 <div className="overflow-x-auto overflow-y-auto">
-                    <table className={`min-w-full ${tableBackgroundClasses}`}>
+                    <table className={`min-w-full border-separate border-spacing-0 ${tableBackgroundClasses}`}>
                         <thead>
                             <tr className={`border-y ${headerClasses}`}>
                                 {columns.map((col) => (

@@ -4,19 +4,19 @@ import { GoSearch } from "react-icons/go";
 import { MultiFilterState } from "@redux/slices/justificationSlice";
 
 // Toggle Switch Component
-export const ToggleSwitch = ({ 
-  isActive, 
-  onClick, 
-  label, 
-  size = "normal" 
+export const ToggleSwitch = ({
+  isActive,
+  onClick,
+  label,
+  size = "normal"
 }: {
   isActive: boolean;
   onClick: () => void;
   label: string;
   size?: "normal" | "small";
 }) => {
-  const sizeClasses = size === "small" 
-    ? "h-4 w-7" 
+  const sizeClasses = size === "small"
+    ? "h-4 w-7"
     : "h-6 w-11";
   const thumbClasses = size === "small"
     ? "h-3 w-3"
@@ -47,10 +47,10 @@ export const ToggleSwitch = ({
 };
 
 // Filter Input Component
-export const FilterInput = ({ 
-  type, 
-  placeholder, 
-  value, 
+export const FilterInput = ({
+  type,
+  placeholder,
+  value,
   onChange,
   onKeyDown,
   onPaste,
@@ -83,10 +83,10 @@ export const FilterInput = ({
 );
 
 // Filter Select Component
-export const FilterSelect = ({ 
-  value, 
-  onChange, 
-  options, 
+export const FilterSelect = ({
+  value,
+  onChange,
+  options,
   placeholder,
   id,
   title,

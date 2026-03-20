@@ -37,7 +37,7 @@ export const MultiFilterGrid = ({
           className="px-3 py-2.5 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors disabled:opacity-50"
           disabled={!hasActiveFilters}
         >
-          Limpiar Filtros
+          Limpiar filtros
         </button>
         <div className="flex-shrink-0 ">
           <div className="bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600">
@@ -80,7 +80,7 @@ export const MultiFilterGrid = ({
 
         {/* Fecha de Ausencia Filter */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Ausencia</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de ausencia</label>
           <FilterInput
             type="text"
             placeholder="DD/MM/YYYY"
@@ -92,7 +92,7 @@ export const MultiFilterGrid = ({
 
         {/* Fecha Filter */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de Justificación</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha de justificación</label>
           <FilterInput
             type="text"
             placeholder="DD/MM/YYYY"

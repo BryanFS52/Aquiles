@@ -104,7 +104,7 @@ const JustificacionesInstructorContainer: React.FC<
       // refrescar lista
       handleRefresh();
     } catch (error) {
-      console.error("❌ Error al actualizar justificationStatus:", error);
+      console.error("Error al actualizar justificationStatus:", error);
     }
   };
 
@@ -119,7 +119,7 @@ const JustificacionesInstructorContainer: React.FC<
       ) : (
         <>
           <PageTitle onBack={() => router.back()}>
-            Justificaciones de la Ficha - {competenceName}
+            Justificaciones de la ficha - {competenceName}
             {fichaNumber && ` - Ficha ${fichaNumber}`}
           </PageTitle>
 

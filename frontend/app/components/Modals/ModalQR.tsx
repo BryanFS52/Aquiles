@@ -74,18 +74,18 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
         // Generar QR con manejo de errores mejorado
         const generateQR = async () => {
             try {
-                console.log('🔄 Iniciando generación de QR...');
+                console.log('Iniciando generación de QR');
                 const result = await dispatch(generateQrCode({}));
 
                 if (generateQrCode.fulfilled.match(result)) {
-                    console.log('✅ QR generado exitosamente:', result.payload);
+                    console.log('QR generado exitosamente:', result.payload);
                 } else if (generateQrCode.rejected.match(result)) {
-                    console.error('❌ Error en generateQrCode:', result.payload);
+                    console.error('Error en generateQrCode:', result.payload);
                     const errorMsg = result.payload?.message || 'Error desconocido al generar QR';
                     toast.error(`Error al generar QR: ${errorMsg}`);
                 }
             } catch (error) {
-                console.error('💥 Error inesperado generando QR:', error);
+                console.error('Error inesperado generando QR:', error);
                 toast.error('Error inesperado al generar el código QR. Verifica tu conexión.');
             }
         };
@@ -146,7 +146,7 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
             const urlParams = new URLSearchParams(window.location.search);
             let competenceQuarterId = urlParams.get('competenceId') || urlParams.get('competenceQuarterId') || '1';
             
-            console.log('🎯 CompetenceQuarterId obtenido:', competenceQuarterId, {
+            console.log('CompetenceQuarterId obtenido:', competenceQuarterId, {
                 fromUrl: urlParams.get('competenceId') || urlParams.get('competenceQuarterId'),
                 final: competenceQuarterId
             });
@@ -164,7 +164,7 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
                     // Generar URL de asistencia personalizada con todos los parámetros necesarios
                     const personalizedAttendanceUrl = `${baseUrl}/dashboard/FormularioQRAsistencia?sessionId=${data.sessionId}&token=${btoa(data.sessionId + ':' + Date.now())}&studentId=${student.studentId}&email=${encodeURIComponent(student.email)}&competenceQuarterId=${competenceQuarterId}`;
 
-                    console.log('🔗 URL personalizada generada:', personalizedAttendanceUrl);
+                    console.log('URL personalizada generada:', personalizedAttendanceUrl);
 
                     const htmlContent = getAttendanceEmailTemplate({
                         attendanceUrl: personalizedAttendanceUrl, // URL personalizada con todos los parámetros
@@ -184,14 +184,14 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
 
                     if (sendEmailNotification.fulfilled.match(result)) {
                         successCount++;
-                        console.log(`✅ Correo enviado exitosamente a: ${student.email} (StudentID: ${student.studentId})`);
+                        console.log(`Correo enviado exitosamente a: ${student.email} (StudentID: ${student.studentId})`);
                     } else {
                         errorCount++;
-                        console.error(`❌ Error enviando correo a: ${student.email}`, result.payload);
+                        console.error(`Error enviando correo a: ${student.email}`, result.payload);
                     }
                 } catch (error) {
                     errorCount++;
-                    console.error(`❌ Error inesperado enviando correo a: ${student.email}`, error);
+                    console.error(`Error inesperado enviando correo a: ${student.email}`, error);
                 }
             });
 
@@ -220,14 +220,14 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={handleClose} title="Código QR Para la Toma de Asistencia" size="lg">
+        <Modal isOpen={isOpen} onClose={handleClose} title="Código QR para la toma de asistencia" size="lg">
             <div className={`flex flex-col items-center ${isMobile ? 'px-3' : 'px-4 sm:px-6'}`}>
                 {/* QR Code Container - Solo optimizado para móviles */}
                 <div className={`${isMobile ? 'w-48 h-48 mb-3 p-2' : 'w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 mb-4 sm:mb-6 p-3'} flex items-center justify-center bg-white rounded-lg shadow-sm mx-auto`}>
                     {loading ? (
                         <div className="flex flex-col items-center space-y-2">
                             <div className={`animate-spin rounded-full ${isMobile ? 'h-6 w-6' : 'h-8 w-8 sm:h-12 sm:w-12'} border-b-2 border-blue-600`}></div>
-                            <span className={`${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} text-gray-600`}>Generando QR...</span>
+                            <span className={`${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} text-gray-600`}>Generando QR</span>
                         </div>
                     ) : error ? (
                         <div className={`flex flex-col items-center ${isMobile ? 'space-y-2' : 'space-y-3'} text-center text-red-600`}>
@@ -240,10 +240,10 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
                             </div>
                             <button
                                 onClick={() => {
-                                    console.log('🔄 Reintentando generación de QR...');
+                                    console.log('Reintentando generación de QR');
                                     dispatch(generateQrCode({}));
                                 }}
-                                className="text-xs bg-red-100 text-red-700 px-3 py-1 rounded-full hover:bg-red-200"
+                                className="text-xs bg-red-600 text-red-100 px-3 py-1 rounded-full hover:bg-red-200"
                             >
                                 Reintentar
                             </button>
@@ -345,7 +345,7 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
                         {emailLoading ? (
                             <>
                                 <div className={`animate-spin rounded-full ${isMobile ? 'h-3 w-3' : 'h-4 w-4'} border-b-2 border-white`}></div>
-                                <span>Enviando...</span>
+                                <span>Enviando</span>
                             </>
                         ) : (
                             "Enviar Correo"
@@ -372,7 +372,7 @@ const ModalQR: React.FC<ModalQRProps> = ({ isOpen, onClose }) => {
                 {/* Session Info - Solo para debug */}
                 {data?.sessionId && (
                     <div className={`${isMobile ? 'mt-3' : 'mt-4'} p-2 bg-gray-50 dark:bg-gray-800 rounded text-xs text-gray-500 dark:text-gray-400 text-center ${isMobile ? 'max-w-xs' : 'max-w-sm'}`}>
-                        ID: {data.sessionId.substring(0, 8)}...
+                        ID: {data.sessionId.substring(0, 8)}
                     </div>
                 )}
             </div>

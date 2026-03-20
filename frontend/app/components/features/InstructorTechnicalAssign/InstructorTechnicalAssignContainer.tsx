@@ -11,6 +11,7 @@ import { TEMPORAL_COORDINATOR_ID } from '@/temporaryCredential';
 import PageTitle from '@/components/UI/pageTitle';
 import StatsCards from './StatsCards';
 import SheetCard from './SheetCard';
+import SheetDetailModal from './SheetDetailModal';
 
 // ========== DATOS QUEMADOS - INICIO ==========
 // Estos datos son de ejemplo para pruebas y desarrollo
@@ -34,13 +35,13 @@ const HARDCODED_STUDY_SHEETS = [
       id: "1",
       program: {
         id: "1",
-        name: "Tecnología en Análisis y Desarrollo de Software",
+        name: "Tecnología en análisis y desarrollo de software",
         acronym: "ADSO"
       }
     },
     trainingProject: {
       id: "1",
-      title: "Sistema de Gestión Académica"
+      title: "Sistema de gestión académica"
     }
   },
   {
@@ -60,13 +61,13 @@ const HARDCODED_STUDY_SHEETS = [
       id: "2",
       program: {
         id: "2",
-        name: "Tecnología en Redes de Computadores",
+        name: "Tecnología en redes de computadores",
         acronym: "REDES"
       }
     },
     trainingProject: {
       id: "2",
-      title: "Infraestructura de Red Empresarial"
+      title: "Infraestructura de red empresarial"
     }
   },
   {
@@ -86,13 +87,13 @@ const HARDCODED_STUDY_SHEETS = [
       id: "3",
       program: {
         id: "3",
-        name: "Tecnología en Gestión Empresarial",
+        name: "Tecnología en gestión empresarial",
         acronym: "GESTION"
       }
     },
     trainingProject: {
       id: "3",
-      title: "Plan de Negocio Digital"
+      title: "Plan de negocio digital"
     }
   },
   {
@@ -104,7 +105,7 @@ const HARDCODED_STUDY_SHEETS = [
     state: true,
     journey: {
       id: "3",
-      name: "Fines de Semana",
+      name: "Fines de semana",
       startTime: "07:00",
       endTime: "17:00"
     },
@@ -112,13 +113,13 @@ const HARDCODED_STUDY_SHEETS = [
       id: "4",
       program: {
         id: "4",
-        name: "Tecnología en Diseño Gráfico",
+        name: "Tecnología en diseño gráfico",
         acronym: "DISEÑO"
       }
     },
     trainingProject: {
       id: "4",
-      title: "Campaña Publicitaria Integral"
+      title: "Campaña publicitaria integral"
     }
   },
   {
@@ -138,13 +139,13 @@ const HARDCODED_STUDY_SHEETS = [
       id: "5",
       program: {
         id: "5",
-        name: "Tecnología en Mantenimiento de Equipos de Cómputo",
+        name: "Tecnología en mantenimiento de equipos de cómputo",
         acronym: "MECOM"
       }
     },
     trainingProject: {
       id: "5",
-      title: "Centro de Servicios Técnicos"
+      title: "Centro de servicios técnicos"
     }
   },
   {
@@ -164,13 +165,13 @@ const HARDCODED_STUDY_SHEETS = [
       id: "6",
       program: {
         id: "6",
-        name: "Tecnología en Contabilidad y Finanzas",
+        name: "Tecnología en contabilidad y finanzas",
         acronym: "CONTAFIN"
       }
     },
     trainingProject: {
       id: "6",
-      title: "Sistema Contable para MIPYMES"
+      title: "Sistema contable para MIPYMES"
     }
   },
   {
@@ -196,7 +197,7 @@ const HARDCODED_STUDY_SHEETS = [
     },
     trainingProject: {
       id: "7",
-      title: "Plataforma de Contenido Digital"
+      title: "Plataforma de contenido digital"
     }
   },
   {
@@ -216,13 +217,13 @@ const HARDCODED_STUDY_SHEETS = [
       id: "8",
       program: {
         id: "8",
-        name: "Tecnología en Seguridad y Salud en el Trabajo",
+        name: "Tecnología en seguridad y salud en el trabajo",
         acronym: "SST"
       }
     },
     trainingProject: {
       id: "8",
-      title: "Sistema de Gestión de SST Empresarial"
+      title: "Sistema de gestión de SST empresarial"
     }
   },
   {
@@ -234,7 +235,7 @@ const HARDCODED_STUDY_SHEETS = [
     state: true,
     journey: {
       id: "3",
-      name: "Fines de Semana",
+      name: "Fines de semana",
       startTime: "07:00",
       endTime: "17:00"
     },
@@ -242,13 +243,13 @@ const HARDCODED_STUDY_SHEETS = [
       id: "9",
       program: {
         id: "9",
-        name: "Tecnología en Gestión Logística",
+        name: "Tecnología en gestión logística",
         acronym: "LOGISTICA"
       }
     },
     trainingProject: {
       id: "9",
-      title: "Optimización de Cadena de Suministro"
+      title: "Optimización de cadena de suministro"
     }
   },
   {
@@ -268,13 +269,13 @@ const HARDCODED_STUDY_SHEETS = [
       id: "10",
       program: {
         id: "10",
-        name: "Tecnología en Desarrollo de Videojuegos",
+        name: "Tecnología en desarrollo de videojuegos",
         acronym: "VIDEOJUEGOS"
       }
     },
     trainingProject: {
       id: "10",
-      title: "Videojuego Educativo Interactivo"
+      title: "Videojuego educativo interactivo"
     }
   },
   {
@@ -294,13 +295,13 @@ const HARDCODED_STUDY_SHEETS = [
       id: "11",
       program: {
         id: "11",
-        name: "Tecnología en Automática Industrial",
+        name: "Tecnología en automática industrial",
         acronym: "AUTOMATICA"
       }
     },
     trainingProject: {
       id: "11",
-      title: "Sistema de Control Automatizado"
+      title: "Sistema de control automatizado"
     }
   },
   {
@@ -320,13 +321,13 @@ const HARDCODED_STUDY_SHEETS = [
       id: "12",
       program: {
         id: "12",
-        name: "Tecnología en Marketing Digital",
+        name: "Tecnología en marketing digital",
         acronym: "MARKETING"
       }
     },
     trainingProject: {
       id: "12",
-      title: "Estrategia Digital para Emprendimientos"
+      title: "Estrategia digital para emprendimientos"
     }
   },
   {
@@ -346,13 +347,13 @@ const HARDCODED_STUDY_SHEETS = [
       id: "13",
       program: {
         id: "13",
-        name: "Tecnología en Gestión de Proyectos",
+        name: "Tecnología en gestión de proyectos",
         acronym: "PROYECTOS"
       }
     },
     trainingProject: {
       id: "13",
-      title: "Gestión de Proyecto de Innovación Tecnológica"
+      title: "Gestión de proyecto de innovación tecnológica"
     }
   }
 ];
@@ -558,12 +559,12 @@ const HARDCODED_TEACHERS = [
 const HARDCODED_COORDINATIONS = [
   {
     id: "coord1",
-    name: "Coordinación Tecnologías de la Información",
+    name: "Coordinación tecnologías de la información",
     state: true,
     teachers: HARDCODED_TEACHERS,
     trainingCenter: {
       id: "center1",
-      name: "Centro de Biotecnología Agropecuaria"
+      name: "Centro de biotecnología agropecuaria"
     }
   }
 ];
@@ -576,6 +577,8 @@ const InstructorTechnicalAssignContainer: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const [selectedInstructor, setSelectedInstructor] = useState<Record<string, string>>({});
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedSheet, setSelectedSheet] = useState<any | null>(null);
 
   // ========== DATOS REALES - COMENTADO PARA PRUEBAS ==========
   // DESCOMENTAR estas líneas cuando quieras usar datos reales
@@ -681,7 +684,7 @@ const InstructorTechnicalAssignContainer: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-4"></div>
-          <p className="text-lg font-semibold text-gray-700 dark:text-white">Cargando datos.</p>
+          <p className="text-lg font-semibold text-gray-700 dark:text-white">Cargando datos</p>
         </div>
       </div>
     );
@@ -703,22 +706,42 @@ const InstructorTechnicalAssignContainer: React.FC = () => {
       {/* Este mapeo funciona igual con datos reales o quemados */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
         {studySheets.map((sheet) => (
-          <SheetCard
+          <div
             key={sheet.id}
-            sheet={sheet}
-            teachers={teachers}
-            selectedInstructor={selectedInstructor[sheet.id!] || ""}
-            onSelectInstructor={(instructorId) =>
-              setSelectedInstructor((prev) => ({
-                ...prev,
-                [sheet.id!]: instructorId,
-              }))
-            }
-            onAssignInstructor={() => handleAssignInstructor(sheet.id!, selectedInstructor[sheet.id!])}
-          />
+            onClick={() => {
+              setSelectedSheet(sheet);
+              setModalOpen(true);
+            }}
+            className="cursor-pointer"
+          >
+            <SheetCard
+              sheet={sheet}
+              teachers={teachers}
+              selectedInstructor={selectedInstructor[sheet.id!] || ""}
+              onSelectInstructor={(instructorId) =>
+                setSelectedInstructor((prev) => ({
+                  ...prev,
+                  [sheet.id!]: instructorId,
+                }))
+              }
+              onAssignInstructor={() => handleAssignInstructor(sheet.id!, selectedInstructor[sheet.id!])}
+            />
+          </div>
         ))}
       </div>
-
+      {/* Modal de detalle de ficha */}
+      {selectedSheet && (
+        <SheetDetailModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          sheet={{
+            number: selectedSheet.number,
+            program: selectedSheet.offer?.program || { id: '', name: 'N/A' },
+            students: selectedSheet.students || [],
+            assignedTeacher: null // Aquí puedes pasar el instructor asignado si lo tienes
+          }}
+        />
+      )}
       {/* ========== EMPTY STATE ========== */}
       {/* Este estado vacío funciona igual con datos reales o quemados */}
       {studySheets.length === 0 && (
@@ -740,7 +763,7 @@ const InstructorTechnicalAssignContainer: React.FC = () => {
 
 export default InstructorTechnicalAssignContainer;
 
-/* 
+/*
 ========== INSTRUCCIONES PARA ALTERNAR ENTRE DATOS QUEMADOS Y REALES ==========
 
 PARA USAR DATOS NORMALES (reales):
@@ -769,6 +792,6 @@ PARA USAR DATOS NORMALES (reales):
 NOTA: Los componentes StatsCards y SheetCard funcionan igual con ambos tipos de datos,
       no necesitan modificación.
 
-PARA VOLVER A DATOS QUEMADOS: Simplemente cambia USE_HARDCODED_DATA a true y 
+PARA VOLVER A DATOS QUEMADOS: Simplemente cambia USE_HARDCODED_DATA a true y
 revierte los cambios anteriores.
 */

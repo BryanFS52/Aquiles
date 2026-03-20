@@ -220,21 +220,21 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 order-2 xl:order-2">
                         <button
                             onClick={handleAttendanceClick}
-                            className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl shadow bg-gradient-to-r from-lime-400 to-lime-600 dark:from-shadowBlue dark:to-darkBlue text-black dark:text-white hover:bg-lightGreen dark:hover:bg-shadowBlue transition border hover:border-lightGreen dark:hover:border-shadowBlue whitespace-nowrap"
+                            className="flex items-center gap-3flex justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl shadow text-white bg-gradient-to-r from-primary to-lightGreen hover:from-primary/90 hover:to-lightGreen/90 dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90  dark:text-white"
                         >
-                            <span className="hidden xs:inline">Toma de </span>asistencia <BsQrCode className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="hidden xs:inline">Toma de</span>asistencia<BsQrCode className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
 
                         <button
                             onClick={() => onNavigate(selectedCompetence)}
                             disabled={!selectedCompetence}
                             className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold rounded-xl shadow whitespace-nowrap transition ${selectedCompetence
-                                ? 'bg-gradient-to-r from-lime-400 to-lime-600 dark:from-shadowBlue dark:to-darkBlue text-black dark:text-white hover:bg-lightGreen dark:hover:bg-shadowBlue cursor-pointer'
+                                ? 'bg-gradient-to-r text-white from-primary to-lightGreen hover:from-primary/90 hover:to-lightGreen/90 dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90  dark:text-white'
                                 : 'bg-lightGray dark:bg-gray-600 text-grayText dark:text-gray-400 cursor-not-allowed opacity-60'
                                 }`}
                             title={!selectedCompetence ? 'Debe seleccionar una competencia primero' : ''}
                         >
-                            <span className="hidden xs:inline">Asistencia</span> manual <FaClipboardList className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="hidden xs:inline">Asistencia</span>manual <FaClipboardList className="w-3 h-3 sm:w-4 sm:h-4" />
                         </button>
 
                         {/* Selector de Competencia */}
@@ -256,7 +256,7 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                     <div className="flex items-center justify-center gap-2 sm:gap-3 order-3 xl:order-3">
                         <button
                             onClick={handlePreviousTrimester}
-                            className="bg-gradient-to-r from-lime-400 to-lime-600 dark:from-shadowBlue dark:to-darkBlue text-black dark:text-white rounded-xl p-1.5 sm:p-2 hover:text-white dark:hover:text-gray-200 transition flex-shrink-0"
+                            className="bg-gradient-to-r from-primary to-lightGreen hover:from-primary/90 hover:to-lightGreen/90 dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90  dark:text-white rounded-xl p-1.5 sm:p-2 hover:text-white dark:hover:text-gray-200 transition flex-shrink-0"
                         >
                             <IoIosArrowBack className="text-base sm:text-xl" />
                         </button>
@@ -265,7 +265,7 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                         </span>
                         <button
                             onClick={handleNextTrimester}
-                            className="bg-gradient-to-r from-lime-400 to-lime-600 dark:from-shadowBlue dark:to-darkBlue text-black dark:text-white rounded-xl p-1.5 sm:p-2 hover:text-white dark:hover:text-gray-200 transition flex-shrink-0"
+                            className="bg-gradient-to-r text-gray from-primary to-lightGreen hover:from-primary/90 hover:to-lightGreen/90 dark:from-secondary dark:to-darkBlue dark:hover:from-secondary/90 dark:hover:to-darkBlue/90  dark:text-white rounded-xl p-1.5 sm:p-2 hover:text-white dark:hover:text-gray-200 transition flex-shrink-0"
                         >
                             <IoIosArrowForward className="text-base sm:text-xl" />
                         </button>
@@ -294,7 +294,7 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                             <motion.button
                                 onClick={handleYesClick}
                                 whileHover={{ scale: 1.05 }}
-                                className="bg-lightGreen dark:bg-shadowBlue border border-darkGreen dark:border-darkBlue rounded-xl px-3 sm:px-4 py-1 text-white font-medium text-sm"
+                                className="bg-lightGreen dark:bg-lightGreen/90 border border-lightGreen dark:border-lightGreen rounded-xl px-3 sm:px-4 py-1 text-white font-medium text-sm"
                             >
                                 Sí
                             </motion.button>
@@ -395,24 +395,24 @@ const TableAttendance: React.FC<TableAttendanceProps> = ({ studySheetData, onNav
                 </div>
 
                 {/* Leyenda de iconos */}
-                <div className="bg-white border border-lightGray rounded-xl shadow-sm p-4">
-                    <h3 className="text-sm font-semibold text-darkGray mb-3">Leyenda de asistencia:</h3>
+                <div className="bg-whitedark:bg-gradient-to-br dark:from-shadowBlue dark:to-darkBlue border border-lightGray dark:border-gray-700 rounded-xl shadow-sm p-4">
+                    <h3 className="text-sm font-semibold text-gray dark:text-white mb-3">Leyenda de asistencia:</h3>
                     <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
                         <div className="flex items-center gap-2">
                             <FaCheck className="text-green-500" />
-                            <span className="text-xs sm:text-sm text-darkGray">Presente</span>
+                            <span className="text-xs sm:text-sm text-gray dark:text-white">Presente</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <FaTimes className="text-red-500" />
-                            <span className="text-xs sm:text-sm text-darkGray">Ausente</span>
+                            <span className="text-xs sm:text-sm text-gray dark:text-white">Ausente</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <FaClock className="text-yellow-500" />
-                            <span className="text-xs sm:text-sm text-darkGray">Retardo</span>
+                            <span className="text-xs sm:text-sm text-gray dark:text-white">Retardo</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <FaExclamationTriangle className="text-blue-500" />
-                            <span className="text-xs sm:text-sm text-darkGray">Justificado</span>
+                            <span className="text-xs sm:text-sm text-gray dark:text-white">Justificado</span>
                         </div>
                     </div>
                 </div>

@@ -98,7 +98,7 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
                 lastname: 'Temporal',
                 email: 'temp@example.com'
             },
-            roles: [{ name: 'instructor' }] // Cambia por: 'instructor' o 'coordinador' si necesitas otro rol
+            roles: [{ name: 'coordinador' }] // Cambia por: 'instructor','coordinador' o 'aprendiz' si necesitas otro rol
         };
         
         console.log('[ClientLayoutWrapper] Usando usuario temporal para bypass');
