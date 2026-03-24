@@ -17,9 +17,10 @@ const USE_REAL_SERVICE = false // Modo datos quemados
 // const USE_REAL_SERVICE = true // Modo servicio real
 
 const DUMMY_TRAINING_PROJECTS = [
-  { id: 1, trainingProjectName: 'Proyecto Formativo Software Empresarial' },
-  { id: 2, trainingProjectName: 'Proyecto Formativo Redes e Infraestructura' },
-  { id: 3, trainingProjectName: 'Proyecto Formativo Analítica y Datos' },
+  { id: 1, trainingProjectName: 'Proyecto formativo Software empresarial' },
+  { id: 2, trainingProjectName: 'Proyecto formativo Redes e infraestructura' },
+  { id: 3, trainingProjectName: 'Proyecto formativo Analítica y datos' },
+  { id: 4, trainingProjectName: 'Proyecto formativo Ciberseguridad' },
 ]
 
 const DUMMY_STUDY_SHEETS_BY_PROJECT: Record<number, Array<{ id: number; number: string; journey?: { name: string } }>> = {
@@ -34,6 +35,10 @@ const DUMMY_STUDY_SHEETS_BY_PROJECT: Record<number, Array<{ id: number; number: 
   3: [
     { id: 301, number: '2758971', journey: { name: 'Tarde' } },
     { id: 302, number: '2758973', journey: { name: 'Noche' } },
+  ],
+  4: [
+    { id: 401, number: '2758975', journey: { name: 'Mañana' } },
+    { id: 402, number: '2758977', journey: { name: 'Tarde' } },
   ],
 }
 
