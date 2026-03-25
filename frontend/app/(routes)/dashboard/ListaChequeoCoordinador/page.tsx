@@ -801,6 +801,22 @@ export default function CoordinadorChecklistView() {
     return []
   }, [checklistDetail, juryAssignments])
 
+  // Agrupar criterios por componente
+  const groupedItems = useMemo(() => {
+    if (!checklistDetail?.items) return {};
+
+    return checklistDetail.items.reduce((acc: any, item: any) => {
+      const code = item.code?.toUpperCase() || "";
+
+      const categoryName = code.startsWith('TEC') ? 'Indicadores técnicos' :
+        code.startsWith('ACT') ? 'Indicadores actitudinales' : 'Otros';
+
+      if (!acc[categoryName]) acc[categoryName] = [];
+      acc[categoryName].push(item);
+      return acc;
+    }, {});
+  }, [checklistDetail]);
+
   return (
     <>
       <PageTitle>Listas de chequeo trimestrales</PageTitle>
@@ -1032,7 +1048,7 @@ export default function CoordinadorChecklistView() {
                       </div>
 
                       {isChecklistLocked(checklist) && (
-                        <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] font-semibold text-amber-700">
+                        <div className="rounded-lg border border-amber-200 dark:border-amber-700 bg-amber-50 dark:bg-[#232a3a] px-3 py-2 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
                           Lista bloqueada: en evaluación o cerrada. No admite edición/eliminación.
                         </div>
                       )}
@@ -1130,19 +1146,37 @@ export default function CoordinadorChecklistView() {
                 <p className="mt-1 whitespace-pre-wrap text-sm text-gray-900 dark:text-gray-100">{checklistDetail.remarks || 'Sin observaciones'}</p>
               </div>
 
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-gray-900/40">
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Indicadores técnicos</p>
-                  <p className="mt-1 text-xl font-bold text-gray-900 dark:text-white">
-                    {checklistDetail.items?.filter((item: any) => item.code?.startsWith('TEC')).length ?? 0}
-                  </p>
-                </div>
-                <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-gray-900/40">
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Indicadores actitudinales</p>
-                  <p className="mt-1 text-xl font-bold text-gray-900 dark:text-white">
-                    {checklistDetail.items?.filter((item: any) => item.code?.startsWith('ACT')).length ?? 0}
-                  </p>
-                </div>
+              {/* Categorías agrupadas */}
+              <div className="space-y-4">
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest px-1">Desglose de indicadores</p>
+                {Object.entries(groupedItems).map(([categoryName, items]: [string, any]) => (
+                  <div key={categoryName} className="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900/20 overflow-hidden">
+                    <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                      <h3 className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                        {categoryName}
+                      </h3>
+                    </div>
+                    <ul className="divide-y divide-gray-100 dark:divide-gray-800">
+                      {items.map((item: any, index: number) => {
+                        const itemKey = item.id || `${item.code}-${index}` || `idx-${index}`;
+
+                        return (
+                          <li key={itemKey} className="flex items-start gap-3 p-4 text-sm hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                            <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${item.code?.toUpperCase().startsWith('TEC') ? 'bg-lime-500' : 'bg-blue-500'}`}></span>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[10px] font-mono font-bold text-gray-400 uppercase">
+                                {item.code || 'S/C'}
+                              </span>
+                              <p className="text-gray-700 dark:text-gray-200">
+                                {item.indicator || item.description || "Sin descripción disponible"}
+                              </p>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ))}
               </div>
 
               <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-700 dark:bg-gray-900/40">
