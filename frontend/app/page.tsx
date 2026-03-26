@@ -77,8 +77,8 @@ function HomeContent() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <Loader />
-          <p className="mt-4 text-gray-600">Verificando autenticación...</p>
-          <p className="mt-2 text-gray-500 text-sm">Conectando con cerberos...</p>
+          <p className="mt-4 text-gray-600">Verificando autenticación</p>
+          <p className="mt-2 text-gray-500 text-sm">Conectando con cerberos</p>
         </div>
       </div>
     );
@@ -88,7 +88,7 @@ function HomeContent() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">
         <Loader />
-        <p className="mt-4 text-gray-600">Redirigiendo al login...</p>
+        <p className="mt-4 text-gray-600">Redirigiendo al login</p>
       </div>
     </div>
   );

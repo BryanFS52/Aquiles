@@ -44,8 +44,8 @@ interface ModalJustificationDetailsProps {
 }
 
 const ModalJustificationDetails: React.FC<ModalJustificationDetailsProps> = ({ 
-  isOpen, 
-  onClose, 
+  isOpen,
+  onClose,
   justificationData
 }) => {
   if (!isOpen || !justificationData) return null;

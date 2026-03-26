@@ -10,6 +10,7 @@ import Paginator from "../UI/Paginator/Paginator";
 interface FichaData {
   id: string;
   numeroFicha: string;
+  nombrePrograma: string;
   totalAprendices: number;
   justificacionesPendientes: number;
   justificacionesAprobadas: number;
@@ -43,7 +44,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-18",
       fechaJustificacion: "2025-10-19",
       tipo: "Calamidad Doméstica",
-      estado: "Aprobada",
+      estado: "Pendiente",
       motivo: "Emergencia familiar, se adjunta certificado médico del familiar",
     },
     {
@@ -53,7 +54,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-15",
       fechaJustificacion: "2025-10-18",
       tipo: "Problemas de Transporte",
-      estado: "Rechazada",
+      estado: "Pendiente",
       motivo: "Problemas con el transporte público, sin evidencia adjunta",
     },
     {
@@ -73,7 +74,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-10",
       fechaJustificacion: "2025-10-11",
       tipo: "Cita Médica",
-      estado: "Aprobada",
+      estado: "Pendiente",
       motivo: "Cita con especialista, se adjunta comprobante médico",
     },
     {
@@ -83,7 +84,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-09",
       fechaJustificacion: "2025-10-10",
       tipo: "Enfermedad",
-      estado: "Aprobada",
+      estado: "Pendiente",
       motivo: "Incapacidad médica por resfriado común",
     },
     {
@@ -103,7 +104,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-07",
       fechaJustificacion: "2025-10-08",
       tipo: "Problemas de Transporte",
-      estado: "Rechazada",
+      estado: "Pendiente",
       motivo: "Sin evidencia de problemas de transporte",
     },
     {
@@ -113,7 +114,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-06",
       fechaJustificacion: "2025-10-07",
       tipo: "Cita Médica",
-      estado: "Aprobada",
+      estado: "Pendiente",
       motivo: "Cita con oftalmólogo, se adjunta comprobante",
     },
     {
@@ -126,6 +127,56 @@ const justificationsData: Record<string, any[]> = {
       estado: "Pendiente",
       motivo: "Renovación de documentos personales",
     },
+    {
+      id: "j16",
+      aprendiz: "Isabella Rojas Torres",
+      documento: "5566778899",
+      fechaAusencia: "2025-10-05",
+      fechaJustificacion: "2025-10-06",
+      tipo: "Asunto Personal",
+      estado: "Pendiente",
+      motivo: "Renovación de documentos personales",
+    },
+    {
+      id: "j16",
+      aprendiz: "Isabella Rojas Torres",
+      documento: "5566778899",
+      fechaAusencia: "2025-10-05",
+      fechaJustificacion: "2025-10-06",
+      tipo: "Asunto Personal",
+      estado: "Pendiente",
+      motivo: "Renovación de documentos personales",
+    },
+    {
+      id: "j16",
+      aprendiz: "Isabella Rojas Torres",
+      documento: "5566778899",
+      fechaAusencia: "2025-10-05",
+      fechaJustificacion: "2025-10-06",
+      tipo: "Asunto Personal",
+      estado: "Pendiente",
+      motivo: "Renovación de documentos personales",
+    },
+    {
+      id: "j16",
+      aprendiz: "Isabella Rojas Torres",
+      documento: "5566778899",
+      fechaAusencia: "2025-10-05",
+      fechaJustificacion: "2025-10-06",
+      tipo: "Asunto Personal",
+      estado: "Pendiente",
+      motivo: "Renovación de documentos personales",
+    },
+    {
+      id: "j16",
+      aprendiz: "Isabella Rojas Torres",
+      documento: "5566778899",
+      fechaAusencia: "2025-10-05",
+      fechaJustificacion: "2025-10-06",
+      tipo: "Asunto Personal",
+      estado: "Pendiente",
+      motivo: "Renovación de documentos personales",
+    }
   ],
   "2": [
     {
@@ -145,7 +196,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-25",
       fechaJustificacion: "2025-10-26",
       tipo: "Asunto Familiar",
-      estado: "Pendiente",
+      estado: "Aprobada",
       motivo: "Compromiso familiar importante",
     },
     {
@@ -165,7 +216,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-03",
       fechaJustificacion: "2025-10-04",
       tipo: "Calamidad Doméstica",
-      estado: "Pendiente",
+      estado: "Aprobada",
       motivo: "Inundación en el hogar, gestión de seguros",
     },
     {
@@ -188,6 +239,46 @@ const justificationsData: Record<string, any[]> = {
       estado: "Aprobada",
       motivo: "Diligencias legales personales",
     },
+    {
+      id: "j20",
+      aprendiz: "Gabriela Morales Soto",
+      documento: "9900112233",
+      fechaAusencia: "2025-10-01",
+      fechaJustificacion: "2025-10-02",
+      tipo: "Asunto Personal",
+      estado: "Aprobada",
+      motivo: "Diligencias legales personales",
+    },
+    {
+      id: "j20",
+      aprendiz: "Gabriela Morales Soto",
+      documento: "9900112233",
+      fechaAusencia: "2025-10-01",
+      fechaJustificacion: "2025-10-02",
+      tipo: "Asunto Personal",
+      estado: "Aprobada",
+      motivo: "Diligencias legales personales",
+    },
+    {
+      id: "j20",
+      aprendiz: "Gabriela Morales Soto",
+      documento: "9900112233",
+      fechaAusencia: "2025-10-01",
+      fechaJustificacion: "2025-10-02",
+      tipo: "Asunto Personal",
+      estado: "Aprobada",
+      motivo: "Diligencias legales personales",
+    },
+    {
+      id: "j20",
+      aprendiz: "Gabriela Morales Soto",
+      documento: "9900112233",
+      fechaAusencia: "2025-10-01",
+      fechaJustificacion: "2025-10-02",
+      tipo: "Asunto Personal",
+      estado: "Aprobada",
+      motivo: "Diligencias legales personales",
+    }
   ],
   "3": [
     {
@@ -197,7 +288,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-16",
       fechaJustificacion: "2025-10-17",
       tipo: "Cita Médica",
-      estado: "Aprobada",
+      estado: "Rechazada",
       motivo: "Exámenes de laboratorio programados",
     },
     {
@@ -207,7 +298,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-23",
       fechaJustificacion: "2025-10-24",
       tipo: "Problemas de Transporte",
-      estado: "Pendiente",
+      estado: "Rechazada",
       motivo: "Paro de transporte en la zona",
     },
     {
@@ -227,7 +318,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-09-30",
       fechaJustificacion: "2025-10-01",
       tipo: "Enfermedad",
-      estado: "Aprobada",
+      estado: "Rechazada",
       motivo: "Dolor de estómago agudo, certificado médico adjunto",
     },
     {
@@ -237,7 +328,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-09-29",
       fechaJustificacion: "2025-09-30",
       tipo: "Cita Médica",
-      estado: "Aprobada",
+      estado: "Rechazada",
       motivo: "Control prenatal programado",
     },
     {
@@ -247,7 +338,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-09-28",
       fechaJustificacion: "2025-09-29",
       tipo: "Asunto Familiar",
-      estado: "Pendiente",
+      estado: "Rechazada",
       motivo: "Acompañamiento a padre en cita médica",
     },
     {
@@ -260,6 +351,36 @@ const justificationsData: Record<string, any[]> = {
       estado: "Rechazada",
       motivo: "No presenta evidencia suficiente",
     },
+    {
+      id: "j24",
+      aprendiz: "Juliana Marín Ortiz",
+      documento: "2526272829",
+      fechaAusencia: "2025-09-27",
+      fechaJustificacion: "2025-09-28",
+      tipo: "Problemas de Transporte",
+      estado: "Rechazada",
+      motivo: "No presenta evidencia suficiente",
+    },
+    {
+      id: "j24",
+      aprendiz: "Juliana Marín Ortiz",
+      documento: "2526272829",
+      fechaAusencia: "2025-09-27",
+      fechaJustificacion: "2025-09-28",
+      tipo: "Problemas de Transporte",
+      estado: "Rechazada",
+      motivo: "No presenta evidencia suficiente",
+    },
+    {
+      id: "j24",
+      aprendiz: "Juliana Marín Ortiz",
+      documento: "2526272829",
+      fechaAusencia: "2025-09-27",
+      fechaJustificacion: "2025-09-28",
+      tipo: "Problemas de Transporte",
+      estado: "Rechazada",
+      motivo: "No presenta evidencia suficiente",
+    }
   ],
   "4": [
     {
@@ -279,7 +400,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-09-26",
       fechaJustificacion: "2025-09-27",
       tipo: "Asunto Personal",
-      estado: "Pendiente",
+      estado: "Aprobada",
       motivo: "Gestión de papeles de vehículo",
     },
     {
@@ -292,6 +413,26 @@ const justificationsData: Record<string, any[]> = {
       estado: "Aprobada",
       motivo: "Daño en tubería del hogar, adjunta factura del plomero",
     },
+    {
+      id: "j26",
+      aprendiz: "Sebastián Ortega Luna",
+      documento: "3536373839",
+      fechaAusencia: "2025-09-25",
+      fechaJustificacion: "2025-09-26",
+      tipo: "Calamidad Doméstica",
+      estado: "Aprobada",
+      motivo: "Daño en tubería del hogar, adjunta factura del plomero",
+    },
+    {
+      id: "j26",
+      aprendiz: "Sebastián Ortega Luna",
+      documento: "3536373839",
+      fechaAusencia: "2025-09-25",
+      fechaJustificacion: "2025-09-26",
+      tipo: "Calamidad Doméstica",
+      estado: "Aprobada",
+      motivo: "Daño en tubería del hogar, adjunta factura del plomero",
+    }
   ],
   "5": [
     {
@@ -301,7 +442,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-15",
       fechaJustificacion: "2025-10-16",
       tipo: "Cita Médica",
-      estado: "Aprobada",
+      estado: "Rechazada",
       motivo: "Consulta cardiológica programada con especialista",
     },
     {
@@ -311,7 +452,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-12",
       fechaJustificacion: "2025-10-13",
       tipo: "Enfermedad",
-      estado: "Pendiente",
+      estado: "Rechazada",
       motivo: "Síntomas virales, esperando resultado de exámenes",
     },
     {
@@ -331,7 +472,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-05",
       fechaJustificacion: "2025-10-06",
       tipo: "Calamidad Doméstica",
-      estado: "Aprobada",
+      estado: "Rechazada",
       motivo: "Robo en la vivienda, diligencias con la policía",
     },
   ],
@@ -353,19 +494,9 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-18",
       fechaJustificacion: "2025-10-19",
       tipo: "Cita Médica",
-      estado: "Pendiente",
-      motivo: "Control dermatológico por condición crónica",
-    },
-    {
-      id: "j33",
-      aprendiz: "Fernando Javier Ospina",
-      documento: "7071727374",
-      fechaAusencia: "2025-10-14",
-      fechaJustificacion: "2025-10-15",
-      tipo: "Asunto Familiar",
       estado: "Aprobada",
-      motivo: "Funeral de familiar cercano, adjunta esquela",
-    },
+      motivo: "Control dermatológico por condición crónica",
+    }
   ],
   "7": [
     {
@@ -377,27 +508,7 @@ const justificationsData: Record<string, any[]> = {
       tipo: "Enfermedad",
       estado: "Aprobada",
       motivo: "Infección estomacal aguda, incapacidad médica",
-    },
-    {
-      id: "j35",
-      aprendiz: "Manuel Eduardo Restrepo",
-      documento: "8081828384",
-      fechaAusencia: "2025-10-17",
-      fechaJustificacion: "2025-10-18",
-      tipo: "Asunto Personal",
-      estado: "Pendiente",
-      motivo: "Diligencias bancarias urgentes por fraude",
-    },
-    {
-      id: "j36",
-      aprendiz: "Claudia Patricia Álvarez",
-      documento: "8586878889",
-      fechaAusencia: "2025-10-11",
-      fechaJustificacion: "2025-10-12",
-      tipo: "Cita Médica",
-      estado: "Rechazada",
-      motivo: "Cita médica no prioritaria que pudo reagendarse",
-    },
+    }
   ],
   "8": [
     {
@@ -407,7 +518,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-19",
       fechaJustificacion: "2025-10-20",
       tipo: "Problemas de Transporte",
-      estado: "Aprobada",
+      estado: "Pendiente",
       motivo: "Paro de transportadores en la región",
     },
     {
@@ -420,6 +531,16 @@ const justificationsData: Record<string, any[]> = {
       estado: "Pendiente",
       motivo: "Incendio en el sector, evacuación preventiva",
     },
+    {
+      id: "j39",
+      aprendiz: "Andrés Mauricio León",
+      documento: "1001011121",
+      fechaAusencia: "2025-10-16",
+      fechaJustificacion: "2025-10-17",
+      tipo: "Asunto Familiar",
+      estado: "Pendiente",
+      motivo: "Nacimiento de hijo, acompañamiento en hospital",
+    }
   ],
   "9": [
     {
@@ -429,7 +550,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-16",
       fechaJustificacion: "2025-10-17",
       tipo: "Asunto Familiar",
-      estado: "Aprobada",
+      estado: "Rechazada",
       motivo: "Nacimiento de hijo, acompañamiento en hospital",
     },
     {
@@ -439,7 +560,7 @@ const justificationsData: Record<string, any[]> = {
       fechaAusencia: "2025-10-09",
       fechaJustificacion: "2025-10-10",
       tipo: "Enfermedad",
-      estado: "Pendiente",
+      estado: "Rechazada",
       motivo: "Dolor de cabeza intenso, esperando cita neurológica",
     },
     {
@@ -463,37 +584,7 @@ const justificationsData: Record<string, any[]> = {
       tipo: "Problemas de Transporte",
       estado: "Aprobada",
       motivo: "Daño en puente vehicular, vía cerrada por reparaciones",
-    },
-    {
-      id: "j43",
-      aprendiz: "Héctor Fabián Cárdenas",
-      documento: "2829303132",
-      fechaAusencia: "2025-10-14",
-      fechaJustificacion: "2025-10-15",
-      tipo: "Asunto Personal",
-      estado: "Pendiente",
-      motivo: "Trámites legales por divorcio, cita con abogado",
-    },
-    {
-      id: "j44",
-      aprendiz: "Sandra Milena Gaitán",
-      documento: "3334353637",
-      fechaAusencia: "2025-10-07",
-      fechaJustificacion: "2025-10-08",
-      tipo: "Calamidad Doméstica",
-      estado: "Aprobada",
-      motivo: "Daño eléctrico en la vivienda, gestión con empresa de energía",
-    },
-    {
-      id: "j45",
-      aprendiz: "Oscar Reinaldo Bermúdez",
-      documento: "3839404142",
-      fechaAusencia: "2025-10-01",
-      fechaJustificacion: "2025-10-02",
-      tipo: "Enfermedad",
-      estado: "Aprobada",
-      motivo: "Intoxicación alimentaria, certificado médico adjunto",
-    },
+    }
   ],
 };
 
@@ -550,7 +641,7 @@ const JustificationCoordinatorModal: React.FC<JustificationCoordinatorModalProps
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Ficha ${fichaData.numeroFicha}`}
+      title={`${fichaData.nombrePrograma} - Ficha ${fichaData.numeroFicha}`}
       size="xxxl"
       className="max-h-[90vh]"
     >
@@ -613,7 +704,11 @@ const JustificationCoordinatorModal: React.FC<JustificationCoordinatorModalProps
                 )}
               </div>
             </div>
-            <JustificationList justifications={currentJustifications} />
+            <JustificationList
+              justifications={currentJustifications}
+              nombrePrograma={fichaData.nombrePrograma}
+              numeroFicha={fichaData.numeroFicha}
+            />
           </div>
         </div>
 

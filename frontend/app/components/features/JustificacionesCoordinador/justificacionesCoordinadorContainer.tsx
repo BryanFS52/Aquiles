@@ -11,84 +11,102 @@ const fichasData = [
   {
     id: "1",
     numeroFicha: "2558104",
-    totalAprendices: 32,
-    justificacionesPendientes: 8,
-    justificacionesAprobadas: 45,
-    justificacionesRechazadas: 3,
+    nombrePrograma: "Analisis y desarrollo de software",
+    totalAprendices: 30,
+    justificacionesAprobadas: 0,
+    justificacionesPendientes: 15,
+    justificacionesRechazadas: 0,
   },
   {
     id: "2",
     numeroFicha: "2558105",
+    nombrePrograma: "Sistemas de la informacion",
     totalAprendices: 28,
-    justificacionesPendientes: 5,
-    justificacionesAprobadas: 38,
-    justificacionesRechazadas: 2,
+    justificacionesAprobadas: 10,
+    justificacionesPendientes: 0,
+    justificacionesRechazadas: 0,
   },
   {
     id: "3",
     numeroFicha: "2558106",
-    totalAprendices: 25,
-    justificacionesPendientes: 12,
-    justificacionesAprobadas: 52,
-    justificacionesRechazadas: 7,
+    nombrePrograma: "Ciberseguridad",
+    totalAprendices: 28,
+    justificacionesAprobadas: 0,
+    justificacionesPendientes: 0,
+    justificacionesRechazadas: 10,
   },
   {
     id: "4",
     numeroFicha: "2558107",
+    nombrePrograma: "Redes y telecomunicaciones",
     totalAprendices: 30,
-    justificacionesPendientes: 3,
-    justificacionesAprobadas: 41,
-    justificacionesRechazadas: 1,
+    justificacionesAprobadas: 5,
+    justificacionesPendientes: 0,
+    justificacionesRechazadas: 0,
   },
   {
     id: "5",
     numeroFicha: "2558108",
+    nombrePrograma: "Análisis y Desarrollo de Software",
     totalAprendices: 27,
-    justificacionesPendientes: 10,
-    justificacionesAprobadas: 47,
+    justificacionesAprobadas: 0,
+    justificacionesPendientes: 0,
     justificacionesRechazadas: 4,
   },
   {
     id: "6",
     numeroFicha: "2558109",
+    nombrePrograma: "Diseño y Desarrollo de Software",
     totalAprendices: 29,
-    justificacionesPendientes: 7,
-    justificacionesAprobadas: 44,
-    justificacionesRechazadas: 5,
+    justificacionesPendientes: 0,
+    justificacionesAprobadas: 2,
+    justificacionesRechazadas: 0,
   },
   {
     id: "7",
     numeroFicha: "2558110",
+    nombrePrograma: "Ciberseguridad",
     totalAprendices: 31,
-    justificacionesPendientes: 9,
-    justificacionesAprobadas: 49,
-    justificacionesRechazadas: 6,
+    justificacionesAprobadas: 1,
+    justificacionesPendientes: 0,
+    justificacionesRechazadas: 0,
   },
   {
     id: "8",
     numeroFicha: "2558111",
+    nombrePrograma: "Redes y telecomunicaciones",
     totalAprendices: 26,
-    justificacionesPendientes: 4,
-    justificacionesAprobadas: 42,
-    justificacionesRechazadas: 2,
+    justificacionesAprobadas: 0,
+    justificacionesPendientes: 3,
+    justificacionesRechazadas: 0,
   },
   {
     id: "9",
     numeroFicha: "2558112",
+    nombrePrograma: "Análisis y Desarrollo de Software",
     totalAprendices: 24,
-    justificacionesPendientes: 6,
-    justificacionesAprobadas: 39,
+    justificacionesAprobadas: 0,
+    justificacionesPendientes: 0,
     justificacionesRechazadas: 3,
   },
   {
     id: "10",
     numeroFicha: "2558113",
+    nombrePrograma: "Diseño y Desarrollo de Software",
     totalAprendices: 28,
-    justificacionesPendientes: 11,
-    justificacionesAprobadas: 46,
-    justificacionesRechazadas: 4,
+    justificacionesAprobadas: 1,
+    justificacionesPendientes: 0,
+    justificacionesRechazadas: 0,
   },
 ];
+
+// Función para normalizar texto (eliminar tildes y pasar a minúsculas)
+function normalizeText(text: string) {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, ""); // Solo elimina los diacríticos (tildes)
+}
 
 const JustificacionesCoordinadorContainer: React.FC = () => {
   const [selectedFicha, setSelectedFicha] = useState<typeof fichasData[0] | null>(null);
@@ -103,10 +121,11 @@ const JustificacionesCoordinadorContainer: React.FC = () => {
   // Filtrar fichas basado en búsqueda y filtros
   const filteredFichas = useMemo(() => {
     return fichasData.filter(ficha => {
-      const matchSearch = ficha.numeroFicha.toLowerCase().includes(searchTerm.toLowerCase());
-      
+      const search = normalizeText(searchTerm);
+      const matchSearch =
+        normalizeText(ficha.numeroFicha).includes(search) ||
+        (ficha.nombrePrograma && normalizeText(ficha.nombrePrograma).includes(search));
       if (!matchSearch) return false;
-      
       switch (filterStatus) {
         case "approved":
           return ficha.justificacionesAprobadas > 0;
@@ -145,12 +164,12 @@ const JustificacionesCoordinadorContainer: React.FC = () => {
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
-    setCurrentPage(1); // Resetear a primera página
+    setCurrentPage(1);
   };
 
   const handleFilterChange = (filter: "all" | "approved" | "pending"| "rejected") => {
     setFilterStatus(filter);
-    setCurrentPage(1); // Resetear a primera página
+    setCurrentPage(1);
   };
 
   return (
@@ -161,6 +180,7 @@ const JustificacionesCoordinadorContainer: React.FC = () => {
 
       {/* Estadísticas generales */}
       <div className="mb-6 sm:mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+
         {/* Total Fichas */}
         <div className="bg-white dark:bg-shadowBlue p-4 sm:p-5 rounded-xl shadow-md border-l-4 border-primary dark:border-primary">
           <p className="text-xs sm:text-sm text-darkGray dark:text-gray-300">Total fichas</p>
@@ -194,7 +214,7 @@ const JustificacionesCoordinadorContainer: React.FC = () => {
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar por número de ficha..."
+              placeholder="Buscar por programa o número de ficha"
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-shadowBlue dark:text-white"
@@ -203,6 +223,7 @@ const JustificacionesCoordinadorContainer: React.FC = () => {
 
           {/* Filtros y vista */}
           <div className="flex items-center gap-4">
+
             {/* Filtros por estado */}
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filtrar:</span>
