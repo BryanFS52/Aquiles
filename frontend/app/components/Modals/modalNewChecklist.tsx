@@ -487,7 +487,7 @@ export default function CrearListaChequeo({
           <textarea
             value={observaciones}
             onChange={(e) => setObservaciones(e.target.value)}
-            placeholder="Describe la competencia asociada..."
+            placeholder="Describe la competencia asociada"
             className={`${sharedTextareaClass} h-24`}
           />
         </div>

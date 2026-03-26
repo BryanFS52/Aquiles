@@ -29,8 +29,8 @@ const StatCard: React.FC<StatCardProps> = ({
         
         {/* Efecto de brillo en hover */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-        
         <div className="relative flex flex-col space-y-3">
+          
           {/* Icono con efecto glassmorphism */}
           <div className="flex items-center justify-between">
             <div className={`${iconColor} p-2.5 rounded-xl bg-white/25 backdrop-blur-sm shadow-md transform group-hover:scale-105 group-hover:rotate-3 transition-all duration-300`}>

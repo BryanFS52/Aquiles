@@ -15,7 +15,7 @@ export interface ChecklistTemplate {
 export const CHECKLIST_TEMPLATES: ChecklistTemplate[] = [
     {
         id: 'tpl-1',
-        name: 'Plantilla Desarrollo de Software',
+        name: 'Plantilla desarrollo de software',
         description: 'Base para seguimiento de evidencias técnicas y actitudinales en desarrollo.',
         trimester: '1',
         competence: 'Analizar requerimientos y participar en la construcción de soluciones de software de acuerdo con la necesidad planteada.',
@@ -32,7 +32,7 @@ export const CHECKLIST_TEMPLATES: ChecklistTemplate[] = [
     },
     {
         id: 'tpl-2',
-        name: 'Plantilla Infraestructura y Redes',
+        name: 'Plantilla infraestructura y redes',
         description: 'Enfocada en configuración, diagnóstico y trabajo colaborativo.',
         trimester: '2',
         competence: 'Implementar y verificar componentes de infraestructura tecnológica cumpliendo criterios técnicos y de calidad.',
@@ -49,7 +49,7 @@ export const CHECKLIST_TEMPLATES: ChecklistTemplate[] = [
     },
     {
         id: 'tpl-3',
-        name: 'Plantilla Analítica de Datos',
+        name: 'Plantilla analítica de datos',
         description: 'Plantilla para seguimiento de procesos de análisis e interpretación de datos.',
         trimester: '3',
         competence: 'Procesar e interpretar conjuntos de datos para apoyar la toma de decisiones en el proyecto formativo.',

@@ -43,7 +43,7 @@ const FALLBACK_JURORS: JurorCandidate[] = [
     name: 'Juan Pérez',
     document: '1045123456',
     email: 'juan.perez@sena.edu.co',
-    specialty: 'Desarrollo de Software',
+    specialty: 'Desarrollo de software',
     center: 'Centro de Servicios Financieros',
     active: true,
   },
@@ -52,7 +52,7 @@ const FALLBACK_JURORS: JurorCandidate[] = [
     name: 'María Rodríguez',
     document: '52891234',
     email: 'maria.rodriguez@sena.edu.co',
-    specialty: 'Bases de Datos',
+    specialty: 'Bases de datos',
     center: 'Centro de Servicios Financieros',
     active: true,
   },
@@ -68,9 +68,9 @@ const FALLBACK_JURORS: JurorCandidate[] = [
 ]
 
 const LOCAL_TRAINING_PROJECT_LABELS: Record<string, string> = {
-  '1': 'Proyecto Formativo Software Empresarial',
-  '2': 'Proyecto Formativo Redes e Infraestructura',
-  '3': 'Proyecto Formativo Analítica y Datos',
+  '1': 'Proyecto formativo software empresarial',
+  '2': 'Proyecto formativo redess e infraestructura',
+  '3': 'Proyecto formativo analítica y datos',
 }
 
 const LOCAL_STUDY_SHEET_LABELS: Record<string, string> = {
@@ -940,7 +940,7 @@ export default function CoordinadorChecklistView() {
                                   <svg className="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 2m6-11a9 9 0 11-18 0 9 9 0 0118 0z" />
                                   </svg>
-                                  Historial
+                                  Versiones
                                 </button>
                                 <div className="border-t border-gray-200 dark:border-gray-700"></div>
                                 <button

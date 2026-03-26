@@ -16,9 +16,11 @@ interface Justification {
 
 interface JustificationListProps {
   justifications: Justification[];
+  nombrePrograma?: string;
+  numeroFicha?: string;
 }
 
-const JustificationList: React.FC<JustificationListProps> = ({ justifications }) => {
+const JustificationList: React.FC<JustificationListProps> = ({ justifications, nombrePrograma, numeroFicha }) => {
   const getStatusIcon = (estado: string) => {
     switch (estado) {
       case "Aprobada":
@@ -67,12 +69,14 @@ const JustificationList: React.FC<JustificationListProps> = ({ justifications })
 
   return (
     <div className="space-y-4">
+      {/* Lista de justificaciones */}
       {justifications.map((justification) => (
         <div
           key={justification.id}
           className="bg-white dark:bg-gray-700 rounded-lg shadow-md p-5 hover:shadow-lg transition-shadow duration-200 border border-gray-200 dark:border-gray-600"
         >
           <div className="flex items-start justify-between">
+
             {/* Información del aprendiz */}
             <div className="flex-1">
               <div className="flex items-center space-x-3 mb-3">
