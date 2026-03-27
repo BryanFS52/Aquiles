@@ -817,6 +817,10 @@ export default function CoordinadorChecklistView() {
     }, {});
   }, [checklistDetail]);
 
+  // Nuevos filtros
+  const [searchTerm, setSearchTerm] = useState("") // Busqueda por nombre o proyecto
+  const [statusFilter, setStatusFilter] = useState("todos") // Filtro por estado de flujo (Borrador, Vigente, En evaluación, Cerrada)
+
   return (
     <>
       <PageTitle>Listas de chequeo trimestrales</PageTitle>
@@ -1243,6 +1247,11 @@ export default function CoordinadorChecklistView() {
       {juryModalOpen && juryChecklist && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4">
           <div className="max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-3xl border border-gray-100 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800">
+            {getAssignedJurorsCount(juryChecklist.id) > 0 && (
+              <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 px-4 py-3 rounded-md mb-4 mt-6 mx-6 dark:bg-yellow-900/30 dark:text-yellow-200 dark:border-yellow-700">
+                Ya hay jurados asignados a esta sustentación. No puedes modificarlos.
+              </div>
+            )}
             <div className="sticky top-0 z-10 border-b border-white/20 bg-gradient-to-r from-[#5cb800] to-[#8fd400] p-5 text-white dark:from-secondary dark:to-blue-900 dark:border-gray-700">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -1262,12 +1271,14 @@ export default function CoordinadorChecklistView() {
                   onChange={(e) => setJurySearchTerm(e.target.value)}
                   placeholder="Buscar por nombre, documento, especialidad"
                   className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-600"
+                  disabled={getAssignedJurorsCount(juryChecklist.id) > 0}
                 />
 
                 <select
                   value={jurySpecialtyFilter}
                   onChange={(e) => setJurySpecialtyFilter(e.target.value)}
                   className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-600"
+                  disabled={getAssignedJurorsCount(juryChecklist.id) > 0}
                 >
                   {specialtyOptions.map((option) => (
                     <option key={option} value={option}>{option === 'todos' ? 'Todas las especialidades' : option}</option>
@@ -1278,6 +1289,7 @@ export default function CoordinadorChecklistView() {
                   value={juryCenterFilter}
                   onChange={(e) => setJuryCenterFilter(e.target.value)}
                   className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-600"
+                  disabled={getAssignedJurorsCount(juryChecklist.id) > 0}
                 >
                   {centerOptions.map((option) => (
                     <option key={option} value={option}>{option === 'todos' ? 'Todos los centros' : option}</option>
@@ -1289,6 +1301,7 @@ export default function CoordinadorChecklistView() {
                   value={sessionDate}
                   onChange={(e) => setSessionDate(e.target.value)}
                   className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-600"
+                  disabled={getAssignedJurorsCount(juryChecklist.id) > 0}
                 />
 
                 <input
@@ -1296,6 +1309,7 @@ export default function CoordinadorChecklistView() {
                   value={sessionTime}
                   onChange={(e) => setSessionTime(e.target.value)}
                   className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-600"
+                  disabled={getAssignedJurorsCount(juryChecklist.id) > 0}
                 />
               </div>
 
@@ -1306,6 +1320,7 @@ export default function CoordinadorChecklistView() {
                     checked={onlyAvailable}
                     onChange={(e) => setOnlyAvailable(e.target.checked)}
                     className="h-4 w-4 rounded border-gray-600 text-gray-800 focus:ring-gray-300"
+                    disabled={getAssignedJurorsCount(juryChecklist.id) > 0}
                   />
                   Mostrar solo jurados disponibles en ese horario
                 </label>
@@ -1326,6 +1341,7 @@ export default function CoordinadorChecklistView() {
                         ? 'border-lime-500 bg-lime-100 shadow dark:border-lime-400 dark:bg-lime-900/20'
                         : 'border-gray-200 bg-white hover:border-lime-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-shadowBlue'
                         }`}
+                      disabled={getAssignedJurorsCount(juryChecklist.id) > 0}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>

@@ -1,17 +1,18 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import InfoCard from "./InfoCard";
 import JustificationCoordinatorModal from "../../Modals/JustificationCoordinatorModal";
 import PageTitle from "@/components/UI/pageTitle";
 import { FaSearch, FaTh, FaList, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { Label } from "../actasInstructor/Primitives";
 
 // Datos quemados de fichas
 const fichasData = [
   {
     id: "1",
     numeroFicha: "2558104",
-    nombrePrograma: "Analisis y desarrollo de software",
+    nombrePrograma: "Análisis y Desarrollo de Software",
     totalAprendices: 30,
     justificacionesAprobadas: 0,
     justificacionesPendientes: 15,
@@ -100,12 +101,12 @@ const fichasData = [
   },
 ];
 
-// Función para normalizar texto (eliminar tildes y pasar a minúsculas)
+// Función para normalizar texto
 function normalizeText(text: string) {
   return text
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, ""); // Solo elimina los diacríticos (tildes)
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 const JustificacionesCoordinadorContainer: React.FC = () => {
@@ -116,16 +117,60 @@ const JustificacionesCoordinadorContainer: React.FC = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(8);
-  const [filterStatus, setFilterStatus] = useState<"all" | "approved"  | "pending" | "rejected">("all");
+  const [filterStatus, setFilterStatus] = useState<"all" | "approved" | "pending" | "rejected">("all");
+  const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
 
-  // Filtrar fichas basado en búsqueda y filtros
+  // Temporal con los datos mock (quemados) borrar esto y dejar implementado lo de abajo cuando tengamos datos reales
+  const programasDisponibles = useMemo(() => {
+    const map = new Map();
+
+    fichasData.forEach(f => {
+      const normalized = normalizeText(f.nombrePrograma);
+
+      if (!map.has(normalized)) {
+        map.set(normalized, f.nombrePrograma);
+      }
+    });
+
+    return Array.from(map.entries()).map(([value, label]) => ({
+    value,
+    label
+  }));
+}, []);
+
+  // Descomentarear esto cuando tengamos la conexion con chaos y olympo y tengamos que implementar esto
+
+  // const { data } = useQuery(GET_PROGRAMS, {
+  //   variables: {
+  //     page: 0,
+  //     size: 100,
+  //   },
+  // });
+
+  // const programasDisponibles = useMemo(() => {
+  // return data?.allPrograms?.data?.map(p => p.name) || [];
+  // }, [data]);
+
+  // Filtro completo (busqueda, programa y estado)
   const filteredFichas = useMemo(() => {
     return fichasData.filter(ficha => {
       const search = normalizeText(searchTerm);
+
+      // Barra de busqueda
       const matchSearch =
         normalizeText(ficha.numeroFicha).includes(search) ||
-        (ficha.nombrePrograma && normalizeText(ficha.nombrePrograma).includes(search));
+        normalizeText(ficha.nombrePrograma).includes(search);
+
       if (!matchSearch) return false;
+
+      // Filtro por programa
+      const matchProgram =
+        selectedPrograms.length === 0 ||
+        selectedPrograms.includes(normalizeText(ficha.nombrePrograma));
+
+      if (!matchProgram) return false;
+
+      // Filtro por estado
       switch (filterStatus) {
         case "approved":
           return ficha.justificacionesAprobadas > 0;
@@ -137,14 +182,26 @@ const JustificacionesCoordinadorContainer: React.FC = () => {
           return true;
       }
     });
-  }, [searchTerm, filterStatus]);
+  }, [searchTerm, filterStatus, selectedPrograms]);
 
   // Paginación
   const totalPages = Math.ceil(filteredFichas.length / itemsPerPage);
+
   const paginatedFichas = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredFichas.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredFichas, currentPage, itemsPerPage]);
+
+  // Handlers
+  const handleSerch = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
+  };
+
+  const handleFilterChange = (filter: "all" | "approved" | "pending" | "rejected") => {
+    setFilterStatus(filter);
+    setCurrentPage(1);
+  };
 
   const handleFichaClick = (ficha: typeof fichasData[0], statusFilter: "all" | "Aprobada" | "Pendiente" | "Rechazada" = "all") => {
     setSelectedFicha(ficha);
@@ -167,15 +224,37 @@ const JustificacionesCoordinadorContainer: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const handleFilterChange = (filter: "all" | "approved" | "pending"| "rejected") => {
-    setFilterStatus(filter);
+  const toggleProgram = (programa: string) => {
+    setSelectedPrograms(prev =>
+      prev.includes(programa)
+        ? prev.filter(p => p !== programa)
+        : [...prev, programa]
+    );
     setCurrentPage(1);
   };
+
+  // Droddown de programas
+  const [isProgramFilterOpen, setIsProgramFilterOpen] = useState(false);
+
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutSide = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProgramFilterOpen(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutSide);
+    return () => {
+      document.removeEventListener("click", handleClickOutSide);
+    };
+  },[]);
 
   return (
     <div className="p-6 space-y-6">
       <div className="mb-6">
-          <PageTitle>Gestión de justificaciones por ficha</PageTitle>
+        <PageTitle>Gestión de justificaciones por ficha</PageTitle>
       </div>
 
       {/* Estadísticas generales */}
@@ -206,7 +285,7 @@ const JustificacionesCoordinadorContainer: React.FC = () => {
         </div>
       </div>
 
-      {/* Controles de filtro y vista */}
+      {/* Busqueda */}
       <div className="bg-white dark:bg-shadowBlue rounded-xl p-6 shadow-md border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           {/* Búsqueda */}
@@ -221,16 +300,14 @@ const JustificacionesCoordinadorContainer: React.FC = () => {
             />
           </div>
 
-          {/* Filtros y vista */}
+          {/* Filtros por estado */}
           <div className="flex items-center gap-4">
-
-            {/* Filtros por estado */}
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filtrar:</span>
               <select
                 value={filterStatus}
                 onChange={(e) => handleFilterChange(e.target.value as any)}
-                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-shadowBlue dark:text-white"
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-shadowBlue dark:text-white text-sm"
               >
                 <option value="all">Todas</option>
                 <option value="approved">Aprobadas</option>
@@ -239,25 +316,60 @@ const JustificacionesCoordinadorContainer: React.FC = () => {
               </select>
             </div>
 
-            {/* Toggle vista */}
+            {/* Filtro por programas */}
+            <div className="relative" ref={dropdownRef}>
+              <button onClick={(e) => {e.stopPropagation();
+                  setIsProgramFilterOpen(prev => !prev);
+                }}
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-blue-50 dark:bg-shadowBlue text-blue-700 dark:text-white text-sm flex items-center gap-2"
+                >
+                  Programas ({selectedPrograms.length})
+                  <svg className="w-4 h-4 ml-1 text-blue-700 dark:text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+
+              { /* Dropdown de programas */}
+              {isProgramFilterOpen && (
+                <div
+                  className="absolute mt-2 w-64 max-h-60 overflow-y-auto bg-white dark:bg-shadowBlue border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-50 p-3 space-y-2"
+                  >
+                    {programasDisponibles.map(programa => (
+                      <label key={programa.value} className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={selectedPrograms.includes(programa.value)}
+                          onChange={() => toggleProgram(programa.value)}
+                        />
+                        {programa.label}
+                      </label>
+                    ))}
+
+                    { /* Limpiar */}
+                    <button
+                      onClick={() => setSelectedPrograms([])}
+                      className="text-xs text-blue-600 mt-2"
+                      >
+                        Limpiar selección
+                      </button>
+                    </div>
+                  )}
+            </div>
+
             <div className="flex items-center bg-gray-100 dark:bg-shadowBlue rounded-lg p-1">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-md transition-colors ${
-                  viewMode === "grid"
+                className={`p-2 rounded-md transition-colors ${viewMode === "grid"
                     ? "bg-white dark:bg-darkBlue text-blue-600 dark:text-blue-400 shadow-sm"
                     : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                }`}
+                  }`}
               >
                 <FaTh />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-2 rounded-md transition-colors ${
-                  viewMode === "list"
+                className={`p-2 rounded-md transition-colors ${viewMode === "list"
                     ? "bg-white dark:bg-darkBlue text-blue-600 dark:text-blue-400 shadow-sm"
                     : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                }`}
+                  }`}
               >
                 <FaList />
               </button>
@@ -279,7 +391,7 @@ const JustificacionesCoordinadorContainer: React.FC = () => {
           )}
         </div>
 
-        {/* Grid/Lista de fichas */}
+        {/* Lista de fichas */}
         {paginatedFichas.length > 0 ? (
           <div className={
             viewMode === "grid"
@@ -323,11 +435,10 @@ const JustificacionesCoordinadorContainer: React.FC = () => {
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`px-4 py-2 rounded-lg border ${
-                    currentPage === page
+                  className={`px-4 py-2 rounded-lg border ${currentPage === page
                       ? "bg-blue-600 text-white border-blue-600"
                       : "border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-shadowBlue"
-                  }`}
+                    }`}
                 >
                   {page}
                 </button>
