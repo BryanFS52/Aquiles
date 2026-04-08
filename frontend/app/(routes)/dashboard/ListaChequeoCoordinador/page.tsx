@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from "react"
+import { useRef, useState, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch, RootState } from "@redux/store"
 import { fetchChecklists, addChecklist, updateChecklist, deleteChecklist } from "@redux/slices/checklistSlice"
@@ -69,7 +69,7 @@ const FALLBACK_JURORS: JurorCandidate[] = [
 
 const LOCAL_TRAINING_PROJECT_LABELS: Record<string, string> = {
   '1': 'Proyecto formativo software empresarial',
-  '2': 'Proyecto formativo redess e infraestructura',
+  '2': 'Proyecto formativo redes e infraestructura',
   '3': 'Proyecto formativo analítica y datos',
 }
 
@@ -109,7 +109,7 @@ const LOCAL_ONLY_FIELDS = [
  * - studySheets (fichas asociadas)
  * - trainingProjectId
  * - items (indicadores)
- * 
+ *
  * CAMPOS QUE SE LLENAN EN LA VISTA DEL INSTRUCTOR:
  * - instructorSignature (firma digital)
  * - evaluationCriteria (cumplimiento de criterios)
@@ -638,8 +638,11 @@ export default function CoordinadorChecklistView() {
     })
   }, [jurorCandidates, jurySearchTerm, jurySpecialtyFilter, juryCenterFilter, onlyAvailable, sessionAt, busySlotsByJuror])
 
-  const getAssignedJurorsCount = (checklistId: string | number): number => {
-    return juryAssignments[String(checklistId)]?.length || 0
+  const getAssignedJurorsCount = (checklist: any): number => {
+    const local = juryAssignments[String(checklist.id)] || []
+    const backend = checklist.associatedJuries || []
+
+    return local.length > 0 ? local.length : backend.length
   }
 
   const handleOpenJuryModal = (checklist: any) => {
@@ -672,48 +675,72 @@ export default function CoordinadorChecklistView() {
   }
 
   const handleSaveJuryAssignment = async () => {
-    if (!juryChecklist) return
+    if (!juryChecklist) return;
 
+    const alreadyHasJurors = getAssignedJurorsCount(juryChecklist) > 0;
+
+    if (alreadyHasJurors) {
+      toast.warning('Ya hay jurados asignados a este lista de chequeo');
+      return;
+    }
+
+    // Validaciones
     if (!sessionDate || !sessionTime) {
-      toast.error('Define la fecha y hora de la sustentación para verificar disponibilidad')
-      return
+      toast.error('Define la fecha y hora de la sustentación');
+      return;
     }
 
     if (selectedJurorIds.length === 0) {
-      toast.error('Selecciona al menos un jurado')
-      return
+      toast.error('Selecciona al menos un jurado');
+      return;
     }
 
-    const selectedJurors = jurorCandidates.filter((juror) => selectedJurorIds.includes(juror.id))
+    const selectedJurors = jurorCandidates.filter((juror) =>
+      selectedJurorIds.includes(juror.id)
+    );
+
     const selectedSession = `${sessionDate}T${sessionTime}`
-    const conflictedJurors = selectedJurors.filter((juror) => !isJurorAvailableAtSession(juror.id))
+
+    // Validacion de disponibilidad
+    const conflictedJurors = selectedJurors.filter(
+      (juror) => !isJurorAvailableAtSession(juror.id)
+    );
 
     if (conflictedJurors.length > 0) {
-      toast.error(`Sin disponibilidad: ${conflictedJurors.map((juror) => juror.name).join(', ')}`)
-      return
+      toast.error(
+        `Sin disponibilidad: ${conflictedJurors
+          .map((juror) => juror.name)
+          .join(', ')}`
+        );
+      return;
     }
 
+    // Crear asignacion
     const assignedAt = new Date().toISOString()
-    const assignmentPayload: AssignedJuror[] = selectedJurors.map((juror) => ({
+    const assignmentPayload: AssignedJuror[] = selectedJurors.map(
+      (juror) => ({
       ...juror,
       assignedAt,
       sessionAt: selectedSession,
-    }))
+      })
+    );
 
     const checklistId = String(juryChecklist.id)
+    
     const updatedAssignments = {
       ...juryAssignments,
       [checklistId]: assignmentPayload,
     }
 
-    setJuryAssignments(updatedAssignments)
+    setJuryAssignments(updatedAssignments);
 
     if (!USE_REAL_SERVICE) {
       const updated = localChecklists.map((item) =>
         String(item.id) === checklistId
           ? { ...item, associatedJuries: assignmentPayload }
           : item
-      )
+      );
+
       setLocalChecklists(updated)
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated))
     } else {
@@ -729,6 +756,12 @@ export default function CoordinadorChecklistView() {
       }
     }
 
+    toast.success('Asignacion guardada correctamente');
+
+    setJuryModalOpen(false)
+    setJuryChecklist(null)
+    setSelectedJurorIds([])
+
     const notificationResults = await Promise.allSettled(
       selectedJurors.map((juror) =>
         dispatch(sendEmailNotification({
@@ -743,10 +776,6 @@ export default function CoordinadorChecklistView() {
 
     const sentCount = notificationResults.filter((result) => result.status === 'fulfilled').length
     toast.success(`Jurados asignados correctamente. Notificaciones enviadas: ${sentCount}/${selectedJurors.length}`)
-
-    setJuryModalOpen(false)
-    setJuryChecklist(null)
-    setSelectedJurorIds([])
   }
 
   const checklistSource = USE_REAL_SERVICE ? (checklists || []) : localChecklists
@@ -817,44 +846,243 @@ export default function CoordinadorChecklistView() {
     }, {});
   }, [checklistDetail]);
 
-  // Nuevos filtros
-  const [searchTerm, setSearchTerm] = useState("") // Busqueda por nombre o proyecto
-  const [statusFilter, setStatusFilter] = useState("todos") // Filtro por estado de flujo (Borrador, Vigente, En evaluación, Cerrada)
+  const [filters, setFilters] = useState({
+    activos: false,
+    inactivos: false,
+    conJurado: false,
+    sinJurado: false,
+    borrador: false,
+    vigente: false,
+    enEvaluacion: false,
+    cerrada: false,
+  })
+
+  const [search, setSearch] = useState("");
+
+  // Aplicar filtros a las listas
+  const listasFiltradas = filteredChecklists.filter((item: any) => {
+    const texto = search.trim().toLowerCase();
+
+    // Obtener jurados asignados
+    const assignedJurors = juryAssignments[String(item.id)] || item.associatedJuries || [];
+
+    // Verificar si algun jurado coincide con la busqueda
+    const juradosCoinciden = assignedJurors.some((juror: any) => {
+      const nombreCompleto = juror.name?.toLowerCase();
+      return nombreCompleto?.includes(texto)
+    });
+
+    // Verificar si el proyecto coincide con la busqueda
+    const projectId = item.trainingProjectId ? String(item.trainingProjectId) : '';
+    const projectLabel = LOCAL_TRAINING_PROJECT_LABELS[projectId] || '';
+
+    const proyectoCoincide = projectLabel.toLowerCase().includes(texto);
+
+    // Veficiar si la ficha coincide con la busqueda
+    const fichas = String(item.studySheets || '')
+    .split(',')
+    .map((f: string) => f.trim())
+    .filter(Boolean);
+
+    const fichaCoincide = fichas.some((f: string) =>   {
+      const label = (LOCAL_STUDY_SHEET_LABELS[f] || '').toLowerCase();
+      return (
+        f.toLowerCase().includes(texto) ||
+        label.includes(texto)
+      );
+    })
+
+    // Cumple la busqueda si coincide con alguno de los tres
+    const cumpleBusqueda = !texto || juradosCoinciden || proyectoCoincide || fichaCoincide;
+
+    // Filtros
+    const status = item.workflowStatus?.toLowerCase() || "";
+    const tieneJurado = assignedJurors.length > 0;
+
+    // Estado activo/inactivo
+    const filtroEstado =
+      (!filters.activos && !filters.inactivos) ||
+      (filters.activos && item.state) ||
+      (filters.inactivos && !item.state);
+
+    // Jurados
+    const filtroJurados =
+      (!filters.conJurado && !filters.sinJurado) ||
+      (filters.conJurado && tieneJurado) ||
+      (filters.sinJurado && !tieneJurado);
+
+    // Estado de flujo
+    const estadosSeleccionados: string[] = [];
+    if (filters.borrador) estadosSeleccionados.push("draft", "borrador");
+    if (filters.vigente) estadosSeleccionados.push("active", "vigente");
+    if (filters.enEvaluacion) estadosSeleccionados.push("in_evaluation", "en evaluación", "enevaluacion");
+    if (filters.cerrada) estadosSeleccionados.push("closed", "cerrada");
+
+    const filtroWorkflow =
+      estadosSeleccionados.length === 0 || estadosSeleccionados.includes(status);
+
+    return cumpleBusqueda && filtroEstado && filtroJurados && filtroWorkflow;
+  });
+
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  const [showFilters, setShowFilters] = useState(false)
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!menuRef.current) return;
+
+      if (!menuRef.current.contains(e.target as Node)) {
+        setShowFilters(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Verificar si tiene jurados asignados (para filtros)
+    const hasAssignedJurors = juryChecklist ? getAssignedJurorsCount(juryChecklist) > 0 : false;
 
   return (
     <>
       <PageTitle>Listas de chequeo trimestrales</PageTitle>
 
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-4">
-          <label
-            htmlFor="trimestre-select"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            Filtrar por trimestre:
-          </label>
-          <select
-            id="trimestre-select"
-            value={selectedTrimestre}
-            onChange={(e) => setSelectedTrimestre(e.target.value)}
-            className="px-4 py-3 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-full focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
-          >
-            <option value="todos">Todos los trimestres</option>
-            <option value="1">Primer trimestre</option>
-            <option value="2">Segundo trimestre</option>
-            <option value="3">Tercer trimestre</option>
-            <option value="4">Cuarto trimestre</option>
-            <option value="5">Quinto trimestre</option>
-            <option value="6">Sexto trimestre</option>
-            <option value="7">Séptimo trimestre</option>
-          </select>
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+
+        <div className="flex items-center gap-3 flex-wrap">
+          <input
+            type="text"
+            placeholder="Buscar por proyecto, ficha o jurado"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="px-3 py-2 w-[300px] border-2 border-lime-500/30 rounded-full focus:outline-none focus:ring-2 focus:ring-lime-500 text-sm"
+          />
+
+          <div className="relative" ref={menuRef}>
+
+            <button
+              onClick={() => setShowFilters(prev => !prev)}
+              className="px-4 py-2 border-2 border-lime-500/30 dark:border-shadowBlue/50 rounded-full focus:outline-none focus:ring-4 focus:ring-lime-600/30 dark:focus:ring-shadowBlue/30 focus:border-lime-600 dark:focus:border-shadowBlue bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-white shadow-lg hover:shadow-xl transition-all duration-300 font-medium"
+            >
+              Filtrar por:
+            </button>
+
+            {showFilters && (
+              <div className="absolute top-full left-0 mt-2 w-[320px] z-50 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-4 flex flex-col gap-4">
+
+                {/* Trimestre */}
+                <div>
+                  <label className="block mb-1 text-xs font-bold text-gray-500 uppercase">Trimestre</label>
+                  <select
+                    value={selectedTrimestre}
+                    onChange={(e) => setSelectedTrimestre(e.target.value)}
+                    className="w-full px-3 py-2 border-2 border-lime-500/30 rounded-full focus:outline-none focus:ring-2 focus:ring-lime-500 text-sm"
+                  >
+                    <option value="todos">Todos los trimestres</option>
+                    <option value="1">Primer trimestre</option>
+                    <option value="2">Segundo trimestre</option>
+                    <option value="3">Tercer trimestre</option>
+                    <option value="4">Cuarto trimestre</option>
+                    <option value="5">Quinto trimestre</option>
+                    <option value="6">Sexto trimestre</option>
+                    <option value="7">Séptimo trimestre</option>
+                  </select>
+                </div>
+
+                {/* Estado - activos/inactivos */}
+                <div className="bg-gray-50 dark:bg-gray-900/40 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <p className="text-xs font-bold text-gray-500 uppercase mb-2">Estado</p>
+                  <div className="flex flex-col gap-2">
+                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={filters.activos}
+                        onChange={(e) => setFilters(prev => ({ ...prev, activos: e.target.checked }))}
+                      />
+                      Activos
+                    </label>
+                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={filters.inactivos}
+                        onChange={(e) => setFilters(prev => ({ ...prev, inactivos: e.target.checked }))}
+                      />
+                      Inactivos
+                    </label>
+                  </div>
+                </div>
+
+                {/* Jurados */}
+                <div className="bg-gray-50 dark:bg-gray-900/40 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <p className="text-xs font-bold text-gray-500 uppercase mb-2">Jurados</p>
+                  <div className="flex flex-col gap-2">
+                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={filters.conJurado}
+                        onChange={(e) => setFilters(prev => ({ ...prev, conJurado: e.target.checked }))}
+                      />
+                      Con jurado
+                    </label>
+                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={filters.sinJurado}
+                        onChange={(e) => setFilters(prev => ({ ...prev, sinJurado: e.target.checked }))}
+                      />
+                      Sin jurado
+                    </label>
+                  </div>
+                </div>
+
+                {/* Estado de flujo */}
+                <div className="bg-gray-50 dark:bg-gray-900/40 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <p className="text-xs font-bold text-gray-500 uppercase mb-2">Estado de flujo</p>
+                  <div className="flex flex-col gap-2">
+                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={filters.borrador}
+                        onChange={(e) => setFilters(prev => ({ ...prev, borrador: e.target.checked }))}
+                      />
+                      Borrador
+                    </label>
+                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={filters.vigente}
+                        onChange={(e) => setFilters(prev => ({ ...prev, vigente: e.target.checked }))}
+                      />
+                      Vigente
+                    </label>
+                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={filters.enEvaluacion}
+                        onChange={(e) => setFilters(prev => ({ ...prev, enEvaluacion: e.target.checked }))}
+                      />
+                      En evaluación
+                    </label>
+                    <label className="flex items-center gap-2 text-sm cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={filters.cerrada}
+                        onChange={(e) => setFilters(prev => ({ ...prev, cerrada: e.target.checked }))}
+                      />
+                      Cerrada
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        <button
-          onClick={handleOpenCreateModal}
-          disabled={isLoading}
-          className="bg-gradient-to-r from-lime-600 to-lime-500 dark:from-shadowBlue dark:to-darkBlue text-white px-6 py-3 rounded-full hover:from-lime-500 hover:to-lime-600 dark:hover:from-darkBlue dark:hover:to-shadowBlue transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <button className="px-4 py-2 bg-lime-600 text-white rounded-full shadow-md hover:bg-lime-700 transition">
           Crear lista de chequeo
         </button>
       </div>
@@ -868,7 +1096,7 @@ export default function CoordinadorChecklistView() {
               </p>
             </div>
           </div>
-        ) : filteredChecklists.length === 0 ? (
+        ) : listasFiltradas.length === 0 ? (
           <div className="text-center py-8">
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 border-2 border-dashed border-gray-300 dark:border-gray-600">
               <p className="text-gray-500 dark:text-gray-400 text-lg">
@@ -882,7 +1110,7 @@ export default function CoordinadorChecklistView() {
         ) : (
           <div className="pb-8 px-2">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
-              {filteredChecklists.map((checklist) => (
+              {listasFiltradas.map((checklist) => (
                 <div
                   key={checklist.id}
                   className="group relative transform transition-all duration-300 hover:scale-105 hover:z-10"
@@ -980,7 +1208,7 @@ export default function CoordinadorChecklistView() {
                           Fichas asociadas <br />
                         </span>
                         <span className="inline-block mt-1 px-3 py-1 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 text-gray-800 dark:text-gray-200 rounded-full text-xs font-bold border border-gray-300 dark:border-gray-500">
-                          {getFormattedStudySheets(checklist.studySheets || "")}
+                          {String(checklist.studySheets || '').split(',').map((id: string) => id.trim()).filter(Boolean).map((id: string) => LOCAL_STUDY_SHEET_LABELS[id] || `Ficha ${id}`).join(' • ')}
                         </span>
                       </div>
 
@@ -993,7 +1221,7 @@ export default function CoordinadorChecklistView() {
                             Asignados
                           </span>
                           <span className="text-sm font-bold text-lime-800 dark:text-white">
-                            {getAssignedJurorsCount(checklist.id)}
+                            {getAssignedJurorsCount(checklist)}
                           </span>
                         </div>
                       </div>
@@ -1247,11 +1475,6 @@ export default function CoordinadorChecklistView() {
       {juryModalOpen && juryChecklist && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4">
           <div className="max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-3xl border border-gray-100 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800">
-            {getAssignedJurorsCount(juryChecklist.id) > 0 && (
-              <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 px-4 py-3 rounded-md mb-4 mt-6 mx-6 dark:bg-yellow-900/30 dark:text-yellow-200 dark:border-yellow-700">
-                Ya hay jurados asignados a esta sustentación. No puedes modificarlos.
-              </div>
-            )}
             <div className="sticky top-0 z-10 border-b border-white/20 bg-gradient-to-r from-[#5cb800] to-[#8fd400] p-5 text-white dark:from-secondary dark:to-blue-900 dark:border-gray-700">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -1264,6 +1487,7 @@ export default function CoordinadorChecklistView() {
                 </div>
               </div>
             </div>
+
             <div className="space-y-5 p-5">
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-5">
                 <input
@@ -1271,14 +1495,12 @@ export default function CoordinadorChecklistView() {
                   onChange={(e) => setJurySearchTerm(e.target.value)}
                   placeholder="Buscar por nombre, documento, especialidad"
                   className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-600"
-                  disabled={getAssignedJurorsCount(juryChecklist.id) > 0}
                 />
 
                 <select
                   value={jurySpecialtyFilter}
                   onChange={(e) => setJurySpecialtyFilter(e.target.value)}
-                  className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-600"
-                  disabled={getAssignedJurorsCount(juryChecklist.id) > 0}
+                  className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-600"                
                 >
                   {specialtyOptions.map((option) => (
                     <option key={option} value={option}>{option === 'todos' ? 'Todas las especialidades' : option}</option>
@@ -1289,7 +1511,6 @@ export default function CoordinadorChecklistView() {
                   value={juryCenterFilter}
                   onChange={(e) => setJuryCenterFilter(e.target.value)}
                   className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-600"
-                  disabled={getAssignedJurorsCount(juryChecklist.id) > 0}
                 >
                   {centerOptions.map((option) => (
                     <option key={option} value={option}>{option === 'todos' ? 'Todos los centros' : option}</option>
@@ -1301,7 +1522,6 @@ export default function CoordinadorChecklistView() {
                   value={sessionDate}
                   onChange={(e) => setSessionDate(e.target.value)}
                   className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-600"
-                  disabled={getAssignedJurorsCount(juryChecklist.id) > 0}
                 />
 
                 <input
@@ -1309,7 +1529,6 @@ export default function CoordinadorChecklistView() {
                   value={sessionTime}
                   onChange={(e) => setSessionTime(e.target.value)}
                   className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus:border-gray-500 dark:focus:ring-gray-600"
-                  disabled={getAssignedJurorsCount(juryChecklist.id) > 0}
                 />
               </div>
 
@@ -1320,7 +1539,6 @@ export default function CoordinadorChecklistView() {
                     checked={onlyAvailable}
                     onChange={(e) => setOnlyAvailable(e.target.checked)}
                     className="h-4 w-4 rounded border-gray-600 text-gray-800 focus:ring-gray-300"
-                    disabled={getAssignedJurorsCount(juryChecklist.id) > 0}
                   />
                   Mostrar solo jurados disponibles en ese horario
                 </label>
@@ -1328,6 +1546,7 @@ export default function CoordinadorChecklistView() {
                   Seleccionados: {selectedJurorIds.length}
                 </span>
               </div>
+
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 {filteredJurors.map((juror) => {
                   const selected = selectedJurorIds.includes(juror.id)
@@ -1341,7 +1560,6 @@ export default function CoordinadorChecklistView() {
                         ? 'border-lime-500 bg-lime-100 shadow dark:border-lime-400 dark:bg-lime-900/20'
                         : 'border-gray-200 bg-white hover:border-lime-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-shadowBlue'
                         }`}
-                      disabled={getAssignedJurorsCount(juryChecklist.id) > 0}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
